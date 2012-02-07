@@ -51,7 +51,7 @@ object YourProjectBuild extends Build {
   
   lazy val rdfModel = Project(
     id = "rdf-model",
-    base = file("rdf-model"),
+    base = file("core"),
     settings = buildSettings
   ) dependsOn (algebraic)
 
