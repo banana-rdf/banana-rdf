@@ -2,7 +2,7 @@ package org.w3.rdf
 
 import org.w3.algebraic._
 
-trait Model {
+trait Module {
 
   trait GraphInterface extends Iterable[Triple] { self =>
     def ++(other: Graph): Graph

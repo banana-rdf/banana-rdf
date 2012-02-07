@@ -2,7 +2,7 @@ package org.w3.rdf
 
 import org.w3.algebraic._
 
-object ScalaModel extends Model {
+object ScalaModule extends Module {
 
 
   case class Graph(triples: Set[Triple]) extends GraphInterface {

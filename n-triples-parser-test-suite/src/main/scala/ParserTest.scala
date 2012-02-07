@@ -6,7 +6,7 @@ import org.junit.Assert._
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class NTriplesParserTest[M <: Model](val m: M) {
+abstract class NTriplesParserTest[M <: Module](val m: M) {
 
   val parser: NTriplesParser[m.type]
   val isomorphism: GraphIsomorphism[m.type]

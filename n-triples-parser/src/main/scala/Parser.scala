@@ -11,7 +11,7 @@ import nomo.Errors.{TreeError, Single}
  * @since 02/02/2012
  */
 
-class NTriplesParser[M <: Model](val m: M) {
+class NTriplesParser[M <: Module](val m: M) {
   
   import m._
 
