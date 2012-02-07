@@ -30,7 +30,7 @@ object ScalaModule extends Module {
   case class NodeLiteral(lit: Literal) extends Node
   object NodeLiteral extends AlgebraicDataType1[Literal, NodeLiteral]
 
-  case class IRI(iri: String) { override def toString = '"' + iri + '"' }
+  case class IRI(iri: String) { override def toString = '<' + iri + '>' }
   object IRI extends AlgebraicDataType1[String, IRI]
 
   case class BNode(label: String)

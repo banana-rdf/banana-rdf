@@ -73,8 +73,8 @@ object YourProjectBuild extends Build {
   lazy val transformerTestSuite = Project(
     id = "transformer-testsuite",
     base = file("transformer-testsuite"),
-    settings = buildSettings
-  ) dependsOn (transformer, graphIsomorphism)
+    settings = buildSettings ++ testsuiteDeps
+  ) dependsOn (rdfModel, transformer, graphIsomorphism, jena)
 
   lazy val jena = Project(
     id = "jena",
@@ -91,7 +91,7 @@ object YourProjectBuild extends Build {
   lazy val nTriplesParserTestSuite = Project(
     id = "n-triples-parser-test-suite",
     base = file("n-triples-parser-test-suite"),
-    settings = buildSettings ++ testsuiteDeps
+    settings = buildSettings ++ testsuiteDeps ++ jenaDeps
   ) dependsOn (nTriplesParser, graphIsomorphism)
 
 }

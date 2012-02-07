@@ -73,7 +73,7 @@ object JenaModule extends Module {
       if (node.isLiteral) Some(node.asInstanceOf[Node_Literal]) else None
   }
 
-  case class IRI(iri: String) { override def toString = '"' + iri + '"' }
+  case class IRI(iri: String) { override def toString = '<' + iri + '>' }
   object IRI extends AlgebraicDataType1[String, IRI]
 
   type BNode = JenaNode
