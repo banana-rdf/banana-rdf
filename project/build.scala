@@ -41,6 +41,9 @@ object YourProjectBuild extends Build {
       rdfModel,
       graphIsomorphism,
       transformer,
+      transformerTestSuite,
+      nTriplesParser,
+      nTriplesParserTestSuite,
       jena))
   
   lazy val algebraic = Project(
@@ -66,6 +69,12 @@ object YourProjectBuild extends Build {
     base = file("transformer"),
     settings = buildSettings
   ) dependsOn (rdfModel)
+
+  lazy val transformerTestSuite = Project(
+    id = "transformer-testsuite",
+    base = file("transformer-testsuite"),
+    settings = buildSettings
+  ) dependsOn (transformer, graphIsomorphism)
 
   lazy val jena = Project(
     id = "jena",
