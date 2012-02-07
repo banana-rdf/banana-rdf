@@ -57,22 +57,16 @@ class NTriplesParser[M <: Module](val m: M) {
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   val xsdString = IRI(xsd + "string")
 
-  val plainLit = (P.single('"')>>literal<< P.word("\"")).map(l=> Literal(l.mkString, None, Some(xsdString)))
+  val plainLit = (P.single('"')>>literal<< P.word("\"")).map(l=> l.mkString)
 
   val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
-    case lit ++ None => lit
-    case Literal(lexicalForm, langtag, _) ++ Some(Left(tpe)) => Literal(lexicalForm, None, Some(tpe))
-    case Literal(lexicalForm, _, datatype) ++ Some(Right(langTag)) => Literal(lexicalForm, Some(langTag), datatype)
+    case lexicalForm ++ option => Literal(lexicalForm, option.getOrElse(xsdString))
   }
 
-  val typeFunc = (P.word("^^") >> uriRef).map(tpe => Left(tpe))
-  val langFunc = (P.word("@") >> lang ).map(lng=> Right(lng))
+  val typeFunc = (P.word("^^") >> uriRef)
+  val langFunc = (P.word("@") >> lang )
 
-  val node = uriRef | bnode | fullLiteral map {
-    case n@IRI(_) => NodeIRI(n)
-    case bn@BNode(_) => NodeBNode(bn)
-    case lit@Literal(_, _, _) => NodeLiteral(lit)
-  }
+  val node = uriRef | bnode | fullLiteral
   val pred = uriRef
   val dot = P.single('.')
 

@@ -1,6 +1,7 @@
 package org.w3.rdf
 
 import org.w3.algebraic._
+import org.w3.rdf.ScalaModule.LangTag
 
 object ScalaModule extends Module {
 
@@ -21,25 +22,19 @@ object ScalaModule extends Module {
 
   sealed trait Node
 
-  case class NodeIRI(i: IRI) extends Node
-  object NodeIRI extends AlgebraicDataType1[IRI, NodeIRI]
-
-  case class NodeBNode(b: BNode) extends Node
-  object NodeBNode extends AlgebraicDataType1[BNode, NodeBNode]
-
-  case class NodeLiteral(lit: Literal) extends Node
-  object NodeLiteral extends AlgebraicDataType1[Literal, NodeLiteral]
-
-  case class IRI(iri: String) { override def toString = '<' + iri + '>' }
+  case class IRI(iri: String) extends Node { override def toString = '<' + iri + '>' }
   object IRI extends AlgebraicDataType1[String, IRI]
 
-  case class BNode(label: String)
+  case class BNode(label: String) extends Node
   object BNode extends AlgebraicDataType1[String, BNode]
 
-  case class Literal(lexicalForm: String, langtag: Option[LangTag], datatype: Option[IRI])
-  object Literal extends AlgebraicDataType3[String, Option[LangTag], Option[IRI], Literal]
+  case class Literal(lexicalForm: String, datatype: IRI=xsdString) extends Node
+  object Literal extends AlgebraicDataType2[String, IRI, Literal]
   
-  case class LangTag(s: String)
-  object LangTag extends AlgebraicDataType1[String, LangTag]
+  class LangTag(val s: String) extends IRI(rdfns+s)
+  object LangTag extends AlgebraicDataType1[String, LangTag] {
+    def unapply(lt: LangTag): Option[String] = if (lt.s != null) return Some(lt.s) else None
+    def apply(tag: String): LangTag = new LangTag(tag)
+  }
 
 }

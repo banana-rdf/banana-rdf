@@ -24,12 +24,12 @@ abstract class NTriplesParserTest[M <: Module](val m: M) {
     implicit val U: Unit = ()
     val parsedGraph = Graph(parser.ntriples(n3).get)
     
-    val ntriples = NodeIRI(IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/"))
+    val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
     val creator = IRI("http://purl.org/dc/elements/1.1/creator")
     val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
-    val dave = NodeLiteral(Literal("Dave Beckett", None, Some(IRI("http://www.w3.org/2001/XMLSchema#string"))))
-    val art = NodeLiteral(Literal("Art Barstow", None, Some(IRI("http://www.w3.org/2001/XMLSchema#string"))))
-    val w3org = NodeIRI(IRI("http://www.w3.org/"))
+    val dave = Literal("Dave Beckett",xsdString)
+    val art = Literal("Art Barstow",xsdString)
+    val w3org = IRI("http://www.w3.org/")
     
     val expected = 
       Graph(
