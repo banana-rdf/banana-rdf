@@ -73,13 +73,13 @@ object JenaModule extends Module {
 //      if (node.isLiteral) Some(node.asInstanceOf[Node_Literal]) else None
 //  }
 
-  type IRI = Node_URI
+  type IRI = JenaNode
   object IRI extends AlgebraicDataType1[String, IRI]  {
     def apply(iriStr: String): IRI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
     def unapply(node: IRI): Option[String] = if (node.isURI) Some(node.getURI) else None
   }
 
-  type BNode = Node_Blank
+  type BNode = JenaNode
   object BNode extends AlgebraicDataType1[String, BNode] {
     def apply(label: String): BNode = {
       val id = AnonId.create(label)
@@ -91,7 +91,7 @@ object JenaModule extends Module {
 
   lazy val mapper = TypeMapper.getInstance
   
-  type Literal = Node_Literal
+  type Literal = JenaNode
   object Literal extends AlgebraicDataType2[String, IRI, Literal] {
     def apply(lit: String, datatype: IRI=xsdString): Literal = {
       val node = datatype match {
@@ -105,14 +105,17 @@ object JenaModule extends Module {
       if (literal.isLiteral)
         Some((
           literal.getLiteralLexicalForm.toString,
-          { val l = literal.getLiteralLanguage; 
-            if (l != "") LangTag(l) else IRI(literal.getLiteralDatatype.getURI)})
+          { val l = literal.getLiteralLanguage;
+            if (l != "") LangTag(l) else {
+              val dtIRI = literal.getLiteralDatatype
+              if (dtIRI!=null) IRI(dtIRI.getURI) else xsdString
+            }})
         )
       else
         None
   }
   
-  case class LangTag(s: String) extends IRI {
+  case class LangTag(s: String) extends Node_URI {
     override lazy val getURI = RDF.getURI+s
 
     override def equals(that: Any) = that match {
@@ -122,6 +125,7 @@ object JenaModule extends Module {
 
     override def hashCode() = getURI.hashCode()
   }
+
   object LangTag extends AlgebraicDataType1[String, LangTag]
 
 }

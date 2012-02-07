@@ -18,14 +18,17 @@ class TransformerTest {
     model.getReader("TURTLE").read(model, new FileReader("jena/src/test/resources/card.ttl"), "http://www.w3.org/People/Berners-Lee/card")
     
     val jenaGraph = JenaModule.Graph.fromJena(model.getGraph)
-//    println(jenaGraph)
+    println(jenaGraph)
     
     val scalaGraph = JenaToScala.transform(jenaGraph)
-    
+
     val jenaGraphAgain: JenaModule.Graph = ScalaToJena.transform(scalaGraph)
-    
-//    println(jenaGraphAgain)
-    
+
+
+    val newModel= ModelFactory.createModelForGraph(jenaGraphAgain.jenaGraph)
+
+    newModel.getWriter("TURTLE").write(newModel,System.out,null)
+
     // assertTrue(jenaGraph.jenaGraph isIsomorphicWith jenaGraphAgain.jenaGraph)
     assertTrue(GraphIsomorphismForJenaModel.isIsomorphicWith(jenaGraph, jenaGraphAgain))
     

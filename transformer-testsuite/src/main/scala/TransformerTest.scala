@@ -1,3 +1,4 @@
+import com.hp.hpl.jena.rdf.model.impl.RDFWriterFImpl
 import com.hp.hpl.jena.rdf.model.ModelFactory
 import java.io.{FileReader, File}
 import org.junit.Test
@@ -23,7 +24,10 @@ class TransformerTest[M<: Module](m: M) {
     val scalaGraph = JenaToScala.transform(jenaGraph)
     
     val jenaGraphAgain: JenaModule.Graph = ScalaToJena.transform(scalaGraph)
-    
+
+    val newModel= ModelFactory.createModelForGraph(jenaGraphAgain.jenaGraph)
+
+    newModel.getWriter("TURTLE").write(model,System.out,null)
 //    println(jenaGraphAgain)
     
     // assertTrue(jenaGraph.jenaGraph isIsomorphicWith jenaGraphAgain.jenaGraph)
