@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -x
 
 # adapted from https://gist.github.com/1643715
 
@@ -7,7 +7,7 @@ for i in $(find $HOME/.sbt/boot/scala-2.9.1/org.scala-tools.sbt/sbt/0.11.2/compi
   echo $t
   unzip $i -d $t
   cd $t
-  sed -i API.scala -e 's/sym.isLocalClass || sym.isAnonymousClass || sym.fullName.endsWith(LocalChild)/sym.isLocalClass || sym.isAnonymousClass || sym.fullName.endsWith(LocalChild.toString)/g'
+  sed  -e 's/sym.isLocalClass || sym.isAnonymousClass || sym.fullName.endsWith(LocalChild)/sym.isLocalClass || sym.isAnonymousClass || sym.fullName.endsWith(LocalChild.toString)/g' -i '' API.scala
   rm $i
   zip -r $i .
   cd ..
