@@ -1,0 +1,7 @@
+#!/bin/sh
+
+hg clone https://bitbucket.org/pchiusano/nomo
+cd nomo
+./sbt package
+cp target/scala-2.9.1.final/nomo.jar ../n-triples-parser/lib
+
