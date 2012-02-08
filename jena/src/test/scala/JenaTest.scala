@@ -18,8 +18,7 @@ class TransformerTest {
     model.getReader("TURTLE").read(model, new FileReader("jena/src/test/resources/card.ttl"), "http://www.w3.org/People/Berners-Lee/card")
     
     val jenaGraph = JenaModule.Graph.fromJena(model.getGraph)
-    println(jenaGraph)
-    
+
     val scalaGraph = JenaToScala.transform(jenaGraph)
 
     val jenaGraphAgain: JenaModule.Graph = ScalaToJena.transform(scalaGraph)
