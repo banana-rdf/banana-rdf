@@ -16,7 +16,8 @@ class Transformer[ModelA <: Module, ModelB <: Module](val a: ModelA, val b: Mode
   def transformNode(n: a.Node): b.Node = n match {
     case a.IRI(iri) => b.IRI(iri)
     case a.BNode(label) => b.BNode(label)
-    case a.Literal(literal,a.IRI(datatype)) => b.Literal(literal,b.IRI(datatype))
+    case a.Literal(literal,Right(a.IRI(datatype))) => b.Literal(literal,Right(b.IRI(datatype)))
+    case a.Literal(literal,Left(a.Lang(tag))) => b.Literal(literal,Left(b.Lang(tag)))
   }
   
 }

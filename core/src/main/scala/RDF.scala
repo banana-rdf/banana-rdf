@@ -4,8 +4,8 @@ import org.w3.algebraic._
 
 trait Module {
 
-  val xsdString = IRI("http://www.w3.org/2001/XMLSchema#string")
-  val rdfns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  val xsdStringType = Right(IRI("http://www.w3.org/2001/XMLSchema#string"))
+//  val rdfns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 
 
   trait GraphInterface extends Iterable[Triple] { self =>
@@ -17,7 +17,8 @@ trait Module {
   type IRI <: Node
   type BNode <: Node
   type Literal <: Node
-  type LangTag <: IRI
+  type Lang
+  type LiteralType = Either[Lang,IRI]
 
   trait GraphCompanionObject {
     def empty: Graph
@@ -33,9 +34,9 @@ trait Module {
 
   val BNode: AlgebraicDataType1[String, BNode]
 
-  val Literal: AlgebraicDataType2[String, IRI, Literal]
+  val Literal: AlgebraicDataType2[String,LiteralType, Literal]
 
-  val LangTag: AlgebraicDataType1[String, LangTag]
+  val Lang: AlgebraicDataType1[String, Lang]
 
 }
 

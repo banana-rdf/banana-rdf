@@ -1,7 +1,7 @@
 package org.w3.rdf
 
 import org.w3.algebraic._
-import org.w3.rdf.ScalaModule.LangTag
+import org.w3.rdf.ScalaModule.Lang
 
 object ScalaModule extends Module {
 
@@ -28,13 +28,13 @@ object ScalaModule extends Module {
   case class BNode(label: String) extends Node
   object BNode extends AlgebraicDataType1[String, BNode]
 
-  case class Literal(lexicalForm: String, datatype: IRI=xsdString) extends Node
-  object Literal extends AlgebraicDataType2[String, IRI, Literal]
+  case class Literal(lexicalForm: String, datatype: LiteralType=xsdStringType) extends Node
+  object Literal extends AlgebraicDataType2[String, LiteralType, Literal]
   
-  class LangTag(val s: String) extends IRI(rdfns+s)
-  object LangTag extends AlgebraicDataType1[String, LangTag] {
-    def unapply(lt: LangTag): Option[String] = if (lt.s != null) return Some(lt.s) else None
-    def apply(tag: String): LangTag = new LangTag(tag)
+  class Lang(val tag: String)
+  object Lang extends AlgebraicDataType1[String, Lang] {
+    def unapply(lt: Lang): Option[String] = if (lt.tag != null) return Some(lt.tag) else None
+    def apply(tag: String): Lang = new Lang(tag)
   }
 
 }
