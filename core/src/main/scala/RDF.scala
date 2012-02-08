@@ -3,8 +3,8 @@ package org.w3.rdf
 import org.w3.algebraic._
 
 trait Module {
-
-  val xsdStringType = Right(IRI("http://www.w3.org/2001/XMLSchema#string"))
+  val xsdString = IRI("http://www.w3.org/2001/XMLSchema#string")
+  val xsdStringType = Right(xsdString)
 //  val rdfns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 
 

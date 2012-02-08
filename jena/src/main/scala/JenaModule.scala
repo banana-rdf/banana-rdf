@@ -78,7 +78,7 @@ object JenaModule extends Module {
       datatype.fold(
         lang=> JenaNode.createLiteral(lit,lang.tag,null) ,
         iri => JenaNode.createLiteral(lit,null, 
-         if (iri eq xsdStringType) null else mapper.getTypeByName(iri.getURI))
+         if (iri eq xsdString) null else mapper.getTypeByName(iri.getURI))
       ).asInstanceOf[Node_Literal]
     }
     
@@ -87,9 +87,9 @@ object JenaModule extends Module {
         Some((
           literal.getLiteralLexicalForm.toString,
           { val l = literal.getLiteralLanguage;
-            if (l != "") Left(Lang(l)) else {
+            if ("" != l ) Left(Lang(l)) else {
               val dtIRI = literal.getLiteralDatatype
-              if (dtIRI!=null) Right(IRI(dtIRI.getURI)) else xsdStringType
+              if (null==dtIRI) xsdStringType else Right(IRI(dtIRI.getURI))
             }})
         )
       else

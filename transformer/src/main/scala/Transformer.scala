@@ -17,10 +17,10 @@ class Transformer[ModelA <: Module, ModelB <: Module](val a: ModelA, val b: Mode
     case a.IRI(iri) => b.IRI(iri)
     case a.BNode(label) => b.BNode(label)
     case a.Literal(literal,dt) => {
-      dt.fold(
-      { case a.Lang(tag) => b.Literal(literal,Left(b.Lang(tag)))},
-      { case a.IRI(iri)  => if (iri eq a.xsdStringType) b.Literal(literal,b.xsdStringType)
-          else b.Literal(literal,Right(b.IRI(iri))) }
+      if (a.xsdStringType eq dt) b.Literal(literal,b.xsdStringType)
+      else dt.fold(
+      { case a.Lang(tag) => b.Literal(literal,Left(b.Lang(tag)))   },
+      { case a.IRI(iri)  => b.Literal(literal,Right(b.IRI(iri)))   }
       )
     }
   }
