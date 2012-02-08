@@ -1,1 +1,5 @@
 An RDF library in Scala.
+
+---
+requires scala 2.10M1 (Magic 1)
+and needs a patch. Run ./sbt to download then ./patch-sbt
