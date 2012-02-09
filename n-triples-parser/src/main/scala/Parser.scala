@@ -61,11 +61,12 @@ class NTriplesParser[M <: Module](val m: M) {
   val plainLit = (P.single('"')>>literal<< P.word("\"")).map(l=> l.mkString)
 
   val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
-    case lexicalForm ++ option => Literal(lexicalForm, option.getOrElse(xsdStringType))
+    case lexicalForm ++ option => Literal(lexicalForm, option.getOrElse(xsdStringIRI))
   }
 
-  val typeFunc = (P.word("^^") >> uriRef).map(i=>Right(i))
-  val langFunc = (P.word("@") >> lang ).map(l=>Left(l))
+  val typeFunc = (P.word("^^") >> uriRef)
+  val langFunc = (P.word("@") >> lang )
+
 
   val node = uriRef | bnode | fullLiteral
   val pred = uriRef

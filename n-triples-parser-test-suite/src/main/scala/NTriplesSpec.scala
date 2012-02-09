@@ -100,7 +100,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
      )
    }
 
-   property("langLiteral") = forAll(genLangLiteral) { case tst @ m.Literal(lit,Left(Lang(lang))) =>
+   property("langLiteral") = forAll(genLangLiteral) { case tst @ m.Literal(lit,Lang(lang)) =>
      import NTriplesParser._
      val testStr = "\"" + toLiteral(lit) + "\"@" + lang
      val res = P.fullLiteral(testStr)
@@ -108,7 +108,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
          ( res.isSuccess :| "res was failure" ) &&
          ({val Literal(litres,x) = res.get;
            litres == lit} :| "literal string does not match") &&
-         ({val Literal(_,Left(Lang(langRes))) =res.get
+         ({val Literal(_,Lang(langRes)) =res.get
            langRes == lang} :| "literal is not a lang literal") &&
          ( { res.get == tst } :| "the final equality fails")
      )
@@ -128,10 +128,10 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
      all(res :_*)
    }
 
-  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ m.Literal(str,Right(IRI(uri))) =>
+  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ m.Literal(str,IRI(uri)) =>
     val literal = '"'+NTriplesParser.toLiteral(str)+"\"^^<"+uri+">"
     val res = P.fullLiteral(literal)
-    val Literal(lit,Right(IRI(dt_iri))) = res.get
+    val Literal(lit,IRI(dt_iri)) = res.get
     ("literal="+literal+"\nresult = "+res) |: all (
        res.isSuccess  &&
        lit == str &&
@@ -146,15 +146,15 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
    * but well there would have to be more need than just a toString method!
    */
   def turtleStr(n: Node): String= n match {
-    case IRI(iri) => "<"+iri+">"
-    case Literal(txt,typ) => '"'+NTriplesParser.toLiteral(txt)+"\"" +
-      typ.fold({
-        case Lang(tag) => "@" + tag
-      }, {
-        case x if x==xsdString => "";
-        case IRI(iri) => "^^<" + iri + ">"
-      })
     case BNode(tag) => "_:"+tag
+    case IRI(iri) => "<"+iri+">"
+    case Literal(txt,typ) => '"' + NTriplesParser.toLiteral(txt) + "\"" + {
+      typ match {
+        case Lang(tag) => "@" + tag
+        case x: IRI if x == xsdStringIRI => "";
+        case IRI(iri) => "^^<" + iri + ">"
+      }
+    }
   }
   
   property("statement") = forAll(genRelation){ case tr @ Triple(sub,rel,obj) =>

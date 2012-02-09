@@ -28,8 +28,8 @@ abstract class NTriplesParserTest[M <: Module](val m: M) {
     val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
     val creator = IRI("http://purl.org/dc/elements/1.1/creator")
     val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
-    val dave = Literal("Dave Beckett",xsdStringType)
-    val art = Literal("Art Barstow",xsdStringType)
+    val dave = Literal("Dave Beckett",xsdStringIRI)
+    val art = Literal("Art Barstow")
     val w3org = IRI("http://www.w3.org/")
     
     val expected = 

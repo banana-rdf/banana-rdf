@@ -7,6 +7,7 @@ import com.hp.hpl.jena.datatypes.{RDFDatatype, TypeMapper}
 
 import org.w3.algebraic._
 import com.hp.hpl.jena.vocabulary.{RDF, XSD}
+import util.MurmurHash3
 
 object JenaModule extends Module {
 
@@ -73,31 +74,44 @@ object JenaModule extends Module {
   lazy val mapper = TypeMapper.getInstance
   
   type Literal = JenaNode
-  object Literal extends LiteralDataType[String, Literal] {
-    def apply(lit: String, datatype: LiteralType): Literal = {
-      datatype.fold(
-        lang=> JenaNode.createLiteral(lit,lang.tag,null) ,
-        iri => JenaNode.createLiteral(lit,null, 
-         if (iri eq xsdString) null else mapper.getTypeByName(iri.getURI))
-      ).asInstanceOf[Node_Literal]
+  object Literal extends AlgebraicDataType2[String, IRI, Literal] with Function1[String, Literal] {
+    def apply(lexicalForm: String) = apply(lexicalForm, xsdStringIRI)
+
+    def apply(lexicalForm: String, dataType: IRI) = {
+      dataType match {
+        case Lang(tag) => JenaNode.createLiteral(lexicalForm, tag, null)
+        case IRI(iri) => JenaNode.createLiteral(lexicalForm, null,
+          if (iri eq xsdString) null else mapper.getTypeByName(iri))
+      }
     }
-    
-    def unapply(literal: Literal): Option[(String, LiteralType)] =
-      if (literal.isLiteral)
-        Some((
-          literal.getLiteralLexicalForm.toString,
-          { val l = literal.getLiteralLanguage;
-            if ("" != l ) Left(Lang(l)) else {
-              val dtIRI = literal.getLiteralDatatype
-              if (null==dtIRI) xsdStringType else Right(IRI(dtIRI.getURI))
-            }})
-        )
-      else
-        None
+
+    def unapply(literal: Literal): Option[(String, IRI)] = {
+      val lang = literal.getLiteralLanguage;
+      val lexicalForm = literal.getLiteralLexicalForm
+      if ("" != lang) Some(lexicalForm, Lang(lang))
+      else {
+        val dtIRI = literal.getLiteralDatatype
+        val dataType = if (null == dtIRI) xsdStringIRI else IRI(dtIRI.getURI)
+        Some((lexicalForm, dataType))
+      }
+    }
   }
-  
-  case class Lang(tag: String)
 
-  object Lang extends AlgebraicDataType1[String, Lang]
 
+
+
+  //IRI should be composed of pieces, then tag can be a part of IRI, perhaps a  the rdfLang+"_"+tag be
+  //the full IRI
+  class Lang(val tag: String) extends Node_URI(rdfLang) {
+    override def equals(obj: Any) = obj match {
+      case otherlang: Lang => otherlang.tag == tag
+      case _ => false
+    }
+    override lazy val hashCode = MurmurHash3.stringHash(tag)
+  }
+
+  object Lang extends AlgebraicDataType1[String, Lang] {
+    def unapply(lt: Lang): Option[String] = if (lt.tag != null) return Some(lt.tag) else None
+    def apply(tag: String): Lang = new Lang(tag)
+  }
 }

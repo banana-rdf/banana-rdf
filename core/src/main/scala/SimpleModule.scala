@@ -1,7 +1,7 @@
 package org.w3.rdf
 
 import org.w3.algebraic._
-import org.w3.rdf.ScalaModule.Lang
+import util.{MurmurHash3, MurmurHash}
 
 object ScalaModule extends Module {
 
@@ -28,15 +28,19 @@ object ScalaModule extends Module {
   case class BNode(label: String) extends Node
   object BNode extends AlgebraicDataType1[String, BNode]
 
-  case class Literal(lexicalForm: String, datatype: LiteralType) extends Node
-  object Literal extends LiteralDataType[String, Literal]
-  
-  class Lang(val tag: String) {
+  case class Literal protected (lexicalForm: String, dataType: IRI) extends Node
+  object Literal extends AlgebraicDataType2[String, IRI, Literal] with Function1[String, Literal] {
+    def apply(lexicalForm: String) = apply(lexicalForm, xsdStringIRI)
+  }
+
+  //IRI should be composed of pieces, then tag can be a part of IRI, perhaps a  the rdfLang+"_"+tag be
+  //the full IRI
+  class Lang(val tag: String) extends IRI(rdfLang) {
     override def equals(obj: Any) = obj match {
       case otherlang: Lang => otherlang.tag == tag
       case _ => false
     }
-    override def hashCode() = tag.hashCode()
+    override lazy val hashCode = MurmurHash3.stringHash(tag)
   }
   object Lang extends AlgebraicDataType1[String, Lang] {
     def unapply(lt: Lang): Option[String] = if (lt.tag != null) return Some(lt.tag) else None
