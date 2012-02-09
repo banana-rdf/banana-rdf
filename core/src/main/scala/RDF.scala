@@ -5,7 +5,6 @@ import org.w3.algebraic._
 trait Module {
   val xsdString = IRI("http://www.w3.org/2001/XMLSchema#string")
   val xsdStringType = Right(xsdString)
-//  val rdfns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 
 
   trait GraphInterface extends Iterable[Triple] { self =>
@@ -34,11 +33,20 @@ trait Module {
 
   val BNode: AlgebraicDataType1[String, BNode]
 
-  val Literal: AlgebraicDataType2[String,LiteralType, Literal]
+  val Literal: LiteralDataType[String, Literal]
 
   val Lang: AlgebraicDataType1[String, Lang]
 
+  //attempt to get an optional apply
+  trait LiteralDataType[String, Literal] extends AlgebraicDataType2[String,  LiteralType, Literal] {
+    def apply(lexicalForm: String): Literal = apply(lexicalForm, xsdStringType)
+  }
+
+  implicit def iri2Right(iri: IRI) = Right(iri)
+  implicit def lang2Left(lang: Lang) = Left(lang)
+
 }
+
 
 
 

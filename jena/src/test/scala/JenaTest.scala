@@ -1,12 +1,11 @@
-package org.w3.rdf
+package org.w3.rdf.test
 
 import org.junit.Test
 import org.junit.Assert._
 import java.io._
-import com.hp.hpl.jena._
 import com.hp.hpl.jena.rdf.model._
-import com.hp.hpl.jena.graph._
 import org.w3.rdf.jena._
+import org.w3.rdf.GraphIsomorphismForJenaModel
 
 class TransformerTest {
   

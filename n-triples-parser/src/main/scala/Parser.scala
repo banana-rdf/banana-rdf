@@ -23,7 +23,8 @@ class NTriplesParser[M <: Module](val m: M) {
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
 
-  val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),pos => Single("digit",Some(pos))).map(l => Lang(l.get))
+  val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),
+    pos => Single("not a legal lang tag",Some(pos))).map(l => Lang(l.get))
 
   val space = P.takeWhile( c => c == ' '|| c == '\t' )
   val anySpace =  P.takeWhile(_.isWhitespace )
@@ -63,8 +64,8 @@ class NTriplesParser[M <: Module](val m: M) {
     case lexicalForm ++ option => Literal(lexicalForm, option.getOrElse(xsdStringType))
   }
 
-  val typeFunc = (P.word("^^") >> uriRef).map(Right(_))
-  val langFunc = (P.word("@") >> lang ).map(Left(_))
+  val typeFunc = (P.word("^^") >> uriRef).map(i=>Right(i))
+  val langFunc = (P.word("@") >> lang ).map(l=>Left(l))
 
   val node = uriRef | bnode | fullLiteral
   val pred = uriRef
@@ -76,7 +77,7 @@ class NTriplesParser[M <: Module](val m: M) {
 
 }
 
-object NTripleParser {
+object NTriplesParser {
 
   val hexChar = Array( '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
 

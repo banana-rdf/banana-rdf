@@ -28,10 +28,16 @@ object ScalaModule extends Module {
   case class BNode(label: String) extends Node
   object BNode extends AlgebraicDataType1[String, BNode]
 
-  case class Literal(lexicalForm: String, datatype: LiteralType=xsdStringType) extends Node
-  object Literal extends AlgebraicDataType2[String, LiteralType, Literal]
+  case class Literal(lexicalForm: String, datatype: LiteralType) extends Node
+  object Literal extends LiteralDataType[String, Literal]
   
-  class Lang(val tag: String)
+  class Lang(val tag: String) {
+    override def equals(obj: Any) = obj match {
+      case otherlang: Lang => otherlang.tag == tag
+      case _ => false
+    }
+    override def hashCode() = tag.hashCode()
+  }
   object Lang extends AlgebraicDataType1[String, Lang] {
     def unapply(lt: Lang): Option[String] = if (lt.tag != null) return Some(lt.tag) else None
     def apply(tag: String): Lang = new Lang(tag)

@@ -73,8 +73,8 @@ object JenaModule extends Module {
   lazy val mapper = TypeMapper.getInstance
   
   type Literal = JenaNode
-  object Literal extends AlgebraicDataType2[String, LiteralType, Literal] {
-    def apply(lit: String, datatype: LiteralType=xsdStringType): Literal = {
+  object Literal extends LiteralDataType[String, Literal] {
+    def apply(lit: String, datatype: LiteralType): Literal = {
       datatype.fold(
         lang=> JenaNode.createLiteral(lit,lang.tag,null) ,
         iri => JenaNode.createLiteral(lit,null, 

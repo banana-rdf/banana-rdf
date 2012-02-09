@@ -20,9 +20,12 @@ object YourProjectBuild extends Build {
   import BuildSettings._
   
   val junitInterface = "com.novocode" % "junit-interface" % "0.8"
+
+  val scalacheck = "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
   
   val testsuiteDeps =
-    Seq(libraryDependencies += junitInterface)
+    Seq(libraryDependencies += junitInterface,
+        libraryDependencies += scalacheck)
   
   val testDeps =
     Seq(libraryDependencies += junitInterface % "test")

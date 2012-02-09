@@ -1,7 +1,8 @@
-package org.w3.rdf
+package org.w3.rdf.test
 
 import org.junit.Test
 import org.junit.Assert._
+import org.w3.rdf.{GraphIsomorphism, NTriplesParser, Module}
 
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
