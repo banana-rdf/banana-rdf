@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2012 Henry Story
+ * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
+ */
+
 package org.w3.rdf
 
 import nomo._

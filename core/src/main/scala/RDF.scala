@@ -22,7 +22,7 @@ trait Module {
   type Graph <: GraphInterface
   type Triple
   type Node
-  type IRIWorkAround <: Node
+  type IRIWorkAround <: Node  //todo: remove when scala 2.10M1 bug is fixed. check tag without_scala_2.10_workaround
   type IRI <: IRIWorkAround
   type BNode <: Node
   type Literal <: Node
