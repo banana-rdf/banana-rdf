@@ -22,10 +22,11 @@ trait Module {
   type Graph <: GraphInterface
   type Triple
   type Node
-  type IRI <: Node
+  type IRIWorkAround <: Node
+  type IRI <: IRIWorkAround
   type BNode <: Node
   type Literal <: Node
-  type Lang <: IRI
+  type Lang <: IRIWorkAround
 
   trait GraphCompanionObject {
     def empty: Graph
@@ -41,7 +42,7 @@ trait Module {
 
   val BNode: AlgebraicDataType1[String, BNode]
 
-  val Literal: AlgebraicDataType2[String, IRI, Literal] with Function1[String, Literal]
+  val Literal: AlgebraicDataType2[String, IRIWorkAround, Literal] with Function1[String, Literal]
 
   val Lang: AlgebraicDataType1[String, Lang]
 

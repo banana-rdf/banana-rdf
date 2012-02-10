@@ -52,9 +52,9 @@ object JenaModule extends Module {
   type Node = JenaNode
   object Node {
     def unapply(node: JenaNode): Option[Node] =
-      if (node.isURI || node.isBlank || node.isLiteral) Some(node) else None
+      if (node.isInstanceOf[LangInt] || node.isURI || node.isBlank || node.isLiteral) Some(node) else None
   }
-
+  type IRIWorkAround = JenaNode
   type IRI = JenaNode
   object IRI extends AlgebraicDataType1[String, IRI]  {
     def apply(iriStr: String): IRI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
@@ -102,16 +102,19 @@ object JenaModule extends Module {
 
   //IRI should be composed of pieces, then tag can be a part of IRI, perhaps a  the rdfLang+"_"+tag be
   //the full IRI
-  class Lang(val tag: String) extends Node_URI(rdfLang) {
+  class LangInt(val tag: String) extends Node_URI(rdfLang)  {
     override def equals(obj: Any) = obj match {
-      case otherlang: Lang => otherlang.tag == tag
+      case otherlang: LangInt => otherlang.tag == tag
       case _ => false
     }
     override lazy val hashCode = MurmurHash3.stringHash(tag)
   }
-
+  type Lang = JenaNode
   object Lang extends AlgebraicDataType1[String, Lang] {
-    def unapply(lt: Lang): Option[String] = if (lt.tag != null) return Some(lt.tag) else None
-    def apply(tag: String): Lang = new Lang(tag)
+    def unapply(lt: Lang): Option[String] = lt match {
+      case li :LangInt if   li.tag != null => Some(li.tag)
+      case _ => None
+    }
+    def apply(tag: String): Lang = new LangInt(tag)
   }
 }

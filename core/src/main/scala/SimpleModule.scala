@@ -22,29 +22,27 @@ object ScalaModule extends Module {
 
   sealed trait Node
 
-  case class IRI(iri: String) extends Node { override def toString = '<' + iri + '>' }
+  trait IRIWA extends Node {
+    val iri: String
+   }
+  type IRIWorkAround = IRIWA
+  case class IRI(iri: String) extends IRIWA { override def toString = '<' + iri + '>' }
   object IRI extends AlgebraicDataType1[String, IRI]
 
   case class BNode(label: String) extends Node
   object BNode extends AlgebraicDataType1[String, BNode]
 
-  case class Literal protected (lexicalForm: String, dataType: IRI) extends Node
-  object Literal extends AlgebraicDataType2[String, IRI, Literal] with Function1[String, Literal] {
+  case class Literal protected (lexicalForm: String, dataType: IRIWorkAround) extends Node
+  object Literal extends AlgebraicDataType2[String, IRIWorkAround, Literal] with Function1[String, Literal] {
     def apply(lexicalForm: String) = apply(lexicalForm, xsdStringIRI)
   }
 
   //IRI should be composed of pieces, then tag can be a part of IRI, perhaps a  the rdfLang+"_"+tag be
   //the full IRI
-  class Lang(val tag: String) extends IRI(rdfLang) {
-    override def equals(obj: Any) = obj match {
-      case otherlang: Lang => otherlang.tag == tag
-      case _ => false
-    }
-    override lazy val hashCode = MurmurHash3.stringHash(tag)
+  case class Lang(val tag: String) extends IRIWA {
+    val iri = rdfLang
+    override def toString = "@"+tag
   }
-  object Lang extends AlgebraicDataType1[String, Lang] {
-    def unapply(lt: Lang): Option[String] = if (lt.tag != null) return Some(lt.tag) else None
-    def apply(tag: String): Lang = new Lang(tag)
-  }
+  object Lang extends AlgebraicDataType1[String, Lang]
 
 }
