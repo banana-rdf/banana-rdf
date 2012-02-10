@@ -1,3 +1,4 @@
+
 package org.w3.rdf.test
 
 import org.junit.Test
@@ -34,8 +35,7 @@ class TransformerTest {
   
 }
 
-class JenaNTriplesParserTest extends NTriplesParserTest[JenaModule.type](JenaModule) {
-  val parser = JenaNTriplesParser
+object JenaNTriplesParserTest extends NTriplesParserTest(JenaModule, JenaNTriplesParser) {
   val isomorphism = GraphIsomorphismForJenaModel
 }
 

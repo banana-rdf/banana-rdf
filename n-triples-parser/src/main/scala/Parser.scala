@@ -16,12 +16,11 @@ import nomo.Errors.{TreeError, Single}
  * @since 02/02/2012
  */
 
-class NTriplesParser[M <: Module](val m: M) {
+class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X, U]) {
   
   import m._
 
   //setup, should be in type
-  val P = Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Unit](4))
   implicit def toTreeError(msg: String): Errors.TreeError = Errors.Single(msg, None)
   implicit val U: Unit = ()
   //end setup
@@ -29,7 +28,7 @@ class NTriplesParser[M <: Module](val m: M) {
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
 
   val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),
-    pos => Single("not a legal lang tag",Some(pos))).map(l => Lang(l.get))
+    pos => P.err.single('!',pos)).map(l => Lang(l.get.toString))
 
   val space = P.takeWhile( c => c == ' '|| c == '\t' )
   val anySpace =  P.takeWhile(_.isWhitespace )
@@ -37,10 +36,10 @@ class NTriplesParser[M <: Module](val m: M) {
   def isUriChar(c: Char) = ( ! c.isWhitespace) && c != '<' && c != '>'
 
 
-  val uriRef = ( P.single('<') >> P.takeWhile(isUriChar(_) ) << P.single('>')).map(i=>IRI(i.get))
+  val uriRef = ( P.single('<') >> P.takeWhile(isUriChar(_) ) << P.single('>')).map(i=>IRI(i.get.toString))
   import P.++
   
-  val bnode = P.word("_:")>>P.takeWhile(_.isLetterOrDigit).map (n=>BNode(n.get))
+  val bnode = P.word("_:")>>P.takeWhile(_.isLetterOrDigit).map (n=>BNode(n.get.toString))
 
 
   val lit_u = (P.word("\\u")>> P.any++P.any++P.any++P.any) map {
@@ -56,7 +55,7 @@ class NTriplesParser[M <: Module](val m: M) {
   val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
 
   val literal = ( lit_u | lit_U | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
-      P.takeWhile1(c=> c!= '\\' && c != '"', pos => Single("no char!",Some(pos)))
+      P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single(' ',pos))
     ).many
 
   val xsd = "http://www.w3.org/2001/XMLSchema#"

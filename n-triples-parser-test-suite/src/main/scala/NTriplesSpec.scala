@@ -13,6 +13,8 @@ import scala.util.Random
 import collection.immutable.NumericRange
 import collection.mutable.HashSet
 import org.w3.rdf.{NTriplesParser, Module}
+import nomo.{Accumulators, Errors, Parsers, Monotypic}
+import nomo.Accumulators.Position
 
 /**
  * @author bblfish
@@ -22,7 +24,8 @@ import org.w3.rdf.{NTriplesParser, Module}
 class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   
   implicit val U: Unit = ()
-  val P: NTriplesParser[m.type] = new NTriplesParser(m)
+  val P: NTriplesParser[M, String, TreeError, Position, Unit]= new NTriplesParser(m,
+    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Unit](4)))
   import m._
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
     "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
