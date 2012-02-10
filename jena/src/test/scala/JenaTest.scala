@@ -26,7 +26,7 @@ class TransformerTest {
 
     val newModel= ModelFactory.createModelForGraph(jenaGraphAgain.jenaGraph)
 
-    newModel.getWriter("TURTLE").write(newModel,System.out,null)
+//    newModel.getWriter("TURTLE").write(newModel,System.out,null)
 
     // assertTrue(jenaGraph.jenaGraph isIsomorphicWith jenaGraphAgain.jenaGraph)
     assertTrue(GraphIsomorphismForJenaModel.isIsomorphicWith(jenaGraph, jenaGraphAgain))
@@ -35,7 +35,14 @@ class TransformerTest {
   
 }
 
-object JenaNTriplesParserTest extends NTriplesParserTest(JenaModule, JenaNTriplesParser) {
+class JenaNTriplesParserStringTest extends NTriplesParserTest(JenaNTriplesStringParser) {
   val isomorphism = GraphIsomorphismForJenaModel
+
+   def toF(string: String) = string
 }
 
+class JenaNTriplesParserSeqTest extends NTriplesParserTest(JenaNTriplesSeqParser) {
+  val isomorphism = GraphIsomorphismForJenaModel
+
+   def toF(string: String) = string.toSeq
+}

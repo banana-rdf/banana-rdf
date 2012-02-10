@@ -36,10 +36,10 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   def isUriChar(c: Char) = ( ! c.isWhitespace) && c != '<' && c != '>'
 
 
-  val uriRef = ( P.single('<') >> P.takeWhile(isUriChar(_) ) << P.single('>')).map(i=>IRI(i.get.toString))
+  val uriRef = ( P.single('<') >> P.takeWhile(isUriChar(_) ) << P.single('>')).map(i=>IRI(i.toString))
   import P.++
   
-  val bnode = P.word("_:")>>P.takeWhile(_.isLetterOrDigit).map (n=>BNode(n.get.toString))
+  val bnode = P.word("_:")>>P.takeWhile(_.isLetterOrDigit).map (n=>BNode(n.toString))
 
 
   val lit_u = (P.word("\\u")>> P.any++P.any++P.any++P.any) map {
