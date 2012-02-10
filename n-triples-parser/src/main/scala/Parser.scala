@@ -55,7 +55,7 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
 
   val literal = ( lit_u | lit_U | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
-      P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single(' ',pos))
+      P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single('!',pos))
     ).many
 
   val xsd = "http://www.w3.org/2001/XMLSchema#"
@@ -76,7 +76,7 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val pred = uriRef
   val dot = P.single('.')
 
-  val sentence = (node++(space>>pred)++(space>>node)).map(s=>Triple(s._1._1,s._1._2,s._2)) << (space++dot)
+  val sentence = (node++(space>>pred)++(space>>node)).map{case s++r++o=>Triple(s,r,o)} << (space++dot)
   val ntriples = anySpace >> (sentence delimit anySpace )
   
 
