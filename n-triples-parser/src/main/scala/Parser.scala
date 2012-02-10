@@ -9,8 +9,11 @@ import nomo._
 import nomo.Errors.{TreeError, Single}
 
 /**
- * Parser for the simplest of all RDF encodings: NTriples
+ * Async Parser for the simplest of all RDF encodings: NTriples
  * http://www.w3.org/TR/rdf-testcases/#ntriples
+ *
+ * This is using the nomo library that is being developed
+ * here:  https://bitbucket.org/pchiusano/nomo
  *
  * @author bblfish
  * @since 02/02/2012
