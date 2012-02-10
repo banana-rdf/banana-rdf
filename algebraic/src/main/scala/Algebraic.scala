@@ -1,5 +1,14 @@
 package org.w3.algebraic
 
+/**
+ * Why are these called Algebraic DataTypes?
+ * A good answer can be found in this very readable blog post
+ * "The Algebra of Data, and the Calculus of Mutation"
+ * http://blog.lab49.com/archives/3011
+ */
+
+
+/* does what it says*/
 trait UnApply0[R] {
   def unapply(r: R): Boolean
 }
