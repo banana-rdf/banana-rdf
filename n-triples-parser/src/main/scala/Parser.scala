@@ -29,6 +29,8 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   //end setup
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
+  val hexChar = "1234567890ABCDEFabcdef".seq
+  def hex = P.anyOf(hexChar)
 
   val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),
     pos => P.err.single('!',pos)).map(l => Lang(l.get.toString))
@@ -45,10 +47,10 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val bnode = P.word("_:")>>P.takeWhile(_.isLetterOrDigit).map (n=>BNode(n.toString))
 
 
-  val lit_u = (P.word("\\u")>> P.any++P.any++P.any++P.any) map {
+  val lit_u = (P.word("\\u")>> hex++hex++hex++hex) map {
     case c1++c2++c3++c4 => Integer.parseInt(new String(Array(c1,c2,c3,c4)),16).toChar
   }
-  val lit_U = (P.word("\\U")>> P.any++P.any++P.any++P.any++P.any++P.any++P.any++P.any) map {
+  val lit_U = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
     case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
   }
   val lt_tab = P.word("\\t").map(c=>0x9.toChar)
