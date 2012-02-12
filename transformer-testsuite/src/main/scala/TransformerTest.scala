@@ -3,7 +3,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory
 import java.io.{FileReader, File}
 import org.junit.Test
 import org.w3.rdf
-import rdf.jena.{JenaModule, ScalaToJena, JenaToScala}
+import rdf.jena.{JenaModule, SimpleToJena, JenaToSimple}
 import rdf.{GraphIsomorphismForJenaModel, Module}
 
 class TransformerTest[M<: Module](m: M) {
@@ -21,9 +21,9 @@ class TransformerTest[M<: Module](m: M) {
     val jenaGraph = JenaModule.Graph.fromJena(model.getGraph)
 //    println(jenaGraph)
     
-    val scalaGraph = JenaToScala.transform(jenaGraph)
+    val graph = JenaToSimple.transform(jenaGraph)
     
-    val jenaGraphAgain: JenaModule.Graph = ScalaToJena.transform(scalaGraph)
+    val jenaGraphAgain: JenaModule.Graph = SimpleToJena.transform(graph)
 
     val newModel= ModelFactory.createModelForGraph(jenaGraphAgain.jenaGraph)
 

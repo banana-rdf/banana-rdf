@@ -3,8 +3,7 @@ package org.w3.rdf
 import org.w3.algebraic._
 import util.{MurmurHash3, MurmurHash}
 
-object ScalaModule extends Module {
-
+object SimpleModule extends Module {
 
   case class Graph(triples: Set[Triple]) extends GraphInterface {
     def iterator = triples.iterator
