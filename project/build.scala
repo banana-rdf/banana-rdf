@@ -41,7 +41,7 @@ object YourProjectBuild extends Build {
     settings = buildSettings,
     aggregate = Seq(
       algebraic,
-      rdfModel,
+      core,
       graphIsomorphism,
       transformer,
       transformerTestSuite,
@@ -55,8 +55,8 @@ object YourProjectBuild extends Build {
     settings = buildSettings
   )
   
-  lazy val rdfModel = Project(
-    id = "rdf-model",
+  lazy val core = Project(
+    id = "core",
     base = file("core"),
     settings = buildSettings
   ) dependsOn (algebraic)
@@ -65,31 +65,31 @@ object YourProjectBuild extends Build {
     id = "graph-isomorphism",
     base = file("graph-isomorphism"),
     settings = buildSettings
-  ) dependsOn (rdfModel)
+  ) dependsOn (core)
 
   lazy val transformer = Project(
     id = "transformer",
     base = file("transformer"),
     settings = buildSettings
-  ) dependsOn (rdfModel)
+  ) dependsOn (core)
 
   lazy val transformerTestSuite = Project(
     id = "transformer-testsuite",
     base = file("transformer-testsuite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (rdfModel, transformer, graphIsomorphism, jena)
+  ) dependsOn (core, transformer, graphIsomorphism, jena)
 
   lazy val jena = Project(
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
-  ) dependsOn (rdfModel, graphIsomorphism, transformer, nTriplesParser, nTriplesParserTestSuite % "test")
+  ) dependsOn (core, graphIsomorphism, transformer, nTriplesParser, nTriplesParserTestSuite % "test")
 
   lazy val nTriplesParser = Project(
     id = "n-triples-parser",
     base = file("n-triples-parser"),
     settings = buildSettings ++ jenaDeps
-  ) dependsOn (rdfModel)
+  ) dependsOn (core)
   
   lazy val nTriplesParserTestSuite = Project(
     id = "n-triples-parser-test-suite",
