@@ -77,7 +77,7 @@ object YourProjectBuild extends Build {
     id = "transformer-testsuite",
     base = file("transformer-testsuite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (core, transformer, graphIsomorphism, jena)
+  ) dependsOn (core, transformer, graphIsomorphism)
 
   lazy val jena = Project(
     id = "jena",

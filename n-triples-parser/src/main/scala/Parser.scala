@@ -67,10 +67,12 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   val xsdString = IRI(xsd + "string")
 
-  val plainLit = (P.single('"')>>literal<< P.word("\"")).map(l=> l.mkString)
+  val plainLit = (P.single('"')>>literal<< P.word("\"")).map(l => l.mkString)
 
   val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
-    case lexicalForm ++ option => Literal(lexicalForm, option.getOrElse(xsdStringIRI))
+    case lexicalForm ++ None => TypedLiteral(lexicalForm, xsdStringIRI)
+    case lexicalForm ++ Some(uriRef@IRI(_)) => TypedLiteral(lexicalForm, uriRef)
+    case lexicalForm ++ Some(lang@Lang(_)) => LangLiteral(lexicalForm, lang)
   }
 
   val typeFunc = (P.word("^^") >> uriRef)

@@ -22,11 +22,12 @@ trait Module {
   type Graph <: GraphInterface
   type Triple
   type Node
-  type IRIWorkAround <: Node  //todo: remove when scala 2.10M1 bug is fixed. check tag without_scala_2.10_workaround
-  type IRI <: IRIWorkAround
+  type IRI <: Node
   type BNode <: Node
   type Literal <: Node
-  type Lang <: IRIWorkAround
+  type TypedLiteral <: Literal
+  type LangLiteral <: Literal
+  type Lang
 
   trait GraphCompanionObject {
     def empty: Graph
@@ -38,12 +39,26 @@ trait Module {
 
   val Triple: AlgebraicDataType3[Node, IRI, Node, Triple]
 
+  trait NodeCompanionObject {
+    def fold[T](node: Node)(funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T
+  }
+  
+  val Node: NodeCompanionObject
+  
   val IRI : AlgebraicDataType1[String, IRI]
 
   val BNode: AlgebraicDataType1[String, BNode]
 
-  val Literal: AlgebraicDataType2[String, IRIWorkAround, Literal] with Function1[String, Literal]
-
+  trait LiteralCompanionObject {
+    def fold[T](literal: Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T
+  }
+  
+  val Literal: LiteralCompanionObject
+  
+  val TypedLiteral: AlgebraicDataType2[String, IRI, TypedLiteral]
+  
+  val LangLiteral: AlgebraicDataType2[String, Lang, LangLiteral]
+  
   val Lang: AlgebraicDataType1[String, Lang]
 
 }

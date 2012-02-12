@@ -50,18 +50,22 @@ object JenaModule extends Module {
   }
 
   type Node = JenaNode
-  object Node {
-    def unapply(node: JenaNode): Option[Node] =
-      if (node.isInstanceOf[LangInt] || node.isURI || node.isBlank || node.isLiteral) Some(node) else None
+  
+  object Node extends NodeCompanionObject {
+    def fold[T](node: Node)(funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T = node match {
+      case iri: IRI => funIRI(iri)
+      case bnode: BNode => funBNode(bnode)
+      case literal: Literal => funLiteral(literal)
+    }
   }
-  type IRIWorkAround = JenaNode
-  type IRI = JenaNode
+  
+  type IRI = Node_URI
   object IRI extends AlgebraicDataType1[String, IRI]  {
     def apply(iriStr: String): IRI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
     def unapply(node: IRI): Option[String] = if (node.isURI) Some(node.getURI) else None
   }
 
-  type BNode = JenaNode
+  type BNode = Node_Blank
   object BNode extends AlgebraicDataType1[String, BNode] {
     def apply(label: String): BNode = {
       val id = AnonId.create(label)
@@ -73,48 +77,53 @@ object JenaModule extends Module {
 
   lazy val mapper = TypeMapper.getInstance
   
-  type Literal = JenaNode
-  object Literal extends AlgebraicDataType2[String, IRI, Literal] with Function1[String, Literal] {
-    def apply(lexicalForm: String) = apply(lexicalForm, xsdStringIRI)
-
-    def apply(lexicalForm: String, dataType: IRI) = {
-      dataType match {
-        case Lang(tag) => JenaNode.createLiteral(lexicalForm, tag, null)
-        case IRI(iri) => JenaNode.createLiteral(lexicalForm, null,
-          if (iri eq xsdString) null else mapper.getTypeByName(iri))
-      }
-    }
-
-    def unapply(literal: Literal): Option[(String, IRI)] = {
-      val lang = literal.getLiteralLanguage;
-      val lexicalForm = literal.getLiteralLexicalForm
-      if ("" != lang) Some(lexicalForm, Lang(lang))
-      else {
-        val dtIRI = literal.getLiteralDatatype
-        val dataType = if (null == dtIRI) xsdStringIRI else IRI(dtIRI.getURI)
-        Some((lexicalForm, dataType))
-      }
+  type Literal = Node_Literal
+  
+  object Literal extends LiteralCompanionObject {
+    /**
+     * LangLiteral are not different types in Jena
+     * we can discriminate on the lang tag presence
+     */
+    def fold[T](literal: Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T = literal match {
+      case tl if literal.getLiteralLanguage != null && literal.getLiteralLanguage != "" => funTL(tl)
+      case ll => funLL(ll)
     }
   }
 
-
-
-
-  //IRI should be composed of pieces, then tag can be a part of IRI, perhaps a  the rdfLang+"_"+tag be
-  //the full IRI
-  class LangInt(val tag: String) extends Node_URI(rdfLang)  {
-    override def equals(obj: Any) = obj match {
-      case otherlang: LangInt => otherlang.tag == tag
-      case _ => false
+  
+  type TypedLiteral = Node_Literal
+  object TypedLiteral extends AlgebraicDataType2[String, IRI, TypedLiteral] {
+    def apply(lexicalForm: String, iri: IRI): TypedLiteral = {
+      val IRI(iriString) = iri
+      JenaNode.createLiteral(lexicalForm, null, mapper.getTypeByName(iriString)).asInstanceOf[Node_Literal]
     }
-    override lazy val hashCode = MurmurHash3.stringHash(tag)
+    def unapply(typedLiteral: TypedLiteral): Option[(String, IRI)] = {
+      val typ = typedLiteral.getLiteralDatatype
+      if (typ != null)
+        Some((typedLiteral.getLiteralLexicalForm.toString, IRI(typ.getURI)))
+      else
+        None
+    }
   }
-  type Lang = JenaNode
+  
+  type LangLiteral = Node_Literal
+  object LangLiteral extends AlgebraicDataType2[String, Lang, LangLiteral] {
+    def apply(lexicalForm: String, lang: Lang): LangLiteral = {
+      val Lang(langString) = lang
+      JenaNode.createLiteral(lexicalForm, langString, mapper.getTypeByName(xsdString)).asInstanceOf[Node_Literal]
+    }
+    def unapply(langLiteral: LangLiteral): Option[(String, Lang)] = {
+      val l = langLiteral.getLiteralLanguage
+      if (l != "")
+        Some((langLiteral.getLiteralLexicalForm.toString, Lang(l)))
+      else
+        None
+    }
+  }
+  
+  type Lang = String
   object Lang extends AlgebraicDataType1[String, Lang] {
-    def unapply(lt: Lang): Option[String] = lt match {
-      case li :LangInt if   li.tag != null => Some(li.tag)
-      case _ => None
-    }
-    def apply(tag: String): Lang = new LangInt(tag)
+    def apply(langString: String) = langString
+    def unapply(lang: Lang) = Some(lang)
   }
 }
