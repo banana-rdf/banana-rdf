@@ -39,6 +39,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#fr",
     "http://www.w3.org/2001/XMLSchema#string")
 
+  def newline = Gen.oneOf(Array("\n","\r","\r\n"))
   def genSimpleLang = Gen.alphaChar.combine(Gen.alphaNumChar) { (oc,ocn)=> Some(""+oc.get+ocn.get) }
   
   def genLangStr = Gen.choose(1,3).flatMap {n=>
@@ -162,7 +163,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   
   property("statement") = forAll(genRelation){ case tr @ Triple(sub,rel,obj) =>
     val statement = turtleStr(sub)+" "+turtleStr(rel)+" "+turtleStr(obj)+" ."
-    val res = P.sentence(statement)
+    val res = P.triple(statement)
     ("statement to parse="+statement+" result ="+ res) |: all  (
       ( res.isSuccess :| "failed test") &&
       ( (res.get == tr) :| "parse produced a different result")
@@ -183,15 +184,18 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
 
   def generateDoc(graph: List[m.Triple]) = {
     val b = new StringBuilder
-    for (m.Triple(s,r,o) <- graph) {
-      b.append(genAnySpace.sample.get)
-      b.append(turtleStr(s))
-      b.append(genSpace.sample.get)
-      b.append(turtleStr(r))
-      b.append(genSpace.sample.get)
-      b.append(turtleStr(o))
-      b.append(genSpace.sample.get)
-      b.append(".")
+    if (graph != Nil) { //the pattern matching below does not work well enough at present
+      for (m.Triple(s, r, o) <- graph) {
+        b.append(genAnySpace.sample.get)
+        b.append(turtleStr(s))
+        b.append(genSpace.sample.get)
+        b.append(turtleStr(r))
+        b.append(genSpace.sample.get)
+        b.append(turtleStr(o))
+        b.append(genSpace.sample.get)
+        b.append(".")
+        b.append(newline.sample.get)
+      }
     }
     b.append(genAnySpace.sample.get)
     b.toString

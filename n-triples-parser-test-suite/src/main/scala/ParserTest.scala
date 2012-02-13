@@ -103,6 +103,7 @@ abstract class NTriplesParserTest[M <: Module,F,E,X](val parser: NTriplesParser[
     val g = parser.m.Graph(res.get)
     val gR = parser.m.Graph(resR.get)
 
+
     assertEquals("The two graphs must have the same size",g.size,gR.size)
 
     assertTrue("the two graphs must be isomorphic",isIsomorphicWith(g,gR))

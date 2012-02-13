@@ -1,7 +1,7 @@
 package org.w3.rdf.test
 
 import org.w3.rdf._
-import jena.JenaModule
+import org.w3.rdf.jena.JenaModule
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
 
 object JenaNTriplesStringParser extends NTriplesParser(JenaModule,

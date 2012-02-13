@@ -29,22 +29,25 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   //end setup
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
-  val hexChar = "1234567890ABCDEFabcdef".seq
-  def hex = P.anyOf(hexChar)
+  val hexadecimalChars = "1234567890ABCDEFabcdef".seq
+  def hex = P.anyOf(hexadecimalChars)
 
   val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),
     pos => P.err.single('!',pos)).map(l => Lang(l.get.toString))
 
-  val space = P.takeWhile( c => c == ' '|| c == '\t' )
+  val space1 = P.takeWhile1( c => c == ' '|| c == '\t', pos => P.err.single('!',pos))
+  val space = P.takeWhile( c => c == ' '|| c == '\t')
+
   val anySpace =  P.takeWhile(_.isWhitespace )
+  val eoln = P.word("\n") | P.word ("\r\n")| P.word("\r")
 
-  def isUriChar(c: Char) = ( ! c.isWhitespace) && c != '<' && c != '>'
+  def isUriChar(c: Char) = ( ! c.isWhitespace) && c != '<' && c != '>'  &&
+    c> 0x1F &&  (c < 0x7F || c > 0x9F )  //control characters
 
 
-  val uriRef = ( P.single('<') >> P.takeWhile(isUriChar(_) ) << P.single('>')).map(i=>IRI(i.toString))
   import P.++
   
-  val bnode = P.word("_:")>>P.takeWhile(_.isLetterOrDigit).map (n=>BNode(n.toString))
+  val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).map (n=>BNode(n.toString))
 
 
   val lit_u = (P.word("\\u")>> hex++hex++hex++hex) map {
@@ -61,29 +64,36 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
 
   val literal = ( lit_u | lit_U | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
       P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single('!',pos))
-    ).many
+    ).many.map(l=> l.mkString)
+
+  val uriStr = (lit_u | lit_U | lt_slash | lt_quote |
+      P.takeWhile1(c => isUriChar(c),pos => P.err.single('!',pos))
+     ).many1.map(i=>i.mkString)
 
   val xsd = "http://www.w3.org/2001/XMLSchema#"
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   val xsdString = IRI(xsd + "string")
 
-  val plainLit = (P.single('"')>>literal<< P.word("\"")).map(l=> l.mkString)
+  val plainLit = (P.single('"')>>literal<< P.single('\"'))
+
+
+  val typeFunc = P.word("^^") >> uriRef
+  val langFunc = P.single('@') >> lang
+
+
+  val dot = P.single('.')
 
   val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
     case lexicalForm ++ option => Literal(lexicalForm, option.getOrElse(xsdStringIRI))
   }
-
-  val typeFunc = (P.word("^^") >> uriRef)
-  val langFunc = (P.word("@") >> lang )
-
-
-  val node = uriRef | bnode | fullLiteral
+  val uriRef = ( P.single('<') >> uriStr  << P.single('>')).map(i=>IRI(i))
   val pred = uriRef
-  val dot = P.single('.')
-
-  val sentence = (node++(space>>pred)++(space>>node)).map{case s++r++o=>Triple(s,r,o)} << (space++dot)
-  val ntriples = anySpace >> (sentence delimit anySpace )
-  
+  val subject = uriRef | bnode
+  val obj = uriRef | bnode | fullLiteral
+  val triple = (subject++(space1>>pred)++(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>space)
+  val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
+  val line = space >> (comment.as(None) | triple.map(Some(_)) | P.unit(None) )
+  val ntriples = line.delimit(eoln).map(_.flatten)
 
 }
 
@@ -92,7 +102,7 @@ object NTriplesParser {
   val hexChar = Array( '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
 
 
-  def hex(c: Char) = {
+  private def hex(c: Char) = {
     val b = new StringBuilder(6)
     b.append("\\u").
       append(hexChar((c >> 12) & 0xF)).
@@ -101,7 +111,7 @@ object NTriplesParser {
       append(hexChar(c & 0xF))
     b
   }
-  def hexLong(c: Char) = {
+  private def hexLong(c: Char) = {
     val b = new StringBuilder(10)
     b.append("\\U").
       append(hexChar((c >> 28) & 0xF)).
