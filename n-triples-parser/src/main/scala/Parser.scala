@@ -70,13 +70,13 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val plainLit = (P.single('"')>>literal<< P.word("\"")).map(l => l.mkString)
 
   val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
-    case lexicalForm ++ None => TypedLiteral(lexicalForm, xsdStringIRI)
-    case lexicalForm ++ Some(uriRef@IRI(_)) => TypedLiteral(lexicalForm, uriRef)
-    case lexicalForm ++ Some(lang@Lang(_)) => LangLiteral(lexicalForm, lang)
+    case lexicalForm ++ None => TypedLiteral(lexicalForm)
+    case lexicalForm ++ Some(Left(uriRef)) => TypedLiteral(lexicalForm, uriRef)
+    case lexicalForm ++ Some(Right(lang)) => LangLiteral(lexicalForm, lang)
   }
 
-  val typeFunc = (P.word("^^") >> uriRef)
-  val langFunc = (P.word("@") >> lang )
+  val typeFunc = (P.word("^^") >> uriRef) map Left.apply
+  val langFunc = (P.word("@") >> lang) map Right.apply
 
 
   val node = uriRef | bnode | fullLiteral

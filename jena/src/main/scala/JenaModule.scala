@@ -85,22 +85,26 @@ object JenaModule extends Module {
      * we can discriminate on the lang tag presence
      */
     def fold[T](literal: Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T = literal match {
-      case tl if literal.getLiteralLanguage != null && literal.getLiteralLanguage != "" => funTL(tl)
-      case ll => funLL(ll)
+      case typedLiteral: TypedLiteral if literal.getLiteralLanguage == null || literal.getLiteralLanguage.isEmpty =>
+        funTL(typedLiteral)
+      case langLiteral: LangLiteral => funLL(langLiteral)
     }
   }
 
   
   type TypedLiteral = Node_Literal
-  object TypedLiteral extends AlgebraicDataType2[String, IRI, TypedLiteral] {
+  object TypedLiteral extends TypedLiteralCompanionObject {
     def apply(lexicalForm: String, iri: IRI): TypedLiteral = {
       val IRI(iriString) = iri
-      JenaNode.createLiteral(lexicalForm, null, mapper.getTypeByName(iriString)).asInstanceOf[Node_Literal]
+      val typ = mapper.getTypeByName(iriString)
+      JenaNode.createLiteral(lexicalForm, null, typ).asInstanceOf[Node_Literal]
     }
     def unapply(typedLiteral: TypedLiteral): Option[(String, IRI)] = {
       val typ = typedLiteral.getLiteralDatatype
       if (typ != null)
         Some((typedLiteral.getLiteralLexicalForm.toString, IRI(typ.getURI)))
+      else if (typedLiteral.getLiteralLanguage.isEmpty)
+        Some((typedLiteral.getLiteralLexicalForm.toString, xsdStringIRI))
       else
         None
     }

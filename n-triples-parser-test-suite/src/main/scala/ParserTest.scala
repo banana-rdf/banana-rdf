@@ -1,8 +1,7 @@
-package org.w3.rdf.test
+package org.w3.rdf
 
 import org.junit.Test
 import org.junit.Assert._
-import org.w3.rdf.{GraphIsomorphism, NTriplesParser, Module}
 import util.Random
 import java.io._
 import nomo.{Success, Accumulator}
@@ -10,7 +9,7 @@ import nomo.{Success, Accumulator}
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class NTriplesParserTest[M <: Module,F,E,X](val parser: NTriplesParser[M, F, E, X, Unit]) {
+abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesParser[M, F, E, X, Unit]) {
 
   implicit val U: Unit = ()
   val isomorphism: GraphIsomorphism[parser.m.type]
@@ -39,8 +38,8 @@ abstract class NTriplesParserTest[M <: Module,F,E,X](val parser: NTriplesParser[
     val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
     val creator = IRI("http://purl.org/dc/elements/1.1/creator")
     val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
-    val dave = Literal("Dave Beckett",xsdStringIRI)
-    val art = Literal("Art Barstow")
+    val dave = TypedLiteral("Dave Beckett", xsdStringIRI)
+    val art = TypedLiteral("Art Barstow")
     val w3org = IRI("http://www.w3.org/")
     
     val expected = 
@@ -103,6 +102,9 @@ abstract class NTriplesParserTest[M <: Module,F,E,X](val parser: NTriplesParser[
     val g = parser.m.Graph(res.get)
     val gR = parser.m.Graph(resR.get)
 
+//    println("<<< "+diff(g, gR).size)
+//    println(">>> "+diff(gR, g).size)
+    
     assertEquals("The two graphs must have the same size",g.size,gR.size)
 
     assertTrue("the two graphs must be isomorphic",isIsomorphicWith(g,gR))

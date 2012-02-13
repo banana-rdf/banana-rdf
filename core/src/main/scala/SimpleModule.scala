@@ -48,7 +48,7 @@ object SimpleModule extends Module {
   }
   
   case class TypedLiteral(lexicalForm: String, datatype: IRI) extends Literal
-  object TypedLiteral extends AlgebraicDataType2[String, IRI, TypedLiteral]
+  object TypedLiteral extends TypedLiteralCompanionObject
   
   case class LangLiteral(lexicalForm: String, lang: Lang) extends Literal {
     val datatype = IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
