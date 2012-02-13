@@ -1,7 +1,6 @@
 package org.w3.rdf
 
 import org.w3.algebraic._
-import util.{MurmurHash3, MurmurHash}
 
 object SimpleModule extends Module {
 

@@ -29,7 +29,7 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   //end setup
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
-  val hexadecimalChars = "1234567890ABCDEFabcdef".seq
+  val hexadecimalChars = "1234567890ABCDEFabcdef"
   def hex = P.anyOf(hexadecimalChars)
 
   val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),

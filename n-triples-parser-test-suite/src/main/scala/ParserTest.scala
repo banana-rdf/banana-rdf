@@ -98,7 +98,7 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
         try {
           val length = in.read(bytes)
           if (length > -1) {
-            chunk = chunk.parse(new String(bytes, 0, length, "ASCII").seq)
+            chunk = chunk.parse(new String(bytes, 0, length, "ASCII"))
           } else inOpen = false
         } catch {
           case e: IOException => inOpen = false
@@ -108,7 +108,7 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
         try {
           val length = inR.read(bytesR)
           if (length > -1) {
-            chunkR = chunkR.parse(new String(bytesR, 0, length, "ASCII").seq)
+            chunkR = chunkR.parse(new String(bytesR, 0, length, "ASCII"))
           } else inROpen = false
         } catch {
           case e: IOException => inROpen = false

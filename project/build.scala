@@ -8,9 +8,9 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++ Seq (
     organization := "org.w3",
     version      := "0.1",
-    scalaVersion := "2.10.0-M1",
+    scalaVersion := "2.9.1",
     parallelExecution in Test := false,
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-Yvirtpatmat", "-optimize")
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types")
   )
 
 }

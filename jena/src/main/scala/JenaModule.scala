@@ -2,12 +2,10 @@ package org.w3.rdf.jena
 
 import org.w3.rdf._
 import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
-import com.hp.hpl.jena.rdf.model.{AnonId}
-import com.hp.hpl.jena.datatypes.{RDFDatatype, TypeMapper}
+import com.hp.hpl.jena.rdf.model.AnonId
+import com.hp.hpl.jena.datatypes.TypeMapper
 
 import org.w3.algebraic._
-import com.hp.hpl.jena.vocabulary.{RDF, XSD}
-import util.MurmurHash3
 
 object JenaModule extends Module {
 
