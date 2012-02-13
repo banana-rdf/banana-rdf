@@ -13,13 +13,15 @@ class Transformer[ModelA <: Module, ModelB <: Module](val a: ModelA, val b: Mode
       transformNode(o))
   }
   
-  def transformNode(n: a.Node): b.Node = n match {
-    case a.IRI(iri) => b.IRI(iri)
-    case a.BNode(label) => b.BNode(label)
-    case a.Literal(literal,tpe) => b.Literal(literal,tpe match {
-      case a.Lang(tag) => b.Lang(tag)
-      case a.IRI(iri) => b.IRI(iri)
-    })
-  }
-
+  def transformNode(n: a.Node): b.Node = a.Node.fold(n) (
+    { case a.IRI(iri) => b.IRI(iri) },
+    { case a.BNode(label) => b.BNode(label) },
+    { literal: a.Literal => transformLiteral(literal) }
+  )
+  
+  def transformLiteral(literal: a.Literal): b.Literal = a.Literal.fold(literal) (
+    { case a.TypedLiteral(lexicalForm, a.IRI(datatypeIRI)) => b.TypedLiteral(lexicalForm, b.IRI(datatypeIRI)) },
+    { case a.LangLiteral(lexicalForm, a.Lang(lang)) => b.LangLiteral(lexicalForm, b.Lang(lang)) }
+  )
+  
 }

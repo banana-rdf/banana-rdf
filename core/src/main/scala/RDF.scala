@@ -11,9 +11,9 @@ import org.w3.algebraic._
  *   - We make a Lang <: IRI as this massively simplifies the model whilst making it type safe.
  */
 trait Module {
-  val xsdString = "http://www.w3.org/2001/XMLSchema#string"
-  val xsdStringIRI = IRI(xsdString)
-  val rdfLang = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
+  lazy val xsdString = "http://www.w3.org/2001/XMLSchema#string"
+  lazy val xsdStringIRI = IRI(xsdString)
+  lazy val rdfLang = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
 
 
   trait GraphInterface extends Iterable[Triple] { self =>
@@ -22,11 +22,12 @@ trait Module {
   type Graph <: GraphInterface
   type Triple
   type Node
-  type IRIWorkAround <: Node  //todo: remove when scala 2.10M1 bug is fixed. check tag without_scala_2.10_workaround
-  type IRI <: IRIWorkAround
+  type IRI <: Node
   type BNode <: Node
   type Literal <: Node
-  type Lang <: IRIWorkAround
+  type TypedLiteral <: Literal
+  type LangLiteral <: Literal
+  type Lang
 
   trait GraphCompanionObject {
     def empty: Graph
@@ -38,12 +39,30 @@ trait Module {
 
   val Triple: AlgebraicDataType3[Node, IRI, Node, Triple]
 
+  trait NodeCompanionObject {
+    def fold[T](node: Node)(funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T
+  }
+  
+  val Node: NodeCompanionObject
+  
   val IRI : AlgebraicDataType1[String, IRI]
 
   val BNode: AlgebraicDataType1[String, BNode]
 
-  val Literal: AlgebraicDataType2[String, IRIWorkAround, Literal] with Function1[String, Literal]
-
+  trait LiteralCompanionObject {
+    def fold[T](literal: Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T
+  }
+  
+  val Literal: LiteralCompanionObject
+  
+  trait TypedLiteralCompanionObject extends AlgebraicDataType2[String, IRI, TypedLiteral] with Function1[String, TypedLiteral] {
+    def apply(lexicalForm: String): TypedLiteral = TypedLiteral(lexicalForm, xsdStringIRI)
+  }
+  
+  val TypedLiteral: TypedLiteralCompanionObject
+  
+  val LangLiteral: AlgebraicDataType2[String, Lang, LangLiteral]
+  
   val Lang: AlgebraicDataType1[String, Lang]
 
 }

@@ -36,7 +36,7 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
     pos => P.err.single('!',pos)).map(l => Lang(l.get.toString))
 
   val space1 = P.takeWhile1( c => c == ' '|| c == '\t', pos => P.err.single('!',pos))
-  val space = P.takeWhile( c => c == ' '|| c == '\t')
+  val space = P.takeWhile( c => c == ' '|| c == '\t' )
 
   val anySpace =  P.takeWhile(_.isWhitespace )
   val eoln = P.word("\n") | P.word ("\r\n")| P.word("\r")
@@ -76,16 +76,18 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
 
   val plainLit = (P.single('"')>>literal<< P.single('\"'))
 
+  val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
+    case lexicalForm ++ None => TypedLiteral(lexicalForm)
+    case lexicalForm ++ Some(Left(uriRef)) => TypedLiteral(lexicalForm, uriRef)
+    case lexicalForm ++ Some(Right(lang)) => LangLiteral(lexicalForm, lang)
+  }
 
-  val typeFunc = P.word("^^") >> uriRef
-  val langFunc = P.single('@') >> lang
+  val typeFunc = (P.word("^^") >> uriRef) map Left.apply
+  val langFunc = (P.word("@") >> lang) map Right.apply
 
 
   val dot = P.single('.')
 
-  val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
-    case lexicalForm ++ option => Literal(lexicalForm, option.getOrElse(xsdStringIRI))
-  }
   val uriRef = ( P.single('<') >> uriStr  << P.single('>')).map(i=>IRI(i))
   val pred = uriRef
   val subject = uriRef | bnode
@@ -94,7 +96,7 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
   val line = space >> (comment.as(None) | triple.map(Some(_)) | P.unit(None) )
   val ntriples = line.delimit(eoln).map(_.flatten)
-
+  
 }
 
 object NTriplesParser {

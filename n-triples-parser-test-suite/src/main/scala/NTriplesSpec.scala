@@ -3,7 +3,7 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf.test
+package org.w3.rdf
 
 import org.scalacheck._
 import Prop._
@@ -12,7 +12,6 @@ import nomo.Errors._
 import scala.util.Random
 import collection.immutable.NumericRange
 import collection.mutable.HashSet
-import org.w3.rdf.{NTriplesParser, Module}
 import nomo.{Accumulators, Errors, Parsers, Monotypic}
 import nomo.Accumulators.Position
 
@@ -23,10 +22,14 @@ import nomo.Accumulators.Position
 
 class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   
-  implicit val U: Unit = ()
-  val P: NTriplesParser[M, String, TreeError, Position, Unit]= new NTriplesParser(m,
-    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Unit](4)))
+  val serializer = new NTriplesSerializer[m.type](m)
   import m._
+  import serializer._
+  
+  implicit val U: Unit = ()
+  val P: NTriplesParser[m.type, String, TreeError, Position, Unit] = new NTriplesParser(m,
+    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Unit](4)))
+
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
     "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
     "ftp://ftp.is.co.za/rfc/rfc1808.txt", "ldap://[2001:db8::7]/c=GB?objectClass?one",
@@ -48,20 +51,23 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
 
   def genUnicodeStr: Gen[String] = for(cs <- Gen.listOf(ntripleChar)) yield cs.mkString
 
-  def genIRI = Gen.oneOf(uris).map(u=>IRI(u))
+  def genIRI = Gen.oneOf(uris).map( u => IRI(u) )
   
-  def genPlainLiteral = for (str <- genUnicodeStr) yield Literal(str)
+  def genPlainLiteral = for (str <- genUnicodeStr) yield TypedLiteral(str)
   def genTypedLiteral = for (str <- genUnicodeStr;
-                             tpe <- genIRI) yield Literal(str, tpe)
+                             tpe <- genIRI) yield TypedLiteral(str, tpe)
   def genLangLiteral = for (str <- genUnicodeStr;
-                        lang <- genLangStr) yield Literal(str,Lang(lang))
-  def genBnode = Gen.identifier.map(id=>BNode(id))
+                        lang <- genLangStr) yield LangLiteral(str, Lang(lang))
+  def genBnode = Gen.identifier.map(id => BNode(id))
 
-  def genAnyNode = Gen.oneOf(genPlainLiteral,genTypedLiteral,genLangLiteral,genBnode,genIRI)
-  def genSubjNode = Gen.oneOf(genIRI,genBnode)
-  def genRelation = for (subj <- genSubjNode;
-                       rel <- genIRI;
-                       obj <- genAnyNode) yield Triple(subj, rel, obj)
+  def genAnyNode = Gen.oneOf(genPlainLiteral, genTypedLiteral, genLangLiteral, genBnode, genIRI)
+  def genSubjNode = Gen.oneOf(genIRI, genBnode)
+  def genRelation =
+    for {
+      subj <- genSubjNode
+      rel <- genIRI
+      obj <- genAnyNode
+    } yield Triple(subj, rel, obj)
   def genGraph = Gen.listOf(genRelation)
   def genSpace = Gen.listOf1(Gen.oneOf(" \t")).map(_.mkString)
   def genAnySpace = Gen.listOf1(Gen.oneOf(" \t\n\r  ")).map(_.mkString)
@@ -95,7 +101,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   }
 
 
-   property("Plainliteral") = forAll(genPlainLiteral) { case literal @ m.Literal(lit,tpe) =>
+   property("Plainliteral") = forAll(genPlainLiteral) { case literal @ m.TypedLiteral(lit, tpe) =>
      val literalStr = '"'+NTriplesParser.toLiteral(lit)+'"'
      val res= P.fullLiteral(literalStr)
      ("literal in='"+literalStr+"' result = '"+res+"'") |: all(
@@ -104,15 +110,15 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
      )
    }
 
-   property("langLiteral") = forAll(genLangLiteral) { case tst @ m.Literal(lit,Lang(lang)) =>
+   property("langLiteral") = forAll(genLangLiteral) { case tst @ m.LangLiteral(lit, Lang(lang)) =>
      import NTriplesParser._
      val testStr = "\"" + toLiteral(lit) + "\"@" + lang
      val res = P.fullLiteral(testStr)
      ("input:" + testStr + "\nresult = '" + res + "'") |: all(
          ( res.isSuccess :| "res was failure" ) &&
-         ({val Literal(litres,x) = res.get;
+         ({val LangLiteral(litres, x) = res.get;
            litres == lit} :| "literal string does not match") &&
-         ({val Literal(_,Lang(langRes)) =res.get
+         ({val LangLiteral(_,Lang(langRes)) =res.get
            langRes == lang} :| "literal is not a lang literal") &&
          ( { res.get == tst } :| "the final equality fails")
      )
@@ -132,37 +138,19 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
      all(res :_*)
    }
 
-  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ m.Literal(str,IRI(uri)) =>
+  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ m.TypedLiteral(str, IRI(uri)) =>
     val literal = '"'+NTriplesParser.toLiteral(str)+"\"^^<"+uri+">"
     val res = P.fullLiteral(literal)
-    val Literal(lit,IRI(dt_iri)) = res.get
+    val TypedLiteral(lit, IRI(dt_iri)) = res.get
     ("literal="+literal+"\nresult = "+res) |: all (
        res.isSuccess  &&
        lit == str &&
        dt_iri == uri
     )
   }
-
-  /**
-   * perhaps this is the only reason why one may want to have intermediate Node objects
-   * (NodeBNode, NodeLiteral,...)
-   * that wrap the abstract IRI, ... types: so that one can give them a few more methods on them.
-   * but well there would have to be more need than just a toString method!
-   */
-  def turtleStr(n: Node): String= n match {
-    case BNode(tag) => "_:"+tag
-    case IRI(iri) => "<"+iri+">"
-    case Literal(txt,typ) => '"' + NTriplesParser.toLiteral(txt) + "\"" + {
-      typ match {
-        case Lang(tag) => "@" + tag
-        case x: IRI if x == xsdStringIRI => "";
-        case IRI(iri) => "^^<" + iri + ">"
-      }
-    }
-  }
   
-  property("statement") = forAll(genRelation){ case tr @ Triple(sub,rel,obj) =>
-    val statement = turtleStr(sub)+" "+turtleStr(rel)+" "+turtleStr(obj)+" ."
+  property("statement") = forAll(genRelation){ case tr @ Triple(sub, rel, obj) =>
+    val statement = tripleAsN3(tr)
     val res = P.triple(statement)
     ("statement to parse="+statement+" result ="+ res) |: all  (
       ( res.isSuccess :| "failed test") &&
@@ -171,6 +159,18 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   }
   
   property("graph") = forAll(genGraph) {
+    triples =>
+      val graph = Graph(triples)
+      val doc = asN3(graph)
+      val res = P.ntriples(doc)
+      
+      ("inputdoc="+doc+"\n----result ="+res) |: all (
+        res.isSuccess &&
+        ( (Graph(res.get) == graph) :| "the parsed graph does not contain the same relations as the original")
+      )
+  }
+
+ property("messyGraph") = forAll(genGraph) {
     graph =>
       val doc = generateDoc(graph)
       val res = P.ntriples(doc)
@@ -181,17 +181,18 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
         ( (HashSet(res.get) == set) :| "the parsed graph does not contain the same relations as the original")
       )
   }
-
+ 
+  /** Generate an NTriples document from the statements but with very messy whitespacing */
   def generateDoc(graph: List[m.Triple]) = {
     val b = new StringBuilder
     if (graph != Nil) { //the pattern matching below does not work well enough at present
       for (m.Triple(s, r, o) <- graph) {
         b.append(genAnySpace.sample.get)
-        b.append(turtleStr(s))
+        b.append(nodeAsN3(s))
         b.append(genSpace.sample.get)
-        b.append(turtleStr(r))
+        b.append(nodeAsN3(r))
         b.append(genSpace.sample.get)
-        b.append(turtleStr(o))
+        b.append(nodeAsN3(o))
         b.append(genSpace.sample.get)
         b.append(".")
         b.append(newline.sample.get)

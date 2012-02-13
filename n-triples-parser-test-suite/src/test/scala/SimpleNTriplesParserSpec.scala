@@ -3,11 +3,13 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-import org.w3.rdf.ScalaModule
-import org.w3.rdf.test.NTriplesSpec
+package org.w3.rdf
+
+import org.w3.rdf.SimpleModule
+import org.w3.rdf.NTriplesSpec
 
 /**
  * @author bblfish
  * @created 08/02/2012
  */
-object SimpleNTriplesParserSpec extends NTriplesSpec(ScalaModule)
+object SimpleNTriplesParserSpec extends NTriplesSpec(SimpleModule)
