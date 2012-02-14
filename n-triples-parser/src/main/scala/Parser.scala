@@ -33,7 +33,7 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   def hex = P.anyOf(hexadecimalChars)
 
   val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),
-    pos => P.err.single('!',pos)).map(l => Lang(l.get.toString))
+    pos => P.err.single('!',pos)).map(l => Lang(l.toSeq.mkString))
 
   val space1 = P.takeWhile1( c => c == ' '|| c == '\t', pos => P.err.single('!',pos))
   val space = P.takeWhile( c => c == ' '|| c == '\t' )
@@ -47,7 +47,7 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
 
   import P.++
   
-  val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).map (n=>BNode(n.toString))
+  val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).map (n=>BNode(n.toSeq.mkString))
 
 
   val lit_u = (P.word("\\u")>> hex++hex++hex++hex) map {
@@ -59,16 +59,16 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val lt_tab = P.word("\\t").map(c=>0x9.toChar)
   val lt_cr = P.word("\\r").map(c=>0xD.toChar)
   val lt_nl = P.word("\\n").map(c=>0xA.toChar)
-  val lt_slash = P.word("\\\\").map(c=>"\\")
+  val lt_slash = P.word("\\\\").map(c=>'\\')
   val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
 
   val literal = ( lit_u | lit_U | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
-      P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single('!',pos))
-    ).many.map(l=> l.mkString)
+      P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single('!',pos)).map(n=>n.toSeq.mkString)
+    ).many.map(l=> l.toSeq.mkString)
 
   val uriStr = (lit_u | lit_U | lt_slash | lt_quote |
-      P.takeWhile1(c => isUriChar(c),pos => P.err.single('!',pos))
-     ).many1.map(i=>i.mkString)
+      P.takeWhile1(c => isUriChar(c),pos => P.err.single('!',pos)).map(n=>n.toSeq.mkString)
+     ).many1.map(i=>i.toSeq.mkString)
 
   val xsd = "http://www.w3.org/2001/XMLSchema#"
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
