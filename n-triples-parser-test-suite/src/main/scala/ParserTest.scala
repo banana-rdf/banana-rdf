@@ -49,8 +49,6 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
         Triple(ntriples, creator, art),
         Triple(ntriples, publisher, w3org)
       )
-//    assertEquals("The two graphs must have the same size",expected.size,parsedGraph.size)
-
     assertTrue("graphs must be isomorphic",isIsomorphicWith(expected, parsedGraph))
   }
 
@@ -91,6 +89,7 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
     var chunkR = ParsedChunk(parser.ntriples,parser.P.annotator())
 
     //scala.io.Reader seemed to have a problem.
+    //here we test Asynchronous IO, feeding in pieces at a time
     var inOpen = true
     var inROpen = true
     while (inOpen || inROpen) {
