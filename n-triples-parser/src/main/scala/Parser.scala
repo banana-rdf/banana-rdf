@@ -7,6 +7,8 @@ package org.w3.rdf
 
 import nomo._
 import nomo.Errors.{TreeError, Single}
+import scala.collection.mutable
+import org.w3.rdf.Module
 
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples
@@ -19,13 +21,17 @@ import nomo.Errors.{TreeError, Single}
  * @since 02/02/2012
  */
 
-class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X, U]) {
-  
+trait ListenerAgent[T] {
+  def send(a: T)
+}
+
+//todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
+class NTriplesParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
   import m._
 
   //setup, should be in type
   implicit def toTreeError(msg: String): Errors.TreeError = Errors.Single(msg, None)
-  implicit val U: Unit = ()
+//  implicit val U: Unit = ()
   //end setup
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
@@ -95,7 +101,15 @@ class NTriplesParser[M <: Module,F,E,X,U](val m: M, val P: Parsers[F, Char, E, X
   val triple = (subject++(space1>>pred)++(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>space)
   val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
   val line = space >> (comment.as(None) | triple.map(Some(_)) | P.unit(None) )
-  val ntriples = line.delimit(eoln).map(_.flatten)
+  val ntriples = (line.mapResult{
+    r =>
+      r.get match {
+        case Some(t) => r.user.send(t);
+        case None => ()
+      }
+      Success(r)
+  } ).delimitIgnore(eoln)
+  val ntriplesList = line.delimit(eoln).map(_.flatten)
   
 }
 

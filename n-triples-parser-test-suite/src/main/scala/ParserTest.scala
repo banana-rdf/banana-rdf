@@ -6,13 +6,20 @@ import util.Random
 import java.io._
 import nomo.{Success, Accumulator}
 import com.hp.hpl.jena.rdf.model.{ModelFactory=>JenaModelFactory, Model => JenaModel}
+import collection.mutable
+
+
+case class Listener(val queue: mutable.Queue[Any] = new mutable.Queue[Any]()) extends ListenerAgent[Any] {
+  def send(a: Any) = queue.enqueue(a)
+}
+
 
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesParser[M, F, E, X, Unit]) {
+abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesParser[M, F, E, X, Listener]) {
 
-  implicit val U: Unit = ()
+  implicit def U: Listener = new Listener
   val isomorphism: GraphIsomorphism[parser.m.type]
   
   import parser.m._
@@ -28,12 +35,19 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
  <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
 
  """
+
+  def randomSz = {
+    val random = 29 to 47+1
+    random(Random.nextInt(random.length ))
+  }
+
   
   @Test()
   def read_simple_n3(): Unit = {
 
-    val res = parser.ntriples(n3).get
-    val parsedGraph = parser.m.Graph(res)
+    val res = parser.ntriples(n3)
+    val tr = res.user.queue.toList.map(_.asInstanceOf[Triple])
+    val parsedGraph = parser.m.Graph(tr)
     assertEquals("should be three triples in graph",3,parsedGraph.size)
 
     val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
@@ -52,14 +66,10 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
     assertTrue("graphs must be isomorphic",isIsomorphicWith(expected, parsedGraph))
   }
 
-  @Test()
+    @Test()
   def read_long_n3s_in_chunks(): Unit = {
     import scala.io._
 
-    def randomSz = {
-      val random = 29 to 47+1
-      random(Random.nextInt(random.length ))
-    }
     val card: File = new File(this.getClass.getResource("/card.nt").toURI)
     val in = new FileInputStream(card)
     val bytes = new Array[Byte](randomSz)
@@ -72,21 +82,8 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
     jenaCard.read(new FileInputStream(card),null,"N-TRIPLE")
     assertEquals("Pure Jena should have read 354 triples in"+card.getPath,354,jenaCard.size())
 
-
-    import parser.P._
-    case class ParsedChunk(val parser: Parser[List[Triple]],val acc: Accumulator[Char, X, Unit]) {
-      def parse(buf: Seq[Char]) = {
-        if (!buf.isEmpty) {
-          val (tripleParser, newAccu) = parser.feedChunked(buf, acc, buf.size)
-          ParsedChunk(tripleParser, newAccu)
-        } else {
-          this
-        }
-      }
-    }
-
-    var chunk = ParsedChunk(parser.ntriples,parser.P.annotator())
-    var chunkR = ParsedChunk(parser.ntriples,parser.P.annotator())
+    var chunk = ParsedChunk(parser.ntriples,parser.P.annotator(U))
+    var chunkR = ParsedChunk(parser.ntriples,parser.P.annotator(U))
 
     //scala.io.Reader seemed to have a problem.
     //here we test Asynchronous IO, feeding in pieces at a time
@@ -117,20 +114,24 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
 
 
 
-    val res = chunk.parser.result(chunk.acc)
-    val resR = chunkR.parser.result(chunkR.acc)
+    val result = chunk.parser.result(chunk.acc)
+    val resultR = chunkR.parser.result(chunkR.acc)
 
-    println("the last triple found was in card.nt was "+res.get.last)
-    println("the last triple found was in card.random.nt was "+resR.get.last)
-
-    assertNotSame("the results of reading both cards should be different lists",res.get,resR.get)
-
-    assertTrue("error parsing card.nt - failed at "+res.position+" status="+res.status,res.isSuccess)
-    assertTrue("error parsing card.random.nt - failed at "+res.position+" with status "+res.status,resR.isSuccess)
+    val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
+    val resR = resultR.user.queue.toList.map(_.asInstanceOf[Triple])
 
 
-    val g = parser.m.Graph(res.get)
-    val gR = parser.m.Graph(resR.get)
+    println("the last triple found was in card.nt was "+res.last)
+    println("the last triple found was in card.random.nt was "+resR.last)
+
+    assertNotSame("the results of reading both cards should be different lists",res,resR)
+
+    assertTrue("error parsing card.nt - failed at "+result.position+" status="+result.status,result.isSuccess)
+    assertTrue("error parsing card.random.nt - failed at "+resultR.position+" with status "+resultR.status,resultR.isSuccess)
+
+
+    val g = parser.m.Graph(res)
+    val gR = parser.m.Graph(resR)
 
     println("<<< "+diff(g, gR).size)
     println(">>> "+diff(gR, g).size)
@@ -140,6 +141,18 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
 
     assertTrue("the two graphs must be isomorphic",isIsomorphicWith(g,gR))
 
+  }
+
+  import parser.P._
+  case class ParsedChunk(val parser: Parser[Unit],val acc: Accumulator[Char, X, Listener]) {
+    def parse(buf: Seq[Char]) = {
+      if (!buf.isEmpty) {
+        val (tripleParser, newAccu) = parser.feedChunked(buf, acc, buf.size)
+        ParsedChunk(tripleParser, newAccu)
+      } else {
+        this
+      }
+    }
   }
 
 

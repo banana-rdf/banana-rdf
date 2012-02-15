@@ -9,7 +9,7 @@ extends NTriplesParser(
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
-    Accumulators.position[Unit](4)))
+    Accumulators.position[Listener](4)))
 
 object JenaNTriplesSeqParser
 extends NTriplesParser(
@@ -17,4 +17,4 @@ extends NTriplesParser(
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
-    Accumulators.position[Unit](4)))
+    Accumulators.position[Listener](4)))

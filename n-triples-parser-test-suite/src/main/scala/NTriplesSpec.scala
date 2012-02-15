@@ -14,11 +14,13 @@ import collection.immutable.NumericRange
 import collection.mutable.HashSet
 import nomo.{Accumulators, Errors, Parsers, Monotypic}
 import nomo.Accumulators.Position
+import scala.collection.mutable
 
 /**
  * @author bblfish
  * @created 03/02/2012
  */
+
 
 class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   
@@ -26,9 +28,15 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   import m._
   import serializer._
   
-  implicit val U: Unit = ()
-  val P: NTriplesParser[M, String, TreeError, Position, Unit] = new NTriplesParser(m,
-    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Unit](4)))
+  implicit def U: Listener = new Listener()
+
+  case class Listener(val queue: mutable.Queue[Any] = new mutable.Queue[Any]()) extends ListenerAgent[Any] {
+    def send(a: Any) = queue.enqueue(a)
+  }
+
+
+  val P: NTriplesParser[M, String, TreeError, Position, Listener] = new NTriplesParser(m,
+    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
 
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
     "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
@@ -173,15 +181,29 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
  property("messyGraph") = forAll(genGraph) {
     graph =>
       val doc = generateDoc(graph)
-      val res = P.ntriples(doc)
+      val res = P.ntriplesList(doc)
       val set = HashSet(graph)
-      
+
       ("inputdoc="+doc+"\n----result ="+res) |: all (
         res.isSuccess &&
         ( (HashSet(res.get) == set) :| "the parsed graph does not contain the same relations as the original")
       )
   }
- 
+
+  property("messyGraphWithListener") = forAll(genGraph) {
+    graph =>
+      val doc = generateDoc(graph)
+      val res = P.ntriples(doc)
+      val set = HashSet(graph:_*)
+
+      val resSet = res.user.queue.map(_.asInstanceOf[Triple]).toSet
+
+      ("input graph="+graph+"\ninput set="+set+"\ninputdoc="+doc+"\nresult ="+res+"\nuser content="+resSet) |: all (
+        res.isSuccess &&
+          ( (resSet == set) :| "the parsed graph does not contain the same relations as the original")
+      )
+  }
+
   /** Generate an NTriples document from the statements but with very messy whitespacing */
   def generateDoc(graph: List[m.Triple]) = {
     val b = new StringBuilder
