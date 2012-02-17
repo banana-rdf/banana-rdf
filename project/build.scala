@@ -19,6 +19,8 @@ object YourProjectBuild extends Build {
 
   import BuildSettings._
   
+  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
+  
   val junitInterface = "com.novocode" % "junit-interface" % "0.8"
 
   val scalacheck = "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
@@ -38,7 +40,7 @@ object YourProjectBuild extends Build {
   lazy val pimpMyRdf = Project(
     id = "pimp-my-rdf",
     base = file("."),
-    settings = buildSettings,
+    settings = buildSettings ++ Seq(EclipseKeys.skipParents in ThisBuild := false),
     aggregate = Seq(
       algebraic,
       core,
