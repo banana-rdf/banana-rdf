@@ -22,21 +22,23 @@ object YourProjectBuild extends Build {
   import com.typesafe.sbteclipse.plugin.EclipsePlugin._
   
   val junitInterface = "com.novocode" % "junit-interface" % "0.8"
-
   val scalacheck = "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
+  val scalatest = "org.scalatest" %% "scalatest" % "1.7.1"
   
   val testsuiteDeps =
     Seq(libraryDependencies += junitInterface,
+        libraryDependencies += scalatest,
         libraryDependencies += scalacheck)
   
   val testDeps =
-    Seq(libraryDependencies += junitInterface % "test")
+    Seq(libraryDependencies += junitInterface % "test",
+        libraryDependencies += scalatest % "test")
   
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
       libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.0-incubating")
-      
+  
   lazy val pimpMyRdf = Project(
     id = "pimp-my-rdf",
     base = file("."),
@@ -60,7 +62,7 @@ object YourProjectBuild extends Build {
   lazy val core = Project(
     id = "core",
     base = file("core"),
-    settings = buildSettings
+    settings = buildSettings ++ testDeps
   ) dependsOn (algebraic)
 
   lazy val graphIsomorphism = Project(
