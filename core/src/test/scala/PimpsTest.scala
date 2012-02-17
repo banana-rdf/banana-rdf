@@ -3,6 +3,7 @@ package org.w3.rdf
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 
+// TODO use generators
 abstract class PimpsTest[M <: Module](val m: M) extends WordSpec with MustMatchers {
   
   import m._
@@ -48,6 +49,16 @@ abstract class PimpsTest[M <: Module](val m: M) extends WordSpec with MustMatche
     }
     "have a lexical form" in {
       literal.lexicalForm must equal ("my-string")
+    }
+  }
+  
+  "a Scala Int" must {
+    val i = 42
+    "be mapped to TypedLiteral with the xsd:int datatype" in {
+      val lit: TypedLiteral = 42
+      val TypedLiteral(lexicalForm, datatype) = lit
+      lexicalForm must equal ("42")
+      datatype must equal (xsd("int"))
     }
   }
   
