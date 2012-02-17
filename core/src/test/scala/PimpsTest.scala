@@ -32,9 +32,22 @@ abstract class PimpsTest[M <: Module](val m: M) extends WordSpec with MustMatche
     "be foldable" in {
       node fold (
         { case IRI(iriString) => "foo" must equal (iriString) },
-        { bnode => assert(false) },
-        { literal => assert(false) }
+        { bnode => sys.error("should not be here") },
+        { literal => sys.error("should not be here") }
       )
+    }
+  }
+  
+  "a literal" must {
+    val literal = TypedLiteral("my-string", IRI("xsd:string"))
+    "be foldable" in {
+      literal fold (
+        { case TypedLiteral(lexicalForm, _) => "my-string" must equal (lexicalForm) },
+        { langLiteral => sys.error("should not be here") }
+      )
+    }
+    "have a lexical form" in {
+      literal.lexicalForm must equal ("my-string")
     }
   }
   

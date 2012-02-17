@@ -21,6 +21,16 @@ class Pimps[M <: Module](val m: M) {
   
   implicit def wrapNode(node: Node): NodeW = new NodeW(node)
   
+  class LiteralW(literal: Literal) {
+    def lexicalForm = Literal.fold(literal) (
+      { case TypedLiteral(s, _) => s },
+      { case LangLiteral(s, _) => s }
+    )
+    def fold[T](funTL: TypedLiteral => T, funLL: LangLiteral => T): T = Literal.fold(literal)(funTL, funLL)
+  }
+  
+  implicit def wrapLiteral(literal: Literal): LiteralW = new LiteralW(literal)
+  
 }
 
 
