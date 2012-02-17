@@ -8,7 +8,6 @@ package org.w3.rdf
 import nomo._
 import nomo.Errors.{TreeError, Single}
 import scala.collection.mutable
-import org.w3.rdf.Module
 
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples

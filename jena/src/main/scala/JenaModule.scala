@@ -36,7 +36,7 @@ object JenaModule extends Module {
   }
 
   type Triple = JenaTriple
-  object Triple extends AlgebraicDataType3[Node, IRI, Node, Triple] {
+  object Triple extends TripleCompanionObject {
     def apply(s: Node, p: IRI, o: Node): Triple = {
       JenaTriple.create(s, p, o)
     }
@@ -58,13 +58,13 @@ object JenaModule extends Module {
   }
   
   type IRI = Node_URI
-  object IRI extends AlgebraicDataType1[String, IRI]  {
+  object IRI extends IRICompanionObject {
     def apply(iriStr: String): IRI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
     def unapply(node: IRI): Option[String] = if (node.isURI) Some(node.getURI) else None
   }
 
   type BNode = Node_Blank
-  object BNode extends AlgebraicDataType1[String, BNode] {
+  object BNode extends BNodeCompanionObject {
     def apply(label: String): BNode = {
       val id = AnonId.create(label)
       JenaNode.createAnon(id).asInstanceOf[Node_Blank]
@@ -109,7 +109,7 @@ object JenaModule extends Module {
   }
   
   type LangLiteral = Node_Literal
-  object LangLiteral extends AlgebraicDataType2[String, Lang, LangLiteral] {
+  object LangLiteral extends LangLiteralCompanionObject {
     def apply(lexicalForm: String, lang: Lang): LangLiteral = {
       val Lang(langString) = lang
       JenaNode.createLiteral(lexicalForm, langString, mapper.getTypeByName(xsdString)).asInstanceOf[Node_Literal]
@@ -124,7 +124,7 @@ object JenaModule extends Module {
   }
   
   type Lang = String
-  object Lang extends AlgebraicDataType1[String, Lang] {
+  object Lang extends LangCompanionObject {
     def apply(langString: String) = langString
     def unapply(lang: Lang) = Some(lang)
   }

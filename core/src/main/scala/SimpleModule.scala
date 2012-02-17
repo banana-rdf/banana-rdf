@@ -16,7 +16,7 @@ object SimpleModule extends Module {
   }
   
   case class Triple(s: Node, p: IRI, o: Node)
-  object Triple extends AlgebraicDataType3[Node, IRI, Node, Triple]
+  object Triple extends TripleCompanionObject
   
   sealed trait Node
   
@@ -29,10 +29,10 @@ object SimpleModule extends Module {
   }
 
   case class IRI(iri: String) extends Node
-  object IRI extends AlgebraicDataType1[String, IRI]
+  object IRI extends IRICompanionObject
 
   case class BNode(label: String) extends Node
-  object BNode extends AlgebraicDataType1[String, BNode]
+  object BNode extends BNodeCompanionObject
 
   sealed trait Literal extends Node {
     val lexicalForm: String
@@ -52,10 +52,10 @@ object SimpleModule extends Module {
   case class LangLiteral(lexicalForm: String, lang: Lang) extends Literal {
     val datatype = IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
   }
-  object LangLiteral extends AlgebraicDataType2[String, Lang, LangLiteral]
+  object LangLiteral extends LangLiteralCompanionObject
 
   type Lang = String
-  object Lang extends AlgebraicDataType1[String, Lang] {
+  object Lang extends LangCompanionObject {
     def apply(langString: String) = langString
     def unapply(lang: Lang) = Some(lang)
   }

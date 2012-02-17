@@ -34,10 +34,11 @@ trait Module {
     def apply(elems: Triple*): Graph
     def apply(it: Iterable[Triple]): Graph
   }
-
   val Graph: GraphCompanionObject
 
-  val Triple: AlgebraicDataType3[Node, IRI, Node, Triple]
+  trait TripleCompanionObject extends AlgebraicDataType3[Node, IRI, Node, Triple]
+  
+  val Triple: TripleCompanionObject
 
   trait NodeCompanionObject {
     def fold[T](node: Node)(funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T
@@ -45,9 +46,13 @@ trait Module {
   
   val Node: NodeCompanionObject
   
-  val IRI : AlgebraicDataType1[String, IRI]
+  trait IRICompanionObject extends AlgebraicDataType1[String, IRI]
+  
+  val IRI : IRICompanionObject
 
-  val BNode: AlgebraicDataType1[String, BNode]
+  trait BNodeCompanionObject extends AlgebraicDataType1[String, BNode]
+  
+  val BNode: BNodeCompanionObject
 
   trait LiteralCompanionObject {
     def fold[T](literal: Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T
@@ -61,7 +66,11 @@ trait Module {
   
   val TypedLiteral: TypedLiteralCompanionObject
   
-  val LangLiteral: AlgebraicDataType2[String, Lang, LangLiteral]
+  trait LangLiteralCompanionObject extends AlgebraicDataType2[String, Lang, LangLiteral]
+  
+  val LangLiteral: LangLiteralCompanionObject
+  
+  trait LangCompanionObject extends AlgebraicDataType1[String, Lang]
   
   val Lang: AlgebraicDataType1[String, Lang]
 
