@@ -1,8 +1,9 @@
-package org.w3.rdf
+package org.w3.rdf.simple
 
 import org.w3.algebraic._
+import org.w3.rdf._
 
-object SimpleModule extends Module {
+object SimpleModule extends RDFModule {
 
   case class Graph(triples: Set[Triple]) extends GraphInterface {
     def iterator = triples.iterator

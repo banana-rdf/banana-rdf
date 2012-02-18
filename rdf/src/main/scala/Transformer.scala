@@ -1,6 +1,6 @@
 package org.w3.rdf
 
-class Transformer[ModelA <: Module, ModelB <: Module](val a: ModelA, val b: ModelB) {
+class Transformer[ModelA <: RDFModule, ModelB <: RDFModule](val a: ModelA, val b: ModelB) {
 
   def transform(graph: a.Graph): b.Graph =
     b.Graph(graph map transformTriple)

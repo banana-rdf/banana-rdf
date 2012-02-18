@@ -1,10 +1,11 @@
-package org.w3.rdf
+package org.w3.rdf.jena
 
-import org.w3.rdf.jena.JenaModule
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
+import org.w3.rdf._
+import org.w3.rdf.n3._
 
 object JenaNTriplesStringParser
-extends NTriplesParser(
+extends n3.Parser(
   JenaModule,
   Parsers(
     Monotypic.String,
@@ -12,7 +13,7 @@ extends NTriplesParser(
     Accumulators.position[Listener](4)))
 
 object JenaNTriplesSeqParser
-extends NTriplesParser(
+extends n3.Parser(
   JenaModule,
   Parsers(
     Monotypic.Seq[Char],

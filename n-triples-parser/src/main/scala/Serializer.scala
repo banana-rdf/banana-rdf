@@ -3,7 +3,9 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf
+package org.w3.rdf.n3
+
+import org.w3.rdf._
 
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples
@@ -16,7 +18,7 @@ package org.w3.rdf
  * @since 02/02/2012
  */
 
-class NTriplesSerializer[M <: Module](val m: M) {
+class Serializer[M <: RDFModule](val m: M) {
   
   import m._
   

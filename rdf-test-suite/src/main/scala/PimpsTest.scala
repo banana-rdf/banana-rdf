@@ -4,7 +4,7 @@ import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 
 // TODO use generators
-abstract class PimpsTest[M <: Module](val m: M) extends WordSpec with MustMatchers {
+abstract class PimpsTest[M <: RDFModule](val m: M) extends WordSpec with MustMatchers {
   
   import m._
   

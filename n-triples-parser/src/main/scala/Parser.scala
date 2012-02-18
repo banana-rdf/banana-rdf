@@ -3,11 +3,12 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf
+package org.w3.rdf.n3
 
 import nomo._
 import nomo.Errors.{TreeError, Single}
 import scala.collection.mutable
+import org.w3.rdf._
 
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples
@@ -25,7 +26,7 @@ trait ListenerAgent[T] {
 }
 
 //todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
-class NTriplesParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
+class Parser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
   import m._
 
   //setup, should be in type

@@ -7,7 +7,7 @@ import com.hp.hpl.jena.datatypes.TypeMapper
 
 import org.w3.algebraic._
 
-object JenaModule extends Module {
+object JenaModule extends RDFModule {
 
   class Graph(val jenaGraph: JenaGraph) extends GraphInterface {
     def iterator: Iterator[Triple] = new Iterator[Triple] {

@@ -3,7 +3,7 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf
+package org.w3.rdf.n3
 
 import org.scalacheck._
 import Prop._
@@ -15,6 +15,7 @@ import collection.mutable.HashSet
 import nomo.{Accumulators, Errors, Parsers, Monotypic}
 import nomo.Accumulators.Position
 import scala.collection.mutable
+import org.w3.rdf._
 
 /**
  * @author bblfish
@@ -22,9 +23,9 @@ import scala.collection.mutable
  */
 
 
-class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
+class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
   
-  val serializer = new NTriplesSerializer[m.type](m)
+  val serializer = new Serializer[m.type](m)
   import m._
   import serializer._
   
@@ -35,7 +36,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   }
 
 
-  val P: NTriplesParser[M, String, TreeError, Position, Listener] = new NTriplesParser(m,
+  val P: Parser[M, String, TreeError, Position, Listener] = new Parser(m,
     Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
 
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",

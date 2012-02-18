@@ -1,4 +1,4 @@
-package org.w3.rdf
+package org.w3.rdf.n3
 
 import org.junit.Test
 import org.junit.Assert._
@@ -7,7 +7,7 @@ import java.io._
 import nomo.{Success, Accumulator}
 import com.hp.hpl.jena.rdf.model.{ModelFactory=>JenaModelFactory, Model => JenaModel}
 import collection.mutable
-
+import org.w3.rdf._
 
 case class Listener(val queue: mutable.Queue[Any] = new mutable.Queue[Any]()) extends ListenerAgent[Any] {
   def send(a: Any) = queue.enqueue(a)
@@ -17,7 +17,7 @@ case class Listener(val queue: mutable.Queue[Any] = new mutable.Queue[Any]()) ex
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesParser[M, F, E, X, Listener]) {
+abstract class ParserTest[M <: RDFModule, F, E, X](val parser: Parser[M, F, E, X, Listener]) {
 
   implicit def U: Listener = new Listener
   val isomorphism: GraphIsomorphism[parser.m.type]

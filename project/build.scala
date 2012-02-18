@@ -45,10 +45,9 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ Seq(EclipseKeys.skipParents in ThisBuild := false),
     aggregate = Seq(
       algebraic,
-      core,
-      graphIsomorphism,
-      transformer,
-      transformerTestSuite,
+      rdf,
+      rdfTestSuite,
+      simpleRdf,
       nTriplesParser,
       nTriplesParserTestSuite,
       jena))
@@ -59,47 +58,41 @@ object YourProjectBuild extends Build {
     settings = buildSettings
   )
   
-  lazy val core = Project(
-    id = "core",
-    base = file("core"),
+  lazy val rdf = Project(
+    id = "rdf",
+    base = file("rdf"),
     settings = buildSettings ++ testDeps
   ) dependsOn (algebraic)
 
-  lazy val graphIsomorphism = Project(
-    id = "graph-isomorphism",
-    base = file("graph-isomorphism"),
-    settings = buildSettings
-  ) dependsOn (core)
-
-  lazy val transformer = Project(
-    id = "transformer",
-    base = file("transformer"),
-    settings = buildSettings
-  ) dependsOn (core)
-
-  lazy val transformerTestSuite = Project(
-    id = "transformer-testsuite",
-    base = file("transformer-testsuite"),
+  lazy val rdfTestSuite = Project(
+    id = "rdf-test-suite",
+    base = file("rdf-test-suite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (core, transformer, graphIsomorphism)
+  ) dependsOn (rdf)
 
+  val simpleRdf = Project(
+    id = "simple-rdf",
+    base = file("simple-rdf"),
+    settings = buildSettings ++ testDeps
+  ) dependsOn (rdf, nTriplesParser, rdfTestSuite % "test", nTriplesParserTestSuite % "test")
+  
   lazy val jena = Project(
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
-  ) dependsOn (core, graphIsomorphism, transformer, nTriplesParser, nTriplesParserTestSuite % "test")
+  ) dependsOn (rdf, nTriplesParser, simpleRdf % "test", rdfTestSuite % "test", nTriplesParserTestSuite % "test")
 
   lazy val nTriplesParser = Project(
     id = "n-triples-parser",
     base = file("n-triples-parser"),
     settings = buildSettings ++ jenaDeps
-  ) dependsOn (core)
+  ) dependsOn (rdf)
   
   lazy val nTriplesParserTestSuite = Project(
     id = "n-triples-parser-test-suite",
     base = file("n-triples-parser-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ jenaDeps
-  ) dependsOn (nTriplesParser, graphIsomorphism)
+  ) dependsOn (nTriplesParser)
 
 }
 

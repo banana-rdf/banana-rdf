@@ -1,11 +1,10 @@
-
-package org.w3.rdf
+package org.w3.rdf.jena
 
 import org.junit.Test
 import org.junit.Assert._
 import java.io._
 import com.hp.hpl.jena.rdf.model._
-import org.w3.rdf.jena._
+import org.w3.rdf._
 
 class TransformerTest {
   
@@ -31,7 +30,7 @@ class TransformerTest {
 
     // assertTrue(jenaGraph.jenaGraph isIsomorphicWith jenaGraphAgain.jenaGraph)
     
-    import GraphIsomorphismForJenaModel._
+    import GraphIsomorphism._
     
     assertTrue(isIsomorphicWith(jenaGraph, jenaGraphAgain))
     
@@ -39,15 +38,15 @@ class TransformerTest {
   
 }
 
-class JenaNTriplesParserStringTest extends NTriplesParserTest(JenaNTriplesStringParser) {
-  val isomorphism = GraphIsomorphismForJenaModel
+class JenaNTriplesParserStringTest extends n3.ParserTest(JenaNTriplesStringParser) {
+  val isomorphism = GraphIsomorphism
   
   def toF(string: String) = string
 }
 
 
-class JenaNTriplesParserSeqTest extends NTriplesParserTest(JenaNTriplesSeqParser) {
-  val isomorphism = GraphIsomorphismForJenaModel
+class JenaNTriplesParserSeqTest extends n3.ParserTest(JenaNTriplesSeqParser) {
+  val isomorphism = GraphIsomorphism
   
   def toF(string: String) = string.toSeq
 }

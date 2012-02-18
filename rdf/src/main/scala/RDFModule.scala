@@ -10,7 +10,7 @@ import org.w3.algebraic._
  *   - we allow literals in subject position - for help later in reasoning.
  *   - We make a Lang <: IRI as this massively simplifies the model whilst making it type safe.
  */
-trait Module {
+trait RDFModule {
 
   trait GraphInterface extends Iterable[Triple] { self =>
     def ++(other: Graph): Graph
