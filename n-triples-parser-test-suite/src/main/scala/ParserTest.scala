@@ -21,11 +21,9 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
 
   implicit def U: Listener = new Listener
   val isomorphism: GraphIsomorphism[parser.m.type]
-  val pimps = new Pimps[parser.m.type](parser.m)
   
   import parser.m._
   import isomorphism._
-  import pimps._
 
   /** so that this test can be run with different IO models */
   def toF(string: String): F

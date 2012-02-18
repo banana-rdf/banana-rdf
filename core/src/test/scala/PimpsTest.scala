@@ -8,9 +8,6 @@ abstract class PimpsTest[M <: Module](val m: M) extends WordSpec with MustMatche
   
   import m._
   
-  val pimps: Pimps[m.type]
-  import pimps._
-  
   "a tuple of (s: Node, p: IRI, o: Node)" must {
     
     val s = BNode("something")
@@ -64,6 +61,3 @@ abstract class PimpsTest[M <: Module](val m: M) extends WordSpec with MustMatche
   
 }
 
-class PimpsForSimpleModuleTest extends PimpsTest(SimpleModule) {
-  val pimps = PimpsForSimpleModule
-}
