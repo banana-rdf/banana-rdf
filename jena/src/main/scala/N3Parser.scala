@@ -4,7 +4,7 @@ import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.rdf._
 import org.w3.rdf.n3._
 
-object JenaNTriplesStringParser
+object N3StringParser
 extends n3.Parser(
   JenaModule,
   Parsers(
@@ -12,7 +12,7 @@ extends n3.Parser(
     Errors.tree[Char],
     Accumulators.position[Listener](4)))
 
-object JenaNTriplesSeqParser
+object N3SeqParser
 extends n3.Parser(
   JenaModule,
   Parsers(

@@ -21,10 +21,6 @@ import org.w3.rdf._
  * @since 02/02/2012
  */
 
-trait ListenerAgent[T] {
-  def send(a: T)
-}
-
 //todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
 class Parser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
   import m._

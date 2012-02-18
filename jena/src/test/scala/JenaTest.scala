@@ -37,16 +37,3 @@ class TransformerTest {
   }
   
 }
-
-class JenaNTriplesParserStringTest extends n3.ParserTest(JenaNTriplesStringParser) {
-  val isomorphism = GraphIsomorphism
-  
-  def toF(string: String) = string
-}
-
-
-class JenaNTriplesParserSeqTest extends n3.ParserTest(JenaNTriplesSeqParser) {
-  val isomorphism = GraphIsomorphism
-  
-  def toF(string: String) = string.toSeq
-}
