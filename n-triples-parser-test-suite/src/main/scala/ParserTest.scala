@@ -21,9 +21,11 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
 
   implicit def U: Listener = new Listener
   val isomorphism: GraphIsomorphism[parser.m.type]
+  val pimps = new Pimps[parser.m.type](parser.m)
   
   import parser.m._
   import isomorphism._
+  import pimps._
 
   /** so that this test can be run with different IO models */
   def toF(string: String): F
@@ -53,20 +55,20 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
     val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
     val creator = IRI("http://purl.org/dc/elements/1.1/creator")
     val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
-    val dave = TypedLiteral("Dave Beckett", xsdStringIRI)
-    val art = TypedLiteral("Art Barstow")
+    val dave = "Dave Beckett".typedLiteral
+    val art = "Art Barstow".typedLiteral
     val w3org = IRI("http://www.w3.org/")
     
     val expected = 
       Graph(
-        Triple(ntriples, creator, dave),
-        Triple(ntriples, creator, art),
-        Triple(ntriples, publisher, w3org)
+        (ntriples, creator, dave),
+        (ntriples, creator, art),
+        (ntriples, publisher, w3org)
       )
     assertTrue("graphs must be isomorphic",isIsomorphicWith(expected, parsedGraph))
   }
 
-    @Test()
+  @Test()
   def read_long_n3s_in_chunks(): Unit = {
     import scala.io._
 

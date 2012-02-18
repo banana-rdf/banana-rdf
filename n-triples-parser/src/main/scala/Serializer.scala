@@ -20,6 +20,9 @@ class NTriplesSerializer[M <: Module](val m: M) {
   
   import m._
   
+//  val pimps = new Pimps(m)
+//  import pimps._
+  
   def asN3(graph: Graph): String =
     graph map tripleAsN3 mkString "\n"
 
@@ -45,7 +48,7 @@ class NTriplesSerializer[M <: Module](val m: M) {
   )
   
   def typedLiteralAsN3(typedLiteral: TypedLiteral): String = typedLiteral match {
-    case TypedLiteral(lexicalForm, IRI(iri)) if iri == xsdStringIRI =>
+    case TypedLiteral(lexicalForm, datatype) if datatype == xsdString =>
       "\"%s\"" format NTriplesParser.toLiteral(lexicalForm)
     case TypedLiteral(lexicalForm, IRI(iri)) =>
       "\"%s\"^^<%s>" format (NTriplesParser.toLiteral(lexicalForm), iri)

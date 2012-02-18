@@ -11,10 +11,6 @@ import org.w3.algebraic._
  *   - We make a Lang <: IRI as this massively simplifies the model whilst making it type safe.
  */
 trait Module {
-  lazy val xsdString = "http://www.w3.org/2001/XMLSchema#string"
-  lazy val xsdStringIRI = IRI(xsdString)
-  lazy val rdfLang = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
-
 
   trait GraphInterface extends Iterable[Triple] { self =>
     def ++(other: Graph): Graph
@@ -61,7 +57,7 @@ trait Module {
   val Literal: LiteralCompanionObject
   
   trait TypedLiteralCompanionObject extends AlgebraicDataType2[String, IRI, TypedLiteral] with Function1[String, TypedLiteral] {
-    def apply(lexicalForm: String): TypedLiteral = TypedLiteral(lexicalForm, xsdStringIRI)
+    def apply(lexicalForm: String): TypedLiteral = TypedLiteral(lexicalForm, IRI("http://www.w3.org/2001/XMLSchema#string"))
   }
   
   val TypedLiteral: TypedLiteralCompanionObject
@@ -74,9 +70,15 @@ trait Module {
   
   val Lang: AlgebraicDataType1[String, Lang]
 
+  def prefixBuilder(prefix: String)(value: String): IRI = IRI(prefix+value)
+
+  // helpers methods
+  
+  val xsd = prefixBuilder("http://www.w3.org/2001/XMLSchema#") _
+  val rdf = prefixBuilder("http://www.w3.org/1999/02/22-rdf-syntax-ns#") _
+
+  val xsdString = xsd("string")
+  val xsdInt = xsd("int")
+  val rdfLang = rdf("langString")
+  
 }
-
-
-
-
-

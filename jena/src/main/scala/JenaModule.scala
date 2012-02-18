@@ -74,6 +74,10 @@ object JenaModule extends Module {
   }
 
   lazy val mapper = TypeMapper.getInstance
+  def jenaDatatype(datatype: IRI) = {
+    val IRI(iriString) = datatype
+    mapper.getTypeByName(iriString)
+  }
   
   type Literal = Node_Literal
   
@@ -102,7 +106,7 @@ object JenaModule extends Module {
       if (typ != null)
         Some((typedLiteral.getLiteralLexicalForm.toString, IRI(typ.getURI)))
       else if (typedLiteral.getLiteralLanguage.isEmpty)
-        Some((typedLiteral.getLiteralLexicalForm.toString, xsdStringIRI))
+        Some((typedLiteral.getLiteralLexicalForm.toString, xsdString))
       else
         None
     }
@@ -112,7 +116,7 @@ object JenaModule extends Module {
   object LangLiteral extends LangLiteralCompanionObject {
     def apply(lexicalForm: String, lang: Lang): LangLiteral = {
       val Lang(langString) = lang
-      JenaNode.createLiteral(lexicalForm, langString, mapper.getTypeByName(xsdString)).asInstanceOf[Node_Literal]
+      JenaNode.createLiteral(lexicalForm, langString, jenaDatatype(xsdString)).asInstanceOf[Node_Literal]
     }
     def unapply(langLiteral: LangLiteral): Option[(String, Lang)] = {
       val l = langLiteral.getLiteralLanguage

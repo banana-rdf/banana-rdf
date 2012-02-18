@@ -6,11 +6,6 @@ class Pimps[M <: Module](val m: M) {
   
   import m._
   
-  def prefixBuilder(prefix: String)(value: String): IRI = IRI(prefix+value)
-  
-  val xsd = prefixBuilder("http://www.w3.org/2001/XMLSchema#") _
-  val rdf = prefixBuilder("http://www.w3.org/1999/02/22-rdf-syntax-ns#") _
-  
   implicit def tupleToTriple(tuple: (Node, IRI, Node)): Triple = Triple(tuple._1, tuple._2, tuple._3)
   
   class TripleW(triple: Triple) {
@@ -36,7 +31,17 @@ class Pimps[M <: Module](val m: M) {
   
   implicit def wrapLiteral(literal: Literal): LiteralW = new LiteralW(literal)
   
-  implicit def wrapIntAsLiteral(i: Int): TypedLiteral = TypedLiteral(i.toString, xsd("int"))
+  implicit def wrapIntAsLiteral(i: Int): TypedLiteral = TypedLiteral(i.toString, xsdInt)
+  
+  implicit def wrapStringAsLiteral(s: String): TypedLiteral = TypedLiteral(s, xsdString)
+  
+  class LiteralBuilder(lexicalForm: String) {
+    def ^^(datatype: IRI): TypedLiteral = TypedLiteral(lexicalForm, datatype)
+    def lang(tag: String): LangLiteral = LangLiteral(lexicalForm, Lang(tag))
+    def typedLiteral: TypedLiteral = TypedLiteral(lexicalForm, xsdString)
+  }
+  
+  implicit def wrapStringInLiteralBuilder(lexicalForm: String): LiteralBuilder = new LiteralBuilder(lexicalForm)
   
 }
 
