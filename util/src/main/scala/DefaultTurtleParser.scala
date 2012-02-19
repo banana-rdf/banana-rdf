@@ -10,10 +10,10 @@ class DefaultTurtleParser[M <: RDFModule](override val m: M) extends rdf.TurtleP
   
   private val jenaToM = new Transformer[JenaModule.type, m.type](JenaModule, m)
   
-  def read(is: InputStream, base: String): m.Graph =
-    jenaToM.transform(jena.TurtleParser.read(is, base))
+  def read(is: InputStream, base: String): Either[Throwable, m.Graph] =
+    jena.TurtleParser.read(is, base).right.map(jenaToM.transform)
   
-  def read(reader: Reader, base: String): m.Graph =
-   jenaToM.transform(jena.TurtleParser.read(reader, base))
+  def read(reader: Reader, base: String): Either[Throwable, m.Graph] =
+    jena.TurtleParser.read(reader, base).right.map(jenaToM.transform)
   
 }

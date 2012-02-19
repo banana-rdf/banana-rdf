@@ -6,18 +6,24 @@ abstract class TurtleParser[M <: RDFModule](val m: M) {
   
   import m._
   
-  def read(is: InputStream, base: String): Graph
+  def read(is: InputStream, base: String): Either[Throwable, Graph]
   
-  def read(reader: Reader, base: String): Graph
+  def read(reader: Reader, base: String): Either[Throwable, Graph]
   
-  def read(file: File, base: String): Graph = {
-    val fis = new BufferedInputStream(new FileInputStream(file))
-    read(fis, base)
-  }
+  def read(file: File, base: String): Either[Throwable, Graph] =
+    try {
+      val fis = new BufferedInputStream(new FileInputStream(file))
+      read(fis, base)
+    } catch {
+      case t => Left(t)
+    }
   
-  def read(s: String, base: String): Graph = {
-    val reader = new StringReader(s)
-    read(s, base)
-  }
+  def read(s: String, base: String): Either[Throwable, Graph] =
+    try {
+      val reader = new StringReader(s)
+      read(s, base)
+    } catch {
+      case t => Left(t)
+    }
   
 }

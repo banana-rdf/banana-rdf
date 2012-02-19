@@ -8,17 +8,25 @@ object TurtleParser extends rdf.TurtleParser(JenaModule) {
   
   import JenaModule._
   
-  def read(is: InputStream, base: String): Graph = {
-    val model = ModelFactory.createDefaultModel()
-    model.getReader("TURTLE").read(model, is, base)
-    Graph.fromJena(model.getGraph)
-  }
+  def read(is: InputStream, base: String): Either[Throwable, Graph] =
+    try {
+      val model = ModelFactory.createDefaultModel()
+      model.getReader("TURTLE").read(model, is, base)
+      val graph = Graph.fromJena(model.getGraph)
+      Right(graph)
+    } catch {
+      case t => Left(t)
+    }
   
-  def read(reader: Reader, base: String): Graph = {
-    val model = ModelFactory.createDefaultModel()
-    model.getReader("TURTLE").read(model, reader, base)
-    Graph.fromJena(model.getGraph)
-  }
+  def read(reader: Reader, base: String): Either[Throwable, Graph] =
+    try {
+      val model = ModelFactory.createDefaultModel()
+      model.getReader("TURTLE").read(model, reader, base)
+      val graph = Graph.fromJena(model.getGraph)
+      Right(graph)
+    } catch {
+      case t => Left(t)
+    }
   
   
 }
