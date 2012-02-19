@@ -98,10 +98,12 @@ class NTriplesParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P:
   val pred = uriRef
   val subject = uriRef | bnode
   val obj = uriRef | bnode | fullLiteral
-  val triple = (subject++(space1>>pred)++(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>space)
+  val nTriple = (subject++(space1>>pred)++(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>space)
   val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
-  val line = space >> (comment.as(None) | triple.map(Some(_)) | P.unit(None) )
-  val ntriples = (line.mapResult{
+  val line = space >> (comment.as(None) | nTriple.map(Some(_)) | P.unit(None) )
+
+  /** function that parse NTriples and send results to user in a streaming fashion */
+  val nTriples = (line.mapResult{
     r =>
       r.get match {
         case Some(t) => r.user.send(t);
@@ -109,8 +111,11 @@ class NTriplesParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P:
       }
       Success(r)
   } ).delimitIgnore(eoln)
-  val ntriplesList = line.delimit(eoln).map(_.flatten)
-  
+
+  /** function that parses NTriples and return result to caller as a list */
+  val nTriplesList = line.delimit(eoln).map(_.flatten)
+
+
 }
 
 object NTriplesParser {

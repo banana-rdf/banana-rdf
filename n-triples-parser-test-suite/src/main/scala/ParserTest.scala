@@ -45,7 +45,7 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
   @Test()
   def read_simple_n3(): Unit = {
 
-    val res = parser.ntriples(n3)
+    val res = parser.nTriples(n3)
     val tr = res.user.queue.toList.map(_.asInstanceOf[Triple])
     val parsedGraph = parser.m.Graph(tr)
     assertEquals("should be three triples in graph",3,parsedGraph.size)
@@ -82,8 +82,8 @@ abstract class NTriplesParserTest[M <: Module, F, E, X](val parser: NTriplesPars
     jenaCard.read(new FileInputStream(card),null,"N-TRIPLE")
     assertEquals("Pure Jena should have read 354 triples in"+card.getPath,354,jenaCard.size())
 
-    var chunk = ParsedChunk(parser.ntriples,parser.P.annotator(U))
-    var chunkR = ParsedChunk(parser.ntriples,parser.P.annotator(U))
+    var chunk = ParsedChunk(parser.nTriples,parser.P.annotator(U))
+    var chunkR = ParsedChunk(parser.nTriples,parser.P.annotator(U))
 
     //scala.io.Reader seemed to have a problem.
     //here we test Asynchronous IO, feeding in pieces at a time

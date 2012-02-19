@@ -159,7 +159,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   
   property("statement") = forAll(genRelation){ case tr @ Triple(sub, rel, obj) =>
     val statement = tripleAsN3(tr)
-    val res = P.triple(statement)
+    val res = P.nTriple(statement)
     ("statement to parse="+statement+" result ="+ res) |: all  (
       ( res.isSuccess :| "failed test") &&
       ( (res.get == tr) :| "parse produced a different result")
@@ -181,7 +181,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
  property("messyGraph") = forAll(genGraph) {
     graph =>
       val doc = generateDoc(graph)
-      val res = P.ntriplesList(doc)
+      val res = P.nTriplesList(doc)
       val set = HashSet(graph)
 
       ("inputdoc="+doc+"\n----result ="+res) |: all (
@@ -193,7 +193,7 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   property("messyGraphWithListener") = forAll(genGraph) {
     graph =>
       val doc = generateDoc(graph)
-      val res = P.ntriples(doc)
+      val res = P.nTriples(doc)
       val set = HashSet(graph:_*)
 
       val resSet = res.user.queue.map(_.asInstanceOf[Triple]).toSet
