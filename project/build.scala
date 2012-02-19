@@ -67,14 +67,20 @@ object YourProjectBuild extends Build {
     id = "simple-rdf",
     base = file("simple-rdf"),
     settings = buildSettings ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test", util % "test")
   
   lazy val jena = Project(
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
-  ) dependsOn (rdf, n3, simpleRdf % "test", rdfTestSuite % "test", n3TestSuite % "test")
-
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
+  
+  lazy val util = Project(
+    id = "util",
+    base = file("util"),
+    settings = buildSettings ++ jenaDeps
+  ) dependsOn (rdf, jena)
+  
   lazy val n3 = Project(
     id = "n3",
     base = file("n3"),

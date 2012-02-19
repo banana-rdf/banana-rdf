@@ -129,9 +129,6 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: Parser[
     val g = m.Graph(res)
     val gR = m.Graph(resR)
 
-    println("<<< "+diff(g, gR).size)
-    println(">>> "+diff(gR, g).size)
-
     assertEquals("There should be 354 triples in "+card.getPath,354,g.size)
     assertEquals("There should be 354 triples in "+card_random.getPath,354,gR.size)
 
