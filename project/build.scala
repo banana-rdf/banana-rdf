@@ -39,6 +39,11 @@ object YourProjectBuild extends Build {
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
       libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.0-incubating")
   
+  val sesameDeps =
+    Seq(
+      resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-runtime" % "2.6.3")
+  
   lazy val pimpMyRdf = Project(
     id = "pimp-my-rdf",
     base = file("."),
@@ -49,7 +54,8 @@ object YourProjectBuild extends Build {
       simpleRdf,
       n3,
       n3TestSuite,
-      jena))
+      jena,
+      sesame))
   
   lazy val rdf = Project(
     id = "rdf",
@@ -73,6 +79,12 @@ object YourProjectBuild extends Build {
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
+  
+  lazy val sesame = Project(
+    id = "sesame",
+    base = file("sesame"),
+    settings = buildSettings ++ sesameDeps ++ testDeps
   ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
   
   lazy val util = Project(
