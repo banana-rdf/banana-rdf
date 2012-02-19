@@ -12,14 +12,15 @@ import org.w3.rdf._
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class ParserTest[M <: RDFModule, F, E, X](val parser: Parser[M, F, E, X, Listener]) {
+abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: Parser[M, F, E, X, Listener]) {
 
-  implicit def U: Listener = new Listener
-  val isomorphism: GraphIsomorphism[parser.m.type]
+  val isomorphism: GraphIsomorphism[m.type]
   
-  import parser.m._
+  import m._
   import isomorphism._
-
+  
+  implicit def U: Listener = new Listener
+  
   /** so that this test can be run with different IO models */
   def toF(string: String): F
 
@@ -42,7 +43,7 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val parser: Parser[M, F, E, X
 
     val res = parser.ntriples(n3)
     val tr = res.user.queue.toList.map(_.asInstanceOf[Triple])
-    val parsedGraph = parser.m.Graph(tr)
+    val parsedGraph = m.Graph(tr)
     assertEquals("should be three triples in graph",3,parsedGraph.size)
 
     val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
@@ -125,8 +126,8 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val parser: Parser[M, F, E, X
     assertTrue("error parsing card.random.nt - failed at "+resultR.position+" with status "+resultR.status,resultR.isSuccess)
 
 
-    val g = parser.m.Graph(res)
-    val gR = parser.m.Graph(resR)
+    val g = m.Graph(res)
+    val gR = m.Graph(resR)
 
     println("<<< "+diff(g, gR).size)
     println(">>> "+diff(gR, g).size)
