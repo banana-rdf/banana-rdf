@@ -48,8 +48,8 @@ object YourProjectBuild extends Build {
       rdf,
       rdfTestSuite,
       simpleRdf,
-      nTriplesParser,
-      nTriplesParserTestSuite,
+      n3,
+      n3TestSuite,
       jena))
   
   lazy val algebraic = Project(
@@ -74,25 +74,25 @@ object YourProjectBuild extends Build {
     id = "simple-rdf",
     base = file("simple-rdf"),
     settings = buildSettings ++ testDeps
-  ) dependsOn (rdf, nTriplesParser, rdfTestSuite % "test", nTriplesParserTestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
   
   lazy val jena = Project(
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
-  ) dependsOn (rdf, nTriplesParser, simpleRdf % "test", rdfTestSuite % "test", nTriplesParserTestSuite % "test")
+  ) dependsOn (rdf, n3, simpleRdf % "test", rdfTestSuite % "test", n3TestSuite % "test")
 
-  lazy val nTriplesParser = Project(
-    id = "n-triples-parser",
-    base = file("n-triples-parser"),
+  lazy val n3 = Project(
+    id = "n3",
+    base = file("n3"),
     settings = buildSettings ++ jenaDeps
   ) dependsOn (rdf)
   
-  lazy val nTriplesParserTestSuite = Project(
-    id = "n-triples-parser-test-suite",
-    base = file("n-triples-parser-test-suite"),
+  lazy val n3TestSuite = Project(
+    id = "n3-test-suite",
+    base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ jenaDeps
-  ) dependsOn (nTriplesParser)
+  ) dependsOn (n3)
 
 }
 
