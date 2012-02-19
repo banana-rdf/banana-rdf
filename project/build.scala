@@ -44,7 +44,6 @@ object YourProjectBuild extends Build {
     base = file("."),
     settings = buildSettings ++ Seq(EclipseKeys.skipParents in ThisBuild := false),
     aggregate = Seq(
-      algebraic,
       rdf,
       rdfTestSuite,
       simpleRdf,
@@ -52,17 +51,11 @@ object YourProjectBuild extends Build {
       n3TestSuite,
       jena))
   
-  lazy val algebraic = Project(
-    id = "algebraic",
-    base = file("algebraic"),
-    settings = buildSettings
-  )
-  
   lazy val rdf = Project(
     id = "rdf",
     base = file("rdf"),
     settings = buildSettings ++ testDeps
-  ) dependsOn (algebraic)
+  )
 
   lazy val rdfTestSuite = Project(
     id = "rdf-test-suite",

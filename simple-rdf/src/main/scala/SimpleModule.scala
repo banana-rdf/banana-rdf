@@ -1,6 +1,5 @@
 package org.w3.rdf.simple
 
-import org.w3.algebraic._
 import org.w3.rdf._
 
 object SimpleModule extends RDFModule {

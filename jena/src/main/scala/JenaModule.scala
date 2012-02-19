@@ -5,8 +5,6 @@ import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => 
 import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 
-import org.w3.algebraic._
-
 object JenaModule extends RDFModule {
 
   class Graph(val jenaGraph: JenaGraph) extends GraphInterface {

@@ -1,7 +1,5 @@
 package org.w3.rdf
 
-import org.w3.algebraic._
-
 /**
  * A Module that gathers the types needed to define an RDF implementation
  * Closely based on
@@ -32,7 +30,9 @@ trait RDFModule {
   }
   val Graph: GraphCompanionObject
 
-  trait TripleCompanionObject extends AlgebraicDataType3[Node, IRI, Node, Triple]
+  trait TripleCompanionObject extends Function3[Node, IRI, Node, Triple] {
+    def unapply(t: Triple): Option[(Node, IRI, Node)]
+  }
   
   val Triple: TripleCompanionObject
 
@@ -42,11 +42,15 @@ trait RDFModule {
   
   val Node: NodeCompanionObject
   
-  trait IRICompanionObject extends AlgebraicDataType1[String, IRI]
+  trait IRICompanionObject extends Function1[String, IRI] {
+    def unapply(i: IRI): Option[String]
+  }
   
   val IRI : IRICompanionObject
 
-  trait BNodeCompanionObject extends AlgebraicDataType1[String, BNode]
+  trait BNodeCompanionObject extends Function1[String, BNode] {
+    def unapply(bn: BNode): Option[String]
+  }
   
   val BNode: BNodeCompanionObject
 
@@ -56,19 +60,24 @@ trait RDFModule {
   
   val Literal: LiteralCompanionObject
   
-  trait TypedLiteralCompanionObject extends AlgebraicDataType2[String, IRI, TypedLiteral] with Function1[String, TypedLiteral] {
+  trait TypedLiteralCompanionObject extends Function2[String, IRI, TypedLiteral] with Function1[String, TypedLiteral] {
+    def unapply(tl: TypedLiteral): Option[(String, IRI)]
     def apply(lexicalForm: String): TypedLiteral = TypedLiteral(lexicalForm, IRI("http://www.w3.org/2001/XMLSchema#string"))
   }
   
   val TypedLiteral: TypedLiteralCompanionObject
   
-  trait LangLiteralCompanionObject extends AlgebraicDataType2[String, Lang, LangLiteral]
+  trait LangLiteralCompanionObject extends Function2[String, Lang, LangLiteral] {
+    def unapply(ll: LangLiteral): Option[(String, Lang)]
+  }
   
   val LangLiteral: LangLiteralCompanionObject
   
-  trait LangCompanionObject extends AlgebraicDataType1[String, Lang]
+  trait LangCompanionObject extends Function1[String, Lang] {
+    def unapply(l: Lang): Option[String]
+  }
   
-  val Lang: AlgebraicDataType1[String, Lang]
+  val Lang: LangCompanionObject
 
   def prefixBuilder(prefix: String)(value: String): IRI = IRI(prefix+value)
 
