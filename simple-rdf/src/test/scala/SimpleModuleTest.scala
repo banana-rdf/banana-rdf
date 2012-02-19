@@ -17,3 +17,5 @@ class N3ParserSeqTest extends n3.ParserTest(SimpleModule, SimpleN3SeqParser) {
   val isomorphism = SimpleGraphIsomorphism
   def toF(string: String) = string.toSeq
 }
+
+class SimpleTurtleParserTest extends TurtleParserTest(SimpleModule, SimpleTurtleParser, SimpleGraphIsomorphism)
