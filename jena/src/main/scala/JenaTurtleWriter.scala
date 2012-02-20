@@ -4,7 +4,7 @@ import org.w3.rdf
 import java.io._
 import com.hp.hpl.jena.rdf.model._
 
-object TurtleWriter extends rdf.TurtleWriter(JenaModule) {
+object JenaTurtleWriter extends rdf.TurtleWriter(JenaModule) {
   
   import JenaModule._
   

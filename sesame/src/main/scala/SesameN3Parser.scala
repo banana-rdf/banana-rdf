@@ -1,12 +1,12 @@
-package org.w3.rdf.jena
+package org.w3.rdf.sesame
 
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.rdf._
 import org.w3.rdf.n3._
 
-object N3StringParser
+object SesameN3StringParser
 extends n3.Parser(
-  JenaModule,
+  SesameModule,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
@@ -14,7 +14,7 @@ extends n3.Parser(
 
 object N3SeqParser
 extends n3.Parser(
-  JenaModule,
+  SesameModule,
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],

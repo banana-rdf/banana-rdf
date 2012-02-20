@@ -4,7 +4,7 @@ import org.w3.rdf
 import java.io._
 import com.hp.hpl.jena.rdf.model._
 
-object TurtleReader extends rdf.TurtleReader(JenaModule) {
+object JenaTurtleReader extends rdf.TurtleReader(JenaModule) {
   
   import JenaModule._
   

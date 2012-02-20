@@ -3,7 +3,7 @@ package org.w3.rdf.simple
 import org.w3.rdf._
 import org.w3.rdf.util.DefaultGraphIsomorphism
 
-class SimpleModuleTest extends PimpsTest(SimpleModule)
+class SimpleModuleTest extends PimpsTestSuite(SimpleModule)
 
 class SimpleN3ParserSpec extends n3.NTriplesSpec(SimpleModule)
 

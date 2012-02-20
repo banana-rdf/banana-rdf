@@ -4,13 +4,12 @@ import org.w3.rdf
 
 import org.openrdf.model.Statement
 import org.openrdf.model.impl.{GraphImpl, StatementImpl, LiteralImpl}
-
 import java.io._
-import java.util.{LinkedList, Collection}
+import java.util.LinkedList
 
 import scala.collection.immutable.List
 
-object TurtleReader extends rdf.TurtleReader(SesameModule) {
+object SesameTurtleReader extends rdf.TurtleReader(SesameModule) {
   
   import SesameModule._
   
