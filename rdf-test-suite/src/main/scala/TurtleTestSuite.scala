@@ -23,12 +23,12 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
       )
     }
   
-//  def beIsomorphicWith(right: m.Graph): BeMatcher[m.Graph] = beIsomorphicWithGeneral(m)(iso)(right)
+  def isomorphicWith(right: m.Graph): BeMatcher[m.Graph] = beIsomorphicWithGeneral(m)(iso)(right)
 
   import m._
   
-  val referenceGraph = {
-    val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
+  def graphBuilder(prefix: Prefix) = {
+    val ntriples = prefix("ntriples/")
     val creator = IRI("http://purl.org/dc/elements/1.1/creator")
     val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
     val dave = "Dave Beckett".typedLiteral
@@ -41,8 +41,15 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
     )
   }
   
-  val baseUri = "http://example.com/foo"
-
+  val rdfCore = "http://www.w3.org/2001/sw/RDFCore/"
+  val rdfCorePrefix = prefixBuilder(rdfCore) _
+  val referenceGraph = graphBuilder(rdfCorePrefix)
+  
+  // TODO: there is a bug in Sesame with hash uris as prefix
+  val foo = "http://example.com/foo/"
+  val fooPrefix = prefixBuilder(foo) _
+  val fooGraph = graphBuilder(fooPrefix)
+  
   "read TURTLE version of timbl's card" in {
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
     val graph = reader.read(file, file.toURI.toString)
@@ -55,7 +62,7 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    val graph = reader.read(turtleString, baseUri)
+    val graph = reader.read(turtleString, rdfCore)
     
     val g: m.Graph = graph.right.get
     assert(iso.isIsomorphicWith(referenceGraph, g))
@@ -63,10 +70,19 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
   }
   
   "write simple graph as TURTLE string" in {
-    
-    val turtleString = writer.asString(referenceGraph, baseUri)
+    val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/")
     turtleString.right.value must not be ('empty)
-    
+  }
+  
+  "works with relative uris" in {
+    val turtleString = writer.asString(referenceGraph, rdfCore)
+//    println("  --- "+turtleString)
+    val computedFooGraph = turtleString.right flatMap { s => reader.read(s, foo) }
+//    println("0 --- "+computedFooGraph)
+//    println("1 --- "+fooGraph)
+    val g: m.Graph = computedFooGraph.right.get
+//    println("2 --- "+g)
+    assert(iso.isIsomorphicWith(fooGraph, g))
   }
   
 }

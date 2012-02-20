@@ -40,7 +40,7 @@ object SesameTurtleReader extends rdf.TurtleReader(SesameModule) {
       val triples = new java.util.LinkedList[Statement]
       val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
       turtleParser.setRDFHandler(collector)
-      turtleParser.parse(reader, base);
+      turtleParser.parse(reader, base)
       Right(new Graph(new GraphImpl(triples)))
     } catch {
       case t => Left(t)
