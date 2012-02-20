@@ -104,6 +104,12 @@ object YourProjectBuild extends Build {
     base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ jenaDeps
   ) dependsOn (n3)
-
+  
+  lazy val store = Project(
+    id = "store",
+    base = file("store"),
+    settings = buildSettings
+  ) dependsOn (rdf)
+  
 }
 

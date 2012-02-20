@@ -2,7 +2,7 @@ package org.w3.rdf
 
 import java.io._
 
-abstract class TurtleParser[M <: RDFModule](val m: M) {
+abstract class TurtleReader[M <: RDFModule](val m: M) {
   
   import m._
   
