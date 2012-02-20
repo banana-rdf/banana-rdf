@@ -10,7 +10,7 @@ import java.util.Collection
 
 import scala.collection.immutable.List
 
-object TurtleParser extends rdf.TurtleParser(SesameModule) {
+object TurtleReader extends rdf.TurtleReader(SesameModule) {
   
   import SesameModule._
   
