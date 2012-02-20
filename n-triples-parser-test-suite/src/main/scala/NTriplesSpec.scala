@@ -27,6 +27,8 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   val serializer = new NTriplesSerializer[m.type](m)
   import m._
   import serializer._
+  val gen = new SpecTriplesGenerator[m.type](m)
+  import gen._
   
   implicit def U: Listener = new Listener()
 
@@ -38,63 +40,8 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
   val P: NTriplesParser[M, String, TreeError, Position, Listener] = new NTriplesParser(m,
     Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
 
-  val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
-    "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
-    "ftp://ftp.is.co.za/rfc/rfc1808.txt", "ldap://[2001:db8::7]/c=GB?objectClass?one",
-    "mailto:John.Doe@example.com", "news:comp.infosystems.www.servers.unix",
-    "tel:+1-816-555-1212", "telnet://192.0.2.16:80/",
-    "foo://example.com:8042/over/there?name=ferret#nose",
-    "urn:example:animal:ferret:nose",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#en",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#de",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#fr",
-    "http://www.w3.org/2001/XMLSchema#string")
 
-  def newline = Gen.oneOf(Array("\n","\r","\r\n"))
-  def genSimpleLang = Gen.alphaChar.combine(Gen.alphaNumChar) { (oc,ocn)=> Some(""+oc.get+ocn.get) }
-  
-  def genLangStr = Gen.choose(1,3).flatMap {n=>
-       for (cs <- Gen.containerOfN[List,String](n, genSimpleLang) ) yield cs.mkString("-")
-  }
 
-  def genUnicodeStr: Gen[String] = for(cs <- Gen.listOf(ntripleChar)) yield cs.mkString
-
-  def genIRI = Gen.oneOf(uris).map( u => IRI(u) )
-  
-  def genPlainLiteral = for (str <- genUnicodeStr) yield TypedLiteral(str)
-  def genTypedLiteral = for (str <- genUnicodeStr;
-                             tpe <- genIRI) yield TypedLiteral(str, tpe)
-  def genLangLiteral = for (str <- genUnicodeStr;
-                        lang <- genLangStr) yield LangLiteral(str, Lang(lang))
-  def genBnode = Gen.identifier.map(id => BNode(id))
-
-  def genAnyNode = Gen.oneOf(genPlainLiteral, genTypedLiteral, genLangLiteral, genBnode, genIRI)
-  def genSubjNode = Gen.oneOf(genIRI, genBnode)
-  def genRelation =
-    for {
-      subj <- genSubjNode
-      rel <- genIRI
-      obj <- genAnyNode
-    } yield Triple(subj, rel, obj)
-  def genGraph = Gen.listOf(genRelation)
-  def genSpace = Gen.listOf1(Gen.oneOf(" \t")).map(_.mkString)
-  def genAnySpace = Gen.listOf1(Gen.oneOf(" \t\n\r  ")).map(_.mkString)
-
-  def ntripleChar = Gen.frequency(
-    (1,Gen.oneOf("\\'\"\t\r\n")),
-    (2,Gen.oneOf(NumericRange(1,256,1))),
-    (1,genSpace),
-    (10,unicodeChar)
-  )
-  
-  def unicodeChar = Gen((p: Gen.Params) => {
-    var c = 0
-    do {
-      c = Random.nextInt(0xFFFF)
-    } while (!Character.isDefined(c))
-    Some(c.toChar)
-  })
-  
   
    property("lang") = forAll(genLangStr){ lang =>
      P.lang(lang).isSuccess
@@ -227,4 +174,88 @@ class NTriplesSpec[M <: Module](val m: M)  extends Properties("NTriples") {
 
 }
 
+class SpecTriplesGenerator[M <: Module](val m: M) {
+  import m._
+  val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
+    "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
+    "ftp://ftp.is.co.za/rfc/rfc1808.txt", "ldap://[2001:db8::7]/c=GB?objectClass?one",
+    "mailto:John.Doe@example.com", "news:comp.infosystems.www.servers.unix",
+    "tel:+1-816-555-1212", "telnet://192.0.2.16:80/",
+    "foo://example.com:8042/over/there?name=ferret#nose",
+    "urn:example:animal:ferret:nose",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#en",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#de",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#fr",
+    "http://www.w3.org/2001/XMLSchema#string")
 
+
+  def ntripleChar = Gen.frequency(
+    (1,Gen.oneOf("\\'\"\t\r\n")),
+    (2,Gen.oneOf(NumericRange(1,256,1))),
+    (1,genSpace),
+    (10,unicodeChar)
+  )
+
+  def unicodeChar = Gen((p: Gen.Params) => {
+    var c = 0
+    do {
+      c = Random.nextInt(0xFFFF)
+    } while (!Character.isDefined(c))
+    Some(c.toChar)
+  })
+
+
+  def newline = Gen.oneOf(Array("\n","\r","\r\n"))
+  def genSimpleLang = Gen.alphaChar.combine(Gen.alphaNumChar) { (oc,ocn)=> Some(""+oc.get+ocn.get) }
+
+  def genLangStr = Gen.choose(1,3).flatMap {n=>
+    for (cs <- Gen.containerOfN[List,String](n, genSimpleLang) ) yield cs.mkString("-")
+  }
+
+  def genUnicodeStr: Gen[String] = for(cs <- Gen.listOf(ntripleChar)) yield cs.mkString
+
+  def genIRI = Gen.oneOf(uris).map( u => IRI(u) )
+
+  def genPlainLiteral = for (str <- genUnicodeStr) yield TypedLiteral(str)
+  def genTypedLiteral = for (str <- genUnicodeStr;
+                             tpe <- genIRI) yield TypedLiteral(str, tpe)
+  def genLangLiteral = for (str <- genUnicodeStr;
+                            lang <- genLangStr) yield LangLiteral(str, Lang(lang))
+  def genBnode = Gen.identifier.map(id => BNode(id))
+
+  def genAnyNode = Gen.oneOf(genPlainLiteral, genTypedLiteral, genLangLiteral, genBnode, genIRI)
+  def genSubjNode = Gen.oneOf(genIRI, genBnode)
+  def genRelation =
+    for {
+      subj <- genSubjNode
+      rel <- genIRI
+      obj <- genAnyNode
+    } yield Triple(subj, rel, obj)
+  def genGraph = Gen.listOf(genRelation)
+  def genSpace = Gen.listOf1(Gen.oneOf(" \t")).map(_.mkString)
+  def genAnySpace = Gen.listOf1(Gen.oneOf(" \t\n\r  ")).map(_.mkString)
+  def genComment = for {
+    space <- genSpace
+    line <- genUnicodeStr
+    eol <- newline
+  } yield {
+    space + "#" + line.map {
+      case '\n' => "\\n"
+      case '\r' => "\\r"
+      case c => c
+    }.mkString + eol
+  }
+
+}
+
+class SpecTurtleGenerator[M <: Module](override val m: M)  extends SpecTriplesGenerator[M](m){
+
+  val goodPrefixes= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
+    "\\u002e:","e\\u0eff\\u0045:","e\\t:")
+  val badPrefixes= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf")
+
+  def genGoodPrefixes = Gen.elements(goodPrefixes)
+  def genBadPrefixes = Gen.listOf(badPrefixes)
+  def genSpaceOrComment = Gen.oneOf(genSpace,genComment)
+
+}

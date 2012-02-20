@@ -10,6 +10,13 @@ import nomo.Errors.{TreeError, Single}
 import scala.collection.mutable
 import org.w3.rdf.Module
 
+
+trait ListenerAgent[T] {
+  def send(a: T)
+}
+
+
+
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples
  * http://www.w3.org/TR/rdf-testcases/#ntriples
@@ -20,19 +27,13 @@ import org.w3.rdf.Module
  * @author bblfish
  * @since 02/02/2012
  */
-
-trait ListenerAgent[T] {
-  def send(a: T)
-}
-
-//todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
 class NTriplesParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
+//todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
+
   import m._
 
-  //setup, should be in type
+  //todo: do we really need a tree error for such a simple language (what do TreeErrors enable?)
   implicit def toTreeError(msg: String): Errors.TreeError = Errors.Single(msg, None)
-//  implicit val U: Unit = ()
-  //end setup
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
   val hexadecimalChars = "1234567890ABCDEFabcdef"
@@ -56,10 +57,10 @@ class NTriplesParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P:
   val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).map (n=>BNode(n.toSeq.mkString))
 
 
-  val lit_u = (P.word("\\u")>> hex++hex++hex++hex) map {
+  val u_CHAR = (P.word("\\u")>> hex++hex++hex++hex) map {
     case c1++c2++c3++c4 => Integer.parseInt(new String(Array(c1,c2,c3,c4)),16).toChar
   }
-  val lit_U = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
+  val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
     case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
   }
   val lt_tab = P.word("\\t").map(c=>0x9.toChar)
@@ -68,11 +69,11 @@ class NTriplesParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P:
   val lt_slash = P.word("\\\\").map(c=>'\\')
   val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
 
-  val literal = ( lit_u | lit_U | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
+  val literal = ( u_CHAR | U_CHAR | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
       P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single('!',pos)).map(n=>n.toSeq.mkString)
     ).many.map(l=> l.toSeq.mkString)
 
-  val uriStr = (lit_u | lit_U | lt_slash | lt_quote |
+  val uriStr = (u_CHAR | U_CHAR | lt_slash | lt_quote |
       P.takeWhile1(c => isUriChar(c),pos => P.err.single('!',pos)).map(n=>n.toSeq.mkString)
      ).many1.map(i=>i.toSeq.mkString)
 
@@ -165,5 +166,98 @@ object NTriplesParser {
     }
     b.toString()
   }
-  
+
+}
+
+
+
+/**
+ * Turtle Parser as specified at http://www.w3.org/TR/turtle/
+ *
+ * @param m
+ * @param P
+ * @tparam M
+ * @tparam F
+ * @tparam E
+ * @tparam X
+ * @tparam U
+ */
+class TurtleParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
+  import TurtleParser._
+  import P.++
+
+  /** Parses the single token given that matches the function */
+  def single(isC: Char => Boolean ): P.Parser[Char] = P.any mapResult (s =>
+    s.status.flatMap(i => if (isC(i) ) Success(i) else Failure(P.err.single(i, s.position))))
+
+  val COLON = P.single(':')
+  val PREFIX = P.word("@prefix")
+  val dot = P.single('.')
+
+  val SP = (P.takeWhile1(c=> " \t\r\n".contains(c),err) | comment ).many1
+  val comment = P.single('#')>>P.takeWhile(c=> c != '\r' && c != '\n')
+
+  val hexadecimalChars = "1234567890ABCDEFabcdef"
+  def hex = P.anyOf(hexadecimalChars)
+
+  val u_CHAR = (P.word("\\u")>> hex++hex++hex++hex) map {
+    case c1++c2++c3++c4 => Integer.parseInt(new String(Array(c1,c2,c3,c4)),16).toChar
+  }
+  val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
+    case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
+  }
+  val err = (pos: X) =>P.err.single('!',pos)
+
+  val UCHAR = u_CHAR | U_CHAR
+  val UCHARS = UCHAR.many1.map(_.mkString)
+  val PN_CHARS_BASE = single(pn_chars_simple) | UCHAR
+  val PN_CHARS_U = PN_CHARS_BASE | P.single ('_')
+  val PN_CHARS =  P.takeWhile1(pn_chars_dot, err).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
+  val PN_decode = PN_CHARS.many1.map(_.mkString)
+
+  val PN_PREFIX = P.takeWhile(_ != ':').mapResult {
+    case Result(Success(pfx), pos, us)=> {
+      val prefx = pfx.toSeq.mkString
+      if (prefx.size == 0) Success("")
+      else if (prefx.last == '.') Failure(P.err.single(prefx.last,pos))
+      else if (!pn_chars_simple(prefx.head) && UCHAR(prefx)(us).isFailure) {
+        Failure(P.err.single(prefx.head,pos))
+      } else {
+        PN_decode(prefx)(us).status
+      }
+    }
+    case other => other.status
+  }
+
+  val PNAME_NS =  PN_PREFIX << COLON
+  val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char,err) | UCHARS).many.map(_.mkString)<<P.single ('>')
+  val prefixID =  (PREFIX >> SP >> PNAME_NS) ++ (SP>>IRI_REF)
+  val directive = prefixID //| base
+
+  val statement = ( directive << dot ) //| ( turtleTriples << dot )
+
+
+}
+
+
+object TurtleParser {
+  val pn_simple_set = List[Pair[Int, Int]](('A'.toInt,'Z'.toInt),('a'.toInt,'z'.toInt),
+    (0x00C0,0x00D6), (0x00D8,0x00F6), (0x00F8,0x02FF), (0x0370,0x037D),
+    (0x037F,0x1FFF), (0x200C,0x200D), (0x2070,0x218F), (0x2C00,0x2FEF),
+    (0x3001,0xD7FF), (0xF900,0xFDCF), (0xFDF0,0xFFFD), (0x10000,0xEFFFF)
+  )
+  val non_iri_chars = Array('<','>','"','{','}','|','^','`','\\')
+
+  val pn_chars_set = ('0'.toInt,'9'.toInt)::pn_simple_set:::List((0x300,0x36F),(0x203F,0x2040))
+
+  def pn_chars_simple(c: Char): Boolean = pn_simple_set.exists(in(_)(c))
+
+  def pn_chars_dot(c: Char) = c == '.' || pn_chars(c)
+  def pn_chars(c: Char) = c == '-' || c == '_' || c == 0xB7 || pn_chars_set.exists(in(_)(c))
+
+  def iri_char(c: Char) = !( non_iri_chars.contains(c) || in((0,' '.toInt))(c) )
+
+  def in(interval: Pair[Int, Int])(c: Char) =  c>=interval._1 && c<=interval._2
+
+
 }
