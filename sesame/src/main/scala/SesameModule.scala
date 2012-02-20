@@ -16,11 +16,8 @@ object SesameModule extends RDFModule {
   type Lang = String
   
   class Graph(val sesameGraph: GraphImpl) extends GraphInterface {
-    def iterator: Iterator[Triple] = new Iterator[Triple] {
-      val iterator = sesameGraph.iterator
-      def hasNext = iterator.hasNext
-      def next = iterator.next
-    }
+    import scala.collection.JavaConverters._
+    def iterator: Iterator[Triple] = sesameGraph.asScala.iterator
     def ++(other: Graph):Graph = {
       val g = new GraphImpl()
       iterator foreach { t => g add t }

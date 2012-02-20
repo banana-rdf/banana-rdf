@@ -9,6 +9,7 @@ import org.scalatest.EitherValues._
 abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with MustMatchers {
   
   val reader: TurtleReader[m.type]
+  val writer: TurtleWriter[m.type]
   val iso: GraphIsomorphism[m.type]
   
   import org.scalatest.matchers.{BeMatcher, MatchResult}
@@ -25,6 +26,22 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
 //  def beIsomorphicWith(right: m.Graph): BeMatcher[m.Graph] = beIsomorphicWithGeneral(m)(iso)(right)
 
   import m._
+  
+  val referenceGraph = {
+    val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
+    val creator = IRI("http://purl.org/dc/elements/1.1/creator")
+    val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
+    val dave = "Dave Beckett".typedLiteral
+    val art = "Art Barstow".typedLiteral
+    val w3org = IRI("http://www.w3.org/")
+    Graph(
+      (ntriples, creator, dave),
+      (ntriples, creator, art),
+      (ntriples, publisher, w3org)
+    )
+  }
+  
+  val baseUri = "http://example.com/foo"
 
   "read TURTLE version of timbl's card" in {
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
@@ -38,23 +55,17 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    val graph = reader.read(turtleString, "http://example.com/foo")
-    
-    val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
-    val creator = IRI("http://purl.org/dc/elements/1.1/creator")
-    val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
-    val dave = "Dave Beckett".typedLiteral
-    val art = "Art Barstow".typedLiteral
-    val w3org = IRI("http://www.w3.org/")
-    
-    val expectedGraph = Graph(
-      (ntriples, creator, dave),
-      (ntriples, creator, art),
-      (ntriples, publisher, w3org)
-    )
+    val graph = reader.read(turtleString, baseUri)
     
     val g: m.Graph = graph.right.get
-    assert(iso.isIsomorphicWith(expectedGraph, g))
+    assert(iso.isIsomorphicWith(referenceGraph, g))
+    
+  }
+  
+  "write simple graph as TURTLE string" in {
+    
+    val turtleString = writer.asString(referenceGraph, baseUri)
+    turtleString.right.value must not be ('empty)
     
   }
   
