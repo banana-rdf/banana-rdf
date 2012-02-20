@@ -2,7 +2,5 @@ An RDF library in Scala.
 
 For details on the general architecture, see the presentation
 http://www.w3.org/2012/02/02-pimp-my-RDF-with-bananas/#1
-
----
-requires scala 2.10M1 (Magic 1)
-and needs a patch. Run ./sbt to download then ./patch-sbt
+----
+Requires Scala 2.9.1
