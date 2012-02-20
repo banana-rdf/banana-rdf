@@ -59,6 +59,7 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: Parser[
         (ntriples, creator, art),
         (ntriples, publisher, w3org)
       )
+     
     assertTrue("graphs must be isomorphic",isIsomorphicWith(expected, parsedGraph))
   }
 

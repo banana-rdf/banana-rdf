@@ -41,8 +41,10 @@
          dc:title "Tim Berners-Lee's editable FOAF file";
          :maker card:i;
          :primaryTopic card:i .
-    
-    blog:4     dc:title "timbl's blog";
+
+# there is a bug in sesame when parsing blog:4    
+#    blog:4     dc:title "timbl's blog";
+    <http://dig.csail.mit.edu/breadcrumbs/blog/4>     dc:title "timbl's blog";
          s:seeAlso <http://dig.csail.mit.edu/breadcrumbs/blog/feed/4>;
          :maker card:i .
     
@@ -102,7 +104,9 @@
          :openid B:;
          :phone <tel:+1-(617)-253-5702>;
          :title "Sir";
-         :weblog blog:4;
+# same bug again
+#         :weblog blog:4;
+         :weblog <http://dig.csail.mit.edu/breadcrumbs/blog/4>;
          :workplaceHomepage <http://www.w3.org/> .
     
     w3c:W3C     :member card:i .

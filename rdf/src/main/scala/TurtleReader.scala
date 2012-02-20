@@ -21,7 +21,7 @@ abstract class TurtleReader[M <: RDFModule](val m: M) {
   def read(s: String, base: String): Either[Throwable, Graph] =
     try {
       val reader = new StringReader(s)
-      read(s, base)
+      read(reader, base)
     } catch {
       case t => Left(t)
     }

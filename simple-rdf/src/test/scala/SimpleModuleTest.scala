@@ -18,4 +18,7 @@ class N3ParserSeqTest extends n3.ParserTest(SimpleModule, SimpleN3SeqParser) {
   def toF(string: String) = string.toSeq
 }
 
-class SimpleTurtleTest extends TurtleTestSuite(SimpleModule, SimpleTurtleReader, SimpleGraphIsomorphism)
+class SimpleTurtleTest extends TurtleTestSuite(SimpleModule) {
+  val reader = SimpleTurtleReader
+  val iso = SimpleGraphIsomorphism
+}
