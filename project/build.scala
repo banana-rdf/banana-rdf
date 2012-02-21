@@ -19,83 +19,97 @@ object YourProjectBuild extends Build {
 
   import BuildSettings._
   
+  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
+  
   val junitInterface = "com.novocode" % "junit-interface" % "0.8"
-
   val scalacheck = "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
+  val scalatest = "org.scalatest" %% "scalatest" % "1.7.1"
   
   val testsuiteDeps =
     Seq(libraryDependencies += junitInterface,
+        libraryDependencies += scalatest,
         libraryDependencies += scalacheck)
   
   val testDeps =
-    Seq(libraryDependencies += junitInterface % "test")
+    Seq(libraryDependencies += junitInterface % "test",
+        libraryDependencies += scalatest % "test")
   
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
       libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.0-incubating")
-      
+  
+  val sesameDeps =
+    Seq(
+      resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-runtime" % "2.6.3")
+  
   lazy val pimpMyRdf = Project(
     id = "pimp-my-rdf",
     base = file("."),
-    settings = buildSettings,
+    settings = buildSettings ++ Seq(EclipseKeys.skipParents in ThisBuild := false),
     aggregate = Seq(
-      algebraic,
-      core,
-      graphIsomorphism,
-      transformer,
-      transformerTestSuite,
-      nTriplesParser,
-      nTriplesParserTestSuite,
-      jena))
+      rdf,
+      rdfTestSuite,
+      simpleRdf,
+      n3,
+      n3TestSuite,
+      jena,
+      sesame))
   
-  lazy val algebraic = Project(
-    id = "algebraic",
-    base = file("algebraic"),
-    settings = buildSettings
+  lazy val rdf = Project(
+    id = "rdf",
+    base = file("rdf"),
+    settings = buildSettings ++ testDeps
   )
-  
-  lazy val core = Project(
-    id = "core",
-    base = file("core"),
-    settings = buildSettings
-  ) dependsOn (algebraic)
 
-  lazy val graphIsomorphism = Project(
-    id = "graph-isomorphism",
-    base = file("graph-isomorphism"),
-    settings = buildSettings
-  ) dependsOn (core)
-
-  lazy val transformer = Project(
-    id = "transformer",
-    base = file("transformer"),
-    settings = buildSettings
-  ) dependsOn (core)
-
-  lazy val transformerTestSuite = Project(
-    id = "transformer-testsuite",
-    base = file("transformer-testsuite"),
+  lazy val rdfTestSuite = Project(
+    id = "rdf-test-suite",
+    base = file("rdf-test-suite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (core, transformer, graphIsomorphism)
+  ) dependsOn (rdf)
 
+  val simpleRdf = Project(
+    id = "simple-rdf",
+    base = file("simple-rdf"),
+    settings = buildSettings ++ testDeps
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test", util % "test")
+  
   lazy val jena = Project(
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
-  ) dependsOn (core, graphIsomorphism, transformer, nTriplesParser, nTriplesParserTestSuite % "test")
-
-  lazy val nTriplesParser = Project(
-    id = "n-triples-parser",
-    base = file("n-triples-parser"),
-    settings = buildSettings ++ jenaDeps
-  ) dependsOn (core)
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
   
-  lazy val nTriplesParserTestSuite = Project(
-    id = "n-triples-parser-test-suite",
-    base = file("n-triples-parser-test-suite"),
+  lazy val sesame = Project(
+    id = "sesame",
+    base = file("sesame"),
+    settings = buildSettings ++ sesameDeps ++ testDeps
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
+  
+  lazy val util = Project(
+    id = "util",
+    base = file("util"),
+    settings = buildSettings ++ jenaDeps
+  ) dependsOn (rdf, jena)
+  
+  lazy val n3 = Project(
+    id = "n3",
+    base = file("n3"),
+    settings = buildSettings ++ jenaDeps
+  ) dependsOn (rdf)
+  
+  lazy val n3TestSuite = Project(
+    id = "n3-test-suite",
+    base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ jenaDeps
-  ) dependsOn (nTriplesParser, graphIsomorphism)
-
+  ) dependsOn (n3)
+  
+  lazy val store = Project(
+    id = "store",
+    base = file("store"),
+    settings = buildSettings
+  ) dependsOn (rdf)
+  
 }
 

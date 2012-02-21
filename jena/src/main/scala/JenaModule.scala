@@ -5,9 +5,7 @@ import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => 
 import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 
-import org.w3.algebraic._
-
-object JenaModule extends Module {
+object JenaModule extends RDFModule {
 
   class Graph(val jenaGraph: JenaGraph) extends GraphInterface {
     def iterator: Iterator[Triple] = new Iterator[Triple] {
@@ -36,7 +34,7 @@ object JenaModule extends Module {
   }
 
   type Triple = JenaTriple
-  object Triple extends AlgebraicDataType3[Node, IRI, Node, Triple] {
+  object Triple extends TripleCompanionObject {
     def apply(s: Node, p: IRI, o: Node): Triple = {
       JenaTriple.create(s, p, o)
     }
@@ -58,13 +56,13 @@ object JenaModule extends Module {
   }
   
   type IRI = Node_URI
-  object IRI extends AlgebraicDataType1[String, IRI]  {
+  object IRI extends IRICompanionObject {
     def apply(iriStr: String): IRI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
     def unapply(node: IRI): Option[String] = if (node.isURI) Some(node.getURI) else None
   }
 
   type BNode = Node_Blank
-  object BNode extends AlgebraicDataType1[String, BNode] {
+  object BNode extends BNodeCompanionObject {
     def apply(label: String): BNode = {
       val id = AnonId.create(label)
       JenaNode.createAnon(id).asInstanceOf[Node_Blank]
@@ -74,6 +72,10 @@ object JenaModule extends Module {
   }
 
   lazy val mapper = TypeMapper.getInstance
+  def jenaDatatype(datatype: IRI) = {
+    val IRI(iriString) = datatype
+    mapper.getTypeByName(iriString)
+  }
   
   type Literal = Node_Literal
   
@@ -102,17 +104,17 @@ object JenaModule extends Module {
       if (typ != null)
         Some((typedLiteral.getLiteralLexicalForm.toString, IRI(typ.getURI)))
       else if (typedLiteral.getLiteralLanguage.isEmpty)
-        Some((typedLiteral.getLiteralLexicalForm.toString, xsdStringIRI))
+        Some((typedLiteral.getLiteralLexicalForm.toString, xsdString))
       else
         None
     }
   }
   
   type LangLiteral = Node_Literal
-  object LangLiteral extends AlgebraicDataType2[String, Lang, LangLiteral] {
+  object LangLiteral extends LangLiteralCompanionObject {
     def apply(lexicalForm: String, lang: Lang): LangLiteral = {
       val Lang(langString) = lang
-      JenaNode.createLiteral(lexicalForm, langString, mapper.getTypeByName(xsdString)).asInstanceOf[Node_Literal]
+      JenaNode.createLiteral(lexicalForm, langString, jenaDatatype(xsdString)).asInstanceOf[Node_Literal]
     }
     def unapply(langLiteral: LangLiteral): Option[(String, Lang)] = {
       val l = langLiteral.getLiteralLanguage
@@ -124,7 +126,7 @@ object JenaModule extends Module {
   }
   
   type Lang = String
-  object Lang extends AlgebraicDataType1[String, Lang] {
+  object Lang extends LangCompanionObject {
     def apply(langString: String) = langString
     def unapply(lang: Lang) = Some(lang)
   }

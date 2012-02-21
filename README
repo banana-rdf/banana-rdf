@@ -1,6 +1,0 @@
-An RDF library in Scala.
-
-For details on the general architecture, see the presentation
-http://www.w3.org/2012/02/02-pimp-my-RDF-with-bananas/#1
-----
-Requires Scala 2.9.1
