@@ -187,9 +187,10 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   val COLON = P.single(':')
   val PREFIX = P.word("@prefix")
   val dot = P.single('.')
+  val eoln = P.word ("\r\n") | P.word("\n")  | P.word("\r")
 
   val SP = (P.takeWhile1(c=> " \t\r\n".contains(c),err) | comment ).many1
-  val comment = P.single('#')>>P.takeWhile(c=> c != '\r' && c != '\n')
+  val comment = P.single('#')>>P.takeWhile(c=> c != '\r' && c != '\n') << eoln
 
   val hexadecimalChars = "1234567890ABCDEFabcdef"
   def hex = P.anyOf(hexadecimalChars)
@@ -224,8 +225,9 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   }
 
   val PNAME_NS =  PN_PREFIX << COLON
-  val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char,err) | UCHARS).many.map(_.mkString)<<P.single ('>')
-  val prefixID =  (PREFIX >> SP >> PNAME_NS) ++ (SP>>IRI_REF)
+  val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, pos =>P.err.single('!',pos)) | UCHARS).many.map(_.mkString)<<P.single('>')
+  val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
+  val prefixID =  PREFIX_Part1 ++ SP>>IRI_REF
   val directive = prefixID //| base
 
   val statement = ( directive << dot ) //| ( turtleTriples << dot )

@@ -197,13 +197,7 @@ class SpecTriplesGenerator[M <: RDFModule](val m: M) {
     (10,unicodeChar)
   )
 
-  def unicodeChar = Gen((p: Gen.Params) => {
-    var c = 0
-    do {
-      c = Random.nextInt(0xFFFF)
-    } while (!Character.isDefined(c))
-    Some(c.toChar)
-  })
+  def unicodeChar = Gen.alphaNumChar//Arbitrary.arbChar.arbitrary
 
 
   def newline: Gen[String] = Gen.oneOf(Array("\n","\r","\r\n"))
