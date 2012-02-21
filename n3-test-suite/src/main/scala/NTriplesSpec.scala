@@ -239,15 +239,3 @@ class SpecTriplesGenerator[M <: RDFModule](val m: M) {
 
 }
 
-class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriplesGenerator[M](m){
-
-  val goodPrefixes= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
-    "\\u002e:","e\\u0eff\\u0045:","e\\t:")
-  val badPrefixes= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf")
-
-  def genSpaceOrComment = Gen.frequency(
-    (1,genSpace),
-    (1,genComment)
-  )
-
-}

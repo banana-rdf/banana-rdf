@@ -97,15 +97,11 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   }
   def encoder = Charset.forName("UTF-8").newEncoder
 
-  property("good first half of prefix") = secure {
+  property("simple good first half of @prefix (no weird whitepace or comments") = secure {
     val results = for (prefix <- goodPrefixes) yield {
       System.out.println("prefix="+prefix)
-      val space1 = genSpaceOrComment.sample.get
-      val space2 = genSpaceOrComment.sample.get
-      System.out.println("space1=["+space1+"]")
-      System.out.println("space2=["+space2+"]")
-      val pre = "@prefix" + space1 + prefix + space2
-      System.out.println(pre)
+      val pre = "@prefix " + prefix
+      System.out.println("["+pre+"]")
       try {
         val res = P.PREFIX_Part1(pre)
         ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
@@ -146,5 +142,19 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 //
 //  }
 
+
+}
+
+
+class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriplesGenerator[M](m){
+
+  val goodPrefixes= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
+    "\\u002e:","e\\u0eff\\u0045:","e\\t:")
+  val badPrefixes= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf")
+
+  def genSpaceOrComment = Gen.frequency(
+    (1,genSpace),
+    (1,genComment)
+  )
 
 }

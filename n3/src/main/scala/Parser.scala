@@ -167,6 +167,12 @@ object NTriplesParser {
 
 /**
  * Turtle Parser as specified at http://www.w3.org/TR/turtle/
+ * That version is getting a bit too difficult to implement - due to rules like
+ *  PN_PREFIX	   ::=   	PN_CHARS_BASE ( ( PN_CHARS | "." )* PN_CHARS )?
+ *
+ * trying the older
+ *    http://www.w3.org/TeamSubmission/turtle/#sec-grammar-grammar
+ *
  *
  * @param m
  * @param P
@@ -184,13 +190,14 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   def single(isC: Char => Boolean ): P.Parser[Char] = P.any mapResult (s =>
     s.status.flatMap(i => if (isC(i) ) Success(i) else Failure(P.err.single(i, s.position))))
 
+  val err = (pos: X) =>P.err.single('!',pos)
   val COLON = P.single(':')
   val PREFIX = P.word("@prefix")
   val dot = P.single('.')
   val eoln = P.word ("\r\n") | P.word("\n")  | P.word("\r")
 
-  val SP = (P.takeWhile1(c=> " \t\r\n".contains(c),err) | comment ).many1
   val comment = P.single('#')>>P.takeWhile(c=> c != '\r' && c != '\n') << eoln
+  val SP = (P.takeWhile1(c=> " \t\r\n".contains(c),err) | comment ).many1
 
   val hexadecimalChars = "1234567890ABCDEFabcdef"
   def hex = P.anyOf(hexadecimalChars)
@@ -201,7 +208,6 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
     case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
   }
-  val err = (pos: X) =>P.err.single('!',pos)
 
   val UCHAR = u_CHAR | U_CHAR
   val UCHARS = UCHAR.many1.map(_.mkString)
@@ -214,11 +220,11 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
     case Result(Success(pfx), pos, us)=> {
       val prefx = pfx.toSeq.mkString
       if (prefx.size == 0) Success("")
-      else if (prefx.last == '.') Failure(P.err.single(prefx.last,pos))
+      else if (prefx.last == '.') Failure(P.err.single('.',pos))
       else if (!pn_chars_simple(prefx.head) && UCHAR(prefx)(us).isFailure) {
         Failure(P.err.single(prefx.head,pos))
       } else {
-        PN_decode(prefx)(us).status
+        PN_decode(prefx)(us).status.mapL(e=>P.err.single(':',pos))
       }
     }
     case other => other.status
@@ -231,7 +237,7 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   val directive = prefixID //| base
 
   val statement = ( directive << dot ) //| ( turtleTriples << dot )
-
+  val turtleDoc = statement.many
 
 }
 
