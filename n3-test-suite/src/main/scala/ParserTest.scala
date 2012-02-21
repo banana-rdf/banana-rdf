@@ -12,7 +12,7 @@ import org.w3.rdf._
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: Parser[M, F, E, X, Listener]) {
+abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriplesParser[M, F, E, X, Listener]) {
 
   val isomorphism: GraphIsomorphism[m.type]
   

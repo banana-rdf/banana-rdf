@@ -11,12 +11,6 @@ import scala.collection.mutable
 import org.w3.rdf._
 
 
-trait ListenerAgent[T] {
-  def send(a: T)
-}
-
-
-
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples
  * http://www.w3.org/TR/rdf-testcases/#ntriples
@@ -182,7 +176,7 @@ object NTriplesParser {
  * @tparam X
  * @tparam U
  */
-class TurtleParser[M <: Module,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
+class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
   import TurtleParser._
   import P.++
 

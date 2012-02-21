@@ -38,7 +38,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
   }
 
 
-  val P: Parser[M, String, TreeError, Position, Listener] = new Parser(m,
+  val P: NTriplesParser[M, String, TreeError, Position, Listener] = new NTriplesParser(m,
     Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
 
 
@@ -175,7 +175,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
 
 }
 
-class SpecTriplesGenerator[M <: Module](val m: M) {
+class SpecTriplesGenerator[M <: RDFModule](val m: M) {
   import m._
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
     "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
@@ -206,7 +206,7 @@ class SpecTriplesGenerator[M <: Module](val m: M) {
   })
 
 
-  def newline = Gen.oneOf(Array("\n","\r","\r\n"))
+  def newline: Gen[String] = Gen.oneOf(Array("\n","\r","\r\n"))
   def genSimpleLang = Gen.alphaChar.combine(Gen.alphaNumChar) { (oc,ocn)=> Some(""+oc.get+ocn.get) }
 
   def genLangStr = Gen.choose(1,3).flatMap {n=>
@@ -233,30 +233,27 @@ class SpecTriplesGenerator[M <: Module](val m: M) {
       obj <- genAnyNode
     } yield Triple(subj, rel, obj)
   def genGraph = Gen.listOf(genRelation)
-  def genSpace = Gen.listOf1(Gen.oneOf(" \t")).map(_.mkString)
+  def genSpace: Gen[String] = Gen.listOf1(Gen.oneOf(" \t")).map(_.mkString)
   def genAnySpace = Gen.listOf1(Gen.oneOf(" \t\n\r  ")).map(_.mkString)
-  def genComment = for {
+  def genComment: Gen[String] = for {
     space <- genSpace
     line <- genUnicodeStr
     eol <- newline
   } yield {
-    space + "#" + line.map {
-      case '\n' => "\\n"
-      case '\r' => "\\r"
-      case c => c
-    }.mkString + eol
+    ""+space + "#" + line + eol
   }
 
 }
 
-class SpecTurtleGenerator[M <: Module](override val m: M)  extends SpecTriplesGenerator[M](m){
+class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriplesGenerator[M](m){
 
   val goodPrefixes= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
     "\\u002e:","e\\u0eff\\u0045:","e\\t:")
   val badPrefixes= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf")
 
-  def genGoodPrefixes = Gen.elements(goodPrefixes)
-  def genBadPrefixes = Gen.listOf(badPrefixes)
-  def genSpaceOrComment = Gen.oneOf(genSpace,genComment)
+  def genSpaceOrComment = Gen.frequency(
+    (1,genSpace),
+    (1,genComment)
+  )
 
 }

@@ -4,16 +4,16 @@ import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.rdf._
 import org.w3.rdf.n3._
 
-object JenaN3StringParser
-extends n3.Parser(
+object JenaNTriplesStringParser
+extends n3.NTriplesParser(
   JenaModule,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
     Accumulators.position[Listener](4)))
 
-object JenaN3SeqParser
-extends n3.Parser(
+object JenaNTriplesSeqParser
+extends n3.NTriplesParser(
   JenaModule,
   Parsers(
     Monotypic.Seq[Char],

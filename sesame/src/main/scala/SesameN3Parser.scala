@@ -4,16 +4,16 @@ import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.rdf._
 import org.w3.rdf.n3._
 
-object SesameN3StringParser
-extends n3.Parser(
+object NTriplesStringParser
+extends n3.NTriplesParser(
   SesameModule,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
     Accumulators.position[Listener](4)))
 
-object N3SeqParser
-extends n3.Parser(
+object NTriplesSeqParser
+extends n3.NTriplesParser(
   SesameModule,
   Parsers(
     Monotypic.Seq[Char],

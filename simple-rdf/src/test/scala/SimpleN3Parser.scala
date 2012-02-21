@@ -3,16 +3,16 @@ package org.w3.rdf.simple
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.rdf.n3
 
-object SimpleN3StringParser
-extends n3.Parser(
+object SimpleTurtleStringParser
+extends n3.TurtleParser(
   SimpleModule,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
     Accumulators.position[n3.Listener](4)))
 
-object SimpleN3SeqParser
-extends n3.Parser(
+object SimpleTurtleSeqParser
+extends n3.TurtleParser(
   SimpleModule,
   Parsers(
     Monotypic.Seq[Char],

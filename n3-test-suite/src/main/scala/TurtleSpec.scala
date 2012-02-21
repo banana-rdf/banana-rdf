@@ -1,4 +1,9 @@
-package org.w3.rdf
+/*
+ * Copyright (c) 2012 Henry Story
+ * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
+ */
+
+package org.w3.rdf.n3
 
 /*
 * Copyright (c) 2012 Henry Story
@@ -11,12 +16,13 @@ import nomo.Errors.TreeError
 import nomo.Accumulators.Position
 import nomo.Parsers._
 import nomo.{Parsers, Accumulators, Errors, Monotypic}
+import org.w3.rdf.RDFModule
 
 /**
  * @author bblfish
  * @created 20/02/2012
  */
-class TurtleSpec [M <: Module](val m: M)  extends Properties("Turtle") {
+class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   import m._
 
   val gen = new SpecTurtleGenerator[m.type](m)
@@ -47,7 +53,30 @@ class TurtleSpec [M <: Module](val m: M)  extends Properties("Turtle") {
       )
     }
     all(res :_*)
+  }
 
+  property("good IRIs") = secure {
+    val results = for (iri <- uris) yield {
+      System.out.println("iri="+iri)
+      val iriRef = "<" + iri + ">"
+      System.out.println(iriRef)
+      val res = P.IRI_REF(iriRef)
+
+      ("prefix line in='" + iriRef + "' result = '" + res + "'") |: all(
+        res.isSuccess &&
+          (res.get == iri)
+      )
+    }
+    all(results :_*)
+ }
+
+  property("test comment generator") = forAll( genComment ) {
+    comm =>
+      System.out.println("comment test:"+comm+"---")
+      ("comment is =[" + comm + "]") |: all(
+        comm.startsWith("#") &&
+          (comm.endsWith("\n") || comm.endsWith("\r"))
+      )
   }
 
   property("good prefix line tests") = secure {
