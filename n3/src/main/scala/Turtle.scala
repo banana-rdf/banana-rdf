@@ -40,7 +40,7 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   lazy val BASE = P.word("@base")
   lazy val dot = P.single('.')
   lazy val eoln = P.word ("\r\n") | P.word("\n")  | P.word("\r")
-  lazy val CLOSE_ANGLE = P.word("\\>").map(a=>">")
+  lazy val CLOSE_ANGLE = P.word("\\>").map(a=>">")   // unclear in the spec if this is allowed (not allowed by grammar)
 
   lazy val SP = (P.takeWhile1(c=> " \t\r\n".contains(c),err) | comment ).many1
   lazy val comment = P.single('#')>>P.takeWhile(c=> c != '\r' && c != '\n') << eoln
@@ -54,6 +54,8 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   lazy val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
     case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
   }
+  lazy val PN_LOCAL_ESC = P.single('\\')>>single((c: Char) => pn_local_esc.contains(c))
+  lazy val PLX=  (P.single('%')++hex++hex).map{case '%'++h1++h2=> "%"+h1+h2} | PN_LOCAL_ESC.map(_.toString)
 
   lazy val UCHAR = u_CHAR | U_CHAR
   lazy val IRICHAR = UCHAR | CLOSE_ANGLE
@@ -92,10 +94,25 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
     r.status.map(iri=>r.user.addPrefix("",iri))
     r.status
   }
+  lazy val PNL_FIRST = ( PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX ).map(_.toString)
+  lazy val PNL_BODY = ( PN_CHARS | dot | PLX ).map(_.toString)
+  lazy val PNL_LAST = ( PN_CHARS | PLX ).map(_.toString)
+  lazy val PN_LOCAL =  (PNL_FIRST ++ (PNL_BODY.many.map(_.mkString) ++ PNL_LAST ).optional) map {
+    case first++Some(body++last)=> first + body + last
+    case first++None => first
+  }
+  lazy val PNAME_LN = PNAME_NS ++ PN_LOCAL
+  lazy val PrefixedName = PNAME_LN | PNAME_NS
+  lazy val IRIref = IRI_REF | PrefixedName
+//  lazy val predicateObjectList =
+
+  lazy val subject = IRIref //| blank
+
+//  lazy val triples =  subject ++ predicateObjectList
 
   lazy val directive = prefixID | base
 
-  lazy val statement = ( directive << dot ) //| ( turtleTriples << dot )
+  lazy val statement = ( directive >> dot ) //| ( triples >> dot )
   lazy val turtleDoc = statement.many
 
 }
@@ -108,6 +125,8 @@ object TurtleParser {
     (0x3001,0xD7FF), (0xF900,0xFDCF), (0xFDF0,0xFFFD), (0x10000,0xEFFFF)
   )
   private val non_iri_chars = Array('<','>','"','{','}','|','^','`','\\')
+  
+  val pn_local_esc = Array('_' , '~' , '.' , '-' , '!' , '$' , '&' , '\'' , '(' , ')' , '*' , '+' , ',' , ';' , '=' , ':' , '/' , '?' , '#' , '@' , '%' )
 
   private val pn_chars_set = ('0'.toInt,'9'.toInt)::pn_char_intervals_base:::List((0x300,0x36F),(0x203F,0x2040))
 

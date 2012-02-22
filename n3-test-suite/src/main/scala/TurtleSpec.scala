@@ -36,17 +36,18 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   implicit def U: Listener = new Listener()
 
   property("good prefix type test") = secure {
-    val res = for (pref <- goodPrefixes) yield {
-      val result = P.PNAME_NS(pref)
-      ("prefix in = '"+pref+"' result = '"+result+"'") |: all (
-         result.isSuccess //todo: find a way to compare input and compted value precisely
+    val res = for ((orig,write) <- zipPfx) yield {
+      val result = P.PNAME_NS(write)
+      ("prefix in = '"+write+"' result = '"+result+"'") |: all (
+         result.isSuccess &&
+         result.get == orig
       )
     }
     all(res :_*)
   }
 
   property("bad prefix type test") = secure {
-    val res = for (pref <- badPrefixes) yield {
+    val res = for (pref <- bdPfx) yield {
       val res = P.PNAME_NS(pref)
       ("prefix in = '"+pref+"' result = '"+res+"'") |: all (
         res.isFailure
@@ -98,7 +99,7 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   def encoder = Charset.forName("UTF-8").newEncoder
 
   property("simple good first half of @prefix (no weird whitepace or comments") = secure {
-    val results = for (prefix <- goodPrefixes) yield {
+    val results = for (prefix <- gdPfx) yield {
       val pre = "@prefix " + prefix
       try {
         val res = P.PREFIX_Part1(pre)
@@ -113,25 +114,25 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   }
 
   property("good prefix line tests") = secure {
-    val results = for (prefix <- goodPrefixes;
-                       (pure,encoded) <- uriPairs) yield {
+    val results = for ((origPfx,encodedPfx) <- zipPfx;
+                       (pureIRI,encodedIRI) <- uriPairs) yield {
       try {
         val user = U
         val space1 = genSpaceOrComment.sample.get
         val space2 = genSpaceOrComment.sample.get
-        val preStr = "@prefix" + space1 + prefix + space2 + "<" + encoded + ">"
+        val preStr = "@prefix" + space1 + encodedPfx + space2 + "<" + encodedIRI + ">"
         val res = P.prefixID(preStr)(user)
-        val (parsedPre,parsedVal) = res.get
+        val (parsedPre,parsedIRI) = res.get
         val prefixes = user.prefixes
-        val unicode = "\\\\u(....)".r
-        val decodedPrefix = unicode.replaceAllIn(prefix,m=>Integer.parseInt(m.group(1),16).toChar.toString)
 
         ("prefix line in='" + preStr + "' result = " +res+ "user prefixes="+prefixes) |: all(
           res.isSuccess &&
-            ((prefixes.get(parsedPre)  == Some(parsedVal)) :| "parsed prefixes did not end up in user") &&
-            ((prefixes.get(decodedPrefix)  == Some(pure)) :|
-              "userPrefixHash["+decodedPrefix+"] did not return the "+
-              " original iri "+pure)
+            ((origPfx == parsedPre) :| "original and parsed prefixes don't match") &&
+            ((pureIRI == parsedIRI) :| "original and parsed IRI don't match ") &&
+            ((prefixes.get(parsedPre)  == Some(parsedIRI)) :| "parsed prefixes did not end up in user") &&
+            ((prefixes.get(origPfx)  == Some(pureIRI)) :|
+              "userPrefixHash["+origPfx+"] did not return the "+
+              " original iri "+pureIRI)
         )
       } catch {
         case e => {
@@ -167,6 +168,49 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
     all(results :_*)
   }
 
+  property("test Prefix Name non empty local part") = secure {
+    val results = for (
+      (origLcl,wLcl) <- zipPrefLocal
+      if (origLcl != "")
+    ) yield try {
+        System.out.println("pfx=>"+wLcl+"< and orig >"+origLcl+"<")
+        val res = P.PN_LOCAL(wLcl)
+        ("name=["+wLcl+"] result="+res) |: all (
+          res.isSuccess &&
+            ((res.get == origLcl) :| "original and parsed data don't match!"  )
+        )
+      } catch {
+        case e => {
+          e.printStackTrace();
+          throw e
+        }
+      }
+    all(results :_*)
+
+  }
+
+//  property("test namespaced names") = secure {
+//     val results = for (
+//       (origPfx,wPfx) <- zipPfx;
+//       (origLcl,wLcl) <- zipPrefLocal
+//     ) yield try {
+//       val name =wPfx+wLcl
+//       System.out.println("pfx=>"+name+"<")
+//       val res = P.PNAME_LN(name)
+//       ("name=["+name+"] result="+res) |: all (
+//        res.isSuccess &&
+//        ((res.get == (origPfx,origLcl)) :| "original and parsed data don't match!"  )
+//       )
+//     } catch {
+//         case e => {
+//           e.printStackTrace();
+//           throw e
+//         }
+//     }
+//    all(results :_*)
+//
+//  }
+
 //  property("fixed bad prefix tests") {
 //
 //  }
@@ -177,9 +221,21 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 
 class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriplesGenerator[M](m){
 
-  val goodPrefixes= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
+  val gdPfxOrig= List[String](":","cert:","foaf:","foaf.new:","a\u2764:","䷀:","Í\u2318-\u262f:",
+    "\u002e:","e\u0eff\u0045:")
+  val gdPfx= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
     "\\u002e:","e\\u0eff\\u0045:")
-  val badPrefixes= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf","e\\t:")
+  val zipPfx = gdPfxOrig.zip(gdPfx)
+
+
+  val bdPfx= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf","e\\t:")
+
+  val gdPfxLcl =   List[String]("_\u2071\u2c001.%34","0","00","","\u3800snapple%4e.\u00b7","_\u2764\u262f.\u2318",
+    "%29coucou")
+  val gdPfxLcl_W = List[String]("_\u2071\u2c001.%34","0","00","","\u3800snapple%4e.\\u00b7","_\\u2764\\u262f.\\u2318",
+    "%29coucou")
+
+  val zipPrefLocal = gdPfxLcl.zip(gdPfxLcl_W)
 
   def genSpaceOrComment = Gen.frequency(
     (1,genSpace),
