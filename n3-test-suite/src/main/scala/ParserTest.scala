@@ -118,8 +118,8 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriple
     val resR = resultR.user.queue.toList.map(_.asInstanceOf[Triple])
 
 
-    println("the last triple found was in card.nt was "+res.last)
-    println("the last triple found was in card.random.nt was "+resR.last)
+//    println("the last triple found was in card.nt was "+res.last)
+//    println("the last triple found was in card.random.nt was "+resR.last)
 
     assertNotSame("the results of reading both cards should be different lists",res,resR)
 

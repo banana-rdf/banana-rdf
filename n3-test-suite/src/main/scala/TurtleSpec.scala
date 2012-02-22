@@ -99,9 +99,9 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 
   property("simple good first half of @prefix (no weird whitepace or comments") = secure {
     val results = for (prefix <- goodPrefixes) yield {
-      System.out.println("prefix="+prefix)
+//      System.out.println("prefix="+prefix)
       val pre = "@prefix " + prefix
-      System.out.println("["+pre+"]")
+//      System.out.println("["+pre+"]")
       try {
         val res = P.PREFIX_Part1(pre)
         ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
