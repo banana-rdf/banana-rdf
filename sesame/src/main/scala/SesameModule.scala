@@ -3,9 +3,11 @@ package org.w3.rdf.sesame
 import org.w3.rdf._
 import org.openrdf.model.impl._
 import org.openrdf.model._
+import scala.collection.JavaConverters._
 
 object SesameModule extends RDFModule {
   
+  type Graph = GraphImpl
   type Triple = Statement
   type Node = Value
   type IRI = URIImpl
@@ -15,26 +17,21 @@ object SesameModule extends RDFModule {
   type LangLiteral = LiteralImpl
   type Lang = String
   
-  class Graph(val sesameGraph: GraphImpl) extends GraphInterface {
-    import scala.collection.JavaConverters._
-    def iterator: Iterator[Triple] = sesameGraph.asScala.iterator
-    def ++(other: Graph):Graph = {
-      val g = new GraphImpl()
-      iterator foreach { t => g add t }
-      other.iterator foreach { t => g add t }
-      new Graph(g)
-    }
-  }
-
   object Graph extends GraphCompanionObject {
-    def fromSesame(sesameGraph: GraphImpl): Graph = new Graph(sesameGraph)
-    def empty: Graph = new Graph(new GraphImpl())
+    def empty: Graph = new GraphImpl
     def apply(elems: Triple*): Graph = apply(elems.toIterable)
     def apply(it: Iterable[Triple]): Graph = {
-      val sesameGraph = new GraphImpl()
-      it foreach { t => sesameGraph add t }
-      new Graph(sesameGraph)
+      val graph = empty
+      it foreach { t => graph add t }
+      graph
     }
+    def union(left: Graph, right: Graph): Graph = {
+      val graph = empty
+      toIterable(left) foreach { t => graph add t }
+      toIterable(right) foreach { t => graph add t }
+      graph
+    }
+    def toIterable(graph: Graph): Iterable[Triple] = graph.asScala
   }
   
   object Triple extends TripleCompanionObject {

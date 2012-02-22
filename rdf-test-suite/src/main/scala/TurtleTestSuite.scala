@@ -12,12 +12,14 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
   val writer: TurtleWriter[m.type]
   val iso: GraphIsomorphism[m.type]
   
+  import iso._
+  
   import org.scalatest.matchers.{BeMatcher, MatchResult}
   
   def beIsomorphicWithGeneral[M <: RDFModule](m: M)(iso: GraphIsomorphism[m.type])(right: m.Graph): BeMatcher[m.Graph] =
     new BeMatcher[m.Graph] {
       def apply(left: m.Graph) = MatchResult(
-        iso.isIsomorphicWith(left, right),
+        iso.isomorphism(left, right),
         "left graph is isomorphic to right graph",
         "%s not isomorphic with %s" format (left.toString, right.toString)
       )
@@ -54,7 +56,7 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
     val graph = reader.read(file, file.toURI.toString)
 //    graph.fold( _.printStackTrace, r => println(r.size))
-    graph.right.value must have size (77)
+    graph.right.value.size must equal (77)
   }
   
   "read simple TURTLE String" in {
@@ -63,9 +65,8 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
     val graph = reader.read(turtleString, rdfCore)
-    
     val g: m.Graph = graph.right.get
-    assert(iso.isIsomorphicWith(referenceGraph, g))
+    assert(referenceGraph isIsomorphicWith g)
     
   }
   
@@ -82,7 +83,7 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
 //    println("1 --- "+fooGraph)
     val g: m.Graph = computedFooGraph.right.get
 //    println("2 --- "+g)
-    assert(iso.isIsomorphicWith(fooGraph, g))
+    assert(fooGraph isIsomorphicWith g)
   }
   
 }

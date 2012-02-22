@@ -60,7 +60,7 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriple
         (ntriples, publisher, w3org)
       )
      
-    assertTrue("graphs must be isomorphic",isIsomorphicWith(expected, parsedGraph))
+    assertTrue("graphs must be isomorphic", expected isIsomorphicWith parsedGraph)
   }
 
   @Test()
@@ -133,7 +133,7 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriple
     assertEquals("There should be 354 triples in "+card.getPath,354,g.size)
     assertEquals("There should be 354 triples in "+card_random.getPath,354,gR.size)
 
-    assertTrue("the two graphs must be isomorphic",isIsomorphicWith(g,gR))
+    assertTrue("the two graphs must be isomorphic", g isIsomorphicWith gR)
 
   }
 
