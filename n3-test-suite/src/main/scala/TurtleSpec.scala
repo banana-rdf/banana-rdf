@@ -173,7 +173,6 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
       (origLcl,wLcl) <- zipPrefLocal
       if (origLcl != "")
     ) yield try {
-        System.out.println("pfx=>"+wLcl+"< and orig >"+origLcl+"<")
         val res = P.PN_LOCAL(wLcl)
         ("name=["+wLcl+"] result="+res) |: all (
           res.isSuccess &&
@@ -189,27 +188,26 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 
   }
 
-//  property("test namespaced names") = secure {
-//     val results = for (
-//       (origPfx,wPfx) <- zipPfx;
-//       (origLcl,wLcl) <- zipPrefLocal
-//     ) yield try {
-//       val name =wPfx+wLcl
-//       System.out.println("pfx=>"+name+"<")
-//       val res = P.PNAME_LN(name)
-//       ("name=["+name+"] result="+res) |: all (
-//        res.isSuccess &&
-//        ((res.get == (origPfx,origLcl)) :| "original and parsed data don't match!"  )
-//       )
-//     } catch {
-//         case e => {
-//           e.printStackTrace();
-//           throw e
-//         }
-//     }
-//    all(results :_*)
-//
-//  }
+  property("test namespaced names") = secure {
+     val results = for (
+       (origPfx,wPfx) <- zipPfx;
+       (origLcl,wLcl) <- zipPrefLocal
+     ) yield try {
+       val name =wPfx+wLcl+genSpace.sample.get
+       val res = P.PNAME_LN(name)
+       ("name=["+name+"] result="+res) |: all (
+        res.isSuccess &&
+        ((res.get == (origPfx,origLcl)) :| "original and parsed data don't match!"  )
+       )
+     } catch {
+         case e => {
+           e.printStackTrace();
+           throw e
+         }
+     }
+    all(results :_*)
+
+  }
 
 //  property("fixed bad prefix tests") {
 //

@@ -78,7 +78,7 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
         result.status.mapL(e=>P.err.single(':',pos))
       }
     }
-    case other => other.status.map(x=>"never gets called, as the result has to be some error")
+    case other => other.status.map(x=>"this function never gets called: 'other' is an error. Just here to change type.")
   }
 
   lazy val PNAME_NS =  (PN_PREFIX << COLON).map(prefix=>prefix+":")
@@ -94,12 +94,22 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
     r.status.map(iri=>r.user.addPrefix("",iri))
     r.status
   }
-  lazy val PNL_FIRST = ( PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX ).map(_.toString)
-  lazy val PNL_BODY = ( PN_CHARS | dot | PLX ).map(_.toString)
-  lazy val PNL_LAST = ( PN_CHARS | PLX ).map(_.toString)
-  lazy val PN_LOCAL =  (PNL_FIRST ++ (PNL_BODY.many.map(_.mkString) ++ PNL_LAST ).optional) map {
-    case first++Some(body++last)=> first + body + last
-    case first++None => first
+  lazy val PNL_FIRST = PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX
+  lazy val PNL_BODY = PN_CHARS | dot | PLX
+  lazy val PNL_LAST = PN_CHARS | PLX
+  lazy val PN_LOCAL =  P.takeWhile(c=> !c.isWhitespace).mapResult {
+    case Result(Success(pfx), pos, us)=> {
+      val prefx = pfx.toSeq.mkString
+      if (prefx.size == 0) Success("")
+      else if (prefx.last == '.') Failure(P.err.single('.',pos))
+      else if (PNL_FIRST(prefx)(us).isFailure) {
+        Failure(P.err.single(prefx.head,pos))
+      } else {
+        val result = ((PNL_FIRST++PNL_BODY.many).map{case a++b=> a+b.mkString}<<P.eof)(prefx)(us)
+        result.status.mapL(e=>P.err.single(':',pos))
+      }
+    }
+    case other => other.status.map(x=>"this function never gets called: 'other' is an error. Just here to change type.")
   }
   lazy val PNAME_LN = PNAME_NS ++ PN_LOCAL
   lazy val PrefixedName = PNAME_LN | PNAME_NS
@@ -129,6 +139,8 @@ object TurtleParser {
   val pn_local_esc = Array('_' , '~' , '.' , '-' , '!' , '$' , '&' , '\'' , '(' , ')' , '*' , '+' , ',' , ';' , '=' , ':' , '/' , '?' , '#' , '@' , '%' )
 
   private val pn_chars_set = ('0'.toInt,'9'.toInt)::pn_char_intervals_base:::List((0x300,0x36F),(0x203F,0x2040))
+
+
 
   def pn_chars_base(c: Char): Boolean = pn_char_intervals_base.exists(in(_)(c))
 
