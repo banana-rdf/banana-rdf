@@ -3,7 +3,7 @@ package org.w3.rdf
 class Transformer[ModelA <: RDFModule, ModelB <: RDFModule](val a: ModelA, val b: ModelB) {
 
   def transform(graph: a.Graph): b.Graph =
-    b.Graph(graph map transformTriple)
+    b.Graph(a.Graph.toIterable(graph) map transformTriple)
     
   def transformTriple(t: a.Triple): b.Triple = {
     val a.Triple(s, a.IRI(iri), o) = t

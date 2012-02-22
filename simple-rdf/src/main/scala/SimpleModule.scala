@@ -4,15 +4,14 @@ import org.w3.rdf._
 
 object SimpleModule extends RDFModule {
 
-  case class Graph(triples: Set[Triple]) extends GraphInterface {
-    def iterator = triples.iterator
-    def ++(other: Graph): Graph = Graph(triples ++ other.triples)
-  }
-
+  type Graph = Set[Triple]
+  
   object Graph extends GraphCompanionObject {
-    def empty: Graph = Graph(Set[Triple]())
-    def apply(elems: Triple*): Graph = Graph(Set[Triple](elems:_*))
-    def apply(it: Iterable[Triple]): Graph = Graph(it.toSet)
+    def empty: Graph = Set[Triple]()
+    def apply(elems: Triple*): Graph = Set[Triple](elems:_*)
+    def apply(it: Iterable[Triple]): Graph = it.toSet
+    def union(left: Graph, right: Graph): Graph = left ++ right
+    def toIterable(graph: Graph): Iterable[Triple] = graph.toIterable
   }
   
   case class Triple(s: Node, p: IRI, o: Node)

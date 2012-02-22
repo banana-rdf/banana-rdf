@@ -12,8 +12,7 @@ object JenaTurtleReader extends rdf.TurtleReader(JenaModule) {
     try {
       val model = ModelFactory.createDefaultModel()
       model.getReader("TURTLE").read(model, is, base)
-      val graph = Graph.fromJena(model.getGraph)
-      Right(graph)
+      Right(model.getGraph)
     } catch {
       case t => Left(t)
     }
@@ -22,8 +21,7 @@ object JenaTurtleReader extends rdf.TurtleReader(JenaModule) {
     try {
       val model = ModelFactory.createDefaultModel()
       model.getReader("TURTLE").read(model, reader, base)
-      val graph = Graph.fromJena(model.getGraph)
-      Right(graph)
+      Right(model.getGraph)
     } catch {
       case t => Left(t)
     }

@@ -10,7 +10,7 @@ object JenaTurtleWriter extends rdf.TurtleWriter(JenaModule) {
   
   def write(graph: Graph, os: OutputStream, base: String): Either[Throwable, Unit] =
     try {
-      val model = ModelFactory.createModelForGraph(graph.jenaGraph)
+      val model = ModelFactory.createModelForGraph(graph)
       model.getWriter("TURTLE").write(model, os, base)
       Right()
     } catch {
@@ -19,7 +19,7 @@ object JenaTurtleWriter extends rdf.TurtleWriter(JenaModule) {
   
   def write(graph: Graph, writer: Writer, base: String): Either[Throwable, Unit] =
     try {
-      val model = ModelFactory.createModelForGraph(graph.jenaGraph)
+      val model = ModelFactory.createModelForGraph(graph)
       model.getWriter("TURTLE").write(model, writer, base)
       Right()
     } catch {

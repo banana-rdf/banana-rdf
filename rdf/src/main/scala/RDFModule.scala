@@ -10,10 +10,7 @@ package org.w3.rdf
  */
 trait RDFModule {
 
-  trait GraphInterface extends Iterable[Triple] { self =>
-    def ++(other: Graph): Graph
-  }
-  type Graph <: GraphInterface
+  type Graph
   type Triple
   type Node
   type IRI <: Node
@@ -27,6 +24,8 @@ trait RDFModule {
     def empty: Graph
     def apply(elems: Triple*): Graph
     def apply(it: Iterable[Triple]): Graph
+    def union(left: Graph, right: Graph): Graph
+    def toIterable(graph: Graph): Iterable[Triple]
   }
   val Graph: GraphCompanionObject
 
@@ -94,6 +93,14 @@ trait RDFModule {
   val rdfLang = rdf("langString")
   
   // pimps
+  
+  class GraphW(graph: Graph) {
+    def toIterable: Iterable[Triple] = Graph.toIterable(graph)
+    def union(otherGraph: Graph): Graph = Graph.union(graph, otherGraph)
+  }
+  
+  implicit def wrapGraph(graph: Graph): GraphW = new GraphW(graph)
+  implicit def graphAsIterable(graph: Graph): Iterable[Triple] = Graph.toIterable(graph)
   
   implicit def tupleToTriple(tuple: (Node, IRI, Node)): Triple = Triple(tuple._1, tuple._2, tuple._3)
   

@@ -4,32 +4,28 @@ import org.w3.rdf._
 import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
 import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
+import scala.collection.JavaConverters._
 
 object JenaModule extends RDFModule {
 
-  class Graph(val jenaGraph: JenaGraph) extends GraphInterface {
-    def iterator: Iterator[Triple] = new Iterator[Triple] {
-      val iterator = jenaGraph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
-      def hasNext = iterator.hasNext
-      def next = iterator.next
-    }
-    def ++(other: Graph):Graph = {
-      val g = Factory.createDefaultGraph
-      iterator foreach { t => g add t }
-      other.iterator foreach { t => g add t }
-      new Graph(g)
-    }
-
-  }
-
+  type Graph = JenaGraph
+  
   object Graph extends GraphCompanionObject {
-    def fromJena(jenaGraph: JenaGraph): Graph = new Graph(jenaGraph)
-    def empty: Graph = new Graph(Factory.createDefaultGraph)
+    def empty: Graph = Factory.createDefaultGraph
     def apply(elems: Triple*): Graph = apply(elems.toIterable)
     def apply(it: Iterable[Triple]): Graph = {
-      val jenaGraph = Factory.createDefaultGraph
-      it foreach { t => jenaGraph add t }
-      new Graph(jenaGraph)
+      val graph = empty
+      it foreach { t => graph add t }
+      graph
+    }
+    def union(left: Graph, right: Graph): Graph = {
+      val graph = Factory.createDefaultGraph
+      toIterable(left) foreach { t => graph add t }
+      toIterable(right) foreach { t => graph add t }
+      graph
+    }
+    def toIterable(graph: Graph): Iterable[Triple] = new Iterable[Triple] {
+      val iterator = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala
     }
   }
 
