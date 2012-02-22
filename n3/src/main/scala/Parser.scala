@@ -167,11 +167,6 @@ object NTriplesParser {
 
 /**
  * Turtle Parser as specified at http://www.w3.org/TR/turtle/
- * That version is getting a bit too difficult to implement - due to rules like
- *  PN_PREFIX	   ::=   	PN_CHARS_BASE ( ( PN_CHARS | "." )* PN_CHARS )?
- *
- * trying the older
- *    http://www.w3.org/TeamSubmission/turtle/#sec-grammar-grammar
  *
  *
  * @param m
