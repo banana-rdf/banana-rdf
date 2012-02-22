@@ -232,7 +232,7 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   lazy val PNAME_NS =  PN_PREFIX << COLON
   lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, pos =>P.err.single('!',pos)) | UCHARS).many.map(_.mkString)<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
-  lazy val prefixID =  PREFIX_Part1 ++ SP>>IRI_REF
+  lazy val prefixID =  PREFIX_Part1 ++ (SP>>IRI_REF)
   lazy val directive = prefixID //| base
 
   lazy val statement = ( directive << dot ) //| ( turtleTriples << dot )

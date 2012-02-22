@@ -99,9 +99,7 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 
   property("simple good first half of @prefix (no weird whitepace or comments") = secure {
     val results = for (prefix <- goodPrefixes) yield {
-      System.out.println("prefix="+prefix)
       val pre = "@prefix " + prefix
-      System.out.println("["+pre+"]")
       try {
         val res = P.PREFIX_Part1(pre)
         ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
@@ -114,29 +112,24 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
     all(results :_*)
   }
 
-//  property("good prefix line tests") = secure {
-//    val results = for (prefix <- goodPrefixes;
-//               iri <- uris) yield {
-//      System.out.println("prefix="+prefix)
-//      System.out.println("iri="+iri)
-//      val space1 = genSpaceOrComment.sample.get
-//      val space2 = genSpaceOrComment.sample.get
-//      System.out.println("space1=["+space1+"]")
-//      System.out.println("space2=["+space2+"]")
-//      val pre = "@prefix" + space1 + prefix + space2 + "<" + iri + ">"
-//      System.out.println(pre)
-//      try {
-//      val res = P.prefixID(pre)
-//      ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
-//        res.isSuccess &&
-//          (res.get._2 == iri)
-//      )
-//      } catch {
-//        case e => { e.printStackTrace(); throw e }
-//      }
-//    }
-//    all(results :_*)
-//  }
+  property("good prefix line tests") = secure {
+    val results = for (prefix <- goodPrefixes;
+               iri <- uris) yield {
+      val space1 = genSpaceOrComment.sample.get
+      val space2 = genSpaceOrComment.sample.get
+      val pre = "@prefix" + space1 + prefix + space2 + "<" + iri + ">"
+      try {
+      val res = P.prefixID(pre)
+      ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
+        res.isSuccess &&
+          (res.get._2 == iri)
+      )
+      } catch {
+        case e => { e.printStackTrace(); throw e }
+      }
+    }
+    all(results :_*)
+  }
 
 //  property("fixed bad prefix tests") {
 //

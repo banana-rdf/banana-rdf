@@ -197,7 +197,7 @@ class SpecTriplesGenerator[M <: RDFModule](val m: M) {
     (10,unicodeChar)
   )
 
-  def unicodeChar = Gen.alphaNumChar//Arbitrary.arbChar.arbitrary
+  def unicodeChar = Arbitrary.arbChar.arbitrary
 
 
   def newline: Gen[String] = Gen.oneOf(Array("\n","\r","\r\n"))
@@ -234,7 +234,8 @@ class SpecTriplesGenerator[M <: RDFModule](val m: M) {
     line <- genUnicodeStr
     eol <- newline
   } yield {
-    ""+space + "#" + line + eol
+    val onelineonly = line.split("[\r\n]")(0)
+    ""+space + "#" + onelineonly + eol
   }
 
 }
