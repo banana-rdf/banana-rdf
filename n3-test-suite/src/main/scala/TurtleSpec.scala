@@ -116,13 +116,22 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
     val results = for (prefix <- goodPrefixes;
                iri <- uris) yield {
       try {
+        val user = U
         val space1 = genSpaceOrComment.sample.get
         val space2 = genSpaceOrComment.sample.get
-        val pre = "@prefix" + space1 + prefix + space2 + "<" + iri + ">"
-        val res = P.prefixID(pre)
-        ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
+        val preStr = "@prefix" + space1 + prefix + space2 + "<" + iri + ">"
+        val res = P.prefixID(preStr)(user)
+        val (parsedPre,parsedVal) = res.get
+        val prefixes = user.prefixes
+        val unicode = "\\\\u(....)".r
+        val decodedPrefix = unicode.replaceAllIn(prefix,m=>Integer.parseInt(m.group(1),16).toChar.toString)
+        val decodedPrefix2 = decodedPrefix.replaceAll("\\\\t","\t")
+        ("prefix line in='" + preStr + "' result = " +res+ "user prefixes="+prefixes) |: all(
           res.isSuccess &&
-            (res.get._2 == iri)
+            ((prefixes.get(parsedPre)  == Some(parsedVal)) :| "parsed prefixes did not end up in user") &&
+            ((prefixes.get(decodedPrefix2)  == Some(iri)) :|
+              "userPrefixHash["+decodedPrefix+"] did not return the "+
+              " original iri "+iri)
         )
       } catch {
         case e => {
@@ -144,8 +153,8 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriplesGenerator[M](m){
 
   val goodPrefixes= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
-    "\\u002e:","e\\u0eff\\u0045:","e\\t:")
-  val badPrefixes= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf")
+    "\\u002e:","e\\u0eff\\u0045:")
+  val badPrefixes= List[String]("cert.:","2oaf:",".new:","❤:","⌘-☯:","","cert","foaf","e\\t:")
 
   def genSpaceOrComment = Gen.frequency(
     (1,genSpace),

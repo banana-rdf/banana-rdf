@@ -7,6 +7,7 @@ package org.w3.rdf.n3
 import nomo.{Failure, Success, Result, Parsers}
 import org.w3.rdf.n3.ListenerAgent
 import org.w3.rdf.RDFModule
+import java.io.Serializable
 
 
 /**
@@ -54,29 +55,33 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
 
   lazy val UCHAR = u_CHAR | U_CHAR
   lazy val UCHARS = UCHAR.many1.map(_.mkString)
-  lazy val PN_CHARS_BASE = single(pn_chars_simple) | UCHAR
+  lazy val PN_CHARS_BASE = single(pn_chars_base) | UCHAR
   lazy val PN_CHARS_U = PN_CHARS_BASE | P.single ('_')
   lazy val PN_CHARS =  P.takeWhile1(pn_chars_dot, err).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
   lazy val PN_decode = PN_CHARS.many1.map(_.mkString)
 
-  lazy val PN_PREFIX = P.takeWhile(_ != ':').mapResult {
+  lazy val PN_PREFIX  : P.Parser[String] = P.takeWhile(_ != ':').mapResult {
     case Result(Success(pfx), pos, us)=> {
       val prefx = pfx.toSeq.mkString
       if (prefx.size == 0) Success("")
       else if (prefx.last == '.') Failure(P.err.single('.',pos))
-      else if (!pn_chars_simple(prefx.head) && UCHAR(prefx)(us).isFailure) {
+      else if (!pn_chars_base(prefx.head) && UCHAR(prefx)(us).isFailure) {
         Failure(P.err.single(prefx.head,pos))
       } else {
-        PN_decode(prefx)(us).status.mapL(e=>P.err.single(':',pos))
+        val result = (PN_decode<<P.eof)(prefx)(us)
+        result.status.mapL(e=>P.err.single(':',pos))
       }
     }
-    case other => other.status
+    case other => other.status.map(x=>"never gets called, as the result has to be some error")
   }
 
-  lazy val PNAME_NS =  PN_PREFIX << COLON
+  lazy val PNAME_NS =  (PN_PREFIX << COLON).map(prefix=>prefix+":")
   lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | UCHARS).many.map(_.mkString)<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
-  lazy val prefixID =  PREFIX_Part1 ++ (SP>>IRI_REF)
+  lazy val prefixID =  (PREFIX_Part1 ++ (SP>>IRI_REF)).mapResult{ r=>
+    r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
+    r.status
+  }
   lazy val directive = prefixID //| base
 
   lazy val statement = ( directive << dot ) //| ( turtleTriples << dot )
@@ -86,16 +91,16 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
 
 
 object TurtleParser {
-  val pn_simple_set = List[Pair[Int, Int]](('A'.toInt,'Z'.toInt),('a'.toInt,'z'.toInt),
+  private val pn_char_intervals_base = List[Pair[Int, Int]](('A'.toInt,'Z'.toInt),('a'.toInt,'z'.toInt),
     (0x00C0,0x00D6), (0x00D8,0x00F6), (0x00F8,0x02FF), (0x0370,0x037D),
     (0x037F,0x1FFF), (0x200C,0x200D), (0x2070,0x218F), (0x2C00,0x2FEF),
     (0x3001,0xD7FF), (0xF900,0xFDCF), (0xFDF0,0xFFFD), (0x10000,0xEFFFF)
   )
-  val non_iri_chars = Array('<','>','"','{','}','|','^','`','\\')
+  private val non_iri_chars = Array('<','>','"','{','}','|','^','`','\\')
 
-  val pn_chars_set = ('0'.toInt,'9'.toInt)::pn_simple_set:::List((0x300,0x36F),(0x203F,0x2040))
+  private val pn_chars_set = ('0'.toInt,'9'.toInt)::pn_char_intervals_base:::List((0x300,0x36F),(0x203F,0x2040))
 
-  def pn_chars_simple(c: Char): Boolean = pn_simple_set.exists(in(_)(c))
+  def pn_chars_base(c: Char): Boolean = pn_char_intervals_base.exists(in(_)(c))
 
   def pn_chars_dot(c: Char) = c == '.' || pn_chars(c)
   def pn_chars(c: Char) = c == '-' || c == '_' || c == 0xB7 || pn_chars_set.exists(in(_)(c))

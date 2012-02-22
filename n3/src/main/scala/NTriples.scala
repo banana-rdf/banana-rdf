@@ -104,7 +104,7 @@ class NTriplesParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val
         case Some(t) => r.user.send(t);
         case None => ()
       }
-      Success(r)
+      r.status
   } ).delimitIgnore(eoln)
   
   /** function that parses NTriples and return result to caller as a list */

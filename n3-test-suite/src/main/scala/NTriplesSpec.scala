@@ -32,11 +32,6 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
   
   implicit def U: Listener = new Listener()
 
-  case class Listener(val queue: mutable.Queue[Any] = new mutable.Queue[Any]()) extends ListenerAgent[Any] {
-    def send(a: Any) = queue.enqueue(a)
-  }
-
-
   val P: NTriplesParser[M, String, TreeError, Position, Listener] = new NTriplesParser(m,
     Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
 
