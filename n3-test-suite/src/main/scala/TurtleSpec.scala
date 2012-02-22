@@ -115,17 +115,19 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   property("good prefix line tests") = secure {
     val results = for (prefix <- goodPrefixes;
                iri <- uris) yield {
-      val space1 = genSpaceOrComment.sample.get
-      val space2 = genSpaceOrComment.sample.get
-      val pre = "@prefix" + space1 + prefix + space2 + "<" + iri + ">"
       try {
-      val res = P.prefixID(pre)
-      ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
-        res.isSuccess &&
-          (res.get._2 == iri)
-      )
+        val space1 = genSpaceOrComment.sample.get
+        val space2 = genSpaceOrComment.sample.get
+        val pre = "@prefix" + space1 + prefix + space2 + "<" + iri + ">"
+        val res = P.prefixID(pre)
+        ("prefix line in='" + pre + "' result = '" + res + "'") |: all(
+          res.isSuccess &&
+            (res.get._2 == iri)
+        )
       } catch {
-        case e => { e.printStackTrace(); throw e }
+        case e => {
+          e.printStackTrace(); throw e
+        }
       }
     }
     all(results :_*)

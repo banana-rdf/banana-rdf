@@ -9,7 +9,6 @@ import org.scalacheck._
 import Prop._
 
 import nomo.Errors._
-import scala.util.Random
 import collection.immutable.NumericRange
 import collection.mutable.HashSet
 import nomo.{Accumulators, Errors, Parsers, Monotypic}
@@ -199,7 +198,6 @@ class SpecTriplesGenerator[M <: RDFModule](val m: M) {
 
   def unicodeChar = Arbitrary.arbChar.arbitrary
 
-
   def newline: Gen[String] = Gen.oneOf(Array("\n","\r","\r\n"))
   def genSimpleLang = Gen.alphaChar.combine(Gen.alphaNumChar) { (oc,ocn)=> Some(""+oc.get+ocn.get) }
 
@@ -231,11 +229,12 @@ class SpecTriplesGenerator[M <: RDFModule](val m: M) {
   def genAnySpace = Gen.listOf1(Gen.oneOf(" \t\n\r  ")).map(_.mkString)
   def genComment: Gen[String] = for {
     space <- genSpace
-    line <- genUnicodeStr
+    str <- genUnicodeStr
     eol <- newline
   } yield {
-    val onelineonly = line.split("[\r\n]")(0)
-    ""+space + "#" + onelineonly + eol
+    val lines = str.split("[\r\n]")
+    val line = if (lines.size==0) "" else lines(0)
+    ""+space + "#" + line + eol
   }
 
 }
