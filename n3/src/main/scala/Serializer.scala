@@ -46,14 +46,14 @@ class Serializer[M <: RDFModule](val m: M) {
   
   def literalAsN3(literal: Literal): String = Literal.fold(literal) (
     { typedLiteral: TypedLiteral => typedLiteralAsN3(typedLiteral) },
-    { case LangLiteral(lexicalForm, Lang(lang)) => "\"%s\"@%s" format (NTriplesParser.toLiteral(lexicalForm), lang) }
+    { case LangLiteral(lexicalForm, Lang(lang)) => "\"%s\"@%s" format (NTriplesParser.toAsciiLiteral(lexicalForm), lang) }
   )
   
   def typedLiteralAsN3(typedLiteral: TypedLiteral): String = typedLiteral match {
     case TypedLiteral(lexicalForm, datatype) if datatype == xsdString =>
-      "\"%s\"" format NTriplesParser.toLiteral(lexicalForm)
+      "\"%s\"" format NTriplesParser.toAsciiLiteral(lexicalForm)
     case TypedLiteral(lexicalForm, IRI(iri)) =>
-      "\"%s\"^^<%s>" format (NTriplesParser.toLiteral(lexicalForm), iri)
+      "\"%s\"^^<%s>" format (NTriplesParser.toAsciiLiteral(lexicalForm), iri)
   }
   
 }

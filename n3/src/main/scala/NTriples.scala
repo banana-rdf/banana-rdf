@@ -140,25 +140,48 @@ object NTriplesParser {
       append(hexChar(c & 0xF))
     b
   }
+  private def iri(c: Char, b: StringBuilder): Boolean = {
+    if ("<>\\{}\"|^'\t\f\r\n".contains(c)) b.append(hex(c))
+    else return false
+    true
+  }
 
-  def toLiteral(str: String) = {
+  private def literal(c: Char, b: StringBuilder): Boolean = {
+    if (c <= 0x8) b.append(hex(c))
+    else if (c == 0x9) b.append("\\t")
+    else if (c == 0xA) b.append("\\n")
+    else if (c == 0xB || c == 0xC) b.append(hex(c))
+    else if (c == 0xD) b.append("\\r")
+    else if (c >= 0xE && c <= 0x1F) b.append(hex(c))
+    else if (c == 0x20 || c == 0x21) b.append(c)
+    else if (c == 0x22) b.append('\\').append('"')
+    else if (c >= 0x23 && c <= 0x5b) b.append(c)
+    else if (c == 0x5c) b.append('\\').append('\\')
+    else if (c >= 0x5d && c <= 0x7e) b.append(c)
+    else if (c >= 0x7f && c <= 0xffff) b.append(hex(c))
+    else if (c >= 0x10000 & c <= 0x10FFFF) b.append(hexLong(c))
+    else {
+      return false
+    }
+    true
+  }
+
+  /** encode a string so that it can appear in a ASCII only Literal */
+  def toAsciiLiteral(str: String) = {
     val b = new StringBuilder
-    for (c <- str) yield {
-      if (c <= 0x8) b.append(hex(c))
-      else if (c == 0x9) b.append("\\t")
-      else if (c == 0xA) b.append("\\n")
-      else if (c == 0xB || c == 0xC) b.append(hex(c))
-      else if (c == 0xD) b.append("\\r")
-      else if (c >= 0xE && c <= 0x1F) b.append(hex(c))
-      else if (c == 0x20 || c == 0x21) b.append(c)
-      else if (c == 0x22) b.append('\\').append('"')
-      else if (c >= 0x23 && c <= 0x5b) b.append(c)
-      else if (c == 0x5c) b.append('\\').append('\\')
-      else if (c >= 0x5d && c <= 0x7e) b.append(c)
-      else if (c >= 0x7f && c <= 0xffff) b.append(hex(c))
-      else if (c >= 0x10000 & c <= 0x10FFFF) b.append(hexLong(c))
+    for (c <- str)  {
+      literal(c,b)
     }
     b.toString()
+  }
+
+  /** encode a string so that it can appear in a URI that is fully ASCII */
+  def toIRI(str: String) = {
+    val b = new StringBuilder
+    for (c <- str) {
+      iri(c,b) || literal(c,b)
+    }
+    b.toString
   }
   
 }

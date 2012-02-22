@@ -43,7 +43,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
    }
 
   property("literal") = forAll(genUnicodeStr) { str=>
-    val literal = NTriplesParser.toLiteral(str)
+    val literal = NTriplesParser.toAsciiLiteral(str)
     val res= P.literal(literal)
     ("input literal="+literal+"evidence = '"+res+"'") |: all (
      res.isSuccess &&
@@ -52,7 +52,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
 
 
    property("Plainliteral") = forAll(genPlainLiteral) { case literal @ m.TypedLiteral(lit, tpe) =>
-     val literalStr = '"'+NTriplesParser.toLiteral(lit)+'"'
+     val literalStr = '"'+NTriplesParser.toAsciiLiteral(lit)+'"'
      val res= P.fullLiteral(literalStr)
      ("literal in='"+literalStr+"' result = '"+res+"'") |: all(
       res.isSuccess &&
@@ -62,7 +62,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
 
    property("langLiteral") = forAll(genLangLiteral) { case tst @ m.LangLiteral(lit, Lang(lang)) =>
      import NTriplesParser._
-     val testStr = "\"" + toLiteral(lit) + "\"@" + lang
+     val testStr = "\"" + toAsciiLiteral(lit) + "\"@" + lang
      val res = P.fullLiteral(testStr)
      ("input:" + testStr + "\nresult = '" + res + "'") |: all(
          ( res.isSuccess :| "res was failure" ) &&
@@ -89,7 +89,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
    }
 
   property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ m.TypedLiteral(str, IRI(uri)) =>
-    val literal = '"'+NTriplesParser.toLiteral(str)+"\"^^<"+uri+">"
+    val literal = '"'+NTriplesParser.toAsciiLiteral(str)+"\"^^<"+uri+">"
     val res = P.fullLiteral(literal)
     val TypedLiteral(lit, IRI(dt_iri)) = res.get
     ("literal="+literal+"\nresult = "+res) |: all (
@@ -181,7 +181,21 @@ class SpecTriplesGenerator[M <: RDFModule](val m: M) {
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#en",
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#de",
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#fr",
-    "http://www.w3.org/2001/XMLSchema#string")
+    "http://www.w3.org/2001/XMLSchema#string",
+    "http://xmlns.com/foaf/emotion#♡",
+    "http://xmlns.com/foaf/emotion#☺",
+    "http://beyond.com/\t/flexibility",
+    "http://alcoholics.anonymous/\r\n/startAgain",
+    "http://moveon.org/\f/print",
+    "http://nasdaq.com/'AAPL",
+    "http://bush.gov/\r\n/bornagain",
+    "http://lewis.org/ont/modal/▢⇾",
+    "http://über.info/>",
+    "http://nasdaq.org/\"W3C")
+
+  val encodedURIs = uris.map(u => NTriplesParser.toIRI(u))
+
+  val uriPairs = uris.zip(encodedURIs)
 
 
   def ntripleChar = Gen.frequency(

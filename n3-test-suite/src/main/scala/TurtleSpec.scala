@@ -56,13 +56,13 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   }
 
   property("good IRIs") = secure {
-    val results = for (iri <- uris) yield {
-      val iriRef = "<" + iri + ">"
+    val results = for ((pure,encoded) <- uriPairs) yield {
+      val iriRef = "<" + encoded + ">"
       val res = P.IRI_REF(iriRef)
 
       ("prefix line in='" + iriRef + "' result = '" + res + "'") |: all(
         res.isSuccess &&
-          (res.get == iri)
+          (res.get == pure)
       )
     }
     all(results :_*)
@@ -114,24 +114,49 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 
   property("good prefix line tests") = secure {
     val results = for (prefix <- goodPrefixes;
-               iri <- uris) yield {
+                       (pure,encoded) <- uriPairs) yield {
       try {
         val user = U
         val space1 = genSpaceOrComment.sample.get
         val space2 = genSpaceOrComment.sample.get
-        val preStr = "@prefix" + space1 + prefix + space2 + "<" + iri + ">"
+        val preStr = "@prefix" + space1 + prefix + space2 + "<" + encoded + ">"
         val res = P.prefixID(preStr)(user)
         val (parsedPre,parsedVal) = res.get
         val prefixes = user.prefixes
         val unicode = "\\\\u(....)".r
         val decodedPrefix = unicode.replaceAllIn(prefix,m=>Integer.parseInt(m.group(1),16).toChar.toString)
-        val decodedPrefix2 = decodedPrefix.replaceAll("\\\\t","\t")
+
         ("prefix line in='" + preStr + "' result = " +res+ "user prefixes="+prefixes) |: all(
           res.isSuccess &&
             ((prefixes.get(parsedPre)  == Some(parsedVal)) :| "parsed prefixes did not end up in user") &&
-            ((prefixes.get(decodedPrefix2)  == Some(iri)) :|
+            ((prefixes.get(decodedPrefix)  == Some(pure)) :|
               "userPrefixHash["+decodedPrefix+"] did not return the "+
-              " original iri "+iri)
+              " original iri "+pure)
+        )
+      } catch {
+        case e => {
+          e.printStackTrace(); throw e
+        }
+      }
+    }
+    all(results :_*)
+  }
+
+  property("good base tests") = secure {
+    val results = for ((pure,encoded) <- uriPairs) yield {
+      try {
+        val user = U
+        val space1 = genSpaceOrComment.sample.get
+        val space2 = genSpaceOrComment.sample.get
+        val preStr = "@base" + space1 + "<" + encoded + ">"+space2
+        val res = P.base(preStr)(user)
+        val base = res.get
+        val prefixes = user.prefixes
+
+        ("prefix line in='" + preStr + "' result = " +res) |: all(
+          res.isSuccess &&
+            (( base == pure) :| "the decoded base differs from the original one") &&
+            ((prefixes.get("")  == Some(pure)) :| "base did not end up in user state")
         )
       } catch {
         case e => {

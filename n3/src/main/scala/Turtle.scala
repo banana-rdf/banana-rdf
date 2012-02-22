@@ -37,8 +37,10 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   lazy val err = (pos: X) =>P.err.single('!',pos)
   lazy val COLON = P.single(':')
   lazy val PREFIX = P.word("@prefix")
+  lazy val BASE = P.word("@base")
   lazy val dot = P.single('.')
   lazy val eoln = P.word ("\r\n") | P.word("\n")  | P.word("\r")
+  lazy val CLOSE_ANGLE = P.word("\\>").map(a=>">")
 
   lazy val SP = (P.takeWhile1(c=> " \t\r\n".contains(c),err) | comment ).many1
   lazy val comment = P.single('#')>>P.takeWhile(c=> c != '\r' && c != '\n') << eoln
@@ -54,6 +56,8 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   }
 
   lazy val UCHAR = u_CHAR | U_CHAR
+  lazy val IRICHAR = UCHAR | CLOSE_ANGLE
+  lazy val IRICHARS = IRICHAR.many1.map(_.mkString)
   lazy val UCHARS = UCHAR.many1.map(_.mkString)
   lazy val PN_CHARS_BASE = single(pn_chars_base) | UCHAR
   lazy val PN_CHARS_U = PN_CHARS_BASE | P.single ('_')
@@ -76,13 +80,20 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   }
 
   lazy val PNAME_NS =  (PN_PREFIX << COLON).map(prefix=>prefix+":")
-  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | UCHARS).many.map(_.mkString)<<P.single('>')
+  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | IRICHARS).many.map(_.mkString)<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
     r.status
   }
-  lazy val directive = prefixID //| base
+
+  lazy val base = (BASE >> SP >> IRI_REF).mapResult{ r =>
+    //the base is just the namespace without a :
+    r.status.map(iri=>r.user.addPrefix("",iri))
+    r.status
+  }
+
+  lazy val directive = prefixID | base
 
   lazy val statement = ( directive << dot ) //| ( turtleTriples << dot )
   lazy val turtleDoc = statement.many
