@@ -41,7 +41,7 @@ class Serializer[M <: RDFModule](val m: M) {
   
   def iriAsN3(iri: IRI): String = {
     val IRI(iriString) = iri
-    "<" + iriString + ">"
+    "<" + NTriplesParser.toIRI(iriString) + ">"
   }
   
   def literalAsN3(literal: Literal): String = Literal.fold(literal) (
@@ -53,7 +53,7 @@ class Serializer[M <: RDFModule](val m: M) {
     case TypedLiteral(lexicalForm, datatype) if datatype == xsdString =>
       "\"%s\"" format NTriplesParser.toAsciiLiteral(lexicalForm)
     case TypedLiteral(lexicalForm, IRI(iri)) =>
-      "\"%s\"^^<%s>" format (NTriplesParser.toAsciiLiteral(lexicalForm), iri)
+      "\"%s\"^^<%s>" format (NTriplesParser.toAsciiLiteral(lexicalForm), NTriplesParser.toIRI(iri))
   }
   
 }

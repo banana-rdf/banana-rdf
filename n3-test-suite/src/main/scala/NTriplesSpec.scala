@@ -76,8 +76,8 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
 
 
    property("uris") = secure { 
-     val res =for (uri <- uris) yield {
-       var uriref = "<" + uri + ">"
+     val res =for ((uri,encoded) <- uriPairs) yield {
+       var uriref = "<" + encoded + ">"
        val parsedUri = P.uriRef(uriref)
        ("result = " + parsedUri) |: all(
          (parsedUri.isSuccess :| "failure to parse") &&
@@ -89,7 +89,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
    }
 
   property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ m.TypedLiteral(str, IRI(uri)) =>
-    val literal = '"'+NTriplesParser.toAsciiLiteral(str)+"\"^^<"+uri+">"
+    val literal = '"'+NTriplesParser.toAsciiLiteral(str)+"\"^^<"+NTriplesParser.toIRI(uri)+">"
     val res = P.fullLiteral(literal)
     val TypedLiteral(lit, IRI(dt_iri)) = res.get
     ("literal="+literal+"\nresult = "+res) |: all (

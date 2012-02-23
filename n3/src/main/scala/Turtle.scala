@@ -66,6 +66,9 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   lazy val PN_CHARS =  P.takeWhile1(pn_chars_dot, err).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
   lazy val PN_decode = PN_CHARS.many1.map(_.mkString)
 
+  /*
+   *for a discussion of this rule see: https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rules
+   */
   lazy val PN_PREFIX  : P.Parser[String] = P.takeWhile(_ != ':').mapResult {
     case Result(Success(pfx), pos, us)=> {
       val prefx = pfx.toSeq.mkString
@@ -78,7 +81,7 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
         result.status.mapL(e=>P.err.single(':',pos))
       }
     }
-    case other => other.status.map(x=>"this function never gets called: 'other' is an error. Just here to change type.")
+    case other => other.status.map(x=>"this map() never gets called, as 'other' is an error.")
   }
 
   lazy val PNAME_NS =  (PN_PREFIX << COLON).map(prefix=>prefix+":")
@@ -97,6 +100,10 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   lazy val PNL_FIRST = PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX
   lazy val PNL_BODY = PN_CHARS | dot | PLX
   lazy val PNL_LAST = PN_CHARS | PLX
+
+  /**
+   *for a discussion of this rule see: https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rules
+   */
   lazy val PN_LOCAL =  P.takeWhile(c=> !c.isWhitespace).mapResult {
     case Result(Success(pfx), pos, us)=> {
       val prefx = pfx.toSeq.mkString
@@ -109,7 +116,7 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
         result.status.mapL(e=>P.err.single(':',pos))
       }
     }
-    case other => other.status.map(x=>"this function never gets called: 'other' is an error. Just here to change type.")
+    case other => other.status.map(x=>"this map() never gets called, as 'other' is an error.")
   }
   lazy val PNAME_LN = PNAME_NS ++ PN_LOCAL
   lazy val PrefixedName = PNAME_LN | PNAME_NS

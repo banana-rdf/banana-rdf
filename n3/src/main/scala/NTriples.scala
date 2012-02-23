@@ -33,6 +33,10 @@ class NTriplesParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val
   val hexadecimalChars = "1234567890ABCDEFabcdef"
   def hex = P.anyOf(hexadecimalChars)
 
+  /** Parses the single token given that matches the function */
+  def single(isC: Char => Boolean ): P.Parser[Char] = P.any mapResult (s =>
+    s.status.flatMap(i => if (isC(i) ) Success(i) else Failure(P.err.single(i, s.position))))
+
   val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),
     pos => P.err.single('!',pos)).map(l => Lang(l.toSeq.mkString))
 
@@ -48,57 +52,58 @@ class NTriplesParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val
 
   import P.++
   
-  val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).map (n=>BNode(n.toSeq.mkString))
+  lazy val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).map (n=>BNode(n.toSeq.mkString))
 
 
-  val u_CHAR = (P.word("\\u")>> hex++hex++hex++hex) map {
+  lazy val u_CHAR = (P.word("\\u")>> hex++hex++hex++hex) map {
     case c1++c2++c3++c4 => Integer.parseInt(new String(Array(c1,c2,c3,c4)),16).toChar
   }
-  val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
+  lazy val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
     case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
   }
-  val lt_tab = P.word("\\t").map(c=>0x9.toChar)
-  val lt_cr = P.word("\\r").map(c=>0xD.toChar)
-  val lt_nl = P.word("\\n").map(c=>0xA.toChar)
-  val lt_slash = P.word("\\\\").map(c=>'\\')
-  val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
+  lazy val lt_tab = P.word("\\t").map(c=>0x9.toChar)
+  lazy val lt_cr = P.word("\\r").map(c=>0xD.toChar)
+  lazy val lt_nl = P.word("\\n").map(c=>0xA.toChar)
+  lazy val lt_slash = P.word("\\\\").map(c=>'\\')
+  lazy val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
 
-  val literal = ( u_CHAR | U_CHAR | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
+  lazy val literal = ( u_CHAR | U_CHAR | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
       P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single('!',pos)).map(n=>n.toSeq.mkString)
     ).many.map(l=> l.toSeq.mkString)
 
-  val uriStr = (u_CHAR | U_CHAR | lt_slash | lt_quote |
-      P.takeWhile1(c => isUriChar(c),pos => P.err.single('!',pos)).map(n=>n.toSeq.mkString)
-     ).many1.map(i=>i.toSeq.mkString)
+  lazy val uriStr = (u_CHAR | U_CHAR |
+      lt_slash | lt_quote |
+      single(c => isUriChar(c))
+    ).many1.map(i=>i.toSeq.mkString)
 
   val xsd = "http://www.w3.org/2001/XMLSchema#"
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  val xsdString = IRI(xsd + "string")
+  lazy val xsdString = IRI(xsd + "string")
 
-  val plainLit = (P.single('"')>>literal<< P.single('\"'))
+  lazy val plainLit = (P.single('"')>>literal<< P.single('\"'))
 
-  val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
+  lazy val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
     case lexicalForm ++ None => TypedLiteral(lexicalForm)
     case lexicalForm ++ Some(Left(uriRef)) => TypedLiteral(lexicalForm, uriRef)
     case lexicalForm ++ Some(Right(lang)) => LangLiteral(lexicalForm, lang)
   }
 
-  val typeFunc = (P.word("^^") >> uriRef) map Left.apply
-  val langFunc = (P.word("@") >> lang) map Right.apply
+  lazy val typeFunc = (P.word("^^") >> uriRef) map Left.apply
+  lazy val langFunc = (P.word("@") >> lang) map Right.apply
 
 
-  val dot = P.single('.')
+  lazy val dot = P.single('.')
 
-  val uriRef = ( P.single('<') >> uriStr  << P.single('>')).map(i=>IRI(i))
-  val pred = uriRef
-  val subject = uriRef | bnode
-  val obj = uriRef | bnode | fullLiteral
-  val nTriple = (subject++(space1>>pred)++(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>space)
-  val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
-  val line = space >> (comment.as(None) | nTriple.map(Some(_)) | P.unit(None) )
+  lazy val uriRef = ( P.single('<') >> uriStr  << P.single('>')).map(i=>IRI(i))
+  lazy val pred = uriRef
+  lazy val subject = uriRef | bnode
+  lazy val obj = uriRef | bnode | fullLiteral
+  lazy val nTriple = (subject++(space1>>pred)++(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>space)
+  lazy val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
+  lazy val line = space >> (comment.as(None) | nTriple.map(Some(_)) | P.unit(None) )
 
   /** function that parse NTriples and send results to user in a streaming fashion */
-  val nTriples = (line.mapResult{
+  lazy val nTriples = (line.mapResult{
     r =>
       r.get match {
         case Some(t) => r.user.send(t);
@@ -108,7 +113,7 @@ class NTriplesParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val
   } ).delimitIgnore(eoln)
   
   /** function that parses NTriples and return result to caller as a list */
-  val nTriplesList = line.delimit(eoln).map(_.flatten)
+  lazy val nTriplesList = line.delimit(eoln).map(_.flatten)
 
 
 }
@@ -166,7 +171,9 @@ object NTriplesParser {
     true
   }
 
-  /** encode a string so that it can appear in a ASCII only Literal */
+  /**
+   * encode a string so that it can appear in a ASCII only Literal
+   **/
   def toAsciiLiteral(str: String) = {
     val b = new StringBuilder
     for (c <- str)  {
@@ -175,7 +182,12 @@ object NTriplesParser {
     b.toString()
   }
 
-  /** encode a string so that it can appear in a URI that is fully ASCII */
+  /**
+   * encode a string so that it can appear in a URI that is fully ASCII.
+   * Not 100% sure about these rules yet.
+   * For utf one should be able to devise more sophisticated rules for iri
+   * construction.
+   */
   def toIRI(str: String) = {
     val b = new StringBuilder
     for (c <- str) {
