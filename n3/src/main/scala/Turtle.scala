@@ -26,6 +26,8 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   import TurtleParser._
   import P.++
 
+  val rdfType = m.IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type ")
+
   /**
    * Note without lazy val, the order of the parsers would be important
    */
@@ -98,34 +100,27 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
     r.status
   }
   lazy val PNL_FIRST = PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX
-  lazy val PNL_BODY = PN_CHARS | dot | PLX
-  lazy val PNL_LAST = PN_CHARS | PLX
+  lazy val PNL_BODY = PN_CHARS | PLX  //removed . in name, which is in current spec. too difficult to handle right now.
 
   /**
    *for a discussion of this rule see: https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rules
    */
-  lazy val PN_LOCAL =  P.takeWhile(c=> !c.isWhitespace).mapResult {
-    case Result(Success(pfx), pos, us)=> {
-      val prefx = pfx.toSeq.mkString
-      if (prefx.size == 0) Success("")
-      else if (prefx.last == '.') Failure(P.err.single('.',pos))
-      else if (PNL_FIRST(prefx)(us).isFailure) {
-        Failure(P.err.single(prefx.head,pos))
-      } else {
-        val result = ((PNL_FIRST++PNL_BODY.many).map{case a++b=> a+b.mkString}<<P.eof)(prefx)(us)
-        result.status.mapL(e=>P.err.single(':',pos))
-      }
-    }
-    case other => other.status.map(x=>"this map() never gets called, as 'other' is an error.")
-  }
-  lazy val PNAME_LN = PNAME_NS ++ PN_LOCAL
+  lazy val PN_LOCAL = (PNL_FIRST ++ PNL_BODY.many.map(_.mkString)).map { case first++body => first+body }
+
+  lazy val PNAME_LN = PNAME_NS ++ PN_LOCAL.optional.map(_.getOrElse(""))
   lazy val PrefixedName = PNAME_LN | PNAME_NS
   lazy val IRIref = IRI_REF | PrefixedName
-//  lazy val predicateObjectList =
+
+  lazy val obj = IRIref //| blank | literal
+  lazy val predicate = IRIref
+  lazy val verb = predicate | P.single('a').as(rdfType)
+
+  lazy val objectList = obj ++ ( P.single(',') >> obj ).many
+  lazy val predicateObjectList = verb ++ objectList //( ";" verb objectList )* (";")?
 
   lazy val subject = IRIref //| blank
 
-//  lazy val triples =  subject ++ predicateObjectList
+  lazy val triples =  subject ++ predicateObjectList
 
   lazy val directive = prefixID | base
 

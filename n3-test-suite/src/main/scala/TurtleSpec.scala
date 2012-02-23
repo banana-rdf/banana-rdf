@@ -206,8 +206,20 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
          }
      }
     all(results :_*)
-
   }
+
+  lazy val simple_sentences = Array(
+    "<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i> .",
+    ":me foaf:knows bl:tim",
+    ":me a foaf:Person"
+  )
+
+//  property("test simple sentences") = secure {
+//     val results = for ( sentence <- simple_sentences) yield {
+//       val res = P.triples(sentence)
+//     }
+//  }
+
 
 //  property("fixed bad prefix tests") {
 //
@@ -221,7 +233,9 @@ class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriple
 
   val gdPfxOrig= List[String](":","cert:","foaf:","foaf.new:","a\u2764:","䷀:","Í\u2318-\u262f:",
     "\u002e:","e\u0eff\u0045:")
-  val gdPfx= List[String](":","cert:","foaf:","foaf.new:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
+  //note: foaf.new does not NEED to have the . encoded as of spec of feb 2012. but it's difficult to deal with.
+  //see https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rule
+  val gdPfx= List[String](":","cert:","foaf:","foaf\\u002enew:","a\\u2764:","䷀:","Í\\u2318-\\u262f:",
     "\\u002e:","e\\u0eff\\u0045:")
   val zipPfx = gdPfxOrig.zip(gdPfx)
 
@@ -230,7 +244,9 @@ class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriple
 
   val gdPfxLcl =   List[String]("_\u2071\u2c001.%34","0","00","","\u3800snapple%4e.\u00b7","_\u2764\u262f.\u2318",
     "%29coucou")
-  val gdPfxLcl_W = List[String]("_\u2071\u2c001.%34","0","00","","\u3800snapple%4e.\\u00b7","_\\u2764\\u262f.\\u2318",
+  //note:the '.' do not NEED to be encoded as of spec of feb 2012. but it's difficult to deal with.
+  //see https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rule
+  val gdPfxLcl_W = List[String]("_\u2071\u2c001\\u002e%34","0","00","","\u3800snapple%4e\\u002e\\u00b7","_\\u2764\\u262f\\u002e\\u2318",
     "%29coucou")
 
   val zipPrefLocal = gdPfxLcl.zip(gdPfxLcl_W)
