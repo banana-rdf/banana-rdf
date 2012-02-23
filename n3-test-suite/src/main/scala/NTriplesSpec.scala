@@ -30,10 +30,10 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
   val gen = new SpecTriplesGenerator[m.type](m)
   import gen._
   
-  implicit def U: Listener = new Listener[m.type](m)
+  implicit def U : Listener[M] = new Listener(m)
 
-  val P: NTriplesParser[M, String, TreeError, Position, Listener] = new NTriplesParser(m,
-    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
+  val P: NTriplesParser[M, String, TreeError, Position, Listener[M]] = new NTriplesParser(m,
+    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[M]](4)))
 
 
 

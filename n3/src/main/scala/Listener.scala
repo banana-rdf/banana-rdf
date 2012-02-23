@@ -7,31 +7,32 @@ case class Listener[M <: RDFModule](val m: M) {
   private val prefixs = new mutable.HashMap[String, m.IRI]
   val queue: mutable.Queue[m.Triple] = new mutable.Queue[m.Triple]()
 
-  def send(a: Triple) = queue.enqueue(a)
+  def send(a: Any) = queue.enqueue(a.asInstanceOf[m.Triple])
 
-  def addPrefix(nameSpace: String, uri: m.IRI) {
-    prefixs.put(nameSpace,uri)
+  def addPrefix(nameSpace: String, uri: Any) {
+    prefixs.put(nameSpace,uri.asInstanceOf[m.IRI])
   }
 
-  def setObject(obj: m.IRI) {
-    send(Triple(subject,verb,obj))
+  def setObject(obj: Any) {
+    send(m.Triple(subject,verb,obj.asInstanceOf[m.Node]))
   }
 
   def prefixes = prefixs.toMap
 
   var verb: m.IRI = _
-  def setVerb(rel: m.IRI) {
-    verb=rel
+  def setVerb(rel: Any) {
+    verb=rel.asInstanceOf[m.IRI]
   }
 
   var subject: m.Node = _
-  def setSubject(subj: m.IRI) {
-      subject = subj
+  def setSubject(subj: Any) {
+    subject = subj match {
+      case pname: PName => m.IRI(prefixes.get(pname.prefix).get + pname.name)
+      case iri: m.IRI => iri
+    }
   }
 
-  def setSubject(pname: PName) {
-     subject = m.IRI(prefixes.get(pname.prefix).get + pname.name)
-  }
+
 }
 
 case class PName(prefix: String, name: String)

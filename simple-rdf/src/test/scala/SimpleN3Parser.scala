@@ -9,7 +9,7 @@ extends n3.TurtleParser(
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
-    Accumulators.position[n3.Listener](4)))
+    Accumulators.position[n3.Listener[SimpleModule.type]](4)))
 
 object SimpleTurtleSeqParser
 extends n3.TurtleParser(
@@ -17,4 +17,4 @@ extends n3.TurtleParser(
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
-    Accumulators.position[n3.Listener](4)))
+    Accumulators.position[n3.Listener[SimpleModule.type]](4)))

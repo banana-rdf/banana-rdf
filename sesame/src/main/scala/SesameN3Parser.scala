@@ -10,7 +10,7 @@ extends n3.NTriplesParser(
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
-    Accumulators.position[Listener](4)))
+    Accumulators.position[Listener[SesameModule.type ]](4)))
 
 object NTriplesSeqParser
 extends n3.NTriplesParser(
@@ -18,4 +18,4 @@ extends n3.NTriplesParser(
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
-    Accumulators.position[Listener](4)))
+    Accumulators.position[Listener[SesameModule.type ]](4)))

@@ -12,14 +12,14 @@ import org.w3.rdf._
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriplesParser[M, F, E, X, Listener]) {
+abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriplesParser[M, F, E, X, Listener[M]]) {
 
   val isomorphism: GraphIsomorphism[m.type]
   
   import m._
   import isomorphism._
   
-  implicit def U: Listener = new Listener
+  implicit def U = new Listener(m)
   
   /** so that this test can be run with different IO models */
   def toF(string: String): F
@@ -138,7 +138,7 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriple
   }
 
   import parser.P._
-  case class ParsedChunk(val parser: Parser[Unit],val acc: Accumulator[Char, X, Listener]) {
+  case class ParsedChunk(val parser: Parser[Unit],val acc: Accumulator[Char, X, Listener[M]]) {
     def parse(buf: Seq[Char]) = {
       if (!buf.isEmpty) {
         val (tripleParser, newAccu) = parser.feedChunked(buf, acc, buf.size)

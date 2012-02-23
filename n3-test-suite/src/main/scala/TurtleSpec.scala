@@ -26,14 +26,15 @@ import java.io.{BufferedReader, StringReader}
  */
 class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   import m._
+  import System.out
 
   val gen = new SpecTurtleGenerator[m.type](m)
   import gen._
 
-  val P: TurtleParser[M, String, TreeError, Position, Listener] = new TurtleParser(m,
-    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
+  val P = new TurtleParser(m,
+    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[M]](4)))
 
-  implicit def U: Listener = new Listener[m.type](m)
+  implicit def U: Listener[M] = new Listener(m)
 
   property("good prefix type test") = secure {
     val res = for ((orig,write) <- zipPfx) yield {
@@ -63,7 +64,7 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 
       ("prefix line in='" + iriRef + "' result = '" + res + "'") |: all(
         res.isSuccess &&
-          (res.get == pure)
+          (res.get == IRI(pure))
       )
     }
     all(results :_*)
@@ -128,9 +129,9 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
         ("prefix line in='" + preStr + "' result = " +res+ "user prefixes="+prefixes) |: all(
           res.isSuccess &&
             ((origPfx == parsedPre) :| "original and parsed prefixes don't match") &&
-            ((pureIRI == parsedIRI) :| "original and parsed IRI don't match ") &&
+            ((IRI(pureIRI) == parsedIRI) :| "original and parsed IRI don't match ") &&
             ((prefixes.get(parsedPre)  == Some(parsedIRI)) :| "parsed prefixes did not end up in user") &&
-            ((prefixes.get(origPfx)  == Some(pureIRI)) :|
+            ((prefixes.get(origPfx)  == Some(IRI(pureIRI))) :|
               "userPrefixHash["+origPfx+"] did not return the "+
               " original iri "+pureIRI)
         )
@@ -156,8 +157,8 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 
         ("prefix line in='" + preStr + "' result = " +res) |: all(
           res.isSuccess &&
-            (( base == pure) :| "the decoded base differs from the original one") &&
-            ((prefixes.get("")  == Some(pure)) :| "base did not end up in user state")
+            (( base == IRI(pure)) :| "the decoded base differs from the original one") &&
+            ((prefixes.get("")  == Some(IRI(pure))) :| "base did not end up in user state")
         )
       } catch {
         case e => {
@@ -194,10 +195,10 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
        (origLcl,wLcl) <- zipPrefLocal
      ) yield try {
        val name =wPfx+wLcl+genSpace.sample.get
-       val res = P.PNAME_LN(name)
+       val res = P.PrefixedName(name)
        ("name=["+name+"] result="+res) |: all (
         res.isSuccess &&
-        ((res.get == (origPfx,origLcl)) :| "original and parsed data don't match!"  )
+        ((res.get == PName(origPfx,origLcl)) :| "original and parsed data don't match!"  )
        )
      } catch {
          case e => {
@@ -215,8 +216,11 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   )
 
   property("test simple sentences") = secure {
-      Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"),
-      P.triples()
+      val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
+      val res = P.triples( "<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i> .")
+    ("Initial Triple="+t+" result="+res) |: all (
+      res.isSuccess
+    )
   }
 
 

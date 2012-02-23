@@ -31,7 +31,7 @@ object SimpleNTriplesStringParser
     Parsers(
       Monotypic.String,
       Errors.tree[Char],
-      Accumulators.position[Listener](4)))
+      Accumulators.position[Listener[SimpleModule.type]](4)))
 
 object SimpleNTriplesSeqParser
   extends n3.NTriplesParser(
@@ -39,7 +39,7 @@ object SimpleNTriplesSeqParser
     Parsers(
       Monotypic.Seq[Char],
       Errors.tree[Char],
-      Accumulators.position[Listener](4)))
+      Accumulators.position[Listener[SimpleModule.type]](4)))
 
 // TODO come back here when a writer is available
 //class SimpleTurtleTest extends TurtleTestSuite(SimpleModule) {
