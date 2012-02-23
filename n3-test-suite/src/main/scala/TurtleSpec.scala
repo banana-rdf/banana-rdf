@@ -215,16 +215,32 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
     ":me a foaf:Person"
   )
 
-  property("test simple sentences") = secure {
+  property("test NTriples simple sentences") = secure {
       val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
       val res = P.triples( "<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i> .")
     ("Initial Triple="+t+" result="+res) |: all (
-      res.isSuccess
+      res.isSuccess  &&
+      res.user.queue.size == 1 &&
+      res.user.queue.head == t
+    )
+  }
+
+  property("test multiple Object sentence") = secure {
+    val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
+    val t2=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("<<http://presbrey.mit.edu/foaf#presbrey>>"))
+    val g= m.Graph(t,t2)
+    val res = P.triples( """<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i>,
+    <http://presbrey.mit.edu/foaf#presbrey> .""")
+
+    ("result="+res) |: all (
+      res.isSuccess  &&
+        res.user.queue.size == 2 &&
+        m.Graph(res.user.queue.toIterable) == g
     )
   }
 
 
-//  property("fixed bad prefix tests") {
+  //  property("fixed bad prefix tests") {
 //
 //  }
 
