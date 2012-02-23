@@ -1,9 +1,11 @@
 package org.w3.rdf.n3
 
 import collection.immutable
+import org.w3.rdf.RDFModule
 
-trait ListenerAgent[T] {
-  def send(a: T)
+trait ListenerAgent {
+
+  def send(a: Any)
 
   def addPrefix(nameSpace: String, uri: String): Unit
 

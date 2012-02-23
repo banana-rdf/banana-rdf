@@ -5,7 +5,6 @@
 package org.w3.rdf.n3
 
 import nomo.{Failure, Success, Result, Parsers}
-import org.w3.rdf.n3.ListenerAgent
 import org.w3.rdf.RDFModule
 import java.io.Serializable
 
@@ -22,9 +21,10 @@ import java.io.Serializable
  * @tparam X
  * @tparam U
  */
-class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
+class TurtleParser[M <: RDFModule,F,E,X,U <: Listener[M]](val m: M, val P: Parsers[F, Char, E, X, U]) {
   import TurtleParser._
   import P.++
+  import m._
 
   val rdfType = m.IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type ")
 
@@ -87,7 +87,7 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
   }
 
   lazy val PNAME_NS =  (PN_PREFIX << COLON).map(prefix=>prefix+":")
-  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | IRICHARS).many.map(_.mkString)<<P.single('>')
+  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | IRICHARS).many.map(i=>IRI(i.mkString))<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
@@ -107,20 +107,40 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P
    */
   lazy val PN_LOCAL = (PNL_FIRST ++ PNL_BODY.many.map(_.mkString)).map { case first++body => first+body }
 
-  lazy val PNAME_LN = PNAME_NS ++ PN_LOCAL.optional.map(_.getOrElse(""))
-  lazy val PrefixedName = PNAME_LN | PNAME_NS
+  lazy val PNAME_LN = (PNAME_NS ++ PN_LOCAL).map{ case ns++local => PName(ns,local)}
+  lazy val PrefixedName = PNAME_LN | PNAME_NS.map(ns => PName(ns,""))
   lazy val IRIref = IRI_REF | PrefixedName
 
-  lazy val obj = IRIref //| blank | literal
+  lazy val obj = IRIref.mapResult{
+    r =>
+      r.get match {
+        case iri: m.IRI => r.user.setObject(iri)
+      }
+      r.status
+  } //| blank | literal
   lazy val predicate = IRIref
   lazy val verb = predicate | P.single('a').as(rdfType)
 
-  lazy val objectList = obj ++ ( P.single(',') >> obj ).many
-  lazy val predicateObjectList = verb ++ objectList //( ";" verb objectList )* (";")?
+  lazy val objectList = (obj >> ( SP.optional >> P.single(',')>> SP.optional >> obj ).manyIgnore )
 
-  lazy val subject = IRIref //| blank
+  lazy val predicateObjectList = verb.mapResult {
+    r =>
+      r.get match {
+        case iri: IRI => r.user.setVerb(iri)
+      }
+      r.status
+  }<<SP.optional ++ objectList //( ";" verb objectList )* (";")?
 
-  lazy val triples =  subject ++ predicateObjectList
+  lazy val subject = IRIref.mapResult{
+    r =>
+      r.get match {
+        case iri: IRI => r.user.setSubject(iri)
+        case pname: PName => r.user.setSubject(pname)
+      }
+      r.status
+  } //| blank
+
+  lazy val triples =  subject<<SP.optional ++ predicateObjectList
 
   lazy val directive = prefixID | base
 

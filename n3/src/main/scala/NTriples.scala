@@ -23,7 +23,7 @@ import org.w3.rdf._
  */
 
 //todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
-class NTriplesParser[M <: RDFModule,F,E,X,U <: ListenerAgent[Any]](val m: M, val P: Parsers[F, Char, E, X, U]) {
+class NTriplesParser[M <: RDFModule,F,E,X,U <: Listener[M]](val m: M, val P: Parsers[F, Char, E, X, U]) {
   import m._
 
   //todo: do we really need a tree error for such a simple language (what do TreeErrors enable?)

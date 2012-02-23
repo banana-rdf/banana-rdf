@@ -4,9 +4,8 @@ package org.w3.rdf
  * A Module that gathers the types needed to define an RDF implementation
  * Closely based on
  *   http://dvcs.w3.org/hg/rdf/raw-file/default/rdf-concepts/index.html
- * But with two notable exceptions:
+ * But with the  notable exceptions:
  *   - we allow literals in subject position - for help later in reasoning.
- *   - We make a Lang <: IRI as this massively simplifies the model whilst making it type safe.
  */
 trait RDFModule {
 

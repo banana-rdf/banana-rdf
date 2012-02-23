@@ -33,7 +33,7 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   val P: TurtleParser[M, String, TreeError, Position, Listener] = new TurtleParser(m,
     Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener](4)))
 
-  implicit def U: Listener = new Listener()
+  implicit def U: Listener = new Listener[m.type](m)
 
   property("good prefix type test") = secure {
     val res = for ((orig,write) <- zipPfx) yield {
@@ -214,11 +214,10 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
     ":me a foaf:Person"
   )
 
-//  property("test simple sentences") = secure {
-//     val results = for ( sentence <- simple_sentences) yield {
-//       val res = P.triples(sentence)
-//     }
-//  }
+  property("test simple sentences") = secure {
+      Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"),
+      P.triples()
+  }
 
 
 //  property("fixed bad prefix tests") {
