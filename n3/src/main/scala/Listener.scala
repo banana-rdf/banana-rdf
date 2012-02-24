@@ -21,7 +21,7 @@ case class Listener[RDF <: RDFDataType](val ops: RDFOperations[RDF]) {
   }
 
   def resolve(pname: PName): Option[IRI] = {
-    prefixs.get(pname.prefix).map(pre=>IRI(pre+pname.name))
+    prefixs.get(pname.prefix).map{ case IRI(pre)=>IRI(pre + pname.name)}
   }
 
   def prefixes = prefixs.toMap

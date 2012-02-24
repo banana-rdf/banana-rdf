@@ -271,6 +271,21 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
     )
   }
 
+  property("test multiple objects and literal predicates with prefixes") = secure {
+    val g= Graph(t,t2,t3,t4,t5)
+    val res = P.turtleDoc( """@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    <http://bblfish.net/#hjs> foaf:knows <http://www.w3.org/People/Berners-Lee/card#i> ,
+                                         <http://presbrey.mit.edu/foaf#presbrey>;
+        foaf:mbox <mailto:henry.story@bblfish.net> ;
+        foaf:name "Henry Story"@en, 'bblfish'. """)
+
+    ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+      res.isSuccess  &&
+        (( res.user.queue.size == 5 ) :| "the two graphs are not the same size" ) &&
+        ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
+    )
+  }
+
 
   //  property("fixed bad prefix tests") {
 //

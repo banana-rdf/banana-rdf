@@ -178,8 +178,8 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
 
   lazy val directive = prefixID | base
 
-  lazy val statement = ( directive >> dot ) //| ( triples >> dot )
-  lazy val turtleDoc = statement.many
+  lazy val statement = ( directive << SP.optional << dot ) | ( triples << SP.optional << dot )
+  lazy val turtleDoc = (SP.optional>>statement<<SP.optional).manyIgnore
 
 }
 
