@@ -13,13 +13,13 @@ object SimpleN3ParserSpec extends n3.NTriplesSpec(SimpleRDFOperations)
 
 object SimpleTurtleParserSpec extends n3.TurtleSpec(SimpleRDFOperations)
 
-class NTriplesParserStringTest extends n3.ParserTest(SimpleRDFOperations, SimpleNTriplesStringParser) {
+class NTriplesParserStringTest extends n3.NTriplesParserTest(SimpleRDFOperations, SimpleNTriplesStringParser) {
   val isomorphism = SimpleGraphIsomorphism
   def toF(string: String) = string
 }
 
 
-class NTriplesParserSeqTest extends n3.ParserTest(SimpleRDFOperations, SimpleNTriplesSeqParser) {
+class NTriplesParserSeqTest extends n3.NTriplesParserTest(SimpleRDFOperations, SimpleNTriplesSeqParser) {
   val isomorphism = SimpleGraphIsomorphism
   def toF(string: String) = string.toSeq
 }

@@ -12,12 +12,16 @@ case class Listener[RDF <: RDFDataType](val ops: RDFOperations[RDF]) {
 
   def send(a: RDF#Triple) = queue.enqueue(a)
 
-  def addPrefix(nameSpace: String, uri: RDF#IRI) {
-    prefixs.put(nameSpace, uri)
+  def addPrefix(name: String, value: RDF#IRI) {
+    prefixs.put(name, value)
   }
 
   def setObject(obj: RDF#Node) {
     send(Triple(subject, verb, obj))
+  }
+
+  def resolve(pname: PName): Option[IRI] = {
+    prefixs.get(pname.prefix).map(pre=>IRI(pre+pname.name))
   }
 
   def prefixes = prefixs.toMap
@@ -30,12 +34,10 @@ case class Listener[RDF <: RDFDataType](val ops: RDFOperations[RDF]) {
 
   var subject: RDF#Node = _
   
-  def setSubject(subj: RDF#Node) =
-    subj fold (
-      iri => subject = iri,
-      bnode => sys.error("not sure what you want"),
-      literal => sys.error("not sure what you want")
-    )
+  def setSubject(subj: RDF#Node) {
+      subject = subj
+  }
+
   
 }
 

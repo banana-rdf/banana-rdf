@@ -4,9 +4,10 @@
  */
 package org.w3.rdf.n3
 
-import nomo.{Failure, Success, Result, Parsers}
 import org.w3.rdf._
 import java.io.Serializable
+import nomo._
+import nomo.Errors.TreeError
 
 
 /**
@@ -112,38 +113,65 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
 
   lazy val PNAME_LN = (PNAME_NS ++ PN_LOCAL).map{ case ns++local => PName(ns,local)}
   lazy val PrefixedName = PNAME_LN | PNAME_NS.map(ns => PName(ns,""))
-  lazy val IRIref = IRI_REF | PrefixedName
+  lazy val IRIref = IRI_REF | PrefixedName.mapResult[IRI]{ r =>
+    r.status.flatMap{ pn =>
+        //todo: work out how to set more friendly errors https://bitbucket.org/pchiusano/nomo/issue/7/errors
+        r.user.resolve(pn).map(i=>Success(i)).getOrElse(Failure(P.err.empty))
+      }
+  }
+  val q1 = P.single('\'')
+  val q2 = P.single('"')
 
-  lazy val obj = IRIref.mapResult{
-    r =>
-      // TODO if it was of type RDF#Node, you could use "fold"
-//      r.get match {
-//        case iri: m.IRI => r.user.setObject(iri)
-//      }
-      r.status
-  } //| blank | literal
+  val ECHAR = P.single('\\')>> P.anyOf("tbnrf\\\"'").map {
+    case 't' => '\t'
+    case 'b' => '\b'
+    case 'n' => '\n'
+    case 'r' => '\r'
+    case 'f' => '\f'
+    case x => x
+  }
+
+  lazy val STRING_LITERAL1 = (
+    q1 >>  ( P.takeWhile1(c => !"\\'\n\r".contains(c),err).map(_.toSeq.mkString) | ECHAR | UCHAR ).many << q1
+    ).map(_.mkString)
+
+  lazy val STRING_LITERAL2 = (
+    q2 >>  ( P.takeWhile1(c => !"\\\"\n\r".contains(c),err).map(_.toSeq.mkString) | ECHAR | UCHAR ).many << q2
+    ).map(_.mkString)
+
+  val LANGTAG = P.single('@') >> {
+    P.takeWhile1(alphabet(_),err) ++ (P.single('-') >> P.takeWhile1(alphaNumeric(_),err).map(_.toSeq.mkString) ).many
+  }.map{
+    case c ++ list => Lang(c+list.mkString("-"))
+  }
+
+  lazy val String = STRING_LITERAL1 | STRING_LITERAL2  // | STRING_LITERAL_LONG1 | STRING_LITERAL_LONG2
+
+
+  lazy val RDFLiteral = {
+    String ++ (
+      LANGTAG.map(tag => (lit: String) => LangLiteral(lit,tag)) |
+      ( P.word("^^")>>IRIref ).map (tp => (lit: String) => TypedLiteral(lit,tp)) )
+      .optional
+  }.map {
+    case str ++ Some(func) => func(str)
+    case str ++ None => TypedLiteral(str)
+  }
+
+  lazy val literal = RDFLiteral // | NumericLiteral | BooleanLiteral
+
+  lazy val obj = (IRIref | literal).mapResult{ r =>  r.status.map{ node => { r.user.setObject(node); r } } }  //| blank
   lazy val predicate = IRIref
-  lazy val verb = predicate | P.single('a').as(rdfType)
+  lazy val verb =  ( predicate | P.single('a').as(rdfType) ).mapResult{ r =>
+    r.status.map{ iri => { r.user.setVerb(iri); r } }
+  }
 
-  lazy val objectList = (obj >> ( SP.optional >> P.single(',')>> SP.optional >> obj ).manyIgnore )
+  lazy val objectList = obj.delimit1Ignore( SP.optional >> P.single(',')>> SP.optional )
 
-  lazy val predicateObjectList = verb.mapResult {
-    r =>
-      // there is really something weird here with the types
-//      r.get match {
-//        case iri: IRI => r.user.setVerb(iri)
-//      }
-      r.status
-  }<<SP.optional ++ objectList //( ";" verb objectList )* (";")?
+  lazy val predicateObjectList = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)
 
-  lazy val subject = IRIref.mapResult{
-    r =>
-      // TODO I don't undersntad what you want to achieve
-//      r.get match {
-//        case iri: IRI => r.user.setSubject(iri)
-//        case pname: PName => r.user.setSubject(pname)
-//      }
-      r.status
+  lazy val subject = IRIref.mapResult{ r =>
+    r.status.map{ node => { r.user.setSubject(node); r } }
   } //| blank
 
   lazy val triples =  subject<<SP.optional ++ predicateObjectList
@@ -157,7 +185,10 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
 
 
 object TurtleParser {
-  private val pn_char_intervals_base = List[Pair[Int, Int]](('A'.toInt,'Z'.toInt),('a'.toInt,'z'.toInt),
+  private val romanAlphabet = List[Pair[Int, Int]](('A'.toInt,'Z'.toInt),('a'.toInt,'z'.toInt))
+  private val romanAlphaNumeric = ('0'.toInt,'9'.toInt)::romanAlphabet
+
+  private val pn_char_intervals_base = romanAlphabet:::List[Pair[Int, Int]](
     (0x00C0,0x00D6), (0x00D8,0x00F6), (0x00F8,0x02FF), (0x0370,0x037D),
     (0x037F,0x1FFF), (0x200C,0x200D), (0x2070,0x218F), (0x2C00,0x2FEF),
     (0x3001,0xD7FF), (0xF900,0xFDCF), (0xFDF0,0xFFFD), (0x10000,0xEFFFF)
@@ -169,7 +200,8 @@ object TurtleParser {
   private val pn_chars_set = ('0'.toInt,'9'.toInt)::pn_char_intervals_base:::List((0x300,0x36F),(0x203F,0x2040))
 
 
-
+  def alphabet(c: Char): Boolean =  romanAlphabet.exists(in(_)(c))
+  def alphaNumeric(c: Char): Boolean = romanAlphaNumeric.exists(in(_)(c))
   def pn_chars_base(c: Char): Boolean = pn_char_intervals_base.exists(in(_)(c))
 
   def pn_chars_dot(c: Char) = c == '.' || pn_chars(c)

@@ -220,24 +220,54 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
   property("test NTriples simple sentences") = secure {
       val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
       val res = P.triples( "<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i> .")
-    ("Initial Triple="+t+" result="+res) |: all (
+    ("Initial Triple="+t+" res="+res+" res.user.queue="+res.user.queue) |: all (
       res.isSuccess  &&
       res.user.queue.size == 1 &&
       res.user.queue.head == t
     )
   }
+  val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
+  val t2=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://presbrey.mit.edu/foaf#presbrey"))
+  val t3=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/mbox"), IRI("mailto:henry.story@bblfish.net"))
+  val t4=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/name"), LangLiteral("Henry Story",Lang("en")))
+  val t5=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/name"), TypedLiteral("bblfish"))
 
   property("test multiple Object sentence") = secure {
-    val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
-    val t2=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("<<http://presbrey.mit.edu/foaf#presbrey>>"))
     val g= Graph(t,t2)
     val res = P.triples( """<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i>,
     <http://presbrey.mit.edu/foaf#presbrey> .""")
 
-    ("result="+res) |: all (
+    ("result="+res +" res.user.queue="+res.user.queue) |: all (
       res.isSuccess  &&
         res.user.queue.size == 2 &&
         Graph(res.user.queue.toIterable) == g
+    )
+  }
+
+  property("test multiple objects and predicates") = secure {
+    val g= Graph(t,t2,t3)
+    val res = P.triples( """<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i>,
+    <http://presbrey.mit.edu/foaf#presbrey>;
+        <http://xmlns.com/foaf/0.1/mbox> <mailto:henry.story@bblfish.net>""")
+
+    ("result="+res +" res.user.queue="+res.user.queue) |: all (
+      res.isSuccess  &&
+        res.user.queue.size == 3 &&
+        Graph(res.user.queue.toIterable) == g
+    )
+  }
+
+  property("test multiple objects and literal predicates") = secure {
+    val g= Graph(t,t2,t3,t4,t5)
+    val res = P.triples( """<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i>,
+    <http://presbrey.mit.edu/foaf#presbrey>;
+        <http://xmlns.com/foaf/0.1/mbox> <mailto:henry.story@bblfish.net> ;
+        <http://xmlns.com/foaf/0.1/name> "Henry Story"@en, 'bblfish' """)
+
+    ("result="+res +" res.user.queue="+res.user.queue) |: all (
+      res.isSuccess  &&
+        (( res.user.queue.size == 5 ) :| "the two graphs are not the same size" ) &&
+        ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
     )
   }
 
