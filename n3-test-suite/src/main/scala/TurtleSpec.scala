@@ -32,6 +32,9 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
   val gen = new SpecTurtleGenerator[RDF](ops)
   import gen._
 
+  val serializer = new Serializer(ops)
+
+
   val P = new TurtleParser(
       ops,
       Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[RDF]](4)))
@@ -229,11 +232,14 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
   val f_knows = IRI("http://xmlns.com/foaf/0.1/knows")
   val f_mbox = IRI("http://xmlns.com/foaf/0.1/mbox")
   val f_name = IRI("http://xmlns.com/foaf/0.1/name")
-  val t=Triple(IRI("http://bblfish.net/#hjs"),f_knows, IRI("http://www.w3.org/People/Berners-Lee/card#i"))
-  val t2=Triple(IRI("http://bblfish.net/#hjs"),f_knows, IRI("http://presbrey.mit.edu/foaf#presbrey"))
-  val t3=Triple(IRI("http://bblfish.net/#hjs"),f_mbox, IRI("mailto:henry.story@bblfish.net"))
-  val t4=Triple(IRI("http://bblfish.net/#hjs"),f_name, LangLiteral("Henry Story",Lang("en")))
-  val t5=Triple(IRI("http://bblfish.net/#hjs"),f_name, TypedLiteral("bblfish"))
+  val hjs=IRI("http://bblfish.net/#hjs")
+  val timbl = IRI("http://www.w3.org/People/Berners-Lee/card#i")
+  val presbrey = IRI("http://presbrey.mit.edu/foaf#presbrey")
+  val t=Triple(hjs,f_knows, timbl)
+  val t2=Triple(hjs,f_knows, presbrey)
+  val t3=Triple(hjs,f_mbox, IRI("mailto:henry.story@bblfish.net"))
+  val t4=Triple(hjs,f_name, LangLiteral("Henry Story",Lang("en")))
+  val t5=Triple(hjs,f_name, TypedLiteral("bblfish"))
 
   property("test multiple Object sentence") = secure {
     val g= Graph(t,t2)
@@ -306,7 +312,7 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
      Is busy dying.
 """
   val bobDylan=IRI("http://dbpedia.org/resource/Bob_Dylan")
-  val t6= Triple(bobDylan,IRI("http://purl.org/dc/elements/1.1/created"),LangLiteral(lit1,Lang("en-us")))
+  val t6= Triple(bobDylan,IRI("http://purl.org/dc/elements/1.1/created"),LangLiteral(lit1,Lang("en-us-poetic2")))
   val t7= Triple(bobDylan,f_name,LangLiteral("Bob Dylan",Lang("en")))
 
   property("test prefixes long literals and comments") = secure {
@@ -317,15 +323,62 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
     . @prefix foaf: <http://xmlns.com/foaf/0.1/>  .#comment touching dot
 
     db:Bob_Dylan dc:created  #this is a long literal, so it starts on the next line
-    '''%s'''@en-us;  #comment after semicolon
+    '''%s'''@en-us-poetic2;  #comment after semicolon
         #can an name have a quote in it?
-        foaf:name"Bob Dylan"@en.
+        foaf:name "Bob Dylan"@en.
     """.format(lit1)
     val res = P.turtleDoc(doc )
-     out.println(doc)
     ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
       res.isSuccess  &&
         (( res.user.queue.size == 2) :| "the two graphs are not the same size" ) &&
+        ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
+    )
+  }
+
+
+  property("test prefixes long literals and comments") = secure {
+    val g= Graph(t6,t7)
+    val doc = ("""#start with a commment is always good
+    @prefix dc:<http://purl.org/dc/elements/1.1/>.  #dot and iri close together
+    @prefix db:
+         <http://dbpedia.org/resource/> #dot on next line to see
+    .@prefix foaf: <http://xmlns.com/foaf/0.1/>  .#comment touching dot and @touching it too
+
+    db:Bob_Dylan #comment after subject
+        dc:created #comment after verb
+    """+"\"\"\"%s\"\"\"" +"""@en-us-poetic2  #comment before semicolon
+     ; #semicolon all alone
+
+        foaf:name"Bob Dylan"@en.  #name touches literal
+    """).format(lit1)
+    val res = P.turtleDoc(doc )
+    ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+      res.isSuccess  &&
+        (( res.user.queue.size == 2) :| "the two graphs are not the same size" ) &&
+        ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
+    )
+  }
+
+  val hasCats = IRI("http://cats.edu/ont/has")
+
+  val t8 = Triple(hjs,hasCats,TypedLiteral("2",xsdInteger))
+  val t9 = Triple(timbl,hasCats,TypedLiteral(".5e-3",xsdDouble))
+  val t10 = Triple(presbrey,hasCats,TypedLiteral("3.14",xsdDecimal))
+
+  property("test numbers") = secure {
+    import serializer._
+      val g = Graph(t8,t9,t10)
+    val doc = """
+    @prefix cats: <http://cats.edu/ont/has>
+         %s cats: 2 .
+         %s cats: .5e-3 .
+         %s cats: 3.14.
+      """.format(iriAsN3(hjs),iriAsN3(timbl),iriAsN3(presbrey))
+    out.println(doc)
+    val res = P.turtleDoc(doc )
+    ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+      res.isSuccess  &&
+        (( res.user.queue.size == 3) :| "the two graphs are not the same size" ) &&
         ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
     )
   }

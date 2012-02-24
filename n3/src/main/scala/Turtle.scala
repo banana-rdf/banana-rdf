@@ -30,9 +30,7 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
   import P.++
   import ops._
 
-  val rdfType = IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type ")
-
-  /**
+ /**
    * Note without lazy val, the order of the parsers would be important
    */
 
@@ -182,7 +180,32 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
     case str ++ None => TypedLiteral(str)
   }
 
-  lazy val literal = RDFLiteral // | NumericLiteral | BooleanLiteral
+  lazy val INTEGER = P.takeWhile1(numeric(_),err).map(_.toSeq.mkString)
+
+  lazy val Decimal = ( (INTEGER<<dot)++INTEGER ).map{
+    case i++d=> TypedLiteral(""+i+"."+d,xsdDecimal)
+  } | (dot>>INTEGER).map(i=> TypedLiteral("."+i,xsdDecimal))
+
+  lazy val Exponent = ( P.anyOf("eE") ++ P.anyOf("+-").optional ++ INTEGER ) map {
+    case e++pos++exp => ""+e+pos.getOrElse("")+exp
+  }
+
+  //having done all this parsing, it would be nice to just return a scala.Double
+  //perhaps we can have a wrapped Literal, which contains it's value...
+  lazy val Double =  ((INTEGER<<dot)++INTEGER++Exponent).map{
+    case i++dec++exp => TypedLiteral(i+"."+dec+exp,xsdDouble)
+  } | ( (dot >> INTEGER) ++ Exponent ).map {
+    case i++e => TypedLiteral("."+i+e,xsdDouble)
+  } | (INTEGER ++ Exponent).map {
+    case i ++ e => TypedLiteral(i+e, xsdDouble)
+  }
+
+  lazy val NumericLiteralUnsigned = INTEGER.map(i=>TypedLiteral(i, xsdInteger)) | Decimal | Double
+  lazy val NumericLiteral =  NumericLiteralUnsigned //| NumericLiteralPositive   | NumericLiteralNegative
+  val BooleanLiteral = P.word("true").as(xsdTrue) | P.word("false").as(xsdFalse)
+
+
+  lazy val literal = RDFLiteral  | NumericLiteral | BooleanLiteral
 
   lazy val obj = (IRIref | literal).mapResult{ r =>  r.status.map{ node => { r.user.setObject(node); r } } }  //| blank
   lazy val predicate = IRIref
@@ -226,6 +249,7 @@ object TurtleParser {
 
 
   def alphabet(c: Char): Boolean =  romanAlphabet.exists(in(_)(c))
+  def numeric(c: Char): Boolean = '0'<=c && c<='9'
   def alphaNumeric(c: Char): Boolean = romanAlphaNumeric.exists(in(_)(c))
   def pn_chars_base(c: Char): Boolean = pn_char_intervals_base.exists(in(_)(c))
 

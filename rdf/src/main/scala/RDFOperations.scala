@@ -92,7 +92,14 @@ trait RDFOperations[RDF <: RDFDataType] {
   val xsdString = xsd("string")
   val xsdInt = xsd("int")
   val rdfLang = rdf("langString")
-  
+  val rdfType = IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type ")
+  val xsdInteger = IRI("http://www.w3.org/2001/XMLSchema#integer")
+  val xsdDecimal = IRI("http://www.w3.org/2001/XMLSchema#decimal")
+  val xsdDouble = IRI("http://www.w3.org/2001/XMLSchema#double")
+  val xsdBoolean = IRI("http://www.w3.org/2001/XMLSchema#boolean")
+  val xsdTrue = TypedLiteral("true",xsdBoolean)
+  val xsdFalse = TypedLiteral("false",xsdBoolean)
+
   // pimps
   
   class GraphW(graph: Graph) {
