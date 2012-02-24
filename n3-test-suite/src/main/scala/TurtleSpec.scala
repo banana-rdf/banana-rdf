@@ -226,11 +226,14 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
       res.user.queue.head == t
     )
   }
-  val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
-  val t2=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://presbrey.mit.edu/foaf#presbrey"))
-  val t3=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/mbox"), IRI("mailto:henry.story@bblfish.net"))
-  val t4=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/name"), LangLiteral("Henry Story",Lang("en")))
-  val t5=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/name"), TypedLiteral("bblfish"))
+  val f_knows = IRI("http://xmlns.com/foaf/0.1/knows")
+  val f_mbox = IRI("http://xmlns.com/foaf/0.1/mbox")
+  val f_name = IRI("http://xmlns.com/foaf/0.1/name")
+  val t=Triple(IRI("http://bblfish.net/#hjs"),f_knows, IRI("http://www.w3.org/People/Berners-Lee/card#i"))
+  val t2=Triple(IRI("http://bblfish.net/#hjs"),f_knows, IRI("http://presbrey.mit.edu/foaf#presbrey"))
+  val t3=Triple(IRI("http://bblfish.net/#hjs"),f_mbox, IRI("mailto:henry.story@bblfish.net"))
+  val t4=Triple(IRI("http://bblfish.net/#hjs"),f_name, LangLiteral("Henry Story",Lang("en")))
+  val t5=Triple(IRI("http://bblfish.net/#hjs"),f_name, TypedLiteral("bblfish"))
 
   property("test multiple Object sentence") = secure {
     val g= Graph(t,t2)
@@ -286,6 +289,46 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
     )
   }
 
+  val lit1 = """
+     Darkness at the break of noon
+     Shadows even the silver spoon
+     The handmade blade, the child's balloon
+     Eclipses both the sun and moon
+     To understand you know too soon
+     There is no sense in trying.
+
+     Pointed threats, they bluff with scorn
+     Suicide remarks are torn
+     From the fool's gold mouthpiece
+     The hollow horn plays wasted words
+     Proves to warn
+     That he not busy being born
+     Is busy dying.
+"""
+  val bobDylan=IRI("http://dbpedia.org/resource/Bob_Dylan")
+  val t6= Triple(bobDylan,IRI("http://purl.org/dc/elements/1.1/created"),LangLiteral(lit1,Lang("en-us")))
+  val t7= Triple(bobDylan,f_name,LangLiteral("Bob Dylan",Lang("en")))
+
+  property("test prefixes long literals and comments") = secure {
+    val g= Graph(t6,t7)
+    val doc = """
+    @prefix dc: <http://purl.org/dc/elements/1.1/>.  #dot close to iri
+    @prefix db:<http://dbpedia.org/resource/> #dot on next line to see
+    . @prefix foaf: <http://xmlns.com/foaf/0.1/>  .#comment touching dot
+
+    db:Bob_Dylan dc:created  #this is a long literal, so it starts on the next line
+    '''%s'''@en-us;  #comment after semicolon
+        #can an name have a quote in it?
+        foaf:name"Bob Dylan"@en.
+    """.format(lit1)
+    val res = P.turtleDoc(doc )
+     out.println(doc)
+    ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+      res.isSuccess  &&
+        (( res.user.queue.size == 2) :| "the two graphs are not the same size" ) &&
+        ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
+    )
+  }
 
   //  property("fixed bad prefix tests") {
 //

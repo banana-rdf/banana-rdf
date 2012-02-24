@@ -93,7 +93,7 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
   lazy val PNAME_NS =  (PN_PREFIX << COLON).map(prefix=>prefix+":")
   lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | IRICHARS).many.map(i=>IRI(i.mkString))<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
-  lazy val prefixID =  (PREFIX_Part1 ++ (SP>>IRI_REF)).mapResult{ r=>
+  lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
     r.status
   }
@@ -121,6 +121,8 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
   }
   val q1 = P.single('\'')
   val q2 = P.single('"')
+  val Q1 = P.word("\'\'\'")
+  val Q2 = P.word("\"\"\"")
 
   val ECHAR = P.single('\\')>> P.anyOf("tbnrf\\\"'").map {
     case 't' => '\t'
@@ -139,17 +141,39 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
     q2 >>  ( P.takeWhile1(c => !"\\\"\n\r".contains(c),err).map(_.toSeq.mkString) | ECHAR | UCHAR ).many << q2
     ).map(_.mkString)
 
+  lazy val STRING_LITERAL_LONG1 = (
+    Q1 >> ((
+      (q1.as("'") | P.word("''").as("''")).optional ++ (
+        P.takeWhile1(c => c != '\'' && c != '\\', err).map(_.toSeq.mkString) | ECHAR | UCHAR)
+      ).map {
+      case Some(quote) ++ c => quote + c
+      case None ++ c => c.toString
+    }).many << Q1
+    ).map(_.mkString)
+
+
+  lazy val STRING_LITERAL_LONG2 = (
+    Q2 >> ((
+      (q2.as("\"") | P.word("\"\"").as("\"\"")).optional ++ (
+        P.takeWhile1(c => c != '\"' && c != '\\', err).map(_.toSeq.mkString) | ECHAR | UCHAR)
+      ).map {
+      case Some(quote) ++ c => quote + c
+      case None ++ c => c.toString
+    }).many << Q2
+    ).map(_.mkString)
+
+
   val LANGTAG = P.single('@') >> {
     P.takeWhile1(alphabet(_),err) ++ (P.single('-') >> P.takeWhile1(alphaNumeric(_),err).map(_.toSeq.mkString) ).many
   }.map{
-    case c ++ list => Lang(c+list.mkString("-"))
+    case c ++ list => Lang(c+(if (list.size==0) "" else "-")+list.mkString("-"))
   }
 
-  lazy val String = STRING_LITERAL1 | STRING_LITERAL2  // | STRING_LITERAL_LONG1 | STRING_LITERAL_LONG2
+  lazy val StringLit =  STRING_LITERAL_LONG1 | STRING_LITERAL_LONG2   | STRING_LITERAL1 | STRING_LITERAL2
 
 
   lazy val RDFLiteral = {
-    String ++ (
+    StringLit ++ (
       LANGTAG.map(tag => (lit: String) => LangLiteral(lit,tag)) |
       ( P.word("^^")>>IRIref ).map (tp => (lit: String) => TypedLiteral(lit,tp)) )
       .optional
@@ -195,7 +219,8 @@ object TurtleParser {
   )
   private val non_iri_chars = Array('<','>','"','{','}','|','^','`','\\')
   
-  val pn_local_esc = Array('_' , '~' , '.' , '-' , '!' , '$' , '&' , '\'' , '(' , ')' , '*' , '+' , ',' , ';' , '=' , ':' , '/' , '?' , '#' , '@' , '%' )
+  val pn_local_esc = Array('_' , '~' , '.' , '-' , '!' , '$' , '&' , '\'' ,
+    '(' , ')' , '*' , '+' , ',' , ';' , '=' , ':' , '/' , '?' , '#' , '@' , '%' )
 
   private val pn_chars_set = ('0'.toInt,'9'.toInt)::pn_char_intervals_base:::List((0x300,0x36F),(0x203F,0x2040))
 
