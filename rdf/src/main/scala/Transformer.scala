@@ -1,11 +1,11 @@
 package org.w3.rdf
 
-class Transformer[ModelA <: RDFModule, ModelB <: RDFModule](val a: ModelA, val b: ModelB) {
+class Transformer[A <: RDFDataType, B <: RDFDataType](val a: RDFOperations[A], val b: RDFOperations[B]) {
 
-  def transform(graph: a.Graph): b.Graph =
+  def transform(graph: A#Graph): B#Graph =
     b.Graph(a.Graph.toIterable(graph) map transformTriple)
     
-  def transformTriple(t: a.Triple): b.Triple = {
+  def transformTriple(t: A#Triple): B#Triple = {
     val a.Triple(s, a.IRI(iri), o) = t
     b.Triple(
       transformNode(s),
@@ -13,13 +13,13 @@ class Transformer[ModelA <: RDFModule, ModelB <: RDFModule](val a: ModelA, val b
       transformNode(o))
   }
   
-  def transformNode(n: a.Node): b.Node = a.Node.fold(n) (
+  def transformNode(n: A#Node): B#Node = a.Node.fold(n) (
     { case a.IRI(iri) => b.IRI(iri) },
     { case a.BNode(label) => b.BNode(label) },
     { literal: a.Literal => transformLiteral(literal) }
   )
   
-  def transformLiteral(literal: a.Literal): b.Literal = a.Literal.fold(literal) (
+  def transformLiteral(literal: A#Literal): B#Literal = a.Literal.fold(literal) (
     { case a.TypedLiteral(lexicalForm, a.IRI(datatypeIRI)) => b.TypedLiteral(lexicalForm, b.IRI(datatypeIRI)) },
     { case a.LangLiteral(lexicalForm, a.Lang(lang)) => b.LangLiteral(lexicalForm, b.Lang(lang)) }
   )

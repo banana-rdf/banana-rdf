@@ -1,14 +1,14 @@
 package org.w3.rdf.jena
 
-import org.w3.rdf
+import org.w3.rdf._
 import java.io._
 import com.hp.hpl.jena.rdf.model._
 
-object JenaTurtleWriter extends rdf.TurtleWriter(JenaModule) {
+object JenaTurtleWriter extends TurtleWriter[JenaDataType](JenaOperations) {
   
-  import JenaModule._
+  import JenaOperations._
   
-  def write(graph: Graph, os: OutputStream, base: String): Either[Throwable, Unit] =
+  def write(graph: JenaDataType#Graph, os: OutputStream, base: String): Either[Throwable, Unit] =
     try {
       val model = ModelFactory.createModelForGraph(graph)
       model.getWriter("TURTLE").write(model, os, base)
@@ -17,7 +17,7 @@ object JenaTurtleWriter extends rdf.TurtleWriter(JenaModule) {
       case t => Left(t)
     }
   
-  def write(graph: Graph, writer: Writer, base: String): Either[Throwable, Unit] =
+  def write(graph: JenaDataType#Graph, writer: Writer, base: String): Either[Throwable, Unit] =
     try {
       val model = ModelFactory.createModelForGraph(graph)
       model.getWriter("TURTLE").write(model, writer, base)

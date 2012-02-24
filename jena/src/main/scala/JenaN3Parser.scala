@@ -6,16 +6,16 @@ import org.w3.rdf.n3._
 
 object JenaNTriplesStringParser
 extends n3.NTriplesParser(
-  JenaModule,
+  JenaOperations,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
-    Accumulators.position[Listener[JenaModule.type]](4)))
+    Accumulators.position[Listener[JenaDataType]](4)))
 
 object JenaNTriplesSeqParser
 extends n3.NTriplesParser(
-  JenaModule,
+  JenaOperations,
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
-    Accumulators.position[Listener[JenaModule.type]](4)))
+    Accumulators.position[Listener[JenaDataType]](4)))

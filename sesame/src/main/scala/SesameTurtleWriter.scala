@@ -6,9 +6,9 @@ import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.openrdf.model.URI
 import org.openrdf.model.impl.URIImpl
 
-object SesameTurtleWriter extends TurtleWriter(SesameModule) {
+object SesameTurtleWriter extends TurtleWriter[SesameDataType](SesameOperations) {
   
-  import SesameModule._
+  import SesameOperations._
   
   // Sesame's parser does not handle relative URI, but let us override the behavior :-)
   def write(uri: URI, writer: Writer, baseURI: String) = {

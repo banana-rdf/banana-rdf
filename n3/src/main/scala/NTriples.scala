@@ -23,8 +23,11 @@ import org.w3.rdf._
  */
 
 //todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
-class NTriplesParser[M <: RDFModule,F,E,X,U <: Listener[M]](val m: M, val P: Parsers[F, Char, E, X, U]) {
-  import m._
+class NTriplesParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
+    val ops: RDFOperations[RDF],
+    val P: Parsers[F, Char, E, X, U]) {
+  
+  import ops._
 
   //todo: do we really need a tree error for such a simple language (what do TreeErrors enable?)
   implicit def toTreeError(msg: String): Errors.TreeError = Errors.Single(msg, None)
@@ -76,6 +79,7 @@ class NTriplesParser[M <: RDFModule,F,E,X,U <: Listener[M]](val m: M, val P: Par
       single(c => isUriChar(c))
     ).many1.map(i=>i.toSeq.mkString)
 
+  // these are already provided by RDFOperations
   val xsd = "http://www.w3.org/2001/XMLSchema#"
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   lazy val xsdString = IRI(xsd + "string")

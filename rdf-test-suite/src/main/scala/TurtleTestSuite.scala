@@ -6,28 +6,28 @@ import java.io._
 import org.scalatest.EitherValues._
 
 
-abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with MustMatchers {
+abstract class TurtleTestSuite[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends WordSpec with MustMatchers {
   
-  val reader: TurtleReader[m.type]
-  val writer: TurtleWriter[m.type]
-  val iso: GraphIsomorphism[m.type]
+  val reader: TurtleReader[RDF]
+  val writer: TurtleWriter[RDF]
+  val iso: GraphIsomorphism[RDF]
   
   import iso._
   
   import org.scalatest.matchers.{BeMatcher, MatchResult}
   
-  def beIsomorphicWithGeneral[M <: RDFModule](m: M)(iso: GraphIsomorphism[m.type])(right: m.Graph): BeMatcher[m.Graph] =
-    new BeMatcher[m.Graph] {
-      def apply(left: m.Graph) = MatchResult(
-        iso.isomorphism(left, right),
-        "left graph is isomorphic to right graph",
-        "%s not isomorphic with %s" format (left.toString, right.toString)
-      )
-    }
-  
-  def isomorphicWith(right: m.Graph): BeMatcher[m.Graph] = beIsomorphicWithGeneral(m)(iso)(right)
+//  def beIsomorphicWithGeneral[M <: RDFModule](m: M)(iso: GraphIsomorphism[m.type])(right: m.Graph): BeMatcher[m.Graph] =
+//    new BeMatcher[m.Graph] {
+//      def apply(left: m.Graph) = MatchResult(
+//        iso.isomorphism(left, right),
+//        "left graph is isomorphic to right graph",
+//        "%s not isomorphic with %s" format (left.toString, right.toString)
+//      )
+//    }
+//  
+//  def isomorphicWith(right: m.Graph): BeMatcher[m.Graph] = beIsomorphicWithGeneral(m)(iso)(right)
 
-  import m._
+  import ops._
   
   def graphBuilder(prefix: Prefix) = {
     val ntriples = prefix("ntriples/")
@@ -65,7 +65,7 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
     val graph = reader.read(turtleString, rdfCore)
-    val g: m.Graph = graph.right.get
+    val g: Graph = graph.right.get
     assert(referenceGraph isIsomorphicWith g)
     
   }
@@ -81,7 +81,7 @@ abstract class TurtleTestSuite[M <: RDFModule](val m: M) extends WordSpec with M
     val computedFooGraph = turtleString.right flatMap { s => reader.read(s, foo) }
 //    println("0 --- "+computedFooGraph)
 //    println("1 --- "+fooGraph)
-    val g: m.Graph = computedFooGraph.right.get
+    val g: Graph = computedFooGraph.right.get
 //    println("2 --- "+g)
     assert(fooGraph isIsomorphicWith g)
   }

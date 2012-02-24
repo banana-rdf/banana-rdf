@@ -1,7 +1,6 @@
 package org.w3.rdf.sesame
 
-import org.w3.rdf
-
+import org.w3.rdf._
 import org.openrdf.model.Statement
 import org.openrdf.model.impl.{GraphImpl, StatementImpl, LiteralImpl}
 import java.io._
@@ -9,9 +8,9 @@ import java.util.LinkedList
 
 import scala.collection.immutable.List
 
-object SesameTurtleReader extends rdf.TurtleReader(SesameModule) {
+object SesameTurtleReader extends TurtleReader[SesameDataType](SesameOperations) {
   
-  import SesameModule._
+  import SesameOperations._
   
   trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
     override def handleStatement(st: Statement): Unit = st.getObject match {

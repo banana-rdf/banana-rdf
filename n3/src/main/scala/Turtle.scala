@@ -5,7 +5,7 @@
 package org.w3.rdf.n3
 
 import nomo.{Failure, Success, Result, Parsers}
-import org.w3.rdf.RDFModule
+import org.w3.rdf._
 import java.io.Serializable
 
 
@@ -21,12 +21,15 @@ import java.io.Serializable
  * @tparam X
  * @tparam U
  */
-class TurtleParser[M <: RDFModule,F,E,X,U <: Listener[M]](val m: M, val P: Parsers[F, Char, E, X, U]) {
+class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
+    val ops: RDFOperations[RDF],
+    val P: Parsers[F, Char, E, X, U]) {
+  
   import TurtleParser._
   import P.++
-  import m._
+  import ops._
 
-  val rdfType = m.IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type ")
+  val rdfType = IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type ")
 
   /**
    * Note without lazy val, the order of the parsers would be important
@@ -113,9 +116,10 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: Listener[M]](val m: M, val P: Parse
 
   lazy val obj = IRIref.mapResult{
     r =>
-      r.get match {
-        case iri: m.IRI => r.user.setObject(iri)
-      }
+      // TODO if it was of type RDF#Node, you could use "fold"
+//      r.get match {
+//        case iri: m.IRI => r.user.setObject(iri)
+//      }
       r.status
   } //| blank | literal
   lazy val predicate = IRIref
@@ -125,18 +129,20 @@ class TurtleParser[M <: RDFModule,F,E,X,U <: Listener[M]](val m: M, val P: Parse
 
   lazy val predicateObjectList = verb.mapResult {
     r =>
-      r.get match {
-        case iri: IRI => r.user.setVerb(iri)
-      }
+      // there is really something weird here with the types
+//      r.get match {
+//        case iri: IRI => r.user.setVerb(iri)
+//      }
       r.status
   }<<SP.optional ++ objectList //( ";" verb objectList )* (";")?
 
   lazy val subject = IRIref.mapResult{
     r =>
-      r.get match {
-        case iri: IRI => r.user.setSubject(iri)
-        case pname: PName => r.user.setSubject(pname)
-      }
+      // TODO I don't undersntad what you want to achieve
+//      r.get match {
+//        case iri: IRI => r.user.setSubject(iri)
+//        case pname: PName => r.user.setSubject(pname)
+//      }
       r.status
   } //| blank
 

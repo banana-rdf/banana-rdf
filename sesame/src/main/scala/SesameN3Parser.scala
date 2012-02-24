@@ -5,17 +5,17 @@ import org.w3.rdf._
 import org.w3.rdf.n3._
 
 object NTriplesStringParser
-extends n3.NTriplesParser(
-  SesameModule,
+extends NTriplesParser(
+  SesameOperations,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
-    Accumulators.position[Listener[SesameModule.type ]](4)))
+    Accumulators.position[Listener[SesameDataType]](4)))
 
 object NTriplesSeqParser
-extends n3.NTriplesParser(
-  SesameModule,
+extends NTriplesParser(
+  SesameOperations,
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
-    Accumulators.position[Listener[SesameModule.type ]](4)))
+    Accumulators.position[Listener[SesameDataType]](4)))

@@ -3,12 +3,12 @@ package org.w3.rdf.util
 import org.w3.rdf._
 import org.w3.rdf.jena._
 
-class DefaultGraphIsomorphism[M <: RDFModule](override val m: M) extends GraphIsomorphism(m) {
+class DefaultGraphIsomorphism[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends GraphIsomorphism[RDF] {
   
-  private val mToJena = new Transformer[m.type, JenaModule.type](m, JenaModule)
-  private val jenaToM = new Transformer[JenaModule.type, m.type](JenaModule, m)
+  private val mToJena = new Transformer[RDF, JenaDataType](ops, JenaOperations)
+  private val jenaToM = new Transformer[JenaDataType, RDF](JenaOperations, ops)
   
-  def isomorphism(g1: m.Graph, g2: m.Graph): Boolean = {
+  def isomorphism(g1: RDF#Graph, g2: RDF#Graph): Boolean = {
     val j1 = mToJena.transform(g1)
     val j2 = mToJena.transform(g2)
     JenaGraphIsomorphism.isomorphism(j1, j2)

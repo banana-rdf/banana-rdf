@@ -1,9 +1,10 @@
 package org.w3.rdf.jena
 
-import org.w3.rdf
+import org.w3.rdf._
 
-object JenaGraphIsomorphism extends rdf.GraphIsomorphism[JenaModule.type](JenaModule) {
+object JenaGraphIsomorphism extends GraphIsomorphism[JenaDataType] {
   
-  def isomorphism(left: m.Graph, right: m.Graph): Boolean = left isIsomorphicWith right
+  def isomorphism(left: JenaDataType#Graph, right: JenaDataType#Graph): Boolean =
+    left isIsomorphicWith right
   
 }

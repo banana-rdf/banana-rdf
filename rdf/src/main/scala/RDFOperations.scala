@@ -7,17 +7,19 @@ package org.w3.rdf
  * But with the  notable exceptions:
  *   - we allow literals in subject position - for help later in reasoning.
  */
-trait RDFModule {
+trait RDFOperations[RDF <: RDFDataType] {
 
-  type Graph
-  type Triple
-  type Node
-  type IRI <: Node
-  type BNode <: Node
-  type Literal <: Node
-  type TypedLiteral <: Literal
-  type LangLiteral <: Literal
-  type Lang
+  // that's really neat: if you import the content of an instance of this trait,
+  // you'll get all the type aliases for free, so you don't need the type projection :-)
+  type Graph = RDF#Graph
+  type Triple = RDF#Triple
+  type Node = RDF#Node
+  type IRI = RDF#IRI
+  type BNode = RDF#BNode
+  type Literal = RDF#Literal
+  type TypedLiteral = RDF#TypedLiteral
+  type LangLiteral = RDF#LangLiteral
+  type Lang = RDF#Lang
 
   trait GraphCompanionObject {
     def empty: Graph

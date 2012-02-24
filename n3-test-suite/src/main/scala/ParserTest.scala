@@ -12,14 +12,16 @@ import org.w3.rdf._
 // would be happy to use
 // NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
 // but the compiler complains, saying it does not know m
-abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriplesParser[M, F, E, X, Listener[M]]) {
+abstract class ParserTest[RDF <: RDFDataType, F, E, X](
+    val ops: RDFOperations[RDF],
+    val parser: NTriplesParser[RDF, F, E, X, Listener[RDF]]) {
 
-  val isomorphism: GraphIsomorphism[m.type]
+  val isomorphism: GraphIsomorphism[RDF]
   
-  import m._
+  import ops._
   import isomorphism._
   
-  implicit def U = new Listener(m)
+  implicit def U = new Listener(ops)
   
   /** so that this test can be run with different IO models */
   def toF(string: String): F
@@ -43,7 +45,7 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriple
 
     val res = parser.nTriples(n3)
     val tr = res.user.queue.toList.map(_.asInstanceOf[Triple])
-    val parsedGraph = m.Graph(tr)
+    val parsedGraph = Graph(tr)
     assertEquals("should be three triples in graph",3,parsedGraph.size)
 
     val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
@@ -127,8 +129,8 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriple
     assertTrue("error parsing card.random.nt - failed at "+resultR.position+" with status "+resultR.status,resultR.isSuccess)
 
 
-    val g = m.Graph(res)
-    val gR = m.Graph(resR)
+    val g = Graph(res)
+    val gR = Graph(resR)
 
     assertEquals("There should be 354 triples in "+card.getPath,354,g.size)
     assertEquals("There should be 354 triples in "+card_random.getPath,354,gR.size)
@@ -138,7 +140,9 @@ abstract class ParserTest[M <: RDFModule, F, E, X](val m: M, val parser: NTriple
   }
 
   import parser.P._
-  case class ParsedChunk(val parser: Parser[Unit],val acc: Accumulator[Char, X, Listener[M]]) {
+  case class ParsedChunk(
+      val parser: Parser[Unit],
+      val acc: Accumulator[Char, X, Listener[RDF]]) {
     def parse(buf: Seq[Char]) = {
       if (!buf.isEmpty) {
         val (tripleParser, newAccu) = parser.feedChunked(buf, acc, buf.size)

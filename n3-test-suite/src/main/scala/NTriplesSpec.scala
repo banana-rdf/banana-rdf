@@ -22,20 +22,22 @@ import org.w3.rdf._
  */
 
 
-class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
+class NTriplesSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Properties("NTriples") {
   
-  val serializer = new Serializer[m.type](m)
-  import m._
+  val serializer = new Serializer[RDF](ops)
+  
+  import ops._
   import serializer._
-  val gen = new SpecTriplesGenerator[m.type](m)
+  
+  val gen = new SpecTriplesGenerator[RDF](ops)
   import gen._
   
-  implicit def U : Listener[M] = new Listener(m)
+  implicit def U : Listener[RDF] = new Listener(ops)
 
-  val P: NTriplesParser[M, String, TreeError, Position, Listener[M]] = new NTriplesParser(m,
-    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[M]](4)))
-
-
+  val P: NTriplesParser[RDF, String, TreeError, Position, Listener[RDF]] =
+    new NTriplesParser(
+      ops,
+      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[RDF]](4)))
 
   
    property("lang") = forAll(genLangStr){ lang =>
@@ -51,7 +53,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
   }
 
 
-   property("Plainliteral") = forAll(genPlainLiteral) { case literal @ m.TypedLiteral(lit, tpe) =>
+   property("Plainliteral") = forAll(genPlainLiteral) { case literal @ TypedLiteral(lit, tpe) =>
      val literalStr = '"'+NTriplesParser.toAsciiLiteral(lit)+'"'
      val res= P.fullLiteral(literalStr)
      ("literal in='"+literalStr+"' result = '"+res+"'") |: all(
@@ -60,7 +62,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
      )
    }
 
-   property("langLiteral") = forAll(genLangLiteral) { case tst @ m.LangLiteral(lit, Lang(lang)) =>
+   property("langLiteral") = forAll(genLangLiteral) { case tst @ LangLiteral(lit, Lang(lang)) =>
      import NTriplesParser._
      val testStr = "\"" + toAsciiLiteral(lit) + "\"@" + lang
      val res = P.fullLiteral(testStr)
@@ -88,7 +90,7 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
      all(res :_*)
    }
 
-  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ m.TypedLiteral(str, IRI(uri)) =>
+  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ TypedLiteral(str, IRI(uri)) =>
     val literal = '"'+NTriplesParser.toAsciiLiteral(str)+"\"^^<"+NTriplesParser.toIRI(uri)+">"
     val res = P.fullLiteral(literal)
     val TypedLiteral(lit, IRI(dt_iri)) = res.get
@@ -147,10 +149,10 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
   }
 
   /** Generate an NTriples document from the statements but with very messy whitespacing */
-  def generateDoc(graph: List[m.Triple]) = {
+  def generateDoc(graph: List[Triple]) = {
     val b = new StringBuilder
     if (graph != Nil) { //the pattern matching below does not work well enough at present
-      for (m.Triple(s, r, o) <- graph) {
+      for (Triple(s, r, o) <- graph) {
         b.append(genAnySpace.sample.get)
         b.append(nodeAsN3(s))
         b.append(genSpace.sample.get)
@@ -169,8 +171,8 @@ class NTriplesSpec[M <: RDFModule](val m: M) extends Properties("NTriples") {
 
 }
 
-class SpecTriplesGenerator[M <: RDFModule](val m: M) {
-  import m._
+class SpecTriplesGenerator[RDF <: RDFDataType](val ops: RDFOperations[RDF]) {
+  import ops._
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
     "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
     "ftp://ftp.is.co.za/rfc/rfc1808.txt", "ldap://[2001:db8::7]/c=GB?objectClass?one",

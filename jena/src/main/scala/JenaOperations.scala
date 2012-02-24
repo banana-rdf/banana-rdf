@@ -6,10 +6,8 @@ import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 import scala.collection.JavaConverters._
 
-object JenaModule extends RDFModule {
+object JenaOperations extends RDFOperations[JenaDataType] {
 
-  type Graph = JenaGraph
-  
   object Graph extends GraphCompanionObject {
     def empty: Graph = Factory.createDefaultGraph
     def apply(elems: Triple*): Graph = apply(elems.toIterable)
@@ -29,7 +27,6 @@ object JenaModule extends RDFModule {
     }
   }
 
-  type Triple = JenaTriple
   object Triple extends TripleCompanionObject {
     def apply(s: Node, p: IRI, o: Node): Triple = {
       JenaTriple.create(s, p, o)
@@ -41,8 +38,6 @@ object JenaModule extends RDFModule {
       }
   }
 
-  type Node = JenaNode
-  
   object Node extends NodeCompanionObject {
     def fold[T](node: Node)(funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T = node match {
       case iri: IRI => funIRI(iri)
@@ -51,13 +46,11 @@ object JenaModule extends RDFModule {
     }
   }
   
-  type IRI = Node_URI
   object IRI extends IRICompanionObject {
     def apply(iriStr: String): IRI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
     def unapply(node: IRI): Option[String] = if (node.isURI) Some(node.getURI) else None
   }
 
-  type BNode = Node_Blank
   object BNode extends BNodeCompanionObject {
     def apply(label: String): BNode = {
       val id = AnonId.create(label)
@@ -73,8 +66,6 @@ object JenaModule extends RDFModule {
     mapper.getTypeByName(iriString)
   }
   
-  type Literal = Node_Literal
-  
   object Literal extends LiteralCompanionObject {
     /**
      * LangLiteral are not different types in Jena
@@ -87,8 +78,6 @@ object JenaModule extends RDFModule {
     }
   }
 
-  
-  type TypedLiteral = Node_Literal
   object TypedLiteral extends TypedLiteralCompanionObject {
     def apply(lexicalForm: String, iri: IRI): TypedLiteral = {
       val IRI(iriString) = iri
@@ -106,7 +95,6 @@ object JenaModule extends RDFModule {
     }
   }
   
-  type LangLiteral = Node_Literal
   object LangLiteral extends LangLiteralCompanionObject {
     def apply(lexicalForm: String, lang: Lang): LangLiteral = {
       val Lang(langString) = lang
@@ -121,7 +109,6 @@ object JenaModule extends RDFModule {
     }
   }
   
-  type Lang = String
   object Lang extends LangCompanionObject {
     def apply(langString: String) = langString
     def unapply(lang: Lang) = Some(lang)

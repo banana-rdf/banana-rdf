@@ -1,14 +1,14 @@
 package org.w3.rdf.jena
 
-import org.w3.rdf
+import org.w3.rdf._
 import java.io._
 import com.hp.hpl.jena.rdf.model._
 
-object JenaTurtleReader extends rdf.TurtleReader(JenaModule) {
+object JenaTurtleReader extends TurtleReader[JenaDataType](JenaOperations) {
   
-  import JenaModule._
+  import JenaOperations._
   
-  def read(is: InputStream, base: String): Either[Throwable, Graph] =
+  def read(is: InputStream, base: String): Either[Throwable, JenaDataType#Graph] =
     try {
       val model = ModelFactory.createDefaultModel()
       model.getReader("TURTLE").read(model, is, base)
@@ -17,7 +17,7 @@ object JenaTurtleReader extends rdf.TurtleReader(JenaModule) {
       case t => Left(t)
     }
   
-  def read(reader: Reader, base: String): Either[Throwable, Graph] =
+  def read(reader: Reader, base: String): Either[Throwable, JenaDataType#Graph] =
     try {
       val model = ModelFactory.createDefaultModel()
       model.getReader("TURTLE").read(model, reader, base)

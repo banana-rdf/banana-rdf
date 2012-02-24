@@ -16,7 +16,7 @@ import nomo.Errors.TreeError
 import nomo.Accumulators.Position
 import nomo.Parsers._
 import nomo.{Parsers, Accumulators, Errors, Monotypic}
-import org.w3.rdf.RDFModule
+import org.w3.rdf._
 import java.nio.charset.Charset
 import java.io.{BufferedReader, StringReader}
 
@@ -24,17 +24,19 @@ import java.io.{BufferedReader, StringReader}
  * @author bblfish
  * @created 20/02/2012
  */
-class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
-  import m._
+class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Properties("Turtle") {
+  import ops._
+  
   import System.out
 
-  val gen = new SpecTurtleGenerator[m.type](m)
+  val gen = new SpecTurtleGenerator[RDF](ops)
   import gen._
 
-  val P = new TurtleParser(m,
-    Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[M]](4)))
+  val P = new TurtleParser(
+      ops,
+      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[RDF]](4)))
 
-  implicit def U: Listener[M] = new Listener(m)
+  implicit def U: Listener[RDF] = new Listener(ops)
 
   property("good prefix type test") = secure {
     val res = for ((orig,write) <- zipPfx) yield {
@@ -228,14 +230,14 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
   property("test multiple Object sentence") = secure {
     val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
     val t2=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("<<http://presbrey.mit.edu/foaf#presbrey>>"))
-    val g= m.Graph(t,t2)
+    val g= Graph(t,t2)
     val res = P.triples( """<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i>,
     <http://presbrey.mit.edu/foaf#presbrey> .""")
 
     ("result="+res) |: all (
       res.isSuccess  &&
         res.user.queue.size == 2 &&
-        m.Graph(res.user.queue.toIterable) == g
+        Graph(res.user.queue.toIterable) == g
     )
   }
 
@@ -248,7 +250,8 @@ class TurtleSpec [M <: RDFModule](val m: M)  extends Properties("Turtle") {
 }
 
 
-class SpecTurtleGenerator[M <: RDFModule](override val m: M)  extends SpecTriplesGenerator[M](m){
+class SpecTurtleGenerator[RDF <: RDFDataType](override val ops: RDFOperations[RDF])
+extends SpecTriplesGenerator[RDF](ops){
 
   val gdPfxOrig= List[String](":","cert:","foaf:","foaf.new:","a\u2764:","䷀:","Í\u2318-\u262f:",
     "\u002e:","e\u0eff\u0045:")

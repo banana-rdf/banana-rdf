@@ -18,9 +18,9 @@ import org.w3.rdf._
  * @since 02/02/2012
  */
 
-class Serializer[M <: RDFModule](val m: M) {
+class Serializer[RDF <: RDFDataType](ops: RDFOperations[RDF]) {
   
-  import m._
+  import ops._
   
 //  val pimps = new Pimps(m)
 //  import pimps._

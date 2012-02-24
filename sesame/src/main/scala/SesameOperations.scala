@@ -5,17 +5,17 @@ import org.openrdf.model.impl._
 import org.openrdf.model._
 import scala.collection.JavaConverters._
 
-object SesameModule extends RDFModule {
+object SesameOperations extends RDFOperations[SesameDataType] {
   
-  type Graph = GraphImpl
-  type Triple = Statement
-  type Node = Value
-  type IRI = URIImpl
-  type BNode = BNodeImpl
-  type Literal = LiteralImpl
-  type TypedLiteral = LiteralImpl
-  type LangLiteral = LiteralImpl
-  type Lang = String
+  override type Graph = SesameDataType#Graph
+  override type Triple = SesameDataType#Triple
+  override type Node = SesameDataType#Node
+  override type IRI = SesameDataType#IRI
+  override type BNode = SesameDataType#BNode
+  override type Literal = SesameDataType#Literal
+  override type TypedLiteral = SesameDataType#TypedLiteral
+  override type LangLiteral = SesameDataType#LangLiteral
+  override type Lang = SesameDataType#Lang
   
   object Graph extends GraphCompanionObject {
     def empty: Graph = new GraphImpl

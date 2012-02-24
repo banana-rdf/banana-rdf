@@ -4,9 +4,10 @@ import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 
 // TODO use generators
-abstract class PimpsTestSuite[M <: RDFModule](val m: M) extends WordSpec with MustMatchers {
+abstract class PimpsTestSuite[RDF <: RDFDataType](val ops: RDFOperations[RDF])
+extends WordSpec with MustMatchers {
   
-  import m._
+  import ops._
   
   "a tuple of (s: Node, p: IRI, o: Node)" must {
     
