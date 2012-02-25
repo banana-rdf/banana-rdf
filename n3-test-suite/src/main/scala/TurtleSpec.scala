@@ -24,12 +24,12 @@ import java.io.{BufferedReader, StringReader}
  * @author bblfish
  * @created 20/02/2012
  */
-class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Properties("Turtle") {
+class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("Turtle") {
   import ops._
   
   import System.out
 
-  val gen = new SpecTurtleGenerator[RDF](ops)
+  val gen = new SpecTurtleGenerator[Rdf](ops)
   import gen._
 
   val serializer = new Serializer(ops)
@@ -37,9 +37,9 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
 
   val P = new TurtleParser(
       ops,
-      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[RDF]](4)))
+      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))
 
-  implicit def U: Listener[RDF] = new Listener(ops)
+  implicit def U: Listener[Rdf] = new Listener(ops)
 
   property("good prefix type test") = secure {
     val res = for ((orig,write) <- zipPfx) yield {
@@ -444,8 +444,8 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
 }
 
 
-class SpecTurtleGenerator[RDF <: RDFDataType](override val ops: RDFOperations[RDF])
-extends SpecTriplesGenerator[RDF](ops){
+class SpecTurtleGenerator[Rdf <: RDF](override val ops: RDFOperations[Rdf])
+extends SpecTriplesGenerator[Rdf](ops){
 
   val gdPfxOrig= List[String](":","cert:","foaf:","foaf.new:","a\u2764:","䷀:","Í\u2318-\u262f:",
     "\u002e:","e\u0eff\u0045:")

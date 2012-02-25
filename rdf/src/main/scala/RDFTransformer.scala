@@ -1,6 +1,6 @@
 package org.w3.rdf
 
-class RDFTransformer[A <: RDFDataType, B <: RDFDataType](
+class RDFTransformer[A <: RDF, B <: RDF](
     val a: RDFOperations[A],
     val b: RDFOperations[B]) {
 

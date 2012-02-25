@@ -6,11 +6,11 @@ import java.io._
 import org.scalatest.EitherValues._
 
 
-abstract class TurtleTestSuite[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends WordSpec with MustMatchers {
+abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends WordSpec with MustMatchers {
   
-  val reader: TurtleReader[RDF]
-  val writer: TurtleWriter[RDF]
-  val iso: GraphIsomorphism[RDF]
+  val reader: TurtleReader[Rdf]
+  val writer: TurtleWriter[Rdf]
+  val iso: GraphIsomorphism[Rdf]
   
   import iso._
   

@@ -1,13 +1,13 @@
 package org.w3.rdf
 
-trait GraphUnion[RDF <: RDFDataType] { self =>
+trait GraphUnion[Rdf <: RDF] { self =>
   
-  def union(left: RDF#Graph, right: RDF#Graph): RDF#Graph
+  def union(left: Rdf#Graph, right: Rdf#Graph): Rdf#Graph
   
-  class GraphUnionW(graph: RDF#Graph) {
-    def union(otherGraph: RDF#Graph): RDF#Graph = self.union(graph, otherGraph)
+  class GraphUnionW(graph: Rdf#Graph) {
+    def union(otherGraph: Rdf#Graph): Rdf#Graph = self.union(graph, otherGraph)
   }
   
-  implicit def wrapGraphInGraphUnionW(graph: RDF#Graph): GraphUnionW = new GraphUnionW(graph)
+  implicit def wrapGraphInGraphUnionW(graph: Rdf#Graph): GraphUnionW = new GraphUnionW(graph)
   
 }

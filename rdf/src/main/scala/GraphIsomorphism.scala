@@ -1,13 +1,13 @@
 package org.w3.rdf
 
-trait GraphIsomorphism[RDF <: RDFDataType] {
+trait GraphIsomorphism[Rdf <: RDF] {
   
-  def isomorphism(left: RDF#Graph, right: RDF#Graph): Boolean
+  def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
   
-  class GraphIsomorphismW(graph: RDF#Graph) {
-    def isIsomorphicWith(otherGraph: RDF#Graph): Boolean = isomorphism(graph, otherGraph)
+  class GraphIsomorphismW(graph: Rdf#Graph) {
+    def isIsomorphicWith(otherGraph: Rdf#Graph): Boolean = isomorphism(graph, otherGraph)
   }
   
-  implicit def wrapGraphForIsomorphism(graph: RDF#Graph): GraphIsomorphismW = new GraphIsomorphismW(graph)
+  implicit def wrapGraphForIsomorphism(graph: Rdf#Graph): GraphIsomorphismW = new GraphIsomorphismW(graph)
   
 }

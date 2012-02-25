@@ -22,8 +22,8 @@ import nomo.Errors.TreeError
  * @tparam X
  * @tparam U
  */
-class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
-    val ops: RDFOperations[RDF],
+class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
+    val ops: RDFOperations[Rdf],
     val P: Parsers[F, Char, E, X, U]) {
   
   import TurtleParser._

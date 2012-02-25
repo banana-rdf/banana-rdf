@@ -1,6 +1,6 @@
 package org.w3.rdf
 
-trait RDFDataType {
+trait RDF {
   type Graph
   type Triple
   type Node

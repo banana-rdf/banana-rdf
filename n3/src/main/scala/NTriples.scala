@@ -23,8 +23,8 @@ import org.w3.rdf._
  */
 
 //todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
-class NTriplesParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
-    val ops: RDFOperations[RDF],
+class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
+    val ops: RDFOperations[Rdf],
     val P: Parsers[F, Char, E, X, U]) {
   
   import ops._
