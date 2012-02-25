@@ -9,7 +9,6 @@ object SimpleModule {
   object Graph {
     def empty: Graph = Set[Triple]()
     def apply(it: Iterable[Triple]): Graph = it.toSet
-    def union(left: Graph, right: Graph): Graph = left ++ right
     def toIterable(graph: Graph): Iterable[Triple] = graph.toIterable
   }
   

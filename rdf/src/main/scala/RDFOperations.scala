@@ -25,7 +25,6 @@ trait RDFOperations[RDF <: RDFDataType] {
     def empty: Graph
     def apply(elems: Triple*): Graph
     def apply(it: Iterable[Triple]): Graph
-    def union(left: Graph, right: Graph): Graph
     def toIterable(graph: Graph): Iterable[Triple]
   }
   val Graph: GraphCompanionObject
@@ -104,7 +103,6 @@ trait RDFOperations[RDF <: RDFDataType] {
   
   class GraphW(graph: Graph) {
     def toIterable: Iterable[Triple] = Graph.toIterable(graph)
-    def union(otherGraph: Graph): Graph = Graph.union(graph, otherGraph)
   }
   
   implicit def wrapGraph(graph: Graph): GraphW = new GraphW(graph)

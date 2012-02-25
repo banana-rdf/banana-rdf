@@ -8,7 +8,6 @@ object SimpleRDFOperations extends RDFOperations[SimpleRDF] {
     def empty: Graph = SimpleModule.Graph.empty
     def apply(elems: Triple*): Graph = apply(elems.toIterable)
     def apply(it: Iterable[Triple]): Graph = SimpleModule.Graph.apply(it)
-    def union(left: Graph, right: Graph): Graph = SimpleModule.Graph.union(left, right)
     def toIterable(graph: Graph): Iterable[Triple] = SimpleModule.Graph.toIterable(graph)
   }
 
