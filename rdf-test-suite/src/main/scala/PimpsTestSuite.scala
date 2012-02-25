@@ -4,7 +4,7 @@ import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 
 // TODO use generators
-abstract class PimpsTestSuite[RDF <: RDFDataType](val ops: RDFOperations[RDF])
+abstract class PimpsTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf])
 extends WordSpec with MustMatchers {
   
   import ops._

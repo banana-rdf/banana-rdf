@@ -22,22 +22,22 @@ import org.w3.rdf._
  */
 
 
-class NTriplesSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Properties("NTriples") {
+class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("NTriples") {
   
-  val serializer = new Serializer[RDF](ops)
+  val serializer = new Serializer[Rdf](ops)
   
   import ops._
   import serializer._
   
-  val gen = new SpecTriplesGenerator[RDF](ops)
+  val gen = new SpecTriplesGenerator[Rdf](ops)
   import gen._
   
-  implicit def U : Listener[RDF] = new Listener(ops)
+  implicit def U : Listener[Rdf] = new Listener(ops)
 
-  val P: NTriplesParser[RDF, String, TreeError, Position, Listener[RDF]] =
+  val P: NTriplesParser[Rdf, String, TreeError, Position, Listener[Rdf]] =
     new NTriplesParser(
       ops,
-      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[RDF]](4)))
+      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))
 
   
    property("lang") = forAll(genLangStr){ lang =>
@@ -171,7 +171,7 @@ class NTriplesSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Prop
 
 }
 
-class SpecTriplesGenerator[RDF <: RDFDataType](val ops: RDFOperations[RDF]) {
+class SpecTriplesGenerator[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
   import ops._
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
     "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",

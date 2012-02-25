@@ -2,7 +2,7 @@ package org.w3.rdf.simple
 
 import org.w3.rdf._
 
-trait SimpleRDF extends RDFDataType {
+trait SimpleRDF extends RDF {
   type Graph = SimpleModule.Graph
   type Triple = SimpleModule.Triple
   type Node = SimpleModule.Node

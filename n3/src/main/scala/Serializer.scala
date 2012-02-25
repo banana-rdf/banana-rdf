@@ -18,7 +18,7 @@ import org.w3.rdf._
  * @since 02/02/2012
  */
 
-class Serializer[RDF <: RDFDataType](ops: RDFOperations[RDF]) {
+class Serializer[Rdf <: RDF](ops: RDFOperations[Rdf]) {
   
   import ops._
   

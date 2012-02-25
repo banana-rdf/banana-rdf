@@ -1,6 +1,7 @@
 package org.w3.rdf.n3
 
 import collection.immutable
+
 trait ListenerAgent {
 
   def send(a: Any)

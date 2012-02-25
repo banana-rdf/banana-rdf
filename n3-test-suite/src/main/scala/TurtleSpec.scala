@@ -24,15 +24,14 @@ import java.io.{BufferedReader, StringReader}
  * @author bblfish
  * @created 20/02/2012
  */
-class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF],
-                                              val isomorphism: GraphIsomorphism[RDF]) extends Properties("Turtle") {
+class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
+                                              val isomorphism: GraphIsomorphism[Rdf]) extends Properties("Turtle") {
   import ops._
-
+  import isomorphism._
+  
   import System.out
 
-  import isomorphism._
-
-  val gen = new SpecTurtleGenerator[RDF](ops)
+  val gen = new SpecTurtleGenerator[Rdf](ops)
   import gen._
 
   val serializer = new Serializer(ops)
@@ -40,9 +39,9 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF],
 
   val P = new TurtleParser(
       ops,
-      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[RDF]](4)))
+      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))
 
-  implicit def U: Listener[RDF] = new Listener(ops)
+  implicit def U: Listener[Rdf] = new Listener(ops)
 
   property("good prefix type test") = secure {
     val res = for ((orig,write) <- zipPfx) yield {
@@ -400,7 +399,7 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF],
   }
 
   property("test numbers") = secure {
-    val nums = Map[TypedLiteral,Boolean](
+  val nums = Map[TypedLiteral,Boolean](
      ("2"^^xsdInteger) -> true,
      ("23423.123"^^xsdDecimal) -> true,
      ("23423123123456789"^^xsdInteger) -> true,
@@ -426,8 +425,8 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF],
      (".123"^^xsdDecimal) -> true,
      ("091.999"^^xsdDecimal) -> true,
      (".123"^^xsdDecimal) -> true
-    )
-    val res = for ((lit,valid) <- nums) yield {
+  )
+       val res = for ((lit,valid) <- nums) yield {
          val TypedLiteral(str,tp) = lit
          val parsed = P.NumericLiteral(str)
          ( "input='"+lit+"' result="+parsed ) |: all (
@@ -437,7 +436,7 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF],
        }
       all(res.toSeq: _*)
   }
-  
+
   property("test blank node subject") = secure {
     val t1 = Triple(BNode("_:n22"),f_name, "Alexandre" lang "fr" )
     val t2 = Triple(BNode(),f_name,"Henry")
@@ -466,8 +465,8 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF],
 }
 
 
-class SpecTurtleGenerator[RDF <: RDFDataType](override val ops: RDFOperations[RDF])
-extends SpecTriplesGenerator[RDF](ops){
+class SpecTurtleGenerator[Rdf <: RDF](override val ops: RDFOperations[Rdf])
+extends SpecTriplesGenerator[Rdf](ops){
 
   val gdPfxOrig= List[String](":","cert:","foaf:","foaf.new:","a\u2764:","䷀:","Í\u2318-\u262f:",
     "\u002e:","e\u0eff\u0045:")

@@ -16,12 +16,6 @@ object JenaOperations extends RDFOperations[JenaDataType] {
       it foreach { t => graph add t }
       graph
     }
-    def union(left: Graph, right: Graph): Graph = {
-      val graph = Factory.createDefaultGraph
-      toIterable(left) foreach { t => graph add t }
-      toIterable(right) foreach { t => graph add t }
-      graph
-    }
     def toIterable(graph: Graph): Iterable[Triple] = new Iterable[Triple] {
       val iterator = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala
     }

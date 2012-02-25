@@ -7,25 +7,24 @@ package org.w3.rdf
  * But with the  notable exceptions:
  *   - we allow literals in subject position - for help later in reasoning.
  */
-trait RDFOperations[RDF <: RDFDataType] {
+trait RDFOperations[Rdf <: RDF] {
 
   // that's really neat: if you import the content of an instance of this trait,
   // you'll get all the type aliases for free, so you don't need the type projection :-)
-  type Graph = RDF#Graph
-  type Triple = RDF#Triple
-  type Node = RDF#Node
-  type IRI = RDF#IRI
-  type BNode = RDF#BNode
-  type Literal = RDF#Literal
-  type TypedLiteral = RDF#TypedLiteral
-  type LangLiteral = RDF#LangLiteral
-  type Lang = RDF#Lang
+  type Graph = Rdf#Graph
+  type Triple = Rdf#Triple
+  type Node = Rdf#Node
+  type IRI = Rdf#IRI
+  type BNode = Rdf#BNode
+  type Literal = Rdf#Literal
+  type TypedLiteral = Rdf#TypedLiteral
+  type LangLiteral = Rdf#LangLiteral
+  type Lang = Rdf#Lang
 
   trait GraphCompanionObject {
     def empty: Graph
     def apply(elems: Triple*): Graph
     def apply(it: Iterable[Triple]): Graph
-    def union(left: Graph, right: Graph): Graph
     def toIterable(graph: Graph): Iterable[Triple]
   }
   val Graph: GraphCompanionObject
@@ -104,7 +103,6 @@ trait RDFOperations[RDF <: RDFDataType] {
   
   class GraphW(graph: Graph) {
     def toIterable: Iterable[Triple] = Graph.toIterable(graph)
-    def union(otherGraph: Graph): Graph = Graph.union(graph, otherGraph)
   }
   
   implicit def wrapGraph(graph: Graph): GraphW = new GraphW(graph)

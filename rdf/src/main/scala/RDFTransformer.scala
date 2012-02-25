@@ -1,6 +1,8 @@
 package org.w3.rdf
 
-class Transformer[A <: RDFDataType, B <: RDFDataType](val a: RDFOperations[A], val b: RDFOperations[B]) {
+class RDFTransformer[A <: RDF, B <: RDF](
+    val a: RDFOperations[A],
+    val b: RDFOperations[B]) {
 
   def transform(graph: A#Graph): B#Graph =
     b.Graph(a.Graph.toIterable(graph) map transformTriple)
