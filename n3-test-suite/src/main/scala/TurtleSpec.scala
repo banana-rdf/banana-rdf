@@ -383,6 +383,7 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
     )
   }
 
+  //this does not fail but it does produce any results either. Not sure what to think of this
   property("test broken number doc ") = secure {
     import serializer._
     val doc = """

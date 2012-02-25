@@ -195,10 +195,7 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
       def w(o: Option[String])=o.getOrElse("")
       def c(o: Option[Char])=o.getOrElse("")
       r.status.flatMap {
-        case None   ++None++None++None     => Failure(err(r.position))
-        case None   ++None++None++Some(exp)=> Failure(err(r.position))
-        case Some(_)++None++None++None     => Failure(err(r.position))
-        case Some(_)++None++None++Some(_)  => Failure(err(r.position))
+        case _      ++None++None++ _       => Failure(err(r.position))
         case sign   ++i   ++None++None     => Success(TypedLiteral(c(sign)+w(i),                      xsdInteger))
         case sign   ++i   ++dec ++None     => Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_)),    xsdDecimal))
         case sign   ++i   ++dec ++Some(exp)=> Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_))+exp,xsdDouble ))
