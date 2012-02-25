@@ -192,15 +192,23 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
 
   //having done all this parsing, it would be nice to just return a scala.Double
   //perhaps we can have a wrapped Literal, which contains it's value...
-  lazy val Double =  ((INTEGER<<dot)++INTEGER++Exponent).map{
+  lazy val Double =  (((INTEGER<<dot)++INTEGER++Exponent).map{
     case i++dec++exp => TypedLiteral(i+"."+dec+exp,xsdDouble)
   } | ( (dot >> INTEGER) ++ Exponent ).map {
     case i++e => TypedLiteral("."+i+e,xsdDouble)
   } | (INTEGER ++ Exponent).map {
     case i ++ e => TypedLiteral(i+e, xsdDouble)
-  }
+  }  )
 
-  lazy val NumericLiteralUnsigned = INTEGER.map(i=>TypedLiteral(i, xsdInteger)) | Decimal | Double
+
+  //todo: perhaps one can be clever and remove the multiple parsings of the initial integer.
+  //one has to be very careful of the order: put the more complex first. Otherwise a dot could be interpreted
+  //as an end of sentence, which could then either lead to backtracking further down the line, or an error. Backtracking
+  //further down could have as consequence that Triples get added to the user, which did not exist. It seems that
+  //such backtracking does not occur (but why? A limitiation of nomo, or just an accident somewhere else?)
+  lazy val NumericLiteralUnsigned =  Double | Decimal | INTEGER.map(i=>TypedLiteral(i, xsdInteger))
+
+
   lazy val NumericLiteral =  NumericLiteralUnsigned //| NumericLiteralPositive   | NumericLiteralNegative
   val BooleanLiteral = P.word("true").as(xsdTrue) | P.word("false").as(xsdFalse)
 

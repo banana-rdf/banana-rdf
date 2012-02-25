@@ -362,23 +362,24 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
   val hasCats = IRI("http://cats.edu/ont/has")
 
   val t8 = Triple(hjs,hasCats,TypedLiteral("2",xsdInteger))
-  val t9 = Triple(timbl,hasCats,TypedLiteral(".5e-3",xsdDouble))
+  val t8bis = Triple(hjs,hasCats,TypedLiteral("3.2",xsdDecimal))
+  val t9 = Triple(timbl,hasCats,TypedLiteral(".5e-42",xsdDouble))
   val t10 = Triple(presbrey,hasCats,TypedLiteral("3.14",xsdDecimal))
 
   property("test numbers") = secure {
     import serializer._
-      val g = Graph(t8,t9,t10)
+      val g = Graph(t8,t8bis,t9,t10)
     val doc = """
-    @prefix cats: <http://cats.edu/ont/has>
-         %s cats: 2 .
-         %s cats: .5e-3 .
+    @prefix cats: <http://cats.edu/ont/has>  .
+         %s cats: 2, 3.2. #that last dot is an end of sentence
+         %s cats: .5e-42 . #a homeopathic amount
          %s cats: 3.14.
       """.format(iriAsN3(hjs),iriAsN3(timbl),iriAsN3(presbrey))
     out.println(doc)
     val res = P.turtleDoc(doc )
     ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
       res.isSuccess  &&
-        (( res.user.queue.size == 3) :| "the two graphs are not the same size" ) &&
+        (( res.user.queue.size == 4) :| "the two graphs are not the same size" ) &&
         ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
     )
   }
