@@ -5,6 +5,7 @@ import org.openrdf.model.impl._
 import org.openrdf.model._
 import scala.collection.JavaConverters._
 
+
 object SesameOperations extends RDFOperations[SesameDataType] {
   
   override type Graph = SesameDataType#Graph
@@ -62,6 +63,8 @@ object SesameOperations extends RDFOperations[SesameDataType] {
   }
   
   object BNode extends BNodeCompanionObject {
+
+    def apply() = ValueFactoryImpl.getInstance().createBNode()
     def apply(label: String): BNode = new BNodeImpl(label)
     def unapply(bn: BNode): Option[String] = Some(bn.getID)
   }

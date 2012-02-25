@@ -11,7 +11,7 @@ class SimpleModuleTest extends PimpsTestSuite(SimpleRDFOperations)
 
 object SimpleN3ParserSpec extends n3.NTriplesSpec(SimpleRDFOperations)
 
-object SimpleTurtleParserSpec extends n3.TurtleSpec(SimpleRDFOperations)
+object SimpleTurtleParserSpec extends n3.TurtleSpec(SimpleRDFOperations, SimpleGraphIsomorphism)
 
 class NTriplesParserStringTest extends n3.NTriplesParserTest(SimpleRDFOperations, SimpleNTriplesStringParser) {
   val isomorphism = SimpleGraphIsomorphism

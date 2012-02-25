@@ -52,12 +52,14 @@ object JenaOperations extends RDFOperations[JenaDataType] {
   }
 
   object BNode extends BNodeCompanionObject {
+    def apply() = JenaNode.createAnon().asInstanceOf[Node_Blank]
     def apply(label: String): BNode = {
       val id = AnonId.create(label)
       JenaNode.createAnon(id).asInstanceOf[Node_Blank]
     }
     def unapply(bn: BNode): Option[String] =
       if (bn.isBlank) Some(bn.getBlankNodeId.getLabelString) else None
+
   }
 
   lazy val mapper = TypeMapper.getInstance

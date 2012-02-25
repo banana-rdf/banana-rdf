@@ -4,13 +4,14 @@ import org.w3.rdf._
 import org.openrdf.model.impl._
 import org.openrdf.model._
 import scala.collection.JavaConverters._
+import org.openrdf.model.{BNode=>SesameBNode}
 
 trait SesameDataType extends RDFDataType {
   type Graph = GraphImpl
   type Triple = Statement
   type Node = Value
   type IRI = URIImpl
-  type BNode = BNodeImpl
+  type BNode = SesameBNode
   type Literal = LiteralImpl
   type TypedLiteral = LiteralImpl
   type LangLiteral = LiteralImpl

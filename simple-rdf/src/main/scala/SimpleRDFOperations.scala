@@ -3,7 +3,7 @@ package org.w3.rdf.simple
 import org.w3.rdf._
 
 object SimpleRDFOperations extends RDFOperations[SimpleRDF] {
-  
+
   object Graph extends GraphCompanionObject {
     def empty: Graph = SimpleModule.Graph.empty
     def apply(elems: Triple*): Graph = apply(elems.toIterable)
@@ -28,6 +28,7 @@ object SimpleRDFOperations extends RDFOperations[SimpleRDF] {
   }
 
   object BNode extends BNodeCompanionObject {
+    def apply() = SimpleModule.BNode()
     def apply(s: String) = SimpleModule.BNode(s)
     def unapply(bn: BNode) = SimpleModule.BNode.unapply(bn)
   }

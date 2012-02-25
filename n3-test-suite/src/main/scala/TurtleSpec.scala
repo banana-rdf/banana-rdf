@@ -24,10 +24,13 @@ import java.io.{BufferedReader, StringReader}
  * @author bblfish
  * @created 20/02/2012
  */
-class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Properties("Turtle") {
+class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF],
+                                              val isomorphism: GraphIsomorphism[RDF]) extends Properties("Turtle") {
   import ops._
-  
+
   import System.out
+
+  import isomorphism._
 
   val gen = new SpecTurtleGenerator[RDF](ops)
   import gen._
@@ -390,42 +393,41 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
     @prefix cats: <http://cats.edu/ont/has>  .
          %s cats: e42 . #no number before the e
       """.format(iriAsN3(hjs))
-    out.println(doc)
     val res = P.turtleDoc(doc )
     ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
       res.isFailure
     )
   }
 
-  val nums = Map[TypedLiteral,Boolean](
-    TypedLiteral("2", xsdInteger) -> true,
-    TypedLiteral("23423.123", xsdDecimal) -> true,
-    TypedLiteral("23423123123456789", xsdInteger) -> true,
-    TypedLiteral(".232e34", xsdDouble) -> true,
-    TypedLiteral(".123", xsdDecimal) -> true,
-    TypedLiteral("23423.123", xsdDecimal) -> true,
-    TypedLiteral(".123", xsdDecimal) -> true,
-    TypedLiteral(".e34", xsdDouble) -> false,
-    TypedLiteral("12.00123123e34", xsdDouble) -> true,
-    TypedLiteral("12e34", xsdDouble) -> true,
-    TypedLiteral("", xsdDouble) -> false,
-    TypedLiteral("-", xsdDouble) -> false,
-    TypedLiteral("+", xsdDouble) -> false,
-    TypedLiteral("+e32", xsdDouble) -> false,
-    TypedLiteral("+2345.123", xsdDecimal) -> true,
-    TypedLiteral("-34523.1978123", xsdDecimal) -> true,
-    TypedLiteral("-2342312349853123123123123", xsdInteger) -> true,
-    TypedLiteral("+2342139023", xsdInteger) -> true,
-    TypedLiteral("+.4334e034", xsdDouble) -> true,
-    TypedLiteral(".123", xsdDecimal) -> true,
-    TypedLiteral("23423.123", xsdDecimal) -> true,
-    TypedLiteral(".123", xsdDecimal) -> true,
-    TypedLiteral(".123", xsdDecimal) -> true,
-    TypedLiteral("091.999", xsdDecimal) -> true,
-    TypedLiteral(".123", xsdDecimal) -> true
-  )
   property("test numbers") = secure {
-       val res = for ((lit,valid) <- nums) yield {
+    val nums = Map[TypedLiteral,Boolean](
+     ("2"^^xsdInteger) -> true,
+     ("23423.123"^^xsdDecimal) -> true,
+     ("23423123123456789"^^xsdInteger) -> true,
+     (".232e34"^^xsdDouble) -> true,
+     (".123"^^xsdDecimal) -> true,
+     ("23423.123"^^xsdDecimal) -> true,
+     (".123"^^xsdDecimal) -> true,
+     (".e34"^^xsdDouble) -> false,
+     ("12.00123123e34"^^xsdDouble) -> true,
+     ("12e34"^^xsdDouble) -> true,
+     (""^^xsdDouble) -> false,
+     ("-"^^xsdDouble) -> false,
+     ("+"^^xsdDouble) -> false,
+     ("+e32"^^xsdDouble) -> false,
+     ("+2345.123"^^xsdDecimal) -> true,
+     ("-34523.1978123"^^xsdDecimal) -> true,
+     ("-2342312349853123123123123"^^xsdInteger) -> true,
+     ("+2342139023"^^xsdInteger) -> true,
+     ("+.4334e034"^^xsdDouble) -> true,
+     (".123"^^xsdDecimal) -> true,
+     ("23423.123"^^xsdDecimal) -> true,
+     (".123"^^xsdDecimal) -> true,
+     (".123"^^xsdDecimal) -> true,
+     ("091.999"^^xsdDecimal) -> true,
+     (".123"^^xsdDecimal) -> true
+    )
+    val res = for ((lit,valid) <- nums) yield {
          val TypedLiteral(str,tp) = lit
          val parsed = P.NumericLiteral(str)
          ( "input='"+lit+"' result="+parsed ) |: all (
@@ -435,11 +437,31 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
        }
       all(res.toSeq: _*)
   }
+  
+  property("test blank node subject") = secure {
+    val t1 = Triple(BNode("_:n22"),f_name, "Alexandre" lang "fr" )
+    val t2 = Triple(BNode(),f_name,"Henry")
+    val t3 = Triple(BNode("_:n22"),f_knows,BNode("_:n22"))
+    val g = Graph(t1,t2,t3)
+    val doc = """
+    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    _:n22 foaf:name "Alexandre"@fr . #simple bnode subject
+    [] foaf:name "Henry" .
+    _:n22 foaf:knows _:n22 .
+    """
+    out.println(doc)
+    val res = P.turtleDoc(doc)
+    try {
+    ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+      res.isSuccess  &&
+        (( res.user.queue.size == 3) :| "the two graphs are not the same size" ) &&
+        ((Graph(res.user.queue.toIterable) isIsomorphicWith  g ) :| "the two graphs are not isomorphic")
+    )
+    } catch {
+      case e => e.printStackTrace(); throw e
+    }
 
-  //  property("fixed bad prefix tests") {
-//
-//  }
-
+  }
 
 }
 

@@ -48,7 +48,7 @@ trait RDFOperations[RDF <: RDFDataType] {
   
   val IRI : IRICompanionObject
 
-  trait BNodeCompanionObject extends Function1[String, BNode] {
+  trait BNodeCompanionObject extends Function1[String, BNode] with Function0[BNode] {
     def unapply(bn: BNode): Option[String]
   }
   
