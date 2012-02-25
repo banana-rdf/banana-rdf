@@ -1,7 +1,6 @@
 package org.w3.rdf.n3
 
 import collection.immutable
-import org.w3.rdf.RDFModule
 
 trait ListenerAgent {
 
