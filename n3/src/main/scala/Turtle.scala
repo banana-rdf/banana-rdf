@@ -182,36 +182,31 @@ class TurtleParser[RDF <: RDFDataType, F, E, X, U <: Listener[RDF]](
 
   lazy val INTEGER = P.takeWhile1(numeric(_),err).map(_.toSeq.mkString)
 
-  lazy val Decimal = ( (INTEGER<<dot)++INTEGER ).map{
-    case i++d=> TypedLiteral(""+i+"."+d,xsdDecimal)
-  } | (dot>>INTEGER).map(i=> TypedLiteral("."+i,xsdDecimal))
-
   lazy val Exponent = ( P.anyOf("eE") ++ P.anyOf("+-").optional ++ INTEGER ) map {
     case e++pos++exp => ""+e+pos.getOrElse("")+exp
   }
 
+  val SIGN = P.anyOf("+-").optional
+
   //having done all this parsing, it would be nice to just return a scala.Double
   //perhaps we can have a wrapped Literal, which contains it's value...
-  lazy val Double =  (((INTEGER<<dot)++INTEGER++Exponent).map{
-    case i++dec++exp => TypedLiteral(i+"."+dec+exp,xsdDouble)
-  } | ( (dot >> INTEGER) ++ Exponent ).map {
-    case i++e => TypedLiteral("."+i+e,xsdDouble)
-  } | (INTEGER ++ Exponent).map {
-    case i ++ e => TypedLiteral(i+e, xsdDouble)
-  }  )
+  lazy val NumericLiteral =
+    (SIGN++INTEGER.optional++(dot>>INTEGER).optional++Exponent.optional).mapResult {  r =>
+      def w(o: Option[String])=o.getOrElse("")
+      def c(o: Option[Char])=o.getOrElse("")
+      r.status.flatMap {
+        case None   ++None++None++None     => Failure(err(r.position))
+        case None   ++None++None++Some(exp)=> Failure(err(r.position))
+        case Some(_)++None++None++None     => Failure(err(r.position))
+        case Some(_)++None++None++Some(_)  => Failure(err(r.position))
+        case sign   ++i   ++None++None     => Success(TypedLiteral(c(sign)+w(i),                      xsdInteger))
+        case sign   ++i   ++dec ++None     => Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_)),    xsdDecimal))
+        case sign   ++i   ++dec ++Some(exp)=> Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_))+exp,xsdDouble ))
+        //todo: improve error message https://bitbucket.org/pchiusano/nomo/issue/7/errors
+      }
+    }
 
-
-  //todo: perhaps one can be clever and remove the multiple parsings of the initial integer.
-  //one has to be very careful of the order: put the more complex first. Otherwise a dot could be interpreted
-  //as an end of sentence, which could then either lead to backtracking further down the line, or an error. Backtracking
-  //further down could have as consequence that Triples get added to the user, which did not exist. It seems that
-  //such backtracking does not occur (but why? A limitiation of nomo, or just an accident somewhere else?)
-  lazy val NumericLiteralUnsigned =  Double | Decimal | INTEGER.map(i=>TypedLiteral(i, xsdInteger))
-
-
-  lazy val NumericLiteral =  NumericLiteralUnsigned //| NumericLiteralPositive   | NumericLiteralNegative
   val BooleanLiteral = P.word("true").as(xsdTrue) | P.word("false").as(xsdFalse)
-
 
   lazy val literal = RDFLiteral  | NumericLiteral | BooleanLiteral
 

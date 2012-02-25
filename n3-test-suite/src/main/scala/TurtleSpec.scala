@@ -375,13 +375,64 @@ class TurtleSpec[RDF <: RDFDataType](val ops: RDFOperations[RDF]) extends Proper
          %s cats: .5e-42 . #a homeopathic amount
          %s cats: 3.14.
       """.format(iriAsN3(hjs),iriAsN3(timbl),iriAsN3(presbrey))
-    out.println(doc)
     val res = P.turtleDoc(doc )
     ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
       res.isSuccess  &&
         (( res.user.queue.size == 4) :| "the two graphs are not the same size" ) &&
         ((Graph(res.user.queue.toIterable) ==  g) :| "the two graphs are not equal")
     )
+  }
+
+  property("test broken number doc ") = secure {
+    import serializer._
+    val doc = """
+    @prefix cats: <http://cats.edu/ont/has>  .
+         %s cats: e42 . #no number before the e
+      """.format(iriAsN3(hjs))
+    out.println(doc)
+    val res = P.turtleDoc(doc )
+    ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+      res.isFailure
+    )
+  }
+
+  val nums = Map[TypedLiteral,Boolean](
+    TypedLiteral("2", xsdInteger) -> true,
+    TypedLiteral("23423.123", xsdDecimal) -> true,
+    TypedLiteral("23423123123123123123123", xsdInteger) -> true,
+    TypedLiteral(".232e34", xsdDouble) -> true,
+    TypedLiteral(".123", xsdDecimal) -> true,
+    TypedLiteral("23423.123", xsdDecimal) -> true,
+    TypedLiteral(".123", xsdDecimal) -> true,
+    TypedLiteral(".e34", xsdDouble) -> false,
+    TypedLiteral("12.123123e34", xsdDouble) -> true,
+    TypedLiteral("12e34", xsdDouble) -> true,
+    TypedLiteral("", xsdDouble) -> false,
+    TypedLiteral("-", xsdDouble) -> false,
+    TypedLiteral("+", xsdDouble) -> false,
+    TypedLiteral("+e32", xsdDouble) -> false,
+    TypedLiteral("+2345.123", xsdDecimal) -> true,
+    TypedLiteral("-34523.123123", xsdDecimal) -> true,
+    TypedLiteral("-23423123123123123123123", xsdInteger) -> true,
+    TypedLiteral("+2342139023", xsdInteger) -> true,
+    TypedLiteral("+.4334e34", xsdDouble) -> true,
+    TypedLiteral(".123", xsdDecimal) -> true,
+    TypedLiteral("23423.123", xsdDecimal) -> true,
+    TypedLiteral(".123", xsdDecimal) -> true,
+    TypedLiteral(".123", xsdDecimal) -> true,
+    TypedLiteral("23423.123", xsdDecimal) -> true,
+    TypedLiteral(".123", xsdDecimal) -> true
+  )
+  property("test numbers") = secure {
+       val res = for ((lit,valid) <- nums) yield {
+         val TypedLiteral(str,tp) = lit
+         val parsed = P.NumericLiteral(str)
+         ( "input='"+lit+"' result="+parsed ) |: all (
+           parsed.isSuccess == valid  &&
+             (( if (parsed.isSuccess) parsed.get==lit else true) :| "the input and output literal don't match" )
+         )
+       }
+      all(res.toSeq: _*)
   }
 
   //  property("fixed bad prefix tests") {
