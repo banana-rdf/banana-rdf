@@ -5,7 +5,7 @@ import org.openrdf.model.impl._
 import org.openrdf.model._
 import scala.collection.JavaConverters._
 
-object SesameOperations extends RDFOperations[SesameDataType] {
+object SesameOperations extends RDFOperations[Sesame] {
   
   object Graph extends GraphCompanionObject {
     def empty: Graph = new GraphImpl

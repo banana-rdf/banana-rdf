@@ -7,7 +7,7 @@ import java.io._
 class DefaultTurtleReader[Rdf <: RDF](override val ops: RDFOperations[Rdf])
 extends TurtleReader[Rdf](ops) {
   
-  private val jenaToM = new RDFTransformer[JenaDataType, Rdf](JenaOperations, ops)
+  private val jenaToM = new RDFTransformer[Jena, Rdf](JenaOperations, ops)
   
   def read(is: InputStream, base: String): Either[Throwable, Rdf#Graph] =
     JenaTurtleReader.read(is, base).right.map(jenaToM.transform)

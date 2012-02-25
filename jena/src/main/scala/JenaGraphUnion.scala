@@ -4,9 +4,9 @@ import org.w3.rdf._
 import com.hp.hpl.jena.graph.Factory
 import JenaOperations.Graph.toIterable
 
-object JenaGraphUnion extends GraphUnion[JenaDataType] {
+object JenaGraphUnion extends GraphUnion[Jena] {
   
-  def union(left: JenaDataType#Graph, right: JenaDataType#Graph): JenaDataType#Graph = {
+  def union(left: Jena#Graph, right: Jena#Graph): Jena#Graph = {
     val graph = Factory.createDefaultGraph
     toIterable(left) foreach { t => graph add t }
     toIterable(right) foreach { t => graph add t }

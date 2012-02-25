@@ -6,7 +6,7 @@ import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 import scala.collection.JavaConverters._
 
-object JenaOperations extends RDFOperations[JenaDataType] {
+object JenaOperations extends RDFOperations[Jena] {
 
   object Graph extends GraphCompanionObject {
     def empty: Graph = Factory.createDefaultGraph

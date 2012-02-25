@@ -5,8 +5,8 @@ import org.w3.rdf.jena._
 
 class DefaultGraphIsomorphism[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends GraphIsomorphism[Rdf] {
   
-  private val mToJena = new RDFTransformer[Rdf, JenaDataType](ops, JenaOperations)
-  private val jenaToM = new RDFTransformer[JenaDataType, Rdf](JenaOperations, ops)
+  private val mToJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
+  private val jenaToM = new RDFTransformer[Jena, Rdf](JenaOperations, ops)
   
   def isomorphism(g1: Rdf#Graph, g2: Rdf#Graph): Boolean = {
     val j1 = mToJena.transform(g1)

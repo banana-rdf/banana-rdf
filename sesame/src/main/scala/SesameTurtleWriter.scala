@@ -6,7 +6,7 @@ import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.openrdf.model.URI
 import org.openrdf.model.impl.URIImpl
 
-object SesameTurtleWriter extends TurtleWriter[SesameDataType](SesameOperations) {
+object SesameTurtleWriter extends TurtleWriter[Sesame](SesameOperations) {
   
   import SesameOperations._
   

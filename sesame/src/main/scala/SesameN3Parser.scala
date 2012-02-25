@@ -10,7 +10,7 @@ extends NTriplesParser(
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
-    Accumulators.position[Listener[SesameDataType]](4)))
+    Accumulators.position[Listener[Sesame]](4)))
 
 object NTriplesSeqParser
 extends NTriplesParser(
@@ -18,4 +18,4 @@ extends NTriplesParser(
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
-    Accumulators.position[Listener[SesameDataType]](4)))
+    Accumulators.position[Listener[Sesame]](4)))

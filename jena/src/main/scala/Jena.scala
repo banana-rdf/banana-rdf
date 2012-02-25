@@ -3,7 +3,7 @@ package org.w3.rdf.jena
 import org.w3.rdf._
 import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
 
-trait JenaDataType extends RDF {
+trait Jena extends RDF {
   type Graph = JenaGraph
   type Triple = JenaTriple
   type Node = JenaNode

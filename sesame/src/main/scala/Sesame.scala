@@ -5,7 +5,7 @@ import org.openrdf.model.impl._
 import org.openrdf.model._
 import scala.collection.JavaConverters._
 
-trait SesameDataType extends RDF {
+trait Sesame extends RDF {
   type Graph = GraphImpl
   type Triple = Statement
   type Node = Value

@@ -6,9 +6,9 @@ import org.openrdf.model.Statement
 import org.openrdf.model.impl.GraphImpl
 import org.openrdf.model.util.ModelUtil
 
-object SesameGraphIsomorphism extends GraphIsomorphism[SesameDataType] {
+object SesameGraphIsomorphism extends GraphIsomorphism[Sesame] {
   
-  def isomorphism(left: SesameDataType#Graph, right: SesameDataType#Graph): Boolean =
+  def isomorphism(left: Sesame#Graph, right: Sesame#Graph): Boolean =
     ModelUtil.equals(left, right)
   
 }

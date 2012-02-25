@@ -8,7 +8,7 @@ import java.util.LinkedList
 
 import scala.collection.immutable.List
 
-object SesameTurtleReader extends TurtleReader[SesameDataType](SesameOperations) {
+object SesameTurtleReader extends TurtleReader[Sesame](SesameOperations) {
   
   import SesameOperations._
   
