@@ -52,6 +52,8 @@ object SesameOperations extends RDFOperations[Sesame] {
   }
   
   object BNode extends BNodeCompanionObject {
+
+    def apply() = ValueFactoryImpl.getInstance().createBNode()
     def apply(label: String): BNode = new BNodeImpl(label)
     def unapply(bn: BNode): Option[String] = Some(bn.getID)
   }

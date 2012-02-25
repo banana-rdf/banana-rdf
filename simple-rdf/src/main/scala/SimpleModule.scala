@@ -1,8 +1,32 @@
 package org.w3.rdf.simple
 
-import org.w3.rdf._
+import java.util.concurrent.atomic._
 
 object SimpleModule {
+  private val counter = new AtomicLong(1)
+  private var prefix = "a"
+  private val iterateAt = Long.MaxValue - 1000000
+  /**
+   * nextId generates unique ids per class loader with minimal use of synchronization.
+   * Does one need more uniqueness for bnode creation?
+   * @return  the next id
+   */
+  private def nextId = {
+    def next(s: String): String = {
+      if (s == "z") "aa";
+      else {
+        val root = s.substring(0,s.length - 1);
+        if (s.last == 'z')
+         next(root) + 'a';
+        else root + (s.last + 1).asInstanceOf[Char];
+      }
+    }
+    if (counter.get() > iterateAt) synchronized {
+       prefix = next(prefix)
+       counter.set(0)
+    }
+    prefix+counter.getAndIncrement
+  }
 
   type Graph = Set[Triple]
   
@@ -26,7 +50,7 @@ object SimpleModule {
 
   case class IRI(iri: String) extends Node
 
-  case class BNode(label: String) extends Node
+  case class BNode(label: String =nextId) extends Node
 
   sealed trait Literal extends Node {
     val lexicalForm: String

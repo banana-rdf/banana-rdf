@@ -70,25 +70,19 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val PN_CHARS =  P.takeWhile1(pn_chars_dot, err).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
   lazy val PN_decode = PN_CHARS.many1.map(_.mkString)
 
-  /*
-   *for a discussion of this rule see: https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rules
+  /**
+   * This does not deal with final dot properly. It will consume it and fail, when it might need to consume up
+   * to and not including the dot.
+
+   * For a discussion of this rule see: https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rules
    */
-  lazy val PN_PREFIX  : P.Parser[String] = P.takeWhile(_ != ':').mapResult {
-    case Result(Success(pfx), pos, us)=> {
-      val prefx = pfx.toSeq.mkString
-      if (prefx.size == 0) Success("")
-      else if (prefx.last == '.') Failure(P.err.single('.',pos))
-      else if (!pn_chars_base(prefx.head) && UCHAR(prefx)(us).isFailure) {
-        Failure(P.err.single(prefx.head,pos))
-      } else {
-        val result = (PN_decode<<P.eof)(prefx)(us)
-        result.status.mapL(e=>P.err.single(':',pos))
+  lazy val PN_PREFIX  : P.Parser[String] =  (PN_CHARS_BASE ++ PN_CHARS.many).mapResult{ r =>
+      r.status.flatMap {
+        case c1 ++ more => if (more.size != 0 && more.last == '.') Error(err(r.position)) else Success(c1+more.mkString)
       }
-    }
-    case other => other.status.map(x=>"this map() never gets called, as 'other' is an error.")
   }
 
-  lazy val PNAME_NS =  (PN_PREFIX << COLON).map(prefix=>prefix+":")
+  lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).map(prefix=>prefix.getOrElse("")+":")
   lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | IRICHARS).many.map(i=>IRI(i.mkString))<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
@@ -207,7 +201,14 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val literal = RDFLiteral  | NumericLiteral | BooleanLiteral
 
-  lazy val obj = (IRIref | literal).mapResult{ r =>  r.status.map{ node => { r.user.setObject(node); r } } }  //| blank
+  lazy val ANON = (P.single('[')>> SP.optional >> P.single(']')).as(BNode())
+  lazy val BLANK_NODE_LABEL = P.word("_:")>>PN_LOCAL.map(BNode(_))
+  lazy val BlankNode = BLANK_NODE_LABEL | ANON
+
+  lazy val blankNodePropertyList = P.single('[') >> SP >> (predicateObjectList << SP << P.single(']'))
+
+  lazy val objBlank = blankNodePropertyList //| collection
+  lazy val obj = (IRIref | literal | BlankNode ).mapResult{ r =>  r.status.map{ node => { r.user.setObject(node); r } } }
   lazy val predicate = IRIref
   lazy val verb =  ( predicate | P.single('a').as(rdfType) ).mapResult{ r =>
     r.status.map{ iri => { r.user.setVerb(iri); r } }
@@ -217,11 +218,11 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val predicateObjectList = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)
 
-  lazy val subject = IRIref.mapResult{ r =>
+  lazy val subject = ( IRIref | BlankNode ).mapResult { r =>
     r.status.map{ node => { r.user.setSubject(node); r } }
-  } //| blank
+  }
 
-  lazy val triples =  subject<<SP.optional ++ predicateObjectList
+  lazy val triples =  subject ++ (SP.optional>>predicateObjectList)
 
   lazy val directive = prefixID | base
 
