@@ -189,10 +189,10 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       def w(o: Option[String])=o.getOrElse("")
       def c(o: Option[Char])=o.getOrElse("")
       r.status.flatMap {
-        case _      ++None++None++ _       => Failure(err(r.position))
-        case sign   ++i   ++None++None     => Success(TypedLiteral(c(sign)+w(i),                      xsdInteger))
-        case sign   ++i   ++dec ++None     => Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_)),    xsdDecimal))
-        case sign   ++i   ++dec ++Some(exp)=> Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_))+exp,xsdDouble ))
+        case _   ++None++None++ _       => Failure(err(r.position))
+        case sign++i   ++None++None     => Success(TypedLiteral(c(sign)+w(i),                      xsdInteger))
+        case sign++i   ++dec ++None     => Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_)),    xsdDecimal))
+        case sign++i   ++dec ++Some(exp)=> Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_))+exp,xsdDouble ))
         //todo: improve error message https://bitbucket.org/pchiusano/nomo/issue/7/errors
       }
     }
@@ -205,10 +205,16 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val BLANK_NODE_LABEL = P.word("_:")>>PN_LOCAL.map(BNode(_))
   lazy val BlankNode = BLANK_NODE_LABEL | ANON
 
-  lazy val blankNodePropertyList = P.single('[') >> SP >> (predicateObjectList << SP << P.single(']'))
+  lazy val blankNodePropertyList = P.single('[').mapResult  {  r =>
+     r.status.map(node=>{ r.user.pushObj(BNode()); r })
+  } >> SP >> (predicateObjectList << SP.optional << P.single(';').optional<< SP.optional << P.single(']').mapResult{ r =>
+    r.status.map(node=>{ r.user.pop; r })
+  })
 
   lazy val objBlank = blankNodePropertyList //| collection
-  lazy val obj = (IRIref | literal | BlankNode ).mapResult{ r =>  r.status.map{ node => { r.user.setObject(node); r } } }
+  lazy val obj = (IRIref | literal | BlankNode ).mapResult{r =>
+    r.status.map{ node => { r.user.setObject(node); r } }
+  } | objBlank
   lazy val predicate = IRIref
   lazy val verb =  ( predicate | P.single('a').as(rdfType) ).mapResult{ r =>
     r.status.map{ iri => { r.user.setVerb(iri); r } }
@@ -216,7 +222,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val objectList = obj.delimit1Ignore( SP.optional >> P.single(',')>> SP.optional )
 
-  lazy val predicateObjectList = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)
+  lazy val predicateObjectList: P.Parser[Unit] = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)
 
   lazy val subject = ( IRIref | BlankNode ).mapResult { r =>
     r.status.map{ node => { r.user.setSubject(node); r } }

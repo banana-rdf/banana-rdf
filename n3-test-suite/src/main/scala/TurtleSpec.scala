@@ -5,10 +5,6 @@
 
 package org.w3.rdf.n3
 
-/*
-* Copyright (c) 2012 Henry Story
-* under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
-*/
 
 import org.scalacheck._
 import Prop._
@@ -234,6 +230,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   val f_knows = IRI("http://xmlns.com/foaf/0.1/knows")
   val f_mbox = IRI("http://xmlns.com/foaf/0.1/mbox")
   val f_name = IRI("http://xmlns.com/foaf/0.1/name")
+  val f_pub = IRI("http://xmlns.com/foaf/0.1/publication")
   val hjs=IRI("http://bblfish.net/#hjs")
   val timbl = IRI("http://www.w3.org/People/Berners-Lee/card#i")
   val presbrey = IRI("http://presbrey.mit.edu/foaf#presbrey")
@@ -437,7 +434,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
       all(res.toSeq: _*)
   }
 
-  property("test blank node subject") = secure {
+  property("simple blank nodes") = secure {
     val t1 = Triple(BNode("_:n22"),f_name, "Alexandre" lang "fr" )
     val t2 = Triple(BNode(),f_name,"Henry")
     val t3 = Triple(BNode("_:n22"),f_knows,BNode("_:n22"))
@@ -448,7 +445,6 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     [] foaf:name "Henry" .
     _:n22 foaf:knows _:n22 .
     """
-    out.println(doc)
     val res = P.turtleDoc(doc)
     try {
     ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
@@ -461,6 +457,36 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     }
 
   }
+
+  property("stacked blank nodes") = secure {
+    val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode()
+    val t1 = Triple(bn1,f_name, "Alexandre" lang "fr" )
+    val t2 = Triple(bn1,f_knows,bn2)
+    val t3 = Triple(bn2,f_name,"Henry")
+    val t4 = Triple(bn1,f_pub,bn3)
+    val t5 = Triple(bn3,f_name,"Pimp My RDF")
+    val g = Graph(t1,t2,t3,t4,t5)
+    val doc = """
+    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    [] foaf:name "Alexandre"@fr ; #simple bnode subject
+       foaf:knows [ foaf:name "Henry";
+                  ];
+       foaf:publication [ foaf:name "Pimp My RDF" ] .
+    """
+    out.println(doc)
+    val res = P.turtleDoc(doc)
+    try {
+      ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+        res.isSuccess  &&
+          (( res.user.queue.size == 5) :| "the two graphs are not the same size" ) &&
+          ((Graph(res.user.queue.toIterable) isIsomorphicWith  g ) :| "the two graphs are not isomorphic")
+      )
+    } catch {
+      case e => e.printStackTrace(); throw e
+    }
+
+  }
+
 
 }
 
