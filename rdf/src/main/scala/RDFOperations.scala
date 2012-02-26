@@ -91,13 +91,16 @@ trait RDFOperations[Rdf <: RDF] {
   val xsdString = xsd("string")
   val xsdInt = xsd("int")
   val rdfLang = rdf("langString")
-  val rdfType = IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type ")
-  val xsdInteger = IRI("http://www.w3.org/2001/XMLSchema#integer")
-  val xsdDecimal = IRI("http://www.w3.org/2001/XMLSchema#decimal")
-  val xsdDouble = IRI("http://www.w3.org/2001/XMLSchema#double")
-  val xsdBoolean = IRI("http://www.w3.org/2001/XMLSchema#boolean")
-  val xsdTrue = TypedLiteral("true",xsdBoolean)
-  val xsdFalse = TypedLiteral("false",xsdBoolean)
+  val rdfType = rdf("type ")
+  val xsdInteger = xsd("integer")
+  val xsdDecimal = xsd("decimal")
+  val xsdDouble = xsd("double")
+  val xsdBoolean = xsd("boolean")
+  val xsdTrueLit = TypedLiteral("true",xsdBoolean)
+  val xsdFalseLit = TypedLiteral("false",xsdBoolean)
+  val rdfFirst = rdf("first")
+  val rdfRest = rdf("rest")
+  val rdfNil = rdf("nil")
 
   // pimps
   
@@ -140,7 +143,7 @@ trait RDFOperations[Rdf <: RDF] {
   class LiteralBuilder(lexicalForm: String) {
     def ^^(datatype: IRI): TypedLiteral = TypedLiteral(lexicalForm, datatype)
     def lang(tag: String): LangLiteral = LangLiteral(lexicalForm, Lang(tag))
-    def typedLiteral: TypedLiteral = TypedLiteral(lexicalForm, xsdString)
+    def § = TypedLiteral(lexicalForm, xsdString)
   }
   
   implicit def wrapStringInLiteralBuilder(lexicalForm: String): LiteralBuilder = new LiteralBuilder(lexicalForm)

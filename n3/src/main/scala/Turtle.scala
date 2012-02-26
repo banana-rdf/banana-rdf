@@ -13,10 +13,7 @@ import nomo.Errors.TreeError
 /**
  * Turtle Parser as specified at http://www.w3.org/TR/turtle/
  *
- *
- * @param m
- * @param P
- * @tparam M
+ * @param  P
  * @tparam F
  * @tparam E
  * @tparam X
@@ -197,7 +194,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       }
     }
 
-  val BooleanLiteral = P.word("true").as(xsdTrue) | P.word("false").as(xsdFalse)
+  val BooleanLiteral = P.word("true").as(xsdTrueLit) | P.word("false").as(xsdFalseLit)
 
   lazy val literal = RDFLiteral  | NumericLiteral | BooleanLiteral
 
@@ -206,13 +203,19 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val BlankNode = BLANK_NODE_LABEL | ANON
 
   lazy val blankNodePropertyList = P.single('[').mapResult  {  r =>
-     r.status.map(node=>{ r.user.pushObj(BNode()); r })
-  } >> SP >> (predicateObjectList << SP.optional << P.single(';').optional<< SP.optional << P.single(']').mapResult{ r =>
+     r.status.map(node=>{ r.user.pushSubject(BNode());  r })
+  } >> SP.optional >> (predicateObjectList << SP.optional << P.single(';').optional << SP.optional >> P.single(']')).mapResult{ r =>
     r.status.map(node=>{ r.user.pop; r })
-  })
+  }
 
-  lazy val objBlank = blankNodePropertyList //| collection
-  lazy val obj = (IRIref | literal | BlankNode ).mapResult{r =>
+  lazy val collection = P.single('(').mapResult  {  r =>
+    r.status.map(node=>{ r.user.pushList; r })
+  } >> SP.optional >> (obj.delimit1Ignore(SP).optional << SP.optional << P.single(')')).mapResult{ r =>
+    r.status.map(node=>{ r.user.pop; r })
+  }
+
+  lazy val objBlank =  blankNodePropertyList | collection
+  lazy val obj: P.Parser[Any] = (IRIref | literal | BlankNode ).mapResult{r =>
     r.status.map{ node => { r.user.setObject(node); r } }
   } | objBlank
   lazy val predicate = IRIref
@@ -225,14 +228,16 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val predicateObjectList: P.Parser[Unit] = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)
 
   lazy val subject = ( IRIref | BlankNode ).mapResult { r =>
-    r.status.map{ node => { r.user.setSubject(node); r } }
-  }
+    r.status.map{ node => { r.user.pushSubject(node); r } }
+  } | objBlank
 
   lazy val triples =  subject ++ (SP.optional>>predicateObjectList)
 
   lazy val directive = prefixID | base
 
-  lazy val statement = ( directive << SP.optional << dot ) | ( triples << SP.optional << dot )
+  lazy val statement = ( directive << SP.optional << dot ) | ( triples << SP.optional << dot ).mapResult { r=>
+    r.status.map(n=>{r.user.pop; r})
+  }
   lazy val turtleDoc = (SP.optional>>statement<<SP.optional).manyIgnore
 
 }

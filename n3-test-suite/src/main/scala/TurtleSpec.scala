@@ -227,10 +227,12 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
       res.user.queue.head == t
     )
   }
-  val f_knows = IRI("http://xmlns.com/foaf/0.1/knows")
-  val f_mbox = IRI("http://xmlns.com/foaf/0.1/mbox")
-  val f_name = IRI("http://xmlns.com/foaf/0.1/name")
-  val f_pub = IRI("http://xmlns.com/foaf/0.1/publication")
+  val foaf = prefixBuilder("http://xmlns.com/foaf/0.1/") _
+  val f_knows = foaf("knows")
+  val f_mbox = foaf("mbox")
+  val f_name = foaf("name")
+  val f_pub = foaf("publication")
+  val f_wants = foaf("wants")
   val hjs=IRI("http://bblfish.net/#hjs")
   val timbl = IRI("http://www.w3.org/People/Berners-Lee/card#i")
   val presbrey = IRI("http://presbrey.mit.edu/foaf#presbrey")
@@ -457,31 +459,27 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     }
 
   }
-
-  property("stacked blank nodes") = secure {
-    val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode(); val bn4 = BNode()
-    val t1 = Triple(bn1,f_name, "Alexandre" lang "fr" )
-    val t2 = Triple(bn1,f_knows,bn2)
-    val t3 = Triple(bn2,f_name,"Henry")
-    val t3_1 = Triple(bn2,f_knows,bn4)
-    val t3_2 = Triple(bn4,f_name,"Tim")
-    val t4 = Triple(bn1,f_pub,bn3)
-    val t5 = Triple(bn3,f_name,"Pimp My RDF")
-    val g = Graph(t1,t2,t3,t3_1,t3_2,t4,t5)
+  property("enclosing blank nodes ") = secure {
+    val bn = BNode();
+    val triples = List[Triple](
+      (bn,f_name, "Joe"§),
+      (bn,f_knows,hjs),
+      (bn,foaf("likes"),rdfNil)
+    )
+    val g = Graph(triples)
     val doc = """
     @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-    [] foaf:name "Alexandre"@fr ; #simple bnode subject
-       foaf:knows [ foaf:name "Henry";
-                    foaf:knows [ foaf:name "Tim" ];
-                  ];
-       foaf:publication [ foaf:name "Pimp My RDF" ] .
+    [ foaf:name "Joe";
+      foaf:knows <http://bblfish.net/#hjs>;
+      foaf:likes () ] .
     """
     out.println(doc)
     val res = P.turtleDoc(doc)
     try {
       ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
         res.isSuccess  &&
-          (( res.user.queue.size == 7) :| "the two graphs are not the same size" ) &&
+          (( res.user.queue.size == triples.size) :| "the two graphs are not the same size. Parsed "+
+            res.user.queue.size +" was expecting "+triples.size ) &&
           ((Graph(res.user.queue.toIterable) isIsomorphicWith  g ) :| "the two graphs are not isomorphic")
       )
     } catch {
@@ -489,6 +487,98 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     }
 
   }
+
+  property("lists") = secure {
+    val shop = prefixBuilder("http://shop.example/product/") _
+    val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
+    val triples = List[Triple](
+      (lst,rdfFirst, shop("paper")),
+      (lst,rdfRest, lst2),
+      (lst2,rdfFirst, shop("cat")),
+      (lst2,rdfRest, lst3),
+      (lst3,rdfFirst, bookNode),
+      (lst3,rdfRest, rdfNil),
+      (bookNode,f_name,"Zen"§),
+      (bookNode,foaf("author") ,rdfNil)
+    )
+    val g = Graph(triples)
+    val doc = """
+    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    @prefix shop: <http://shop.example/product/> .
+    ( shop:paper shop:cat [ foaf:name "Zen";
+                            foaf:author (
+             #the sound of a man typing
+              ) ] ) .
+
+
+    """
+    out.println(doc)
+    val res = P.turtleDoc(doc)
+    try {
+      ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+        res.isSuccess  &&
+          (( res.user.queue.size == triples.size) :| "the two graphs are not the same size. Parsed "+
+            res.user.queue.size +" was expecting "+triples.size ) &&
+          ((Graph(res.user.queue.toIterable) isIsomorphicWith  g ) :| "the two graphs are not isomorphic")
+      )
+    } catch {
+      case e => e.printStackTrace(); throw e
+    }
+  }
+
+
+  property("stacked blank nodes and lists") = secure {
+    val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode(); val bn4 = BNode()
+    val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
+    val shop = prefixBuilder("http://shop.example/product/") _
+    val triples = List[Triple](
+      (bn1,f_name, "Alexandre" lang "fr" ) ,
+      (bn1,f_knows,bn2),
+      (bn2,f_name,"Henry"§),
+      (bn2,f_knows,bn4),
+      (bn4,f_name,"Tim"§),
+      (bn1,f_pub,bn3),
+      (bn3,f_name,"Pimp My RDF"§),
+      (bn1,f_wants,lst),
+      (lst,rdfFirst, shop("paper")),
+      (lst,rdfRest, lst2),
+      (lst2,rdfFirst, shop("cat")),
+      (lst2,rdfRest, lst3),
+      (lst3,rdfFirst, bookNode),
+      (lst3,rdfRest, rdfNil),
+      (bookNode,f_name,"Zen"§),
+      (bookNode,foaf("author") ,rdfNil)
+    )
+    val g = Graph(triples)
+    val doc = """
+    @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    @prefix shop: <http://shop.example/product/> .
+    [] foaf:name "Alexandre"@fr ; #simple bnode subject
+       foaf:knows [ foaf:name "Henry";
+                    foaf:knows [ foaf:name "Tim" ];
+                  ];
+       foaf:publication [ foaf:name "Pimp My RDF" ] ;
+       foaf:wants ( shop:paper shop:cat [ foaf:name "Zen";
+                                          foaf:author (
+             #the sound of a man typing
+                                          ) ] ) .
+       
+    """
+    out.println(doc)
+    val res = P.turtleDoc(doc)
+    try {
+      ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+        res.isSuccess  &&
+          (( res.user.queue.size == triples.size) :| "the two graphs are not the same size. Parsed "+
+            res.user.queue.size +" was expecting "+triples.size ) &&
+          ((Graph(res.user.queue.toIterable) isIsomorphicWith  g ) :| "the two graphs are not isomorphic")
+      )
+    } catch {
+      case e => e.printStackTrace(); throw e
+    }
+
+  }
+
 
 
 }

@@ -110,7 +110,7 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val nTriples = (line.mapResult{
     r =>
       r.get match {
-        case Some(t) => r.user.send(t);
+        case Some(t) => r.user.sendTriple(t);
         case None => ()
       }
       r.status
