@@ -1,0 +1,2291 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML+RDFa 1.0//EN' 'http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd'>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" about="" property="dcterms:language" content="en" xmlns:dcterms='http://purl.org/dc/terms/' xmlns:bibo='http://purl.org/ontology/bibo/' xmlns:foaf='http://xmlns.com/foaf/0.1/' xmlns:xsd='http://www.w3.org/2001/XMLSchema#'>
+<head>
+    <title>Turtle</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    
+    
+    
+    
+    <style type="text/css">
+    /* Style Turtle script blocks to be visable */
+    pre.example script {
+        display:block;
+    }
+    </style> 
+    
+    <style type="text/css">
+/*****************************************************************
+ * ReSpec CSS
+ * Robin Berjon (robin at berjon dot com)
+ * v0.05 - 2009-07-31
+ *****************************************************************/
+
+
+/* --- INLINES --- */
+em.rfc2119 { 
+    text-transform:     lowercase;
+    font-variant:       small-caps;
+    font-style:         normal;
+    color:              #900;
+}
+
+h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+    border: none;
+}
+
+dfn {
+    font-weight:    bold;
+}
+
+a.internalDFN {
+    color:  inherit;
+    border-bottom:  1px solid #99c;
+    text-decoration:    none;
+}
+
+a.externalDFN {
+    color:  inherit;
+    border-bottom:  1px dotted #ccc;
+    text-decoration:    none;
+}
+
+a.bibref {
+    text-decoration:    none;
+}
+
+code {
+    color:  #ff4500;
+}
+
+
+/* --- WEB IDL --- */
+pre.idl {
+    border-top: 1px solid #90b8de;
+    border-bottom: 1px solid #90b8de;
+    padding:    1em;
+    line-height:    120%;
+}
+
+pre.idl::before {
+    content:    "WebIDL";
+    display:    block;
+    width:      150px;
+    background: #90b8de;
+    color:  #fff;
+    font-family:    initial;
+    padding:    3px;
+    font-weight:    bold;
+    margin: -1em 0 1em -1em;
+}
+
+.idlType {
+    color:  #ff4500;
+    font-weight:    bold;
+    text-decoration:    none;
+}
+
+/*.idlModule*/
+/*.idlModuleID*/
+/*.idlInterface*/
+.idlInterfaceID {
+    font-weight:    bold;
+    color:  #005a9c;
+}
+
+.idlSuperclass {
+    font-style: italic;
+    color:  #005a9c;
+}
+
+/*.idlAttribute*/
+.idlAttrType, .idlFieldType {
+    color:  #005a9c;
+}
+.idlAttrName, .idlFieldName {
+    color:  #ff4500;
+}
+.idlAttrName a, .idlFieldName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlMethod*/
+.idlMethType {
+    color:  #005a9c;
+}
+.idlMethName {
+    color:  #ff4500;
+}
+.idlMethName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlParam*/
+.idlParamType {
+    color:  #005a9c;
+}
+.idlParamName {
+    font-style: italic;
+}
+
+.extAttr {
+    color:  #666;
+}
+
+/*.idlConst*/
+.idlConstType {
+    color:  #005a9c;
+}
+.idlConstName {
+    color:  #ff4500;
+}
+.idlConstName a {
+    color:  #ff4500;
+    border-bottom:  1px dotted #ff4500;
+    text-decoration: none;
+}
+
+/*.idlException*/
+.idlExceptionID {
+    font-weight:    bold;
+    color:  #c00;
+}
+
+.idlTypedefID, .idlTypedefType {
+    color:  #005a9c;
+}
+
+.idlRaises, .idlRaises a.idlType, .idlRaises a.idlType code, .excName a, .excName a code {
+    color:  #c00;
+    font-weight:    normal;
+}
+
+.excName a {
+    font-family:    monospace;
+}
+
+.idlRaises a.idlType, .excName a.idlType {
+    border-bottom:  1px dotted #c00;
+}
+
+.excGetSetTrue, .excGetSetFalse, .prmNullTrue, .prmNullFalse, .prmOptTrue, .prmOptFalse {
+    width:  45px;
+    text-align: center;
+}
+.excGetSetTrue, .prmNullTrue, .prmOptTrue { color:  #0c0; }
+.excGetSetFalse, .prmNullFalse, .prmOptFalse { color:  #c00; }
+
+.idlImplements a {
+    font-weight:    bold;
+}
+
+dl.attributes, dl.methods, dl.constants, dl.fields {
+    margin-left:    2em;
+}
+
+.attributes dt, .methods dt, .constants dt, .fields dt {
+    font-weight:    normal;
+}
+
+.attributes dt code, .methods dt code, .constants dt code, .fields dt code {
+    font-weight:    bold;
+    color:  #000;
+    font-family:    monospace;
+}
+
+.attributes dt code, .fields dt code {
+    background:  #ffffd2;
+}
+
+.attributes dt .idlAttrType code, .fields dt .idlFieldType code {
+    color:  #005a9c;
+    background:  transparent;
+    font-family:    inherit;
+    font-weight:    normal;
+    font-style: italic;
+}
+
+.methods dt code {
+    background:  #d9e6f8;
+}
+
+.constants dt code {
+    background:  #ddffd2;
+}
+
+.attributes dd, .methods dd, .constants dd, .fields dd {
+    margin-bottom:  1em;
+}
+
+table.parameters, table.exceptions {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    margin: 0.5em 0;
+    width:  100%;
+}
+table.parameters { border-bottom:  1px solid #90b8de; }
+table.exceptions { border-bottom:  1px solid #deb890; }
+
+.parameters th, .exceptions th {
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+    font-family:    initial;
+    font-weight:    normal;
+    text-shadow:    #666 1px 1px 0;
+}
+.parameters th { background: #90b8de; }
+.exceptions th { background: #deb890; }
+
+.parameters td, .exceptions td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.parameters tr:first-child td, .exceptions tr:first-child td {
+    border-top: none;
+}
+
+.parameters td.prmName, .exceptions td.excName, .exceptions td.excCodeName {
+    width:  100px;
+}
+
+.parameters td.prmType {
+    width:  120px;
+}
+
+table.exceptions table {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    width:  100%;
+}
+
+/* --- TOC --- */
+.toc a {
+    text-decoration:    none;
+}
+
+a .secno {
+    color:  #000;
+}
+
+/* --- TABLE --- */
+table.simple {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    border-bottom:  3px solid #005a9c;
+}
+
+.simple th {
+    background: #005a9c;
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+}
+
+.simple th[scope="row"] {
+    background: inherit;
+    color:  inherit;
+    border-top: 1px solid #ddd;
+}
+
+.simple td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+}
+
+.simple tr:nth-child(even) {
+    background: #f0f6ff;
+}
+
+/* --- DL --- */
+.section dd > p:first-child {
+    margin-top: 0;
+}
+
+.section dd > p:last-child {
+    margin-bottom: 0;
+}
+
+.section dd {
+    margin-bottom:  1em;
+}
+
+.section dl.attrs dd, .section dl.eldef dd {
+    margin-bottom:  0;
+}
+
+/* --- EXAMPLES --- */
+pre.example {
+    border-top: 1px solid #ff4500;
+    border-bottom: 1px solid #ff4500;
+    padding:    1em;
+    margin-top: 1em;
+}
+
+pre.example::before {
+    content:    "Example";
+    display:    block;
+    width:      150px;
+    background: #ff4500;
+    color:  #fff;
+    font-family:    initial;
+    padding:    3px;
+    font-weight:    bold;
+    margin: -1em 0 1em -1em;
+}
+
+/* --- EDITORIAL NOTES --- */
+.issue {
+    padding:    1em;
+    margin: 1em 0em 0em;
+    border: 1px solid #f00;
+    background: #ffc;
+}
+
+.issue::before {
+    content:    "Issue";
+    display:    block;
+    width:  150px;
+    margin: -1.5em 0 0.5em 0;
+    font-weight:    bold;
+    border: 1px solid #f00;
+    background: #fff;
+    padding:    3px 1em;
+}
+
+.note {
+    margin: 1em 0em 0em;
+    padding:    1em;
+    border: 2px solid #cff6d9;
+    background: #e2fff0;
+}
+
+.note::before {
+    content:    "Note";
+    display:    block;
+    width:  150px;
+    margin: -1.5em 0 0.5em 0;
+    font-weight:    bold;
+    border: 1px solid #cff6d9;
+    background: #fff;
+    padding:    3px 1em;
+}
+
+/* --- Best Practices --- */
+div.practice {
+    border: solid #bebebe 1px;
+    margin: 2em 1em 1em 2em;
+}
+
+span.practicelab {
+    margin: 1.5em 0.5em 1em 1em;
+    font-weight: bold;
+    font-style: italic;
+}
+
+span.practicelab   { background: #dfffff; }
+
+span.practicelab {
+    position: relative;
+    padding: 0 0.5em;
+    top: -1.5em;
+}
+
+p.practicedesc {
+    margin: 1.5em 0.5em 1em 1em;
+}
+
+@media screen {
+    p.practicedesc {
+        position: relative;
+        top: -2em;
+        padding: 0;
+        margin: 1.5em 0.5em -1em 1em;
+}
+
+/* --- SYNTAX HIGHLIGHTING --- */
+pre.sh_sourceCode {
+  background-color: white;
+  color: black;
+  font-style: normal;
+  font-weight: normal;
+}
+
+pre.sh_sourceCode .sh_keyword { color: #005a9c; font-weight: bold; }           /* language keywords */
+pre.sh_sourceCode .sh_type { color: #666; }                            /* basic types */
+pre.sh_sourceCode .sh_usertype { color: teal; }                             /* user defined types */
+pre.sh_sourceCode .sh_string { color: red; font-family: monospace; }        /* strings and chars */
+pre.sh_sourceCode .sh_regexp { color: orange; font-family: monospace; }     /* regular expressions */
+pre.sh_sourceCode .sh_specialchar { color:  #ffc0cb; font-family: monospace; }  /* e.g., \n, \t, \\ */
+pre.sh_sourceCode .sh_comment { color: #A52A2A; font-style: italic; }         /* comments */
+pre.sh_sourceCode .sh_number { color: purple; }                             /* literal numbers */
+pre.sh_sourceCode .sh_preproc { color: #00008B; font-weight: bold; }       /* e.g., #include, import */
+pre.sh_sourceCode .sh_symbol { color: blue; }                            /* e.g., *, + */
+pre.sh_sourceCode .sh_function { color: black; font-weight: bold; }         /* function calls and declarations */
+pre.sh_sourceCode .sh_cbracket { color: red; }                              /* block brackets (e.g., {, }) */
+pre.sh_sourceCode .sh_todo { font-weight: bold; background-color: #00FFFF; }   /* TODO and FIXME */
+
+/* Predefined variables and functions (for instance glsl) */
+pre.sh_sourceCode .sh_predef_var { color: #00008B; }
+pre.sh_sourceCode .sh_predef_func { color: #00008B; font-weight: bold; }
+
+/* for OOP */
+pre.sh_sourceCode .sh_classname { color: teal; }
+
+/* line numbers (not yet implemented) */
+pre.sh_sourceCode .sh_linenum { display: none; }
+
+/* Internet related */
+pre.sh_sourceCode .sh_url { color: blue; text-decoration: underline; font-family: monospace; }
+
+/* for ChangeLog and Log files */
+pre.sh_sourceCode .sh_date { color: blue; font-weight: bold; }
+pre.sh_sourceCode .sh_time, pre.sh_sourceCode .sh_file { color: #00008B; font-weight: bold; }
+pre.sh_sourceCode .sh_ip, pre.sh_sourceCode .sh_name { color: #006400; }
+
+/* for Prolog, Perl... */
+pre.sh_sourceCode .sh_variable { color: #006400; }
+
+/* for LaTeX */
+pre.sh_sourceCode .sh_italics { color: #006400; font-style: italic; }
+pre.sh_sourceCode .sh_bold { color: #006400; font-weight: bold; }
+pre.sh_sourceCode .sh_underline { color: #006400; text-decoration: underline; }
+pre.sh_sourceCode .sh_fixed { color: green; font-family: monospace; }
+pre.sh_sourceCode .sh_argument { color: #006400; }
+pre.sh_sourceCode .sh_optionalargument { color: purple; }
+pre.sh_sourceCode .sh_math { color: orange; }
+pre.sh_sourceCode .sh_bibtex { color: blue; }
+
+/* for diffs */
+pre.sh_sourceCode .sh_oldfile { color: orange; }
+pre.sh_sourceCode .sh_newfile { color: #006400; }
+pre.sh_sourceCode .sh_difflines { color: blue; }
+
+/* for css */
+pre.sh_sourceCode .sh_selector { color: purple; }
+pre.sh_sourceCode .sh_property { color: blue; }
+pre.sh_sourceCode .sh_value { color: #006400; font-style: italic; }
+
+/* other */
+pre.sh_sourceCode .sh_section { color: black; font-weight: bold; }
+pre.sh_sourceCode .sh_paren { color: red; }
+pre.sh_sourceCode .sh_attribute { color: #006400; }
+
+</style><link href="http://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet" type="text/css" charset="utf-8" /></head>
+
+    <body style="display: inherit;"><div class="head"><p><a href="http://www.w3.org/"><img width="72" height="48" alt="W3C" src="http://www.w3.org/Icons/w3c_home" /></a></p><h1 id="title" class="title" property="dcterms:title">Turtle</h1><h2 id="subtitle" property="bibo:subtitle">Terse RDF Triple Language</h2><h2 content="2011-08-09T07:00:00+0000" datatype="xsd:dateTime" property="dcterms:issued" id="w3c-working-draft-09-august-2011">W3C Working Draft 09 August 2011</h2><dl><dt>This version:</dt><dd><a href="http://www.w3.org/TR/2011/WD-turtle-20110809/">http://www.w3.org/TR/2011/WD-turtle-20110809/</a></dd><dt>Latest published version:</dt><dd><a href="http://www.w3.org/TR/turtle/">http://www.w3.org/TR/turtle/</a></dd><dt>Latest editor's draft:</dt><dd><a href="http://dvcs.w3.org/hg/rdf/raw-file/default/rdf-turtle/index.html">http://dvcs.w3.org/hg/rdf/raw-file/default/rdf-turtle/index.html</a></dd><dt>Editors:</dt><dd rel="bibo:editor"><span typeof="foaf:Person"><a href="http://www.w3.org/People/Eric/" content="Eric Prud'hommeaux" property="foaf:name" rel="foaf:homepage">Eric Prud'hommeaux</a>, <a href="http://www.w3.org/" rel="foaf:workplaceHomepage">W3C</a></span>
+</dd>
+<dd rel="bibo:editor"><span typeof="foaf:Person"><a href="http://gavin.carothers.name/" content="Gavin Carothers" property="foaf:name" rel="foaf:homepage">Gavin Carothers</a>, <a href="http://topquadrant.com/" rel="foaf:workplaceHomepage">TopQuadrant, Inc</a></span>
+</dd>
+<dt>Authors:</dt><dd rel="dcterms:contributor"><span typeof="foaf:Person"><a href="http://purl.org/net/dajobe/" content="David Beckett" property="foaf:name" rel="foaf:homepage">David Beckett</a></span>
+</dd>
+<dd rel="dcterms:contributor"><span typeof="foaf:Person"><a href="http://www.w3.org/People/Berners-Lee/" content="Tim Berners-Lee" property="foaf:name" rel="foaf:homepage">Tim Berners-Lee</a>, <a href="http://www.w3.org/" rel="foaf:workplaceHomepage">W3C</a></span>
+</dd>
+<dd rel="dcterms:contributor"><span typeof="foaf:Person"><a href="http://www.w3.org/People/Eric/" content="Eric Prud'hommeaux" property="foaf:name" rel="foaf:homepage">Eric Prud'hommeaux</a>, <a href="http://www.w3.org/" rel="foaf:workplaceHomepage">W3C</a></span>
+</dd>
+</dl><p class="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright" rel="license">Copyright</a> © 2008-2011 <span rel="dcterms:publisher"><span typeof="foaf:Organization"><a href="http://www.w3.org/" content="World Wide Web Consotrium" property="foaf:name" rel="foaf:homepage"><acronym title="World Wide Web Consortium">W3C</acronym></a><sup>®</sup></span></span> (<a href="http://www.csail.mit.edu/"><acronym title="Massachusetts Institute of Technology">MIT</acronym></a>, <a href="http://www.ercim.eu/"><acronym title="European Research Consortium for Informatics and Mathematics">ERCIM</acronym></a>, <a href="http://www.keio.ac.jp/">Keio</a>), All Rights Reserved. W3C <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a> rules apply.</p><hr /></div>
+    <div id="abstract" class="introductory section" property="dcterms:abstract" datatype="" typeof="bibo:Chapter" about="#abstract"><h2>Abstract</h2>
+            <p>The Resource Description Framework
+            (<abbr title="Resource Description Framework">RDF</abbr>) is a 
+            general-purpose language for representing information in the Web.</p>
+
+            <p>This document defines a textual syntax for RDF called Turtle
+            that allows an RDF graph to be completely written in a compact and
+            natural text form, with abbreviations for common usage patterns and
+            datatypes.  Turtle provides levels of compatibility with the existing
+            <a href="http://www.w3.org/TR/rdf-testcases/#ntriples">N-Triples</a>
+            
+<!--  and
+            <a href="http://www.w3.org/DesignIssues/Notation3">Notation 3</a>  -->
+
+            format as well as the triple pattern syntax of the
+            <a href="http://www.w3.org/TR/sparql11-query/">SPARQL</a>
+            W3C Recommendation.
+            </p>
+    </div><div class="introductory section" id="sotd" typeof="bibo:Chapter" about="#sotd"><h2>Status of This Document</h2><p><em>This section describes the status of this document at the time of its publication. Other documents may supersede this document. A list of current W3C publications and the latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/">W3C technical reports index</a> at http://www.w3.org/TR/.</em></p>
+      <p>
+            Turtle is already a reasonably settled serialization of RDF.  Many 
+            implementations of Turtle already exist, we are hoping for feedback from those
+            existing implementers and other people deciding that now would be a good time
+            to support Turtle. There are still a few rough edges that need polishing, and 
+            better alignment with the SPARQL triple patterns. The working group does not 
+            expect to make any large changes to the existing syntax.
+      </p>
+    <p>This document was published by the <a href="http://www.w3.org/2011/rdf-wg/">RDF Working Group</a> as a First Public Working Draft. This document is intended to become a W3C Recommendation. If you wish to make comments regarding this document, please send them to <a href="mailto:public-rdf-comments@w3.org">public-rdf-comments@w3.org</a> (<a href="mailto:public-rdf-comments-request@w3.org?subject=subscribe">subscribe</a>, <a href="http://lists.w3.org/Archives/Public/public-rdf-comments/">archives</a>). All feedback is welcome.</p><p>Publication as a Working Draft does not imply endorsement by the W3C Membership. This is a draft document and may be updated, replaced or obsoleted by other documents at any time. It is inappropriate to cite this document as other than work in progress.</p><p>This document was produced by a group operating under the <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 W3C Patent Policy</a>. W3C maintains a <a rel="disclosure" href="http://www.w3.org/2004/01/pp-impl/46168/status">public list of any patent disclosures</a> made in connection with the deliverables of the group; that page also includes instructions for disclosing a patent. An individual who has actual knowledge of a patent which the individual believes contains <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential Claim(s)</a> must disclose the information in accordance with <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section 6 of the W3C Patent Policy</a>.</p></div><div id="toc" typeof="bibo:Chapter" about="#toc" class="section"><h2 class="introductory">Table of Contents</h2><ul class="toc"><li class="tocline"><a href="#sec-intro" class="tocxref"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a href="#an-introduction-to-turtle--informative" class="tocxref"><span class="secno">2. </span>An Introduction to Turtle (Informative)</a><ul class="toc"><li class="tocline"><a href="#terms" class="tocxref"><span class="secno">2.1 </span>RDF Terms</a></li><li class="tocline"><a href="#iris" class="tocxref"><span class="secno">2.2 </span>Abbreviating IRIs</a></li><li class="tocline"><a href="#abbrev" class="tocxref"><span class="secno">2.3 </span>Abbreviating common datatypes</a></li><li class="tocline"><a href="#groups" class="tocxref"><span class="secno">2.4 </span>Abbreviating groups of triples</a></li><li class="tocline"><a href="#collections" class="tocxref"><span class="secno">2.5 </span>Abbreviating RDF Collections</a></li></ul></li><li class="tocline"><a href="#sec-syntax" class="tocxref"><span class="secno">3. </span>Syntax for IRIs, Literals and Blank Nodes</a></li><li class="tocline"><a href="#sec-grammar" class="tocxref"><span class="secno">4. </span>Turtle Grammar</a><ul class="toc"><li class="tocline"><a href="#sec-grammar-ws" class="tocxref"><span class="secno">4.1 </span>White Space</a></li><li class="tocline"><a href="#sec-grammar-comments" class="tocxref"><span class="secno">4.2 </span>Comments</a></li><li class="tocline"><a href="#sec-strings" class="tocxref"><span class="secno">4.3 </span>String Escapes</a></li><li class="tocline"><a href="#sec-grammar-grammar" class="tocxref"><span class="secno">4.4 </span>Grammar</a></li></ul></li><li class="tocline"><a href="#sec-parsing" class="tocxref"><span class="secno">5. </span>Parsing</a><ul class="toc"><li class="tocline"><a href="#sec-parsing-state" class="tocxref"><span class="secno">5.1 </span>Parser State</a></li><li class="tocline"><a href="#sec-parsing-terms" class="tocxref"><span class="secno">5.2 </span>RDF Term Constructors</a></li><li class="tocline"><a href="#sec-parsing-triples" class="tocxref"><span class="secno">5.3 </span>RDF Triples Constructors</a></li><li class="tocline"><a href="#sec-parsing-example" class="tocxref"><span class="secno">5.4 </span>Parsing Example (Informative)</a></li></ul></li><li class="tocline"><a href="#sec-examples" class="tocxref"><span class="secno">6. </span>Examples (Informative)</a></li><li class="tocline"><a href="#sec-identifiers" class="tocxref"><span class="secno">7. </span>Identifiers for the Turtle Language</a></li><li class="tocline"><a href="#sec-conformance" class="tocxref"><span class="secno">8. </span>Conformance</a></li><li class="tocline"><a href="#sec-mime" class="tocxref"><span class="secno">9. </span>Media Type and Content Encoding</a></li><li class="tocline"><a href="#sec-compared" class="tocxref"><span class="secno">10. </span>Turtle compared</a><ul class="toc"><li class="tocline"><a href="#sec-diff-ntriples" class="tocxref"><span class="secno">10.1 </span>Turtle compared to N-Triples (Informative)</a></li><li class="tocline"><a href="#sec-diff-n3" class="tocxref"><span class="secno">10.2 </span>Turtle compared to Notation 3 (Informative)</a></li><li class="tocline"><a href="#sec-diff-rdfxml" class="tocxref"><span class="secno">10.3 </span>Turtle compared to RDF/XML (Informative)</a></li><li class="tocline"><a href="#sec-diff-sparql" class="tocxref"><span class="secno">10.4 </span>Turtle compared to SPARQL (Informative)</a></li></ul></li><li class="tocline"><a href="#sec-mediaReg" class="tocxref"><span class="secno">A. </span>Internet Media Type, File Extension and Macintosh File Type (Normative)</a></li><li class="tocline"><a href="#sec-acks" class="tocxref"><span class="secno">B. </span>Acknowledgements (Informative)</a></li><li class="tocline"><a href="#sec-changelog" class="tocxref"><span class="secno">C. </span>Changes (Informative)</a></li><li class="tocline"><a href="#references" class="tocxref"><span class="secno">D. </span>References</a><ul class="toc"><li class="tocline"><a href="#normative-references" class="tocxref"><span class="secno">D.1 </span>Normative references</a></li><li class="tocline"><a href="#informative-references" class="tocxref"><span class="secno">D.2 </span>Informative references</a></li></ul></li></ul></div>
+
+    
+    
+    <div id="sec-intro" typeof="bibo:Chapter" about="#sec-intro" class="section">
+            
+<!-- OddPage -->
+<h2><span class="secno">1. </span>Introduction</h2>
+            <p>This document defines Turtle, the Terse RDF Triple Language,
+            a concrete syntax for RDF as defined in the
+            <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html">RDF Concepts and Abstract Syntax</a> ([<cite><a class="bibref" rel="biblioentry" href="#bib-RDF-CONCEPTS">RDF-CONCEPTS</a></cite>]) W3C Recommendation.
+            Turtle is an extension of 
+            <a href="http://www.w3.org/TR/rdf-testcases/#ntriples">N-Triples</a>
+
+            ([<cite><a class="bibref" rel="biblioentry" href="#bib-N-TRIPLES">N-TRIPLES</a></cite>])
+            carefully taking the most useful and appropriate things added from
+            <a href="http://www.w3.org/DesignIssues/Notation3">Notation 3</a>
+            ([<cite><a class="bibref" rel="biblioentry" href="#bib-N3">N3</a></cite>])
+            while staying within the RDF model.</p>
+            <p class="issue"><a href="http://www.w3.org/2011/rdf-wg/track/issues/4">ISSUE-4</a>: A future version of this document is expected to define N-Triples.</p>
+            <p>The Turtle grammar for <a href="#prod-turtle2-triples"><code>triples</code></a> is a subset of the 
+            <a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/">SPARQL Query Language for RDF</a>
+            [<cite><a class="bibref" rel="biblioentry" href="#bib-RDF-SPARQL-QUERY">RDF-SPARQL-QUERY</a></cite>] grammar for <a href="http://www.w3.org/TR/sparql11-query/#rTriplesBlock"><code>TriplesBlock</code></a>. The two grammars share production and terminal names where possible.</p>
+    </div>
+    <div id="an-introduction-to-turtle--informative" typeof="bibo:Chapter" about="#an-introduction-to-turtle--informative" class="section">
+
+            
+<!-- OddPage -->
+<h2><span class="secno">2. </span>An Introduction to Turtle (Informative)</h2>
+            <p>This section is informative.  The
+            <a href="#sec-syntax">Turtle Syntax</a> and <a href="#sec-grammar">Turtle Grammar</a> sections formally define the language.
+            </p>
+
+            <p>A Turtle document allows writing down an RDF graph in a compact
+            textual form.  It consists of a sequence of directives, triple-generating
+            statements or blank lines.  Comments may be given after a <code>#</code> that is not part of another lexical token
+            and continue to the end of the line.</p>
+
+            <p>Simple triples are a sequence of (subject, predicate, object)
+            terms, separated by whitespace and terminated by '.' after each
+            triple.  This corresponds to
+            <a href="http://www.w3.org/TR/rdf-testcases/#ntriples">N-Triples</a>
+            [<cite><a class="bibref" rel="biblioentry" href="#bib-N-TRIPLES">N-TRIPLES</a></cite>].
+            </p>
+            <p class="issue"><a href="http://www.w3.org/2011/rdf-wg/track/issues/4">ISSUE-4</a>: A future version of this document is expected to define N-Triples.</p>
+
+            <p>There are three types of <em>RDF Term</em>:
+            <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-iri">Internationalized Resource Identifiers</a> (IRIs for short),
+            <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">literals</a> and
+            <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">blank nodes</a>.</p>
+
+            <div id="terms" typeof="bibo:Chapter" about="#terms" class="section">
+                <h3><span class="secno">2.1 </span>RDF Terms</h3>
+
+                <p>IRIs are written enclosed in '&lt;' and '&gt;' and may be
+                absolute RDF URI References or relative to the current base IRI
+                (described below).
+                </p>
+
+                <pre class="example">
+<span># this is not a complete turtle document
+&lt;http://example.org/path/&gt;
+
+&lt;http://example.org/path/#fragment&gt;
+&lt;/path&gt;
+&lt;#fragment&gt;
+&lt;&gt;</span></pre>
+
+                <p>IRIs may also be abbreviated by using Turtle's <code>@prefix</code>
+                directive that allows declaring a short prefix name for a long prefix
+                of repeated IRIs. This is useful for many RDF vocabularies that are
+                all defined with a common namespace like IRI.</p>
+                
+                <p class="note">While <code>@prefix</code> works somewhat like XML 
+                namespaces the restrictions from XML QNames do NOT apply. <code>leg:3032571</code>
+                is a perfectly fine prefixed name.</p>
+
+                <p>Once a prefix such as <code>@prefix foo:
+                &lt;http://example.org/ns#&gt;</code> is defined, any mention of a
+                URI later in the document may use a <em>prefixed name</em> that
+                starts <code>foo:</code> to stand for the longer IRI.  So for
+                example, the prefixed name <code>foo:bar</code> is a shorthand for
+                the IRI <code>http://example.org/ns#bar</code>.</p>
+
+                <pre class="example">
+<span># this is a complete turtle document
+@prefix foo: &lt;http://example.org/ns#&gt; .
+@prefix : &lt;http://other.example.org/ns#&gt; .
+foo:bar foo: : .
+:bar : foo:bar .
+</span></pre>
+
+                <p>Literals are written either using double-quotes when they do not
+                contain linebreaks like <code>"simple literal"</code> or
+                <code>"""long literal"""</code> when they may contain linebreaks.
+                </p>
+
+                <pre class="example">
+<span># this is not a complete turtle document
+"a string"
+"""a string"""
+"""a string
+with newlines
+"""
+</span></pre>
+
+                <p>Literals have either a language suffix or a datatype IRI
+                but not both.  Languages are indicated by appending the simple
+                literal with <code>@</code> and the language tag.  Datatype IRIs
+                similarly append <code>^^</code> followed by any legal IRI form (full
+                or prefixed) as described above to give the datatype IRI. <span class="non-issue">Literals
+                may be written without either a language tag or a datatype IRI as a
+                shortcut for a literal with the type <code>xsd:string</code>.</span>
+                </p>
+
+                <pre class="example">
+<span># this is not a complete turtle document
+"That Seventies Show"
+"That Seventies Show"@en
+"Cette Série des Années Soixante-dix"@fr
+"Cette Série des Années Septante"@fr-be
+"mylexicaldata"^^&lt;http://example.org/my/datatype&gt;
+"""10"""^^xsd:decimal
+</span></pre>
+
+                <p>
+                  The <code>"That Seventies Show"</code> above is equivalent to <code>"That Seventies Show"^^xsd:string</code>.
+                </p>
+
+                <p class="issue">
+                  <a href="http://www.w3.org/2011/rdf-wg/track/issues/12">ISSUE-12</a> The RDF Working Group is currently examining a simplification of RDF which considers plain literals with no language tag to be literals with a datatype <code>xsd:string</code>.
+                </p>
+
+                <p>Blank nodes are written as <code>_:</code><em>BLANK_NODE_LABEL</em>
+                to provide a blank node either from the given <a href="#term-turtle2-BLANK_NODE_LABEL">BLANK_NODE_LABEL</a>.
+                A generated blank node may also be made with <code>[]</code>
+
+                which is useful to provide the subject of RDF triples for
+                each pair from the <a href="#prod-turtle2-predicateObjectList">predicateObjectList</a>
+                or the root of the <a href="#prod-turtle2-collection">collection</a>.
+                </p>
+
+                <pre class="example">
+<span># this is not a complete turtle document
+_:me
+_:a1234
+</span></pre>
+
+
+                <p>Literals <span class="non-issue">, prefixed names</span> and IRIs may also contain escapes to encode surrounding
+                syntax, non-printable characters and to encode Unicode characters by
+                codepoint number (although they may also be given directly, encoded
+                as UTF-8).  The character escapes are:</p>
+
+                <ul>
+                <li><code>\t</code> (U+0009, tab)</li>
+                <li><code>\n</code> (U+000A, linefeed)</li>
+                <li><code>\r</code> (U+000D, carriage return)</li>
+
+                <li><code>\"</code> (U+0022, double quote - only allowed inside <a href="#prod-turtle2-String">strings</a>)</li>
+                <li><code>\></code> (U+003E, greater than - only allowed inside <a href="#term-turtle2-IRI_REF">IRI_REFs</a>)</li>
+                <li><code>\\</code> (U+005C, backslash)</li>
+
+                <li>
+                <code>\u</code><em>HHHH</em> or
+                <code>\U</code><em>HHHHHHHH</em>
+                for writing Unicode characters by hexadecimal codepoint where
+                <em>H</em> is a single hexadecimal digit.
+                </li>
+                </ul>
+
+                <p>See the <a href="#sec-strings">String escapes</a> section for full details.</p>
+
+                <p class="issue">
+                  <a href="http://www.w3.org/2011/rdf-wg/track/issues/67">ISSUE 67</a> The inclusion of escape sequences in prefixed names is undecided.
+                </p>
+
+            </div>
+            <div id="iris" typeof="bibo:Chapter" about="#iris" class="section">
+                <h3><span class="secno">2.2 </span>Abbreviating IRIs</h3>
+
+                <p>The current base IRI may be altered in a Turtle document using the
+                <code>@base</code> directive.  It allows further abbreviation of
+                IRIs but is usually for simplifying the IRIs in the data, where
+                the prefix directives are for vocabularies that describe the data.</p>
+
+                <p>Whenever this directive appears, it defines the base IRI for which
+                all relative IRIs are resolved against.  That includes IRIs,
+                qualified names, prefix directives as well as later base directives.
+                </p>
+
+                <pre class="example">
+<span># this is a complete turtle document
+# In-scope base URI is the document URI at this point
+&lt;a1&gt; &lt;b1&gt; &lt;c1&gt; .
+@base &lt;http://example.org/ns/&gt; .
+# In-scope base URI is http://example.org/ns/ at this point
+
+&lt;a2&gt; &lt;http://example.org/ns/b2&gt; &lt;c2&gt; .
+@base &lt;foo/&gt; .
+# In-scope base URI is http://example.org/ns/foo/ at this point
+&lt;a3&gt; &lt;b3&gt; &lt;c3&gt; .
+@prefix : &lt;bar#&gt; .
+:a4 :b4 :c4 .
+@prefix : &lt;http://example.org/ns2#&gt; .
+:a5 :b5 :c5 .</span></pre>
+
+
+                <p>The token <code>a</code> is equivalent to the IRI
+                <code>&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt;</code>
+                </p>
+
+                <pre class="example">
+<span># this is a complete turtle document
+@prefix doc: &lt;http://example.org/#ns&gt; .
+
+&lt;http://example.org/path&gt; a doc:Document .
+                </span></pre>
+                </div>
+                <div id="abbrev" typeof="bibo:Chapter" about="#abbrev" class="section">
+                <h3><span class="secno">2.3 </span>Abbreviating common datatypes</h3>
+
+                <p>Decimal integers may be written directly and correspond to
+                the XML Schema Datatype
+                <a href="http://www.w3.org/TR/xmlschema-2/#integer">xsd:integer</a>
+                in both syntax and datatype IRI.</p>
+
+                <pre class="example">
+<span>
+# this is not a complete turtle document
+-5
+0
+1
+10
++1
+# some long form examples
+"-5"^^xsd:integer
+"10"^^&lt;http://www.w3.org/2001/XMLSchema#integer&gt;
+                </span></pre>
+
+                <p>Decimal floating point double/fixed precision numbers may be written
+                directly and correspond to the XML Schema Datatype
+                <a href="http://www.w3.org/TR/xmlschema-2/#integer">xsd:double</a>
+                in both syntax and datatype IRI.
+                </p>
+
+                <pre class="example">
+<span>
+# this is not a complete turtle document
+1.3e2
+10e0
+-12.5e10
+# some long form examples
+"1.3e2"^^xsd:double
+"-12.5e10"^^&lt;http://www.w3.org/2001/XMLSchema#double&gt;
+                </span></pre>
+
+                <p>Decimal floating point arbitrary precision numbers may be written
+                directly and correspond to the XML Schema Datatype
+                <a href="http://www.w3.org/TR/xmlschema-2/#integer">xsd:decimal</a>.
+                in both syntax and datatype IRI.
+                </p>
+
+                <pre class="example">
+<span>
+# this is not a complete turtle document
+0.0
+1.0
+1.234567890123456789
+-5.0
+# some long form examples
+"0.0"^^xsd:decimal
+"-5.0"^^&lt;http://www.w3.org/2001/XMLSchema#decimal&gt;
+
+                </span></pre>
+
+                <p>Boolean may be written directly as <code>true</code> or
+                <code>false</code> and correspond to the
+                the XML Schema Datatype
+                <a href="http://www.w3.org/TR/xmlschema-2/#boolean">xsd:boolean</a>
+                in both syntax and datatype IRI.
+                </p>
+
+                <pre class="example">
+<span>
+# this is not a complete turtle document
+true
+false
+# same in long form
+"true"^^xsd:boolean
+"false"^^&lt;http://www.w3.org/2001/XMLSchema#boolean&gt;
+                </span></pre>
+            </div>
+
+            <div id="groups" typeof="bibo:Chapter" about="#groups" class="section">
+                <h3><span class="secno">2.4 </span>Abbreviating groups of triples</h3>
+
+                <p>The <code>,</code> symbol may be used to repeat the subject and
+                predicate of triples that only differ in the object RDF term.</p>
+                <pre class="example">
+<span>
+# this is not a complete turtle document
+:subject :predicate :object1 ,
+    :object2 .
+# creates two triples, the last triple is :subject :predicate :object2 .
+                </span></pre>
+
+                <p>The <code>;</code> symbol may be used to repeat the subject of
+                triples that vary only in predicate and object RDF terms.</p>
+                <pre class="example">
+<span>
+# this is not a complete turtle document
+:subject :predicate1 :obj1 ;
+:predicate2 :obj2 .
+# creates two triples, the last triple is :subject :predicate2 :obj2 .
+                </span></pre>
+
+                </div>
+                <div id="collections" typeof="bibo:Chapter" about="#collections" class="section">
+                <h3><span class="secno">2.5 </span>Abbreviating RDF Collections</h3>
+
+                <p>An RDF Collection may be abbreviated using a sequence of
+                RDF Terms enclosed in <code>( )</code> brackets.  Whitespace may
+                be used to separate them, as usual.  This format provides a
+                blank node at the start of RDF Collection which may be used
+                in further abbreviations.
+                </p>
+
+                <pre class="example">
+<span>
+# this is a complete turtle document
+@prefix : &lt;http://example.org/foo&gt; .
+# the object of this triple is the RDF collection blank node
+:subject :predicate ( :a :b :c ) .
+
+# an empty collection value - rdf:nil
+:subject :predicate2 () .
+                </span></pre>
+
+                <p>See section <a href="#collections">Collections</a> for
+                the details on the long form of the generated triples.
+                </p>
+            </div>
+        </div>
+        <div id="sec-syntax" typeof="bibo:Chapter" about="#sec-syntax" class="section">
+            
+<!-- OddPage -->
+<h2><span class="secno">3. </span>Syntax for IRIs, Literals and Blank Nodes</h2>
+            <p>Turtle is a language for an <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-rdf-graph">RDF graph</a>,
+            a set of <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-rdf-triple">RDF triple</a>s. An RDF graph is 
+            composed of <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-iri">URI reference</a>s (now interpreted as IRIs),
+            <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">literal</a>s and 
+            <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">blank node</a>s.</p>
+            <p>The Turtle syntax for IRIs is identical to that of SPARQL Query, including the use of 
+            <code>prefix</code> and <code>base</code> directives, though these are spelled 
+            <code>@prefix</code> and <code>@base</code> respectively in Turtle. 
+            Per <a href="http://tools.ietf.org/html/rfc3986#section-5.1.1">RFC3986 section 5.1.1</a> [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC3986">RFC3986</a></cite>], 
+            the parsing begins with a context-defined In-Scope Base URI. Each <code>@base</code> directive 
+            sets a new In-Scope Base URI, relative to the previous one. <code>@prefix</code> directives 
+            map a local name to an IRI, also resolved against the current In-Scope Base URI. 
+            Subsequent <code>@prefix</code> may re-map the same local name.</p>
+
+            <p>Turtle IRI syntax, including relative IRI resolution, is defined by <a href="http://www.w3.org/TR/rdf-sparql-query/#QSynIRI">SPARQL Query section 4.1.1</a> (noting the different spellings of the <code>PREFIX</code> and <code>BASE</code> keywords).</p>
+
+            <p>Example (<a href="tests/test-30.ttl">test-30.ttl</a>) with document base IRI 
+            http://www.w3.org/2001/sw/DataAccess/df1/tests/</p>
+
+            <div><pre class="example">
+# In-scope base URI is http://www.w3.org/2001/sw/DataAccess/df1/tests/ at this point
+&lt;a1&gt; &lt;b1&gt; &lt;c1&gt; .
+@base &lt;http://example.org/ns/&gt; .
+# In-scope base URI is http://example.org/ns/ at this point
+&lt;a2&gt; &lt;http://example.org/ns/b2&gt; &lt;c2&gt; .
+@base &lt;foo/&gt; .
+# In-scope base URI is http://example.org/ns/foo/ at this point
+&lt;a3&gt; &lt;b3&gt; &lt;c3&gt; .
+@prefix : &lt;bar#&gt; .
+:a4 :b4 :c4 .
+@prefix : &lt;http://example.org/ns2#&gt; .
+:a5 :b5 :c5 .</pre></div>
+            <p>encodes the following N-Triples
+            (<a href="tests/test-30.out">test-30.out</a>):
+
+            </p>
+            <div><pre class="example">
+&lt;http://www.w3.org/2001/sw/DataAccess/df1/tests/a1&gt; &lt;http://www.w3.org/2001/sw/DataAccess/df1/tests/b1&gt; &lt;http://www.w3.org/2001/sw/DataAccess/df1/tests/c1&gt; .
+&lt;http://example.org/ns/a2&gt; &lt;http://example.org/ns/b2&gt; &lt;http://example.org/ns/c2&gt; .
+&lt;http://example.org/ns/foo/a3&gt; &lt;http://example.org/ns/foo/b3&gt; &lt;http://example.org/ns/foo/c3&gt; .
+&lt;http://example.org/ns/foo/bar#a4&gt; &lt;http://example.org/ns/foo/bar#b4&gt; &lt;http://example.org/ns/foo/bar#c4&gt; .
+&lt;http://example.org/ns2#a5&gt; &lt;http://example.org/ns2#b5&gt; &lt;http://example.org/ns2#c5&gt; .</pre></div>
+
+            <p>The Turtle syntax for literals and blank nodes are defined by <a href="http://www.w3.org/TR/rdf-sparql-query/#QSynLiterals">SPARQL Query section 4.1.2</a> and <a href="http://www.w3.org/TR/rdf-sparql-query/#QSynBlankNodes">SPARQL Query section 4.1.4</a> respectively.</p>
+        </div>
+        <div id="sec-grammar" typeof="bibo:Chapter" about="#sec-grammar" class="section">
+          
+<!-- OddPage -->
+<h2><span class="secno">4. </span>Turtle Grammar</h2>
+
+          <p>A Turtle document is a
+          Unicode[<cite><a class="bibref" rel="biblioentry" href="#bib-UNICODE">UNICODE</a></cite>]
+          character string encoded in UTF-8.
+          Unicode codepoints only in the range U+0 to U+10FFFF inclusive are
+          allowed.
+          </p>
+          <div id="sec-grammar-ws" typeof="bibo:Chapter" about="#sec-grammar-ws" class="section">
+            <h3><span class="secno">4.1 </span>White Space</h3>
+
+            <p>White space (production <a href="#term-turtle2-WS">ws</a>) is used to separate
+            two tokens which would otherwise be (mis-)recognized as one token.
+
+            </p>
+
+            <p>White space is significant in tokens
+            <a href="#term-turtle2-IRI_REF">IRI_REF</a> and <a href="#prod-turtle2-String">string</a>.
+            </p>
+          </div>
+          <div id="sec-grammar-comments" typeof="bibo:Chapter" about="#sec-grammar-comments" class="section">
+            <h3><span class="secno">4.2 </span>Comments</h3>
+
+            <p>Comments in Turtle take the form of '#', outside an
+            <a href="#term-turtle2-IRI_REF">IRI_REF</a> or strings,
+            and continue to the end of line (marked by characters U+000D or U+000A)
+            or end of file if there is no end of line after the comment
+            marker.  Comments are treated as white space.
+
+            </p>
+          </div>
+          <div id="sec-strings" typeof="bibo:Chapter" about="#sec-strings" class="section">
+            <h3><span class="secno">4.3 </span>String Escapes</h3>
+
+            <p>Turtle strings and IRIs can use <code>\</code>-escape sequences to
+            represent Unicode code points.</p>
+
+
+            <p>The following table describes all the escapes
+            allowed inside a <a href="#prod-turtle2-String">string</a>
+            or <a href="#term-turtle2-IRI_REF">IRI_REF</a>:</p>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Escape</th>
+
+                  <th>Unicode code point</th>
+
+                </tr>
+              </thead>
+              <tbody>
+
+                <tr>
+                  <td>'\u' <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a></td>
+                  <td>A Unicode codepoint in the range U+0 to U+FFFF inclusive
+              corresponding to the encoded hexadecimal value.</td>
+                </tr>
+
+                                                              
+                <tr>
+                  <td>'\U' <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a> <a href="#rHEX">hex</a></td>
+
+                  <td>A Unicode codepoint in the range U+10000 to U+10FFFF inclusive
+              corresponding to the encoded hexadecimal value.</td>
+                </tr>
+
+                <tr>
+                  <td>'\t'</td>
+                  <td>U+0009</td>
+                </tr>
+                                                              
+                <tr>
+
+                  <td>'\n'</td>
+                  <td>U+000A</td>
+                </tr>
+                                                              
+                <tr>
+                  <td>'\r'</td>
+                  <td>U+000D</td>
+                </tr>
+
+                                                              
+                <tr>
+                  <td>'\"'<br />
+            (inside <a href="#prod-turtle2-String">string</a>)</td>
+                <td>U+0022</td>
+                </tr>
+                                                              
+                <tr>
+
+                  <td>'\>'<br />
+            (inside <a href="#term-turtle2-IRI_REF">IRI_REF</a> only)</td>
+                  <td>U+003E</td>
+                </tr>
+                                                              
+                <tr>
+                  <td>'\\'</td>
+
+                  <td>U+005C</td>
+                </tr>
+                                                              
+              </tbody>
+            </table>
+
+            <p>where <a href="#rHEX">HEX</a> is a hexadecimal character</p>
+            <blockquote>
+              <p><span style="font-family: monospace; font-size: 85%;"><a id="rHEX">HEX</a> 
+            ::= [0-9] | [A-F] | [a-f]</span></p>
+
+            </blockquote>
+          </div>
+          <div id="sec-grammar-grammar" typeof="bibo:Chapter" about="#sec-grammar-grammar" class="section">
+          <h3><span class="secno">4.4 </span>Grammar</h3>
+            <p>The <abbr title="Extended Backus–Naur Form">EBNF</abbr> used here is defined in XML 1.0 (Third Edition)
+            [<cite><a class="bibref" rel="biblioentry" href="#bib-EBNF-NOTATION">EBNF-NOTATION</a></cite>]. Production labels consisting of a number and a final 's', e.g. [<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">60s</span></a>], reference to the production with that number in the <a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#sparqlGrammar">SPARQL Query Language for RDF grammar</a> [<cite><a class="bibref" rel="biblioentry" href="#bib-RDF-SPARQL-QUERY">RDF-SPARQL-QUERY</a></cite>].
+            </p>
+            <p class="note">There are known formating issues with the table form of the grammar. Please see <a href="turtle.bnf">turtle.bnf</a> for exact grammar.</p>
+            <div><table class="grammar" summary="Turtle - Terse RDF Triple Language EBNF">
+   <caption>Turtle - Terse RDF Triple Language EBNF</caption>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-turtleDoc"></a>[<span class="prodNo">1</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="topcell"><code class="production prod">turtleDoc</code></td>
+<td class="topcell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="topcell"><code class="content">(<span class="prod"><a tabindex="14" class="grammarRef" href="#prod-turtle2-statement">statement</a></span>)*</code></td>
+
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-statement"></a>[<span class="prodNo">2</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">statement</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="15" class="grammarRef" href="#prod-turtle2-directive">directive</a></span> "."<br/>
+
+| <span class="prod"><a tabindex="16" class="grammarRef" href="#prod-turtle2-triples">triples</a></span> "."</code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-directive"></a>[<span class="prodNo">3</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">directive</code></td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content"><span class="prod"><a tabindex="17" class="grammarRef" href="#prod-turtle2-prefixID">prefixID</a></span><br/>
+| <span class="prod"><a tabindex="18" class="grammarRef" href="#prod-turtle2-base">base</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-prefixID"></a>[<span class="prodNo">4</span>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">prefixID</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content"><span class="prod"><a tabindex="19" class="grammarRef" href="#term-turtle2-PREFIX">PREFIX</a></span> <span class="prod"><a tabindex="20" class="grammarRef" href="#term-turtle2-PNAME_NS">PNAME_NS</a></span> <span class="prod"><a tabindex="21" class="grammarRef" href="#term-turtle2-IRI_REF">IRI_REF</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-base"></a>[<span class="prodNo">5</span>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">base</code></td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="22" class="grammarRef" href="#term-turtle2-BASE">BASE</a></span> <span class="prod"><a tabindex="23" class="grammarRef" href="#term-turtle2-IRI_REF">IRI_REF</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-triples"></a>[<span class="prodNo">6</span>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">triples</code></td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="24" class="grammarRef" href="#prod-turtle2-subject">subject</a></span> <span class="prod"><a tabindex="25" class="grammarRef" href="#prod-turtle2-predicateObjectList">predicateObjectList</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-predicateObjectList"></a>[<span class="prodNo">7</span>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">predicateObjectList</code></td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="26" class="grammarRef" href="#prod-turtle2-verb">verb</a></span> <span class="prod"><a tabindex="27" class="grammarRef" href="#prod-turtle2-objectList">objectList</a></span> ( ";" <span class="prod"><a tabindex="28" class="grammarRef" href="#prod-turtle2-verb">verb</a></span> <span class="prod"><a tabindex="29" class="grammarRef" href="#prod-turtle2-objectList">objectList</a></span> )* (";")?</code></td>
+</tr>
+
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-objectList"></a>[<span class="prodNo">8</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">objectList</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="30" class="grammarRef" href="#prod-turtle2-object">object</a></span> ( "," <span class="prod"><a tabindex="31" class="grammarRef" href="#prod-turtle2-object">object</a></span> )*</code></td>
+
+</tr>
+
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-verb"></a>[<span class="prodNo">9</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">verb</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="32" class="grammarRef" href="#prod-turtle2-predicate">predicate</a></span><br/>
+| "a"</code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-subject"></a>[<span class="prodNo">10</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">subject</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="33" class="grammarRef" href="#prod-turtle2-IRIref">IRIref</a></span><br/>
+| <span class="prod"><a tabindex="34" class="grammarRef" href="#prod-turtle2-blank">blank</a></span></code></td>
+
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-predicate"></a>[<span class="prodNo">11</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">predicate</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="35" class="grammarRef" href="#prod-turtle2-IRIref">IRIref</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-object"></a>[<span class="prodNo">12</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">object</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="36" class="grammarRef" href="#prod-turtle2-IRIref">IRIref</a></span><br/>
+| <span class="prod"><a tabindex="37" class="grammarRef" href="#prod-turtle2-blank">blank</a></span><br/>
+
+| <span class="prod"><a tabindex="38" class="grammarRef" href="#prod-turtle2-literal">literal</a></span></code></td>
+
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-literal"></a>[<span class="prodNo">13</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">literal</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content"><span class="prod"><a tabindex="39" class="grammarRef" href="#prod-turtle2-RDFLiteral">RDFLiteral</a></span><br/>
+| <span class="prod"><a tabindex="40" class="grammarRef" href="#prod-turtle2-NumericLiteral">NumericLiteral</a></span><br/>
+
+| <span class="prod"><a tabindex="41" class="grammarRef" href="#prod-turtle2-BooleanLiteral">BooleanLiteral</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-blank"></a>[<span class="prodNo">14</span>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">blank</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="42" class="grammarRef" href="#prod-turtle2-BlankNode">BlankNode</a></span><br/>
+
+| <span class="prod"><a tabindex="43" class="grammarRef" href="#prod-turtle2-blankNodePropertyList">blankNodePropertyList</a></span><br/>
+| <span class="prod"><a tabindex="44" class="grammarRef" href="#prod-turtle2-collection">collection</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-blankNodePropertyList"></a>[<span class="prodNo">15</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">blankNodePropertyList</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"[" <span class="prod"><a tabindex="45" class="grammarRef" href="#prod-turtle2-predicateObjectList">predicateObjectList</a></span> "]"</code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-collection"></a>[<span class="prodNo">16</span>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">collection</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"(" <span class="prod"><a tabindex="46" class="grammarRef" href="#prod-turtle2-object">object</a></span>* ")"</code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-RDFLiteral"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">60s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">RDFLiteral</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="47" class="grammarRef" href="#prod-turtle2-String">String</a></span> ( <span class="prod"><a tabindex="48" class="grammarRef" href="#term-turtle2-LANGTAG">LANGTAG</a></span> | ( "^^" <span class="prod"><a tabindex="49" class="grammarRef" href="#prod-turtle2-IRIref">IRIref</a></span> ) )?</code></td>
+
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-NumericLiteral"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">61s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">NumericLiteral</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="50" class="grammarRef" href="#prod-turtle2-NumericLiteralUnsigned">NumericLiteralUnsigned</a></span><br/>
+| <span class="prod"><a tabindex="51" class="grammarRef" href="#prod-turtle2-NumericLiteralPositive">NumericLiteralPositive</a></span><br/>
+
+| <span class="prod"><a tabindex="52" class="grammarRef" href="#prod-turtle2-NumericLiteralNegative">NumericLiteralNegative</a></span></code></td>
+
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-NumericLiteralUnsigned"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">62s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">NumericLiteralUnsigned</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content"><span class="prod"><a tabindex="53" class="grammarRef" href="#term-turtle2-INTEGER">INTEGER</a></span><br/>
+| <span class="prod"><a tabindex="54" class="grammarRef" href="#term-turtle2-DECIMAL">DECIMAL</a></span><br/>
+
+| <span class="prod"><a tabindex="55" class="grammarRef" href="#term-turtle2-DOUBLE">DOUBLE</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-NumericLiteralPositive"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">63s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">NumericLiteralPositive</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="56" class="grammarRef" href="#term-turtle2-INTEGER_POSITIVE">INTEGER_POSITIVE</a></span><br/>
+
+| <span class="prod"><a tabindex="57" class="grammarRef" href="#term-turtle2-DECIMAL_POSITIVE">DECIMAL_POSITIVE</a></span><br/>
+| <span class="prod"><a tabindex="58" class="grammarRef" href="#term-turtle2-DOUBLE_POSITIVE">DOUBLE_POSITIVE</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-NumericLiteralNegative"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">64s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">NumericLiteralNegative</code></td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="59" class="grammarRef" href="#term-turtle2-INTEGER_NEGATIVE">INTEGER_NEGATIVE</a></span><br/>
+| <span class="prod"><a tabindex="60" class="grammarRef" href="#term-turtle2-DECIMAL_NEGATIVE">DECIMAL_NEGATIVE</a></span><br/>
+| <span class="prod"><a tabindex="61" class="grammarRef" href="#term-turtle2-DOUBLE_NEGATIVE">DOUBLE_NEGATIVE</a></span></code></td>
+
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-BooleanLiteral"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">65s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">BooleanLiteral</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"true"<br/>
+| "false"</code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-String"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">66s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">String</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="62" class="grammarRef" href="#term-turtle2-STRING_LITERAL1">STRING_LITERAL1</a></span><br/>
+| <span class="prod"><a tabindex="63" class="grammarRef" href="#term-turtle2-STRING_LITERAL2">STRING_LITERAL2</a></span><br/>
+
+| <span class="prod"><a tabindex="64" class="grammarRef" href="#term-turtle2-STRING_LITERAL_LONG1">STRING_LITERAL_LONG1</a></span><br/>
+| <span class="prod"><a tabindex="65" class="grammarRef" href="#term-turtle2-STRING_LITERAL_LONG2">STRING_LITERAL_LONG2</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-IRIref"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">67s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production prod">IRIref</code></td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="66" class="grammarRef" href="#term-turtle2-IRI_REF">IRI_REF</a></span><br/>
+| <span class="prod"><a tabindex="67" class="grammarRef" href="#prod-turtle2-PrefixedName">PrefixedName</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-PrefixedName"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">68s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">PrefixedName</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="68" class="grammarRef" href="#term-turtle2-PNAME_LN">PNAME_LN</a></span><br/>
+| <span class="prod"><a tabindex="69" class="grammarRef" href="#term-turtle2-PNAME_NS">PNAME_NS</a></span></code></td>
+
+</tr>
+</tbody>
+
+<tbody class="prod">
+<tr valign="baseline">
+<td class="cell"><a id="prod-turtle2-BlankNode"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">69s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="production prod">BlankNode</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="70" class="grammarRef" href="#term-turtle2-BLANK_NODE_LABEL">BLANK_NODE_LABEL</a></span><br/>
+| <span class="prod"><a tabindex="71" class="grammarRef" href="#term-turtle2-ANON">ANON</a></span></code></td>
+
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-BASE"></a>[<span class="prodNo">17</span>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">BASE</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"@base"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PREFIX"></a>[<span class="prodNo">18</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">PREFIX</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"@prefix"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-IRI_REF"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rRDFLiteral"><span class="prodNo">70s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">IRI_REF</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content">"&lt;" ( [^&lt;&gt;\"{}|^`\\] - [#0000- ] | <span class="prod"><a class="grammarRef" href="#term-turtle2-UCHAR">UCHAR</a></span> )* "&gt;"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PNAME_NS"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rPNAME_NS"><span class="prodNo">71s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">PNAME_NS</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content">(<span class="prod"><a tabindex="72" class="grammarRef" href="#term-turtle2-PN_PREFIX">PN_PREFIX</a></span>)? ":"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PNAME_LN"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rPNAME_LN"><span class="prodNo">72s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">PNAME_LN</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content"><span class="prod"><a tabindex="73" class="grammarRef" href="#term-turtle2-PNAME_NS">PNAME_NS</a></span> <span class="prod"><a tabindex="74" class="grammarRef" href="#term-turtle2-PN_LOCAL">PN_LOCAL</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-BLANK_NODE_LABEL"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rBLANK_NODE_LABEL"><span class="prodNo">73s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">BLANK_NODE_LABEL</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content">"_:" <span class="prod"><a tabindex="75" class="grammarRef" href="#term-turtle2-PN_LOCAL">PN_LOCAL</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-VAR1"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rVAR1"><span class="prodNo">74s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">VAR1</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content">"?" <span class="prod"><a tabindex="76" class="grammarRef" href="#term-turtle2-VARNAME">VARNAME</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+
+<td class="cell"><a id="term-turtle2-VAR2"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rVAR2"><span class="prodNo">75s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">VAR2</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content">"$" <span class="prod"><a tabindex="77" class="grammarRef" href="#term-turtle2-VARNAME">VARNAME</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-LANGTAG"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rLANGTAG"><span class="prodNo">76s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">LANGTAG</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content"><span class="prod"><a tabindex="78" class="grammarRef" href="#term-turtle2-BASE">BASE</a></span><br/>
+| <span class="prod"><a tabindex="79" class="grammarRef" href="#term-turtle2-PREFIX">PREFIX</a></span><br/>
+| "@" [a-zA-Z]+ ( "-" [a-zA-Z0-9]+ )*</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-INTEGER"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rINTEGER"><span class="prodNo">77s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">INTEGER</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">[0-9]+</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-DECIMAL"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rDECIMAL"><span class="prodNo">78s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">DECIMAL</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">[0-9]+ "." [0-9]*<br/>
+| "." [0-9]+</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-DOUBLE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rDOUBLE"><span class="prodNo">79s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">DOUBLE</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">[0-9]+ "." [0-9]* <span class="prod"><a tabindex="80" class="grammarRef" href="#term-turtle2-EXPONENT">EXPONENT</a></span><br/>
+| "." ( [0-9] )+ <span class="prod"><a tabindex="81" class="grammarRef" href="#term-turtle2-EXPONENT">EXPONENT</a></span><br/>
+| ( [0-9] )+ <span class="prod"><a tabindex="82" class="grammarRef" href="#term-turtle2-EXPONENT">EXPONENT</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+
+<td class="cell"><a id="term-turtle2-INTEGER_POSITIVE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rINTEGER_POSITIVE"><span class="prodNo">80s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">INTEGER_POSITIVE</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"+" <span class="prod"><a tabindex="83" class="grammarRef" href="#term-turtle2-INTEGER">INTEGER</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+
+<td class="cell"><a id="term-turtle2-DECIMAL_POSITIVE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rDECIMAL_POSITIVE"><span class="prodNo">81s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">DECIMAL_POSITIVE</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"+" <span class="prod"><a tabindex="84" class="grammarRef" href="#term-turtle2-DECIMAL">DECIMAL</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+
+<td class="cell"><a id="term-turtle2-DOUBLE_POSITIVE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rDOUBLE_POSITIVE"><span class="prodNo">82s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">DOUBLE_POSITIVE</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell"><code class="content">"+" <span class="prod"><a tabindex="85" class="grammarRef" href="#term-turtle2-DOUBLE">DOUBLE</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+
+<td class="cell"><a id="term-turtle2-INTEGER_NEGATIVE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rINTEGER_NEGATIVE"><span class="prodNo">83s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">INTEGER_NEGATIVE</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"-" <span class="prod"><a tabindex="86" class="grammarRef" href="#term-turtle2-INTEGER">INTEGER</a></span></code></td>
+
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+
+<td class="cell"><a id="term-turtle2-DECIMAL_NEGATIVE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rDECIMAL_NEGATIVE"><span class="prodNo">84s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">DECIMAL_NEGATIVE</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"-" <span class="prod"><a tabindex="87" class="grammarRef" href="#term-turtle2-DECIMAL">DECIMAL</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+
+<td class="cell"><a id="term-turtle2-DOUBLE_NEGATIVE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rDOUBLE_NEGATIVE"><span class="prodNo">85s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">DOUBLE_NEGATIVE</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"-" <span class="prod"><a tabindex="88" class="grammarRef" href="#term-turtle2-DOUBLE">DOUBLE</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-EXPONENT"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rEXPONENT"><span class="prodNo">86s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">EXPONENT</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">[eE] [+-]? [0-9]+</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-STRING_LITERAL1"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rSTRING_LITERAL1"><span class="prodNo">87s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">STRING_LITERAL1</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"'" ( ( [^'\\\n\r] ) | <span class="prod"><a tabindex="89" class="grammarRef" href="#term-turtle2-ECHAR">ECHAR</a></span> | <span class="prod"><a class="grammarRef" href="#term-turtle2-UCHAR">UCHAR</a></span> )* "'"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-STRING_LITERAL2"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rSTRING_LITERAL2"><span class="prodNo">88s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">STRING_LITERAL2</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">'"' ( ( [^\"\\\n\r] ) | <span class="prod"><a tabindex="90" class="grammarRef" href="#term-turtle2-ECHAR">ECHAR</a></span> | <span class="prod"><a class="grammarRef" href="#term-turtle2-UCHAR">UCHAR</a></span> )* '"'</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-STRING_LITERAL_LONG1"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rSTRING_LITERAL_LONG1"><span class="prodNo">89s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">STRING_LITERAL_LONG1</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"'''" ( ( "'" | "''" )? ( [^'\\] | <span class="prod"><a tabindex="91" class="grammarRef" href="#term-turtle2-ECHAR">ECHAR</a></span> | <span class="prod"><a class="grammarRef" href="#term-turtle2-UCHAR">UCHAR</a></span> ) )* "'''"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-STRING_LITERAL_LONG2"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rSTRING_LITERAL_LONG2"><span class="prodNo">90s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">STRING_LITERAL_LONG2</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">'"""' ( ( '"' | '""' )? ( [^\"\\] | <span class="prod"><a tabindex="92" class="grammarRef" href="#term-turtle2-ECHAR">ECHAR</a></span> | <span class="prod"><a class="grammarRef" href="#term-turtle2-UCHAR">UCHAR</a></span> ) )* '"""'</code></td>
+
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-UCHAR"></a>[<!-- a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rUCHAR" --><span class="prodNo">19</span><!-- /a -->]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">UCHAR</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">( "\\u" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] )<br />
+| ( "\\U" [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] )</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-ECHAR"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rECHAR"><span class="prodNo">91s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">ECHAR</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"\\" [tbnrf\\\"']</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-NIL"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rNIL"><span class="prodNo">92s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">NIL</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"(" (<span class="prod"><a tabindex="93" class="grammarRef" href="#term-turtle2-WS">WS</a></span>)* ")"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-WS"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rWS"><span class="prodNo">93s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">WS</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">" "<br/>
+| "\t"<br/>
+| "\r"<br/>
+
+| "\n"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-ANON"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rANON"><span class="prodNo">94s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">ANON</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">"[" (<span class="prod"><a tabindex="94" class="grammarRef" href="#term-turtle2-WS">WS</a></span>)* "]"</code></td>
+
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PN_CHARS_BASE"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rPN_CHARS_BASE"><span class="prodNo">95s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">PN_CHARS_BASE</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">[A-Z]<br/>
+| [a-z]<br/>
+
+| [#00C0-#00D6]<br/>
+| [#00D8-#00F6]<br/>
+| [#00F8-#02FF]<br/>
+| [#0370-#037D]<br/>
+
+| [#037F-#1FFF]<br/>
+| [#200C-#200D]<br/>
+| [#2070-#218F]<br/>
+| [#2C00-#2FEF]<br/>
+| [#3001-#D7FF]<br/>
+
+| [#F900-#FDCF]<br/>
+| [#FDF0-#FFFD]<br/>
+| [#10000-#EFFFF]<br />
+| <span class="prod"><a class="grammarRef" href="#term-turtle2-UCHAR">UCHAR</a></span></code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PN_CHARS_U"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rPN_CHARS_U"><span class="prodNo">96s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">PN_CHARS_U</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="95" class="grammarRef" href="#term-turtle2-PN_CHARS_BASE">PN_CHARS_BASE</a></span><br/>
+| "_"</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-VARNAME"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rVARNAME"><span class="prodNo">97s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">VARNAME</code>&gt;</td>
+
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">( <span class="prod"><a tabindex="96" class="grammarRef" href="#term-turtle2-PN_CHARS_U">PN_CHARS_U</a></span> | [0-9] ) ( <span class="prod"><a tabindex="97" class="grammarRef" href="#term-turtle2-PN_CHARS_U">PN_CHARS_U</a></span> | [0-9] | #00B7 | [#0300-#036F] | [#203F-#2040] )*</code></td>
+
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PN_CHARS"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rPN_CHARS"><span class="prodNo">98s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">PN_CHARS</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="98" class="grammarRef" href="#term-turtle2-PN_CHARS_U">PN_CHARS_U</a></span><br/>
+| "-"<br/>
+
+| [0-9]<br/>
+| #00B7<br/>
+| [#0300-#036F]<br/>
+| [#203F-#2040]</code></td>
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PN_PREFIX"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rPN_PREFIX"><span class="prodNo">99s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+
+<td class="cell">&lt;<code class="production term">PN_PREFIX</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content"><span class="prod"><a tabindex="99" class="grammarRef" href="#term-turtle2-PN_CHARS_BASE">PN_CHARS_BASE</a></span> ( ( <span class="prod"><a tabindex="100" class="grammarRef" href="#term-turtle2-PN_CHARS">PN_CHARS</a></span> | "." )* <span class="prod"><a tabindex="101" class="grammarRef" href="#term-turtle2-PN_CHARS">PN_CHARS</a></span> )?</code></td>
+
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PN_LOCAL"></a>[<a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/#rPN_LOCAL"><span class="prodNo">100s</span></a>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell">&lt;<code class="production term">PN_LOCAL</code>&gt;</td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">( <span class="prod"><a tabindex="102" class="grammarRef" href="#term-turtle2-PN_CHARS_U">PN_CHARS_U</a></span> | [0-9] ) ( ( <span class="prod"><a tabindex="103" class="grammarRef" href="#term-turtle2-PN_CHARS">PN_CHARS</a></span> | "." )* <span class="prod"><a tabindex="104" class="grammarRef" href="#term-turtle2-PN_CHARS">PN_CHARS</a></span> )?</code></td>
+
+</tr>
+</tbody>
+
+<tbody class="term">
+<tr valign="baseline">
+<td class="cell"><a id="term-turtle2-PASSED_TOKENS"></a>[<span class="prodNo">-</span>]&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="production directive">PASSED TOKENS</code></td>
+<td class="cell">&nbsp;&nbsp;&nbsp;::=&nbsp;&nbsp;&nbsp;</td>
+<td class="cell"><code class="content">[ \t\r\n]+<br/>
+| "#" [^\r\n]*</code></td>
+
+</tr>
+</tbody>
+</table></div>
+          </div>
+        </div>
+        <div id="sec-parsing" typeof="bibo:Chapter" about="#sec-parsing" class="section"> 
+          
+<!-- OddPage -->
+<h2><span class="secno">5. </span>Parsing</h2>
+
+          <p>The <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html">RDF Concepts and Abstract Syntax</a> ([<cite><a class="bibref" rel="biblioentry" href="#bib-RDF-CONCEPTS">RDF-CONCEPTS</a></cite>]) specification defines three types of <em>RDF Term</em>:
+
+          <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-iri">RDF URI References</a> (here called IRIs),
+          <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">literals</a> and
+          <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">blank nodes</a>.
+          Literals are composed of a <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-lexical-form">lexical form</a> and an optional <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-language-identifier">language tag</a> or datatype IRI.
+          An extra type, <code class="dfn" id="prefix">prefix</code>, is used during parsing to map string identifiers to namespace IRIs.
+
+          
+<!--  The Turtle grammar uses the same productions and terminals to create these terms as does <a href="http://www.w3.org/TR/rdf-sparql-query/#grammar">SPARQL</a>.  -->
+
+<!--  This set is listed in <a href="http://www.w3.org/TR/rdf-sparql-query/#docTerminology">SPARQL §1.2.4</a>.  -->
+
+
+          This section maps a string conforming to the grammar in <a href="#sec-grammar-grammar">section 4.4</a> to a set of triples by mapping strings matching productions and lexical tokens to RDF terms or their components (e.g. language tags, lexical forms of literals). Some productions change the parser state (base or prefix declarations).</p>
+          <div id="sec-parsing-state" typeof="bibo:Chapter" about="#sec-parsing-state" class="section">
+          <h3><span class="secno">5.1 </span>Parser State</h3>
+
+              <p>Parsing Turtle requires a state of four items:</p>
+
+              <ul>
+                <li id="baseURI">IRI <code class="dfn">baseURI</code> — When the <a href="#prod-turtle2-base">base production</a> is reached, the second rule argument, <code>IRI_REF</code>, is the base URI used for relative IRI resolution <span class="testrefs">(test: <a href="tests/#base1">base1</a> <a href="tests/#base2">base2</a>)</span>.</li>
+
+                <li id="namespaces">Map[<a href="#prefix" class="type prefix">prefix</a> -> IRI] <code class="dfn">namespaces</code> — The second and third rule arguments (<code>PNAME_NS</code> and <code>IRI_REF</code>) in the <a href="#prod-turtle2-prefixID">prefixID production</a> assign a namespace name (<code>IRI_REF</code>) for the prefix (<code>PNAME_NS</code>). Outside of a <code>prefixID</code> production, any <code>PNAME_NS</code> is substituted with the namespace <span class="testrefs">(test: <a href="tests/#prefix1">prefix1</a> 
+<!--  a href="tests/#escapedPrefix1">escapedPrefix1</a  -->
+ <a href="tests/#escapedNamespace1">escapedNamespace1</a>)</span>. Note that the prefix may be an empty string, per the <code>PNAME_NS,</code> production: <code>(PN_PREFIX)? ":"</code> <span class="testrefs">(test: <a href="tests/#default1">default1</a>)</span>.</li>
+
+                <li id="bnodeLabels">Map[<a class="type string">string</a> -> <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">blank node</a>] <code class="dfn">bnodeLabels</code> — A mapping from string to blank node label.</li>
+                <li id="curSubject">RDF_Term <code class="dfn">curSubject</code> — The <code class="curSubject">curSubject</code> is bound to the <code><a href="#prod-turtle2-subject">subject</a></code> production.</li>
+
+                <li id="curPredicate">RDF_Term <code class="dfn">curPredicate</code> — The <code class="curPredicate">curPredicate</code> is bound to the <code><a href="#prod-turtle2-verb">verb</a></code> production. If token matched was "<code>a</code>", <code class="curPredicate">curPredicate</code> is bound to the IRI <code>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</code> <span class="testrefs">(test: <a href="tests/#type">type</a>)</span>.</li>
+
+              </ul>
+          </div>
+          <div id="sec-parsing-terms" typeof="bibo:Chapter" about="#sec-parsing-terms" class="section">
+          <h3><span class="secno">5.2 </span>RDF Term Constructors</h3>
+
+              <p>This table maps productions and lexical tokens to <code>RDF terms</code> or components of <code>RDF terms</code> listed in <a href="#sec-parsing">section 5</a>:</p>
+
+              <table>
+                <thead>
+              <tr>                                  <th>                                                                       production               </th><th>                                                                                       type            </th><th>procedure</th></tr>
+                </thead>
+                <tbody>
+              <tr id="handle-IRI_REF"><td><a href="#term-turtle2-IRI_REF" class="type IRI">IRI_REF              </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-iri">      IRI         </a></td><td>The characters between "&lt;" and "&gt;" are <a href="#unescape">unescaped¹</a> to form the unicode string of the IRI. Relative IRI resolution is performed per <a href="http://www.w3.org/TR/rdf-sparql-query/#QSynIRI">SPARQL Query section 4.1.1</a>.</td></tr>
+              <tr id="handle-PNAME_NS"><td><a href="#term-turtle2-PNAME_NS" class="type string">PNAME_NS             </a></td><td><a href="#prefix">                                                                     prefix      </a></td><td>The potentially empty unicode string matching the first argument of the rule is a key into the <a href="#namespaces">namespaces map</a>.</td></tr>
+              <tr id="handle-PNAME_LN"><td><a href="#term-turtle2-PNAME_LN" class="type IRI">PNAME_LN             </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-iri">      IRI         </a></td><td>A <a href="#prefix">prefix</a> is identified by the first argument, <code>PNAME_NS</code>. The <a href="#namespaces">namespaces map</a> has a corresponding <code>namespace</code>. The unicode string of the IRI is formed by concatenating this <code>namespace</code> and the second argument, <code>PN_LOCAL</code>. Relative IRI resolution is performed per <a href="http://www.w3.org/TR/rdf-sparql-query/#QSynIRI">SPARQL Query section 4.1.1</a>.</td></tr>
+              <tr id="handle-STRING_LITERAL1"><td><a href="#term-turtle2-STRING_LITERAL1" class="type lexicalForm">STRING_LITERAL1      </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-lexical-form">                         lexical form</a></td><td>The characters between the outermost "'"s are <a href="#unescape">unescaped¹</a> to form the unicode string of a lexical form.</td></tr>
+              <tr id="handle-STRING_LITERAL2"><td><a href="#term-turtle2-STRING_LITERAL2" class="type lexicalForm">STRING_LITERAL2      </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-lexical-form">                         lexical form</a></td><td>The characters between the outermost '"'s are <a href="#unescape">unescaped¹</a> to form the unicode string of a lexical form.</td></tr>
+              <tr id="handle-STRING_LITERAL_LONG1"><td><a href="#term-turtle2-STRING_LITERAL_LONG1" class="type lexicalForm">STRING_LITERAL_LONG1 </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-lexical-form">                         lexical form</a></td><td>The characters between the outermost "'''"s are <a href="#unescape">unescaped¹</a> to form the unicode string of a lexical form.</td></tr>
+              <tr id="handle-STRING_LITERAL_LONG2"><td><a href="#term-turtle2-STRING_LITERAL_LONG2" class="type lexicalForm">STRING_LITERAL_LONG2 </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-lexical-form">                         lexical form</a></td><td>The characters between the outermost '"""'s are <a href="#unescape">unescaped¹</a> to form the unicode string of a lexical form.</td></tr>
+              <tr id="handle-LANGTAG"><td><a href="#term-turtle2-LANGTAG" class="type langTag">LANGTAG              </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-language-identifier">language tag</a></td><td>The characters following the "@" form the unicode string of the language tag.</td></tr>
+              <tr id="handle-RDFLiteral"><td><a href="#prod-turtle2-RDFLiteral" class="type literal">RDFLiteral           </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">            literal     </a></td><td>The literal has a lexical form of the first rule argument (<code>String</code>) and either a language tag of <code>LANGTAG</code> or a datatype IRI of <code>IRIref</code>, depending on which rule matched the input.</td></tr>
+              <tr id="handle-INTEGER"><td><a href="#term-turtle2-INTEGER" class="type integer">INTEGER              </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">            literal     </a></td><td>The literal has a lexical form of the input string, and a datatype of xsd:integer.</td></tr>
+              <tr id="handle-DECIMAL"><td><a href="#term-turtle2-DECIMAL" class="type decimal">DECIMAL              </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">            literal     </a></td><td>The literal has a lexical form of the input string, and a datatype of xsd:decimal.</td></tr>
+              <tr id="handle-DOUBLE"><td><a href="#term-turtle2-DOUBLE" class="type double">DOUBLE               </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">            literal     </a></td><td>The literal has a lexical form of the input string, and a datatype of xsd:double.</td></tr>
+              <tr id="handle-BooleanLiteral"><td><a href="#prod-turtle2-BooleanLiteral" class="type boolean">BooleanLiteral       </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-literal">            literal     </a></td><td>The literal has a lexical form of the "true" or "false", depending on which matched the input, and a datatype of xsd:boolean.</td></tr>
+              <tr id="handle-BLANK_NODE_LABEL"><td><a href="#term-turtle2-BLANK_NODE_LABEL" class="type bNode">BLANK_NODE_LABEL     </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">         blank node  </a></td><td>The string matching the second argument, <code>PN_LOCAL</code>, is a key in <a href="#bnodeLabels">bnodeLabels</a>. If there is no corresponding blank node in the map, one is allocated.</td></tr>
+              <tr id="handle-ANON"><td><a href="#term-turtle2-ANON" class="type bNode">ANON                 </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">         blank node  </a></td><td>A blank node is generated.</td></tr>
+              <tr id="handle-blankNodePropertyList"><td><a href="#prod-turtle2-blankNodePropertyList" class="type bNode">blankNodePropertyList</a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">         blank node  </a></td><td>A blank node is generated. Note the rules for <code>blankNodePropertyList</code> in the next section.</td></tr>
+              <tr id="handle-collection"><td><a href="#prod-turtle2-collection" class="type bNode">collection           </a></td><td><a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-blank-node">         blank node  </a></td><td>A blank node is generated. Note the rules for <code>collection</code> in the next section.</td></tr>
+                </tbody>
+              </table>
+
+              <p><a id="unescape">¹</a> <a href="http://www.w3.org/TeamSubmission/turtle/#sec-strings">Section 3.3</a> defines an mapping from <code>escaped unicode strings</code> to <code>unicode strings</code>. The following lexical tokens are unescaped to produce <code>unicode strings</code>: <a href="#term-turtle2-IRI_REF" class="type IRI">IRI_REF</a>, 
+<!--  <a class="type PNAME_NS" href="#term-turtle2-PNAME_NS">PNAME_NS</a>,  -->
+
+<!--  <a class="type IRI"          href="#term-turtle2-PNAME_LN">PNAME_LN</a>,  -->
+<a href="#term-turtle2-STRING_LITERAL1" class="type lexicalForm">STRING_LITERAL1</a>, <a href="#term-turtle2-STRING_LITERAL2" class="type lexicalForm">STRING_LITERAL2</a>, <a href="#term-turtle2-STRING_LITERAL_LONG1" class="type lexicalForm">STRING_LITERAL_LONG1</a> and <a href="#term-turtle2-STRING_LITERAL_LONG2" class="type lexicalForm">STRING_LITERAL_LONG2</a>
+<!--  and <a class="type langTag"      href="#term-turtle2-LANGTAG">LANGTAG</a>  -->
+
+<!--  and <a class="type bNode"        href="#term-turtle2-BLANK_NODE_LABEL">BLANK_NODE_LABEL</a>  -->
+.</p>
+          </div>
+          <div id="sec-parsing-triples" typeof="bibo:Chapter" about="#sec-parsing-triples" class="section">
+          <h3><span class="secno">5.3 </span>RDF Triples Constructors</h3>
+              <p>A Turtle document defines an <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-rdf-graph">RDF graph</a> composed of set of <a href="http://dvcs.w3.org/hg/rdf/raw-file/c8c62e757bed/rdf-concepts/index.html#dfn-rdf-triple">RDF triple</a>s.
+          Each <a href="#prod-turtle2-object" class="grammarRef" tabindex="30">object</a> <code>N</code> in the document produces an RDF triple: <span class="ntriple"><code class="curSubject">curSubject</code> <code class="curPredicate">curPredicate</code> <code>N</code> .</span>
+
+          </p>
+
+          <p>
+          Beginning the <code><a href="#prod-turtle2-blankNodePropertyList">blankNodePropertyList</a></code> production records the <code class="curSubject">curSubject</code> and <code class="curPredicate">curPredicate</code>, and sets <code class="curSubject">curSubject</code> to a novel <code>blank node</code> <code>B</code>.
+          Finishing the <code><a href="#prod-turtle2-blankNodePropertyList">blankNodePropertyList</a></code> production restores <code class="curSubject">curSubject</code> and <code class="curPredicate">curPredicate</code>.
+          The node produced by matching <code><a href="#prod-turtle2-blankNodePropertyList">blankNodePropertyList</a></code> is the blank node <code>B</code>.
+
+          </p>
+
+          <p>
+          Beginning the <code><a href="#prod-turtle2-collection">collection</a></code> production records the <code class="curSubject">curSubject</code> and <code class="curPredicate">curPredicate</code>, sets <code class="curSubject">curSubject</code> to a novel <code>blank node</code> <code>B<sub>head</sub></code> and sets <code class="curSubject">curSubject</code> and <code class="curPredicate">curPredicate</code> to <code>B<sub>head</sub></code> and <code>rdf:first</code> respectively.
+          Each object <code>O</code> in <code><a href="#prod-turtle2-collection">collection</a></code> allocates a novel <code>blank node</code> <code>B<sub>n</sub></code>, creates an additional triple <span class="ntriple"><code>curSubject rdf:rest B<sub>n</sub></code> .</span> and sets <code>curSubject</code> to <code>B<sub>n</sub></code>.
+          Finishing the <code><a href="#prod-turtle2-collection">collection</a></code> production creates an additional triple <span class="ntriple"><code>curSubject rdf:rest rdf:nil</code> .</span> and restores <code class="curSubject">curSubject</code> and <code class="curPredicate">curPredicate</code>
+
+          The node produced by matching <code><a href="#prod-turtle2-collection">collection</a></code> is the blank node <code>B<sub>head</sub></code>.
+          </p>
+          </div>
+          <div class="informative section" id="sec-parsing-example" typeof="bibo:Chapter" about="#sec-parsing-example">
+          <h3><span class="secno">5.4 </span>Parsing Example (Informative)</h3><p><em>This section is non-normative.</em></p>
+
+          <p>The following informative example shows the semantic actions performed when  parsing this Turtle document with an LALR(1) parser:</p>
+          <pre class="example">
+<span>
+@prefix ericFoaf: &lt;http://www.w3.org/People/Eric/ericP-foaf.rdf#&gt; .
+@prefix : &lt;http://xmlns.com/foaf/0.1/&gt; .
+ericFoaf:ericP :givenName "Eric" ;
+              :knows &lt;http://norman.walsh.name/knows/who/dan-brickley&gt; ,
+                      [ :mbox &lt;mailto:timbl@w3.org&gt; ] ,
+                      &lt;http://getopenid.com/amyvdh&gt; .
+          </span></pre>
+
+              <ul>
+                <li>Map the prefix <code>ericFoaf</code> to the IRI <code>http://www.w3.org/People/Eric/ericP-foaf.rdf#</code>.</li>
+                <li>Map the empty prefix to the IRI <code>http://xmlns.com/foaf/0.1/</code>.</li>
+                <li>Assign <code class="curSubject">curSubject</code> the IRI <code>http://www.w3.org/People/Eric/ericP-foaf.rdf#ericP</code>.</li>
+
+                <li>Assign <code class="curPredicate">curPredicate</code> the IRI <code>http://xmlns.com/foaf/0.1/givenName</code>.</li>
+                <li>Emit an RDF triple: <span class="ntriple"><code>&lt;...rdf#ericP&gt;</code> <code>&lt;.../givenName&gt;</code> <code>"Eric"</code> .</span></li>
+
+                <li>Assign <code class="curPredicate">curPredicate</code> the IRI <code>http://xmlns.com/foaf/0.1/knows</code>.</li>
+                <li>Emit an RDF triple: <span class="ntriple"><code>&lt;...rdf#ericP&gt;</code> <code>&lt;.../knows&gt;</code> <code>&lt;...who/dan-brickley&gt;</code> .</span></li>
+
+                <li>Emit an RDF triple: <span class="ntriple"><code>&lt;...rdf#ericP&gt;</code> <code>&lt;.../knows&gt;</code> <code>_:1</code> .</span></li>
+                <li>Save <code class="curSubject">curSubject</code> and reassign to the blank node <code>_:1</code>.</li>
+
+                <li>Save <code class="curPredicate">curPredicate</code>.</li>
+                <li>Assign <code class="curPredicate">curPredicate</code> the IRI <code>http://xmlns.com/foaf/0.1/mbox</code>.</li>
+                <li>Emit an RDF triple: <span class="ntriple"><code>_:1</code> <code>&lt;.../mbox&gt;</code> <code>&lt;mailto:timbl@w3.org&gt;</code> .</span></li>
+
+                <li>Restore <code class="curSubject">curSubject</code> and <code class="curPredicate">curPredicate</code> to their saved values (<code>&lt;...rdf#ericP&gt;</code>, <code>&lt;.../knows&gt;</code>).</li>
+                <li>Emit an RDF triple: <span class="ntriple"><code>&lt;...rdf#ericP&gt;</code> <code>&lt;.../knows&gt;</code> <code>&lt;http://getopenid.com/amyvdh&gt;</code> .</span></li>
+
+              </ul>
+          </div>
+        </div>
+        <div class="informative section" id="sec-examples" typeof="bibo:Chapter" about="#sec-examples">
+        
+<!-- OddPage -->
+<h2><span class="secno">6. </span>Examples (Informative)</h2><p><em>This section is non-normative.</em></p>
+
+          <p>This example is a Turtle translation of 
+          <a href="http://www.w3.org/TR/rdf-syntax-grammar/#example7">example 7</a>
+          in the
+          <a href="http://www.w3.org/TR/rdf-syntax-grammar/">RDF/XML Syntax specification</a>
+          (<a href="examples/example1.ttl">example1.ttl</a>):
+          </p>
+
+          <div><pre class="example">
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix dc: &lt;http://purl.org/dc/elements/1.1/&gt; .
+@prefix ex: &lt;http://example.org/stuff/1.0/&gt; .
+
+&lt;http://www.w3.org/TR/rdf-syntax-grammar&gt;
+  dc:title "RDF/XML Syntax Specification (Revised)" ;
+  ex:editor [
+    ex:fullname "Dave Beckett";
+    ex:homePage &lt;http://purl.org/net/dajobe/&gt;
+  ] .</pre></div>
+
+
+          <p>An example of an RDF collection of two literals.</p>
+          <pre class="example">
+<span>
+@prefix : &lt;http://example.org/stuff/1.0/&gt; .
+:a :b ( "apple" "banana" ) .
+          </span></pre>
+          <p>which is short for (<a href="examples/example2.ttl">example2.ttl</a>):</p>
+
+          <div><pre class="example">
+@prefix : &lt;http://example.org/stuff/1.0/&gt; .
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+:a :b
+  [ rdf:first "apple";
+    rdf:rest [ rdf:first "banana";
+               rdf:rest rdf:nil ]
+  ] .</pre></div>
+
+          <p>An example of two identical triples containing literal objects
+          containing newlines, written in plain and long literal forms.
+          Assumes that line feeds in this document are #xA.
+          (<a href="examples/example3.ttl">example3.ttl</a>):</p>
+
+          <div><pre class="example">
+@prefix : &lt;http://example.org/stuff/1.0/&gt; .
+
+:a :b "The first line\nThe second line\n  more" .
+
+:a :b """The first line
+The second line
+  more""" .</pre></div>
+
+          <p>As indicated by the grammar, a <a href="#prod-turtle2-collection">collection</a> can be either a <a href="#prod-turtle2-subject">subject</a> or an <a href="#prod-turtle2-object">object</a>. This subject or object will be the novel blank node for the first object, if the collection has one or more objects, or <code>rdf:nil</code> if the collection is empty.</p>
+
+          <p>For example,</p>
+
+          <pre class="example untested">
+<span>(1 2.0 3E1) :p "w" .</span></pre>
+
+          <p>is syntactic sugar for (noting that the blank nodes <code>b0</code>, <code>b1</code> and <code>b2</code> do not occur anywhere else in the RDF graph):</p>
+
+<pre class="example untested">
+<span>    _:b0  rdf:first  1 ;
+          rdf:rest   _:b1 .
+    _:b1  rdf:first  2.0 ;
+          rdf:rest   _:b2 .
+    _:b2  rdf:first  3E1 ;
+          rdf:rest   rdf:nil .
+    _:b0  :p         "w" . </span></pre>
+
+          <p>RDF collections can be nested and can involve other syntactic forms:</p>
+
+          <pre class="example untested">
+(1 [:p :q] ( 2 ) ) .</pre>
+
+          <p>is syntactic sugar for:</p><pre class="example untested">
+<span>    _:b0  rdf:first  1 ;
+          rdf:rest   _:b1 .
+    _:b1  rdf:first  _:b2 .
+    _:b2  :p         :q .
+    _:b1  rdf:rest   _:b3 .
+    _:b3  rdf:first  _:b4 .
+    _:b4  rdf:first  2 ;
+          rdf:rest   rdf:nil .
+    _:b3  rdf:rest   rdf:nil .</span></pre>
+        </div>
+        <div id="sec-identifiers" typeof="bibo:Chapter" about="#sec-identifiers" class="section">
+          
+<!-- OddPage -->
+<h2><span class="secno">7. </span>Identifiers for the Turtle Language</h2>
+          <p>The IRI that identifies the Turtle language is:<br />
+          <code>http://www.w3.org/ns/formats/Turtle</code>
+          </p>
+
+          <p>The XML (Namespace name, Local name) pair that identifies
+          the Turtle language is:<br />
+          Namespace: <code>http://www.w3.org/ns/formats/Turtle</code><br />
+          Local name: <code>turtle</code><br />
+          The suggested namespace prefix is <code>ttl</code> (informative)
+          which would make this <code>ttl:turtle</code> as an XML QName.
+          </p>
+          <p class="issue">Previous versions of the Turtle specified 
+          <code>http://www.w3.org/2008/turtle#turtle</code> as the IRI for the Turtle language. 
+          This change aligns Turtle with identifiers for RDF/XML, N3, POWDER, etc</p>
+          
+        </div>
+        <div id="sec-conformance" typeof="bibo:Chapter" about="#sec-conformance" class="section">
+          
+<!-- OddPage -->
+<h2><span class="secno">8. </span>Conformance</h2>
+          <p>Systems conforming to Turtle <em class="rfc2119" title="must">must</em> pass all the following test cases:</p>
+
+          <ol>
+          <li>The <a href="http://www.w3.org/TR/2004/REC-rdf-testcases-20040210/#ntrip_tests">N-Triples tests</a> in the
+          <a href="http://www.w3.org/TR/2004/REC-rdf-testcases-20040210/">RDF Test Cases</a> W3C Recommendation.</li>
+
+          <li>The <a href="tests/">Turtle Test Suite</a>
+          <br />
+          <p>Passing these tests means:</p>
+          <ol>
+          <li>All the <code>test-n.ttl</code> tests <em class="rfc2119" title="must">must</em> generate equivalent RDF
+          triples to those given in the corresponding <code>test-n.out</code>
+          N-Triples file.</li>
+          <li>All the <code>bad-n.ttl</code> tests <em class="rfc2119" title="must not">must not</em> generate RDF triples.</li>
+          </ol>
+          </li>
+          </ol>
+        </div>
+        <div id="sec-mime" typeof="bibo:Chapter" about="#sec-mime" class="section">
+          
+<!-- OddPage -->
+<h2><span class="secno">9. </span>Media Type and Content Encoding</h2>
+          
+          <p>The media type of Turtle is <code>text/turtle</code>.
+          The content encoding of Turtle content is always UTF-8. Charset 
+          parameters on the mime type are required until such time as the 
+          <code>text/</code> media type tree permits UTF-8 to be sent without a 
+          charset parameter. See <a href="#sec-mediaReg">B. Internet Media 
+          Type, File Extension and Macintosh File Type</a> for the media type 
+          registration form.
+          </p>
+        </div>
+
+      <div id="sec-compared" typeof="bibo:Chapter" about="#sec-compared" class="section">
+        
+<!-- OddPage -->
+<h2><span class="secno">10. </span>Turtle compared</h2>
+        <p>Turtle is related to a number of other languages.</p>
+      <div class="informative section" id="sec-diff-ntriples" typeof="bibo:Chapter" about="#sec-diff-ntriples">
+        <h3><span class="secno">10.1 </span>Turtle compared to N-Triples (Informative)</h3><p><em>This section is non-normative.</em></p>
+       
+        <p class="issue"><a href="http://www.w3.org/2011/rdf-wg/track/issues/4">ISSUE-4</a>: A future version of this document is expected to define N-Triples. By default, the RDF WG will specify N-Triples to allow UTF-8 characters in IRIs, literals and blank node identifiers. Readers with an opinion about whether or not N-Triples should be ASCII-only may wish to comment.</p>
+        <p>All N-Triples files are vaild Turtle documents. Turtle adds the following syntax to N-Triples:</p>
+
+        <ol>
+          <li>Whitespace restrictions removed</li>
+          <li>Text content-encoding changed from ASCII to UTF-8</li>
+
+          <li>Three additional string syntaxes: <a href="#term-turtle2-STRING_LITERAL2">STRING_LITERAL2</a>, <a href="#term-turtle2-STRING_LITERAL_LONG1">STRING_LITERAL_LONG1</a>, <a href="#term-turtle2-STRING_LITERAL_LONG2">STRING_LITERAL_LONG2</a></li>
+          <li><code><a href="#term-turtle2-BASE">@base</a></code> directive for setting a base IRI</li>
+          <li><code><a href="#term-turtle2-PREFIX">@prefix</a></code> directive for assigning namespace prefixes</li>
+
+          <li><a href="#prod-turtle2-PrefixedName">Prefixed names</a></li>
+          <li><a href="#prod-turtle2-objectList">Object lists</a> separated by <code>,</code></li>
+          <li><a href="#prod-turtle2-predicateObjectList">Predicate object lists</a> separated by <code>;</code></li>
+          <li><a href="#term-turtle2-ANON">Unlabled blank nodes</a> indicated by <code>[]</code></li>
+
+          <li><code>rdf:type</code> shorthand <code>a</code></li>
+          <li><a href="#prod-turtle2-collection">RDF collection constructor</a> bound by <code>()</code>s</li>
+          <li><a href="#term-turtle2-INTEGER">Decimal integer literals</a> of type <code>xsd:integer</code></li>
+
+          <li><a href="#term-turtle2-DECIMAL">Decimal double literals</a> of type <code>xsd:double</code></li>
+          <li><a href="#term-turtle2-DOUBLE">Decimal arbitrary length literals</a> of type <code>xsd:decimal</code></li>
+          <li><a href="#prod-turtle2-BooleanLiteral">Boolean literals</a> of type <code>xsd:boolean</code></li>
+        </ol>
+      </div>
+      <div class="informative section" id="sec-diff-n3" typeof="bibo:Chapter" about="#sec-diff-n3">
+        <h3><span class="secno">10.2 </span>Turtle compared to Notation 3 (Informative)</h3><p><em>This section is non-normative.</em></p>
+
+        <p>Turtle is similar to and inspired by the more powerful Notation 3 (<abbr title="Notation 3">N3</abbr>).
+    Please see the most recent Notation3 specification for comparison with Turtle.
+
+<!--  
+        While the syntax played a role in the creation of Turtle
+        they are not strictly compatible. There are a number of differences in 
+        escaping, encoding and structure. N3 triples are a superset of RDF triples. 
+        In particular, N3 formulae (graphs) may be the subject or object of N3 triples.
+        For example here, the formula with <code>_:Bob a foaf:Person</code> is the object of another arc:</p>
+        <pre>_:Bob ex:said { _:Bob a foaf:Person } .</pre> 
+        
+        <p>In addition, Literals are allowed in the subject position. For example:</p>
+        <pre>"Bob" ex:said "Hi Bob" .</pre>
+
+        <p>Following is a partial list of syntactic features in N3 which are not in Turtle:</p>
+
+        <ol>
+          <li><code>{</code> ... <code>}</code></li>
+          <li><code>is</code> <code>of</code></li>
+
+          <li>paths like <code>:a.:b.:c</code> and <code>:a^:b^:c</code></li>
+          <li><code>@keywords</code></li>
+          <li><code>=&gt;</code> implies</li>
+          <li><code>=</code>  equivalence</li>
+
+          <li><code>@forAll</code></li>
+          <li><code>@forSome</code></li>
+          <li>&lt;=</li>
+        </ol>
+ -->
+
+      </p></div>
+      <div class="informative section" id="sec-diff-rdfxml" typeof="bibo:Chapter" about="#sec-diff-rdfxml">
+        <h3><span class="secno">10.3 </span>Turtle compared to RDF/XML (Informative)</h3><p><em>This section is non-normative.</em></p>
+        <p>
+            <a href="http://www.w3.org/TR/2004/REC-rdf-syntax-grammar-20040210/">RDF/XML</a>
+            ([<cite><a class="bibref" rel="biblioentry" href="#bib-RDF-SYNTAX-GRAMMAR">RDF-SYNTAX-GRAMMAR</a></cite>])
+            has certain restrictions imposed by XML and the use of XML Namespaces
+            that prevent it encoding all RDF graphs (some predicate URIs are
+            forbidden and XML 1.0 forbids encoding some Unicode codepoints).
+            These restrictions do not apply to Turtle.</p>
+      </div>
+      <div class="informative section" id="sec-diff-sparql" typeof="bibo:Chapter" about="#sec-diff-sparql">
+      <h3><span class="secno">10.4 </span>Turtle compared to SPARQL (Informative)</h3><p><em>This section is non-normative.</em></p>
+
+      <p>The <a href="http://www.w3.org/TR/sparql11-query/">SPARQL Query Language for RDF</a> (<abbr title="SPARQL Protocol And RDF Query Language">SPARQL</abbr>) [<cite><a class="bibref" rel="biblioentry" href="#bib-RDF-SPARQL-QUERY">RDF-SPARQL-QUERY</a></cite>] uses a Turtle style syntax for its <a href="http://www.w3.org/TR/sparql11-query/#rTriplesBlock">TriplesBlock production</a>.
+      This production differs from the Turtle language in that:
+      </p>
+
+      <ol>
+    <li>SPARQL permits RDF Literals as the subject of RDF triples (per <a href="http://www.w3.org/TR/sparql11-query/#rGraphTerm">Last Call draft</a>)</li>
+
+    <li>SPARQL permits variables (<code>?</code><em>name</em> or <code>$</code><em>name</em>) in any part of the triple of the form</li>
+    <li>Turtle allows <a href="#prod-turtle2-directive">prefix and base declarations</a> anywhere outside of a triple. In SPARQL, they are only allowed in the <a href="http://www.w3.org/TR/sparql11-query/#rPrologue">Prologue</a> (at the start of the SPARQL query).</li>
+
+      </ol>
+
+      <p>For further information see the
+      <a href="http://www.w3.org/TR/sparql11-query/#QSynIRI">Syntax for IRIs</a>
+      and <a href="http://www.w3.org/TR/sparql11-query/#grammar">SPARQL Grammar</a>
+      sections of the SPARQL query document [<cite><a class="bibref" rel="biblioentry" href="#bib-RDF-SPARQL-QUERY">RDF-SPARQL-QUERY</a></cite>].
+      </p>
+      </div>
+      
+      </div>
+      
+      <div class="appendix section" id="sec-mediaReg" typeof="bibo:Chapter" about="#sec-mediaReg">
+        
+<!-- OddPage -->
+<h2><span class="secno">A. </span>Internet Media Type, File Extension and Macintosh File Type (Normative)</h2>
+        <dl>
+          <dt>Contact:</dt>
+          <dd>Eric Prud'hommeaux</dd>
+          <dt>See also:</dt>
+
+          <dd><a href="http://www.w3.org/2002/06/registering-mediatype">How to Register a Media Type for a W3C Specification</a></dd>
+          <dd><a href="http://www.w3.org/2001/tag/2002/0129-mime">Internet Media Type registration, consistency of use</a><br />TAG Finding 3 June 2002 (Revised 4 September 2002)</dd>
+        </dl>
+        <p>The Internet Media Type / MIME Type for Turtle is "text/turtle".</p>
+        <p>It is recommended that Turtle files have the extension ".ttl" (all lowercase) on all platforms.</p>
+
+        <p>It is recommended that Turtle files stored on Macintosh HFS file systems be given a file type of "TEXT".</p>
+        <p>This information that follows has been <a href="http://www.w3.org/mid/20071218114549.GQ8244@w3.org">submitted to the IESG</a> for review, approval, and registration with IANA.</p>
+        <dl>
+          <dt>Type name:</dt>
+          <dd>text</dd>
+
+          <dt>Subtype name:</dt>
+          <dd>turtle</dd>
+          <dt>Required parameters:</dt>
+          <dd>None</dd>
+          <dt>Optional parameters:</dt>
+          <dd><code>charset</code> — this parameter is required when transferring non-ASCII data. If present, the value of <code>charset</code> is always <code>UTF-8</code>.</dd>
+
+          <dt>Encoding considerations:</dt>
+          <dd>The syntax of Turtle is expressed over code points in Unicode [<cite><a class="bibref" rel="biblioentry" href="#bib-UNICODE">UNICODE</a></cite>]. The encoding is always UTF-8 [<cite><a class="bibref" rel="biblioentry" href="#bib-UTF-8">UTF-8</a></cite>].</dd>
+          <dd>Unicode code points may also be expressed using an \uXXXX (U+0 to U+FFFF) or \UXXXXXXXX syntax (for U+10000 onwards) where X is a hexadecimal digit [0-9A-F]</dd>
+          <dt>Security considerations:</dt>
+          <dd>Turtle is a general-purpose assertion language; applications may evaluate given data to infer more assertions or to dereference IRIs, invoking the security considerations of the scheme for that IRI. Note in particular, the privacy issues in [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC3023">RFC3023</a></cite>] section 10 for HTTP IRIs. Data obtained from an inaccurate or malicious data source may lead to inaccurate or misleading conclusions, as well as the dereferencing of unintended IRIs. Care must be taken to align the trust in consulted resources with the sensitivity of the intended use of the data; inferences of potential medical treatments would likely require different trust than inferences for trip planning.</dd>
+
+          <dd>Turtle is used to express arbitrary application data; security considerations will vary by domain of use. Security tools and protocols applicable to text (e.g. PGP encryption, MD5 sum validation, password-protected compression) may also be used on Turtle documents. Security/privacy protocols must be imposed which reflect the sensitivity of the embedded information.</dd>
+          <dd>Turtle can express data which is presented to the user, for example, RDF Schema labels. Application rendering strings retrieved from untrusted Turtle documents must ensure that malignant strings may not be used to mislead the reader. The security considerations in the media type registration for XML ([<cite><a class="bibref" rel="biblioentry" href="#bib-RFC3023">RFC3023</a></cite>] section 10) provide additional guidance around the expression of arbitrary data and markup.</dd>
+          <dd>Turtle uses IRIs as term identifiers. Applications interpreting data expressed in Turtle should address the security issues of
+      <a href="http://www.ietf.org/rfc/rfc3987.txt" class="norm">Internationalized Resource Identifiers (IRIs)</a> [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC3987">RFC3987</a></cite>] Section 8, as well as
+      <a href="http://www.ietf.org/rfc/rfc3986.txt" class="norm">Uniform Resource Identifier (URI): Generic Syntax</a> [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC3986">RFC3986</a></cite>] Section 7.</dd>
+
+          <dd>Multiple IRIs may have the same appearance. Characters in different scripts may 
+    look similar (a Cyrillic "о" may appear similar to a Latin "o"). A character followed 
+    by combining characters may have the same visual representation as another character 
+    (LATIN SMALL LETTER E followed by COMBINING ACUTE ACCENT has the same visual representation 
+    as LATIN SMALL LETTER E WITH ACUTE).
+    
+<!--  (<code>foo:resum&#40751;code> and <code>f&#1086;&#1086;:resume&#769;</code>) -->
+
+    Any person or application that is writing or interpreting data in Turtle must take care to use the IRI that matches the intended semantics, and avoid IRIs that make look similar.
+    Further information about matching of similar characters can be found 
+    in <a href="http://www.unicode.org/reports/tr36/" class="inform">Unicode Security 
+    Considerations</a> [<cite><a class="bibref" rel="biblioentry" href="#bib-UNISEC">UNISEC</a></cite>] and
+    <a href="http://www.ietf.org/rfc/rfc3987.txt" class="norm">Internationalized Resource 
+    Identifiers (IRIs)</a> [<cite><a class="bibref" rel="biblioentry" href="#bib-RFC3987">RFC3987</a></cite>] Section 8.
+
+    
+<!-- @@ no security considerations section at this time. @@
+    See Turtle - Terse RDF Triple Language appendix X, <a href="#security">Security Considerations</a> 
+        as well as <a class="norm" href="http://www.ietf.org/rfc/rfc3629.txt">RFC 3629</a> 
+        [<a href="#rfc3629">RFC3629</a>] section 7, Security Considerations.  -->
+</dd>
+
+          <dt>Interoperability considerations:</dt>
+          <dd>There are no known interoperability issues.</dd>
+          <dt>Published specification:</dt>
+          <dd>This specification.</dd>
+          <dt>Applications which use this media type:</dt>
+
+          <dd>No widely deployed applications are known to use this media type. It may be used by some web services and clients consuming their data.</dd>
+          <dt>Additional information:</dt>
+          <dt>Magic number(s):</dt>
+          <dd>Turtle documents may have the strings '@prefix' or '@base' (case dependent) near the beginning of the document.</dd>
+          <dt>File extension(s):</dt>
+          <dd>".ttl"</dd>
+
+          <dt>Base URI:</dt>
+          <dd>The Turtle '@base &lt;IRIref&gt;' term can change the current base URI for relative IRIrefs in the query language that are used sequentially later in the document.</dd>
+          <dt>Macintosh file type code(s):</dt>
+          <dd>"TEXT"</dd>
+          <dt>Person &amp; email address to contact for further information:</dt>
+
+          <dd>Eric Prud'hommeaux &lt;eric@w3.org&gt;</dd>
+          <dt>Intended usage:</dt>
+          <dd>COMMON</dd>
+          <dt>Restrictions on usage:</dt>
+          <dd>None</dd>
+          <dt>Author/Change controller:</dt>
+
+          <dd>The Turtle specification is the product of David Beckett and Tim Berners-Lee. A W3C Working Group may assume maintenance of this document; W3C reserves change control over this specifications.</dd>
+        </dl>
+      </div>
+      
+      
+      <div class="appendix section" id="sec-acks" typeof="bibo:Chapter" about="#sec-acks">
+        
+<!-- OddPage -->
+<h2><span class="secno">B. </span>Acknowledgements (Informative)</h2>
+        
+        <p>This work was described in the paper
+        <a href="http://www.dajobe.org/2003/11/new-syntaxes-rdf/">New Syntaxes for RDF</a>
+        which discusses other RDF syntaxes and the background
+        to the Turtle (Submitted to WWW2004, referred to as <em>N-Triples
+        Plus</em> there).</p>
+
+        <p>This work was started during the
+        <a href="http://www.w3.org/2001/sw/Europe/">Semantic Web Advanced Development Europe (SWAD-Europe)</a>
+        project funded by the EU IST-7 programme IST-2001-34732 (2002-2004)
+        and further development supported by the
+        <a href="http://www.ilrt.bris.ac.uk/">Institute for Learning and Research Technology</a> at the  <a href="http://www.bristol.ac.uk/">University of Bristol</a>, UK (2002-Sep 2005).
+        </p>
+
+      </div>
+      <div class="appendix section" id="sec-changelog" typeof="bibo:Chapter" about="#sec-changelog">
+      
+<!-- OddPage -->
+<h2><span class="secno">C. </span>Changes (Informative)</h2>
+
+      <p>Changes since the last publication of this document
+      <a href="http://www.w3.org/TeamSubmission/2008/SUBM-turtle-20080114/">W3C Turtle Submission 2008-01-14</a>
+      .  See the
+      <a href="http://www.w3.org/TeamSubmission/2008/SUBM-turtle-20080114/#sec-changelog">Previous changelog for further information</a>
+      </p>
+
+
+            <ul>
+
+          <li>Adopted three additional string syntaxes from SPARQL: <a href="#term-turtle2-STRING_LITERAL2">STRING_LITERAL2</a>, <a href="#term-turtle2-STRING_LITERAL_LONG1">STRING_LITERAL_LONG1</a>, <a href="#term-turtle2-STRING_LITERAL_LONG2">STRING_LITERAL_LONG2</a></li>
+
+          <li>Adopted case-independent constants for XSD booleans <code>true</code> and <code>false</code>.</li>
+          <li>Adopted SPARQL's syntax for prefixed names (see <a href="http://www.w3.org/TR/sparql11-query/#rPrefixedName">editor's draft</a>):
+          <ul>
+            <li>'.'s in names in all positions of a local name apart from the first or last, e.g. <code>ex:first.name</code>.</li>
+
+            <li>digits in the first character of the <a href="http://www.w3.org/TR/rdf-sparql-query/#rPN_LOCAL">PN_LOCAL</a> lexical token, e.g. <code>ex:7tm</code>.</li>
+          </ul></li>
+          <li>Made <a href="#sec-syntax">syntax section</a> normative.
+          <ul>
+            <li>adopted SPARQL's IRI resolution and prefix substitution text.</li>
+
+            <li>explicitly allowed re-use of the same prefix.</li>
+          </ul></li>
+          <li>Added <a href="#sec-parsing">parsing rules</a>.</li>
+            </ul>
+      </div>
+
+
+        
+    
+
+
+
+
+<div id="references" class="appendix section" typeof="bibo:Chapter" about="#references">
+<!-- OddPage -->
+<h2><span class="secno">D. </span>References</h2><div id="normative-references" typeof="bibo:Chapter" about="#normative-references" class="section"><h3><span class="secno">D.1 </span>Normative references</h3><dl class="bibliography" about=""><dt id="bib-EBNF-NOTATION">[EBNF-NOTATION]</dt><dd rel="dcterms:requires">Tim Bray; Jean Paoli; C. M. Sperberg-McQueen; Eve Maler; François Yergeau. <a href="http://www.w3.org/TR/REC-xml/#sec-notation"><cite>EBNF Notation</cite></a> 26 November 2008. W3C Recommendation. URL: <a href="http://www.w3.org/TR/REC-xml/#sec-notation">http://www.w3.org/TR/REC-xml/#sec-notation</a> 
+</dd><dt id="bib-N-TRIPLES">[N-TRIPLES]</dt><dd rel="dcterms:requires">Jan Grant; Dave Beckett. <a href="http://www.w3.org/TR/rdf-testcases/#ntriples"><cite>N-Triples</cite></a> 10 February 2004. W3C Recommendation. URL:  <a href="http://www.w3.org/TR/rdf-testcases/#ntriples">http://www.w3.org/TR/rdf-testcases/#ntriples</a>
+</dd><dt id="bib-RDF-CONCEPTS">[RDF-CONCEPTS]</dt><dd rel="dcterms:requires">Graham Klyne; Jeremy J. Carroll. <a href="http://www.w3.org/TR/2004/REC-rdf-concepts-20040210/"><cite>Resource Description Framework (RDF): Concepts and Abstract Syntax.</cite></a> 10 February 2004. W3C Recommendation. URL: <a href="http://www.w3.org/TR/2004/REC-rdf-concepts-20040210/">http://www.w3.org/TR/2004/REC-rdf-concepts-20040210/</a> <br /> (The referenced RDF Concepts document has yet not been re-published by the RDF Working Group. It is included here instead of the <a href="http://www.w3.org/TR/2004/REC-rdf-concepts-20040210/">last published version</a> as it includes new material relevant to the interpretation of the Turtle specification.)
+</dd><dt id="bib-RFC3023">[RFC3023]</dt><dd rel="dcterms:requires">M. Murata; S. St.Laurent; D. Kohn. <a href="http://www.ietf.org/rfc/rfc3023.txt"><cite>XML Media Types</cite></a> January 2001. Internet RFC 3023. URL: <a href="http://www.ietf.org/rfc/rfc3023.txt">http://www.ietf.org/rfc/rfc3023.txt</a> 
+</dd><dt id="bib-RFC3986">[RFC3986]</dt><dd rel="dcterms:requires">T. Berners-Lee; R. Fielding; L. Masinter. <a href="http://www.ietf.org/rfc/rfc3986.txt"><cite>Uniform Resource Identifier (URI): Generic Syntax.</cite></a> January 2005. Internet RFC 3986. URL: <a href="http://www.ietf.org/rfc/rfc3986.txt">http://www.ietf.org/rfc/rfc3986.txt</a> 
+</dd><dt id="bib-RFC3987">[RFC3987]</dt><dd rel="dcterms:requires">M. Dürst; M. Suignard. <a href="http://www.ietf.org/rfc/rfc3987.txt"><cite>Internationalized Resource Identifiers (IRIs).</cite></a> January 2005. Internet RFC 3987. URL: <a href="http://www.ietf.org/rfc/rfc3987.txt">http://www.ietf.org/rfc/rfc3987.txt</a> 
+</dd><dt id="bib-UNICODE">[UNICODE]</dt><dd rel="dcterms:requires">The Unicode Consortium. <a href="http://www.unicode.org/unicode/standard/versions/enumeratedversions.html"><cite>The Unicode Standard.</cite></a> 2003. Defined by: The Unicode Standard, Version 4.0 (Boston, MA, Addison-Wesley, ISBN 0-321-18578-1), as updated from time to time by the publication of new versions URL: <a href="http://www.unicode.org/unicode/standard/versions/enumeratedversions.html">http://www.unicode.org/unicode/standard/versions/enumeratedversions.html</a> 
+</dd><dt id="bib-UTF-8">[UTF-8]</dt><dd rel="dcterms:requires">F. Yergeau. <a href="http://www.ietf.org/rfc/rfc3629.txt"><cite>UTF-8, a transformation format of ISO 10646</cite></a>. IETF RFC 3629. November 2003. URL: <a href="http://www.ietf.org/rfc/rfc3629.txt">http://www.ietf.org/rfc/rfc3629.txt</a>
+</dd></dl></div><div id="informative-references" typeof="bibo:Chapter" about="#informative-references" class="section"><h3><span class="secno">D.2 </span>Informative references</h3><dl class="bibliography" about=""><dt id="bib-N3">[N3]</dt><dd rel="dcterms:references">Tim Berners-Lee; Dan Connolly. <a href="http://www.w3.org/TeamSubmission/2008/SUBM-n3-20080114/"><cite>Notation3 (N3): A readable RDF syntax.</cite></a> 14 January 2008. W3C Team Submission. URL: <a href="http://www.w3.org/TeamSubmission/2008/SUBM-n3-20080114/">http://www.w3.org/TeamSubmission/2008/SUBM-n3-20080114/</a> 
+</dd><dt id="bib-RDF-SPARQL-QUERY">[RDF-SPARQL-QUERY]</dt><dd rel="dcterms:references">Andy Seaborne; Eric Prud'hommeaux. <a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/"><cite>SPARQL Query Language for RDF.</cite></a> 15 January 2008. W3C Recommendation. URL: <a href="http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/">http://www.w3.org/TR/2008/REC-rdf-sparql-query-20080115/</a> 
+</dd><dt id="bib-RDF-SYNTAX-GRAMMAR">[RDF-SYNTAX-GRAMMAR]</dt><dd rel="dcterms:references">Dave Beckett. <a href="http://www.w3.org/TR/2004/REC-rdf-syntax-grammar-20040210/"><cite>RDF/XML Syntax Specification (Revised).</cite></a> 10 February 2004. W3C Recommendation. URL: <a href="http://www.w3.org/TR/2004/REC-rdf-syntax-grammar-20040210/">http://www.w3.org/TR/2004/REC-rdf-syntax-grammar-20040210/</a> 
+</dd><dt id="bib-UNISEC">[UNISEC]</dt><dd rel="dcterms:references">Mark Davis; Michel Suignard. <a href="http://www.unicode.org/reports/tr36/"><cite>Unicode Security Considerations</cite></a> 4 August 2010. URL: <a href="http://www.unicode.org/reports/tr36/">http://www.unicode.org/reports/tr36/</a>
+</dd></dl></div></div></body></html>

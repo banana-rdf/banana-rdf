@@ -4,9 +4,8 @@ import org.junit.Test
 import org.junit.Assert._
 import util.Random
 import java.io._
-import nomo.{Success, Accumulator}
+import nomo.Accumulator
 import com.hp.hpl.jena.rdf.model.{ModelFactory=>JenaModelFactory, Model => JenaModel}
-import collection.mutable
 import org.w3.rdf._
 
 // would be happy to use
@@ -67,7 +66,6 @@ abstract class NTriplesParserTest[Rdf <: RDF, F, E, X](
 
   @Test()
   def read_long_n3s_in_chunks(): Unit = {
-    import scala.io._
 
     val card: File = new File(this.getClass.getResource("/card.nt").toURI)
     val in = new FileInputStream(card)

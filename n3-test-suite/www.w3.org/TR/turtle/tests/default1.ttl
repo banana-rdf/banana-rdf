@@ -1,0 +1,8 @@
+# prefix1 - simple prefix expansion
+# 
+# $Id: default1.ttl,v 1.1 2011/08/08 15:58:52 eric Exp $
+
+@prefix : <http://xmlns.com/foaf/0.1/> .
+@prefix ericFoaf: <http://www.w3.org/People/Eric/ericP-foaf.rdf#> .
+
+ericFoaf:ericP :givenName "Eric" .
