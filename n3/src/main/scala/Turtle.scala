@@ -5,19 +5,22 @@
 package org.w3.rdf.n3
 
 import org.w3.rdf._
-import java.io.Serializable
 import nomo._
-import nomo.Errors.TreeError
 
 
 /**
  * Turtle Parser as specified at http://www.w3.org/TR/turtle/
+ * Using Nomo library https://bitbucket.org/pchiusano/nomo
+ *
+ * This is a non blocking parser for Turtle. It does not block on input,
+ * and serialises its output. Ie: it can send triples to another process as
+ * it parses them.
  *
  * @param  P
  * @tparam F
  * @tparam E
  * @tparam X
- * @tparam U
+ * @tparam U The Listener, which keeps prefixes and sends its results on
  */
 class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     val ops: RDFOperations[Rdf],
