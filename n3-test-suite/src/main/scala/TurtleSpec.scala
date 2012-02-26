@@ -459,17 +459,20 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
 
   property("stacked blank nodes") = secure {
-    val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode()
+    val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode(); val bn4 = BNode()
     val t1 = Triple(bn1,f_name, "Alexandre" lang "fr" )
     val t2 = Triple(bn1,f_knows,bn2)
     val t3 = Triple(bn2,f_name,"Henry")
+    val t3_1 = Triple(bn2,f_knows,bn4)
+    val t3_2 = Triple(bn4,f_name,"Tim")
     val t4 = Triple(bn1,f_pub,bn3)
     val t5 = Triple(bn3,f_name,"Pimp My RDF")
-    val g = Graph(t1,t2,t3,t4,t5)
+    val g = Graph(t1,t2,t3,t3_1,t3_2,t4,t5)
     val doc = """
     @prefix foaf: <http://xmlns.com/foaf/0.1/> .
     [] foaf:name "Alexandre"@fr ; #simple bnode subject
        foaf:knows [ foaf:name "Henry";
+                    foaf:knows [ foaf:name "Tim" ];
                   ];
        foaf:publication [ foaf:name "Pimp My RDF" ] .
     """
@@ -478,7 +481,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     try {
       ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
         res.isSuccess  &&
-          (( res.user.queue.size == 5) :| "the two graphs are not the same size" ) &&
+          (( res.user.queue.size == 7) :| "the two graphs are not the same size" ) &&
           ((Graph(res.user.queue.toIterable) isIsomorphicWith  g ) :| "the two graphs are not isomorphic")
       )
     } catch {
