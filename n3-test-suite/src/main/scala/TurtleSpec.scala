@@ -21,7 +21,7 @@ import java.io.{BufferedReader, StringReader}
  * @created 20/02/2012
  */
 class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
-                                              val isomorphism: GraphIsomorphism[Rdf]) extends Properties("Turtle") {
+                             val isomorphism: GraphIsomorphism[Rdf]) extends Properties("Turtle") {
   import ops._
   import isomorphism._
   

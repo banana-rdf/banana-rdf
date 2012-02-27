@@ -18,7 +18,7 @@ import org.w3.rdf._
  * For the moment there is a bit of security, and the code will throw exceptions at runtime
  * if something is done wrong. It should not be able to do it though.
  */
-case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
+case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: String="") {
 
   import ops._
 
