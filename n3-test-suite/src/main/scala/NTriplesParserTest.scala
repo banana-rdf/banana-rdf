@@ -1,4 +1,10 @@
+/*
+ * Copyright (c) 2012 Henry Story
+ * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
+ */
+
 package org.w3.rdf.n3
+
 
 import org.junit.Test
 import org.junit.Assert._
@@ -7,10 +13,23 @@ import java.io._
 import nomo.Accumulator
 import com.hp.hpl.jena.rdf.model.{ModelFactory=>JenaModelFactory, Model => JenaModel}
 import org.w3.rdf._
+import jena.{Jena, JenaOperations}
+import sesame.{Sesame, SesameOperations, SesameTurtleReader, SesameGraphIsomorphism}
 
-// would be happy to use
-// NTriplesParserTest[M <: Model](m: M, parser: NTriplesParser[m.type], isomorphism: GraphIsomorphism[m.type])
-// but the compiler complains, saying it does not know m
+
+/**
+ * This is a class that enables each implementation of org.w3.rdf to test its ability to
+ * interact with the NTriples parser written with Nomo.
+ *
+ * The test suites in the test directory test Nomo versus the parsers from Sesame, Jena, etc...
+ *
+ * @param ops
+ * @param parser
+ * @tparam Rdf
+ * @tparam F
+ * @tparam E
+ * @tparam X
+ */
 abstract class NTriplesParserTest[Rdf <: RDF, F, E, X](
     val ops: RDFOperations[Rdf],
     val parser: NTriplesParser[Rdf, F, E, X, Listener[Rdf]]) {
@@ -33,6 +52,8 @@ abstract class NTriplesParserTest[Rdf <: RDF, F, E, X](
 
  """
 
+
+
   def randomSz = {
     val random = 29 to 47+1
     random(Random.nextInt(random.length ))
@@ -41,7 +62,6 @@ abstract class NTriplesParserTest[Rdf <: RDF, F, E, X](
   
   @Test()
   def read_simple_n3(): Unit = {
-
     val res = parser.nTriples(n3)
     val tr = res.user.queue.toList.map(_.asInstanceOf[Triple])
     val parsedGraph = Graph(tr)
@@ -64,8 +84,73 @@ abstract class NTriplesParserTest[Rdf <: RDF, F, E, X](
     assertTrue("graphs must be isomorphic", expected isIsomorphicWith parsedGraph)
   }
 
+  private val mToJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
+  private val mToSesame = new RDFTransformer[Rdf, Sesame](ops, SesameOperations)
+
+  @Test
+  def official_n3_test {
+    val testFile =  new File(this.getClass.getResource("/www.w3.org/2000/10/rdf-tests/rdfcore/ntriples/test.nt").toURI)
+
+    //read using Jena's NTriples parser, so we can test the n3 NTriples parser by comparing outputs
+    val jenaModel = JenaModelFactory.createDefaultModel()
+    jenaModel.read(new FileInputStream(testFile),null,"N-TRIPLE")
+    val jenaGraph = jenaModel.getGraph
+    assertEquals("There were read 30 triples in "+testFile.getPath,30,jenaModel.size())
+
+
+    val sesameReader = SesameTurtleReader.read(testFile,"")
+    assertTrue("sesame parsed document",sesameReader.isRight)
+    assertEquals("there were 30 triples in the "+testFile.getPath,30,sesameReader.right.get.size())
+
+    var chunk = ParsedChunk(parser.nTriples,parser.P.annotator(U))
+    var inOpen = true
+    val in = new FileInputStream(testFile)
+    val bytes = new Array[Byte](randomSz)
+
+    while (inOpen ) {
+      try {
+        val length = in.read(bytes)
+        if (length > -1) {
+          chunk = chunk.parse(new String(bytes, 0, length, "ASCII"))
+        } else inOpen = false
+      } catch {
+        case e: IOException => inOpen = false
+      }
+    }
+
+    val result = chunk.parser.result(chunk.acc)
+    val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
+    val g = Graph(res)
+    assertEquals("Our parser should have read 30 triples"+testFile.getPath,30,res.size)
+
+    val gAsSesame = mToSesame.transform(g)
+    assertTrue("the two graphs must be isomorphic (using Sesame isomorphism comparison)",
+      SesameGraphIsomorphism.isomorphism (gAsSesame, sesameReader.right.get) )
+
+    //first we look that each triple can be found (to narrow down issues)
+    res.foreach {
+      var counter = 0
+      triple =>
+        counter += 1
+      def bn(node: Node): Jena#Node = node match { case _ :BNode => null; case other=>mToJena.transformNode(other) }
+
+      //the following seems to indicate that a map function for a triple would be useful.
+      //something that would allow us to do triple.map(bn(_)) and then pass that on
+      val res = jenaGraph.find( bn(triple.subject),bn(triple.predicate),bn(triple.objectt) )
+
+      assertTrue("the jena graph must contain every statement we read with our parser. \r\n" +
+        "Testing triple no "+ counter +": "+triple, res.hasNext)
+    }
+
+    //this fails. Not surew here the fault lies.
+    val gAsJena = mToJena.transform(g)
+    assertTrue("the two graphs must be isomorphic (using Jena's isomorphism comparison)",
+      gAsJena isIsomorphicWith jenaGraph)
+  }
+
+
   @Test()
-  def read_long_n3s_in_chunks(): Unit = {
+  def read_long_n3s_in_chunks() {
 
     val card: File = new File(this.getClass.getResource("/card.nt").toURI)
     val in = new FileInputStream(card)

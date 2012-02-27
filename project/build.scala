@@ -79,13 +79,13 @@ object YourProjectBuild extends Build {
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
   lazy val sesame = Project(
     id = "sesame",
     base = file("sesame"),
     settings = buildSettings ++ sesameDeps ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
   lazy val util = Project(
     id = "util",
@@ -102,8 +102,8 @@ object YourProjectBuild extends Build {
   lazy val n3TestSuite = Project(
     id = "n3-test-suite",
     base = file("n3-test-suite"),
-    settings = buildSettings ++ testsuiteDeps ++ jenaDeps
-  ) dependsOn (n3)
+    settings = buildSettings ++ testsuiteDeps
+  ) dependsOn (n3, jena, sesame)
   
   lazy val store = Project(
     id = "store",

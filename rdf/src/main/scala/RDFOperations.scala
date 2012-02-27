@@ -112,13 +112,12 @@ trait RDFOperations[Rdf <: RDF] {
   implicit def graphAsIterable(graph: Graph): Iterable[Triple] = Graph.toIterable(graph)
   
   implicit def tupleToTriple(tuple: (Node, IRI, Node)): Triple = Triple(tuple._1, tuple._2, tuple._3)
-  
+
   class TripleW(triple: Triple) {
     val Triple(subject, predicate, objectt) = triple
   }
-  
   implicit def wrapTriple(triple: Triple): TripleW = new TripleW(triple)
-  
+
   class NodeW(node: Node) {
     def fold[T](funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T =
       Node.fold(node)(funIRI, funBNode, funLiteral)
