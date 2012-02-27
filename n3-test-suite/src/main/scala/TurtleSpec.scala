@@ -35,7 +35,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
   val P = new TurtleParser(
       ops,
-      Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))
+      Parsers(Monotypic.Seq[Char], Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))
 
   implicit def U: Listener[Rdf] = new Listener(ops)
 
@@ -579,7 +579,18 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
   }
 
-
+   property("debugging space") = secure {
+     val tr = Triple(IRI("http://example.org/resource15"),IRI("http://example.org/property"),BNode("anon"))
+     val tr2 = Triple(IRI("http://example.org/resource16"),IRI("http://example.org/property"),"\u00E9"§)
+     val doc = """<http://example.org/resource15> <http://example.org/property> _:anon.
+     # \\u and \\U escapes
+     # latin small letter e with acute symbol \u00E9 - 3 UTF-8 bytes #xC3 #A9
+<http://example.org/resource16> <http://example.org/property> "\u00E9" .
+     """
+     val res = P.turtleDoc(doc)
+     ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
+       res.isSuccess)
+   }
 
 }
 

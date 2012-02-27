@@ -63,12 +63,15 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val UCHAR = u_CHAR | U_CHAR
   lazy val IRICHAR = UCHAR | CLOSE_ANGLE
-  lazy val IRICHARS = IRICHAR.many1.map(_.mkString)
-  lazy val UCHARS = UCHAR.many1.map(_.mkString)
+  lazy val IRICHARS = IRICHAR.many1.map(_.toSeq.mkString)
+  lazy val UCHARS = UCHAR.many1.map(_.toSeq.mkString)
   lazy val PN_CHARS_BASE = single(pn_chars_base) | UCHAR
   lazy val PN_CHARS_U = PN_CHARS_BASE | P.single ('_')
-  lazy val PN_CHARS =  P.takeWhile1(pn_chars_dot, err).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
-  lazy val PN_decode = PN_CHARS.many1.map(_.mkString)
+
+  //todo: current spec requires that dot is readable. But that makes things difficult to parse.
+  //todo: was P.takeWhile1(pn_chars_dot, err)
+  lazy val PN_CHARS =  P.takeWhile1(pn_chars, err).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
+  lazy val PN_decode = PN_CHARS.many1.map(_.toSeq.mkString)
 
   /**
    * This does not deal with final dot properly. It will consume it and fail, when it might need to consume up
@@ -78,12 +81,12 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
    */
   lazy val PN_PREFIX  : P.Parser[String] =  (PN_CHARS_BASE ++ PN_CHARS.many).mapResult{ r =>
       r.status.flatMap {
-        case c1 ++ more => if (more.size != 0 && more.last == '.') Error(err(r.position)) else Success(c1+more.mkString)
+        case c1 ++ more => if (more.size != 0 && more.last == '.') Error(err(r.position)) else Success(c1+more.toSeq.mkString)
       }
   }
 
   lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).map(prefix=>prefix.getOrElse("")+":")
-  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err) | IRICHARS).many.map(i=>IRI(i.mkString))<<P.single('>')
+  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err).map(_.toSeq.mkString) | IRICHARS).many.map(i=>IRI(i.toSeq.mkString))<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
@@ -101,7 +104,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   /**
    *for a discussion of this rule see: https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rules
    */
-  lazy val PN_LOCAL = (PNL_FIRST ++ PNL_BODY.many.map(_.mkString)).map { case first++body => first+body }
+  lazy val PN_LOCAL = (PNL_FIRST ++ PNL_BODY.many.map(_.toSeq.mkString)).map { case first++body => first+body }
 
   lazy val PNAME_LN = (PNAME_NS ++ PN_LOCAL).map{ case ns++local => PName(ns,local)}
   lazy val PrefixedName = PNAME_LN | PNAME_NS.map(ns => PName(ns,""))
@@ -127,11 +130,11 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val STRING_LITERAL1 = (
     q1 >>  ( P.takeWhile1(c => !"\\'\n\r".contains(c),err).map(_.toSeq.mkString) | ECHAR | UCHAR ).many << q1
-    ).map(_.mkString)
+    ).map(_.toSeq.mkString)
 
   lazy val STRING_LITERAL2 = (
     q2 >>  ( P.takeWhile1(c => !"\\\"\n\r".contains(c),err).map(_.toSeq.mkString) | ECHAR | UCHAR ).many << q2
-    ).map(_.mkString)
+    ).map(_.toSeq.mkString)
 
   lazy val STRING_LITERAL_LONG1 = (
     Q1 >> ((
@@ -141,7 +144,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       case Some(quote) ++ c => quote + c
       case None ++ c => c.toString
     }).many << Q1
-    ).map(_.mkString)
+    ).map(_.toSeq.mkString)
 
 
   lazy val STRING_LITERAL_LONG2 = (
@@ -152,13 +155,13 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       case Some(quote) ++ c => quote + c
       case None ++ c => c.toString
     }).many << Q2
-    ).map(_.mkString)
+    ).map(_.toSeq.mkString)
 
 
   val LANGTAG = P.single('@') >> {
-    P.takeWhile1(alphabet(_),err) ++ (P.single('-') >> P.takeWhile1(alphaNumeric(_),err).map(_.toSeq.mkString) ).many
+    P.takeWhile1(alphabet(_),err).map (_.toSeq.mkString) ++ (P.single('-') >> P.takeWhile1(alphaNumeric(_),err).map(_.toSeq.mkString) ).many
   }.map{
-    case c ++ list => Lang(c+(if (list.size==0) "" else "-")+list.mkString("-"))
+    case c ++ list => Lang(c+(if (list.size==0) "" else "-")+list.toSeq.mkString("-"))
   }
 
   lazy val StringLit =  STRING_LITERAL_LONG1 | STRING_LITERAL_LONG2   | STRING_LITERAL1 | STRING_LITERAL2

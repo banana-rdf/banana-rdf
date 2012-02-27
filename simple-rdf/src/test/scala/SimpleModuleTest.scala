@@ -9,7 +9,7 @@ import org.w3.rdf.n3._
 
 class SimpleModuleTest extends PimpsTestSuite(SimpleRDFOperations)
 
-object SimpleN3ParserSpec extends n3.NTriplesSpec(SimpleRDFOperations)
+object SimpleNTriplesParserSpec extends n3.NTriplesSpec(SimpleRDFOperations)
 
 object SimpleTurtleParserSpec extends n3.TurtleSpec(SimpleRDFOperations, SimpleGraphIsomorphism)
 
