@@ -135,7 +135,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
         fail.get.printStackTrace(new PrintWriter( stack))
         info("stack trace:"+stack.getBuffer)
       }
-      f
+      fail
     }
     val errs = res.filter(_!= None)
 

@@ -214,7 +214,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val literal = RDFLiteral  | NumericLiteral | BooleanLiteral
 
-  lazy val ANON = (P.single('[')>> SP.optional >> P.single(']')).as(BNode())
+  lazy val ANON = (P.single('[')>> SP.optional >> P.single(']')).map(x=>BNode())
   lazy val BLANK_NODE_LABEL = P.word("_:")>>PN_LOCAL.map(BNode(_))
   lazy val BlankNode = BLANK_NODE_LABEL | ANON
 
