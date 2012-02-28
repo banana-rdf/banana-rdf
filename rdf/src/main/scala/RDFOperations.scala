@@ -91,7 +91,7 @@ trait RDFOperations[Rdf <: RDF] {
   val xsdString = xsd("string")
   val xsdInt = xsd("int")
   val rdfLang = rdf("langString")
-  val rdfType = rdf("type ")
+  val rdfType = rdf("type")
   val xsdInteger = xsd("integer")
   val xsdDecimal = xsd("decimal")
   val xsdDouble = xsd("double")
