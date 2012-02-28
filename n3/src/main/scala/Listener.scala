@@ -181,6 +181,7 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null)
     prefixs.put(name, value)
   }
 
+
   @throws(classOf[URISyntaxException])
   def resolve(iriStr: String): Rdf#IRI = {
      val uri = if (currentBase != null) {
