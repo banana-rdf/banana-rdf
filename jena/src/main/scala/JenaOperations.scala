@@ -76,9 +76,7 @@ object JenaOperations extends RDFOperations[Jena] {
 
   object TypedLiteral extends TypedLiteralCompanionObject {
     def apply(lexicalForm: String, iri: IRI): TypedLiteral = {
-      val IRI(iriString) = iri
-      val typ = mapper.getTypeByName(iriString)
-      JenaNode.createLiteral(lexicalForm, null, typ).asInstanceOf[Node_Literal]
+      JenaNode.createLiteral(lexicalForm, null, jenaDatatype(iri)).asInstanceOf[Node_Literal]
     }
     def unapply(typedLiteral: TypedLiteral): Option[(String, IRI)] = {
       val typ = typedLiteral.getLiteralDatatype
@@ -94,7 +92,7 @@ object JenaOperations extends RDFOperations[Jena] {
   object LangLiteral extends LangLiteralCompanionObject {
     def apply(lexicalForm: String, lang: Lang): LangLiteral = {
       val Lang(langString) = lang
-      JenaNode.createLiteral(lexicalForm, langString, jenaDatatype(xsdString)).asInstanceOf[Node_Literal]
+      JenaNode.createLiteral(lexicalForm, langString, null).asInstanceOf[Node_Literal]
     }
     def unapply(langLiteral: LangLiteral): Option[(String, Lang)] = {
       val l = langLiteral.getLiteralLanguage
