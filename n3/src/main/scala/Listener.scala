@@ -172,7 +172,7 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null)
   var currentBase = base
   @throws(classOf[URISyntaxException])
   def alterBase(newbase: IRI) {
-    newbase match {
+    currentBase = newbase match {
       case IRI(i) => new URI(i)
     }
   }
@@ -183,9 +183,11 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null)
 
   @throws(classOf[URISyntaxException])
   def resolve(iriStr: String): Rdf#IRI = {
-     currentBase = if (currentBase != null) currentBase.resolve(iriStr)
-     else new URI(iriStr)
-     IRI(currentBase.toString)
+     val uri = if (currentBase != null) {
+       if ("" == iriStr) currentBase // for a ".../index.html" base, java returns ".../" on  uri.resolve("")
+       else currentBase.resolve(iriStr)
+     } else new URI(iriStr)
+     IRI(uri.toString)
   }
 
 

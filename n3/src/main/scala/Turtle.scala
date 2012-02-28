@@ -87,9 +87,14 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   }
 
   lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).map(prefix=>prefix.getOrElse(""))
-  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err).map(_.toSeq.mkString) | IRICHARS).many.mapResult{
-    r=>r.status.map(iri=>r.user.resolve(iri.toSeq.mkString))
-   }<<P.single('>')
+  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err).map(_.toSeq.mkString) |
+    IRICHARS).many.mapResult{ r =>
+      try {
+        r.status.map(iri => r.user.resolve(iri.toSeq.mkString))
+      } catch {
+        case e: URISyntaxException => Error(err(r.position)) //todo: should this be a failure?
+      }
+  }<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
@@ -98,7 +103,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val base = (BASE >> SP >> IRI_REF).mapResult{ r =>
     try {
-      r.status.map{ case iri => {r.user.alterBase(iri); iri}}
+      r.status.map{ iri => {r.user.alterBase(iri); iri}}
     } catch {
       case e: URISyntaxException => Error(err(r.position)) //todo: should this be a failure?
     }

@@ -122,10 +122,10 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
       val resultFile = new File(f.getParentFile,resFileName)
       info(" ")
       info("input "+f.getName+" should produce "+resultFile.getName)
-      val otherReading = referenceParser.read(resultFile,base)
+      val otherReading = referenceParser.read(resultFile,base+f.getName)
       failureOf {
         assert(otherReading.isRight === true, referenceParser + " could not read the " + f + " returned " + otherReading)
-        val result = parseTurtleFile(f, base)
+        val result = parseTurtleFile(f, base+f.getName)
         val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
         isomorphicTest(res, otherReading.right.get)
       }

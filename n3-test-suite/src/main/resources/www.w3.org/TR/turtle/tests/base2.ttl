@@ -4,6 +4,6 @@
 # note the supplied base URI for all Turtle tests:
 #   http://www.w3.org/2001/sw/DataAccess/df1/tests/
 
-@base foaf: <../../../../../2010/01/Turtle/tests/> .
+@base <../../../../../2010/01/Turtle/tests/> .
 <prefix1.ttl> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#PositiveSyntaxTest> .
 
