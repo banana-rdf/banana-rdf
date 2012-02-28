@@ -80,9 +80,9 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
       info("read ntriples file with " +testedParser+" found "+referenceAsSet.size +" triples")
 
       if (result.size!=referenceAsSet.size) {
-        info("The number of triples read was "+result.size+". The reference number was "+referenceAsSet.size)
-        info("But perhaps that is due to there being duplicates. The result size with obvious duplicates removed is "+Set(result:_*).size)
-        if (result.size>0) info("the last triple read was "+result.last)
+        info("    The number of triples read was "+result.size+". The reference number was "+referenceAsSet.size)
+        info("    But perhaps that is due to there being duplicates. The result size with obvious duplicates removed is "+Set(result:_*).size)
+        if (result.size>0) info("    the last triple read was "+result.last)
       }
 
       //test each statement
@@ -92,10 +92,10 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
         triple =>
           counter += 1
           val res = referenceAsSet.contains(rdfTransformer.transformTriple(triple))
-          assert(res, "the reference graph does not contain triple no " + counter + ": " + triple)
+          if (!res) info("     missing triple no " + counter + ": " + triple+" from reference graph.")
       }
 
-      assert(false, "graphs were not isomorphic")
+      assert(false, "     graphs were not isomorphic")
     }
   }
 
@@ -116,10 +116,12 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
   property("The Turtle Parser should parse each of the good files") {
     val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
     info("all these files are in "+tstDir)
+
     val res = for(f <- good) yield {
       val resFileName = f.getName.substring(0,f.getName.length()-"ttl".length())+"out"
       val resultFile = new File(f.getParentFile,resFileName)
-      info("testing file "+f.getName+" against result in "+resultFile.getName)
+      info(" ")
+      info("input "+f.getName+" should produce "+resultFile.getName)
       val otherReading = referenceParser.read(resultFile,base)
       failureOf {
         assert(otherReading.isRight === true, referenceParser + " could not read the " + f + " returned " + otherReading)
@@ -130,7 +132,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
     }
     val errs = res.filter(_!= None)
 
-    assert(errs.size==0,"Not all tests passed. See info for details")
+    assert(errs.size==0,errs.size +" of the tests failed out of a total of "+good.size)
 
 
   }
