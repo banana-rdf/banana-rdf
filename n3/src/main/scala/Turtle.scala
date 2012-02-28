@@ -6,6 +6,7 @@ package org.w3.rdf.n3
 
 import org.w3.rdf._
 import nomo._
+import java.net.{URISyntaxException, URI}
 
 
 /**
@@ -85,8 +86,10 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       }
   }
 
-  lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).map(prefix=>prefix.getOrElse("")+":")
-  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err).map(_.toSeq.mkString) | IRICHARS).many.map(i=>IRI(i.toSeq.mkString))<<P.single('>')
+  lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).map(prefix=>prefix.getOrElse(""))
+  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err).map(_.toSeq.mkString) | IRICHARS).many.mapResult{
+    r=>r.status.map(iri=>r.user.resolve(iri.toSeq.mkString))
+   }<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
@@ -94,9 +97,11 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   }
 
   lazy val base = (BASE >> SP >> IRI_REF).mapResult{ r =>
-    //the base is just the namespace without a :
-    r.status.map(iri=>r.user.addPrefix("",iri))
-    r.status
+    try {
+      r.status.map{ case iri => {r.user.alterBase(iri); iri}}
+    } catch {
+      case e: URISyntaxException => Error(err(r.position)) //todo: should this be a failure?
+    }
   }
   lazy val PNL_FIRST = PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX
   lazy val PNL_BODY = PN_CHARS | PLX  //removed . in name, which is in current spec. too difficult to handle right now.

@@ -10,10 +10,10 @@ import java.io._
 import org.w3.rdf._
 import nomo.Accumulator
 import scala.util.Random
-import org.scalatest.prop.PropertyChecks
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.PropSpec
-import org.scalacheck.Gen
+import java.net.URI
+import org.scalatest.prop.PropertyChecks
+import org.scalatest.{FailureOf, PropSpec}
 
 
 /**
@@ -25,7 +25,7 @@ import org.scalacheck.Gen
 abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOperations[Rdf],
                                                      val testedParser: TurtleParser[Rdf, F, E, X, Listener[Rdf]],
                                                      val referenceParser: TurtleReader[Rdf2])
-  extends PropSpec with PropertyChecks with ShouldMatchers {
+  extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
 
   val morpheus: GraphIsomorphism[Rdf2]
 
@@ -43,10 +43,10 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
   val tstDir = new File(this.getClass.getResource("/www.w3.org/TR/turtle/tests/").toURI)
   val ttlFiles = tstDir.listFiles().filter(_.getName.endsWith(".ttl"))
   val bad= ttlFiles.filter(_.getName.startsWith("bad"))
-  val good = ttlFiles.diff(bad)
+  val good = ttlFiles.diff(bad).filter(!_.getName.contains("manifest"))
 
   def parseTurtleFile(testFile: File, base: String="") = {
-    implicit def U = new Listener(ops)
+    implicit def U = new Listener(ops, new URI(base))
     var chunk = ParsedChunk(testedParser.turtleDoc, testedParser.P.annotator(U))
     var inOpen = true
     val in = new FileInputStream(testFile)
@@ -80,8 +80,9 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
       info("read ntriples file with " +testedParser+" found "+referenceAsSet.size +" triples")
 
       if (result.size!=referenceAsSet.size) {
-        info("the last triple read was "+result.last)
-        assert(result.size === referenceAsSet.size,"the Turtle parser did not parse the right number of triples")
+        info("The number of triples read was "+result.size+". The reference number was "+referenceAsSet.size)
+        info("But perhaps that is due to there being duplicates. The result size with obvious duplicates removed is "+Set(result:_*).size)
+        if (result.size>0) info("the last triple read was "+result.last)
       }
 
       //test each statement
@@ -115,18 +116,22 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
   property("The Turtle Parser should parse each of the good files") {
     val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
     info("all these files are in "+tstDir)
-    for(f <- good) {
-      info("testing file "+f.getName)
-
-      val otherReading = referenceParser.read(f,base)
-      assert(otherReading.isRight === true,referenceParser +" could not read the "+f+" returned "+otherReading)
-
-      val result = parseTurtleFile(f,base)
-
-      val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
-
-      isomorphicTest(res, otherReading.right.get)
+    val res = for(f <- good) yield {
+      val resFileName = f.getName.substring(0,f.getName.length()-"ttl".length())+"out"
+      val resultFile = new File(f.getParentFile,resFileName)
+      info("testing file "+f.getName+" against result in "+resultFile.getName)
+      val otherReading = referenceParser.read(resultFile,base)
+      failureOf {
+        assert(otherReading.isRight === true, referenceParser + " could not read the " + f + " returned " + otherReading)
+        val result = parseTurtleFile(f, base)
+        val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
+        isomorphicTest(res, otherReading.right.get)
+      }
     }
+    val errs = res.filter(_!= None)
+
+    assert(errs.size==0,"Not all tests passed. See info for details")
+
 
   }
 

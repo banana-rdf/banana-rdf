@@ -6,6 +6,7 @@ package org.w3.rdf.n3
 
 import collection.mutable
 import org.w3.rdf._
+import java.net.{URISyntaxException, URI}
 
 /**
  * An agent that collects triples as they are built up and places them in a
@@ -18,7 +19,7 @@ import org.w3.rdf._
  * For the moment there is a bit of security, and the code will throw exceptions at runtime
  * if something is done wrong. It should not be able to do it though.
  */
-case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: String="") {
+case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null) {
 
   import ops._
 
@@ -27,6 +28,7 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: String=""
   val queue: mutable.Queue[Rdf#Triple] = new mutable.Queue[Rdf#Triple]()
   def sendTriple(subj: Node, rel: IRI, obj: Node) = queue.enqueue(Triple(subj,rel,obj))
   def sendTriple(t: Triple) = queue.enqueue(t)
+
 
   trait Mem {
     /**
@@ -167,8 +169,23 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: String=""
     prefixs.get(pname.prefix).map{ case IRI(pre)=> IRI(pre + pname.name)}
   }
 
+  var currentBase = base
+  @throws(classOf[URISyntaxException])
+  def alterBase(newbase: IRI) {
+    newbase match {
+      case IRI(i) => new URI(i)
+    }
+  }
+
   def addPrefix(name: String, value: Rdf#IRI) {
     prefixs.put(name, value)
+  }
+
+  @throws(classOf[URISyntaxException])
+  def resolve(iriStr: String): Rdf#IRI = {
+     currentBase = if (currentBase != null) currentBase.resolve(iriStr)
+     else new URI(iriStr)
+     IRI(currentBase.toString)
   }
 
 
