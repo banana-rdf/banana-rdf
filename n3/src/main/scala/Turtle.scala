@@ -218,22 +218,22 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val BLANK_NODE_LABEL = P.word("_:")>>PN_LOCAL.map(BNode(_))
   lazy val BlankNode = BLANK_NODE_LABEL | ANON
 
-  lazy val blankNodePropertyList = P.single('[').mapResult  {  r =>
-     r.status.map(node=>{ r.user.pushSubject(BNode());  r })
+  lazy val blankNodePropertyList: P.Parser[Node] = P.single('[').mapResult  {  r =>
+     r.status.map(node=>{ val b=BNode(); r.user.pushSubject(b) })
   } >> SP.optional >> (predicateObjectList << SP.optional << P.single(';').optional << SP.optional >> P.single(']')).mapResult{ r =>
-    r.status.map(node=>{ r.user.pop; r })
+    r.status.map(node=>r.user.pop)
   }
 
-  lazy val collection = P.single('(').mapResult  {  r =>
-    r.status.map(node=>{ r.user.pushList; r })
+  lazy val collection: P.Parser[Node] = P.single('(').mapResult  {  r =>
+    r.status.map(node=>{ r.user.pushList; node })
   } >> SP.optional >> (obj.delimit1Ignore(SP).optional << SP.optional << P.single(')')).mapResult{ r =>
-    r.status.map(node=>{ r.user.pop; r })
+    r.status.map(node=> r.user.pop)
   }
 
-  lazy val objBlank =  blankNodePropertyList | collection
-  lazy val obj: P.Parser[Any] = (IRIref | literal | BlankNode ).mapResult{r =>
+  lazy val objBlank: P.Parser[Node] =  blankNodePropertyList | collection
+  lazy val obj: P.Parser[Any] = (IRIref | literal | BlankNode | objBlank ).mapResult{r =>
     r.status.map{ node => { r.user.setObject(node); r } }
-  } | objBlank
+  }
   lazy val predicate = IRIref
   lazy val verb =  ( predicate | P.single('a').as(rdfType) ).mapResult{ r =>
     r.status.map{ iri => { r.user.setVerb(iri); r } }
@@ -243,9 +243,9 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val predicateObjectList: P.Parser[Unit] = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)
 
-  lazy val subject = ( IRIref | BlankNode ).mapResult { r =>
-    r.status.map{ node => { r.user.pushSubject(node); r } }
-  } | objBlank
+  lazy val subject = ( IRIref | BlankNode | objBlank).mapResult { r =>
+    r.status.map{ node => { r.user.pushSubject(node); node } }
+  }
 
   lazy val triples =  subject ++ (SP.optional>>predicateObjectList)
 

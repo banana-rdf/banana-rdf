@@ -120,12 +120,10 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null)
   val context = mutable.Stack[Mem]()
 
   /* exit a list, a [...] or a statement */
-  def pop  {
+  def pop = {
     val previous = context.pop
     previous.end
-    if (context.size>0) {
-      context.head.send(previous.subj)
-    }
+    previous.subj
   }
 
   /**

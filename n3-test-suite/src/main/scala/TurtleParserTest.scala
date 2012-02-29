@@ -117,7 +117,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
     isomorphicTest(res, otherReading.right.get)
   }
 
-  property("The Turtle Parser should pass each of the W3C Turtle Tests") {
+  property("The Turtle parser should pass each of the official W3C Turtle Tests") {
     val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
     info("all these files are in "+tstDir)
 
@@ -128,7 +128,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
       info("input "+f.getName+" should produce "+resultFile.getName)
       val otherReading = referenceParser.read(resultFile,base+f.getName)
       val fail = failureOf {
-        assert(otherReading.isRight === true, referenceParser + " could not read the " + f + " returned " + otherReading)
+        assert(otherReading.isRight === true, referenceParser + " could not read " + f + " detail: " + otherReading)
         val result = parseTurtleFile(f, base+f.getName)
         val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
         isomorphicTest(res, otherReading.right.get)
