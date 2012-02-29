@@ -4,8 +4,8 @@
  */
 package org.w3.rdf.n3
 
+import _root_.nomo._   //_root_ seems to be needed to get intellij 11 and 11.1 (114.243) to find the package
 import org.w3.rdf._
-import nomo._
 import java.net.{URISyntaxException, URI}
 
 
