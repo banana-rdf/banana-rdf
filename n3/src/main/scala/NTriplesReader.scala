@@ -12,7 +12,7 @@ import nomo.Accumulator
 
 
 /**
- * A Traditional Blocking Reader for the nomo based NTriples parser
+ * A Traditional blocking Reader for the nomo based NTriples parser .
  *
  * @author bblfish
  * @created 29/02/2012
@@ -24,8 +24,9 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
   /**
    *
    * @param is an ASCII data containing input stream (UTF-8) may work too
-   * @param base is null, NTriples parsers don't need to know the base of a document, all statements are complete
-   * @return  the graph or an error
+   * @param base is ignored, as NTriples parsers don't need to know the base of a document, all statements
+   *             being complete
+   * @return the graph or an error
    */
   def read(is: InputStream, base: String): Either[Throwable, Rdf#Graph] = {
     read(new InputStreamReader(is, "UTF-8"), base) //currently NTriples only supports ascii, and so utf8 will work.
@@ -33,17 +34,18 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
 
   /**
    *
-   * @param reader is null for NTriple readers
-   * @param base
+   * @param reader containing the data to be parsed
+   * @param base is ignored, as NTriples parsers don't need to know the base of a document, all statements
+   *             being complete
    * @return the graph or an error
    */
   def read(reader: Reader, base: String): Either[Throwable, Rdf#Graph] = {
-    val buf = new Array[Char](1024)
+    val buf = new Array[Char](1024)  //todo: how could one set the size of the buffer?
     import parser.P._
     try {
       var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] = (parser.nTriples, parser.P.annotator(new Listener(ops, null)))
       Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
-        state = state._1.feedChunked(buf, state._2, read)
+        state = state._1.feedChunked(buf.slice(0,read), state._2, read)
       }
       val result = state._1.result(state._2)
       Right(ops.Graph(result.user.queue:_*))

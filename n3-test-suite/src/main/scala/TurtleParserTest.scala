@@ -8,7 +8,7 @@ package org.w3.rdf.n3
 
 import java.io._
 import org.w3.rdf._
-import _root_.nomo.Accumulator //fix for IntelliJ 11 and 11.1beta
+import _root_.nomo.Accumulator //fix for IntelliJ 11 and 11.1beta, because we have a nomo package
 import scala.util.Random
 import org.scalatest.matchers.ShouldMatchers
 import java.net.URI
@@ -128,8 +128,13 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
       info("input "+f.getName+" should produce "+resultFile.getName)
       val otherReading = referenceParser.read(resultFile,base+f.getName)
       val fail = failureOf {
-        assert(otherReading.isRight === true, referenceParser + " could not read " + f + " detail: " + otherReading)
+        if (otherReading.isLeft){
+          info("reference parser "+referenceParser + " could not read " + resultFile + " detail: " + otherReading.left)
+          throw otherReading.left.get
+       }
+
         val result = parseTurtleFile(f, base+f.getName)
+        assert(result.isSuccess,"failed to parse test. Result was:"+result)
         val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
         isomorphicTest(res, otherReading.right.get)
       }
