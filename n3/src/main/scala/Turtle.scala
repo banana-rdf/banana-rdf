@@ -13,6 +13,10 @@ import java.net.{URISyntaxException, URI}
  * Turtle Parser as specified at http://www.w3.org/TR/turtle/
  * Using Nomo library https://bitbucket.org/pchiusano/nomo
  *
+ * but with a couple of tweaks in order to reduce the memory consumption of
+ * the parser (so that it can forget as much information as possible)
+ * https://bitbucket.org/bblfish/nomo/overview
+ *
  * This is a non blocking parser for Turtle. It does not block on input,
  * and serialises its output. Ie: it can send triples to another process as
  * it parses them.

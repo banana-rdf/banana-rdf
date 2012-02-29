@@ -18,6 +18,10 @@ import org.w3.rdf._
  * This is using the nomo library that is being developed
  * here:  https://bitbucket.org/pchiusano/nomo
  *
+ * but with a couple of tweaks in order to reduce the memory consumption of
+ * the parser (so that it can forget as much information as possible)
+ * https://bitbucket.org/bblfish/nomo/overview
+ *
  * @author bblfish
  * @since 02/02/2012
  */
