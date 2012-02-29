@@ -15,6 +15,8 @@ bad tests are of the form
 which must fail.
 
 The tests should be performed with an assumed base URI
-of http://www.w3.org/2001/sw/DataAccess/df1/tests/
+of http://www.w3.org/2001/sw/DataAccess/df1/tests/{filename.ttl}
+ie, the base should be the full URI of the file.
+
 
 Dave
