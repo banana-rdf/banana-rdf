@@ -10,19 +10,19 @@ import org.w3.rdf.sesame
 import org.w3.rdf.jena._
 import sesame.SesameGraphIsomorphism
 
-class JenaTurtleParserStringTest extends n3.TurtleParserTest(JenaOperations, JenaTurtleStringParser,JenaTurtleReader) {
+class JenaTurtleParserStringTest extends n3.TurtleParserTest(JenaTurtleStringParser,JenaTurtleReader) {
   val morpheus = JenaGraphIsomorphism
 }
 
-class JenaTurtleParserSeqTest extends n3.TurtleParserTest(JenaOperations, JenaTurtleSeqParser,JenaTurtleReader) {
+class JenaTurtleParserSeqTest extends n3.TurtleParserTest(JenaTurtleSeqParser,JenaTurtleReader) {
   val morpheus = JenaGraphIsomorphism
 }
 
-class SesameTurtleParserStringTest extends n3.TurtleParserTest(sesame.SesameOperations, sesame.TurtleStringParser,sesame.SesameTurtleReader) {
+class SesameTurtleParserStringTest extends n3.TurtleParserTest(sesame.TurtleStringParser,sesame.SesameTurtleReader) {
   val morpheus = SesameGraphIsomorphism
 }
 
-class SesameTurtleParserSeqTest extends n3.TurtleParserTest(sesame.SesameOperations, sesame.TurtleSeqParser,sesame.SesameTurtleReader) {
+class SesameTurtleParserSeqTest extends n3.TurtleParserTest(sesame.TurtleSeqParser,sesame.SesameTurtleReader) {
   val morpheus = SesameGraphIsomorphism
 }
 

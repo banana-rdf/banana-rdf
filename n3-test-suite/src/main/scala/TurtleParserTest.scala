@@ -19,22 +19,26 @@ import org.scalatest.{FailureOf, PropSpec}
 /**
  * Test parser with official tests from w3c using another turtle parser as a reference point
  *
- * @author bblfish
- * @created 27/02/2012
+ * todo: with a little bit of work, this could be generalised to test any parser.
+ *
+ * @param testedParser the turtle parser to be tested
+ * @param referenceParser only needs to understand NTriples. It reads the expected results
+ * @tparam Rdf The RDF framework understood by the test parser
+ * @tparam Rdf2 The RDF framework with which the reference parser uses
  */
-abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOperations[Rdf],
+abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
                                                      val testedParser: TurtleParser[Rdf, F, E, X, Listener[Rdf]],
                                                      val referenceParser: TurtleReader[Rdf2])
   extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
 
   val morpheus: GraphIsomorphism[Rdf2]
 
-  import ops._
+  import testedParser.ops._
 
   lazy val prime: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
     prime.takeWhile(j => j * j <= i).forall(i % _ > 0))
 
-  object rdfTransformer extends RDFTransformer[Rdf,Rdf2](ops,referenceParser.ops)
+  object rdfTransformer extends RDFTransformer[Rdf,Rdf2](testedParser.ops,referenceParser.ops)
 
   def randomSz = {
     prime(5+Random.nextInt(248))
@@ -46,7 +50,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
   val good = ttlFiles.diff(bad).filter(!_.getName.contains("manifest"))
 
   def parseTurtleFile(testFile: File, base: String="") = {
-    implicit def U = new Listener(ops, new URI(base))
+    implicit def U = new Listener(testedParser.ops, new URI(base))
     var chunk = ParsedChunk(testedParser.turtleDoc, testedParser.P.annotator(U))
     var inOpen = true
     val in = new FileInputStream(testFile)
@@ -113,7 +117,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
     isomorphicTest(res, otherReading.right.get)
   }
 
-  property("The Turtle Parser should parse each of the good files") {
+  property("The Turtle Parser should pass each of the W3C Turtle Tests") {
     val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
     info("all these files are in "+tstDir)
 
@@ -140,8 +144,6 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](val ops: RDFOp
     val errs = res.filter(_!= None)
 
     assert(errs.size==0,errs.size +" of the tests failed out of a total of "+good.size)
-
-
   }
 
   import testedParser.P._
