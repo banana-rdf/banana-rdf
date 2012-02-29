@@ -8,11 +8,11 @@ package org.w3.rdf.n3
 import org.scalacheck._
 import Prop._
 
-import nomo.Errors._
+import _root_.nomo.Errors._
 import collection.immutable.NumericRange
 import collection.mutable.HashSet
-import nomo.{Accumulators, Errors, Parsers, Monotypic}
-import nomo.Accumulators.Position
+import _root_.nomo.{Accumulators, Errors, Parsers, Monotypic}
+import _root_.nomo.Accumulators.Position
 import scala.collection.mutable
 import org.w3.rdf._
 

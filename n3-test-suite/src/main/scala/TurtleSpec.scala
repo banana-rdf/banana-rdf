@@ -8,10 +8,10 @@ package org.w3.rdf.n3
 
 import org.scalacheck._
 import Prop._
-import nomo.Errors.TreeError
-import nomo.Accumulators.Position
-import nomo.Parsers._
-import nomo.{Parsers, Accumulators, Errors, Monotypic}
+import _root_.nomo.Errors.TreeError
+import _root_.nomo.Accumulators.Position
+import _root_.nomo.Parsers._
+import _root_.nomo.{Parsers, Accumulators, Errors, Monotypic}
 import org.w3.rdf._
 import java.nio.charset.Charset
 import java.io.{BufferedReader, StringReader}

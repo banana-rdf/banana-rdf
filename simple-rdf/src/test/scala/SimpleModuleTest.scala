@@ -6,6 +6,7 @@ import org.w3.rdf.util.DefaultGraphIsomorphism
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.rdf._
 import org.w3.rdf.n3._
+import nomo.NTriplesReader
 
 class SimpleModuleTest extends PimpsTestSuite(SimpleRDFOperations)
 
@@ -40,6 +41,11 @@ object SimpleNTriplesSeqParser
       Monotypic.Seq[Char],
       Errors.tree[Char],
       Accumulators.position[Listener[SimpleRDF]](4)))
+
+class NomoTurtleParserSeqTest extends n3.TurtleParserTest(sesame.TurtleStringParser,simple.NTriplesSeqReader) {
+  val morpheus = SimpleGraphIsomorphism
+}
+
 
 // TODO come back here when a writer is available
 //class SimpleTurtleTest extends TurtleTestSuite(SimpleModule) {

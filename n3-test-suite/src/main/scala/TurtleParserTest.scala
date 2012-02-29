@@ -8,7 +8,7 @@ package org.w3.rdf.n3
 
 import java.io._
 import org.w3.rdf._
-import nomo.Accumulator
+import _root_.nomo.Accumulator //fix for IntelliJ 11 and 11.1beta
 import scala.util.Random
 import org.scalatest.matchers.ShouldMatchers
 import java.net.URI

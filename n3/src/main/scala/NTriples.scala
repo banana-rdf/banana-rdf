@@ -5,8 +5,8 @@
 
 package org.w3.rdf.n3
 
-import nomo._
-import nomo.Errors.{TreeError, Single}
+import _root_.nomo._
+import _root_.nomo.Errors.{TreeError, Single}
 import scala.collection.mutable
 import org.w3.rdf._
 

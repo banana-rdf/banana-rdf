@@ -10,7 +10,7 @@ import org.junit.Test
 import org.junit.Assert._
 import util.Random
 import java.io._
-import nomo.Accumulator
+import _root_.nomo.Accumulator
 import com.hp.hpl.jena.rdf.model.{ModelFactory=>JenaModelFactory, Model => JenaModel}
 import org.w3.rdf._
 import jena.{Jena, JenaOperations}
