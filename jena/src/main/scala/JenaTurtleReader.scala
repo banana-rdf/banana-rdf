@@ -11,7 +11,7 @@ object JenaTurtleReader extends TurtleReader[Jena](JenaOperations) {
   def read(is: InputStream, base: String): Either[Throwable, Jena#Graph] =
     try {
       val model = ModelFactory.createDefaultModel()
-      model.getReader("TURTLE").read(model, is, base)
+      model.read(is,base,"TTL")
       Right(model.getGraph)
     } catch {
       case t => Left(t)
@@ -20,7 +20,7 @@ object JenaTurtleReader extends TurtleReader[Jena](JenaOperations) {
   def read(reader: Reader, base: String): Either[Throwable, Jena#Graph] =
     try {
       val model = ModelFactory.createDefaultModel()
-      model.getReader("TURTLE").read(model, reader, base)
+      model.read(reader,base,"TTL")
       Right(model.getGraph)
     } catch {
       case t => Left(t)

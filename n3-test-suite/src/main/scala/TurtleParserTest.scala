@@ -107,7 +107,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
     val testFile =  new File(this.getClass.getResource("/www.w3.org/2000/10/rdf-tests/rdfcore/ntriples/test.nt").toURI)
     info("testing file "+testFile.getName + " at "+testFile.getPath)
 
-    val otherReading = referenceParser.read(testFile,"")
+    val otherReading = referenceParser.read(testFile,"","UTF-8")
     assert(otherReading.isRight === true,referenceParser +" could not read the "+testFile+" returned "+otherReading)
 
     val result = parseTurtleFile(testFile)

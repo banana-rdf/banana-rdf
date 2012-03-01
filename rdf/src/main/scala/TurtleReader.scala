@@ -17,7 +17,15 @@ abstract class TurtleReader[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
     } catch {
       case t => Left(t)
     }
-  
+
+  def read(file: File, base: String, encoding: String): Either[Throwable, Rdf#Graph] =
+    try {
+      val fis = new InputStreamReader(new BufferedInputStream(new FileInputStream(file)),encoding)
+      read(fis, base)
+    } catch {
+      case t => Left(t)
+    }
+
   def read(s: String, base: String): Either[Throwable, Rdf#Graph] =
     try {
       val reader = new StringReader(s)
@@ -25,5 +33,4 @@ abstract class TurtleReader[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
     } catch {
       case t => Left(t)
     }
-  
 }
