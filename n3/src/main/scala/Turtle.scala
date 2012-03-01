@@ -86,7 +86,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
    */
   lazy val PN_PREFIX  : P.Parser[String] =  (PN_CHARS_BASE ++ PN_CHARS.many).mapResult{ r =>
       r.status.flatMap {
-        case c1 ++ more => if (more.size != 0 && more.last == '.') Error(err(r.position)) else Success(c1+more.toSeq.mkString)
+        case c1 ++ more => if (more.size != 0 && more.last == '.') Failure(err(r.position)) else Success(c1+more.toSeq.mkString)
       }
   }
 
@@ -96,7 +96,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       try {
         r.status.map(iri => r.user.resolve(iri.toSeq.mkString))
       } catch {
-        case e: URISyntaxException => Error(err(r.position)) //todo: should this be a failure?
+        case e: URISyntaxException => Failure(err(r.position)) //todo: should this be a failure?
       }
   }<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
@@ -109,7 +109,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     try {
       r.status.map{ iri => {r.user.alterBase(iri); iri}}
     } catch {
-      case e: URISyntaxException => Error(err(r.position)) //todo: should this be a failure?
+      case e: URISyntaxException => Failure(err(r.position)) //todo: should this be a failure?
     }
   }
   lazy val PNL_FIRST = PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX

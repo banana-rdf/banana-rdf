@@ -34,7 +34,7 @@ class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("
   
   implicit def U : Listener[Rdf] = new Listener(ops)
 
-  val P: NTriplesParser[Rdf, String, TreeError, Position, Listener[Rdf]] =
+  val P: NTriplesParser[Rdf, String, TreeMsg, Position, Listener[Rdf]] =
     new NTriplesParser(
       ops,
       Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))

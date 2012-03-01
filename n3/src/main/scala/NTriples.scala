@@ -6,7 +6,6 @@
 package org.w3.rdf.n3
 
 import _root_.nomo._
-import _root_.nomo.Errors.{TreeError, Single}
 import scala.collection.mutable
 import org.w3.rdf._
 
@@ -32,9 +31,6 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     val P: Parsers[F, Char, E, X, U]) {
   
   import ops._
-
-  //todo: do we really need a tree error for such a simple language (what do TreeErrors enable?)
-  implicit def toTreeError(msg: String): Errors.TreeError = Errors.Single(msg, None)
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
   val hexadecimalChars = "1234567890ABCDEFabcdef"

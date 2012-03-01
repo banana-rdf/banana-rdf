@@ -8,7 +8,7 @@ package org.w3.rdf.n3
 
 import org.scalacheck._
 import Prop._
-import _root_.nomo.Errors.TreeError
+import _root_.nomo.Errors.TreeMsg
 import _root_.nomo.Accumulators.Position
 import _root_.nomo.Parsers._
 import _root_.nomo.{Parsers, Accumulators, Errors, Monotypic}
