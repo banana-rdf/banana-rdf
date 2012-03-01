@@ -44,7 +44,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
       val result = P.PNAME_NS(write)
       ("prefix in = '"+write+"' result = '"+result+"'") |: all (
          result.isSuccess &&
-         result.get == orig
+         result.get+":" == orig
       )
     }
     all(res :_*)
@@ -131,10 +131,10 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
         ("prefix line in='" + preStr + "' result = " +res+ "user prefixes="+prefixes) |: all(
           res.isSuccess &&
-            ((origPfx == parsedPre) :| "original and parsed prefixes don't match") &&
+            ((origPfx == parsedPre+":") :| "original and parsed prefixes don't match") &&
             ((IRI(pureIRI) == parsedIRI) :| "original and parsed IRI don't match ") &&
             ((prefixes.get(parsedPre)  == Some(parsedIRI)) :| "parsed prefixes did not end up in user") &&
-            ((prefixes.get(origPfx)  == Some(IRI(pureIRI))) :|
+            ((prefixes.get(origPfx.substring(0,origPfx.size-1))  == Some(IRI(pureIRI))) :|
               "userPrefixHash["+origPfx+"] did not return the "+
               " original iri "+pureIRI)
         )
