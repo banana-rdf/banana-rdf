@@ -184,16 +184,16 @@ class SpecTriplesGenerator[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#de",
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#fr",
     "http://www.w3.org/2001/XMLSchema#string",
+    "http://nasdaq.com/'AAPL",
+    "http://über.info/>",
+    "http://lewis.org/ont/modal/▢⇾",   //unicode examples
     "http://xmlns.com/foaf/emotion#♡",
     "http://xmlns.com/foaf/emotion#☺",
-    "http://beyond.com/\t/flexibility",
+    "http://nasdaq.org/\"W3C",
+    "http://bush.gov/\r\n/bornagain",
     "http://alcoholics.anonymous/\r\n/startAgain",
     "http://moveon.org/\f/print",
-    "http://nasdaq.com/'AAPL",
-    "http://bush.gov/\r\n/bornagain",
-    "http://lewis.org/ont/modal/▢⇾",
-    "http://über.info/>",
-    "http://nasdaq.org/\"W3C")
+    "http://beyond.com/\t/flexibility")
 
   val encodedURIs = uris.map(u => NTriplesParser.toIRI(u))
 

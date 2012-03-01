@@ -126,17 +126,19 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
         val space2 = genSpaceOrComment.sample.get
         val preStr = "@prefix" + space1 + encodedPfx + space2 + "<" + encodedIRI + ">"
         val res = P.prefixID(preStr)(user)
-        val (parsedPre,parsedIRI) = res.get
         val prefixes = user.prefixes
 
         ("prefix line in='" + preStr + "' result = " +res+ "user prefixes="+prefixes) |: all(
           res.isSuccess &&
-            ((origPfx == parsedPre+":") :| "original and parsed prefixes don't match") &&
+          res.isSuccess ==> {  //&& in scalacheck evalutates both sides, hence this construct or we get a null pointer next
+            val (parsedPre,parsedIRI) = res.get
+            all(((origPfx == parsedPre+":") :| "original and parsed prefixes don't match") &&
             ((IRI(pureIRI) == parsedIRI) :| "original and parsed IRI don't match ") &&
             ((prefixes.get(parsedPre)  == Some(parsedIRI)) :| "parsed prefixes did not end up in user") &&
             ((prefixes.get(origPfx.substring(0,origPfx.size-1))  == Some(IRI(pureIRI))) :|
               "userPrefixHash["+origPfx+"] did not return the "+
-              " original iri "+pureIRI)
+              " original iri "+pureIRI) )
+          }
         )
       } catch {
         case e => {
@@ -155,13 +157,12 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
         val space2 = genSpaceOrComment.sample.get
         val preStr = "@base" + space1 + "<" + encoded + ">"+space2
         val res = P.base(preStr)(user)
-        val base = res.get
         val prefixes = user.prefixes
-
         ("prefix line in='" + preStr + "' result = " +res) |: all(
           res.isSuccess &&
-            (( base == IRI(pure)) :| "the decoded base differs from the original one") &&
-            ((prefixes.get("")  == Some(IRI(pure))) :| "base did not end up in user state")
+          res.isSuccess ==>
+            (( res.get == IRI(pure)) :| "the decoded base differs from the original one") &&
+            ((res.user.currentBase  == IRI(pure)) :| "base did not end up in user state")
         )
       } catch {
         case e => {
@@ -384,7 +385,6 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     )
   }
 
-  //this does not fail but it does produce any results either. Not sure what to think of this
   property("test broken number doc ") = secure {
     import serializer._
     val doc = """
@@ -473,7 +473,6 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
       foaf:knows <http://bblfish.net/#hjs>;
       foaf:likes () ] .
     """
-    out.println(doc)
     val res = P.turtleDoc(doc)
     try {
       ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
@@ -512,7 +511,6 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
 
     """
-    out.println(doc)
     val res = P.turtleDoc(doc)
     try {
       ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (
@@ -564,7 +562,6 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
                                           ) ] ) .
        
     """
-    out.println(doc)
     val res = P.turtleDoc(doc)
     try {
       ("result="+res +" res.user.queue="+res.user.queue+ " res.user.prefixes"+res.user.prefixes) |: all (

@@ -26,8 +26,8 @@ import org.scalatest.{FailureOf, PropSpec}
  * @tparam Rdf The RDF framework understood by the test parser
  * @tparam Rdf2 The RDF framework with which the reference parser uses
  */
-abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
-                                                     val testedParser: TurtleParser[Rdf, F, E, X, Listener[Rdf]],
+abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
+                                                     val testedParser: TurtleParser[Rdf, F, X, Listener[Rdf]],
                                                      val referenceParser: TurtleReader[Rdf2])
   extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
 

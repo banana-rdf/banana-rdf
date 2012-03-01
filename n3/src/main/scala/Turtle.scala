@@ -4,7 +4,10 @@
  */
 package org.w3.rdf.n3
 
-import _root_.nomo._   //_root_ seems to be needed to get intellij 11 and 11.1 (114.243) to find the package
+import _root_.nomo._
+import _root_.nomo.Errors.TreeMsg
+
+//_root_ seems to be needed to get intellij 11 and 11.1 (114.243) to find the package
 import org.w3.rdf._
 import java.net.{URISyntaxException, URI}
 
@@ -27,13 +30,14 @@ import java.net.{URISyntaxException, URI}
  * @tparam X
  * @tparam U The Listener, which keeps prefixes and sends its results on
  */
-class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
+class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
     val ops: RDFOperations[Rdf],
-    val P: Parsers[F, Char, E, X, U]) {
+    val P: Parsers[F, Char, TreeMsg, X, U]) {
   
   import TurtleParser._
   import P.++
   import ops._
+  import Errors.msg
 
  /**
    * Note without lazy val, the order of the parsers would be important
@@ -44,6 +48,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     s.status.flatMap(i => if (isC(i) ) Success(i) else Failure(P.err.single(i, s.position))))
 
   lazy val err = (pos: X) =>P.err.single('!',pos)
+  def err2(msg: String) = (pos: X)=>Errors.Single(msg+"at"+pos, None )
   lazy val COLON = P.single(':')
   lazy val PREFIX = P.word("@prefix")
   lazy val BASE = P.word("@base")
@@ -75,7 +80,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   //todo: current spec requires that dot is readable. But that makes things difficult to parse.
   //todo: was P.takeWhile1(pn_chars_dot, err)
-  lazy val PN_CHARS =  P.takeWhile1(pn_chars, err).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
+  lazy val PN_CHARS =  P.takeWhile1(pn_chars, err2("could not find pn_chars")).map(_.toSeq.mkString) | UCHAR.many1.map(_.toSeq.mkString)
   lazy val PN_decode = PN_CHARS.many1.map(_.toSeq.mkString)
 
   /**
@@ -86,7 +91,9 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
    */
   lazy val PN_PREFIX  : P.Parser[String] =  (PN_CHARS_BASE ++ PN_CHARS.many).mapResult{ r =>
       r.status.flatMap {
-        case c1 ++ more => if (more.size != 0 && more.last == '.') Failure(err(r.position)) else Success(c1+more.toSeq.mkString)
+        case c1 ++ more => if (more.size != 0 && more.last == '.')
+          Failure(Errors.Single("The prefix ends in a dot at position "+r.position, None ))
+        else Success(c1+more.toSeq.mkString)
       }
   }
 
@@ -96,7 +103,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       try {
         r.status.map(iri => r.user.resolve(iri.toSeq.mkString))
       } catch {
-        case e: URISyntaxException => Failure(err(r.position)) //todo: should this be a failure?
+        case e: URISyntaxException => Failure(Errors.Single("java URI parsing issue "+r.position, None )) //todo: should this be a failure?
       }
   }<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
@@ -109,7 +116,8 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     try {
       r.status.map{ iri => {r.user.alterBase(iri); iri}}
     } catch {
-      case e: URISyntaxException => Failure(err(r.position)) //todo: should this be a failure?
+      case e: URISyntaxException =>
+        Failure(Errors.Single("java URI parsing issue "+r.position, None ))
     }
   }
   lazy val PNL_FIRST = PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX
@@ -125,7 +133,8 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val IRIref = IRI_REF | PrefixedName.mapResult[IRI]{ r =>
     r.status.flatMap{ pn =>
         //todo: work out how to set more friendly errors https://bitbucket.org/pchiusano/nomo/issue/7/errors
-        r.user.resolve(pn).map(i=>Success(i)).getOrElse(Failure(P.err.empty))
+        r.user.resolve(pn).map(i=>Success(i)).getOrElse(
+          Failure(Errors.Single("could not resolve relative URI "+pn+" at "+r.position, None )))
       }
   }
   val q1 = P.single('\'')
@@ -173,7 +182,8 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
 
   val LANGTAG = P.single('@') >> {
-    P.takeWhile1(alphabet(_),err).map (_.toSeq.mkString) ++ (P.single('-') >> P.takeWhile1(alphaNumeric(_),err).map(_.toSeq.mkString) ).many
+    P.takeWhile1(alphabet(_),err).map (_.toSeq.mkString) ++ (P.single('-') >>
+      P.takeWhile1(alphaNumeric(_), err2("required one alphanum")).map(_.toSeq.mkString) ).many
   }.map{
     case c ++ list => Lang(c+(if (list.size==0) "" else "-")+list.toSeq.mkString("-"))
   }
@@ -191,7 +201,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     case str ++ None => TypedLiteral(str)
   }
 
-  lazy val INTEGER = P.takeWhile1(numeric(_),err).map(_.toSeq.mkString)
+  lazy val INTEGER = P.takeWhile1(numeric(_),err2("required 1 numeric char")).map(_.toSeq.mkString)
 
   lazy val Exponent = ( P.anyOf("eE") ++ P.anyOf("+-").optional ++ INTEGER ) map {
     case e++pos++exp => ""+e+pos.getOrElse("")+exp
@@ -206,7 +216,7 @@ class TurtleParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
       def w(o: Option[String])=o.getOrElse("")
       def c(o: Option[Char])=o.getOrElse("")
       r.status.flatMap {
-        case _   ++None++None++ _       => Failure(err(r.position))
+        case a   ++None++None++ b       => Failure(Errors.Single("cannot parse this as a number "+c(a)+w(b)+" at "+r.position, None ))
         case sign++i   ++None++None     => Success(TypedLiteral(c(sign)+w(i),                      xsdInteger))
         case sign++i   ++dec ++None     => Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_)),    xsdDecimal))
         case sign++i   ++dec ++Some(exp)=> Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_))+exp,xsdDouble ))

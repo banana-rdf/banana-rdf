@@ -18,7 +18,7 @@ import nomo.Accumulator
  * @created 29/02/2012
  */
 
-class TurtleReader[Rdf <: RDF, F, E, X](val parser: TurtleParser[Rdf, F, E, X, Listener[Rdf]])
+class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listener[Rdf]])
   extends RDFTurtleReader(parser.ops) {
 
   /**
