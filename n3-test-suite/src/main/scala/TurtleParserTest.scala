@@ -50,7 +50,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
   val good = ttlFiles.diff(bad).filter(!_.getName.contains("manifest"))
 
   def parseTurtleFile(testFile: File, base: String="") = {
-    implicit def U = new Listener(testedParser.ops, new URI(base))
+    implicit def U = new Listener(testedParser.ops, Some(new URI(base)))
     var chunk = ParsedChunk(testedParser.turtleDoc, testedParser.P.annotator(U))
     var inOpen = true
     val in = new FileInputStream(testFile)

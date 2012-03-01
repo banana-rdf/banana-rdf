@@ -7,6 +7,9 @@ package org.w3.rdf.n3
 import collection.mutable
 import org.w3.rdf._
 import java.net.{URISyntaxException, URI}
+import org.apache.abdera.i18n.iri.{IRISyntaxException, IRI => aIRI}
+
+//perhaps we should use this as our IRI?
 
 /**
  * An agent that collects triples as they are built up and places them in a
@@ -19,7 +22,7 @@ import java.net.{URISyntaxException, URI}
  * For the moment there is a bit of security, and the code will throw exceptions at runtime
  * if something is done wrong. It should not be able to do it though.
  */
-case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null) {
+case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: Option[URI]=None) {
 
   import ops._
 
@@ -167,11 +170,11 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null)
     prefixs.get(pname.prefix).map{ case IRI(pre)=> IRI(pre + pname.name)}
   }
 
-  var currentBase = base
-  @throws(classOf[URISyntaxException])
+  var currentBase = base.map(u=>new aIRI(u))
+  @throws(classOf[IRISyntaxException])
   def alterBase(newbase: IRI) {
     currentBase = newbase match {
-      case IRI(i) => new URI(i)
+      case IRI(i) => Some(new aIRI(i))
     }
   }
 
@@ -179,14 +182,10 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: URI=null)
     prefixs.put(name, value)
   }
 
-
-  @throws(classOf[URISyntaxException])
+  @throws(classOf[IRISyntaxException])
   def resolve(iriStr: String): Rdf#IRI = {
-     val uri = if (currentBase != null) {
-       if ("" == iriStr) currentBase // for a ".../index.html" base, java returns ".../" on  uri.resolve("")
-       else currentBase.resolve(iriStr)
-     } else new URI(iriStr)
-     IRI(uri.toString)
+     val iri = currentBase.map( _.resolve(iriStr)).getOrElse(new aIRI(iriStr))
+     IRI(iri.toString)
   }
 
 

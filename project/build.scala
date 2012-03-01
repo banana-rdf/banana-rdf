@@ -44,6 +44,9 @@ object YourProjectBuild extends Build {
     Seq(
       resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
       libraryDependencies += "org.openrdf.sesame" % "sesame-runtime" % "2.6.3")
+
+  val n3Deps =
+    Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
   
   lazy val pimpMyRdf = Project(
     id = "pimp-my-rdf",
@@ -97,7 +100,7 @@ object YourProjectBuild extends Build {
   lazy val n3 = Project(
     id = "n3",
     base = file("n3"),
-    settings = buildSettings ++ jenaDeps
+    settings = buildSettings ++ jenaDeps ++ n3Deps
   ) dependsOn (rdf)
   
   lazy val n3TestSuite = Project(

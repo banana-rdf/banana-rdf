@@ -6,10 +6,10 @@ package org.w3.rdf.n3
 
 import _root_.nomo._
 import _root_.nomo.Errors.TreeMsg
+import org.apache.abdera.i18n.iri.IRISyntaxException
 
 //_root_ seems to be needed to get intellij 11 and 11.1 (114.243) to find the package
 import org.w3.rdf._
-import java.net.{URISyntaxException, URI}
 
 
 /**
@@ -103,7 +103,10 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
       try {
         r.status.map(iri => r.user.resolve(iri.toSeq.mkString))
       } catch {
-        case e: URISyntaxException => Failure(Errors.Single("java URI parsing issue "+r.position, None )) //todo: should this be a failure?
+        case e: IRISyntaxException => {
+          Failure(
+            Errors.Single("abedera IRI parsing problem at "+r.position+": "+e.getMessage, None ))
+        } //todo: should this be a failure?
       }
   }<<P.single('>')
   lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
@@ -116,8 +119,9 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
     try {
       r.status.map{ iri => {r.user.alterBase(iri); iri}}
     } catch {
-      case e: URISyntaxException =>
+      case e: IRISyntaxException => {
         Failure(Errors.Single("java URI parsing issue "+r.position, None ))
+      }
     }
   }
   lazy val PNL_FIRST = PN_CHARS_U | single(c=> c>='0' && c<='9') | PLX
