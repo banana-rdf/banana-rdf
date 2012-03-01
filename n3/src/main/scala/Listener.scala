@@ -184,7 +184,10 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: Option[UR
 
   @throws(classOf[IRISyntaxException])
   def resolve(iriStr: String): Rdf#IRI = {
-     val iri = currentBase.map( _.resolve(iriStr)).getOrElse(new aIRI(iriStr))
+     val iri = currentBase.map{ b=>
+       if ("#" == iriStr) new aIRI(b.toString+"#")
+       else b.resolve(iriStr)
+     }.getOrElse(new aIRI(iriStr))
      IRI(iri.toString)
   }
 
