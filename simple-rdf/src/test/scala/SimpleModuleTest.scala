@@ -64,7 +64,7 @@ class NomoTurtleParserSeqTest_1 extends n3.TurtleParserTest(TurtleSeqParser,simp
   val morpheus = SimpleGraphIsomorphism
 }
 
-class NomoTurtleParserSeqTest_2 extends n3.TurtleParserTest(TurtleSeqParser,TurtleSeqReader) {
+  class NomoTurtleParserSeqTest_2 extends n3.TurtleParserTest(TurtleSeqParser,TurtleSeqReader) {
   info("Official W3C Test of Test the Nomo Turtle Sequence parser with itself as the NTriples Reader")
   val morpheus = SimpleGraphIsomorphism
 }

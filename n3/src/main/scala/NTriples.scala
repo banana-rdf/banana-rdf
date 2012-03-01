@@ -114,10 +114,10 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
         case None => ()
       }
       r.status
-  } ).delimitIgnore(eoln)
+  } ).delimitIgnore(eoln.commit)
   
   /** function that parses NTriples and return result to caller as a list */
-  lazy val nTriplesList = line.delimit(eoln).map(_.flatten)
+  lazy val nTriplesList = line.delimit(eoln.commit).map(_.flatten)
 
 
 }

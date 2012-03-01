@@ -259,20 +259,21 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val objectList = obj.delimit1Ignore( SP.optional >> P.single(',')>> SP.optional )
 
-  lazy val predicateObjectList: P.Parser[Unit] = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)
+  lazy val predicateObjectList: P.Parser[Unit] = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)<< (SP.optional >> P.single (';') >> SP.optional).optional
 
   lazy val subject = ( IRIref | BlankNode | objBlank).mapResult { r =>
     r.status.map{ node => { r.user.pushSubject(node); node } }
   }
 
-  lazy val triples =  subject ++ (SP.optional>>predicateObjectList)
+  lazy val triples =  subject ++! (SP.optional>>predicateObjectList)
 
   lazy val directive = prefixID | base
 
   lazy val statement = ( directive << SP.optional << dot ) | ( triples << SP.optional << dot ).mapResult { r=>
     r.status.map(n=>{r.user.pop; r})
-  }
-  lazy val turtleDoc = (SP.optional>>statement<<SP.optional).manyIgnore
+  }.commit
+
+  lazy val turtleDoc = (SP.optional>>statement<<SP.optional).manyIgnore.commit
 
 }
 

@@ -163,8 +163,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
       reading
     }
     val errs = res.filter(_.isSuccess)
-
-    assert(errs.size!=0,errs.size +" of the tests wrongly succeeded out of a total of "+bad.size)
+    assert(errs.size==0,errs.size +" of the tests wrongly succeeded out of a total of "+bad.size)
   }
 
 

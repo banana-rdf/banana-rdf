@@ -43,7 +43,7 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
     import parser.P._
     try {
       var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
-        (parser.turtleDoc, parser.P.annotator(new Listener(ops, null)))
+        (parser.turtleDoc, parser.P.annotator(new Listener(ops, None)))
 
       Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
         state = state._1.feedChunked(buf.slice(0,read), state._2, read)
