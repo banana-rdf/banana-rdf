@@ -61,7 +61,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
       try {
         val length = in.read(bytes)
         if (length > -1) {
-          chunk = chunk.parse(new String(bytes, 0, length, "ASCII"))
+          chunk = chunk.parse(new String(bytes, 0, length, "UTF-8"))
         } else inOpen = false
       } catch {
         case e: IOException => inOpen = false
@@ -117,7 +117,7 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
     isomorphicTest(res, otherReading.right.get)
   }
 
-  property("The Turtle parser should pass each of the official W3C Turtle Tests") {
+  property("The Turtle parser should pass each of the positive official W3C Turtle Tests") {
     val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
     info("all these files are in "+tstDir)
 
@@ -150,6 +150,25 @@ abstract class TurtleParserTest[Rdf <: RDF, F, E, X, Rdf2 <: RDF](
 
     assert(errs.size==0,errs.size +" of the tests failed out of a total of "+good.size)
   }
+
+  property("The Turtle parser should fail each of the negative official W3C Turtle Tests") {
+    val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
+    info("all these files are in "+tstDir)
+
+    val res = for(f <- bad) yield {
+      val reading = parseTurtleFile(f,base+f.getName)
+      if (reading.isSuccess) {
+        info(" oops! results found"+reading)
+      }
+      reading
+    }
+    val errs = res.filter(_.isSuccess)
+
+    assert(errs.size!=0,errs.size +" of the tests wrongly succeeded out of a total of "+bad.size)
+  }
+
+
+
 
   import testedParser.P._
   case class ParsedChunk( val parser: Parser[Unit],
