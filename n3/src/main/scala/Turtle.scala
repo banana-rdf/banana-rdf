@@ -110,7 +110,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
             Errors.Single("abedera IRI parsing problem at "+r.position+": "+e.getMessage, None ))
         } //todo: should this be a failure?
       }
-  }<<P.single('>')
+  }<<P.single('>').commit
   lazy val PREFIX_Part1 = PREFIX >> SP >>! PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
@@ -132,7 +132,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   /**
    *for a discussion of this rule see: https://bitbucket.org/pchiusano/nomo/issue/6/complex-ebnf-rules
    */
-  lazy val PN_LOCAL = (PNL_FIRST ++ PNL_BODY.many.map(_.toSeq.mkString)).map { case first++body => first+body }
+  lazy val PN_LOCAL = (PNL_FIRST ++! PNL_BODY.many.commit.map(_.toSeq.mkString)).map { case first++body => first+body }
 
   lazy val PrefixedName = (PNAME_NS ++! PN_LOCAL.optional).map{ case ns++local => PName(ns,local.getOrElse(""))}
 
@@ -198,9 +198,9 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
 
   lazy val RDFLiteral = {
-    StringLit ++ (
+    StringLit ++! (
       LANGTAG.map(tag => (lit: String) => LangLiteral(lit,tag)) |
-      ( P.word("^^")>>IRIref ).map (tp => (lit: String) => TypedLiteral(lit,tp)) )
+      ( P.word("^^")>>!IRIref ).commit.map (tp => (lit: String) => TypedLiteral(lit,tp)) )
       .optional
   }.map {
     case str ++ Some(func) => func(str)
@@ -209,7 +209,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val INTEGER = P.takeWhile1(numeric(_),err2("required 1 numeric char")).map(_.toSeq.mkString)
 
-  lazy val Exponent = ( P.anyOf("eE") ++ P.anyOf("+-").optional ++ INTEGER ) map {
+  lazy val Exponent = ( P.anyOf("eE") ++ P.anyOf("+-").optional ++ INTEGER ).commit map {
     case e++pos++exp => ""+e+pos.getOrElse("")+exp
   }
 
@@ -234,17 +234,17 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val literal = RDFLiteral  | NumericLiteral | BooleanLiteral
 
-  lazy val ANON = (P.single('[')>> SP.optional >> P.single(']')).map(x=>BNode())
-  lazy val BLANK_NODE_LABEL = P.word("_:")>>PN_LOCAL.map(BNode(_))
+  lazy val ANON = (P.single('[')>> SP.optional >> P.single(']')).commit.map(x=>BNode())
+  lazy val BLANK_NODE_LABEL = P.word("_:")>>!PN_LOCAL.map(BNode(_))
   lazy val BlankNode = BLANK_NODE_LABEL | ANON
 
-  lazy val blankNodePropertyList: P.Parser[Node] = P.single('[').mapResult  {  r =>
+  lazy val blankNodePropertyList: P.Parser[Node] = P.single('[').commit.mapResult  {  r =>
      r.status.map(node=>{ val b=BNode(); r.user.pushSubject(b) })
   } >> SP.optional >> (predicateObjectList << SP.optional << P.single(';').optional << SP.optional >> P.single(']')).mapResult{ r =>
     r.status.map(node=>r.user.pop)
   }
 
-  lazy val collection: P.Parser[Node] = P.single('(').mapResult  {  r =>
+  lazy val collection: P.Parser[Node] = P.single('(').commit.mapResult  {  r =>
     r.status.map(node=>{ r.user.pushList; node })
   } >> SP.optional >> (obj.delimit1Ignore(SP).optional << SP.optional << P.single(')').commit).mapResult{ r =>
     r.status.map(node=> r.user.pop)
