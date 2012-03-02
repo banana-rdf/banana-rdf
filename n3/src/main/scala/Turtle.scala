@@ -98,6 +98,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   }
 
   lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).map(prefix=>prefix.getOrElse(""))
+
   lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err).map(_.toSeq.mkString) |
     IRICHARS).many.mapResult{ r =>
       try {
@@ -109,7 +110,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
         } //todo: should this be a failure?
       }
   }<<P.single('>')
-  lazy val PREFIX_Part1 = PREFIX >> SP >> PNAME_NS
+  lazy val PREFIX_Part1 = PREFIX >> SP >>! PNAME_NS
   lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
     r.status
@@ -132,8 +133,8 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
    */
   lazy val PN_LOCAL = (PNL_FIRST ++ PNL_BODY.many.map(_.toSeq.mkString)).map { case first++body => first+body }
 
-  lazy val PNAME_LN = (PNAME_NS ++ PN_LOCAL).map{ case ns++local => PName(ns,local)}
-  lazy val PrefixedName = PNAME_LN | PNAME_NS.map(ns => PName(ns,""))
+  lazy val PrefixedName = (PNAME_NS ++! PN_LOCAL.optional).map{ case ns++local => PName(ns,local.getOrElse(""))}
+
   lazy val IRIref = IRI_REF | PrefixedName.mapResult[IRI]{ r =>
     r.status.flatMap{ pn =>
         //todo: work out how to set more friendly errors https://bitbucket.org/pchiusano/nomo/issue/7/errors
