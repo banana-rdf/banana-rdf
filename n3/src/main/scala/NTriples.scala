@@ -55,7 +55,7 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   import P.++
   
-  lazy val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).map (n=>BNode(n.toSeq.mkString))
+  lazy val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).commit.map (n=>BNode(n.toSeq.mkString))
 
 
   lazy val u_CHAR = (P.word("\\u")>> hex++hex++hex++hex) map {
@@ -70,14 +70,15 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val lt_slash = P.word("\\\\").map(c=>'\\')
   lazy val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
 
-  lazy val literal = ( u_CHAR | U_CHAR | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote |
-      P.takeWhile1(c=> c!= '\\' && c != '"', pos => P.err.single('!',pos)).map(n=>n.toSeq.mkString)
-    ).many.map(l=> l.toSeq.mkString)
+  val err = (pos: X) => P.err.single('!',pos)
+  lazy val literal = (
+      P.takeWhile1(c=> c!= '\\' && c != '"', err).map(_.toSeq.mkString) |
+        u_CHAR | U_CHAR | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote
+    ).many.commit.map(l=> l.toSeq.mkString)
 
-  lazy val uriStr = (u_CHAR | U_CHAR |
-      lt_slash | lt_quote |
-      single(c => isUriChar(c))
-    ).many1.map(i=>i.toSeq.mkString)
+  lazy val uriStr = (P.takeWhile1(isUriChar(_),err).map (_.toSeq.mkString) | u_CHAR | U_CHAR |
+      lt_slash | lt_quote
+    ).commit.many1.map(_.toSeq.mkString)
 
   // these are already provided by RDFOperations
   val xsd = "http://www.w3.org/2001/XMLSchema#"
@@ -103,13 +104,12 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val subject = uriRef | bnode
   lazy val obj = uriRef | bnode | fullLiteral
   lazy val nTriple = (subject++!(space1>>pred)++!(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>!space)
-  lazy val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
-  lazy val line = space >> (comment.as(None) | nTriple.map(Some(_)) | P.unit(None) )
+  lazy val comment = P.single('#').commit <<! P.takeWhile(c =>c != '\r' && c != '\n' )
+  lazy val line = space >>! (comment.as(None) | nTriple.map(Some(_)) | P.unit(None) )
 
   /** function that parse NTriples and send results to user in a streaming fashion */
-  lazy val nTriples = (line.mapResult{
-    r =>
-      r.get match {
+  lazy val nTriples = (line.mapResult{ r=>
+    r.get match {
         case Some(t) => r.user.sendTriple(t);
         case None => ()
       }

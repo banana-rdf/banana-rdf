@@ -43,9 +43,11 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
     val buf = new Array[Char](1024)  //todo: how could one set the size of the buffer?
     import parser.P._
     try {
-      var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] = (parser.nTriples, parser.P.annotator(new Listener(ops, None)))
-      Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
-        state = state._1.feedChunked(buf.slice(0,read), state._2, read)
+      var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
+        (parser.nTriples, parser.P.annotator(new Listener(ops, None)))
+      var read =0
+      while ({ read = reader.read(buf); read > -1 }) {
+        state = state._1.feedChunked(buf.slice(0,read), state._2)
       }
       val result = state._1.result(state._2)
       Right(ops.Graph(result.user.queue:_*))
