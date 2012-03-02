@@ -37,6 +37,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   import TurtleParser._
   import P.++
   import ops._
+  import NTriplesParser.hexVal
   import Errors.msg
 
  /**
@@ -53,7 +54,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   lazy val PREFIX = P.word("@prefix")
   lazy val BASE = P.word("@base")
   lazy val dot = P.single('.')
-  lazy val eoln = P.word ("\r\n") | P.word("\n")  | P.word("\r")
+  lazy val eoln = P.takeWhile1(c=> '\r'==c || '\n'==c,err)
   lazy val CLOSE_ANGLE = P.word("\\>").map(a=>">")   // unclear in the spec if this is allowed (not allowed by grammar)
 
   lazy val SP = (P.takeWhile1(c=> " \t\r\n".contains(c),err) | comment ).many1
@@ -62,11 +63,11 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   lazy val hexadecimalChars = "1234567890ABCDEFabcdef"
   lazy val hex = P.anyOf(hexadecimalChars)
 
-  lazy val u_CHAR = (P.word("\\u")>> hex++hex++hex++hex) map {
-    case c1++c2++c3++c4 => Integer.parseInt(new String(Array(c1,c2,c3,c4)),16).toChar
+  lazy val u_CHAR = (P.word("\\u")>>!hex++hex++hex++hex) map {
+    case c1++c2++c3++c4 => hexVal(c1,c2,c3,c4)
   }
-  lazy val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
-    case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
+  lazy val U_CHAR = (P.word("\\U")>>!hex++hex++hex++hex++hex++hex++hex++hex) map {
+    case c1++c2++c3++c4++c5++c6++c7++c8 => hexVal(c1,c2,c3,c4,c5,c6,c7,c8)
   }
   lazy val PN_LOCAL_ESC = P.single('\\')>>single((c: Char) => pn_local_esc.contains(c))
   lazy val PLX=  (P.single('%')++hex++hex).map{case '%'++h1++h2=> "%"+h1+h2} | PN_LOCAL_ESC.map(_.toString)
@@ -258,7 +259,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
     r.status.map{ iri => { r.user.setVerb(iri); r } }
   }
 
-  lazy val objectList = obj.delimit1Ignore( SP.optional >> P.single(',')>>! SP.optional )
+  lazy val objectList = obj.delimit1Ignore( SP.optional >> P.single(',')>> SP.optional )
 
   lazy val predicateObjectList: P.Parser[Unit] = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)<< (SP.optional >> P.single (';') >> SP.optional).optional
 

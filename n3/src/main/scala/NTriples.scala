@@ -31,6 +31,7 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     val P: Parsers[F, Char, E, X, U]) {
   
   import ops._
+  import NTriplesParser.hexVal
 
   val alpha_digit_dash = "abcdefghijklmnopqrstuvwxyz0123456789-"
   val hexadecimalChars = "1234567890ABCDEFabcdef"
@@ -47,7 +48,7 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   val space = P.takeWhile( c => c == ' '|| c == '\t' )
 
   val anySpace =  P.takeWhile(_.isWhitespace )
-  val eoln =  P.takeWhile1(c=> '\r'==c | '\n'==c,err)
+  val eoln =  P.takeWhile1(c=> '\r'==c || '\n'==c,err)
 
   def isUriChar(c: Char) = ( ! c.isWhitespace) && c != '<' && c != '>'  &&
     c> 0x1F &&  (c < 0x7F || c > 0x9F )  //control characters
@@ -59,10 +60,10 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
 
   lazy val u_CHAR = (P.word("\\u")>>!hex++hex++hex++hex).commit map {
-    case c1++c2++c3++c4 => Integer.parseInt(new String(Array(c1,c2,c3,c4)),16).toChar
+    case c1++c2++c3++c4 => hexVal(c1,c2,c3,c4)
   }
   lazy val U_CHAR = (P.word("\\U")>>hex++hex++hex++hex++hex++hex++hex++hex).commit map {
-    case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
+    case c1++c2++c3++c4++c5++c6++c7++c8 => hexVal(c1,c2,c3,c4,c5,c6,c7,c8)
   }
   lazy val lt_tab = P.word("\\t").map(c=>0x9.toChar)
   lazy val lt_cr = P.word("\\r").map(c=>0xD.toChar)
@@ -174,6 +175,15 @@ object NTriplesParser {
     }
     true
   }
+
+  def hexVal(h1: Char,h2: Char,h3: Char,h4: Char) = (
+      (Character.digit(h1,16)<<12) | (Character.digit(h2,16)<<8) | (Character.digit(h3,16)<<4) | Character.digit(h4,16)
+    ).toChar
+
+  def hexVal(h1: Char,h2: Char,h3: Char,h4: Char,h5: Char,h6: Char, h7: Char, h8: Char) = (
+    (Character.digit(h1,16)<<28) | (Character.digit(h2,16)<<24) | (Character.digit(h3,16)<<20) | Character.digit(h4,16)<<16|
+    (Character.digit(h5,16)<<12) | (Character.digit(h6,16)<<8) | (Character.digit(h7,16)<<4) | Character.digit(h8,16)
+    ).toChar
 
   /**
    * encode a string so that it can appear in a ASCII only Literal
