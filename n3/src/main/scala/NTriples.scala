@@ -92,17 +92,17 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     case lexicalForm ++ Some(Right(lang)) => LangLiteral(lexicalForm, lang)
   }
 
-  lazy val typeFunc = (P.word("^^") >> uriRef) map Left.apply
-  lazy val langFunc = (P.word("@") >> lang) map Right.apply
+  lazy val typeFunc = (P.word("^^") >>! uriRef) map Left.apply
+  lazy val langFunc = (P.word("@") >>! lang) map Right.apply
 
 
   lazy val dot = P.single('.')
 
-  lazy val uriRef = ( P.single('<') >> uriStr  << P.single('>')).map(i=>IRI(i))
+  lazy val uriRef = ( P.single('<') >>! uriStr  <<! P.single('>').commit).map(i=>IRI(i))
   lazy val pred = uriRef
   lazy val subject = uriRef | bnode
   lazy val obj = uriRef | bnode | fullLiteral
-  lazy val nTriple = (subject++(space1>>pred)++(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>space)
+  lazy val nTriple = (subject++!(space1>>pred)++!(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>!space)
   lazy val comment = P.single('#') >> P.takeWhile(c =>c != '\r' && c != '\n' )
   lazy val line = space >> (comment.as(None) | nTriple.map(Some(_)) | P.unit(None) )
 
