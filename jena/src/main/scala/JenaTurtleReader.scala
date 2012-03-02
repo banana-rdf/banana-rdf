@@ -3,11 +3,13 @@ package org.w3.rdf.jena
 import org.w3.rdf._
 import java.io._
 import com.hp.hpl.jena.rdf.model._
+import org.openjena.riot.SysRIOT
 
 object JenaTurtleReader extends TurtleReader[Jena](JenaOperations) {
   
   import JenaOperations._
-  
+  SysRIOT.wireIntoJena()
+
   def read(is: InputStream, base: String): Either[Throwable, Jena#Graph] =
     try {
       val model = ModelFactory.createDefaultModel()
