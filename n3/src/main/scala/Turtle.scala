@@ -74,8 +74,8 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val UCHAR = u_CHAR | U_CHAR
   lazy val IRICHAR = UCHAR | CLOSE_ANGLE
-  lazy val IRICHARS = IRICHAR.many1.map(_.toSeq.mkString)
-  lazy val UCHARS = UCHAR.many1.map(_.toSeq.mkString)
+  lazy val IRICHARS = IRICHAR.commit.many1.map(_.toSeq.mkString)
+  lazy val UCHARS = UCHAR.commit.many1.map(_.toSeq.mkString)
   lazy val PN_CHARS_BASE = single(pn_chars_base) | UCHAR
   lazy val PN_CHARS_U = PN_CHARS_BASE | P.single ('_')
 
@@ -98,10 +98,10 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
       }
   }
 
-  lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).map(prefix=>prefix.getOrElse(""))
+  lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).commit.map(prefix=>prefix.getOrElse(""))
 
-  lazy val IRI_REF =  P.single('<')>>(P.takeWhile1(iri_char, err).map(_.toSeq.mkString) |
-    IRICHARS).many.mapResult{ r =>
+  lazy val IRI_REF =  P.single('<')>>!(P.takeWhile1(iri_char, err).commit.map(_.toSeq.mkString) |
+    IRICHARS).commit.many.mapResult{ r =>
       try {
         r.status.map(iri => r.user.resolve(iri.toSeq.mkString))
       } catch {
@@ -158,36 +158,36 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   }
 
   lazy val STRING_LITERAL1 = (
-    q1 >>!  ( P.takeWhile1(c => !"\\'\n\r".contains(c),err).map(_.toSeq.mkString) | ECHAR | UCHAR ).many <<! q1
-    ).map(_.toSeq.mkString)
+    q1 >>!  ( P.takeWhile1(c => !"\\'\n\r".contains(c),err).commit.map(_.toSeq.mkString) | ECHAR | UCHAR ).many <<! q1
+    ).commit.map(_.toSeq.mkString)
 
   lazy val STRING_LITERAL2 = (
-    q2 >>!  ( P.takeWhile1(c => !"\\\"\n\r".contains(c),err).map(_.toSeq.mkString) | ECHAR | UCHAR ).many <<! q2
-    ).map(_.toSeq.mkString)
+    q2 >>!  ( P.takeWhile1(c => !"\\\"\n\r".contains(c),err).commit.map(_.toSeq.mkString) | ECHAR | UCHAR ).many <<! q2
+    ).commit.map(_.toSeq.mkString)
 
   lazy val STRING_LITERAL_LONG1 = (
     Q1 >>! ((
       (q1.as("'") | P.word("''").as("''")).optional ++ (
-        P.takeWhile1(c => c != '\'' && c != '\\', err).map(_.toSeq.mkString) | ECHAR | UCHAR)
+        P.takeWhile1(c => c != '\'' && c != '\\', err).commit.map(_.toSeq.mkString) | ECHAR | UCHAR)
       ).map {
       case Some(quote) ++ c => quote + c
       case None ++ c => c.toString
-    }).many <<! Q1
-    ).map(_.toSeq.mkString)
+    }).commit.many <<! Q1
+    ).commit.map(_.toSeq.mkString)
 
 
   lazy val STRING_LITERAL_LONG2 = (
     Q2 >>! ((
       (q2.as("\"") | P.word("\"\"").as("\"\"")).optional ++ (
-        P.takeWhile1(c => c != '\"' && c != '\\', err).map(_.toSeq.mkString) | ECHAR | UCHAR)
+        P.takeWhile1(c => c != '\"' && c != '\\', err).commit.map(_.toSeq.mkString) | ECHAR | UCHAR)
       ).map {
       case Some(quote) ++ c => quote + c
       case None ++ c => c.toString
-    }).many <<! Q2
-    ).map(_.toSeq.mkString)
+    }).commit.many <<! Q2
+    ).commit.map(_.toSeq.mkString)
 
 
-  val LANGTAG = P.single('@') >> {
+  val LANGTAG = P.single('@') >>! {
     P.takeWhile1(alphabet(_),err).map (_.toSeq.mkString) ++ (P.single('-') >>
       P.takeWhile1(alphaNumeric(_), err2("required one alphanum")).map(_.toSeq.mkString) ).many
   }.map{
@@ -259,9 +259,11 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
     r.status.map{ iri => { r.user.setVerb(iri); r } }
   }
 
-  lazy val objectList = obj.delimit1Ignore( SP.optional >> P.single(',')>> SP.optional )
+  lazy val objectList = obj.commit.delimit1Ignore( SP.optional >> P.single(',')>>! SP.optional )
 
-  lazy val predicateObjectList: P.Parser[Unit] = ( verb<<SP.optional ++ objectList).delimit1Ignore( SP.optional >> P.single (';') >> SP.optional)<< (SP.optional >> P.single (';') >> SP.optional).optional
+  lazy val verbObjectList =  (verb<<!SP.optional) ++! objectList
+  lazy val VOL_SP = SP.optional >> P.single(';') >> SP.optional
+  lazy val predicateObjectList = verbObjectList.commit << (VOL_SP >> verbObjectList).commit.manyIgnore << VOL_SP.optional
 
   lazy val subject = ( IRIref | BlankNode | objBlank).mapResult { r =>
     r.status.map{ node => { r.user.pushSubject(node); node } }
@@ -271,9 +273,9 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val directive = prefixID | base
 
-  lazy val statement = ( directive << SP.optional << dot ) | ( triples << SP.optional << dot ).mapResult { r=>
+  lazy val statement = ( triples << SP.optional << dot ).mapResult { r=>
     r.status.map(n=>{r.user.pop; r})
-  }.commit
+  }.commit  | ( directive << SP.optional << dot )
 
   lazy val turtleDoc = (SP.optional>>statement<<SP.optional).manyIgnore.commit << SP.optional << P.eof
 
