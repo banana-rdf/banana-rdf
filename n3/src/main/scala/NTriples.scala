@@ -47,7 +47,7 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   val space = P.takeWhile( c => c == ' '|| c == '\t' )
 
   val anySpace =  P.takeWhile(_.isWhitespace )
-  val eoln = P.word("\n") | P.word ("\r\n")| P.word("\r")
+  val eoln =  P.takeWhile1(c=> '\r'==c | '\n'==c,err)
 
   def isUriChar(c: Char) = ( ! c.isWhitespace) && c != '<' && c != '>'  &&
     c> 0x1F &&  (c < 0x7F || c > 0x9F )  //control characters
@@ -55,13 +55,13 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   import P.++
   
-  lazy val bnode = P.word("_:")>>P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).commit.map (n=>BNode(n.toSeq.mkString))
+  lazy val bnode = P.word("_:")>>!P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).commit.map (n=>BNode(n.toSeq.mkString))
 
 
-  lazy val u_CHAR = (P.word("\\u")>> hex++hex++hex++hex) map {
+  lazy val u_CHAR = (P.word("\\u")>>!hex++hex++hex++hex).commit map {
     case c1++c2++c3++c4 => Integer.parseInt(new String(Array(c1,c2,c3,c4)),16).toChar
   }
-  lazy val U_CHAR = (P.word("\\U")>> hex++hex++hex++hex++hex++hex++hex++hex) map {
+  lazy val U_CHAR = (P.word("\\U")>>hex++hex++hex++hex++hex++hex++hex++hex).commit map {
     case c1++c2++c3++c4++c5++c6++c7++c8 => Integer.parseInt(new String(Array(c1,c2,c3,c4,c5,c6,c7,c8)),16).toChar
   }
   lazy val lt_tab = P.word("\\t").map(c=>0x9.toChar)
@@ -85,9 +85,9 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   lazy val xsdString = IRI(xsd + "string")
 
-  lazy val plainLit = (P.single('"')>>literal<< P.single('\"'))
+  lazy val plainLit = (P.single('"')>>!literal<< P.single('\"'))
 
-  lazy val fullLiteral = plainLit ++ (typeFunc | langFunc).optional map {
+  lazy val fullLiteral = plainLit ++! (typeFunc | langFunc).optional map {
     case lexicalForm ++ None => TypedLiteral(lexicalForm)
     case lexicalForm ++ Some(Left(uriRef)) => TypedLiteral(lexicalForm, uriRef)
     case lexicalForm ++ Some(Right(lang)) => LangLiteral(lexicalForm, lang)
@@ -103,9 +103,9 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val pred = uriRef
   lazy val subject = uriRef | bnode
   lazy val obj = uriRef | bnode | fullLiteral
-  lazy val nTriple = (subject++!(space1>>pred)++!(space1>>obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>dot>>!space)
+  lazy val nTriple = (subject++!(space1>>!pred)++!(space1>>!obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>!dot>>!space)
   lazy val comment = P.single('#').commit <<! P.takeWhile(c =>c != '\r' && c != '\n' )
-  lazy val line = space >>! (comment.as(None) | nTriple.map(Some(_)) | P.unit(None) )
+  lazy val line = space >>! ( nTriple.map(Some(_)) | comment.as(None)| P.unit(None) )
 
   /** function that parse NTriples and send results to user in a streaming fashion */
   lazy val nTriples = (line.mapResult{ r=>
