@@ -9,6 +9,7 @@ import org.w3.rdf.n3.{TurtleParser, Listener}
 import org.w3.rdf.{RDF, TurtleReader => RDFTurtleReader}
 import java.io._
 import nomo.Accumulator
+import java.net.URI
 
 
 /**
@@ -40,16 +41,19 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
    */
   def read(reader: Reader, base: String): Either[Throwable, Rdf#Graph] = {
     val buf = new Array[Char](1024)
+    val abase = if (null != base  && "" !=base ) Some(new URI(base)) else None
     import parser.P._
     try {
       var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
-        (parser.turtleDoc, parser.P.annotator(new Listener(ops, None)))
+        (parser.turtleDoc, parser.P.annotator(new Listener(ops, abase)))
 
       Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
         state = state._1.feedChunked(buf.slice(0,read), state._2, read)
       }
       val result = state._1.result(state._2)
-      Right(ops.Graph(result.user.queue:_*))
+      if (result.isSuccess) {
+        Right(ops.Graph(result.user.queue:_*))
+      } else Left(new Throwable(result.toString()))  //todo, clearly this is not what we want
     } catch {
       case e: IOException => Left(e)
     }

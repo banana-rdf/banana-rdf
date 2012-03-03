@@ -26,8 +26,8 @@ import org.scalatest.{FailureOf, PropSpec}
  * @tparam Rdf The RDF framework understood by the test parser
  * @tparam Rdf2 The RDF framework with which the reference parser uses
  */
-abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
-                                                     val testedParser: TurtleParser[Rdf, F, X, Listener[Rdf]],
+abstract class TurtleParserTest[Rdf <: RDF, Rdf2 <: RDF](
+                                                     val testedParser: TurtleReader[Rdf],
                                                      val referenceParser: TurtleReader[Rdf2])
   extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
 
@@ -49,30 +49,9 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
   val bad= ttlFiles.filter(_.getName.startsWith("bad"))
   val good = ttlFiles.diff(bad).filter(!_.getName.contains("manifest"))
 
-  def parseTurtleFile(testFile: File, base: String="") = {
-    implicit def U = new Listener(testedParser.ops, Some(new URI(base)))
-    var chunk = ParsedChunk(testedParser.turtleDoc, testedParser.P.annotator(U))
-    var inOpen = true
-    val in = new FileInputStream(testFile)
-    val bytes = new Array[Byte](randomSz)
-    info("setting Turtle parser to reading with chunk size of " + bytes.size + " bytes")
-
-    while (inOpen) {
-      try {
-        val length = in.read(bytes)
-        if (length > -1) {
-          chunk = chunk.parse(new String(bytes, 0, length, "UTF-8"))
-        } else inOpen = false
-      } catch {
-        case e: IOException => inOpen = false
-      }
-    }
-    chunk.parser.result(chunk.acc)
-  }
-
-  def isomorphicTest(result: List[Rdf#Triple], referenceResult: Rdf2#Graph) {
-    val g = Graph(result)
-    val gAsOther = rdfTransformer.transform(g)
+  //todo: the readers should return the triples as Iterables so that one can know where things went wrong.
+  def isomorphicTest(result: Rdf#Graph, referenceResult: Rdf2#Graph) {
+    val gAsOther = rdfTransformer.transform(result)
 
     val isomorphic = morpheus.isomorphism(gAsOther, referenceResult)
 
@@ -81,21 +60,21 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
 
       import referenceParser.ops.graphAsIterable
       val referenceAsSet = graphAsIterable(referenceResult).toIterable.toSet
+      val resultAsSet = graphAsIterable(gAsOther).toIterable.toSet
       info("read ntriples file with " +testedParser+" found "+referenceAsSet.size +" triples")
 
-      if (result.size!=referenceAsSet.size) {
-        info("    The number of triples read was "+result.size+". The reference number was "+referenceAsSet.size)
-        info("    But perhaps that is due to there being duplicates. The result size with obvious duplicates removed is "+Set(result:_*).size)
-        if (result.size>0) info("    the last triple read was "+result.last)
+      if (resultAsSet.size!=referenceAsSet.size) {
+        info("    The number of triples read was "+resultAsSet.size+". The reference number was "+referenceAsSet.size)
+        //todo: specify the last returned Result from the tested graph
       }
 
       //test each statement
       //this does not work very well yet. We need a contains method on a graph that works for each implementation
-      result.foreach {
+      resultAsSet.foreach {
         var counter = 0
         triple =>
           counter += 1
-          val res = referenceAsSet.contains(rdfTransformer.transformTriple(triple))
+          val res = referenceAsSet.contains(triple)
           if (!res) info("     missing triple no " + counter + ": " + triple+" from reference graph.")
       }
 
@@ -110,15 +89,13 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
     val otherReading = referenceParser.read(testFile,"","UTF-8")
     assert(otherReading.isRight === true,referenceParser +" could not read the "+testFile+" returned "+otherReading)
 
-    val result = parseTurtleFile(testFile)
+    val result = testedParser.read(testFile,"","UTF-8")
 
-    val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
-
-    isomorphicTest(res, otherReading.right.get)
+    isomorphicTest(result.right.get, otherReading.right.get)
   }
 
   property("The Turtle parser should pass each of the positive official W3C Turtle Tests") {
-    val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
+    val base = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
     info("all these files are in "+tstDir)
 
     val res = for(f <- good) yield {
@@ -132,11 +109,10 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
           info("reference parser "+referenceParser + " could not read " + resultFile + " detail: " + otherReading.left)
           throw otherReading.left.get
        }
-
-        val result = parseTurtleFile(f, base+f.getName)
-        assert(result.isSuccess,"failed to parse test. Result was:"+result)
-        val res = result.user.queue.toList.map(_.asInstanceOf[Triple])
-        isomorphicTest(res, otherReading.right.get)
+        info("base set to="+base+f.getName)
+        val result = testedParser.read(f, base+f.getName,"UTF-8")
+        assert(result.isRight,"failed to parse test. Result was:"+result)
+        isomorphicTest(result.right.get, otherReading.right.get)
       }
       if (fail!=None) {
         info("test for "+f.getName+" failed because "+fail.get.getMessage)
@@ -152,34 +128,19 @@ abstract class TurtleParserTest[Rdf <: RDF, F, X, Rdf2 <: RDF](
   }
 
   property("The Turtle parser should fail each of the negative official W3C Turtle Tests") {
-    val base: String = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
+    val base = "http://www.w3.org/2001/sw/DataAccess/df1/tests/"
     info("all these files are in "+tstDir)
 
     val res = for(f <- bad) yield {
-      val reading = parseTurtleFile(f,base+f.getName)
-      if (reading.isSuccess) {
+      val reading = testedParser.read(f,base+f.getName,"UTF-8")
+      if (reading.isRight) {
         info(" oops! results found"+reading)
       }
       reading
     }
-    val errs = res.filter(_.isSuccess)
+    val errs = res.filter(_.isRight)
     assert(errs.size==0,errs.size +" of the tests wrongly succeeded out of a total of "+bad.size)
   }
 
-
-
-
-  import testedParser.P._
-  case class ParsedChunk( val parser: Parser[Unit],
-                          val acc: Accumulator[Char, X, Listener[Rdf]] ) {
-    def parse(buf: Seq[Char]) = {
-      if (!buf.isEmpty) {
-        val (tripleParser, newAccu) = parser.feedChunked(buf, acc, buf.size)
-        ParsedChunk(tripleParser, newAccu)
-      } else {
-        this
-      }
-    }
-  }
 
 }

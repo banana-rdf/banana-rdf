@@ -77,7 +77,7 @@ object YourProjectBuild extends Build {
     id = "simple-rdf",
     base = file("simple-rdf"),
     settings = buildSettings ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", n3TestSuite % "test", util % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", util % "test")
   
   lazy val jena = Project(
     id = "jena",
@@ -107,7 +107,7 @@ object YourProjectBuild extends Build {
     id = "n3-test-suite",
     base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (n3, jena, sesame)
+  ) dependsOn (n3, jena%"test", sesame%"test", simpleRdf%"test", util%"test")
   
   lazy val store = Project(
     id = "store",
