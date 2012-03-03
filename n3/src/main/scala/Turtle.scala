@@ -240,7 +240,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val blankNodePropertyList: P.Parser[Node] = P.single('[').commit.mapResult  {  r =>
      r.status.map(node=>{ val b=BNode(); r.user.pushSubject(b) })
-  } >> SP.optional >> (predicateObjectList << SP.optional << P.single(';').optional << SP.optional >> P.single(']')).mapResult{ r =>
+  } >> predicateObjectList  >>! SP.optional >> P.single(']').commit.mapResult{ r =>
     r.status.map(node=>r.user.pop)
   }
 
@@ -262,14 +262,14 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   lazy val objectList = obj.commit.delimit1Ignore( SP.optional >> P.single(',')>>! SP.optional )
 
   lazy val verbObjectList =  (verb<<!SP.optional) ++! objectList
-  lazy val VOL_SP = SP.optional >> P.single(';') >> SP.optional
-  lazy val predicateObjectList = verbObjectList.commit.delimitIgnore(VOL_SP) << VOL_SP.optional
+  lazy val VOL_SP = SP.optional >> P.single(';')
+  lazy val predicateObjectList = (SP.optional>>verbObjectList).commit.delimitIgnore(VOL_SP) << VOL_SP.optional
 
   lazy val subject = ( IRIref | BlankNode | objBlank).mapResult { r =>
     r.status.map{ node => { r.user.pushSubject(node); node } }
   }
 
-  lazy val triples =  subject ++! (SP.optional>>predicateObjectList)
+  lazy val triples =  subject ++! predicateObjectList
 
   lazy val directive = prefixID | base
 
