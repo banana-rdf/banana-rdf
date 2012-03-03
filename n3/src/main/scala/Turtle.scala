@@ -263,7 +263,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val verbObjectList =  (verb<<!SP.optional) ++! objectList
   lazy val VOL_SP = SP.optional >> P.single(';') >> SP.optional
-  lazy val predicateObjectList = verbObjectList.commit << (VOL_SP >> verbObjectList).commit.manyIgnore << VOL_SP.optional
+  lazy val predicateObjectList = verbObjectList.commit.delimitIgnore(VOL_SP) << VOL_SP.optional
 
   lazy val subject = ( IRIref | BlankNode | objBlank).mapResult { r =>
     r.status.map{ node => { r.user.pushSubject(node); node } }

@@ -40,13 +40,12 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
    * @return the graph or an error
    */
   def read(reader: Reader, base: String): Either[Throwable, Rdf#Graph] = {
-    val buf = new Array[Char](1024)
+    val buf = new Array[Char](4096)
     val abase = if (null != base  && "" !=base ) Some(new URI(base)) else None
     import parser.P._
     try {
       var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
         (parser.turtleDoc, parser.P.annotator(new Listener(ops, abase)))
-
       Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
         state = state._1.feedChunked(buf.slice(0,read), state._2, read)
       }
