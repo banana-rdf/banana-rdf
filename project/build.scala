@@ -22,6 +22,14 @@ object YourProjectBuild extends Build {
   
   import com.typesafe.sbteclipse.plugin.EclipsePlugin._
   
+  val typesafeRepository = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+  val akka = "com.typesafe.akka" % "akka-actor" % "2.0-RC4"
+
+  val sonatypeSnapshots = "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
+  val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.0"
+
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
+
   val junitInterface = "com.novocode" % "junit-interface" % "0.8"
   val scalacheck = "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
   val scalatest = "org.scalatest" %% "scalatest" % "1.7.1"
@@ -59,7 +67,8 @@ object YourProjectBuild extends Build {
       n3,
       n3TestSuite,
       jena,
-      sesame))
+      sesame,
+      linkedData))
   
   lazy val rdf = Project(
     id = "rdf",
@@ -107,13 +116,18 @@ object YourProjectBuild extends Build {
     id = "n3-test-suite",
     base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (n3, jena%"test", sesame%"test", simpleRdf%"test", util%"test")
-  
-  lazy val store = Project(
-    id = "store",
-    base = file("store"),
-    settings = buildSettings
-  ) dependsOn (rdf)
+  ) dependsOn (n3, jena % "test", sesame % "test", simpleRdf % "test", util % "test")
+
+  lazy val linkedData = Project(
+    id = "linked-data",
+    base = file("linked-data"),
+    settings = buildSettings ++ Seq(
+      resolvers += typesafeRepository,
+      resolvers += sonatypeSnapshots,
+      libraryDependencies += akka,
+      libraryDependencies += asyncHttpClient,
+      libraryDependencies += scalaz)
+  ) dependsOn (rdf, sesame, jena)
   
 }
 
