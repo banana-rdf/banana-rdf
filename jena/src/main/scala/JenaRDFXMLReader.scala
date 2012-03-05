@@ -8,6 +8,6 @@ import org.openjena.riot.SysRIOT
 import scalaz.Validation
 import scalaz.Validation._
 
-object JenaTurtleReader extends TurtleReader[Jena](JenaOperations) with JenaGenericReader {
-  val serializationLanguage = "TTL"
+object JenaRDFXMLReader extends RDFXMLReader[Jena](JenaOperations) with JenaGenericReader {
+  val serializationLanguage = "RDF/XML"
 }
