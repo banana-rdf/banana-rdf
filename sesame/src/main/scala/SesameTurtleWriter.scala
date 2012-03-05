@@ -6,6 +6,9 @@ import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.openrdf.model.URI
 import org.openrdf.model.impl.URIImpl
 
+import scalaz.Validation
+import scalaz.Validation._
+
 object SesameTurtleWriter extends TurtleWriter[Sesame](SesameOperations) {
   
   import SesameOperations._
@@ -29,24 +32,22 @@ object SesameTurtleWriter extends TurtleWriter[Sesame](SesameOperations) {
     override def writeURI(uri: URI): Unit = write(uri, writer, baseURI)
   }
   
-  private def write(graph: Graph, turtleWriter: STurtleWriter, base: String): Either[Throwable, Unit] =
-    try {
-      turtleWriter.startRDF()
-      graph foreach turtleWriter.handleStatement
-      turtleWriter.endRDF()
-      Right()
-    } catch {
-      case t => Left(t)
-    }
-  
-  def write(graph: Graph, os: OutputStream, base: String): Either[Throwable, Unit] = {
-    val turtleWriter = new TurtleWriterOS(os, base)
-    write(graph, turtleWriter, base)
+  private def write(graph: Graph, turtleWriter: STurtleWriter, base: String): Validation[Throwable, Unit] = fromTryCatch {
+    turtleWriter.startRDF()
+    graph foreach turtleWriter.handleStatement
+    turtleWriter.endRDF()
   }
   
-  def write(graph: Graph, writer: Writer, base: String): Either[Throwable, Unit] = {
-    val turtleWriter = new TurtleWriterW(writer, base)
-    write(graph, turtleWriter, base)
-  }
+  def write(graph: Graph, os: OutputStream, base: String): Validation[Throwable, Unit] =
+    for {
+      turtleWriter <- fromTryCatch { new TurtleWriterOS(os, base) }
+      result <- write(graph, turtleWriter, base)
+    } yield result
+  
+  def write(graph: Graph, writer: Writer, base: String): Validation[Throwable, Unit] =
+    for {
+      turtleWriter <- fromTryCatch { new TurtleWriterW(writer, base) }
+      result <- write(graph, turtleWriter, base)
+    } yield result
   
 }

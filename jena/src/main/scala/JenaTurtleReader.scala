@@ -5,28 +5,25 @@ import java.io._
 import com.hp.hpl.jena.rdf.model._
 import org.openjena.riot.SysRIOT
 
+import scalaz.Validation
+import scalaz.Validation._
+
 object JenaTurtleReader extends TurtleReader[Jena](JenaOperations) {
   
   import JenaOperations._
   SysRIOT.wireIntoJena()
 
-  def read(is: InputStream, base: String): Either[Throwable, Jena#Graph] =
-    try {
-      val model = ModelFactory.createDefaultModel()
-      model.read(is,base,"TTL")
-      Right(model.getGraph)
-    } catch {
-      case t => Left(t)
-    }
+  def read(is: InputStream, base: String): Validation[Throwable, Jena#Graph] = fromTryCatch {
+    val model = ModelFactory.createDefaultModel()
+    model.read(is,base,"TTL")
+    model.getGraph
+  }
   
-  def read(reader: Reader, base: String): Either[Throwable, Jena#Graph] =
-    try {
-      val model = ModelFactory.createDefaultModel()
-      model.read(reader,base,"TTL")
-      Right(model.getGraph)
-    } catch {
-      case t => Left(t)
-    }
+  def read(reader: Reader, base: String): Validation[Throwable, Jena#Graph] = fromTryCatch {
+    val model = ModelFactory.createDefaultModel()
+    model.read(reader,base,"TTL")
+    model.getGraph
+  }
   
   
 }

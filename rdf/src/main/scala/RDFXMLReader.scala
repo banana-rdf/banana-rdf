@@ -5,7 +5,7 @@ import java.io._
 import scalaz.Validation
 import scalaz.Validation._
 
-abstract class TurtleReader[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
+abstract class RDFXMLReader[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
   
   import ops._
   

@@ -11,6 +11,8 @@ import java.io._
 import nomo.Accumulator
 import java.net.URI
 
+import scalaz.Validation
+import scalaz.Validation._
 
 /**
  * A Traditional blocking Reader for the nomo based Turtle parser
@@ -29,7 +31,7 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
    * @param base of the document being fetched. I.e. the URL of the document!
    * @return  the graph or an error
    */
-  def read(is: InputStream, base: String): Either[Throwable, Rdf#Graph] = {
+  def read(is: InputStream, base: String): Validation[Throwable, Rdf#Graph] = {
     read(new InputStreamReader(is, "UTF-8"), base)
   }
 
@@ -39,24 +41,19 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
    * @param base  of the document being fetched. I.e. the URL of the document!
    * @return the graph or an error
    */
-  def read(reader: Reader, base: String): Either[Throwable, Rdf#Graph] = {
+  def read(reader: Reader, base: String): Validation[Throwable, Rdf#Graph] = fromTryCatch {
     val buf = new Array[Char](4096)
     val abase = if (null != base  && "" !=base ) Some(new URI(base)) else None
     import parser.P._
-    try {
-      var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
-        (parser.turtleDoc, parser.P.annotator(new Listener(ops, abase)))
-      Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
-        state = state._1.feedChunked(buf.slice(0,read), state._2, read)
-      }
-      val result = state._1.result(state._2)
-      if (result.isSuccess) {
-        Right(ops.Graph(result.user.queue:_*))
-      } else Left(new Throwable(result.toString()))  //todo, clearly this is not what we want
-    } catch {
-      case e: IOException => Left(e)
+    var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
+      (parser.turtleDoc, parser.P.annotator(new Listener(ops, abase)))
+    Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
+      state = state._1.feedChunked(buf.slice(0,read), state._2, read)
     }
-
+    val result = state._1.result(state._2)
+    if (result.isSuccess) {
+      ops.Graph(result.user.queue:_*)
+    } else throw new Throwable(result.toString())  //todo, clearly this is not what we want
   }
 
 }

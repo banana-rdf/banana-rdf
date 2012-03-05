@@ -10,6 +10,8 @@ import org.w3.rdf.{RDF, TurtleReader => RDFTurtleReader}
 import java.io._
 import nomo.Accumulator
 
+import scalaz.Validation
+import scalaz.Validation._
 
 /**
  * A Traditional blocking Reader for the nomo based NTriples parser .
@@ -28,7 +30,7 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
    *             being complete
    * @return the graph or an error
    */
-  def read(is: InputStream, base: String): Either[Throwable, Rdf#Graph] = {
+  def read(is: InputStream, base: String): Validation[Throwable, Rdf#Graph] = {
     read(new InputStreamReader(is, "UTF-8"), base) //currently NTriples only supports ascii, and so utf8 will work.
   }
 
@@ -39,22 +41,17 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
    *             being complete
    * @return the graph or an error
    */
-  def read(reader: Reader, base: String): Either[Throwable, Rdf#Graph] = {
+  def read(reader: Reader, base: String): Validation[Throwable, Rdf#Graph] = fromTryCatch {
     val buf = new Array[Char](1024)  //todo: how could one set the size of the buffer?
     import parser.P._
-    try {
-      var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
-        (parser.nTriples, parser.P.annotator(new Listener(ops, None)))
-      var read =0
-      while ({ read = reader.read(buf); read > -1 }) {
-        state = state._1.feedChunked(buf.slice(0,read), state._2)
-      }
-      val result = state._1.result(state._2)
-      Right(ops.Graph(result.user.queue:_*))
-    } catch {
-      case e: IOException => Left(e)
+    var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
+      (parser.nTriples, parser.P.annotator(new Listener(ops, None)))
+    var read =0
+    while ({ read = reader.read(buf); read > -1 }) {
+      state = state._1.feedChunked(buf.slice(0,read), state._2)
     }
-
+    val result = state._1.result(state._2)
+    ops.Graph(result.user.queue:_*)
   }
 
 }

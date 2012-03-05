@@ -6,7 +6,8 @@ import org.openrdf.model.impl.{GraphImpl, StatementImpl, LiteralImpl}
 import java.io._
 import java.util.LinkedList
 
-import scala.collection.immutable.List
+import scalaz.Validation
+import scalaz.Validation._
 
 object SesameTurtleReader extends TurtleReader[Sesame](SesameOperations) {
   
@@ -21,29 +22,22 @@ object SesameTurtleReader extends TurtleReader[Sesame](SesameOperations) {
     }
   }
   
-  def read(is: InputStream, base: String): Either[Throwable, Graph] =
-    try {
-      val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
-      val triples = new java.util.LinkedList[Statement]
-      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-      turtleParser.setRDFHandler(collector)
-      turtleParser.parse(is, base)
-      Right(new GraphImpl(triples))
-    } catch {
-      case t => Left(t)
-    }
+  def read(is: InputStream, base: String): Validation[Throwable, Graph] = fromTryCatch {
+    val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
+    val triples = new java.util.LinkedList[Statement]
+    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
+    turtleParser.setRDFHandler(collector)
+    turtleParser.parse(is, base)
+    new GraphImpl(triples)
+  }
   
-  def read(reader: Reader, base: String): Either[Throwable, Graph] =
-    try {
-      val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
-      val triples = new java.util.LinkedList[Statement]
-      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-      turtleParser.setRDFHandler(collector)
-      turtleParser.parse(reader, base)
-      Right(new GraphImpl(triples))
-    } catch {
-      case t => Left(t)
-    }
-  
+  def read(reader: Reader, base: String): Validation[Throwable, Graph] = fromTryCatch {
+    val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
+    val triples = new java.util.LinkedList[Statement]
+    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
+    turtleParser.setRDFHandler(collector)
+    turtleParser.parse(reader, base)
+    new GraphImpl(triples)
+  }
   
 }

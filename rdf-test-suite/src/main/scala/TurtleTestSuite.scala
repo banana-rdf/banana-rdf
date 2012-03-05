@@ -5,6 +5,8 @@ import org.scalatest.matchers.MustMatchers
 import java.io._
 import org.scalatest.EitherValues._
 
+import scalaz.Validation
+import scalaz.Validation._
 
 abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends WordSpec with MustMatchers {
   
@@ -54,9 +56,9 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
   
   "read TURTLE version of timbl's card" in {
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
-    val graph = reader.read(file, file.toURI.toString)
+    val graph = reader.read(file, file.toURI.toString).fold( t => throw t, g => g )
 //    graph.fold( _.printStackTrace, r => println(r.size))
-    graph.right.value.size must equal (77)
+    graph.size must equal (77)
   }
   
   "read simple TURTLE String" in {
@@ -64,25 +66,22 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    val graph = reader.read(turtleString, rdfCore)
-    val g: Graph = graph.right.get
-    assert(referenceGraph isIsomorphicWith g)
+    val graph = reader.read(turtleString, rdfCore).fold( t => throw t, g => g )
+    assert(referenceGraph isIsomorphicWith graph)
     
   }
   
   "write simple graph as TURTLE string" in {
-    val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/")
-    turtleString.right.value must not be ('empty)
+    val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").fold( t => throw t, s => s )
+    turtleString must not be ('empty)
   }
   
   "works with relative uris" in {
-    val turtleString = writer.asString(referenceGraph, rdfCore)
-//    println("  --- "+turtleString)
-    val computedFooGraph = turtleString.right flatMap { s => reader.read(s, foo) }
-//    println("0 --- "+computedFooGraph)
-//    println("1 --- "+fooGraph)
-    val g: Graph = computedFooGraph.right.get
-//    println("2 --- "+g)
+    val bar = for {
+      turtleString <- writer.asString(referenceGraph, rdfCore)
+      computedFooGraph <- reader.read(turtleString, foo)
+    } yield computedFooGraph
+    val g: Graph = bar.fold( t => throw t, g => g )
     assert(fooGraph isIsomorphicWith g)
   }
   

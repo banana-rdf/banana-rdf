@@ -15,6 +15,8 @@ import java.net.URI
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FailureOf, PropSpec}
 
+import scalaz._
+import scalaz.Validation._
 
 /**
  * Test parser with official tests from w3c using another turtle parser as a reference point
@@ -27,9 +29,9 @@ import org.scalatest.{FailureOf, PropSpec}
  * @tparam Rdf2 The RDF framework with which the reference parser uses
  */
 abstract class TurtleParserTest[Rdf <: RDF, Rdf2 <: RDF](
-                                                     val testedParser: TurtleReader[Rdf],
-                                                     val referenceParser: TurtleReader[Rdf2])
-  extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
+    val testedParser: TurtleReader[Rdf],
+    val referenceParser: TurtleReader[Rdf2])
+extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
 
   val morpheus: GraphIsomorphism[Rdf2]
 
@@ -86,12 +88,14 @@ abstract class TurtleParserTest[Rdf <: RDF, Rdf2 <: RDF](
     val testFile =  new File(this.getClass.getResource("/www.w3.org/2000/10/rdf-tests/rdfcore/ntriples/test.nt").toURI)
     info("testing file "+testFile.getName + " at "+testFile.getPath)
 
-    val otherReading = referenceParser.read(testFile,"","UTF-8")
-    assert(otherReading.isRight === true,referenceParser +" could not read the "+testFile+" returned "+otherReading)
+    val otherReading = referenceParser.read(testFile,"","UTF-8").fold(
+      t => sys.error(referenceParser +" could not read the "+testFile),
+      g => g
+    )
 
-    val result = testedParser.read(testFile,"","UTF-8")
+    val result = testedParser.read(testFile,"","UTF-8").fold(t => throw t, g => g)
 
-    isomorphicTest(result.right.get, otherReading.right.get)
+    isomorphicTest(result, otherReading)
   }
 
   property("The Turtle parser should pass each of the positive official W3C Turtle Tests") {
@@ -103,14 +107,15 @@ abstract class TurtleParserTest[Rdf <: RDF, Rdf2 <: RDF](
       val resultFile = new File(f.getParentFile,resFileName)
       info(" ")
       info("input "+f.getName+" should produce "+resultFile.getName)
-      val otherReading = referenceParser.read(resultFile,base+f.getName)
+      // TODO: don't use the conversion to either but embrace the Validation
+      val otherReading = referenceParser.read(resultFile,base+f.getName).either
       val fail = failureOf {
         if (otherReading.isLeft){
           info("reference parser "+referenceParser + " could not read " + resultFile + " detail: " + otherReading.left)
           throw otherReading.left.get
        }
         info("base set to="+base+f.getName)
-        val result = testedParser.read(f, base+f.getName,"UTF-8")
+        val result = testedParser.read(f, base+f.getName,"UTF-8").either
         assert(result.isRight,"failed to parse test. Result was:"+result)
         isomorphicTest(result.right.get, otherReading.right.get)
       }
@@ -132,7 +137,7 @@ abstract class TurtleParserTest[Rdf <: RDF, Rdf2 <: RDF](
     info("all these files are in "+tstDir)
 
     val res = for(f <- bad) yield {
-      val reading = testedParser.read(f,base+f.getName,"UTF-8")
+      val reading = testedParser.read(f,base+f.getName,"UTF-8").either
       if (reading.isRight) {
         info(" oops! results found"+reading)
       }

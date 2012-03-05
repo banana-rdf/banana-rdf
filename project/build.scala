@@ -11,7 +11,9 @@ object BuildSettings {
     scalaVersion := "2.9.1",
 
     parallelExecution in Test := false,
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types")
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types"),
+    resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+    resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
   )
 
 }
@@ -22,10 +24,8 @@ object YourProjectBuild extends Build {
   
   import com.typesafe.sbteclipse.plugin.EclipsePlugin._
   
-  val typesafeRepository = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   val akka = "com.typesafe.akka" % "akka-actor" % "2.0-RC4"
 
-  val sonatypeSnapshots = "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.0"
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
@@ -73,7 +73,8 @@ object YourProjectBuild extends Build {
   lazy val rdf = Project(
     id = "rdf",
     base = file("rdf"),
-    settings = buildSettings ++ testDeps
+    settings = buildSettings ++ testDeps ++ Seq(
+      libraryDependencies += scalaz)
   )
 
   lazy val rdfTestSuite = Project(
@@ -122,11 +123,8 @@ object YourProjectBuild extends Build {
     id = "linked-data",
     base = file("linked-data"),
     settings = buildSettings ++ Seq(
-      resolvers += typesafeRepository,
-      resolvers += sonatypeSnapshots,
       libraryDependencies += akka,
-      libraryDependencies += asyncHttpClient,
-      libraryDependencies += scalaz)
+      libraryDependencies += asyncHttpClient)
   ) dependsOn (rdf, sesame, jena)
   
 }
