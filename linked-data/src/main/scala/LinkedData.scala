@@ -98,7 +98,7 @@ class LinkedData[Rdf <: RDF](
     val ops: RDFOperations[Rdf],
     val projections: Projections[Rdf],
     val utils: RDFUtils[Rdf],
-    val turtleReader: TurtleReader[Rdf],
+    val turtleReader: RDFReader[Rdf, Turtle],
     val turtleWriter: TurtleWriter[Rdf]) {
   
   import ops._

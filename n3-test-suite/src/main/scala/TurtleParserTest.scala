@@ -29,18 +29,20 @@ import scalaz.Validation._
  * @tparam Rdf2 The RDF framework with which the reference parser uses
  */
 abstract class TurtleParserTest[Rdf <: RDF, Rdf2 <: RDF](
-    val testedParser: TurtleReader[Rdf],
-    val referenceParser: TurtleReader[Rdf2])
+    val testedParser: RDFReader[Rdf, Turtle],
+    val referenceParser: RDFReader[Rdf2, Turtle],
+    val ops: RDFOperations[Rdf],
+    val ops2: RDFOperations[Rdf2])
 extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
 
   val morpheus: GraphIsomorphism[Rdf2]
 
-  import testedParser.ops._
+  import ops._
 
   lazy val prime: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
     prime.takeWhile(j => j * j <= i).forall(i % _ > 0))
 
-  object rdfTransformer extends RDFTransformer[Rdf,Rdf2](testedParser.ops,referenceParser.ops)
+  object rdfTransformer extends RDFTransformer[Rdf,Rdf2](ops, ops2)
 
   def randomSz = {
     prime(5+Random.nextInt(248))
@@ -60,7 +62,7 @@ extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
     if (!isomorphic) {
       info("graphs were not isomorphic - trying to narrow down on problematic statement")
 
-      import referenceParser.ops.graphAsIterable
+      import ops2.graphAsIterable
       val referenceAsSet = graphAsIterable(referenceResult).toIterable.toSet
       val resultAsSet = graphAsIterable(gAsOther).toIterable.toSet
       info("read ntriples file with " +testedParser+" found "+referenceAsSet.size +" triples")

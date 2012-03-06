@@ -6,8 +6,8 @@ import java.io._
 
 import scalaz.Validation
 
-class DefaultTurtleReader[Rdf <: RDF](override val ops: RDFOperations[Rdf])
-extends TurtleReader[Rdf](ops) {
+class DefaultTurtleReader[Rdf <: RDF](val ops: RDFOperations[Rdf])
+extends RDFReader[Rdf, Turtle] {
   
   private val jenaToM = new RDFTransformer[Jena, Rdf](JenaOperations, ops)
   

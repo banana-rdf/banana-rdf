@@ -9,7 +9,7 @@ import java.util.LinkedList
 import scalaz.Validation
 import scalaz.Validation._
 
-object SesameTurtleReader extends TurtleReader[Sesame](SesameOperations) {
+object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
   
   import SesameOperations._
   

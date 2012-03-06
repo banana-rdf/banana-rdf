@@ -37,21 +37,33 @@ object SimpleGraphIsomorphism extends DefaultGraphIsomorphism(SimpleRDFOperation
 /**
  * Test the nomo parser with the sesame Turtle Reader
  */
-class NomoOnSesameParserSeqTest extends n3.TurtleParserTest(NomoTurtleSeqReader,sesame.SesameTurtleReader) {
+class NomoOnSesameParserSeqTest extends n3.TurtleParserTest(
+    NomoTurtleSeqReader,
+    sesame.SesameTurtleReader,
+    SimpleRDFOperations,
+    sesame.SesameOperations) {
   val morpheus = SesameGraphIsomorphism
 }
 
 /**
  * Test Sesame's Parser with the Sesame Parser
  */
-class SesameOnSesameParserTest extends n3.TurtleParserTest(sesame.SesameTurtleReader,sesame.SesameTurtleReader) {
+class SesameOnSesameParserTest extends n3.TurtleParserTest(
+    sesame.SesameTurtleReader,
+    sesame.SesameTurtleReader,
+    sesame.SesameOperations,
+    sesame.SesameOperations) {
   val morpheus = SesameGraphIsomorphism //todo: replace with identityIsomorphism
 }
 
 /**
  * Test Jena's Turtle Parser with Jena's Parser
  */
-class JenaOnJenaParserTest extends n3.TurtleParserTest(jena.JenaTurtleReader,jena.JenaTurtleReader) {
+class JenaOnJenaParserTest extends n3.TurtleParserTest(
+    jena.JenaTurtleReader,
+    jena.JenaTurtleReader,
+    jena.JenaOperations,
+    jena.JenaOperations) {
   val morpheus = jena.JenaGraphIsomorphism //todo: replace with identityIsomorphism
 }
 
