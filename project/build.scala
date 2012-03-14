@@ -1,5 +1,7 @@
 import sbt._
 import Keys._
+import org.ensime.sbt.Plugin.Settings.ensimeConfig
+import org.ensime.sbt.util.SExp._
 
 object BuildSettings {
 
@@ -13,7 +15,14 @@ object BuildSettings {
     parallelExecution in Test := false,
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
-    resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
+    resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+    ensimeConfig := sexp(
+      key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
+      key(":formatting-prefs"), sexp(
+        key(":rewriteArrowSymbols"), true,
+	key(":doubleIndentClassDeclaration"), true
+      )
+    )
   )
 
 }
