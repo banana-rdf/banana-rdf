@@ -21,3 +21,16 @@ You only need a recent version of Java, that's all:
     $ git clone git@github.com:betehess/pimp-my-rdf.git
     $ cd pimp-my-rdf
     $ ./sbt
+
+
+Licence
+-------
+
+This source code is licenced under an open source license. 
+Whether this licence be 
+
+ * [W3C Licence](http://opensource.org/licenses/W3C)
+ * [MIT Licence](http://opensource.org/licenses/MIT)
+ * [Apache 2.0 Licence](http://opensource.org/licenses/Apache-2.0)
+
+has not yet been decided
