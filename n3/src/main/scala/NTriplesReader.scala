@@ -6,7 +6,7 @@
 package org.w3.rdf.n3.nomo
 
 import org.w3.rdf.n3.{NTriplesParser, Listener}
-import org.w3.rdf.{RDF, TurtleReader => RDFTurtleReader}
+import org.w3.rdf.{RDF, RDFReader, Turtle}
 import java.io._
 import nomo.Accumulator
 
@@ -21,8 +21,10 @@ import scalaz.Validation._
  */
 
 class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, X, Listener[Rdf]])
-  extends RDFTurtleReader(parser.ops) {
+  extends RDFReader[Rdf, Turtle] {
 
+  import parser.ops
+  
   /**
    *
    * @param is an ASCII data containing input stream (UTF-8) may work too

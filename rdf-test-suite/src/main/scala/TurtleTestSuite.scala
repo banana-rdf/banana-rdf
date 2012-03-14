@@ -10,7 +10,7 @@ import scalaz.Validation._
 
 abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends WordSpec with MustMatchers {
   
-  val reader: TurtleReader[Rdf]
+  val reader: RDFReader[Rdf, Turtle]
   val writer: TurtleWriter[Rdf]
   val iso: GraphIsomorphism[Rdf]
   

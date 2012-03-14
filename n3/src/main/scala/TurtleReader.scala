@@ -6,7 +6,7 @@
 package org.w3.rdf.n3.nomo
 
 import org.w3.rdf.n3.{TurtleParser, Listener}
-import org.w3.rdf.{RDF, TurtleReader => RDFTurtleReader}
+import org.w3.rdf.{RDF, RDFReader, Turtle}
 import java.io._
 import nomo.Accumulator
 import java.net.URI
@@ -22,8 +22,10 @@ import scalaz.Validation._
  */
 
 class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listener[Rdf]])
-  extends RDFTurtleReader(parser.ops) {
+  extends RDFReader[Rdf, Turtle] {
 
+  import parser.ops
+  
   /**
    *
    * @param is an input stream containing the data. There is no input stream detection mechanism,
