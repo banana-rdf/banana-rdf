@@ -9,7 +9,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++ Seq (
     organization := "org.w3",
-    version      := "0.1",
+    version      := "0.1-SNAPSHOT",
     scalaVersion := "2.9.1",
 
     parallelExecution in Test := false,
@@ -20,9 +20,12 @@ object BuildSettings {
       key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
       key(":formatting-prefs"), sexp(
         key(":rewriteArrowSymbols"), true,
-	key(":doubleIndentClassDeclaration"), true
+	      key(":doubleIndentClassDeclaration"), true
       )
-    )
+    ),
+    publishTo := Some(Resolver.ssh("bblfish repository", "bblfish.net", "/home/hjs/htdocs/work/repo/snapshots") as
+      ("hjs",new File("/Users/hjs/.ssh/id_dsa")))
+
   )
 
 }
