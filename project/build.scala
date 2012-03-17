@@ -1,5 +1,5 @@
 import sbt._
-import Keys._
+import sbt.Keys._
 import org.ensime.sbt.Plugin.Settings.ensimeConfig
 import org.ensime.sbt.util.SExp._
 
@@ -58,7 +58,9 @@ object YourProjectBuild extends Build {
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.0-incubating")
+      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.0-incubating",
+      libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
+  )
   
   val sesameDeps =
     Seq(
