@@ -76,7 +76,7 @@ class RDFUtilsImpl[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends RDFUtils[Rdf
     val uri = new java.net.URI(iriString)
     import uri._
     val uriNoFrag = new java.net.URI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, null)
-    IRI(uriNoFrag.toString + ".ttl")
+    IRI(uriNoFrag.toString)
   }
 
 }

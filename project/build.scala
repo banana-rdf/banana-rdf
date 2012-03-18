@@ -38,7 +38,7 @@ object YourProjectBuild extends Build {
   
   val akka = "com.typesafe.akka" % "akka-actor" % "2.0-RC4"
 
-  val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.0"
+  val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
 
