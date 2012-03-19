@@ -65,7 +65,7 @@ object YourProjectBuild extends Build {
   val sesameDeps =
     Seq(
       resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-runtime" % "2.6.3")
+      libraryDependencies += "org.openrdf.sesame" % "sesame-runtime" % "2.6.4")
 
   val n3Deps =
     Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
