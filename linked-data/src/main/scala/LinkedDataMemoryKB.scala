@@ -4,10 +4,10 @@ import org.w3.rdf._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ConcurrentMap
-import java.util.concurrent.ConcurrentHashMap
-
 import akka.dispatch._
 import akka.util.duration._
+import com.ning.http.client._
+import java.util.concurrent.{ConcurrentHashMap, ExecutorService, Executors, Future ⇒ jFuture}
 
 class LinkedDataMemoryKB[Rdf <: RDF](
     val ops: RDFOperations[Rdf],
@@ -20,14 +20,13 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   import projections._
   import utils._
 
-  import java.util.concurrent.{ ExecutorService, Executors }
+  val logger = new Object {
+    def debug(msg: => String): Unit = println(msg)
+  }
 
   val executor: ExecutorService = Executors.newFixedThreadPool(10)
 
   implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutorService(executor)
-
-  import com.ning.http.client._
-  import java.util.concurrent.{ Future ⇒ jFuture }
 
   val httpClient = {
     val timeout: Int = 2000
@@ -46,6 +45,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   val kb: ConcurrentMap[IRI, Future[Graph]] = new ConcurrentHashMap[IRI, Future[Graph]]().asScala
 
   def shutdown(): Unit = {
+    logger.debug("shuting down the Linked Data facade")
     httpClient.close()
     executor.shutdown()
   }
@@ -55,6 +55,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     if (!kb.isDefinedAt(supportDoc)) {
       val IRI(iri) = supportDoc
       val futureGraph: Future[Graph] = Future {
+        logger.debug("GET " + iri)
         val is = httpClient.prepareGet(iri).setHeader("Accept", "text/rdf+n3").execute().get().getResponseBodyAsStream()
         val graph = turtleReader.read(is, iri).fold(f ⇒ throw f, g ⇒ g)
         graph
@@ -69,23 +70,26 @@ class LinkedDataMemoryKB[Rdf <: RDF](
 
   def point[S](s: S): LD[S] = new LD[S](Promise.successful(s))
 
-  //  type SuperLD[S] = LinkedData#LD[Rdf]
+  class LD[S](val innerFuture: Future[S]) extends super.LDInterface[S] {
 
-  class LD[S](val future: Future[S]) extends super.LDInterface[S] {
+    import ops._
 
-    def timbl(): S = Await.result(future, 5 seconds)
+    /*
+     * yes, 60 seconds is a bit long but dbpedia is freaking slooooow
+     */
+    def timbl(): S = Await.result(innerFuture, 60 seconds)
 
-    def map[A](f: S ⇒ A): LD[A] = new LD[A](future map f)
+    def map[A](f: S ⇒ A): LD[A] = new LD[A](innerFuture map f)
 
     def flatMap[A](f: S ⇒ LD[A]): LD[A] = new LD[A](
       for {
-        value ← future
-        result ← f(value).future
+        value ← innerFuture
+        result ← f(value).innerFuture
       } yield result)
 
     def follow(predicate: IRI)(implicit ev: S =:= IRI): LD[Iterable[Node]] = new LD(
       for {
-        subject ← future map ev
+        subject ← innerFuture map ev
         supportDocument = subject.supportDocument
         graph ← kb.get(supportDocument) getOrElse sys.error("something is really wrong")
       } yield {
@@ -93,17 +97,23 @@ class LinkedDataMemoryKB[Rdf <: RDF](
         os
       })
 
-    def followAll(predicate: IRI)(implicit ev: S =:= Iterable[IRI]): LD[Iterable[Node]] = {
-      val f = future map ev flatMap { iris ⇒
-        val nodesFuture: Iterable[Future[Iterable[Node]]] = iris map (iri ⇒ goto(iri).follow(predicate).future)
-        val nodes: Future[Iterable[Iterable[Node]]] = Future.sequence(nodesFuture)
-        nodes map (_.flatten)
+    def followAll(predicate: IRI)(implicit ev: S =:= Iterable[Node]): LD[Iterable[Node]] = {
+      val f = innerFuture.map(ev) flatMap { (nodes: Iterable[Node]) ⇒
+        val nodesFuture: Iterable[Future[Iterable[Node]]] =
+          nodes.map { (node: Node) =>
+            node.fold[Future[Iterable[Node]]](
+              iri => goto(iri).follow(predicate).innerFuture,
+              bn => Promise.successful(Iterable.empty),
+              lit => Promise.successful(Iterable.empty)
+            )}
+        val futureNodes: Future[Iterable[Iterable[Node]]] = Future.sequence(nodesFuture)
+        futureNodes map (_.flatten)
       }
       new LD(f)
     }
 
     def asURIs()(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[IRI]] = new LD(
-      future map { nodes ⇒
+      innerFuture map { nodes ⇒
         nodes.flatMap {
           _.fold[Option[Rdf#IRI]](
             iri ⇒ Some(iri),

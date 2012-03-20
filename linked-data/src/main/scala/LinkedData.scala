@@ -4,6 +4,14 @@ import org.w3.rdf._
 
 object LinkedData {
 
+  /**
+   * Provides a default instance for LinkedData
+   * <ul>
+   * <li>it comes with an internal memory-based knowledge base to cache the graphs</li>
+   * <li>LD is a Future-based implementation (totally asynchronous)</li>
+   * <li>timbl() waits for the value to be there</li>
+   * </ul>
+   */
   def inMemoryImpl[Rdf <: RDF](
     ops: RDFOperations[Rdf],
     projections: Projections[Rdf],
@@ -19,12 +27,21 @@ object LinkedData {
 
 }
 
+/**
+ * The interface to the Web of Data
+ */
 trait LinkedData[Rdf <: RDF] {
 
+  /**
+   * The abstraction for a value coming from the interaction with the Web of Data
+   */
   type LD[A] <: LDInterface[A]
 
   trait LDInterface[S] {
 
+    /**
+     * don't forget to invoke timbl in order to get the best out of your LD!
+     */
     def timbl(): S
 
     def map[A](f: S ⇒ A): LD[A]
@@ -33,7 +50,7 @@ trait LinkedData[Rdf <: RDF] {
 
     def follow(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]]
 
-    def followAll(predicate: Rdf#IRI)(implicit ev: S =:= Iterable[Rdf#IRI]): LD[Iterable[Rdf#Node]]
+    def followAll(predicate: Rdf#IRI)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
 
     def asURIs()(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]]
 
@@ -45,7 +62,7 @@ trait LinkedData[Rdf <: RDF] {
 
   def goto(iri: Rdf#IRI): LD[Rdf#IRI]
 
-  /* pimps */
+  /* pimps some common RDF types to get a smooth interaction with the LD */
 
   class IRIW(iri: Rdf#IRI) {
     def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] = goto(iri).follow(predicate)
@@ -53,14 +70,14 @@ trait LinkedData[Rdf <: RDF] {
 
   implicit def wrapIRI(iri: Rdf#IRI): IRIW = new IRIW(iri)
 
-  class IRIsW(iris: Iterable[Rdf#IRI]) {
+  class IRIsW(iris: Iterable[Rdf#Node]) {
     def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] = {
       val irisLD = point(iris)
       irisLD.followAll(predicate)
     }
   }
 
-  implicit def wrapIRIs(iris: Iterable[Rdf#IRI]): IRIsW = new IRIsW(iris)
+  implicit def wrapIRIs(iris: Iterable[Rdf#Node]): IRIsW = new IRIsW(iris)
 
 }
 
