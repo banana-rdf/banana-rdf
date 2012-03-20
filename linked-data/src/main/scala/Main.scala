@@ -18,9 +18,9 @@ object Main {
     import ld._
 
     val namesLD = for {
-      barack: IRI ← goto(IRI("http://dbpedia.org/resource/Barack_Obama"))
-      family ← barack.follow(IRI("http://dbpedia.org/ontology/child")).asURIs()
-      members ← family.follow(IRI("http://dbpedia.org/property/members")).asURIs()
+      barack ← goto(IRI("http://dbpedia.org/resource/Barack_Obama"))
+      family ← barack.follow(IRI("http://dbpedia.org/ontology/child"))
+      members ← family.follow(IRI("http://dbpedia.org/property/members"))
       names ← members.follow(IRI("http://dbpedia.org/property/name"))
     } yield names
 
