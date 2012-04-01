@@ -17,25 +17,31 @@ object Main {
     val ld = LinkedData.inMemoryImpl(JenaOperations, JenaProjections, JenaRDFUtils, JenaReaderFactory)
     import ld._
 
-    // val namesLD = for {
-    //   barack ← goto(IRI("http://dbpedia.org/resource/Barack_Obama"))
-    //   family ← barack.follow(IRI("http://dbpedia.org/ontology/child"))
-    //   members ← family.follow(IRI("http://dbpedia.org/property/members"))
-    //   names ← members.follow(IRI("http://dbpedia.org/property/name")).asStrings
-    // } yield names
+//    val namesLD = for {
+//      barack ← goto(IRI("http://dbpedia.org/resource/Barack_Obama"))
+//      family ← barack.follow(IRI("http://dbpedia.org/ontology/child"))
+//      members ← family.follow(IRI("http://dbpedia.org/property/members"))
+//      names ← members.follow(IRI("http://dbpedia.org/property/name")).asStrings
+//    } yield names
+//
+//    val names = namesLD.timbl()
+//
+//    println(names)
 
-    // val names = namesLD.timbl()
 
 
 
-    val namesLD = for {
-      tim ← goto(IRI("http://www.w3.org/People/Berners-Lee/card#i"))
-      name ← tim.follow(IRI("http://xmlns.com/foaf/0.1/name")).asStrings
-    } yield name
+    val cert = prefixBuilder("http://www.w3.org/ns/auth/cert#") _
+    val foaf = prefixBuilder("http://xmlns.com/foaf/0.1/") _
 
-    val name = namesLD.timbl()
+    val resultLD = for {
+      bblfish ← goto(IRI("http://bblfish.net/people/henry/card#me"))
+      people ← bblfish.follow(foaf("knows")).follow(foaf("name")).asStrings
+    } yield people
 
-    println(name)
+    val result = resultLD.timbl()
+
+    println(result)
 
     ld.shutdown()
 

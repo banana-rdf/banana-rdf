@@ -61,10 +61,10 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       val IRI(iri) = supportDoc
       val futureGraph: FutureValidation[LDError, Graph] = delayedValidation {
         logger.debug("GET " + iri)
-        val response = httpClient.prepareGet(iri).setHeader("Accept", "application/rdf+xml, text/rdf+n3").execute().get()
+        val response = httpClient.prepareGet(iri).setHeader("Accept", "application/rdf+xml, text/rdf+n3, text/turtle").execute().get()
         val is = response.getResponseBodyAsStream()
         response.getHeader("Content-Type").split(";")(0) match {
-          case "text/n3" => TurtleReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
+          case "text/n3" | "text/turtle" => TurtleReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
           case "application/rdf+xml" => RDFXMLReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
           case ct => Failure[LDError, Graph](UnknownContentType(ct))
         }
@@ -97,7 +97,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       } yield result
     )
 
-    def follow(predicate: IRI)(implicit ev: S =:= IRI): LD[Iterable[Node]] = new LD(
+    def followIRI(predicate: IRI)(implicit ev: S =:= IRI): LD[Iterable[Node]] = new LD(
       for {
         subject ← underlying map ev
         supportDocument = subject.supportDocument
@@ -108,12 +108,12 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       }
     )
 
-    def followAll(predicate: IRI)(implicit ev: S =:= Iterable[Node]): LD[Iterable[Node]] = {
+    def follow(predicate: IRI)(implicit ev: S =:= Iterable[Node]): LD[Iterable[Node]] = {
       val f = underlying.map(ev) flatMap { (nodes: Iterable[Node]) ⇒
         val nodesFutureValidation: Iterable[FutureValidation[LDError, Iterable[Node]]] =
-          nodes.map { (node: Node) =>
+          nodes.take(3).map { (node: Node) =>
             node.fold[FutureValidation[LDError, Iterable[Node]]](
-              iri => goto(iri).follow(predicate).underlying,
+              iri => goto(iri).followIRI(predicate).underlying,
               bn => immediateValidation(Success(Iterable.empty)),
               lit => immediateValidation(Success(Iterable.empty))
             )}
@@ -163,6 +163,25 @@ class LinkedDataMemoryKB[Rdf <: RDF](
           )
         )
       as[String](f)
+    }
+
+    def asInts(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Int]] = {
+      def f(node: Rdf#Node): Option[Int] = 
+        node.fold[Option[Int]](
+          iri ⇒ None,
+          bnode ⇒ None,
+          _.fold(
+            {
+              case TypedLiteral(lexicalForm, datatype) =>
+                if (datatype == xsdInt)
+                  try Some(lexicalForm.toInt) catch { case nfe: NumberFormatException => None }
+                else
+                  None
+            },
+            langlit => None
+          )
+        )
+      as[Int](f)
     }
 
   }

@@ -49,15 +49,17 @@ trait LinkedData[Rdf <: RDF] {
 
     def flatMap[A](f: S ⇒ LD[A]): LD[A]
 
-    def follow(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]]
+    def followIRI(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]]
 
-    def followAll(predicate: Rdf#IRI)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
+    def follow(predicate: Rdf#IRI)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
 
     def as[T](f: Rdf#Node => Option[T])(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[T]]
 
     def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]]
 
     def asStrings(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[String]]
+
+    def asInts(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Int]]
 
   }
 
@@ -70,7 +72,8 @@ trait LinkedData[Rdf <: RDF] {
   /* enhanced syntax */
 
   class IRIW(iri: Rdf#IRI) {
-    def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] = goto(iri).follow(predicate)
+    def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] =
+      goto(iri).followIRI(predicate)
   }
 
   implicit def wrapIRI(iri: Rdf#IRI): IRIW = new IRIW(iri)
@@ -78,7 +81,7 @@ trait LinkedData[Rdf <: RDF] {
   class IRIsW(iris: Iterable[Rdf#Node]) {
     def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] = {
       val irisLD = point(iris)
-      irisLD.followAll(predicate)
+      irisLD.follow(predicate)
     }
   }
 
