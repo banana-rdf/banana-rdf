@@ -18,12 +18,12 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     val ops: RDFOperations[Rdf],
     val projections: Projections[Rdf],
     val utils: RDFUtils[Rdf],
-    val turtleReader: RDFReader[Rdf, Turtle],
-    val turtleWriter: TurtleWriter[Rdf]) extends LinkedData[Rdf] {
+    val readerFactory: RDFReaderFactory[Rdf]) extends LinkedData[Rdf] {
 
   import ops._
   import projections._
   import utils._
+  import readerFactory._
 
   val logger = new Object {
     def debug(msg: => String): Unit = println(msg)
@@ -61,9 +61,13 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       val IRI(iri) = supportDoc
       val futureGraph: FutureValidation[LDError, Graph] = delayedValidation {
         logger.debug("GET " + iri)
-        val is = httpClient.prepareGet(iri).setHeader("Accept", "text/rdf+n3").execute().get().getResponseBodyAsStream()
-        val graph = turtleReader.read(is, iri) failMap { t => ParsingError }
-        graph
+        val response = httpClient.prepareGet(iri).setHeader("Accept", "application/rdf+xml, text/rdf+n3").execute().get()
+        val is = response.getResponseBodyAsStream()
+        response.getHeader("Content-Type").split(";")(0) match {
+          case "text/n3" => TurtleReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
+          case "application/rdf+xml" => RDFXMLReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
+          case ct => Failure[LDError, Graph](UnknownContentType(ct))
+        }
       }
       kb.put(supportDoc, futureGraph)
     }
@@ -71,6 +75,8 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   }
 
   def point[S](s: S): LD[S] = new LD[S](immediateValidation(Success(s)))
+
+  def pointFailure[S](f: LDError): LD[S] = new LD[S](immediateValidation(Failure(f)))
 
   class LD[S](val underlying: FutureValidation[LDError, S]) extends super.LDInterface[S] {
 
@@ -126,15 +132,38 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       new LD(f)
     }
 
-    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[IRI]] = new LD(
-      underlying map { nodes ⇒
-        nodes.flatMap {
-          _.fold[Option[Rdf#IRI]](
-            iri ⇒ Some(iri),
-            bnode ⇒ None,
-            literal ⇒ None)
-        }
-      })
+    def as[T](f: Rdf#Node => Option[T])(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[T]] =
+      new LD(
+        underlying map { nodes => ev(nodes).map(f).flatten }
+      )
+
+    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[IRI]] = {
+      def f(node: Rdf#Node): Option[Rdf#IRI] = 
+        node.fold[Option[Rdf#IRI]](
+          iri ⇒ Some(iri),
+          bnode ⇒ None,
+          literal ⇒ None)
+      as[IRI](f)
+    }
+
+    def asStrings(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[String]] = {
+      def f(node: Rdf#Node): Option[String] = 
+        node.fold[Option[String]](
+          iri ⇒ None,
+          bnode ⇒ None,
+          _.fold(
+            {
+              case TypedLiteral(lexicalForm, datatype) =>
+                if (datatype == xsdString)
+                  Some(lexicalForm)
+                else
+                  None
+            },
+            langlit => None
+          )
+        )
+      as[String](f)
+    }
 
   }
 }

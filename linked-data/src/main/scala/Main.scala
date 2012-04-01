@@ -14,19 +14,28 @@ object Main {
 
     import JenaOperations._
 
-    val ld = LinkedData.inMemoryImpl(JenaOperations, JenaProjections, JenaRDFUtils, JenaTurtleReader, JenaTurtleWriter)
+    val ld = LinkedData.inMemoryImpl(JenaOperations, JenaProjections, JenaRDFUtils, JenaReaderFactory)
     import ld._
 
+    // val namesLD = for {
+    //   barack ← goto(IRI("http://dbpedia.org/resource/Barack_Obama"))
+    //   family ← barack.follow(IRI("http://dbpedia.org/ontology/child"))
+    //   members ← family.follow(IRI("http://dbpedia.org/property/members"))
+    //   names ← members.follow(IRI("http://dbpedia.org/property/name")).asStrings
+    // } yield names
+
+    // val names = namesLD.timbl()
+
+
+
     val namesLD = for {
-      barack ← goto(IRI("http://dbpedia.org/resource/Barack_Obama"))
-      family ← barack.follow(IRI("http://dbpedia.org/ontology/child"))
-      members ← family.follow(IRI("http://dbpedia.org/property/members"))
-      names ← members.follow(IRI("http://dbpedia.org/property/name"))
-    } yield names
+      tim ← goto(IRI("http://www.w3.org/People/Berners-Lee/card#i"))
+      name ← tim.follow(IRI("http://xmlns.com/foaf/0.1/name")).asStrings
+    } yield name
 
-    val names = namesLD.timbl()
+    val name = namesLD.timbl()
 
-    println(names)
+    println(name)
 
     ld.shutdown()
 

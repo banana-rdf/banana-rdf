@@ -19,14 +19,12 @@ object LinkedData {
     ops: RDFOperations[Rdf],
     projections: Projections[Rdf],
     utils: RDFUtils[Rdf],
-    turtleReader: RDFReader[Rdf, Turtle],
-    turtleWriter: TurtleWriter[Rdf]): LinkedData[Rdf] =
+    readerFactory: RDFReaderFactory[Rdf]): LinkedData[Rdf] =
     new LinkedDataMemoryKB(
       ops,
       projections,
       utils,
-      turtleReader,
-      turtleWriter)
+      readerFactory)
 
 }
 
@@ -55,7 +53,11 @@ trait LinkedData[Rdf <: RDF] {
 
     def followAll(predicate: Rdf#IRI)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
 
+    def as[T](f: Rdf#Node => Option[T])(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[T]]
+
     def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]]
+
+    def asStrings(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[String]]
 
   }
 
