@@ -1,6 +1,9 @@
 package org.w3.linkeddata
 
 import org.w3.rdf._
+import scalaz.Validation
+import akka.util.Duration
+import akka.util.duration._
 
 object LinkedData {
 
@@ -35,14 +38,14 @@ trait LinkedData[Rdf <: RDF] {
   /**
    * The abstraction for a value coming from the interaction with the Web of Data
    */
-  type LD[A] <: LDInterface[A]
+  type LD[S] <: LDInterface[S]
 
   trait LDInterface[S] {
 
     /**
      * don't forget to invoke timbl in order to get the best out of your LD!
      */
-    def timbl(): S
+    def timbl(atMost: Duration = 60.seconds): Validation[LDError, S]
 
     def map[A](f: S ⇒ A): LD[A]
 
@@ -52,7 +55,7 @@ trait LinkedData[Rdf <: RDF] {
 
     def followAll(predicate: Rdf#IRI)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
 
-    def asURIs()(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]]
+    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]]
 
   }
 
@@ -62,7 +65,7 @@ trait LinkedData[Rdf <: RDF] {
 
   def goto(iri: Rdf#IRI): LD[Rdf#IRI]
 
-  /* pimps some common RDF types to get a smooth interaction with the LD */
+  /* enhanced syntax */
 
   class IRIW(iri: Rdf#IRI) {
     def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] = goto(iri).follow(predicate)
