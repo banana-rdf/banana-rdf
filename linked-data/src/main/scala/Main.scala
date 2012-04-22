@@ -36,12 +36,28 @@ object Main {
 
     val resultLD = for {
       bblfish ← goto(IRI("http://bblfish.net/people/henry/card#me"))
-      people ← bblfish.follow(foaf("knows")).follow(foaf("name")).asStrings
-    } yield people
+      person ← bblfish.follow(foaf("knows"))
+      name <- person.follow(foaf("firstName"))
+    } yield ((person, name))
 
     val result = resultLD.timbl()
 
     println(result)
+
+    val foo = for {
+      bblfish ← goto(IRI("http://bblfish.net/people/henry/card#me"))
+      person ← bblfish.follow(foaf("knows"))
+    } yield {
+      for {
+        p <- person
+      } {
+        val name = person.follow(foaf("firstName")).timbl()
+        println(p + " - " + name)
+      }
+    }
+
+    foo.timbl()
+
 
     ld.shutdown()
 

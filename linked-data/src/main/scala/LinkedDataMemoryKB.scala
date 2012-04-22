@@ -4,8 +4,9 @@ import org.w3.rdf._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ConcurrentMap
+import akka.actor._
 import akka.dispatch._
-import akka.util.Duration
+import akka.util._
 import akka.util.duration._
 import com.ning.http.client._
 import java.util.concurrent.{ConcurrentHashMap, ExecutorService, Executors, Future ⇒ jFuture}
@@ -28,6 +29,9 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   val logger = new Object {
     def debug(msg: => String): Unit = println(msg)
   }
+
+  val system = ActorSystem("foo")
+  implicit val dispatcher = system.dispatcher
 
   val executor: ExecutorService = Executors.newFixedThreadPool(10)
 
@@ -53,6 +57,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     logger.debug("shuting down the Linked Data facade")
     httpClient.close()
     executor.shutdown()
+    system.shutdown()
   }
 
   def goto(iri: IRI): LD[IRI] = {
@@ -97,6 +102,8 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       } yield result
     )
 
+    def foreach(f: S => Unit): Unit = underlying foreach f
+
     def followIRI(predicate: IRI)(implicit ev: S =:= IRI): LD[Iterable[Node]] = new LD(
       for {
         subject ← underlying map ev
@@ -108,10 +115,14 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       }
     )
 
-    def follow(predicate: IRI)(implicit ev: S =:= Iterable[Node]): LD[Iterable[Node]] = {
+    def follow(
+      predicate: IRI,
+      max: Int = 10,
+      maxDownloads: Int = 10)(
+      implicit ev: S =:= Iterable[Node]): LD[Iterable[Node]] = {
       val f = underlying.map(ev) flatMap { (nodes: Iterable[Node]) ⇒
         val nodesFutureValidation: Iterable[FutureValidation[LDError, Iterable[Node]]] =
-          nodes.take(3).map { (node: Node) =>
+          nodes.take(maxDownloads).map { (node: Node) =>
             node.fold[FutureValidation[LDError, Iterable[Node]]](
               iri => goto(iri).followIRI(predicate).underlying,
               bn => immediateValidation(Success(Iterable.empty)),
@@ -119,8 +130,18 @@ class LinkedDataMemoryKB[Rdf <: RDF](
             )}
         val nodesFuture: Iterable[Future[Validation[LDError, Iterable[Node]]]] =
           nodesFutureValidation map { _.asFuture }
+        implicit val timeout: Timeout = 10.seconds
+        val promiseStream = PromiseStream[Validation[LDError, Iterable[Node]]]()
+        for {
+          future <- nodesFuture
+        } promiseStream += future
+        val stream = Iterator.continually(promiseStream.dequeue())
         val futureNodes: Future[Iterable[Validation[LDError, Iterable[Node]]]] =
-          Future.sequence(nodesFuture)
+          Future.sequence {
+            val foo = stream.take(max).toSeq
+            println(";;; "+foo.size)
+            foo
+          }
         // as some point, we'll want to accumulate the errors somewhere,
         // still not failing because of the open world model
         val futureSuccesses: Future[Iterable[Iterable[Node]]] =

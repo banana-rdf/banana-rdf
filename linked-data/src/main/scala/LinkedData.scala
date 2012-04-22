@@ -49,9 +49,11 @@ trait LinkedData[Rdf <: RDF] {
 
     def flatMap[A](f: S ⇒ LD[A]): LD[A]
 
+    def foreach(f: S => Unit): Unit
+
     def followIRI(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]]
 
-    def follow(predicate: Rdf#IRI)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
+    def follow(predicate: Rdf#IRI, max: Int = 10, maxDownloads: Int = 10)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
 
     def as[T](f: Rdf#Node => Option[T])(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[T]]
 
@@ -79,9 +81,9 @@ trait LinkedData[Rdf <: RDF] {
   implicit def wrapIRI(iri: Rdf#IRI): IRIW = new IRIW(iri)
 
   class IRIsW(iris: Iterable[Rdf#Node]) {
-    def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] = {
+    def follow(predicate: Rdf#IRI, max: Int = 10, maxDownloads: Int = 10): LD[Iterable[Rdf#Node]] = {
       val irisLD = point(iris)
-      irisLD.follow(predicate)
+      irisLD.follow(predicate, max, maxDownloads)
     }
   }
 

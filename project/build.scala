@@ -13,14 +13,14 @@ object BuildSettings {
     scalaVersion := "2.9.1",
 
     parallelExecution in Test := false,
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types"),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
     ensimeConfig := sexp(
       key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
       key(":formatting-prefs"), sexp(
         key(":rewriteArrowSymbols"), true,
-	      key(":doubleIndentClassDeclaration"), true
+	key(":doubleIndentClassDeclaration"), true
       )
     ),
     publishTo := Some(Resolver.ssh("bblfish repository", "bblfish.net", "/home/hjs/htdocs/work/repo/snapshots") as
@@ -140,6 +140,25 @@ object YourProjectBuild extends Build {
       libraryDependencies += akka,
       libraryDependencies += asyncHttpClient)
   ) dependsOn (rdf, sesame, jena)
+
+  lazy val diesel = Project(
+    id = "diesel",
+    base = file("diesel"),
+    settings = buildSettings ++ testDeps
+  ) dependsOn (rdf, jena % "test", sesame % "test")
+
+  // lazy val peeler = Project(
+  //   id = "peeler",
+  //   base = file("peeler"),
+  //   settings = buildSettings
+  // ) dependsOn (rdf)
   
+  // lazy val dslTestSuite = Project(
+  //   id = "peeler",
+  //   base = file("peeler"),
+  //   settings = buildSettings
+  // ) dependsOn (diesel, peeler, jena % "test", sesame % "test")
+  
+
 }
 
