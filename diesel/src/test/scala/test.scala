@@ -94,7 +94,7 @@ abstract class DieselTest[Rdf <: RDF](
   }
 
 
-  "Diesel must allow easy definition of class a..." in {
+  "Diesel must allow easy use of rdf:type through the method 'a'" in {
 
     val g: GraphNode = (
       bnode("betehess").a(FOAF.Person)
@@ -105,6 +105,21 @@ abstract class DieselTest[Rdf <: RDF](
       Graph(
         Triple(BNode("betehess"), rdf("type"), FOAF.Person),
         Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))))
+
+    assert(g.graph isIsomorphicWith expectedGraph)
+  }
+
+
+
+  "Diesel must allow objectList definition" in {
+
+    val g: GraphNode =
+      bnode("betehess") -- FOAF.name ->- ("Alexandre".lang("fr"), "Alexander".lang("en"))
+
+    val expectedGraph =
+      Graph(
+        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
+        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexander", Lang("en"))))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }

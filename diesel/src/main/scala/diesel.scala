@@ -20,9 +20,15 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
 
   case class GraphNodePredicate(graphNode: GraphNode, p: IRI) {
 
-    def ->-(o: Node): GraphNode = {
+    def ->-(o: Node, os: Node*): GraphNode = {
       val GraphNode(s, acc) = graphNode
-      val graph = acc union Graph(Triple(s, p, o))
+      val graph =
+        if (os.isEmpty) {
+          acc union Graph(Triple(s, p, o))
+        } else {
+          val triples: Iterable[Triple] = (o :: os.toList) map { o => Triple(s, p, o) }
+          Graph(triples) union acc
+        }
       GraphNode(s, graph)
     }
 
