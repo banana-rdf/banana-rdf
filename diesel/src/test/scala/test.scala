@@ -145,6 +145,51 @@ abstract class DieselTest[Rdf <: RDF](
     assert(g.graph isIsomorphicWith expectedGraph)
   }
 
+  "Diesel must support RDF collections" in {
+
+    val g: GraphNode = (
+      bnode("betehess")
+        -- FOAF.name ->- List[Node](29, bnode("bar"), "foo")
+    )
+
+
+    val l: GraphNode = (
+      bnode()
+        -- first ->- 29
+        -- rest ->- (
+          bnode()
+            -- first ->- bnode("bar")
+            -- rest ->- (
+              bnode()
+                -- first ->- "foo"
+                -- rest ->- nil
+            )
+        )
+    )
+
+    val expectedGraph = (
+      bnode("betehess") -- FOAF.name ->- l
+    )
+
+    assert(g.graph isIsomorphicWith expectedGraph.graph)
+  }
+
+
+
+
+  "Diesel must support RDF collections (empty list)" in {
+
+    val g: GraphNode = (
+      bnode("betehess") -- FOAF.name ->- List[Node]()
+    )
+
+    val expectedGraph = (
+      bnode("betehess") -- FOAF.name ->- nil
+    )
+
+    assert(g.graph isIsomorphicWith expectedGraph.graph)
+  }
+
 
 
 }

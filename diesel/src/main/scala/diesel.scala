@@ -18,6 +18,10 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
 
   implicit def wrapNodeInGraphNode(node: Node): GraphNode = GraphNode(node, Graph.empty)
 
+    val first = rdf("first")
+    val rest = rdf("rest")
+    val nil = rdf("nil")
+
   case class GraphNodePredicate(graphNode: GraphNode, p: IRI) {
 
     def ->-(o: Node, os: Node*): GraphNode = {
@@ -37,6 +41,21 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
       val GraphNode(o, graphObject) = graphNodeObject
       val graph = Graph(Triple(s, p, o)) union acc union graphObject
       GraphNode(s, graph)
+    }
+
+    def ->-(collection: List[Node]): GraphNode = {
+      var current: Node = nil
+      val triples = scala.collection.mutable.Set[Triple]()
+      collection.reverse foreach { a =>
+        val newBNode = BNode()
+        triples += Triple(newBNode, first, a)
+        triples += Triple(newBNode, rest, current)
+        current = newBNode
+      }
+      val GraphNode(s, acc) = graphNode
+      triples += Triple(s, p, current)
+      val graph = acc union Graph(triples)
+      GraphNode(current, Graph(triples))
     }
 
   }
