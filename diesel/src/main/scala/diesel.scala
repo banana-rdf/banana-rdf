@@ -7,6 +7,13 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
   import ops._
   import union._
 
+  case class GraphNode(node: Node, graph: Graph) {
+    def --(p: IRI): GraphNodePredicate = GraphNodePredicate(this, p)
+    def -<-(p: IRI): PredicateGraphNode = PredicateGraphNode(p, this)
+  }
+
+  implicit def wrapNodeInGraphNode(node: Node): GraphNode = GraphNode(node, Graph.empty)
+
   case class GraphNodePredicate(graphNode: GraphNode, p: IRI) {
 
     def ->-(o: Node): GraphNode = {
@@ -24,11 +31,6 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
 
   }
 
-  case class GraphNode(node: Node, graph: Graph) {
-    def --(p: IRI): GraphNodePredicate = GraphNodePredicate(this, p)
-    def ->-(p: IRI): GraphNodePredicate = GraphNodePredicate(this, p)
-    def -<-(p: IRI): PredicateGraphNode = PredicateGraphNode(p, this)
-  }
 
   case class PredicateGraphNode(p: IRI, graphNode: GraphNode) {
 
@@ -47,7 +49,6 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
 
   }
 
-  implicit def wrapNodeInGraphNode(node: Node): GraphNode = GraphNode(node, Graph.empty)
 
   def bnode(): BNode = BNode()
 

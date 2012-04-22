@@ -82,6 +82,7 @@ abstract class DieselTest[Rdf <: RDF](
           uri("http://bblfish.net/#hjs") -- FOAF.name ->- "Henry Story"
         )
     )
+
     val expectedGraph =
       Graph(
         Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
@@ -101,3 +102,11 @@ import org.w3.rdf.jena._
 object JenaDiesel extends Diesel(JenaOperations, JenaGraphUnion)
 
 class JenaTest extends DieselTest[Jena](JenaOperations, JenaDiesel, JenaGraphIsomorphism)
+
+
+
+import org.w3.rdf.sesame._
+
+object SesameDiesel extends Diesel(SesameOperations, SesameGraphUnion)
+
+class SesameTest extends DieselTest[Sesame](SesameOperations, SesameDiesel, SesameGraphIsomorphism)
