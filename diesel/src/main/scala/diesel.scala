@@ -8,11 +8,20 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
   import union._
 
   case class GraphNodePredicate(graphNode: GraphNode, p: IRI) {
+
     def -->(o: Node): GraphNode = {
       val GraphNode(s, acc) = graphNode
       val graph = acc union Graph(Triple(s, p, o))
       GraphNode(s, graph)
     }
+
+    def -->(graphNodeObject: GraphNode): GraphNode = {
+      val GraphNode(s, acc) = graphNode
+      val GraphNode(o, graphObject) = graphNodeObject
+      val graph = Graph(Triple(s, p, o)) union acc union graphObject
+      GraphNode(s, graph)
+    }
+
   }
 
   case class GraphNode(node: Node, graph: Graph) {

@@ -24,9 +24,11 @@ abstract class DieselTest[Rdf <: RDF](
     def apply(s: String): IRI = prefixBuilder("http://xmlns.com/foaf/0.1/")(s)
     val name = apply("name")
     val title = apply("title")
+    val knows = apply("knows")
+    val currentProject = apply("currentProject")
   }
 
-  "Diesel must construct a simple GraphNode" in {
+  "Diesel must accept a GraphNode in the object position" in {
 
     val g: GraphNode =
       bnode("betehess") --
@@ -41,6 +43,29 @@ abstract class DieselTest[Rdf <: RDF](
     assert(g.graph isIsomorphicWith expectedGraph)
     
 
+  }
+
+  "Diesel must construct a simple GraphNode" in {
+
+    val g: GraphNode =
+      bnode("betehess") --
+        FOAF.name --> "Alexandre".lang("fr") --
+        FOAF.knows --> (
+          uri("http://bblfish.net/#hjs") --
+            FOAF.name --> "Henry Story" --
+            FOAF.currentProject --> uri("http://webid.info/")
+        )
+    val expectedGraph =
+      Graph(
+        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
+        Triple(BNode("betehess"), FOAF.knows, uri("http://bblfish.net/#hjs")),
+        Triple(uri("http://bblfish.net/#hjs"), FOAF.name, TypedLiteral("Henry Story")),
+        Triple(uri("http://bblfish.net/#hjs"), FOAF.currentProject, uri("http://webid.info/")))
+
+    println(g)
+    println(expectedGraph)
+
+    assert(g.graph isIsomorphicWith expectedGraph)
   }
 
 }
