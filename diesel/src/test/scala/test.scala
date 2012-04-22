@@ -30,10 +30,11 @@ abstract class DieselTest[Rdf <: RDF](
 
   "Diesel must accept a GraphNode in the object position" in {
 
-    val g: GraphNode =
-      bnode("betehess") --
-        FOAF.name --> "Alexandre".lang("fr") --
-        FOAF.title --> "Mr"
+    val g: GraphNode = (
+      bnode("betehess")
+        -- FOAF.name ->- "Alexandre".lang("fr")
+        -- FOAF.title ->- "Mr"
+    )
 
     val expectedGraph =
       Graph(
@@ -45,16 +46,21 @@ abstract class DieselTest[Rdf <: RDF](
 
   }
 
+
+
+
   "Diesel must construct a simple GraphNode" in {
 
-    val g: GraphNode =
-      bnode("betehess") --
-        FOAF.name --> "Alexandre".lang("fr") --
-        FOAF.knows --> (
-          uri("http://bblfish.net/#hjs") --
-            FOAF.name --> "Henry Story" --
-            FOAF.currentProject --> uri("http://webid.info/")
+    val g: GraphNode = (
+      bnode("betehess")
+        -- FOAF.name ->- "Alexandre".lang("fr")
+        -- FOAF.knows ->- (
+          uri("http://bblfish.net/#hjs")
+            -- FOAF.name ->- "Henry Story"
+            -- FOAF.currentProject ->- uri("http://webid.info/")
         )
+    )
+
     val expectedGraph =
       Graph(
         Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
@@ -62,11 +68,30 @@ abstract class DieselTest[Rdf <: RDF](
         Triple(uri("http://bblfish.net/#hjs"), FOAF.name, TypedLiteral("Henry Story")),
         Triple(uri("http://bblfish.net/#hjs"), FOAF.currentProject, uri("http://webid.info/")))
 
-    println(g)
-    println(expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
+  }
+
+
+
+  "Diesel must accept triples written in the inverse order o-p-s using <--" in {
+
+    val g: GraphNode = (
+      bnode("betehess")
+        -- FOAF.name ->- "Alexandre".lang("fr")
+        -<- FOAF.knows -- (
+          uri("http://bblfish.net/#hjs") -- FOAF.name ->- "Henry Story"
+        )
+    )
+    val expectedGraph =
+      Graph(
+        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
+        Triple(IRI("http://bblfish.net/#hjs"), FOAF.knows, BNode("betehess")),
+        Triple(IRI("http://bblfish.net/#hjs"), FOAF.name, TypedLiteral("Henry Story")))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
+
+
 
 }
 

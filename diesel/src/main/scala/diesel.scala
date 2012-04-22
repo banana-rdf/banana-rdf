@@ -9,13 +9,13 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
 
   case class GraphNodePredicate(graphNode: GraphNode, p: IRI) {
 
-    def -->(o: Node): GraphNode = {
+    def ->-(o: Node): GraphNode = {
       val GraphNode(s, acc) = graphNode
       val graph = acc union Graph(Triple(s, p, o))
       GraphNode(s, graph)
     }
 
-    def -->(graphNodeObject: GraphNode): GraphNode = {
+    def ->-(graphNodeObject: GraphNode): GraphNode = {
       val GraphNode(s, acc) = graphNode
       val GraphNode(o, graphObject) = graphNodeObject
       val graph = Graph(Triple(s, p, o)) union acc union graphObject
@@ -25,7 +25,26 @@ abstract class Diesel[Rdf <: RDF](val ops: RDFOperations[Rdf], val union: GraphU
   }
 
   case class GraphNode(node: Node, graph: Graph) {
-    def --(p: IRI): GraphNodePredicate = GraphNodePredicate(this, p)    
+    def --(p: IRI): GraphNodePredicate = GraphNodePredicate(this, p)
+    def ->-(p: IRI): GraphNodePredicate = GraphNodePredicate(this, p)
+    def -<-(p: IRI): PredicateGraphNode = PredicateGraphNode(p, this)
+  }
+
+  case class PredicateGraphNode(p: IRI, graphNode: GraphNode) {
+
+    def --(s: Node): GraphNode = {
+      val GraphNode(o, acc) = graphNode
+      val graph = acc union Graph(Triple(s, p, o))
+      GraphNode(s, graph)
+    }
+
+    def --(graphNodeSubject: GraphNode): GraphNode = {
+      val GraphNode(o, acc) = graphNode
+      val GraphNode(s, graphObject) = graphNodeSubject
+      val graph = Graph(Triple(s, p, o)) union acc union graphObject
+      GraphNode(s, graph)
+    }
+
   }
 
   implicit def wrapNodeInGraphNode(node: Node): GraphNode = GraphNode(node, Graph.empty)

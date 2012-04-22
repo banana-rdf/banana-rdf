@@ -82,7 +82,8 @@ object YourProjectBuild extends Build {
       n3TestSuite,
       jena,
       sesame,
-      linkedData))
+      linkedData,
+      diesel))
   
   lazy val rdf = Project(
     id = "rdf",
