@@ -139,6 +139,8 @@ trait RDFOperations[Rdf <: RDF] {
   
   implicit def wrapStringAsLiteral(s: String): TypedLiteral = TypedLiteral(s, xsdString)
   
+  implicit def wrapFloatAsLiteral(f: Double): TypedLiteral = TypedLiteral(f.toString, xsdDouble)
+  
   class LiteralBuilder(lexicalForm: String) {
     def datatype(datatype: IRI): TypedLiteral = TypedLiteral(lexicalForm, datatype)
     def lang(tag: String): LangLiteral = LangLiteral(lexicalForm, Lang(tag))

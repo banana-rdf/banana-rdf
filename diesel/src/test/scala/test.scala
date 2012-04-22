@@ -27,6 +27,8 @@ abstract class DieselTest[Rdf <: RDF](
     val knows = apply("knows")
     val currentProject = apply("currentProject")
     val Person = apply("Person")
+    val age = apply("age")
+    val height = apply("height")
   }
 
   "Diesel must accept a GraphNode in the object position" in {
@@ -120,6 +122,25 @@ abstract class DieselTest[Rdf <: RDF](
       Graph(
         Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
         Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexander", Lang("en"))))
+
+    assert(g.graph isIsomorphicWith expectedGraph)
+  }
+
+
+  "Diesel must understand Scala's native types" in {
+
+    val g: GraphNode = (
+      bnode("betehess")
+        -- FOAF.name ->- "Alexandre"
+        -- FOAF.age ->- 29
+        -- FOAF.height ->- 1.80
+    )
+
+    val expectedGraph =
+      Graph(
+        Triple(BNode("betehess"), FOAF.name, TypedLiteral("Alexandre", xsdString)),
+        Triple(BNode("betehess"), FOAF.age, TypedLiteral("29", xsdInt)),
+        Triple(BNode("betehess"), FOAF.height, TypedLiteral("1.8", xsdDouble)))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
