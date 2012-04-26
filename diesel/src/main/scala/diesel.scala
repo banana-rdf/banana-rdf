@@ -24,13 +24,8 @@ abstract class Diesel[Rdf <: RDF](
 
     def -<-(p: Rdf#IRI): PredicateGraphNode = PredicateGraphNode(p, this)
 
-    def /(p: Rdf#IRI): Iterable[GraphNode] = {
-      Node.fold(node)(
-        iri => getObjects(graph, iri, p) map { GraphNode(_, graph) },
-        bnode => Seq.empty,
-        lit => Seq.empty
-      )
-    }
+    def /(p: Rdf#IRI): Iterable[GraphNode] =
+      getObjects(graph, node, p) map { GraphNode(_, graph) }
 
   }
 

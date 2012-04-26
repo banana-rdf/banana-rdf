@@ -32,7 +32,8 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
   }
 
   val betehess: GraphNode = (
-    uri("http://bertails.org/#betehess")
+    //uri("http://bertails.org/#betehess")
+    bnode("betehess")
     -- FOAF.name ->- "Alexandre".lang("fr")
     -- FOAF.age ->- 29
     -- FOAF.knows ->- (
@@ -47,7 +48,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
     val name = betehess / FOAF.name
 
-    //name.head.node must be (LangLiteral("Alexandre", Lang("fr")))
+    name.head.node must be (LangLiteral("Alexandre", Lang("fr")))
 
   }
 

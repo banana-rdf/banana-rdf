@@ -67,7 +67,7 @@ object JenaOperations extends RDFOperations[Jena] {
      * LangLiteral are not different types in Jena
      * we can discriminate on the lang tag presence
      */
-    def fold[T](literal: Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T = literal match {
+    def fold[T](literal: Jena#Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T = literal match {
       case typedLiteral: TypedLiteral if literal.getLiteralLanguage == null || literal.getLiteralLanguage.isEmpty =>
         funTL(typedLiteral)
       case langLiteral: LangLiteral => funLL(langLiteral)
