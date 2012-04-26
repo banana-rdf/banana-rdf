@@ -11,7 +11,8 @@ object JenaProjections extends Projections[Jena] {
 
   val visitor: RDFVisitor = new RDFVisitor {
     def visitBlank(r: Resource, id: AnonId) = BNode(id.getLabelString)
-    def visitLiteral(l: JenaLiteral) = Literal.fold(l.asNode.asInstanceOf[Literal])(x => x, x => x) //TypedLiteral(l.getLexicalForm)
+    // go from the model's Node to the Graph one, then cast it (always safe here)
+    def visitLiteral(l: JenaLiteral) = Literal.fold(l.asNode.asInstanceOf[Literal])(x => x, x => x)
     def visitURI(r: Resource, uri: String) = IRI(uri)
   }
 
