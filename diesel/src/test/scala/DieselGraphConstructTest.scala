@@ -10,7 +10,7 @@ import org.scalatest.EitherValues._
 import scalaz.Validation
 import scalaz.Validation._
 
-abstract class DieselTest[Rdf <: RDF](
+abstract class DieselGraphConstructTest[Rdf <: RDF](
   val ops: RDFOperations[Rdf],
   val dsl: Diesel[Rdf],
   val iso: GraphIsomorphism[Rdf]) extends WordSpec with MustMatchers {
@@ -197,14 +197,9 @@ abstract class DieselTest[Rdf <: RDF](
 
 import org.w3.rdf.jena._
 
-object JenaDiesel extends Diesel(JenaOperations, JenaGraphUnion)
-
-class JenaTest extends DieselTest[Jena](JenaOperations, JenaDiesel, JenaGraphIsomorphism)
-
+class JenaDieselGraphConstructTest extends DieselGraphConstructTest[Jena](JenaOperations, JenaDiesel, JenaGraphIsomorphism)
 
 
 import org.w3.rdf.sesame._
 
-object SesameDiesel extends Diesel(SesameOperations, SesameGraphUnion)
-
-class SesameTest extends DieselTest[Sesame](SesameOperations, SesameDiesel, SesameGraphIsomorphism)
+class SesameDieselGraphConstructTest extends DieselGraphConstructTest[Sesame](SesameOperations, SesameDiesel, SesameGraphIsomorphism)
