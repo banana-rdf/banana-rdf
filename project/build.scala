@@ -79,7 +79,7 @@ object YourProjectBuild extends Build {
       rdfTestSuite,
       simpleRdf,
       n3,
-      n3TestSuite,
+//      n3TestSuite,
       jena,
       sesame,
       linkedData,
