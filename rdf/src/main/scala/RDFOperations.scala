@@ -78,30 +78,6 @@ trait RDFOperations[Rdf <: RDF] {
   
   val Lang: LangCompanionObject
 
-  def prefixBuilder(prefix: String)(value: String): IRI = IRI(prefix+value)
-
-  // helpers methods
-  
-  type Prefix = String => IRI
-  
-  val xsd = prefixBuilder("http://www.w3.org/2001/XMLSchema#") _
-  val rdf = prefixBuilder("http://www.w3.org/1999/02/22-rdf-syntax-ns#") _
-  val dc = prefixBuilder("http://purl.org/dc/elements/1.1/") _
-
-  val xsdString = xsd("string")
-  val xsdInt = xsd("int")
-  val rdfLang = rdf("langString")
-  val rdfType = rdf("type")
-  val xsdInteger = xsd("integer")
-  val xsdDecimal = xsd("decimal")
-  val xsdDouble = xsd("double")
-  val xsdBoolean = xsd("boolean")
-  val xsdTrueLit = TypedLiteral("true",xsdBoolean)
-  val xsdFalseLit = TypedLiteral("false",xsdBoolean)
-  val rdfFirst = rdf("first")
-  val rdfRest = rdf("rest")
-  val rdfNil = rdf("nil")
-
   // pimps
   
   class GraphW(graph: Graph) {
@@ -133,18 +109,20 @@ trait RDFOperations[Rdf <: RDF] {
     def fold[T](funTL: TypedLiteral => T, funLL: LangLiteral => T): T = Literal.fold(literal)(funTL, funLL)
   }
   
+  private val _xsd = XSDPrefix(this)
+
   implicit def wrapLiteral(literal: Literal): LiteralW = new LiteralW(literal)
   
-  implicit def wrapIntAsLiteral(i: Int): TypedLiteral = TypedLiteral(i.toString, xsdInt)
+  implicit def wrapIntAsLiteral(i: Int): TypedLiteral = TypedLiteral(i.toString, _xsd.int)
   
-  implicit def wrapStringAsLiteral(s: String): TypedLiteral = TypedLiteral(s, xsdString)
+  implicit def wrapStringAsLiteral(s: String): TypedLiteral = TypedLiteral(s, _xsd.string)
   
-  implicit def wrapFloatAsLiteral(f: Double): TypedLiteral = TypedLiteral(f.toString, xsdDouble)
+  implicit def wrapFloatAsLiteral(f: Double): TypedLiteral = TypedLiteral(f.toString, _xsd.double)
   
   class LiteralBuilder(lexicalForm: String) {
     def datatype(datatype: IRI): TypedLiteral = TypedLiteral(lexicalForm, datatype)
     def lang(tag: String): LangLiteral = LangLiteral(lexicalForm, Lang(tag))
-    def § = TypedLiteral(lexicalForm, xsdString)
+    def § = TypedLiteral(lexicalForm, _xsd.string)
   }
   
   implicit def wrapStringInLiteralBuilder(lexicalForm: String): LiteralBuilder = new LiteralBuilder(lexicalForm)

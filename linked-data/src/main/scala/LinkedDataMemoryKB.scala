@@ -26,6 +26,8 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   import utils._
   import readerFactory._
 
+  val xsd = XSDPrefix(ops)
+
   val logger = new Object {
     def debug(msg: => String): Unit = println(msg)
   }
@@ -175,7 +177,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
           _.fold(
             {
               case TypedLiteral(lexicalForm, datatype) =>
-                if (datatype == xsdString)
+                if (datatype == xsd.string)
                   Some(lexicalForm)
                 else
                   None
@@ -194,7 +196,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
           _.fold(
             {
               case TypedLiteral(lexicalForm, datatype) =>
-                if (datatype == xsdInt)
+                if (datatype == xsd.int)
                   try Some(lexicalForm.toInt) catch { case nfe: NumberFormatException => None }
                 else
                   None

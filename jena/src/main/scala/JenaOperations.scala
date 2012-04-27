@@ -6,6 +6,8 @@ import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 import scala.collection.JavaConverters._
 
+import Prefix._
+
 object JenaOperations extends RDFOperations[Jena] {
 
   object Graph extends GraphCompanionObject {
@@ -83,7 +85,7 @@ object JenaOperations extends RDFOperations[Jena] {
       if (typ != null)
         Some((typedLiteral.getLiteralLexicalForm.toString, IRI(typ.getURI)))
       else if (typedLiteral.getLiteralLanguage.isEmpty)
-        Some((typedLiteral.getLiteralLexicalForm.toString, xsdString))
+        Some((typedLiteral.getLiteralLexicalForm.toString, xsd.string))
       else
         None
     }

@@ -21,6 +21,8 @@ import org.w3.rdf._
 class Serializer[Rdf <: RDF](ops: RDFOperations[Rdf]) {
   
   import ops._
+
+  val xsd = XSDPrefix(ops)
   
 //  val pimps = new Pimps(m)
 //  import pimps._
@@ -50,7 +52,7 @@ class Serializer[Rdf <: RDF](ops: RDFOperations[Rdf]) {
   )
   
   def typedLiteralAsN3(typedLiteral: TypedLiteral): String = typedLiteral match {
-    case TypedLiteral(lexicalForm, datatype) if datatype == xsdString =>
+    case TypedLiteral(lexicalForm, datatype) if datatype == xsd.string =>
       "\"%s\"" format NTriplesParser.toAsciiLiteral(lexicalForm)
     case TypedLiteral(lexicalForm, IRI(iri)) =>
       "\"%s\"^^<%s>" format (NTriplesParser.toAsciiLiteral(lexicalForm), NTriplesParser.toIRI(iri))

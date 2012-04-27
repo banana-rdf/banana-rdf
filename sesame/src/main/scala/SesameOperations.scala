@@ -5,6 +5,8 @@ import org.openrdf.model.impl._
 import org.openrdf.model._
 import scala.collection.JavaConverters._
 
+import Prefix._
+
 object SesameOperations extends RDFOperations[Sesame] {
   
   object Graph extends GraphCompanionObject {
@@ -79,7 +81,7 @@ object SesameOperations extends RDFOperations[Sesame] {
           if (iri != null)
             Some(lexicalForm, iri)
           else
-            Some(lexicalForm, xsdString)
+            Some(lexicalForm, xsd.string)
         }
         case _ => None
       }

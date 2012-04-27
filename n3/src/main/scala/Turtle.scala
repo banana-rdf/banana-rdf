@@ -40,6 +40,9 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   import NTriplesParser.hexVal
   import Errors.msg
 
+  val xsd = XSDPrefix(ops)
+  val rdf = RDFPrefix(ops)
+
  /**
    * Note without lazy val, the order of the parsers would be important
    */
@@ -223,14 +226,14 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
       def c(o: Option[Char])=o.getOrElse("")
       r.status.flatMap {
         case a   ++None++None++ b       => Failure(Errors.Single("cannot parse this as a number "+c(a)+w(b)+" at "+r.position, None ))
-        case sign++i   ++None++None     => Success(TypedLiteral(c(sign)+w(i),                      xsdInteger))
-        case sign++i   ++dec ++None     => Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_)),    xsdDecimal))
-        case sign++i   ++dec ++Some(exp)=> Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_))+exp,xsdDouble ))
+        case sign++i   ++None++None     => Success(TypedLiteral(c(sign)+w(i),                      xsd.integer))
+        case sign++i   ++dec ++None     => Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_)),    xsd.decimal))
+        case sign++i   ++dec ++Some(exp)=> Success(TypedLiteral(c(sign)+w(i)+w(dec.map("."+_))+exp,xsd.double ))
         //todo: improve error message https://bitbucket.org/pchiusano/nomo/issue/7/errors
       }
     }
 
-  val BooleanLiteral = P.word("true").as(xsdTrueLit) | P.word("false").as(xsdFalseLit)
+  val BooleanLiteral = P.word("true").as(xsd.trueLit) | P.word("false").as(xsd.falseLit)
 
   lazy val literal = RDFLiteral  | NumericLiteral | BooleanLiteral
 
@@ -255,7 +258,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
     r.status.map{ node => { r.user.setObject(node); r } }
   }
   lazy val predicate = IRIref
-  lazy val verb =  ( predicate | P.single('a').as(rdfType) ).mapResult{ r =>
+  lazy val verb =  ( predicate | P.single('a').as(rdf.typ) ).mapResult{ r =>
     r.status.map{ iri => { r.user.setVerb(iri); r } }
   }
 

@@ -31,7 +31,7 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
 
   import ops._
   
-  def graphBuilder(prefix: Prefix) = {
+  def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriples = prefix("ntriples/")
     val creator = IRI("http://purl.org/dc/elements/1.1/creator")
     val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
@@ -46,12 +46,12 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
   }
   
   val rdfCore = "http://www.w3.org/2001/sw/RDFCore/"
-  val rdfCorePrefix = prefixBuilder(rdfCore) _
+  val rdfCorePrefix = new PrefixBuilder(rdfCore, ops)
   val referenceGraph = graphBuilder(rdfCorePrefix)
   
   // TODO: there is a bug in Sesame with hash uris as prefix
   val foo = "http://example.com/foo/"
-  val fooPrefix = prefixBuilder(foo) _
+  val fooPrefix = new PrefixBuilder(foo, ops)
   val fooGraph = graphBuilder(fooPrefix)
   
   "read TURTLE version of timbl's card" in {

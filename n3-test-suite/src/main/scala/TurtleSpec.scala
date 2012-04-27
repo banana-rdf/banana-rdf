@@ -228,20 +228,19 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
       res.user.queue.head == t
     )
   }
-  val foaf = prefixBuilder("http://xmlns.com/foaf/0.1/") _
-  val f_knows = foaf("knows")
-  val f_mbox = foaf("mbox")
-  val f_name = foaf("name")
-  val f_pub = foaf("publication")
-  val f_wants = foaf("wants")
+
+  val foaf = FOAFPrefix(ops)
+  val rdf = RDFPrefix(ops)
+  val xsd = XSDPrefix(ops)
+
   val hjs=IRI("http://bblfish.net/#hjs")
   val timbl = IRI("http://www.w3.org/People/Berners-Lee/card#i")
   val presbrey = IRI("http://presbrey.mit.edu/foaf#presbrey")
-  val t=Triple(hjs,f_knows, timbl)
-  val t2=Triple(hjs,f_knows, presbrey)
-  val t3=Triple(hjs,f_mbox, IRI("mailto:henry.story@bblfish.net"))
-  val t4=Triple(hjs,f_name, LangLiteral("Henry Story",Lang("en")))
-  val t5=Triple(hjs,f_name, TypedLiteral("bblfish"))
+  val t=Triple(hjs,foaf.knows, timbl)
+  val t2=Triple(hjs,foaf.knows, presbrey)
+  val t3=Triple(hjs,foaf.mbox, IRI("mailto:henry.story@bblfish.net"))
+  val t4=Triple(hjs,foaf.name, LangLiteral("Henry Story",Lang("en")))
+  val t5=Triple(hjs,foaf.name, TypedLiteral("bblfish"))
 
   property("test multiple Object sentence") = secure {
     val g= Graph(t,t2)
@@ -315,7 +314,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 """
   val bobDylan=IRI("http://dbpedia.org/resource/Bob_Dylan")
   val t6= Triple(bobDylan,IRI("http://purl.org/dc/elements/1.1/created"),LangLiteral(lit1,Lang("en-us-poetic2")))
-  val t7= Triple(bobDylan,f_name,LangLiteral("Bob Dylan",Lang("en")))
+  val t7= Triple(bobDylan,foaf.name,LangLiteral("Bob Dylan",Lang("en")))
 
   property("test prefixes long literals and comments") = secure {
     val g= Graph(t6,t7)
@@ -363,10 +362,10 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
   val hasCats = IRI("http://cats.edu/ont/has")
 
-  val t8 = Triple(hjs,hasCats,TypedLiteral("2",xsdInteger))
-  val t8bis = Triple(hjs,hasCats,TypedLiteral("3.2",xsdDecimal))
-  val t9 = Triple(timbl,hasCats,TypedLiteral(".5e-42",xsdDouble))
-  val t10 = Triple(presbrey,hasCats,TypedLiteral("3.14",xsdDecimal))
+  val t8 = Triple(hjs,hasCats,TypedLiteral("2",xsd.integer))
+  val t8bis = Triple(hjs,hasCats,TypedLiteral("3.2",xsd.decimal))
+  val t9 = Triple(timbl,hasCats,TypedLiteral(".5e-42",xsd.double))
+  val t10 = Triple(presbrey,hasCats,TypedLiteral("3.14",xsd.decimal))
 
   property("test numbers") = secure {
     import serializer._
@@ -399,31 +398,31 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
   property("test numbers") = secure {
   val nums = Map[TypedLiteral,Boolean](
-     ("2".datatype(xsdInteger)) -> true,
-     ("23423.123".datatype(xsdDecimal)) -> true,
-     ("23423123123456789".datatype(xsdInteger)) -> true,
-     (".232e34".datatype(xsdDouble)) -> true,
-     (".123".datatype(xsdDecimal)) -> true,
-     ("23423.123".datatype(xsdDecimal)) -> true,
-     (".123".datatype(xsdDecimal)) -> true,
-     (".e34".datatype(xsdDouble)) -> false,
-     ("12.00123123e34".datatype(xsdDouble)) -> true,
-     ("12e34".datatype(xsdDouble)) -> true,
-     ("".datatype(xsdDouble)) -> false,
-     ("-".datatype(xsdDouble)) -> false,
-     ("+".datatype(xsdDouble)) -> false,
-     ("+e32".datatype(xsdDouble)) -> false,
-     ("+2345.123".datatype(xsdDecimal)) -> true,
-     ("-34523.1978123".datatype(xsdDecimal)) -> true,
-     ("-2342312349853123123123123".datatype(xsdInteger)) -> true,
-     ("+2342139023".datatype(xsdInteger)) -> true,
-     ("+.4334e034".datatype(xsdDouble)) -> true,
-     (".123".datatype(xsdDecimal)) -> true,
-     ("23423.123".datatype(xsdDecimal)) -> true,
-     (".123".datatype(xsdDecimal)) -> true,
-     (".123".datatype(xsdDecimal)) -> true,
-     ("091.999".datatype(xsdDecimal)) -> true,
-     (".123".datatype(xsdDecimal)) -> true
+     ("2".datatype(xsd.integer)) -> true,
+     ("23423.123".datatype(xsd.decimal)) -> true,
+     ("23423123123456789".datatype(xsd.integer)) -> true,
+     (".232e34".datatype(xsd.double)) -> true,
+     (".123".datatype(xsd.decimal)) -> true,
+     ("23423.123".datatype(xsd.decimal)) -> true,
+     (".123".datatype(xsd.decimal)) -> true,
+     (".e34".datatype(xsd.double)) -> false,
+     ("12.00123123e34".datatype(xsd.double)) -> true,
+     ("12e34".datatype(xsd.double)) -> true,
+     ("".datatype(xsd.double)) -> false,
+     ("-".datatype(xsd.double)) -> false,
+     ("+".datatype(xsd.double)) -> false,
+     ("+e32".datatype(xsd.double)) -> false,
+     ("+2345.123".datatype(xsd.decimal)) -> true,
+     ("-34523.1978123".datatype(xsd.decimal)) -> true,
+     ("-2342312349853123123123123".datatype(xsd.integer)) -> true,
+     ("+2342139023".datatype(xsd.integer)) -> true,
+     ("+.4334e034".datatype(xsd.double)) -> true,
+     (".123".datatype(xsd.decimal)) -> true,
+     ("23423.123".datatype(xsd.decimal)) -> true,
+     (".123".datatype(xsd.decimal)) -> true,
+     (".123".datatype(xsd.decimal)) -> true,
+     ("091.999".datatype(xsd.decimal)) -> true,
+     (".123".datatype(xsd.decimal)) -> true
   )
        val res = for ((lit,valid) <- nums) yield {
          val TypedLiteral(str,tp) = lit
@@ -437,9 +436,9 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
 
   property("simple blank nodes") = secure {
-    val t1 = Triple(BNode("_:n22"),f_name, "Alexandre" lang "fr" )
-    val t2 = Triple(BNode(),f_name,"Henry")
-    val t3 = Triple(BNode("_:n22"),f_knows,BNode("_:n22"))
+    val t1 = Triple(BNode("_:n22"),foaf.name, "Alexandre" lang "fr" )
+    val t2 = Triple(BNode(),foaf.name,"Henry")
+    val t3 = Triple(BNode("_:n22"),foaf.knows,BNode("_:n22"))
     val g = Graph(t1,t2,t3)
     val doc = """
     @prefix foaf: <http://xmlns.com/foaf/0.1/> .
@@ -462,9 +461,9 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   property("enclosing blank nodes ") = secure {
     val bn = BNode();
     val triples = List[Triple](
-      (bn,f_name, "Joe"§),
-      (bn,f_knows,hjs),
-      (bn,foaf("likes"),rdfNil)
+      (bn,foaf.name, "Joe"§),
+      (bn,foaf.knows,hjs),
+      (bn,foaf("likes"),rdf.nil)
     )
     val g = Graph(triples)
     val doc = """
@@ -488,17 +487,17 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
 
   property("lists") = secure {
-    val shop = prefixBuilder("http://shop.example/product/") _
+    val shop = PrefixBuilder("http://shop.example/product/", ops)
     val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
     val triples = List[Triple](
-      (lst,rdfFirst, shop("paper")),
-      (lst,rdfRest, lst2),
-      (lst2,rdfFirst, shop("cat")),
-      (lst2,rdfRest, lst3),
-      (lst3,rdfFirst, bookNode),
-      (lst3,rdfRest, rdfNil),
-      (bookNode,f_name,"Zen"§),
-      (bookNode,foaf("author") ,rdfNil)
+      (lst,rdf.first, shop("paper")),
+      (lst,rdf.rest, lst2),
+      (lst2,rdf.first, shop("cat")),
+      (lst2,rdf.rest, lst3),
+      (lst3,rdf.first, bookNode),
+      (lst3,rdf.rest, rdf.nil),
+      (bookNode,foaf.name,"Zen"§),
+      (bookNode,foaf("author") ,rdf.nil)
     )
     val g = Graph(triples)
     val doc = """
@@ -528,24 +527,24 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   property("stacked blank nodes and lists") = secure {
     val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode(); val bn4 = BNode()
     val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
-    val shop = prefixBuilder("http://shop.example/product/") _
+    val shop = PrefixBuilder("http://shop.example/product/", ops)
     val triples = List[Triple](
-      (bn1,f_name, "Alexandre" lang "fr" ) ,
-      (bn1,f_knows,bn2),
-      (bn2,f_name,"Henry"§),
-      (bn2,f_knows,bn4),
-      (bn4,f_name,"Tim"§),
-      (bn1,f_pub,bn3),
-      (bn3,f_name,"Pimp My RDF"§),
-      (bn1,f_wants,lst),
-      (lst,rdfFirst, shop("paper")),
-      (lst,rdfRest, lst2),
-      (lst2,rdfFirst, shop("cat")),
-      (lst2,rdfRest, lst3),
-      (lst3,rdfFirst, bookNode),
-      (lst3,rdfRest, rdfNil),
-      (bookNode,f_name,"Zen"§),
-      (bookNode,foaf("author") ,rdfNil)
+      (bn1,foaf.name, "Alexandre" lang "fr" ) ,
+      (bn1,foaf.knows,bn2),
+      (bn2,foaf.name,"Henry"§),
+      (bn2,foaf.knows,bn4),
+      (bn4,foaf.name,"Tim"§),
+      (bn1,foaf.publication,bn3),
+      (bn3,foaf.name,"Pimp My RDF"§),
+      (bn1,foaf.wants,lst),
+      (lst,rdf.first, shop("paper")),
+      (lst,rdf.rest, lst2),
+      (lst2,rdf.first, shop("cat")),
+      (lst2,rdf.rest, lst3),
+      (lst3,rdf.first, bookNode),
+      (lst3,rdf.rest, rdf.nil),
+      (bookNode,foaf.name,"Zen"§),
+      (bookNode,foaf.author ,rdf.nil)
     )
     val g = Graph(triples)
     val doc = """

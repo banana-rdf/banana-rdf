@@ -31,8 +31,8 @@ object Main {
 
 
 
-    val cert = prefixBuilder("http://www.w3.org/ns/auth/cert#") _
-    val foaf = prefixBuilder("http://xmlns.com/foaf/0.1/") _
+    val cert = PrefixBuilder("http://www.w3.org/ns/auth/cert#", JenaOperations)
+    val foaf = PrefixBuilder("http://xmlns.com/foaf/0.1/", JenaOperations)
 
     val resultLD = for {
       bblfish ← goto(IRI("http://bblfish.net/people/henry/card#me"))

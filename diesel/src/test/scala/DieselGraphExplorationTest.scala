@@ -20,32 +20,25 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
   import dsl._
   import iso._
 
-  object FOAF extends Prefix {
-    def apply(s: String): IRI = prefixBuilder("http://xmlns.com/foaf/0.1/")(s)
-    val name = apply("name")
-    val title = apply("title")
-    val knows = apply("knows")
-    val currentProject = apply("currentProject")
-    val Person = apply("Person")
-    val age = apply("age")
-    val height = apply("height")
-  }
+  val rdf = RDFPrefix(ops)
+  val foaf = FOAFPrefix(ops)
+  val xsd = XSDPrefix(ops)
 
   val betehess: GraphNode = (
     uri("http://bertails.org/#betehess")
-    -- FOAF.name ->- "Alexandre".lang("fr")
-    -- FOAF.age ->- 29
-    -- FOAF.knows ->- (
+    -- foaf.name ->- "Alexandre".lang("fr")
+    -- foaf.age ->- 29
+    -- foaf.knows ->- (
       uri("http://bblfish.net/#hjs")
-      -- FOAF.name ->- "Henry Story"
-      -- FOAF.currentProject ->- uri("http://webid.info/")
+      -- foaf.name ->- "Henry Story"
+      -- foaf.currentProject ->- uri("http://webid.info/")
     )
   )
 
 
   "'/' method must traverse the graph" in {
 
-    val name = betehess / FOAF.name
+    val name = betehess / foaf.name
 
     name.head.node must be (LangLiteral("Alexandre", Lang("fr")))
 
@@ -53,7 +46,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   "'/' method must work with uris and bnodes" in {
 
-    val name = betehess / FOAF.knows flatMap { _ / FOAF.name }
+    val name = betehess / foaf.knows flatMap { _ / foaf.name }
 
     name.head.node must be (TypedLiteral("Henry Story"))
 

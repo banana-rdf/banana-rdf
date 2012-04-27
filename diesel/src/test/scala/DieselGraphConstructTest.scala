@@ -20,29 +20,23 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
   import dsl._
   import iso._
 
-  object FOAF extends Prefix {
-    def apply(s: String): IRI = prefixBuilder("http://xmlns.com/foaf/0.1/")(s)
-    val name = apply("name")
-    val title = apply("title")
-    val knows = apply("knows")
-    val currentProject = apply("currentProject")
-    val Person = apply("Person")
-    val age = apply("age")
-    val height = apply("height")
-  }
+  val rdf = RDFPrefix(ops)
+
+  val foaf = FOAFPrefix(ops)
+  val xsd = XSDPrefix(ops)
 
   "Diesel must accept a GraphNode in the object position" in {
 
     val g: GraphNode = (
       bnode("betehess")
-        -- FOAF.name ->- "Alexandre".lang("fr")
-        -- FOAF.title ->- "Mr"
+        -- foaf.name ->- "Alexandre".lang("fr")
+        -- foaf.title ->- "Mr"
     )
 
     val expectedGraph =
       Graph(
-        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
-        Triple(BNode("betehess"), FOAF.title, TypedLiteral("Mr")))
+        Triple(BNode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))),
+        Triple(BNode("betehess"), foaf.title, TypedLiteral("Mr")))
 
     assert(g.graph isIsomorphicWith expectedGraph)
     
@@ -56,20 +50,20 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
     val g: GraphNode = (
       bnode("betehess")
-        -- FOAF.name ->- "Alexandre".lang("fr")
-        -- FOAF.knows ->- (
+        -- foaf.name ->- "Alexandre".lang("fr")
+        -- foaf.knows ->- (
           uri("http://bblfish.net/#hjs")
-            -- FOAF.name ->- "Henry Story"
-            -- FOAF.currentProject ->- uri("http://webid.info/")
+            -- foaf.name ->- "Henry Story"
+            -- foaf.currentProject ->- uri("http://webid.info/")
         )
     )
 
     val expectedGraph =
       Graph(
-        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
-        Triple(BNode("betehess"), FOAF.knows, uri("http://bblfish.net/#hjs")),
-        Triple(uri("http://bblfish.net/#hjs"), FOAF.name, TypedLiteral("Henry Story")),
-        Triple(uri("http://bblfish.net/#hjs"), FOAF.currentProject, uri("http://webid.info/")))
+        Triple(BNode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))),
+        Triple(BNode("betehess"), foaf.knows, uri("http://bblfish.net/#hjs")),
+        Triple(uri("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")),
+        Triple(uri("http://bblfish.net/#hjs"), foaf.currentProject, uri("http://webid.info/")))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -80,17 +74,17 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
     val g: GraphNode = (
       bnode("betehess")
-        -- FOAF.name ->- "Alexandre".lang("fr")
-        -<- FOAF.knows -- (
-          uri("http://bblfish.net/#hjs") -- FOAF.name ->- "Henry Story"
+        -- foaf.name ->- "Alexandre".lang("fr")
+        -<- foaf.knows -- (
+          uri("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story"
         )
     )
 
     val expectedGraph =
       Graph(
-        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
-        Triple(IRI("http://bblfish.net/#hjs"), FOAF.knows, BNode("betehess")),
-        Triple(IRI("http://bblfish.net/#hjs"), FOAF.name, TypedLiteral("Henry Story")))
+        Triple(BNode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))),
+        Triple(IRI("http://bblfish.net/#hjs"), foaf.knows, BNode("betehess")),
+        Triple(IRI("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -99,14 +93,14 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
   "Diesel must allow easy use of rdf:type through the method 'a'" in {
 
     val g: GraphNode = (
-      bnode("betehess").a(FOAF.Person)
-        -- FOAF.name ->- "Alexandre".lang("fr")
+      bnode("betehess").a(foaf.Person)
+        -- foaf.name ->- "Alexandre".lang("fr")
     )
 
     val expectedGraph =
       Graph(
-        Triple(BNode("betehess"), rdf("type"), FOAF.Person),
-        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))))
+        Triple(BNode("betehess"), rdf("type"), foaf.Person),
+        Triple(BNode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -116,12 +110,12 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
   "Diesel must allow objectList definition" in {
 
     val g: GraphNode =
-      bnode("betehess") -- FOAF.name ->- ("Alexandre".lang("fr"), "Alexander".lang("en"))
+      bnode("betehess") -- foaf.name ->- ("Alexandre".lang("fr"), "Alexander".lang("en"))
 
     val expectedGraph =
       Graph(
-        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexandre", Lang("fr"))),
-        Triple(BNode("betehess"), FOAF.name, LangLiteral("Alexander", Lang("en"))))
+        Triple(BNode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))),
+        Triple(BNode("betehess"), foaf.name, LangLiteral("Alexander", Lang("en"))))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -131,16 +125,16 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
     val g: GraphNode = (
       bnode("betehess")
-        -- FOAF.name ->- "Alexandre"
-        -- FOAF.age ->- 29
-        -- FOAF.height ->- 1.80
+        -- foaf.name ->- "Alexandre"
+        -- foaf.age ->- 29
+        -- foaf.height ->- 1.80
     )
 
     val expectedGraph =
       Graph(
-        Triple(BNode("betehess"), FOAF.name, TypedLiteral("Alexandre", xsdString)),
-        Triple(BNode("betehess"), FOAF.age, TypedLiteral("29", xsdInt)),
-        Triple(BNode("betehess"), FOAF.height, TypedLiteral("1.8", xsdDouble)))
+        Triple(BNode("betehess"), foaf.name, TypedLiteral("Alexandre", xsd.string)),
+        Triple(BNode("betehess"), foaf.age, TypedLiteral("29", xsd.int)),
+        Triple(BNode("betehess"), foaf.height, TypedLiteral("1.8", xsd.double)))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -149,26 +143,26 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
     val g: GraphNode = (
       bnode("betehess")
-        -- FOAF.name ->- List[Node](29, bnode("bar"), "foo")
+        -- foaf.name ->- List[Node](29, bnode("bar"), "foo")
     )
 
 
     val l: GraphNode = (
       bnode()
-        -- first ->- 29
-        -- rest ->- (
+        -- rdf.first ->- 29
+        -- rdf.rest ->- (
           bnode()
-            -- first ->- bnode("bar")
-            -- rest ->- (
+            -- rdf.first ->- bnode("bar")
+            -- rdf.rest ->- (
               bnode()
-                -- first ->- "foo"
-                -- rest ->- nil
+                -- rdf.first ->- "foo"
+                -- rdf.rest ->- rdf.nil
             )
         )
     )
 
     val expectedGraph = (
-      bnode("betehess") -- FOAF.name ->- l
+      bnode("betehess") -- foaf.name ->- l
     )
 
     assert(g.graph isIsomorphicWith expectedGraph.graph)
@@ -180,11 +174,11 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
   "Diesel must support RDF collections (empty list)" in {
 
     val g: GraphNode = (
-      bnode("betehess") -- FOAF.name ->- List[Node]()
+      bnode("betehess") -- foaf.name ->- List[Node]()
     )
 
     val expectedGraph = (
-      bnode("betehess") -- FOAF.name ->- nil
+      bnode("betehess") -- foaf.name ->- rdf.nil
     )
 
     assert(g.graph isIsomorphicWith expectedGraph.graph)

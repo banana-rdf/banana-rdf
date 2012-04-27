@@ -8,6 +8,7 @@ abstract class PimpsTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf])
 extends WordSpec with MustMatchers {
   
   import ops._
+  val xsd = XSDPrefix(ops)
   
   "a tuple of (s: Node, p: IRI, o: Node)" must {
     
@@ -56,7 +57,7 @@ extends WordSpec with MustMatchers {
       val lit: TypedLiteral = 42
       val TypedLiteral(lexicalForm, datatype) = lit
       lexicalForm must equal ("42")
-      datatype must equal (xsd("int"))
+      datatype must equal (xsd.int)
     }
   }
   

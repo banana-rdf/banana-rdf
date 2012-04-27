@@ -6,6 +6,8 @@ import org.openrdf.model.impl.{GraphImpl, StatementImpl, LiteralImpl}
 import java.io._
 import java.util.LinkedList
 
+import Prefix._
+
 import scalaz.Validation
 import scalaz.Validation._
 
@@ -16,7 +18,7 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
   trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
     override def handleStatement(st: Statement): Unit = st.getObject match {
       case o: LiteralImpl if o.getDatatype == null && o.getLanguage == null =>
-        super.handleStatement(new StatementImpl(st.getSubject, st.getPredicate, new LiteralImpl(o.getLabel, xsdString)))
+        super.handleStatement(new StatementImpl(st.getSubject, st.getPredicate, new LiteralImpl(o.getLabel, xsd.string)))
       case other =>
         super.handleStatement(st)
     }

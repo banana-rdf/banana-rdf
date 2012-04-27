@@ -26,6 +26,8 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: Option[UR
 
   import ops._
 
+  val rdf = RDFPrefix(ops)
+
   //we imagine that we are sending these elements to an agent.
   // todo: replace with more appropriate structure
   val queue: mutable.Queue[Rdf#Triple] = new mutable.Queue[Rdf#Triple]()
@@ -76,22 +78,22 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: Option[UR
     //    a rel () .
     // which is equivalent to
     //    a rel rdf:nil .
-   private var first: Node = rdfNil
+   private var first: Node = rdf.nil
 
    /** the subject of the whole list. Is only known when the list is shown to be either empty or
     * when the first element has been found */
-   def subj = first
+   def subj = rdf.first
 
     /**
      * The previous subject so that one can construct
      *     previousSubject rdf:next newSubject .
      */
-   private var previousSubject: Node = first
+   private var previousSubject: Node = rdf.first
 
    //subject of individual triples constructed in the list
    private def newSubject(): Node = {
       val subj: Node = BNode().asInstanceOf[Node]
-      if (first == rdfNil) first = subj
+      if (first == rdf.nil) first = subj
       previousSubject = subj
      subj
     }
@@ -99,12 +101,12 @@ case class Listener[Rdf <: RDF](val ops: RDFOperations[Rdf], val base: Option[UR
    def send(obj: Node) {
      val previous = previousSubject
      val subj = newSubject()
-     if (previous != rdfNil) sendTriple(previous,rdfRest,subj) //else this is the first element of the list
-     sendTriple(subj,rdfFirst,obj)
+     if (previous != rdf.nil) sendTriple(previous,rdf.rest,subj) //else this is the first element of the list
+     sendTriple(subj,rdf.first,obj)
    }
 
     def end {
-      if (first!=rdfNil) sendTriple(previousSubject,rdfRest,rdfNil)
+      if (first!=rdf.nil) sendTriple(previousSubject,rdf.rest,rdf.nil)
     }
 
 
