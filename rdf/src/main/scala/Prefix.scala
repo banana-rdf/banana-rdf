@@ -1,6 +1,8 @@
 package org.w3.rdf
 
-trait Prefix[Rdf <: RDF] extends Function1[String, Rdf#IRI]
+trait Prefix[Rdf <: RDF] {
+  def apply(value: String): Rdf#IRI
+}
 
 
 object PrefixBuilder {
