@@ -24,6 +24,9 @@ import scalaz.Validation._
 class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listener[Rdf]])
   extends RDFReader[Rdf, Turtle] {
 
+  // I don't know why, but this trick makes the presentation compiler happier
+  type RdfGraph = Rdf#Graph
+
   import parser.ops
   
   /**
@@ -33,7 +36,7 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
    * @param base of the document being fetched. I.e. the URL of the document!
    * @return  the graph or an error
    */
-  def read(is: InputStream, base: String): Validation[Throwable, Rdf#Graph] = {
+  def read(is: InputStream, base: String): Validation[Throwable, RdfGraph] = {
     read(new InputStreamReader(is, "UTF-8"), base)
   }
 

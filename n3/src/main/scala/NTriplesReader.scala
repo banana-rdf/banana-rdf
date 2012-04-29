@@ -23,6 +23,9 @@ import scalaz.Validation._
 class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, X, Listener[Rdf]])
   extends RDFReader[Rdf, Turtle] {
 
+  // I don't know why, but this trick makes the presentation compiler happier
+  type RdfGraph = Rdf#Graph
+
   import parser.ops
   
   /**
@@ -32,7 +35,7 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
    *             being complete
    * @return the graph or an error
    */
-  def read(is: InputStream, base: String): Validation[Throwable, Rdf#Graph] = {
+  def read(is: InputStream, base: String): Validation[Throwable, RdfGraph] = {
     read(new InputStreamReader(is, "UTF-8"), base) //currently NTriples only supports ascii, and so utf8 will work.
   }
 
