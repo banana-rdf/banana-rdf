@@ -17,7 +17,7 @@ import scalaz._
 
 class LinkedDataMemoryKB[Rdf <: RDF](
     val ops: RDFOperations[Rdf],
-    val projections: Projections[Rdf],
+    val projections: RDFProjections[Rdf],
     val utils: RDFUtils[Rdf],
     val readerFactory: RDFReaderFactory[Rdf]) extends LinkedData[Rdf] {
 

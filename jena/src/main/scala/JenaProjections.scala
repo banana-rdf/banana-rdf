@@ -3,7 +3,7 @@ package org.w3.rdf.jena
 import org.w3.rdf._
 import scala.collection.JavaConverters._
 
-object JenaProjections extends Projections[Jena] {
+object JenaProjections extends RDFProjections[Jena] {
 
   import JenaOperations._
   import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }

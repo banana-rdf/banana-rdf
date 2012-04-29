@@ -7,7 +7,7 @@ import scalaz.Scalaz._
 abstract class Diesel[Rdf <: RDF](
   val ops: RDFOperations[Rdf],
   val union: GraphUnion[Rdf],
-  val projections: Projections[Rdf]) {
+  val projections: RDFProjections[Rdf]) {
 
   import ops._
   import union._

@@ -17,7 +17,7 @@ object LinkedData {
    */
   def inMemoryImpl[Rdf <: RDF](
     ops: RDFOperations[Rdf],
-    projections: Projections[Rdf],
+    projections: RDFProjections[Rdf],
     utils: RDFUtils[Rdf],
     readerFactory: RDFReaderFactory[Rdf]): LinkedData[Rdf] =
     new LinkedDataMemoryKB(
