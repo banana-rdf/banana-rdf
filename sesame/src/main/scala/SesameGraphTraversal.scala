@@ -3,7 +3,7 @@ package org.w3.rdf.sesame
 import org.w3.rdf._
 import scala.collection.JavaConverters._
 
-object SesameProjections extends RDFProjections[Sesame] {
+object SesameGraphTraversal extends RDFGraphTraversal[Sesame] {
 
   import SesameOperations._
 

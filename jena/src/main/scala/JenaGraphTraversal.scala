@@ -3,20 +3,20 @@ package org.w3.rdf.jena
 import org.w3.rdf._
 import scala.collection.JavaConverters._
 
-object JenaProjections extends RDFProjections[Jena] {
+object JenaGraphTraversal extends RDFGraphTraversal[Jena] {
 
   import JenaOperations._
   import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
   import com.hp.hpl.jena.rdf.model.ResourceFactory._
 
-  val visitor: RDFVisitor = new RDFVisitor {
+  val toNodeVisitor: RDFVisitor = new RDFVisitor {
     def visitBlank(r: Resource, id: AnonId) = BNode(id.getLabelString)
     // go from the model's Node to the Graph one, then cast it (always safe here)
     def visitLiteral(l: JenaLiteral) = Literal.fold(l.asNode.asInstanceOf[Literal])(x => x, x => x)
     def visitURI(r: Resource, uri: String) = IRI(uri)
   }
 
-  def toNode(rdfNode: RDFNode): Node = rdfNode.visitWith(visitor).asInstanceOf[Node]
+  def toNode(rdfNode: RDFNode): Node = rdfNode.visitWith(toNodeVisitor).asInstanceOf[Node]
 
   def getObjects(graph: Jena#Graph, subject: Jena#Node, predicate: Jena#IRI): Iterable[Jena#Node] = {
     val model = ModelFactory.createModelForGraph(graph)
@@ -31,4 +31,5 @@ object JenaProjections extends RDFProjections[Jena] {
       def iterator = it
     }
   }
+
 }

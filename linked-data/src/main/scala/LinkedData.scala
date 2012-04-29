@@ -17,12 +17,12 @@ object LinkedData {
    */
   def inMemoryImpl[Rdf <: RDF](
     ops: RDFOperations[Rdf],
-    projections: RDFProjections[Rdf],
+    graphTraversal: RDFGraphTraversal[Rdf],
     utils: RDFUtils[Rdf],
     readerFactory: RDFReaderFactory[Rdf]): LinkedData[Rdf] =
     new LinkedDataMemoryKB(
       ops,
-      projections,
+      graphTraversal,
       utils,
       readerFactory)
 

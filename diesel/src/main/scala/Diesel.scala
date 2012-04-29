@@ -7,11 +7,11 @@ import scalaz.Scalaz._
 abstract class Diesel[Rdf <: RDF](
   val ops: RDFOperations[Rdf],
   val union: GraphUnion[Rdf],
-  val projections: RDFProjections[Rdf]) {
+  val graphTraversal: RDFGraphTraversal[Rdf]) {
 
   import ops._
   import union._
-  import projections._
+  import graphTraversal._
 
   val rdf = RDFPrefix(ops)
 

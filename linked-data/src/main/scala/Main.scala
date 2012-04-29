@@ -14,7 +14,7 @@ object Main {
 
     import JenaOperations._
 
-    val ld = LinkedData.inMemoryImpl(JenaOperations, JenaProjections, JenaRDFUtils, JenaReaderFactory)
+    val ld = LinkedData.inMemoryImpl(JenaOperations, JenaGraphTraversal, JenaRDFUtils, JenaReaderFactory)
     import ld._
 
 //    val namesLD = for {

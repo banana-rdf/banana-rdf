@@ -17,12 +17,12 @@ import scalaz._
 
 class LinkedDataMemoryKB[Rdf <: RDF](
     val ops: RDFOperations[Rdf],
-    val projections: RDFProjections[Rdf],
+    val graphTraversal: RDFGraphTraversal[Rdf],
     val utils: RDFUtils[Rdf],
     val readerFactory: RDFReaderFactory[Rdf]) extends LinkedData[Rdf] {
 
   import ops._
-  import projections._
+  import graphTraversal._
   import utils._
   import readerFactory._
 
@@ -112,7 +112,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
         supportDocument = subject.supportDocument
         graph ← kb.get(supportDocument) getOrElse sys.error("something is really wrong")
       } yield {
-        val objects = graph.getObjects(subject, predicate)
+        val objects = getObjects(graph, subject, predicate)
         objects
       }
     )
