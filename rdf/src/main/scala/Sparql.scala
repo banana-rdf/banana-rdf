@@ -18,14 +18,26 @@ object Main {
 
 trait Sparql[Rdf <: RDF] {
 
-  type Select
+  type SelectQuery
+
+  type ConstructQuery
+
+  type AskQuery
 
   type Row
 
-  def Select(query: String): Select
+  def SelectQuery(query: String): SelectQuery
 
-  def executeSelect(graph: Rdf#Graph, query: Select): Iterable[Row]
+  def executeSelectQuery(graph: Rdf#Graph, query: SelectQuery): Iterable[Row]
 
   def getNode(row: Row, v: String): Rdf#Node
+
+  def ConstructQuery(query: String): ConstructQuery
+
+  def executeConstructQuery(graph: Rdf#Graph, query: ConstructQuery): Rdf#Graph
+
+  def AskQuery(query: String): AskQuery
+
+  def executeAskQuery(graph: Rdf#Graph, query: AskQuery): Boolean
 
 }
