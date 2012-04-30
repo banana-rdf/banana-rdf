@@ -487,7 +487,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
 
   property("lists") = secure {
-    val shop = PrefixBuilder("http://shop.example/product/", ops)
+    val shop = Prefix("http://shop.example/product/", ops)
     val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
     val triples = List[Triple](
       (lst,rdf.first, shop("paper")),
@@ -527,7 +527,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   property("stacked blank nodes and lists") = secure {
     val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode(); val bn4 = BNode()
     val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
-    val shop = PrefixBuilder("http://shop.example/product/", ops)
+    val shop = Prefix("http://shop.example/product/", ops)
     val triples = List[Triple](
       (bn1,foaf.name, "Alexandre" lang "fr" ) ,
       (bn1,foaf.knows,bn2),
