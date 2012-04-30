@@ -7,7 +7,7 @@ import org.scalatest.matchers.MustMatchers
 import java.io._
 import org.scalatest.EitherValues._
 
-import scalaz.Validation
+import scalaz._
 import scalaz.Validation._
 
 abstract class DieselGraphExplorationTest[Rdf <: RDF](
@@ -46,9 +46,17 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   "'/' method must work with uris and bnodes" in {
 
-    val name = betehess / foaf.knows flatMap { _ / foaf.name }
+    val name = betehess / foaf.knows / foaf.name
 
     name.head.node must be (TypedLiteral("Henry Story"))
+
+  }
+
+  "we must be able to project nodes to Scala types" in {
+
+    (betehess / foaf.age).asInt must be (Success(29))
+
+    (betehess / foaf.knows / foaf.name).asString must be (Success("Henry Story"))
 
   }
 

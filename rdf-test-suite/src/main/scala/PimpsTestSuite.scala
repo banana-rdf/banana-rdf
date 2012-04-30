@@ -53,11 +53,11 @@ extends WordSpec with MustMatchers {
   
   "a Scala Int" must {
     val i = 42
-    "be mapped to TypedLiteral with the xsd:int datatype" in {
+    "be mapped to TypedLiteral with the xsd:integer datatype" in {
       val lit: TypedLiteral = 42
       val TypedLiteral(lexicalForm, datatype) = lit
       lexicalForm must equal ("42")
-      datatype must equal (xsd.int)
+      datatype must equal (xsd.integer)
     }
   }
   

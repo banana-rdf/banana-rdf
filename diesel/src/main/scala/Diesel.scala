@@ -3,6 +3,7 @@ package org.w3.rdf.diesel
 import org.w3.rdf._
 import scalaz._
 import scalaz.Scalaz._
+import scalaz.Validation._
 
 abstract class Diesel[Rdf <: RDF](
   val ops: RDFOperations[Rdf],
@@ -12,6 +13,8 @@ abstract class Diesel[Rdf <: RDF](
   import ops._
   import union._
   import graphTraversal._
+
+  val projections = RDFNodeProjections(ops)
 
   val rdf = RDFPrefix(ops)
 
@@ -26,12 +29,40 @@ abstract class Diesel[Rdf <: RDF](
 
     def -<-(p: Rdf#IRI): PredicateGraphNode = PredicateGraphNode(p, this)
 
-    def /(p: Rdf#IRI): Iterable[GraphNode] =
-      getObjects(graph, node, p) map { GraphNode(_, graph) }
+    def /(p: Rdf#IRI): GraphNodes = {
+      val nodes = getObjects(graph, node, p)
+      GraphNodes(nodes, graph)
+    }
+
+    def asString: Validation[Throwable, String] = projections.asString(node)
+    
+    def asInt: Validation[Throwable, Int] = projections.asInt(node)
+    
+    def asDouble: Validation[Throwable, Double] = projections.asDouble(node)
 
   }
 
-  implicit def wrapNodeInGraphNode(node: Rdf#Node): GraphNode = GraphNode(node, Graph.empty)
+  implicit def node2GraphNode(node: Rdf#Node): GraphNode = GraphNode(node, Graph.empty)
+
+  case class GraphNodes(nodes: Iterable[Rdf#Node], graph: Rdf#Graph) extends Iterable[GraphNode] {
+
+    def iterator = nodes.iterator map { GraphNode(_, graph) }
+
+    def /(p: Rdf#IRI): GraphNodes = {
+      val ns = this flatMap { case GraphNode(node, graph) => getObjects(graph, node, p) }
+      GraphNodes(ns, graph)
+    }
+
+    def node: Validation[Throwable, Rdf#Node] = fromTryCatch { this.head.node }
+    
+    def asString: Validation[Throwable, String] = fromTryCatch { this.head.node } flatMap { _.asString }
+    
+    def asInt: Validation[Throwable, Int] = fromTryCatch { this.head.node } flatMap { _.asInt }
+    
+    def asDouble: Validation[Throwable, Double] = fromTryCatch { this.head.node } flatMap { _.asDouble }
+
+
+  }
 
   case class GraphNodePredicate(graphNode: GraphNode, p: Rdf#IRI) {
 

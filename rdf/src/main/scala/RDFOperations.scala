@@ -113,7 +113,7 @@ trait RDFOperations[Rdf <: RDF] {
 
   implicit def wrapLiteral(literal: Literal): LiteralW = new LiteralW(literal)
   
-  implicit def wrapIntAsLiteral(i: Int): TypedLiteral = TypedLiteral(i.toString, _xsd.int)
+  implicit def wrapIntAsLiteral(i: Int): TypedLiteral = TypedLiteral(i.toString, _xsd.integer)
   
   implicit def wrapStringAsLiteral(s: String): TypedLiteral = TypedLiteral(s, _xsd.string)
   

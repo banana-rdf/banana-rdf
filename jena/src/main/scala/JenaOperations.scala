@@ -6,7 +6,7 @@ import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 import scala.collection.JavaConverters._
 
-import Prefix._
+import JenaPrefix._
 
 object JenaOperations extends RDFOperations[Jena] {
 

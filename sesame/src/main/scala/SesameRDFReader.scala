@@ -6,7 +6,7 @@ import org.openrdf.model.impl.{GraphImpl, StatementImpl, LiteralImpl}
 import java.io._
 import java.util.LinkedList
 
-import Prefix._
+import SesamePrefix._
 
 import scalaz.Validation
 import scalaz.Validation._

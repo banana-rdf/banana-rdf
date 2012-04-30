@@ -5,7 +5,7 @@ import org.openrdf.model.impl._
 import org.openrdf.model._
 import scala.collection.JavaConverters._
 
-import Prefix._
+import SesamePrefix._
 
 object SesameOperations extends RDFOperations[Sesame] {
   

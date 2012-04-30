@@ -5,12 +5,12 @@ trait Prefix[Rdf <: RDF] {
 }
 
 
-object PrefixBuilder {
+object Prefix {
   def apply[Rdf <: RDF](prefix: String, ops: RDFOperations[Rdf]) = new PrefixBuilder(prefix, ops)
 }
 
 class PrefixBuilder[Rdf <: RDF](prefix: String, ops: RDFOperations[Rdf]) extends Prefix[Rdf] {
-  import ops._
+  import ops.IRI
   def apply(value: String): Rdf#IRI = IRI(prefix+value)
 }
 

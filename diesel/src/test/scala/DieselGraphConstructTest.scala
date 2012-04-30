@@ -133,7 +133,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
     val expectedGraph =
       Graph(
         Triple(BNode("betehess"), foaf.name, TypedLiteral("Alexandre", xsd.string)),
-        Triple(BNode("betehess"), foaf.age, TypedLiteral("29", xsd.int)),
+        Triple(BNode("betehess"), foaf.age, TypedLiteral("29", xsd.integer)),
         Triple(BNode("betehess"), foaf.height, TypedLiteral("1.8", xsd.double)))
 
     assert(g.graph isIsomorphicWith expectedGraph)
