@@ -70,8 +70,8 @@ object YourProjectBuild extends Build {
   val n3Deps =
     Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
   
-  lazy val pimpMyRdf = Project(
-    id = "pimp-my-rdf",
+  lazy val bananaRdf = Project(
+    id = "banana-rdf",
     base = file("."),
     settings = buildSettings ++ Seq(EclipseKeys.skipParents in ThisBuild := false),
     aggregate = Seq(
