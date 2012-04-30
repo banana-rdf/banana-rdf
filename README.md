@@ -16,8 +16,8 @@ How to start geeking
 
 You only need a recent version of Java, that's all:
 
-    $ git clone git@github.com:betehess/pimp-my-rdf.git
-    $ cd pimp-my-rdf
+    $ git clone git@github.com:w3c/banana-rdf.git
+    $ cd banana-rdf
     $ ./sbt
 
 Licence
