@@ -44,7 +44,13 @@ object JenaSparql extends Sparql[Jena] {
   
   def AskQuery(query: String): AskQuery = QueryFactory.create(query)
 
-  def executeAskQuery(graph: JenaGraph, query: AskQuery): Boolean = true
+  def executeAskQuery(graph: JenaGraph, query: AskQuery): Boolean = {
+    val model: Model = ModelFactory.createModelForGraph(graph)
+    val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
+    val result = qexec.execAsk()
+    result
+  }
+
 
 
 }

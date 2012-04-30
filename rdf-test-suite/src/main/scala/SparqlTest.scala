@@ -57,4 +57,24 @@ CONSTRUCT {
 
   }
 
+
+  "Alexandre Bertails must appear as an editor in new-tr.rdf" in {
+
+    val query = AskQuery("""
+prefix : <http://www.w3.org/2001/02pd/rec54#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+
+ASK {
+  ?thing :editor ?ed .
+  ?ed contact:fullName "Alexandre Bertails"
+}
+""")
+
+    val alexIsThere = executeAskQuery(graph, query)
+
+    alexIsThere must be (true)
+
+  }
+
 }
