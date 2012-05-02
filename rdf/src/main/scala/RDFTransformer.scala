@@ -18,7 +18,7 @@ class RDFTransformer[A <: RDF, B <: RDF](
   def transformNode(n: A#Node): B#Node = a.Node.fold(n) (
     { case a.IRI(iri) => b.IRI(iri) },
     { case a.BNode(label) => b.BNode(label) },
-    { literal: a.Literal => transformLiteral(literal) }
+    { literal: A#Literal => transformLiteral(literal) }
   )
   
   def transformLiteral(literal: A#Literal): B#Literal = a.Literal.fold(literal) (

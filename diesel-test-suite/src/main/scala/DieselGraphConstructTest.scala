@@ -143,7 +143,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
     val g: GraphNode = (
       bnode("betehess")
-        -- foaf.name ->- List[Node](29, bnode("bar"), "foo")
+        -- foaf.name ->- List[Rdf#Node](29, bnode("bar"), "foo")
     )
 
 
@@ -174,7 +174,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
   "Diesel must support RDF collections (empty list)" in {
 
     val g: GraphNode = (
-      bnode("betehess") -- foaf.name ->- List[Node]()
+      bnode("betehess") -- foaf.name ->- List[Rdf#Node]()
     )
 
     val expectedGraph = (

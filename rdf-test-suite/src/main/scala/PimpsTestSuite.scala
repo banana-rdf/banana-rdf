@@ -19,7 +19,7 @@ extends WordSpec with MustMatchers {
     val tuple = (s, p, o)
     
     "be seen as an RDF Triple with accessors" in {
-      val triple: Triple = tuple
+      val triple: Rdf#Triple = tuple
       // here we're pimping the Triple type with new accessors
       triple.subject must equal (s)
       triple.predicate must equal (p)
@@ -54,7 +54,7 @@ extends WordSpec with MustMatchers {
   "a Scala Int" must {
     val i = 42
     "be mapped to TypedLiteral with the xsd:integer datatype" in {
-      val lit: TypedLiteral = 42
+      val lit: Rdf#TypedLiteral = 42
       val TypedLiteral(lexicalForm, datatype) = lit
       lexicalForm must equal ("42")
       datatype must equal (xsd.integer)

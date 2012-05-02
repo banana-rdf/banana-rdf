@@ -27,31 +27,31 @@ class Serializer[Rdf <: RDF](ops: RDFOperations[Rdf]) {
 //  val pimps = new Pimps(m)
 //  import pimps._
   
-  def asN3(graph: Graph): String =
+  def asN3(graph: Rdf#Graph): String =
     graph map tripleAsN3 mkString "\n"
 
-  def tripleAsN3(triple: Triple): String = {
+  def tripleAsN3(triple: Rdf#Triple): String = {
     val Triple(s, p, o) = triple
     "%s %s %s ." format (nodeAsN3(s), iriAsN3(p), nodeAsN3(o))
   }
   
-  def nodeAsN3(node: Node): String = Node.fold(node) (
+  def nodeAsN3(node: Rdf#Node): String = Node.fold(node) (
     iriAsN3,
     { case BNode(bnode) => "_:" + bnode },
-    { l: Literal => literalAsN3(l) }
+    { l: Rdf#Literal => literalAsN3(l) }
   )
   
-  def iriAsN3(iri: IRI): String = {
+  def iriAsN3(iri: Rdf#IRI): String = {
     val IRI(iriString) = iri
     "<" + NTriplesParser.toIRI(iriString) + ">"
   }
   
-  def literalAsN3(literal: Literal): String = Literal.fold(literal) (
-    { typedLiteral: TypedLiteral => typedLiteralAsN3(typedLiteral) },
+  def literalAsN3(literal: Rdf#Literal): String = Literal.fold(literal) (
+    { typedLiteral: Rdf#TypedLiteral => typedLiteralAsN3(typedLiteral) },
     { case LangLiteral(lexicalForm, Lang(lang)) => "\"%s\"@%s" format (NTriplesParser.toAsciiLiteral(lexicalForm), lang) }
   )
   
-  def typedLiteralAsN3(typedLiteral: TypedLiteral): String = typedLiteral match {
+  def typedLiteralAsN3(typedLiteral: Rdf#TypedLiteral): String = typedLiteral match {
     case TypedLiteral(lexicalForm, datatype) if datatype == xsd.string =>
       "\"%s\"" format NTriplesParser.toAsciiLiteral(lexicalForm)
     case TypedLiteral(lexicalForm, IRI(iri)) =>

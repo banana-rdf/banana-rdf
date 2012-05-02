@@ -53,7 +53,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     new AsyncHttpClient(config)
   }
 
-  val kb: ConcurrentMap[IRI, FutureValidation[LDError, Graph]] = new ConcurrentHashMap[IRI, FutureValidation[LDError, Graph]]().asScala
+  val kb: ConcurrentMap[Rdf#IRI, FutureValidation[LDError, Rdf#Graph]] = new ConcurrentHashMap[Rdf#IRI, FutureValidation[LDError, Rdf#Graph]]().asScala
 
   def shutdown(): Unit = {
     logger.debug("shuting down the Linked Data facade")
@@ -62,18 +62,18 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     system.shutdown()
   }
 
-  def goto(iri: IRI): LD[IRI] = {
+  def goto(iri: Rdf#IRI): LD[Rdf#IRI] = {
     val supportDoc = iri.supportDocument
     if (!kb.isDefinedAt(supportDoc)) {
       val IRI(iri) = supportDoc
-      val futureGraph: FutureValidation[LDError, Graph] = delayedValidation {
+      val futureGraph: FutureValidation[LDError, Rdf#Graph] = delayedValidation {
         logger.debug("GET " + iri)
         val response = httpClient.prepareGet(iri).setHeader("Accept", "application/rdf+xml, text/rdf+n3, text/turtle").execute().get()
         val is = response.getResponseBodyAsStream()
         response.getHeader("Content-Type").split(";")(0) match {
           case "text/n3" | "text/turtle" => TurtleReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
           case "application/rdf+xml" => RDFXMLReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
-          case ct => Failure[LDError, Graph](UnknownContentType(ct))
+          case ct => Failure[LDError, Rdf#Graph](UnknownContentType(ct))
         }
       }
       kb.put(supportDoc, futureGraph)
@@ -106,7 +106,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
 
     def foreach(f: S => Unit): Unit = underlying foreach f
 
-    def followIRI(predicate: IRI)(implicit ev: S =:= IRI): LD[Iterable[Node]] = new LD(
+    def followIRI(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]] = new LD(
       for {
         subject ← underlying map ev
         supportDocument = subject.supportDocument
@@ -118,27 +118,27 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     )
 
     def follow(
-      predicate: IRI,
+      predicate: Rdf#IRI,
       max: Int = 10,
       maxDownloads: Int = 10)(
-      implicit ev: S =:= Iterable[Node]): LD[Iterable[Node]] = {
-      val f = underlying.map(ev) flatMap { (nodes: Iterable[Node]) ⇒
-        val nodesFutureValidation: Iterable[FutureValidation[LDError, Iterable[Node]]] =
-          nodes.take(maxDownloads).map { (node: Node) =>
-            node.fold[FutureValidation[LDError, Iterable[Node]]](
+      implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]] = {
+      val f = underlying.map(ev) flatMap { (nodes: Iterable[Rdf#Node]) ⇒
+        val nodesFutureValidation: Iterable[FutureValidation[LDError, Iterable[Rdf#Node]]] =
+          nodes.take(maxDownloads).map { (node: Rdf#Node) =>
+            node.fold[FutureValidation[LDError, Iterable[Rdf#Node]]](
               iri => goto(iri).followIRI(predicate).underlying,
               bn => immediateValidation(Success(Iterable.empty)),
               lit => immediateValidation(Success(Iterable.empty))
             )}
-        val nodesFuture: Iterable[Future[Validation[LDError, Iterable[Node]]]] =
+        val nodesFuture: Iterable[Future[Validation[LDError, Iterable[Rdf#Node]]]] =
           nodesFutureValidation map { _.asFuture }
         implicit val timeout: Timeout = 10.seconds
-        val promiseStream = PromiseStream[Validation[LDError, Iterable[Node]]]()
+        val promiseStream = PromiseStream[Validation[LDError, Iterable[Rdf#Node]]]()
         for {
           future <- nodesFuture
         } promiseStream += future
         val stream = Iterator.continually(promiseStream.dequeue())
-        val futureNodes: Future[Iterable[Validation[LDError, Iterable[Node]]]] =
+        val futureNodes: Future[Iterable[Validation[LDError, Iterable[Rdf#Node]]]] =
           Future.sequence {
             val foo = stream.take(max).toSeq
             println(";;; "+foo.size)
@@ -146,9 +146,9 @@ class LinkedDataMemoryKB[Rdf <: RDF](
           }
         // as some point, we'll want to accumulate the errors somewhere,
         // still not failing because of the open world model
-        val futureSuccesses: Future[Iterable[Iterable[Node]]] =
+        val futureSuccesses: Future[Iterable[Iterable[Rdf#Node]]] =
           futureNodes map { _ collect { case Success(nodes) => nodes } }
-        val futureResult: Future[Validation[LDError, Iterable[Node]]] =
+        val futureResult: Future[Validation[LDError, Iterable[Rdf#Node]]] =
           futureSuccesses map { ititnodes => Success(ititnodes.flatten) }
         FutureValidation(futureResult)
       }
@@ -160,17 +160,17 @@ class LinkedDataMemoryKB[Rdf <: RDF](
         underlying map { nodes => ev(nodes).map(f).flatten }
       )
 
-    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[IRI]] = {
+    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]] = {
       def f(node: Rdf#Node): Option[Rdf#IRI] = 
         node.fold[Option[Rdf#IRI]](
           iri ⇒ Some(iri),
           bnode ⇒ None,
           literal ⇒ None)
-      as[IRI](f)
+      as[Rdf#IRI](f)
     }
 
     def asStrings(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[String]] = {
-      def f(node: Rdf#Node): Option[String] = 
+      def f(node: Rdf#Node): Option[String] =
         node.fold[Option[String]](
           iri ⇒ None,
           bnode ⇒ None,

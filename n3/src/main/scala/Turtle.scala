@@ -139,7 +139,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val PrefixedName = (PNAME_NS ++! PN_LOCAL.optional).map{ case ns++local => PName(ns,local.getOrElse(""))}
 
-  lazy val IRIref = IRI_REF | PrefixedName.mapResult[IRI]{ r =>
+  lazy val IRIref = IRI_REF | PrefixedName.mapResult[Rdf#IRI]{ r =>
     r.status.flatMap{ pn =>
         //todo: work out how to set more friendly errors https://bitbucket.org/pchiusano/nomo/issue/7/errors
         r.user.resolve(pn).map(i=>Success(i)).getOrElse(
@@ -241,19 +241,19 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   lazy val BLANK_NODE_LABEL = P.word("_:")>>!PN_LOCAL.map(BNode(_))
   lazy val BlankNode = BLANK_NODE_LABEL | ANON
 
-  lazy val blankNodePropertyList: P.Parser[Node] = P.single('[').commit.mapResult  {  r =>
+  lazy val blankNodePropertyList: P.Parser[Rdf#Node] = P.single('[').commit.mapResult  {  r =>
      r.status.map(node=>{ val b=BNode(); r.user.pushSubject(b) })
   } >> predicateObjectList  >>! SP.optional >> P.single(']').commit.mapResult{ r =>
     r.status.map(node=>r.user.pop)
   }
 
-  lazy val collection: P.Parser[Node] = P.single('(').commit.mapResult  {  r =>
+  lazy val collection: P.Parser[Rdf#Node] = P.single('(').commit.mapResult  {  r =>
     r.status.map(node=>{ r.user.pushList; node })
   } >> SP.optional >> (obj.delimit1Ignore(SP).optional << SP.optional << P.single(')').commit).mapResult{ r =>
     r.status.map(node=> r.user.pop)
   }
 
-  lazy val objBlank: P.Parser[Node] =  blankNodePropertyList | collection
+  lazy val objBlank: P.Parser[Rdf#Node] =  blankNodePropertyList | collection
   lazy val obj: P.Parser[Any] = (IRIref | literal | BlankNode | objBlank ).mapResult{r =>
     r.status.map{ node => { r.user.setObject(node); r } }
   }

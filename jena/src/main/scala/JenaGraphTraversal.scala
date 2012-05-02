@@ -12,11 +12,11 @@ object JenaGraphTraversal extends RDFGraphTraversal[Jena] {
   val toNodeVisitor: RDFVisitor = new RDFVisitor {
     def visitBlank(r: Resource, id: AnonId) = BNode(id.getLabelString)
     // go from the model's Node to the Graph one, then cast it (always safe here)
-    def visitLiteral(l: JenaLiteral) = Literal.fold(l.asNode.asInstanceOf[Literal])(x => x, x => x)
+    def visitLiteral(l: JenaLiteral) = Literal.fold(l.asNode.asInstanceOf[Jena#Literal])(x => x, x => x)
     def visitURI(r: Resource, uri: String) = IRI(uri)
   }
 
-  def toNode(rdfNode: RDFNode): Node = rdfNode.visitWith(toNodeVisitor).asInstanceOf[Node]
+  def toNode(rdfNode: RDFNode): Jena#Node = rdfNode.visitWith(toNodeVisitor).asInstanceOf[Jena#Node]
 
   def getObjects(graph: Jena#Graph, subject: Jena#Node, predicate: Jena#IRI): Iterable[Jena#Node] = {
     val model = ModelFactory.createModelForGraph(graph)
@@ -26,8 +26,8 @@ object JenaGraphTraversal extends RDFGraphTraversal[Jena] {
       lit => throw new RuntimeException("shouldn't use a literal here")
     )
     val IRI(p) = predicate
-    val it: Iterator[Node] = model.listObjectsOfProperty(subjectResource, createProperty(p)).asScala map toNode
-    new Iterable[Node] {
+    val it: Iterator[Jena#Node] = model.listObjectsOfProperty(subjectResource, createProperty(p)).asScala map toNode
+    new Iterable[Jena#Node] {
       def iterator = it
     }
   }

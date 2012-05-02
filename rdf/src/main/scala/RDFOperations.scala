@@ -9,119 +9,107 @@ package org.w3.rdf
  */
 trait RDFOperations[Rdf <: RDF] {
 
-  // that's really neat: if you import the content of an instance of this trait,
-  // you'll get all the type aliases for free, so you don't need the type projection :-)
-  type Graph = Rdf#Graph
-  type Triple = Rdf#Triple
-  type Node = Rdf#Node
-  type IRI = Rdf#IRI
-  type BNode = Rdf#BNode
-  type Literal = Rdf#Literal
-  type TypedLiteral = Rdf#TypedLiteral
-  type LangLiteral = Rdf#LangLiteral
-  type Lang = Rdf#Lang
-
   trait GraphCompanionObject {
-    def empty: Graph
-    def apply(elems: Triple*): Graph
-    def apply(it: Iterable[Triple]): Graph
-    def toIterable(graph: Graph): Iterable[Triple]
+    def empty: Rdf#Graph
+    def apply(elems: Rdf#Triple*): Rdf#Graph
+    def apply(it: Iterable[Rdf#Triple]): Rdf#Graph
+    def toIterable(graph: Rdf#Graph): Iterable[Rdf#Triple]
   }
   val Graph: GraphCompanionObject
 
-  trait TripleCompanionObject extends Function3[Node, IRI, Node, Triple] {
-    def unapply(t: Triple): Option[(Node, IRI, Node)]
+  trait TripleCompanionObject extends Function3[Rdf#Node, Rdf#IRI, Rdf#Node, Rdf#Triple] {
+    def unapply(t: Rdf#Triple): Option[(Rdf#Node, Rdf#IRI, Rdf#Node)]
   }
   
   val Triple: TripleCompanionObject
 
   trait NodeCompanionObject {
-    def fold[T](node: Node)(funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T
+    def fold[T](node: Rdf#Node)(funIRI: Rdf#IRI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
   }
   
   val Node: NodeCompanionObject
   
-  trait IRICompanionObject extends Function1[String, IRI] {
-    def unapply(i: IRI): Option[String]
+  trait IRICompanionObject extends Function1[String, Rdf#IRI] {
+    def unapply(i: Rdf#IRI): Option[String]
   }
   
   val IRI : IRICompanionObject
 
-  trait BNodeCompanionObject extends Function1[String, BNode] with Function0[BNode] {
-    def unapply(bn: BNode): Option[String]
+  trait BNodeCompanionObject extends Function1[String, Rdf#BNode] with Function0[Rdf#BNode] {
+    def unapply(bn: Rdf#BNode): Option[String]
   }
   
   val BNode: BNodeCompanionObject
 
   trait LiteralCompanionObject {
-    def fold[T](literal: Literal)(funTL: TypedLiteral => T, funLL: LangLiteral => T): T
+    def fold[T](literal: Rdf#Literal)(funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T): T
   }
   
   val Literal: LiteralCompanionObject
   
-  trait TypedLiteralCompanionObject extends Function2[String, IRI, TypedLiteral] with Function1[String, TypedLiteral] {
-    def unapply(tl: TypedLiteral): Option[(String, IRI)]
-    def apply(lexicalForm: String): TypedLiteral = TypedLiteral(lexicalForm, IRI("http://www.w3.org/2001/XMLSchema#string"))
+  trait TypedLiteralCompanionObject extends Function2[String, Rdf#IRI, Rdf#TypedLiteral] with Function1[String, Rdf#TypedLiteral] {
+    def unapply(tl: Rdf#TypedLiteral): Option[(String, Rdf#IRI)]
+    def apply(lexicalForm: String): Rdf#TypedLiteral = TypedLiteral(lexicalForm, IRI("http://www.w3.org/2001/XMLSchema#string"))
   }
   
   val TypedLiteral: TypedLiteralCompanionObject
   
-  trait LangLiteralCompanionObject extends Function2[String, Lang, LangLiteral] {
-    def unapply(ll: LangLiteral): Option[(String, Lang)]
+  trait LangLiteralCompanionObject extends Function2[String, Rdf#Lang, Rdf#LangLiteral] {
+    def unapply(ll: Rdf#LangLiteral): Option[(String, Rdf#Lang)]
   }
   
   val LangLiteral: LangLiteralCompanionObject
   
-  trait LangCompanionObject extends Function1[String, Lang] {
-    def unapply(l: Lang): Option[String]
+  trait LangCompanionObject extends Function1[String, Rdf#Lang] {
+    def unapply(l: Rdf#Lang): Option[String]
   }
   
   val Lang: LangCompanionObject
 
   // pimps
   
-  class GraphW(graph: Graph) {
-    def toIterable: Iterable[Triple] = Graph.toIterable(graph)
+  class GraphW(graph: Rdf#Graph) {
+    def toIterable: Iterable[Rdf#Triple] = Graph.toIterable(graph)
   }
   
-  implicit def wrapGraph(graph: Graph): GraphW = new GraphW(graph)
-  implicit def graphAsIterable(graph: Graph): Iterable[Triple] = Graph.toIterable(graph)
+  implicit def wrapGraph(graph: Rdf#Graph): GraphW = new GraphW(graph)
+  implicit def graphAsIterable(graph: Rdf#Graph): Iterable[Rdf#Triple] = Graph.toIterable(graph)
   
-  implicit def tupleToTriple(tuple: (Node, IRI, Node)): Triple = Triple(tuple._1, tuple._2, tuple._3)
+  implicit def tupleToTriple(tuple: (Rdf#Node, Rdf#IRI, Rdf#Node)): Rdf#Triple = Triple(tuple._1, tuple._2, tuple._3)
 
-  class TripleW(triple: Triple) {
+  class TripleW(triple: Rdf#Triple) {
     val Triple(subject, predicate, objectt) = triple
   }
-  implicit def wrapTriple(triple: Triple): TripleW = new TripleW(triple)
+  implicit def wrapTriple(triple: Rdf#Triple): TripleW = new TripleW(triple)
 
-  class NodeW(node: Node) {
-    def fold[T](funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T =
+  class NodeW(node: Rdf#Node) {
+    def fold[T](funIRI: Rdf#IRI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T =
       Node.fold(node)(funIRI, funBNode, funLiteral)
   }
   
-  implicit def wrapNode(node: Node): NodeW = new NodeW(node)
+  implicit def wrapNode(node: Rdf#Node): NodeW = new NodeW(node)
   
-  class LiteralW(literal: Literal) {
+  class LiteralW(literal: Rdf#Literal) {
     def lexicalForm = Literal.fold(literal) (
       { case TypedLiteral(s, _) => s },
       { case LangLiteral(s, _) => s }
     )
-    def fold[T](funTL: TypedLiteral => T, funLL: LangLiteral => T): T = Literal.fold(literal)(funTL, funLL)
+    def fold[T](funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T): T = Literal.fold(literal)(funTL, funLL)
   }
   
   private val _xsd = XSDPrefix(this)
 
-  implicit def wrapLiteral(literal: Literal): LiteralW = new LiteralW(literal)
+  implicit def wrapLiteral(literal: Rdf#Literal): LiteralW = new LiteralW(literal)
   
-  implicit def wrapIntAsLiteral(i: Int): TypedLiteral = TypedLiteral(i.toString, _xsd.integer)
+  implicit def wrapIntAsLiteral(i: Int): Rdf#TypedLiteral = TypedLiteral(i.toString, _xsd.integer)
   
-  implicit def wrapStringAsLiteral(s: String): TypedLiteral = TypedLiteral(s, _xsd.string)
+  implicit def wrapStringAsLiteral(s: String): Rdf#TypedLiteral = TypedLiteral(s, _xsd.string)
   
-  implicit def wrapFloatAsLiteral(f: Double): TypedLiteral = TypedLiteral(f.toString, _xsd.double)
+  implicit def wrapFloatAsLiteral(f: Double): Rdf#TypedLiteral = TypedLiteral(f.toString, _xsd.double)
   
   class LiteralBuilder(lexicalForm: String) {
-    def datatype(datatype: IRI): TypedLiteral = TypedLiteral(lexicalForm, datatype)
-    def lang(tag: String): LangLiteral = LangLiteral(lexicalForm, Lang(tag))
+    def datatype(datatype: Rdf#IRI): Rdf#TypedLiteral = TypedLiteral(lexicalForm, datatype)
+    def lang(tag: String): Rdf#LangLiteral = LangLiteral(lexicalForm, Lang(tag))
     def § = TypedLiteral(lexicalForm, _xsd.string)
   }
   

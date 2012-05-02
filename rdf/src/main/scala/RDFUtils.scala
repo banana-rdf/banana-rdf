@@ -1,5 +1,9 @@
 package org.w3.rdf
 
+object RDFUtils {
+  def apply[Rdf <: RDF](ops: RDFOperations[Rdf]): RDFUtils[Rdf] = new RDFUtilsBuilder[Rdf](ops)
+}
+
 trait RDFUtils[Rdf <: RDF] { self =>
 
   def supportDocument(iri: Rdf#IRI): Rdf#IRI
@@ -12,11 +16,11 @@ trait RDFUtils[Rdf <: RDF] { self =>
   implicit def wrapIRI(iri: Rdf#IRI) = new IRIW(iri)
 }
 
-class RDFUtilsImpl[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends RDFUtils[Rdf] {
+class RDFUtilsBuilder[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends RDFUtils[Rdf] {
 
   import ops._
 
-  def supportDocument(iri: IRI): IRI = {
+  def supportDocument(iri: Rdf#IRI): Rdf#IRI = {
     val IRI(iriString) = iri
     val uri = new java.net.URI(iriString)
     import uri._
