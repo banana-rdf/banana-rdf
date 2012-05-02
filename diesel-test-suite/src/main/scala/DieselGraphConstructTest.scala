@@ -187,13 +187,3 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
 
 }
-
-
-import org.w3.rdf.jena._
-
-class JenaDieselGraphConstructTest extends DieselGraphConstructTest[Jena](JenaOperations, JenaDiesel, JenaGraphIsomorphism)
-
-
-import org.w3.rdf.sesame._
-
-class SesameDieselGraphConstructTest extends DieselGraphConstructTest[Sesame](SesameOperations, SesameDiesel, SesameGraphIsomorphism)

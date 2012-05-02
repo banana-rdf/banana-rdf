@@ -108,13 +108,13 @@ object YourProjectBuild extends Build {
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", diesel, dieselTestSuite % "test")
   
   lazy val sesame = Project(
     id = "sesame",
     base = file("sesame"),
     settings = buildSettings ++ sesameDeps ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", diesel, dieselTestSuite % "test")
   
   lazy val n3 = Project(
     id = "n3",
@@ -140,7 +140,13 @@ object YourProjectBuild extends Build {
     id = "diesel",
     base = file("diesel"),
     settings = buildSettings ++ testDeps
-  ) dependsOn (rdf, jena % "test", sesame % "test")
+  ) dependsOn (rdf)
+
+  lazy val dieselTestSuite = Project(
+    id = "diesel-test-suite",
+    base = file("diesel-test-suite"),
+    settings = buildSettings ++ testsuiteDeps
+  ) dependsOn (diesel)
 
 }
 

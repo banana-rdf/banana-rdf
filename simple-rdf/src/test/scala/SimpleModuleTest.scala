@@ -1,7 +1,7 @@
 package org.w3.rdf.simple
 
 import org.w3.rdf._
-import org.w3.rdf.util.DefaultGraphIsomorphism
+import org.w3.rdf.jena.util._
 
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.rdf._
@@ -9,7 +9,6 @@ import org.w3.rdf.n3._
 import nomo.NTriplesReader
 
 class SimpleModuleTest extends PimpsTestSuite(SimpleRDFOperations)
-
 
 object SimpleNTriplesStringParser
   extends n3.NTriplesParser(
