@@ -7,7 +7,7 @@ abstract class SparqlTest[Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf],
-  queryBuilder: SPARQLQueryBuilder[Sparql],
+  queryBuilder: SPARQLQueryBuilder[Rdf, Sparql],
   queryExecution: SPARQLQueryExecution[Rdf, Sparql]
 ) extends WordSpec with MustMatchers {
 
@@ -78,5 +78,37 @@ ASK {
     alexIsThere must be (true)
 
   }
+
+
+
+
+  "a SPARQL query constructor must accept Prefix objects" in {
+
+    val query1 = SelectQuery("""
+prefix : <http://www.w3.org/2001/02pd/rec54#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+
+SELECT DISTINCT ?name WHERE {
+  ?thing :editor ?ed .
+  ?ed contact:fullName ?name
+}
+""")
+
+    val base = Prefix("", "http://www.w3.org/2001/02pd/rec54#", ops)
+    val rdf = RDFPrefix(ops)
+    val contact = Prefix("contact", "http://www.w3.org/2000/10/swap/pim/contact#", ops)
+
+    val query2 = SelectQuery("""
+SELECT DISTINCT ?name WHERE {
+  ?thing :editor ?ed .
+  ?ed contact:fullName ?name
+}
+""", base, rdf, contact)
+
+    query1 must be === query2
+
+  }
+
 
 }
