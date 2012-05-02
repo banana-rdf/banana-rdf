@@ -102,7 +102,7 @@ object YourProjectBuild extends Build {
     id = "simple-rdf",
     base = file("simple-rdf"),
     settings = buildSettings ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", util % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test", jena % "test")
   
   lazy val jena = Project(
     id = "jena",
@@ -116,12 +116,6 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ sesameDeps ++ testDeps
   ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
-  lazy val util = Project(
-    id = "util",
-    base = file("util"),
-    settings = buildSettings ++ jenaDeps
-  ) dependsOn (rdf, jena)
-  
   lazy val n3 = Project(
     id = "n3",
     base = file("n3"),
@@ -132,7 +126,7 @@ object YourProjectBuild extends Build {
     id = "n3-test-suite",
     base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (n3, jena % "test", sesame % "test", simpleRdf % "test", util % "test")
+  ) dependsOn (n3, jena % "test", sesame % "test", simpleRdf % "test")
 
   lazy val linkedData = Project(
     id = "linked-data",
@@ -147,19 +141,6 @@ object YourProjectBuild extends Build {
     base = file("diesel"),
     settings = buildSettings ++ testDeps
   ) dependsOn (rdf, jena % "test", sesame % "test")
-
-  // lazy val peeler = Project(
-  //   id = "peeler",
-  //   base = file("peeler"),
-  //   settings = buildSettings
-  // ) dependsOn (rdf)
-  
-  // lazy val dslTestSuite = Project(
-  //   id = "peeler",
-  //   base = file("peeler"),
-  //   settings = buildSettings
-  // ) dependsOn (diesel, peeler, jena % "test", sesame % "test")
-  
 
 }
 
