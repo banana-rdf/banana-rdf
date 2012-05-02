@@ -3,18 +3,20 @@ package org.w3.rdf
 import org.scalatest._
 import org.scalatest.matchers._
 
-abstract class SparqlTest[Rdf <: RDF](
+abstract class SparqlTest[Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   reader: RDFReader[Rdf, RDFXML],
-  sparql: Sparql[Rdf],
-  iso: GraphIsomorphism[Rdf]
+  iso: GraphIsomorphism[Rdf],
+  queryBuilder: SPARQLQueryBuilder[Sparql],
+  queryExecution: SPARQLQueryExecution[Rdf, Sparql]
 ) extends WordSpec with MustMatchers {
 
   val projections = RDFNodeProjections(ops)
 
   import ops._
-  import sparql._
   import iso._
+  import queryBuilder._
+  import queryExecution._
 
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
