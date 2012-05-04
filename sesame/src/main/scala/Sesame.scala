@@ -1,19 +1,19 @@
 package org.w3.rdf.sesame
 
 import org.w3.rdf._
-import org.openrdf.model.impl._
-import org.openrdf.model._
-import scala.collection.JavaConverters._
-import org.openrdf.model.{BNode=>SesameBNode}
+import org.openrdf.model.{ Graph => SesameGraph, Literal => SesameLiteral, BNode => SesameBNode, _ }
+import org.openrdf.repository._
 
 trait Sesame extends RDF {
-  type Graph = GraphImpl
+  type Graph = SesameGraph
   type Triple = Statement
   type Node = Value
-  type IRI = URIImpl
+  type IRI = URI
   type BNode = SesameBNode
-  type Literal = LiteralImpl
-  type TypedLiteral = LiteralImpl
-  type LangLiteral = LiteralImpl
+  type Literal = SesameLiteral
+  type TypedLiteral = SesameLiteral
+  type LangLiteral = SesameLiteral
   type Lang = String
+
+  type Store = Repository
 }

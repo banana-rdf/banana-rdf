@@ -19,3 +19,4 @@ sbt-launch*.jar
 .idea_modules
 bin
 .ensime
+*.egp

@@ -1,17 +1,16 @@
 package org.w3.rdf
 
-trait RDFStore[Rdf <: RDF, Sparql <: SPARQL] {
+/**
+ * to manipulate named graph within a Store
+ */
+trait RDFStore[Rdf <: RDF] {
 
-  type Store
+  def addNamedGraph(store: Rdf#Store, uri: Rdf#IRI, graph: Rdf#Graph): Rdf#Store
 
-  def asGraph(store: Store): Rdf#Graph
+  def appendToNamedGraph(store: Rdf#Store, uri: Rdf#IRI, graph: Rdf#Graph): Rdf#Store
 
-  def addGraph(store: Store, graph: Rdf#Graph): Store
+  def getNamedGraph(store: Rdf#Store, uri: Rdf#IRI): Rdf#Graph
 
-  def addNamedGraph(store: Store, uri: Rdf#IRI, graph: Rdf#Graph): Store
-
-  def getNamedGraph(store: Store, uri: Rdf#IRI): Rdf#Graph
-
-  def removeGraph(store: Store, uri: Rdf#IRI): Store
+  def removeGraph(store: Rdf#Store, uri: Rdf#IRI): Rdf#Store
 
 }

@@ -62,10 +62,14 @@ object YourProjectBuild extends Build {
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
   
+  /* http://repo.aduna-software.org/maven2/releases/org/openrdf/sesame/ */
   val sesameDeps =
     Seq(
       resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-runtime" % "2.6.4")
+      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-memory" % "2.6.5",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.5",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.5",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % "2.6.5")
 
   val n3Deps =
     Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
@@ -96,7 +100,7 @@ object YourProjectBuild extends Build {
     id = "rdf-test-suite",
     base = file("rdf-test-suite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (rdf)
+  ) dependsOn (rdf, diesel)
 
   val simpleRdf = Project(
     id = "simple-rdf",
@@ -147,6 +151,12 @@ object YourProjectBuild extends Build {
     base = file("diesel-test-suite"),
     settings = buildSettings ++ testsuiteDeps
   ) dependsOn (diesel)
+
+  // lazy val stardog = Project(
+  //   id = "stardog",
+  //   base = file("stardog"),
+  //   settings = buildSettings ++ testDeps
+  // ) dependsOn (rdf, sesame, rdfTestSuite % "test", diesel % "test")
 
 }
 

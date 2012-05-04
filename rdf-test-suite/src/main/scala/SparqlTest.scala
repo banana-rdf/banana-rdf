@@ -8,7 +8,7 @@ abstract class SparqlTest[Rdf <: RDF, Sparql <: SPARQL](
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf],
   queryBuilder: SPARQLQueryBuilder[Rdf, Sparql],
-  queryExecution: SPARQLQueryExecution[Rdf, Sparql]
+  queryExecution: SPARQLGraphQueryExecution[Rdf, Sparql]
 ) extends WordSpec with MustMatchers {
 
   val projections = RDFNodeProjections(ops)

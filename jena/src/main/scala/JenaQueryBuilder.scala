@@ -12,22 +12,4 @@ object JenaQueryBuilder extends SPARQLQueryBuilder[Jena, JenaSPARQL] {
 
   def AskQuery(query: String): JenaSPARQL#AskQuery = QueryFactory.create(query)
 
-  /**************/
-
-  def buildQuery(query: String, prefixes: Seq[Prefix[Jena]]): String = {
-    val builder = new java.lang.StringBuilder
-    prefixes foreach { prefix =>
-      val prefixDefinition = "prefix %s: <%s>\n" format (prefix.prefixName, prefix.prefixIri)
-      builder.append(prefixDefinition)
-    }
-    builder.append(query)
-    builder.toString
-  }
-
-  def SelectQuery(query: String, prefix: Prefix[Jena], prefixes: Prefix[Jena]*): JenaSPARQL#SelectQuery = {
-    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
-    SelectQuery(completeQuery)
-  }
-
-
 }
