@@ -2,6 +2,7 @@ package org.w3.rdf.jena
 
 import org.w3.rdf._
 import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
+import com.hp.hpl.jena.sparql.core.DatasetGraph
 
 trait Jena extends RDF {
   type Graph = JenaGraph
@@ -13,4 +14,6 @@ trait Jena extends RDF {
   type TypedLiteral = Node_Literal
   type LangLiteral = Node_Literal
   type Lang = String
+
+  type Store = DatasetGraph
 }
