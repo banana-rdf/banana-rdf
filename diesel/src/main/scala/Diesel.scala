@@ -6,9 +6,9 @@ import scalaz.Scalaz._
 import scalaz.Validation._
 
 abstract class Diesel[Rdf <: RDF](
-  val ops: RDFOperations[Rdf],
-  val union: GraphUnion[Rdf],
-  val graphTraversal: RDFGraphTraversal[Rdf]) {
+  ops: RDFOperations[Rdf],
+  union: GraphUnion[Rdf],
+  graphTraversal: RDFGraphTraversal[Rdf]) {
 
   import ops._
   import union._

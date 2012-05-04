@@ -9,6 +9,7 @@ import java.io.File
 abstract class StoreTest[Rdf <: RDF](
   ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
+  graphUnion: GraphUnion[Rdf],
   rdfStore: RDFStore[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf]
@@ -22,6 +23,7 @@ abstract class StoreTest[Rdf <: RDF](
   import iso._
   import ops._
   import dsl._
+  import graphUnion._
 
   val store: Rdf#Store
   val foaf = FOAFPrefix(ops)
@@ -51,18 +53,13 @@ abstract class StoreTest[Rdf <: RDF](
     assert(graph2 isIsomorphicWith retrievedGraph2)
   }
 
-  
+  "appendToNamedGraph should be equivalent to graph union" in {
+    addNamedGraph(store, IRI("http://example.com/graph"), graph)
+    appendToNamedGraph(store, IRI("http://example.com/graph"), graph2)
+    val retrievedGraph = getNamedGraph(store, IRI("http://example.com/graph"))
+    val unionGraph = union(graph, graph2)
+    assert(unionGraph isIsomorphicWith retrievedGraph)
+  }
 
-  // "simple scenario" in {
-  //   val base = "http://example.com"
-  //   val trs = reader.read(new File("rdf-test-suite/src/main/resources/new-tr.rdf"), base).fold(t => sys.error(t.toString), s => s)
-  //   val editors = reader.read(new File("rdf-test-suite/src/main/resources/known-tr-editors.rdf"), base) getOrElse sys.error("")
-  //   addNamedGraph(store, IRI("http://example.com/new-tr.rdf"), trs)
-  //   addNamedGraph(store, IRI("http://example.com/known-tr-editors.rdf"), editors)
-  //   val getTrs = getNamedGraph(store, IRI("http://example.com/new-tr.rdf"))
-  //   println(trs.size)
-  //   println(getTrs.size)
-  //   assert(trs isIsomorphicWith getTrs)
-  // }
 
 }

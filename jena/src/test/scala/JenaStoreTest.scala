@@ -6,6 +6,7 @@ import com.hp.hpl.jena.sparql.core._
 class JenaStoreTest() extends StoreTest[Jena](
   JenaOperations,
   JenaDiesel,
+  JenaGraphUnion,
   JenaStore,
   JenaRDFXMLReader,
   JenaGraphIsomorphism) {

@@ -4,6 +4,8 @@ import org.w3.rdf._
 
 object JenaStore extends RDFStore[Jena] {
 
+  import JenaOperations._
+
   def addNamedGraph(store: Jena#Store, uri: Jena#IRI, graph: Jena#Graph): Jena#Store = {
     store.removeGraph(uri)
     store.addGraph(uri, graph)
@@ -11,8 +13,9 @@ object JenaStore extends RDFStore[Jena] {
   }
 
   def appendToNamedGraph(store: Jena#Store, uri: Jena#IRI, graph: Jena#Graph): Jena#Store = {
-    // huh, this will blow up when a test will be written for append :-)
-    store.addGraph(uri, graph)
+    Graph.toIterable(graph) foreach { case Triple(s, p, o) =>
+      store.add(uri, s, p, o)
+    }
     store
   }
 

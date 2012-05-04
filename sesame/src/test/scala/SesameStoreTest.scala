@@ -10,6 +10,7 @@ import org.openrdf.repository.sail._
 class SesameStoreTest() extends StoreTest[Sesame](
   SesameOperations,
   SesameDiesel,
+  SesameGraphUnion,
   SesameStore,
   SesameRDFXMLReader,
   SesameGraphIsomorphism) {
