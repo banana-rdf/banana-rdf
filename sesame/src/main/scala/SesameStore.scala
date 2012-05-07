@@ -7,17 +7,9 @@ import org.openrdf.repository._
 import scala.collection.JavaConverters._
 import org.openrdf.query._
 import org.openrdf.rio.RDFHandler
+import SesameUtil.withConnection
 
 object SesameStore extends RDFStore[Sesame] {
-
-  def withConnection[T](store: Sesame#Store)(func: RepositoryConnection => T): T = {
-    val conn = store.getConnection()
-    conn.setAutoCommit(false)
-    val result = func(conn)
-    conn.commit()
-    conn.close()
-    result
-  }
 
   def addNamedGraph(store: Sesame#Store, uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>

@@ -69,6 +69,7 @@ object YourProjectBuild extends Build {
       libraryDependencies += "org.openrdf.sesame" % "sesame-sail-memory" % "2.6.5",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.5",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.5",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.5",
       libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % "2.6.5")
 
   val n3Deps =
