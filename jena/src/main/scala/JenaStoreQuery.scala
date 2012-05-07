@@ -13,6 +13,8 @@ object JenaStoreQuery extends RDFStoreQuery[Jena, JenaSPARQL] {
 
   def executeSelectQuery(store: DatasetGraph, query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
     val dataset = new GraphStoreBasic(store).toDataset
+    println("$$$ "+dataset.listNames.asScala.toList)
+    println("%%% "+query)
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
     new Iterable[JenaSPARQL#Row] {

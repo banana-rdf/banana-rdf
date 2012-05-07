@@ -1,10 +1,8 @@
 package org.w3.rdf
 
-import org.w3.rdf._
 import org.w3.rdf.diesel._
 import org.scalatest._
 import org.scalatest.matchers._
-import java.io.File
 
 abstract class StoreTest[Rdf <: RDF](
   ops: RDFOperations[Rdf],
