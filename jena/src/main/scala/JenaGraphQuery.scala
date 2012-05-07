@@ -37,6 +37,4 @@ object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
     result
   }
 
-
-
 }
