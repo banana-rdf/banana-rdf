@@ -3,7 +3,7 @@ package org.w3.rdf
 /**
  * to execute SPARQL queries against a Dataset
  */
-trait SPARQLQueryExecution[Rdf <: RDF, Sparql <: SPARQL] {
+trait RDFQuery[Rdf <: RDF, Sparql <: SPARQL] {
 
   type Dataset
 
@@ -17,8 +17,14 @@ trait SPARQLQueryExecution[Rdf <: RDF, Sparql <: SPARQL] {
 
 }
 
-trait SPARQLGraphQueryExecution[Rdf <: RDF, Sparql <: SPARQL] extends SPARQLQueryExecution[Rdf, Sparql] {
+trait RDFGraphQuery[Rdf <: RDF, Sparql <: SPARQL] extends RDFQuery[Rdf, Sparql] {
 
   type Dataset = Rdf#Graph
+
+}
+
+trait RDFStoreQuery[Rdf <: RDF, Sparql <: SPARQL] extends RDFQuery[Rdf, Sparql] {
+
+  type Dataset = Rdf#Store
 
 }

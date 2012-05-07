@@ -7,7 +7,7 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import scala.collection.JavaConverters._
 
-object JenaQueryExecution extends SPARQLGraphQueryExecution[Jena, JenaSPARQL] {
+object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
 
   def executeSelectQuery(graph: JenaGraph, query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
     val model: Model = ModelFactory.createModelForGraph(graph)
