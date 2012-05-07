@@ -3,9 +3,9 @@
 dir=$(dirname $0)
 cd "$dir"
 
-url="http://repo.typesafe.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/0.11.2/sbt-launch.jar"
+url="http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.11.3/sbt-launch.jar"
 
-sbt="sbt-launch-0.11.2.jar"
+sbt="sbt-launch-0.11.3.jar"
 
 # set the right tool to download sbt
 if [ -n "$tool" ]; then
