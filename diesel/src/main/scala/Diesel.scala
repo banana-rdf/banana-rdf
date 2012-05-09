@@ -5,7 +5,12 @@ import scalaz._
 import scalaz.Scalaz._
 import scalaz.Validation._
 
-abstract class Diesel[Rdf <: RDF](
+object Diesel {
+  def apply[Rdf <: RDF](ops: RDFOperations[Rdf], union: GraphUnion[Rdf], graphTraversal: RDFGraphTraversal[Rdf]): Diesel[Rdf] =
+    new Diesel(ops, union, graphTraversal)
+}
+
+class Diesel[Rdf <: RDF](
   ops: RDFOperations[Rdf],
   union: GraphUnion[Rdf],
   graphTraversal: RDFGraphTraversal[Rdf]) {
