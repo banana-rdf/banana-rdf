@@ -1,6 +1,6 @@
-package org.w3.rdf.simple
+package org.w3.banana.simple
 
-import org.w3.rdf._
+import org.w3.banana._
 
 object SimpleGraphUnion extends GraphUnion[SimpleRDF] {
   

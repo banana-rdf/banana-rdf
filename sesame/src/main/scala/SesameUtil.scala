@@ -1,4 +1,4 @@
-package org.w3.rdf.sesame
+package org.w3.banana.sesame
 
 import org.openrdf.repository.{ Repository, RepositoryConnection }
 import org.openrdf.query.QueryResult

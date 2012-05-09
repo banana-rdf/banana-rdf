@@ -3,9 +3,9 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 //uncomment these when the general parser has been generalised again
-//package org.w3.rdf.jena
+//package org.w3.banana.jena
 //
-//import org.w3.rdf.n3
+//import org.w3.banana.n3
 //
 //class JenaNTriplesParserStringTest extends n3.NTriplesParserTest(JenaOperations, JenaNTriplesStringParser) {
 //  val isomorphism = JenaGraphIsomorphism

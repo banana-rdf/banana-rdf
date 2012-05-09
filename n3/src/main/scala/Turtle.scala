@@ -2,14 +2,14 @@
  * Copyright (c) 2012 Henry Story
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 import _root_.nomo._
 import _root_.nomo.Errors.TreeMsg
 import org.apache.abdera.i18n.iri.IRISyntaxException
 
 //_root_ seems to be needed to get intellij 11 and 11.1 (114.243) to find the package
-import org.w3.rdf._
+import org.w3.banana._
 
 
 /**

@@ -3,11 +3,11 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 import _root_.nomo._
 import scala.collection.mutable
-import org.w3.rdf._
+import org.w3.banana._
 
 
 /**

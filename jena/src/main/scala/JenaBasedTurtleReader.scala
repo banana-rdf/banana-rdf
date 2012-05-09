@@ -1,7 +1,7 @@
-package org.w3.rdf.jena.util
+package org.w3.banana.jena.util
 
-import org.w3.rdf._
-import org.w3.rdf.jena._
+import org.w3.banana._
+import org.w3.banana.jena._
 import java.io._
 
 import scalaz.Validation

@@ -1,8 +1,8 @@
-package org.w3.rdf.sesame
+package org.w3.banana.sesame
 
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
-import org.w3.rdf._
-import org.w3.rdf.n3._
+import org.w3.banana._
+import org.w3.banana.n3._
 
 object NTriplesStringParser
 extends NTriplesParser(

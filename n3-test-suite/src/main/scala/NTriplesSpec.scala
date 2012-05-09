@@ -3,7 +3,7 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 import org.scalacheck._
 import Prop._
@@ -14,7 +14,7 @@ import collection.mutable.HashSet
 import _root_.nomo.{Accumulators, Errors, Parsers, Monotypic}
 import _root_.nomo.Accumulators.Position
 import scala.collection.mutable
-import org.w3.rdf._
+import org.w3.banana._
 
 /**
  * @author bblfish

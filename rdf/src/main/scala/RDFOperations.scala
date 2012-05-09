@@ -1,4 +1,4 @@
-package org.w3.rdf
+package org.w3.banana
 
 /**
  * A Module that gathers the types needed to define an RDF implementation

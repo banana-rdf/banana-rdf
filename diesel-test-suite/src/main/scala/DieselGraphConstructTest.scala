@@ -1,6 +1,6 @@
-package org.w3.rdf.diesel
+package org.w3.banana.diesel
 
-import org.w3.rdf._
+import org.w3.banana._
 
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers

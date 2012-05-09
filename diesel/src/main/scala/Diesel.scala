@@ -1,6 +1,6 @@
-package org.w3.rdf.diesel
+package org.w3.banana.diesel
 
-import org.w3.rdf._
+import org.w3.banana._
 import scalaz._
 import scalaz.Scalaz._
 import scalaz.Validation._

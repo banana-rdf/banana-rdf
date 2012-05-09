@@ -4,10 +4,10 @@
 */
 
 
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 import java.io._
-import org.w3.rdf._
+import org.w3.banana._
 import _root_.nomo.Accumulator //fix for IntelliJ 11 and 11.1beta, because we have a nomo package
 import scala.util.Random
 import org.scalatest.matchers.ShouldMatchers

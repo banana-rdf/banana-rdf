@@ -1,6 +1,6 @@
-package org.w3.rdf.jena
+package org.w3.banana.jena
 
-import org.w3.rdf._
+import org.w3.banana._
 import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 

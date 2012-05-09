@@ -3,7 +3,7 @@
 // * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
 // */
 //
-//package org.w3.rdf.n3
+//package org.w3.banana.n3
 //
 //
 //import org.junit.Test
@@ -12,7 +12,7 @@
 //import java.io._
 //import _root_.nomo.Accumulator
 //import com.hp.hpl.jena.rdf.model.{ModelFactory=>JenaModelFactory, Model => JenaModel}
-//import org.w3.rdf._
+//import org.w3.banana._
 //import jena.{Jena, JenaOperations}
 //import sesame.{Sesame, SesameOperations, SesameTurtleReader, SesameGraphIsomorphism}
 //
@@ -20,7 +20,7 @@
 // TODO make this more generic.
 // TODO: the difficulty will be to find an asynchronous api to test the asynchronous reader too
 ///**
-// * This is a class that enables each implementation of org.w3.rdf to test its ability to
+// * This is a class that enables each implementation of org.w3.banana to test its ability to
 // * interact with the NTriples parser written with Nomo.
 // *
 // * The test suites in the test directory test Nomo versus the parsers from Sesame, Jena, etc...

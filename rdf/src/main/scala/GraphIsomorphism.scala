@@ -1,4 +1,4 @@
-package org.w3.rdf
+package org.w3.banana
 
 trait GraphIsomorphism[Rdf <: RDF] {
   

@@ -1,6 +1,6 @@
-package org.w3.rdf.sesame
+package org.w3.banana.sesame
 
-import org.w3.rdf._
+import org.w3.banana._
 import java.io._
 import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.openrdf.model.URI

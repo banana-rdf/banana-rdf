@@ -1,7 +1,7 @@
-package org.w3.rdf.simple
+package org.w3.banana.simple
 
 import nomo.{Accumulators, Errors, Monotypic, Parsers}
-import org.w3.rdf.n3
+import org.w3.banana.n3
 
 object SimpleTurtleStringParser
 extends n3.TurtleParser(

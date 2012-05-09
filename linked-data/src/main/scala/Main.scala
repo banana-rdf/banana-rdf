@@ -1,8 +1,8 @@
 package org.w3.linkeddata
 
-import org.w3.rdf._
-import org.w3.rdf.sesame._
-import org.w3.rdf.jena._
+import org.w3.banana._
+import org.w3.banana.sesame._
+import org.w3.banana.jena._
 
 object Main {
 

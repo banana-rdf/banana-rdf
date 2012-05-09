@@ -3,7 +3,7 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 
 import org.scalacheck._
@@ -12,7 +12,7 @@ import _root_.nomo.Errors.TreeMsg
 import _root_.nomo.Accumulators.Position
 import _root_.nomo.Parsers._
 import _root_.nomo.{Parsers, Accumulators, Errors, Monotypic}
-import org.w3.rdf._
+import org.w3.banana._
 import java.nio.charset.Charset
 import java.io.{BufferedReader, StringReader}
 

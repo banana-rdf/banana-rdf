@@ -1,4 +1,4 @@
-package org.w3.rdf
+package org.w3.banana
 
 import scalaz._
 import scalaz.Validation._

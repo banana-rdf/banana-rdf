@@ -3,10 +3,10 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf.n3.nomo
+package org.w3.banana.n3.nomo
 
-import org.w3.rdf.n3.{NTriplesParser, Listener}
-import org.w3.rdf.{RDF, RDFReader, Turtle}
+import org.w3.banana.n3.{NTriplesParser, Listener}
+import org.w3.banana.{RDF, RDFReader, Turtle}
 import java.io._
 import nomo.Accumulator
 

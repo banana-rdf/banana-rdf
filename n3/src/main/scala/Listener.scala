@@ -2,10 +2,10 @@
 * Copyright (c) 2012 Henry Story
 * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
 */
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 import collection.mutable
-import org.w3.rdf._
+import org.w3.banana._
 import java.net.{URISyntaxException, URI}
 import org.apache.abdera.i18n.iri.{IRISyntaxException, IRI => aIRI}
 

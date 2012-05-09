@@ -1,6 +1,6 @@
-package org.w3.rdf.sesame
+package org.w3.banana.sesame
 
-import org.w3.rdf._
+import org.w3.banana._
 import org.openrdf.model.impl.GraphImpl
 import SesameOperations.Graph.toIterable
 

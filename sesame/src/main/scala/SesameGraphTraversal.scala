@@ -1,6 +1,6 @@
-package org.w3.rdf.sesame
+package org.w3.banana.sesame
 
-import org.w3.rdf._
+import org.w3.banana._
 import scala.collection.JavaConverters._
 
 object SesameGraphTraversal extends RDFGraphTraversal[Sesame] {

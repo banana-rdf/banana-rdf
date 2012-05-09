@@ -1,6 +1,6 @@
-package org.w3.rdf.jena
+package org.w3.banana.jena
 
-import org.w3.rdf._
+import org.w3.banana._
 import java.io._
 import com.hp.hpl.jena.rdf.model._
 

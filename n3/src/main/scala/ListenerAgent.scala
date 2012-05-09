@@ -1,4 +1,4 @@
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 import collection.immutable
 

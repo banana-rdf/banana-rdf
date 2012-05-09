@@ -1,5 +1,5 @@
-package org.w3.rdf.simple
+package org.w3.banana.simple
 
-import org.w3.rdf.jena.util._
+import org.w3.banana.jena.util._
 
 object SimpleGraphIsomorphism extends JenaBasedGraphIsomorphism(SimpleRDFOperations)

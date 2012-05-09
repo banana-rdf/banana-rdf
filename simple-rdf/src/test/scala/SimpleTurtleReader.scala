@@ -1,7 +1,7 @@
-package org.w3.rdf.simple
+package org.w3.banana.simple
 
-import org.w3.rdf.jena.util._
-import org.w3.rdf.n3.nomo.{TurtleReader, NTriplesReader}
+import org.w3.banana.jena.util._
+import org.w3.banana.n3.nomo.{TurtleReader, NTriplesReader}
 
 object SimpleTurtleReader extends JenaBasedTurtleReader[SimpleRDF](SimpleRDFOperations)
 

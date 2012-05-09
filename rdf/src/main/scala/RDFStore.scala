@@ -1,4 +1,4 @@
-package org.w3.rdf
+package org.w3.banana
 
 /**
  * to manipulate named graph within a Store

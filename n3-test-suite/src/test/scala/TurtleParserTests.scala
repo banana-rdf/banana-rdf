@@ -3,14 +3,14 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
 import _root_.nomo.{Accumulators, Errors, Monotypic, Parsers}
 import nomo.TurtleReader
-import org.w3.rdf.{n3, sesame, jena}
+import org.w3.banana.{n3, sesame, jena}
 import sesame.SesameGraphIsomorphism
-import org.w3.rdf.simple._
-import org.w3.rdf.util.DefaultGraphIsomorphism
+import org.w3.banana.simple._
+import org.w3.banana.util.DefaultGraphIsomorphism
 
 //class JenaTurtleParserStringTest extends n3.TurtleParserTest(,jena.JenaTurtleReader) {
 //  val morpheus = jena.JenaGraphIsomorphism

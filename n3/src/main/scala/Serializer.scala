@@ -3,9 +3,9 @@
  * under the Open Source MIT Licence http://www.opensource.org/licenses/MIT
  */
 
-package org.w3.rdf.n3
+package org.w3.banana.n3
 
-import org.w3.rdf._
+import org.w3.banana._
 
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples

@@ -1,6 +1,6 @@
 package org.w3.linkeddata
 
-import org.w3.rdf._
+import org.w3.banana._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ConcurrentMap

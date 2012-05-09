@@ -1,4 +1,4 @@
-package org.w3.rdf.simple
+package org.w3.banana.simple
 
 import java.util.concurrent.atomic._
 
