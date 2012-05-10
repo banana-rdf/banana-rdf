@@ -9,9 +9,9 @@ import org.openrdf.query._
 import org.openrdf.rio.RDFHandler
 import SesameUtil.withConnection
 
-object SesameStore extends RDFStore[Sesame] {
+case class SesameStore(store: Sesame#Store) extends RDFStore[Sesame] {
 
-  def addNamedGraph(store: Sesame#Store, uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
+  def addNamedGraph(uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>
       conn.remove(null: Resource, null, null, uri)
       conn.add(graph, uri)
@@ -19,7 +19,7 @@ object SesameStore extends RDFStore[Sesame] {
     store
   }
 
-  def appendToNamedGraph(store: Sesame#Store, uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
+  def appendToNamedGraph(uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>
       conn.add(graph, uri)
     }
@@ -34,7 +34,7 @@ object SesameStore extends RDFStore[Sesame] {
     def handleStatement(statement: Statement): Unit = graph.add(statement)
   }
 
-  def getNamedGraph(store: Sesame#Store, uri: Sesame#IRI): Sesame#Graph = {
+  def getNamedGraph(uri: Sesame#IRI): Sesame#Graph = {
     val graph = new GraphImpl
     withConnection(store) { conn =>
       conn.export(new RDFCollector(graph), uri)
@@ -42,7 +42,7 @@ object SesameStore extends RDFStore[Sesame] {
     graph
   }
 
-  def removeGraph(store: Sesame#Store, uri: Sesame#IRI): Sesame#Store = {
+  def removeGraph(uri: Sesame#IRI): Sesame#Store = {
     withConnection(store) { conn =>
       conn.remove(null: Resource, null, null, uri)
     }

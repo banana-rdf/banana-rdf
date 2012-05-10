@@ -7,20 +7,18 @@ import org.scalatest.matchers._
 abstract class SparqlQueryOnStoreTest[Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
-  rdfStore: RDFStore[Rdf],
+  store: RDFStore[Rdf],
   iso: GraphIsomorphism[Rdf],
   queryBuilder: SPARQLQueryBuilder[Rdf, Sparql],
   queryExecution: RDFStoreQuery[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
-  import rdfStore._
+  import store._
   import iso._
   import ops._
   import dsl._
   import queryBuilder._
   import queryExecution._
-
-  val store: Rdf#Store
 
   val foaf = FOAFPrefix(ops)
 
@@ -41,8 +39,8 @@ abstract class SparqlQueryOnStoreTest[Rdf <: RDF, Sparql <: SPARQL](
   ).graph
 
   override def beforeAll(): Unit = {
-    addNamedGraph(store, IRI("http://example.com/graph"), graph)
-    addNamedGraph(store, IRI("http://example.com/graph2"), graph2)
+    addNamedGraph(IRI("http://example.com/graph"), graph)
+    addNamedGraph(IRI("http://example.com/graph2"), graph2)
   }
 
   "betehess must know henry" in {
@@ -57,7 +55,7 @@ ASK {
 }
 """)
 
-    val alexKnowsHenry = executeAskQuery(store, query)
+    val alexKnowsHenry = executeAskQuery(store.store, query)
 
     alexKnowsHenry must be (true)
 

@@ -8,15 +8,13 @@ import org.openrdf.repository.sail.SailRepository
 class SesameQueryOnStoreTest() extends SparqlQueryOnStoreTest(
   SesameOperations,
   SesameDiesel,
-  SesameStore,
-  SesameGraphIsomorphism,
-  SesameQueryBuilder,
-  SesameStoreQuery) {
-
-  val store: Repository = {
+  SesameStore {
     val repo = new SailRepository(new MemoryStore)
     repo.initialize()
     repo
-  }
+  },
+  SesameGraphIsomorphism,
+  SesameQueryBuilder,
+  SesameStoreQuery) {
 
 }

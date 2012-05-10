@@ -7,18 +7,15 @@ class JenaStoreTest() extends StoreTest[Jena](
   JenaOperations,
   JenaDiesel,
   JenaGraphUnion,
-  JenaStore,
+  JenaStore(DatasetGraphFactory.createMem()),
   JenaRDFXMLReader,
   JenaGraphIsomorphism) {
 
-  val store: DatasetGraph = DatasetGraphFactory.createMem()
-
   import JenaOperations._
-  import JenaStore._
 
   "adding a named graph should not pollute the default graph" in {
-    addNamedGraph(store, IRI("http://example.com/foo"), graph)
-    val defaultGraph = getNamedGraph(store, null.asInstanceOf[Jena#IRI])
+    store.addNamedGraph(IRI("http://example.com/foo"), graph)
+    val defaultGraph = store.getNamedGraph(null.asInstanceOf[Jena#IRI])
     defaultGraph must have size(0)
   }
 

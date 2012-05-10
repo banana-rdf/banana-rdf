@@ -5,12 +5,14 @@ package org.w3.banana
  */
 trait RDFStore[Rdf <: RDF] {
 
-  def addNamedGraph(store: Rdf#Store, uri: Rdf#IRI, graph: Rdf#Graph): Rdf#Store
+  def store: Rdf#Store
 
-  def appendToNamedGraph(store: Rdf#Store, uri: Rdf#IRI, graph: Rdf#Graph): Rdf#Store
+  def addNamedGraph(uri: Rdf#IRI, graph: Rdf#Graph): Rdf#Store
 
-  def getNamedGraph(store: Rdf#Store, uri: Rdf#IRI): Rdf#Graph
+  def appendToNamedGraph(uri: Rdf#IRI, graph: Rdf#Graph): Rdf#Store
 
-  def removeGraph(store: Rdf#Store, uri: Rdf#IRI): Rdf#Store
+  def getNamedGraph(uri: Rdf#IRI): Rdf#Graph
+
+  def removeGraph(uri: Rdf#IRI): Rdf#Store
 
 }
