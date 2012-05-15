@@ -48,13 +48,16 @@ abstract class AsyncStoreTest[Rdf <: RDF](
     }
   }
 
-  // "appendToNamedGraph should be equivalent to graph union" in {
-  //   addNamedGraph(IRI("http://example.com/graph"), graph)
-  //   appendToNamedGraph(IRI("http://example.com/graph"), graph2)
-  //   val retrievedGraph = getNamedGraph(IRI("http://example.com/graph"))
-  //   val unionGraph = union(graph, graph2)
-  //   assert(unionGraph isIsomorphicWith retrievedGraph)
-  // }
+  "appendToNamedGraph should be equivalent to graph union" in {
+    for {
+      _ <- store.addNamedGraph(IRI("http://example.com/graph"), graph)
+      _ <- store.appendToNamedGraph(IRI("http://example.com/graph"), graph2)
+      retrievedGraph <- store.getNamedGraph(IRI("http://example.com/graph"))
+    } {
+      val unionGraph = union(graph, graph2)
+      assert(unionGraph isIsomorphicWith retrievedGraph)
+    }
+  }
 
 
 }
