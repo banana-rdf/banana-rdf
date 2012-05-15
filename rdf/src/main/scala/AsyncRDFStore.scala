@@ -21,7 +21,8 @@ trait AsyncRDFStore[Rdf <: RDF] {
 class AsyncRDFStoreBuilder[Rdf <: RDF](
   store: RDFStore[Rdf],
   factory: ActorRefFactory)
-  (implicit timeout: Timeout) extends AsyncRDFStore[Rdf] {
+  (implicit timeout: Timeout)
+extends AsyncRDFStore[Rdf] {
 
   case class AddNamedGraph(uri: Rdf#IRI, graph: Rdf#Graph)
   case class AppendToNamedGraph(uri: Rdf#IRI, graph: Rdf#Graph)
