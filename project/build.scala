@@ -36,7 +36,7 @@ object YourProjectBuild extends Build {
   
   import com.typesafe.sbteclipse.plugin.EclipsePlugin._
   
-  val akka = "com.typesafe.akka" % "akka-actor" % "2.0-RC4"
+  val akka = "com.typesafe.akka" % "akka-actor" % "2.0.1"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
@@ -94,13 +94,17 @@ object YourProjectBuild extends Build {
     id = "rdf",
     base = file("rdf"),
     settings = buildSettings ++ testDeps ++ Seq(
-      libraryDependencies += scalaz)
+      libraryDependencies += akka,
+      libraryDependencies += scalaz
+    )
   )
 
   lazy val rdfTestSuite = Project(
     id = "rdf-test-suite",
     base = file("rdf-test-suite"),
-    settings = buildSettings ++ testsuiteDeps
+    settings = buildSettings ++ testsuiteDeps ++ Seq(
+      libraryDependencies += akka
+    )
   ) dependsOn (rdf, diesel)
 
   val simpleRdf = Project(
@@ -112,7 +116,9 @@ object YourProjectBuild extends Build {
   lazy val jena = Project(
     id = "jena",
     base = file("jena"),
-    settings = buildSettings ++ jenaDeps ++ testDeps
+    settings = buildSettings ++ jenaDeps ++ testDeps ++ Seq(
+      libraryDependencies += akka
+    )
   ) dependsOn (rdf, n3, rdfTestSuite % "test", diesel, dieselTestSuite % "test")
   
   lazy val sesame = Project(
@@ -137,7 +143,6 @@ object YourProjectBuild extends Build {
     id = "linked-data",
     base = file("linked-data"),
     settings = buildSettings ++ Seq(
-      libraryDependencies += akka,
       libraryDependencies += asyncHttpClient)
   ) dependsOn (rdf, sesame, jena)
 
