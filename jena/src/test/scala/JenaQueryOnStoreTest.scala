@@ -6,7 +6,8 @@ import com.hp.hpl.jena.sparql.core._
 class JenaQueryOnStoreTest() extends SparqlQueryOnStoreTest(
   JenaOperations,
   JenaDiesel,
-  JenaStore(DatasetGraphFactory.createMem()),
   JenaGraphIsomorphism,
   JenaQueryBuilder,
-  JenaStoreQuery)
+  DatasetGraphFactory.createMem(),
+  (u: DatasetGraph) => JenaStore(u),
+  (u: DatasetGraph) => JenaStoreQuery(u))

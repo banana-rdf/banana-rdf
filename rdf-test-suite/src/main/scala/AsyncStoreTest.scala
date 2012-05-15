@@ -3,20 +3,26 @@ package org.w3.banana
 import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers._
+import akka.actor.ActorSystem
+import akka.util.Timeout
 
 abstract class AsyncStoreTest[Rdf <: RDF](
   ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
   graphUnion: GraphUnion[Rdf],
-  val store: AsyncRDFStore[Rdf],
+  rdfStore: RDFStore[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf]
-) extends WordSpec with MustMatchers {
+) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import iso._
   import ops._
   import dsl._
   import graphUnion._
+
+  val system = ActorSystem("jena-asyncstore-test", AsyncRDFStore.DEFAULT_CONFIG)
+  implicit val timeout = Timeout(1000)
+  val store = AsyncRDFStore(rdfStore, system)
 
   val foaf = FOAFPrefix(ops)
 
@@ -59,5 +65,8 @@ abstract class AsyncStoreTest[Rdf <: RDF](
     }
   }
 
+  override def afterAll(): Unit = {
+    system.shutdown()
+  }
 
 }

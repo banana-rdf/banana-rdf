@@ -4,21 +4,23 @@ import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers._
 
-abstract class SparqlQueryOnStoreTest[Rdf <: RDF, Sparql <: SPARQL](
+abstract class SparqlQueryOnStoreTest[Store, Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
-  store: RDFStore[Rdf],
   iso: GraphIsomorphism[Rdf],
   queryBuilder: SPARQLQueryBuilder[Rdf, Sparql],
-  queryExecution: RDFStoreQuery[Rdf, Sparql]
+  underlyingStore: Store,
+  storeFunc: Store => RDFStore[Rdf],
+  queryEngineFunc: Store => RDFQuery[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
-  import store._
   import iso._
   import ops._
   import dsl._
   import queryBuilder._
-  import queryExecution._
+
+  val store = storeFunc(underlyingStore)
+  val queryEngine = queryEngineFunc(underlyingStore)
 
   val foaf = FOAFPrefix(ops)
 
@@ -39,8 +41,8 @@ abstract class SparqlQueryOnStoreTest[Rdf <: RDF, Sparql <: SPARQL](
   ).graph
 
   override def beforeAll(): Unit = {
-    addNamedGraph(IRI("http://example.com/graph"), graph)
-    addNamedGraph(IRI("http://example.com/graph2"), graph2)
+    store.addNamedGraph(IRI("http://example.com/graph"), graph)
+    store.addNamedGraph(IRI("http://example.com/graph2"), graph2)
   }
 
   "betehess must know henry" in {
@@ -55,7 +57,7 @@ ASK {
 }
 """)
 
-    val alexKnowsHenry = executeAskQuery(store.store, query)
+    val alexKnowsHenry = queryEngine.executeAskQuery(query)
 
     alexKnowsHenry must be (true)
 
