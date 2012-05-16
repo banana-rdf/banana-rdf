@@ -23,20 +23,22 @@ class Diesel[Rdf <: RDF](
 
   val rdf = RDFPrefix(ops)
 
-  case class GraphNode(node: Rdf#Node, graph: Rdf#Graph) {
+  class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
-    def a(clazz: Rdf#IRI): GraphNode = {
+    import pointed.{ node, graph }
+
+    def a(clazz: Rdf#IRI): PointedGraph[Rdf] = {
       val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
-      GraphNode(node, newGraph)
+      PointedGraph(node, newGraph)
     }
 
-    def --(p: Rdf#IRI): GraphNodePredicate = GraphNodePredicate(this, p)
+    def --(p: Rdf#IRI): PointedGraphPredicate = new PointedGraphPredicate(pointed, p)
 
-    def -<-(p: Rdf#IRI): PredicateGraphNode = PredicateGraphNode(p, this)
+    def -<-(p: Rdf#IRI): PredicatePointedGraph = new PredicatePointedGraph(p, pointed)
 
-    def /(p: Rdf#IRI): GraphNodes = {
+    def /(p: Rdf#IRI): PointedGraphs[Rdf] = {
       val nodes = getObjects(graph, node, p)
-      GraphNodes(nodes, graph)
+      PointedGraphs(nodes, graph)
     }
 
     def asString: Validation[Throwable, String] = projections.asString(node)
@@ -47,15 +49,15 @@ class Diesel[Rdf <: RDF](
 
   }
 
-  implicit def node2GraphNode(node: Rdf#Node): GraphNode = GraphNode(node, Graph.empty)
+  class PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]) extends Iterable[PointedGraph[Rdf]] {
 
-  case class GraphNodes(nodes: Iterable[Rdf#Node], graph: Rdf#Graph) extends Iterable[GraphNode] {
+    import pointedGraphs.{ nodes, graph }
 
-    def iterator = nodes.iterator map { GraphNode(_, graph) }
+    def iterator = nodes.iterator map { PointedGraph(_, graph) }
 
-    def /(p: Rdf#IRI): GraphNodes = {
-      val ns = this flatMap { case GraphNode(node, graph) => getObjects(graph, node, p) }
-      GraphNodes(ns, graph)
+    def /(p: Rdf#IRI): PointedGraphs[Rdf] = {
+      val ns = this flatMap { case PointedGraph(node, graph) => getObjects(graph, node, p) }
+      PointedGraphs(ns, graph)
     }
 
     def node: Validation[Throwable, Rdf#Node] = fromTryCatch { this.head.node }
@@ -69,10 +71,10 @@ class Diesel[Rdf <: RDF](
 
   }
 
-  case class GraphNodePredicate(graphNode: GraphNode, p: Rdf#IRI) {
+  class PointedGraphPredicate(pointed: PointedGraph[Rdf], p: Rdf#IRI) {
 
-    def ->-(o: Rdf#Node, os: Rdf#Node*): GraphNode = {
-      val GraphNode(s, acc) = graphNode
+    def ->-(o: Rdf#Node, os: Rdf#Node*): PointedGraph[Rdf] = {
+      val PointedGraph(s, acc) = pointed
       val graph =
         if (os.isEmpty) {
           acc union Graph(Triple(s, p, o))
@@ -80,17 +82,17 @@ class Diesel[Rdf <: RDF](
           val triples: Iterable[Rdf#Triple] = (o :: os.toList) map { o => Triple(s, p, o) }
           Graph(triples) union acc
         }
-      GraphNode(s, graph)
+      PointedGraph(s, graph)
     }
 
-    def ->-(graphNodeObject: GraphNode): GraphNode = {
-      val GraphNode(s, acc) = graphNode
-      val GraphNode(o, graphObject) = graphNodeObject
+    def ->-(pointedObject: PointedGraph[Rdf]): PointedGraph[Rdf] = {
+      val PointedGraph(s, acc) = pointed
+      val PointedGraph(o, graphObject) = pointedObject
       val graph = Graph(Triple(s, p, o)) union acc union graphObject
-      GraphNode(s, graph)
+      PointedGraph(s, graph)
     }
 
-    def ->-(collection: List[Rdf#Node]): GraphNode = {
+    def ->-(collection: List[Rdf#Node]): PointedGraph[Rdf] = {
       var current: Rdf#Node = rdf.nil
       val triples = scala.collection.mutable.Set[Rdf#Triple]()
       collection.reverse foreach { a =>
@@ -99,38 +101,42 @@ class Diesel[Rdf <: RDF](
         triples += Triple(newBNode, rdf.rest, current)
         current = newBNode
       }
-      val GraphNode(s, acc) = graphNode
+      val PointedGraph(s, acc) = pointed
       triples += Triple(s, p, current)
       val graph = acc union Graph(triples)
-      GraphNode(current, Graph(triples))
+      PointedGraph(current, Graph(triples))
     }
 
   }
 
 
-  case class PredicateGraphNode(p: Rdf#IRI, graphNode: GraphNode) {
+  case class PredicatePointedGraph(p: Rdf#IRI, pointed: PointedGraph[Rdf]) {
 
-    def --(s: Rdf#Node): GraphNode = {
-      val GraphNode(o, acc) = graphNode
+    def --(s: Rdf#Node): PointedGraph[Rdf] = {
+      val PointedGraph(o, acc) = pointed
       val graph = acc union Graph(Triple(s, p, o))
-      GraphNode(s, graph)
+      PointedGraph(s, graph)
     }
 
-    def --(graphNodeSubject: GraphNode): GraphNode = {
-      val GraphNode(o, acc) = graphNode
-      val GraphNode(s, graphObject) = graphNodeSubject
+    def --(pointedSubject: PointedGraph[Rdf]): PointedGraph[Rdf] = {
+      val PointedGraph(o, acc) = pointed
+      val PointedGraph(s, graphObject) = pointedSubject
       val graph = Graph(Triple(s, p, o)) union acc union graphObject
-      GraphNode(s, graph)
+      PointedGraph(s, graph)
     }
 
   }
 
+  implicit def node2PointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(new PointedGraph[Rdf](node, Graph.empty))
+
+  implicit def pointedGraph2PointedGraphW(pointed: PointedGraph[Rdf]): PointedGraphW = new PointedGraphW(pointed)
+
+  implicit def multiplePointedGraph2PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]): PointedGraphsW = new PointedGraphsW(pointedGraphs)
 
   def bnode(): Rdf#BNode = BNode()
 
   def bnode(label: String) = BNode(label)
 
   def uri(s: String): Rdf#IRI = IRI(s)
-
 
 }

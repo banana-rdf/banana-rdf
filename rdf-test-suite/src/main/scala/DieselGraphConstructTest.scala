@@ -27,7 +27,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must accept a GraphNode in the object position" in {
 
-    val g: GraphNode = (
+    val g: PointedGraph[Rdf] = (
       bnode("betehess")
         -- foaf.name ->- "Alexandre".lang("fr")
         -- foaf.title ->- "Mr"
@@ -48,7 +48,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must construct a simple GraphNode" in {
 
-    val g: GraphNode = (
+    val g: PointedGraph[Rdf] = (
       bnode("betehess")
         -- foaf.name ->- "Alexandre".lang("fr")
         -- foaf.knows ->- (
@@ -72,7 +72,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must accept triples written in the inverse order o-p-s using <--" in {
 
-    val g: GraphNode = (
+    val g: PointedGraph[Rdf] = (
       bnode("betehess")
         -- foaf.name ->- "Alexandre".lang("fr")
         -<- foaf.knows -- (
@@ -92,7 +92,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must allow easy use of rdf:type through the method 'a'" in {
 
-    val g: GraphNode = (
+    val g: PointedGraph[Rdf] = (
       bnode("betehess").a(foaf.Person)
         -- foaf.name ->- "Alexandre".lang("fr")
     )
@@ -109,7 +109,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must allow objectList definition" in {
 
-    val g: GraphNode =
+    val g: PointedGraph[Rdf] =
       bnode("betehess") -- foaf.name ->- ("Alexandre".lang("fr"), "Alexander".lang("en"))
 
     val expectedGraph =
@@ -123,7 +123,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must understand Scala's native types" in {
 
-    val g: GraphNode = (
+    val g: PointedGraph[Rdf] = (
       bnode("betehess")
         -- foaf.name ->- "Alexandre"
         -- foaf.age ->- 29
@@ -141,13 +141,13 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must support RDF collections" in {
 
-    val g: GraphNode = (
+    val g: PointedGraph[Rdf] = (
       bnode("betehess")
         -- foaf.name ->- List[Rdf#Node](29, bnode("bar"), "foo")
     )
 
 
-    val l: GraphNode = (
+    val l: PointedGraph[Rdf] = (
       bnode()
         -- rdf.first ->- 29
         -- rdf.rest ->- (
@@ -173,7 +173,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must support RDF collections (empty list)" in {
 
-    val g: GraphNode = (
+    val g: PointedGraph[Rdf] = (
       bnode("betehess") -- foaf.name ->- List[Rdf#Node]()
     )
 

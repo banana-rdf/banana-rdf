@@ -24,7 +24,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
   val foaf = FOAFPrefix(ops)
   val xsd = XSDPrefix(ops)
 
-  val betehess: GraphNode = (
+  val betehess: PointedGraph[Rdf] = (
     uri("http://bertails.org/#betehess")
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.age ->- 29
