@@ -87,8 +87,7 @@ object YourProjectBuild extends Build {
 //      n3TestSuite,
       jena,
       sesame,
-      linkedData,
-      diesel))
+      linkedData))
   
   lazy val rdf = Project(
     id = "rdf",
@@ -105,7 +104,7 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ testsuiteDeps ++ Seq(
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, diesel)
+  ) dependsOn (rdf)
 
   val simpleRdf = Project(
     id = "simple-rdf",
@@ -119,13 +118,13 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ jenaDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", diesel, dieselTestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
   lazy val sesame = Project(
     id = "sesame",
     base = file("sesame"),
     settings = buildSettings ++ sesameDeps ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", diesel, dieselTestSuite % "test")
+  ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
   lazy val n3 = Project(
     id = "n3",
@@ -145,24 +144,6 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ Seq(
       libraryDependencies += asyncHttpClient)
   ) dependsOn (rdf, sesame, jena)
-
-  lazy val diesel = Project(
-    id = "diesel",
-    base = file("diesel"),
-    settings = buildSettings ++ testDeps
-  ) dependsOn (rdf)
-
-  lazy val dieselTestSuite = Project(
-    id = "diesel-test-suite",
-    base = file("diesel-test-suite"),
-    settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (diesel)
-
-  // lazy val stardog = Project(
-  //   id = "stardog",
-  //   base = file("stardog"),
-  //   settings = buildSettings ++ testDeps
-  // ) dependsOn (rdf, sesame, rdfTestSuite % "test", diesel % "test")
 
 }
 
