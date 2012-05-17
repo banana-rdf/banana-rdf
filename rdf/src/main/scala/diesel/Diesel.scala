@@ -60,6 +60,8 @@ class Diesel[Rdf <: RDF](
     
     def asDouble: Validation[Throwable, Double] = as[Double]
 
+    def predicates: Iterable[Rdf#IRI] = getPredicates(graph, node)
+
   }
 
   class PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]) extends Iterable[PointedGraph[Rdf]] {
