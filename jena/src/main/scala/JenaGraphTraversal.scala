@@ -2,12 +2,13 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 import scala.collection.JavaConverters._
+import JenaOperations._
+import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
+import com.hp.hpl.jena.rdf.model.ResourceFactory._
+import com.hp.hpl.jena.graph.{ Node => JenaNode, _ }
+import com.hp.hpl.jena.util.iterator._
 
 object JenaGraphTraversal extends RDFGraphTraversal[Jena] {
-
-  import JenaOperations._
-  import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
-  import com.hp.hpl.jena.rdf.model.ResourceFactory._
 
   val toNodeVisitor: RDFVisitor = new RDFVisitor {
     def visitBlank(r: Resource, id: AnonId) = BNode(id.getLabelString)
@@ -29,6 +30,13 @@ object JenaGraphTraversal extends RDFGraphTraversal[Jena] {
     val it: Iterator[Jena#Node] = model.listObjectsOfProperty(subjectResource, createProperty(p)).asScala map toNode
     new Iterable[Jena#Node] {
       def iterator = it
+    }
+  }
+
+  def getPredicates(graph: Jena#Graph, subject: Jena#Node): Iterable[Jena#IRI] = {
+    val triples: Iterator[Jena#IRI] = graph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala map { triple => triple.getPredicate().asInstanceOf[Node_URI]}
+    new Iterable[Jena#IRI] {
+      def iterator = triples
     }
   }
 

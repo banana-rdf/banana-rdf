@@ -60,5 +60,11 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   }
 
+  "betehess should have three predicates: foaf:name foaf:age foaf:knows" in {
+
+    val predicates = betehess.predicates.toList
+    List(foaf.name, foaf.age, foaf.knows) foreach { p => predicates must contain (p) }
+
+  }
 
 }

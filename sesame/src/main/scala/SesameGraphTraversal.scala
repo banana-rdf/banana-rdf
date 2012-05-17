@@ -20,7 +20,19 @@ object SesameGraphTraversal extends RDFGraphTraversal[Sesame] {
       bnode => iterable(bnode),
       lit => Seq.empty
     )
+  }
 
+  def getPredicates(graph: Sesame#Graph, subject: Sesame#Node): Iterable[Sesame#IRI] = {
+
+    def iterable(subject: org.openrdf.model.Resource) = new Iterable[Sesame#IRI] {
+      def iterator = graph.`match`(subject, null, null).asScala map { statement => statement.getPredicate() }
+    }
+
+    Node.fold(subject)(
+      iri => iterable(iri),
+      bnode => iterable(bnode),
+      lit => Seq.empty
+    )
   }
 
 }
