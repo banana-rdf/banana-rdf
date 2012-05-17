@@ -7,7 +7,7 @@ class JenaAsyncQueryOnStoreTest() extends AsyncSparqlQueryOnStoreTest(
   JenaOperations,
   JenaDiesel,
   JenaGraphIsomorphism,
-  JenaQueryBuilder,
+  JenaSPARQLOperations,
   DatasetGraphFactory.createMem(),
   (u: DatasetGraph) => JenaStore(u),
-  (u: DatasetGraph) => JenaStoreQuery(u))
+  (u: DatasetGraph) => JenaStore(u))

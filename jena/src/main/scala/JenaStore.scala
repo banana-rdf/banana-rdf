@@ -2,9 +2,11 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-case class JenaStore(store: Jena#Store) extends RDFStore[Jena] {
+case class JenaStore(store: Jena#Store) extends RDFStore[Jena] with JenaStoreQuery {
 
   import JenaOperations._
+
+  /* RDFStore */
 
   def addNamedGraph(uri: Jena#IRI, graph: Jena#Graph): Jena#Store = {
     store.removeGraph(uri)

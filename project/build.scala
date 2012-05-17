@@ -23,9 +23,8 @@ object BuildSettings {
 	key(":doubleIndentClassDeclaration"), true
       )
     ),
-    publishTo := Some(Resolver.ssh("bblfish repository", "bblfish.net", "/home/hjs/htdocs/work/repo/snapshots") as
-      ("hjs",new File("/Users/hjs/.ssh/id_dsa")))
-
+    licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
+    homepage := Some(url("https://github.com/w3c/banana-rdf"))
   )
 
 }
@@ -94,7 +93,29 @@ object YourProjectBuild extends Build {
     base = file("rdf"),
     settings = buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
-      libraryDependencies += scalaz
+      libraryDependencies += scalaz,
+      publishMavenStyle := true,
+      publishTo <<= version { (v: String) =>
+        val nexus = "https://oss.sonatype.org/"
+        if (v.trim.endsWith("SNAPSHOT")) 
+          Some("snapshots" at nexus + "content/repositories/snapshots") 
+        else
+          Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      },
+      publishArtifact in Test := false,
+      pomIncludeRepository := { _ => false },
+      pomExtra := (
+        <scm>
+          <url>git@github.com:w3c/banana-rdf.git</url>
+          <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
+        </scm>
+        <developers>
+          <developer>
+            <id>betehess</id>
+            <name>Alexandre Bertails</name>
+            <url>http://bertails.org</url>
+          </developer>
+        </developers>)
     )
   )
 

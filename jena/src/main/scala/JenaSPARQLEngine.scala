@@ -7,9 +7,9 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import scala.collection.JavaConverters._
 
-case class JenaGraphQuery(graph: JenaGraph) extends RDFQuery[Jena, JenaSPARQL] {
+case class JenaSPARQLEngine(graph: JenaGraph) extends SPARQLEngine[Jena, JenaSPARQL] {
 
-  def executeSelectQuery(query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
+  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
     val model: Model = ModelFactory.createModelForGraph(graph)
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
@@ -23,14 +23,14 @@ case class JenaGraphQuery(graph: JenaGraph) extends RDFQuery[Jena, JenaSPARQL] {
     JenaGraphTraversal.toNode(node)
   }
 
-  def executeConstructQuery(query: JenaSPARQL#ConstructQuery): JenaGraph = {
+  def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = {
     val model: Model = ModelFactory.createModelForGraph(graph)
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     val result = qexec.execConstruct()
     result.getGraph()
   }
   
-  def executeAskQuery(query: JenaSPARQL#AskQuery): Boolean = {
+  def executeAsk(query: JenaSPARQL#AskQuery): Boolean = {
     val model: Model = ModelFactory.createModelForGraph(graph)
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     val result = qexec.execAsk()

@@ -7,21 +7,21 @@ abstract class SparqlTest[Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf],
-  queryBuilder: SPARQLQueryBuilder[Rdf, Sparql],
-  queryEngineFunc: Rdf#Graph => RDFQuery[Rdf, Sparql]
+  sparqlOperations: SPARQLOperations[Rdf, Sparql],
+  engineFunc: Rdf#Graph => SPARQLEngine[Rdf, Sparql]
 ) extends WordSpec with MustMatchers {
 
   val projections = RDFNodeProjections(ops)
 
   import ops._
   import iso._
-  import queryBuilder._
+  import sparqlOperations._
 
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(file, "http://foo.com") getOrElse sys.error("ouch")
 
-  val queryEngine = queryEngineFunc(graph)
+  val engine = engineFunc(graph)
 
   "new-tr.rdf must have Alexandre Bertails as an editor" in {
 
@@ -36,7 +36,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = queryEngine.executeSelectQuery(query) map { row => projections.asString(queryEngine.getNode(row, "name")) getOrElse sys.error("") }
+    val names: Iterable[String] = engine.executeSelect(query) map { row => projections.asString(getNode(row, "name")) getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
 
@@ -54,7 +54,7 @@ CONSTRUCT {
 }
 """)
 
-    val clonedGraph = queryEngine.executeConstructQuery(query)
+    val clonedGraph = engine.executeConstruct(query)
 
     assert(clonedGraph isIsomorphicWith graph)
 
@@ -74,7 +74,7 @@ ASK {
 }
 """)
 
-    val alexIsThere = queryEngine.executeAskQuery(query)
+    val alexIsThere = engine.executeAsk(query)
 
     alexIsThere must be (true)
 

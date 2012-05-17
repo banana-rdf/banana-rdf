@@ -9,7 +9,7 @@ import org.openrdf.query._
 import org.openrdf.rio.RDFHandler
 import SesameUtil.withConnection
 
-case class SesameStore(store: Sesame#Store) extends RDFStore[Sesame] {
+case class SesameStore(store: Sesame#Store) extends RDFStore[Sesame] with SesameStoreQuery {
 
   def addNamedGraph(uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>

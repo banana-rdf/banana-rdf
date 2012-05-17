@@ -10,22 +10,22 @@ abstract class AsyncSparqlQueryOnStoreTest[Store, Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
   iso: GraphIsomorphism[Rdf],
-  queryBuilder: SPARQLQueryBuilder[Rdf, Sparql],
+  sparqlOps: SPARQLOperations[Rdf, Sparql],
   underlyingStore: Store,
   storeFunc: Store => RDFStore[Rdf],
-  queryEngineFunc: Store => RDFQuery[Rdf, Sparql]
+  engineFunc: Store => SPARQLEngine[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import iso._
   import ops._
   import dsl._
-  import queryBuilder._
+  import sparqlOps._
 
   val system = ActorSystem("jena-asynsparqlquery-test", AsyncRDFStore.DEFAULT_CONFIG)
   implicit val timeout = Timeout(1000)
   val store = storeFunc(underlyingStore)
 
-  val queryEngine = AsyncRDFQuery(queryEngineFunc(underlyingStore), system)
+  val asyncEngine = AsyncSPARQLEngine(engineFunc(underlyingStore), system)
 
   val foaf = FOAFPrefix(ops)
 
@@ -67,7 +67,7 @@ ASK {
 """)
 
     for {
-      alexKnowsHenry <- queryEngine.executeAskQuery(query)
+      alexKnowsHenry <- asyncEngine.executeAsk(query)
     } {
       alexKnowsHenry must be (true)
     }
