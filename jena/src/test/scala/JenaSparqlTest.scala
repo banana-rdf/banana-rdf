@@ -7,5 +7,5 @@ class JenaSparqlTest() extends SparqlTest[Jena, JenaSPARQL](
   JenaOperations,
   JenaRDFXMLReader,
   JenaGraphIsomorphism,
-  JenaQueryBuilder,
-  graph => JenaGraphQuery(graph))
+  JenaSPARQLOperations,
+  graph => JenaSPARQLEngine(graph))

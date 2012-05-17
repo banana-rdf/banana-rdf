@@ -9,9 +9,11 @@ import scala.collection.JavaConverters._
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 
-case class JenaStoreQuery(store: DatasetGraph) extends RDFQuery[Jena, JenaSPARQL] {
+trait JenaStoreQuery extends SPARQLEngine[Jena, JenaSPARQL] {
 
-  def executeSelectQuery(query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
+  def store: DatasetGraph
+
+  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
     val dataset = new GraphStoreBasic(store).toDataset
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
@@ -20,19 +22,14 @@ case class JenaStoreQuery(store: DatasetGraph) extends RDFQuery[Jena, JenaSPARQL
     }
   }
 
-  def getNode(row: JenaSPARQL#Row, v: String): JenaNode = {
-    val node: RDFNode = row.get(v)
-    JenaGraphTraversal.toNode(node)
-  }
-
-  def executeConstructQuery(query: JenaSPARQL#ConstructQuery): JenaGraph = {
+  def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = {
     val dataset = new GraphStoreBasic(store).toDataset
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val result = qexec.execConstruct()
     result.getGraph()
   }
-  
-  def executeAskQuery(query: JenaSPARQL#AskQuery): Boolean = {
+
+  def executeAsk(query: JenaSPARQL#AskQuery): Boolean = {
     val dataset = new GraphStoreBasic(store).toDataset
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val result = qexec.execAsk()

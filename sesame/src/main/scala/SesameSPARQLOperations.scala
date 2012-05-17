@@ -2,7 +2,9 @@ package org.w3.banana.sesame
 
 import org.w3.banana._
 
-object SesameQueryBuilder extends SPARQLQueryBuilder[Sesame, SesameSPARQL] {
+object SesameSPARQLOperations extends SPARQLOperations[Sesame, SesameSPARQL] {
+
+  def getNode(row: SesameSPARQL#Row, v: String): Sesame#Node = row.getValue(v)
 
   def SelectQuery(query: String): SesameSPARQL#SelectQuery = query
     

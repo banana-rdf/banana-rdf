@@ -1,6 +1,8 @@
 package org.w3.banana
 
-trait SPARQLQueryBuilder[Rdf <: RDF, Sparql <: SPARQL] {
+trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
+
+  def getNode(row: Sparql#Row, v: String): Rdf#Node
 
   def SelectQuery(query: String): Sparql#SelectQuery
 

@@ -8,19 +8,19 @@ abstract class SparqlQueryOnStoreTest[Store, Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
   iso: GraphIsomorphism[Rdf],
-  queryBuilder: SPARQLQueryBuilder[Rdf, Sparql],
+  sparqlOps: SPARQLOperations[Rdf, Sparql],
   underlyingStore: Store,
   storeFunc: Store => RDFStore[Rdf],
-  queryEngineFunc: Store => RDFQuery[Rdf, Sparql]
+  engineFunc: Store => SPARQLEngine[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import iso._
   import ops._
   import dsl._
-  import queryBuilder._
+  import sparqlOps._
 
   val store = storeFunc(underlyingStore)
-  val queryEngine = queryEngineFunc(underlyingStore)
+  val engine = engineFunc(underlyingStore)
 
   val foaf = FOAFPrefix(ops)
 
@@ -57,7 +57,7 @@ ASK {
 }
 """)
 
-    val alexKnowsHenry = queryEngine.executeAskQuery(query)
+    val alexKnowsHenry = engine.executeAsk(query)
 
     alexKnowsHenry must be (true)
 

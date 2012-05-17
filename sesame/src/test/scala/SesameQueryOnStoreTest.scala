@@ -9,11 +9,11 @@ class SesameQueryOnStoreTest() extends SparqlQueryOnStoreTest(
   SesameOperations,
   SesameDiesel,
   SesameGraphIsomorphism,
-  SesameQueryBuilder,
+  SesameSPARQLOperations,
   {
     val repo = new SailRepository(new MemoryStore)
     repo.initialize()
     repo
   },
   (u: Repository) => SesameStore(u),
-  (u: Repository) => SesameStoreQuery(u))
+  (u: Repository) => SesameStore(u))
