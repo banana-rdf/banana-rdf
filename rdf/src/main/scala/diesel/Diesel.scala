@@ -19,7 +19,8 @@ class Diesel[Rdf <: RDF](
   import union._
   import graphTraversal._
 
-  val projections = RDFNodeProjections(ops)
+  val commonLiteralBinders = CommonLiteralBinders(ops)
+  import commonLiteralBinders._
 
   val rdf = RDFPrefix(ops)
 
@@ -41,11 +42,23 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(nodes, graph)
     }
 
-    def asString: Validation[Throwable, String] = projections.asString(node)
+    def as[T](implicit binder: LiteralBinder[Rdf, T]): Validation[Throwable, T] = {
+      val literalV = fromTryCatch {
+        Node.fold(node)(
+          iri => sys.error("asLiteral: " + node.toString + " is not a literal"),
+          bnode => sys.error("asLiteral: " + node.toString + " is not a literal"),
+          literal => literal
+        )
+      }
+      literalV flatMap { literal => binder.fromLiteral(literal) }
+    }
+      
+
+    def asString: Validation[Throwable, String] = as[String]
     
-    def asInt: Validation[Throwable, Int] = projections.asInt(node)
+    def asInt: Validation[Throwable, Int] = as[Int]
     
-    def asDouble: Validation[Throwable, Double] = projections.asDouble(node)
+    def asDouble: Validation[Throwable, Double] = as[Double]
 
   }
 
