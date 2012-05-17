@@ -17,10 +17,11 @@ trait AsyncEntityStore[Rdf <: RDF, T] {
 object AsyncEntityStore {
 
   def apply[Rdf <: RDF, T](
+    ops: RDFOperations[Rdf],
     store: RDFStore[Rdf],
-    binder: EntityGraphBinder[Rdf, T]): AsyncEntityStore[Rdf, T] = {
+    binder: PointedGraphBinder[Rdf, T]): AsyncEntityStore[Rdf, T] = {
 
-    val entityStore = EntityStore(store, binder)
+    val entityStore = EntityStore(ops, store, binder)
 
     new AsyncEntityStore[Rdf, T] {
       
