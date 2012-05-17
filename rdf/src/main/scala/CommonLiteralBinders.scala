@@ -30,7 +30,7 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
       )
     }
 
-    def toLiteral(t: String): Rdf#Literal = null
+    def toLiteral(t: String): Rdf#Literal = TypedLiteral(t, xsd.string)
 
   }
 
@@ -50,7 +50,7 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
       )
     }
 
-    def toLiteral(t: Int): Rdf#Literal = null
+    def toLiteral(t: Int): Rdf#Literal = TypedLiteral(t.toString, xsd.int)
 
   }
 
@@ -69,7 +69,7 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
       )
     }
 
-    def toLiteral(t: Double): Rdf#Literal = null
+    def toLiteral(t: Double): Rdf#Literal = TypedLiteral(t.toString, xsd.double)
 
   }
 
