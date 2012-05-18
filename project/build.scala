@@ -11,6 +11,7 @@ object BuildSettings {
     organization := "org.w3",
     version      := "0.1-SNAPSHOT",
     scalaVersion := "2.9.1",
+    crossScalaVersions := Seq("2.9.1", "2.9.2"),
 
     parallelExecution in Test := false,
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
@@ -24,7 +25,29 @@ object BuildSettings {
       )
     ),
     licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
-    homepage := Some(url("https://github.com/w3c/banana-rdf"))
+    homepage := Some(url("https://github.com/w3c/banana-rdf")),
+    publishTo <<= version { (v: String) =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT")) 
+        Some("snapshots" at nexus + "content/repositories/snapshots") 
+      else
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    },
+    publishArtifact in Test := false,
+    pomIncludeRepository := { _ => false },
+    pomExtra := (
+      <scm>
+        <url>git@github.com:w3c/banana-rdf.git</url>
+        <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
+      </scm>
+      <developers>
+        <developer>
+          <id>betehess</id>
+          <name>Alexandre Bertails</name>
+          <url>http://bertails.org</url>
+        </developer>
+      </developers>
+    )
   )
 
 }
@@ -74,8 +97,8 @@ object YourProjectBuild extends Build {
   val n3Deps =
     Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
   
-  lazy val bananaRdf = Project(
-    id = "banana-rdf",
+  lazy val banana = Project(
+    id = "banana",
     base = file("."),
     settings = buildSettings ++ Seq(EclipseKeys.skipParents in ThisBuild := false),
     aggregate = Seq(
@@ -89,38 +112,17 @@ object YourProjectBuild extends Build {
       linkedData))
   
   lazy val rdf = Project(
-    id = "rdf",
+    id = "banana-rdf",
     base = file("rdf"),
     settings = buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += scalaz,
-      publishMavenStyle := true,
-      publishTo <<= version { (v: String) =>
-        val nexus = "https://oss.sonatype.org/"
-        if (v.trim.endsWith("SNAPSHOT")) 
-          Some("snapshots" at nexus + "content/repositories/snapshots") 
-        else
-          Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-      },
-      publishArtifact in Test := false,
-      pomIncludeRepository := { _ => false },
-      pomExtra := (
-        <scm>
-          <url>git@github.com:w3c/banana-rdf.git</url>
-          <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
-        </scm>
-        <developers>
-          <developer>
-            <id>betehess</id>
-            <name>Alexandre Bertails</name>
-            <url>http://bertails.org</url>
-          </developer>
-        </developers>)
+      publishMavenStyle := true
     )
   )
 
   lazy val rdfTestSuite = Project(
-    id = "rdf-test-suite",
+    id = "banana-rdf-test-suite",
     base = file("rdf-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ Seq(
       libraryDependencies += akka
@@ -128,13 +130,13 @@ object YourProjectBuild extends Build {
   ) dependsOn (rdf)
 
   val simpleRdf = Project(
-    id = "simple-rdf",
+    id = "banana-simple-rdf",
     base = file("simple-rdf"),
     settings = buildSettings ++ testDeps
   ) dependsOn (rdf, n3, rdfTestSuite % "test", jena % "test")
   
   lazy val jena = Project(
-    id = "jena",
+    id = "banana-jena",
     base = file("jena"),
     settings = buildSettings ++ jenaDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
@@ -142,25 +144,25 @@ object YourProjectBuild extends Build {
   ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
   lazy val sesame = Project(
-    id = "sesame",
+    id = "banana-sesame",
     base = file("sesame"),
     settings = buildSettings ++ sesameDeps ++ testDeps
   ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
   lazy val n3 = Project(
-    id = "n3",
+    id = "banana-n3",
     base = file("n3"),
     settings = buildSettings ++ jenaDeps ++ n3Deps
   ) dependsOn (rdf)
   
   lazy val n3TestSuite = Project(
-    id = "n3-test-suite",
+    id = "banana-n3-test-suite",
     base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps
   ) dependsOn (n3, jena % "test", sesame % "test", simpleRdf % "test")
 
   lazy val linkedData = Project(
-    id = "linked-data",
+    id = "banana-linked-data",
     base = file("linked-data"),
     settings = buildSettings ++ Seq(
       libraryDependencies += asyncHttpClient)
