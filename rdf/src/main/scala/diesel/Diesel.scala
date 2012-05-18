@@ -26,28 +26,28 @@ class Diesel[Rdf <: RDF](
 
   class NodeW(node: Rdf#Node) {
 
-    def as[T](implicit binder: LiteralBinder[Rdf, T]): Validation[Throwable, T] = {
-      val literalV = fromTryCatch {
+    def as[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, T] = {
+      val literalV = {
         Node.fold(node)(
-          iri => sys.error("asLiteral: " + node.toString + " is not a literal"),
-          bnode => sys.error("asLiteral: " + node.toString + " is not a literal"),
-          literal => literal
+          iri => Failure(FailedConversion("asLiteral: " + node.toString + " is not a literal")),
+          bnode => Failure(FailedConversion("asLiteral: " + node.toString + " is not a literal")),
+          literal => Success(literal)
         )
       }
       literalV flatMap { literal => binder.fromLiteral(literal) }
     }
       
-    def asString: Validation[Throwable, String] = as[String]
+    def asString: Validation[BananaException, String] = as[String]
     
-    def asInt: Validation[Throwable, Int] = as[Int]
+    def asInt: Validation[BananaException, Int] = as[Int]
     
-    def asDouble: Validation[Throwable, Double] = as[Double]
+    def asDouble: Validation[BananaException, Double] = as[Double]
 
-    def asURI: Validation[Throwable, Rdf#IRI] = fromTryCatch {
+    def asURI: Validation[BananaException, Rdf#IRI] = {
       Node.fold(node)(
-        iri => iri,
-        bnode => sys.error("asUri: " + node.toString + " is not a URI"),
-        literal => sys.error("asUri: " + node.toString + " is not a URI")
+        iri => Success(iri),
+        bnode => Failure(FailedConversion("asUri: " + node.toString + " is not a URI")),
+        literal => Failure(FailedConversion("asUri: " + node.toString + " is not a URI"))
       )
     }
 
@@ -88,15 +88,21 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(ns, graph)
     }
 
-    def takeOne: Validation[Throwable, Rdf#Node] = fromTryCatch { this.head.node }
+    def takeOne: Validation[BananaException, Rdf#Node] = {
+      val first = nodes.iterator.next
+      if (first == null)
+        Failure(WrongExpectation("not even one node"))
+      else
+        Success(first)
+    }
 
-    def exactlyOne: Validation[Throwable, Rdf#Node] = {
+    def exactlyOne: Validation[BananaException, Rdf#Node] = {
       val it = nodes.iterator
       val first = it.next
       if (first == null)
-        Failure(new Exception("exactlyOne: not even one node"))
+        Failure(WrongExpectation("expected exactly one node but got 0"))
       else if (it.hasNext)
-        Failure(new Exception("exactlyOne: more that one node"))
+        Failure(WrongExpectation("expected exactly one node but got more than 1"))
       else
         Success(first)
     }

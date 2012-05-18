@@ -17,16 +17,16 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
 
   implicit val StringBinder: LiteralBinder[Rdf, String] = new LiteralBinder[Rdf, String] {
 
-    def fromLiteral(literal: Rdf#Literal): Validation[Throwable, String] = fromTryCatch {
+    def fromLiteral(literal: Rdf#Literal): Validation[BananaException, String] = {
       Literal.fold(literal)(
         {
           case TypedLiteral(lexicalForm, datatype) =>
             if (datatype == xsd.string)
-              lexicalForm
+              Success(lexicalForm)
             else
-              sys.error("asString: " + lexicalForm + " has datatype " + datatype)
+              Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
         },
-        langLiteral => sys.error("asString: " + langLiteral + " is a langLiteral, you want to access its lexical form")
+        langLiteral => Failure(FailedConversion(langLiteral + " is a langLiteral, you want to access its lexical form"))
       )
     }
 
@@ -37,16 +37,16 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
 
   implicit val IntBinder: LiteralBinder[Rdf, Int] = new LiteralBinder[Rdf, Int] {
 
-    def fromLiteral(literal: Rdf#Literal): Validation[Throwable, Int] = fromTryCatch {
+    def fromLiteral(literal: Rdf#Literal): Validation[BananaException, Int] = {
       Literal.fold(literal)(
         {
           case TypedLiteral(lexicalForm, datatype) =>
             if (datatype == xsd.integer)
-              lexicalForm.toInt
+              Success(lexicalForm.toInt)
             else
-              sys.error("asInt: " + lexicalForm + " may be convertible to an Integer but has following datatype: " + datatype)
+              Failure(FailedConversion(lexicalForm + " may be convertible to an Integer but has following datatype: " + datatype))
         },
-        langLiteral => sys.error("asInt: " + langLiteral + " is a langLiteral")
+        langLiteral => Failure(FailedConversion(langLiteral + " is a langLiteral"))
       )
     }
 
@@ -56,16 +56,16 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
 
   implicit val DoubleBinder: LiteralBinder[Rdf, Double] = new LiteralBinder[Rdf, Double] {
 
-    def fromLiteral(literal: Rdf#Literal): Validation[Throwable, Double] = fromTryCatch {
+    def fromLiteral(literal: Rdf#Literal): Validation[BananaException, Double] = {
       Literal.fold(literal)(
         {
           case TypedLiteral(lexicalForm, datatype) =>
             if (datatype == xsd.double)
-              lexicalForm.toDouble
+              Success(lexicalForm.toDouble)
             else
-              sys.error("asDouble: " + lexicalForm + " may be convertible to an Double but has following datatype: " + datatype)
+              Failure(FailedConversion(lexicalForm + " may be convertible to an Double but has following datatype: " + datatype))
         },
-        langLiteral => sys.error("asDouble: " + langLiteral + " is a langLiteral")
+        langLiteral => Failure(FailedConversion(langLiteral + " is a langLiteral"))
       )
     }
 
