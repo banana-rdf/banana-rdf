@@ -63,7 +63,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   }
 
   def goto(iri: Rdf#IRI): LD[Rdf#IRI] = {
-    val supportDoc = iri.supportDocument
+    val supportDoc = supportDocument(iri)
     if (!kb.isDefinedAt(supportDoc)) {
       val IRI(iri) = supportDoc
       val futureGraph: FutureValidation[LDError, Rdf#Graph] = delayedValidation {
@@ -109,8 +109,8 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     def followIRI(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]] = new LD(
       for {
         subject ← underlying map ev
-        supportDocument = subject.supportDocument
-        graph ← kb.get(supportDocument) getOrElse sys.error("something is really wrong")
+        supportDoc = supportDocument(subject)
+        graph ← kb.get(supportDoc) getOrElse sys.error("something is really wrong")
       } yield {
         val objects = getObjects(graph, subject, predicate)
         objects

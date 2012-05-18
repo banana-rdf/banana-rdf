@@ -24,6 +24,35 @@ class Diesel[Rdf <: RDF](
 
   val rdf = RDFPrefix(ops)
 
+  class NodeW(node: Rdf#Node) {
+
+    def as[T](implicit binder: LiteralBinder[Rdf, T]): Validation[Throwable, T] = {
+      val literalV = fromTryCatch {
+        Node.fold(node)(
+          iri => sys.error("asLiteral: " + node.toString + " is not a literal"),
+          bnode => sys.error("asLiteral: " + node.toString + " is not a literal"),
+          literal => literal
+        )
+      }
+      literalV flatMap { literal => binder.fromLiteral(literal) }
+    }
+      
+    def asString: Validation[Throwable, String] = as[String]
+    
+    def asInt: Validation[Throwable, Int] = as[Int]
+    
+    def asDouble: Validation[Throwable, Double] = as[Double]
+
+    def asURI: Validation[Throwable, Rdf#IRI] = fromTryCatch {
+      Node.fold(node)(
+        iri => iri,
+        bnode => sys.error("asUri: " + node.toString + " is not a URI"),
+        literal => sys.error("asUri: " + node.toString + " is not a URI")
+      )
+    }
+
+  }
+
   class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
     import pointed.{ node => _node , graph }
@@ -42,35 +71,9 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(nodes, graph)
     }
 
-    def as[T](implicit binder: LiteralBinder[Rdf, T]): Validation[Throwable, T] = {
-      val literalV = fromTryCatch {
-        Node.fold(node)(
-          iri => sys.error("asLiteral: " + node.toString + " is not a literal"),
-          bnode => sys.error("asLiteral: " + node.toString + " is not a literal"),
-          literal => literal
-        )
-      }
-      literalV flatMap { literal => binder.fromLiteral(literal) }
-    }
-      
-
-    def asString: Validation[Throwable, String] = as[String]
-    
-    def asInt: Validation[Throwable, Int] = as[Int]
-    
-    def asDouble: Validation[Throwable, Double] = as[Double]
-
-    def predicates: Iterable[Rdf#IRI] = getPredicates(graph, node)
-
     def node: Rdf#Node = _node
 
-    def asURI: Validation[Throwable, Rdf#IRI] = fromTryCatch {
-      Node.fold(node)(
-        iri => iri,
-        bnode => sys.error("asUri: " + node.toString + " is not a URI"),
-        literal => sys.error("asUri: " + node.toString + " is not a URI")
-      )
-    }
+    def predicates = getPredicates(graph, node)
 
   }
 
@@ -85,16 +88,19 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(ns, graph)
     }
 
-    def node: Validation[Throwable, Rdf#Node] = fromTryCatch { this.head.node }
-    
-    def asString: Validation[Throwable, String] = fromTryCatch { this.head.node } flatMap { _.asString }
-    
-    def asInt: Validation[Throwable, Int] = fromTryCatch { this.head.node } flatMap { _.asInt }
-    
-    def asDouble: Validation[Throwable, Double] = fromTryCatch { this.head.node } flatMap { _.asDouble }
+    def takeOne: Validation[Throwable, Rdf#Node] = fromTryCatch { this.head.node }
 
-    def asURI: Validation[Throwable, Rdf#IRI] = fromTryCatch { this.head.node } flatMap { _.asURI }
-
+    def exactlyOne: Validation[Throwable, Rdf#Node] = {
+      val it = nodes.iterator
+      val first = it.next
+      if (first == null)
+        Failure(new Exception("exactlyOne: not even one node"))
+      else if (it.hasNext)
+        Failure(new Exception("exactlyOne: more that one node"))
+      else
+        Success(first)
+    }
+    
   }
 
   class PointedGraphPredicate(pointed: PointedGraph[Rdf], p: Rdf#IRI) {
@@ -152,6 +158,8 @@ class Diesel[Rdf <: RDF](
     }
 
   }
+
+  implicit def node2NodeW(node: Rdf#Node): NodeW = new NodeW(node)
 
   implicit def node2PointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(new PointedGraph[Rdf](node, Graph.empty))
 
