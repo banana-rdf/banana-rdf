@@ -68,6 +68,15 @@ trait RDFOperations[Rdf <: RDF] {
 
   // pimps
   
+  class IRIW(iri: Rdf#IRI) {
+    def asString: String = {
+      val IRI(stringIRI) = iri
+      stringIRI
+    }
+  }
+
+  implicit def wrapIRI(iri: Rdf#IRI): IRIW = new IRIW(iri)
+
   class GraphW(graph: Rdf#Graph) {
     def toIterable: Iterable[Rdf#Triple] = Graph.toIterable(graph)
   }

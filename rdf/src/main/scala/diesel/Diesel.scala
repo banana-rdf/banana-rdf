@@ -26,7 +26,7 @@ class Diesel[Rdf <: RDF](
 
   class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
-    import pointed.{ node, graph }
+    import pointed.{ node => _node , graph }
 
     def a(clazz: Rdf#IRI): PointedGraph[Rdf] = {
       val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
@@ -62,6 +62,16 @@ class Diesel[Rdf <: RDF](
 
     def predicates: Iterable[Rdf#IRI] = getPredicates(graph, node)
 
+    def node: Rdf#Node = _node
+
+    def asURI: Validation[Throwable, Rdf#IRI] = fromTryCatch {
+      Node.fold(node)(
+        iri => iri,
+        bnode => sys.error("asUri: " + node.toString + " is not a URI"),
+        literal => sys.error("asUri: " + node.toString + " is not a URI")
+      )
+    }
+
   }
 
   class PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]) extends Iterable[PointedGraph[Rdf]] {
@@ -83,6 +93,7 @@ class Diesel[Rdf <: RDF](
     
     def asDouble: Validation[Throwable, Double] = fromTryCatch { this.head.node } flatMap { _.asDouble }
 
+    def asURI: Validation[Throwable, Rdf#IRI] = fromTryCatch { this.head.node } flatMap { _.asURI }
 
   }
 
