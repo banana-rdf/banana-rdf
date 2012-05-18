@@ -13,45 +13,13 @@ object Diesel {
 class Diesel[Rdf <: RDF](
   ops: RDFOperations[Rdf],
   union: GraphUnion[Rdf],
-  graphTraversal: RDFGraphTraversal[Rdf]) {
+  graphTraversal: RDFGraphTraversal[Rdf]) extends RDFNodeProjections[Rdf](ops) {
 
   import ops._
   import union._
   import graphTraversal._
 
-  val commonLiteralBinders = CommonLiteralBinders(ops)
-  import commonLiteralBinders._
-
   val rdf = RDFPrefix(ops)
-
-  class NodeW(node: Rdf#Node) {
-
-    def as[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, T] = {
-      val literalV = {
-        Node.fold(node)(
-          iri => Failure(FailedConversion("asLiteral: " + node.toString + " is not a literal")),
-          bnode => Failure(FailedConversion("asLiteral: " + node.toString + " is not a literal")),
-          literal => Success(literal)
-        )
-      }
-      literalV flatMap { literal => binder.fromLiteral(literal) }
-    }
-      
-    def asString: Validation[BananaException, String] = as[String]
-    
-    def asInt: Validation[BananaException, Int] = as[Int]
-    
-    def asDouble: Validation[BananaException, Double] = as[Double]
-
-    def asURI: Validation[BananaException, Rdf#IRI] = {
-      Node.fold(node)(
-        iri => Success(iri),
-        bnode => Failure(FailedConversion("asUri: " + node.toString + " is not a URI")),
-        literal => Failure(FailedConversion("asUri: " + node.toString + " is not a URI"))
-      )
-    }
-
-  }
 
   class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
@@ -164,8 +132,6 @@ class Diesel[Rdf <: RDF](
     }
 
   }
-
-  implicit def node2NodeW(node: Rdf#Node): NodeW = new NodeW(node)
 
   implicit def node2PointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(new PointedGraph[Rdf](node, Graph.empty))
 
