@@ -1,7 +1,7 @@
 package org.w3.banana
 
 /**
- * to execute SPARQL queries against a Dataset
+ * to execute SPARQL queries
  */
 trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
 

@@ -7,7 +7,7 @@ import org.openrdf.repository._
 import SesameUtil.{ withConnection, toIterable }
 import org.openrdf.query.QueryLanguage
 
-trait SesameStoreQuery extends SPARQLEngine[Sesame, SesameSPARQL] {
+trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
 
   def store: Repository
   

@@ -19,37 +19,37 @@ trait AsyncSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
 
 }
 
-class AsyncSPARQLEngineBuilder[Rdf <: RDF, Sparql <: SPARQL](
-  engine: SPARQLEngine[Rdf, Sparql],
-  factory: ActorRefFactory)(
-  implicit timeout: Timeout)
-extends AsyncSPARQLEngine[Rdf, Sparql] {
+trait AsyncSPARQLEngineBase[Rdf <: RDF, Sparql <: SPARQL] extends AsyncSPARQLEngine[Rdf, Sparql] {
+
+  def sparqlEngine: SPARQLEngine[Rdf, Sparql]
+  def factory: ActorRefFactory
+  implicit def futuresTimeout: Timeout
 
   case class Select(query: Sparql#SelectQuery)
   case class Construct(query: Sparql#ConstructQuery)
   case class Ask(query: Sparql#AskQuery)
 
-  class EngineActor(engine: SPARQLEngine[Rdf, Sparql]) extends Actor {
+  class EngineActor(sparqlEngine: SPARQLEngine[Rdf, Sparql]) extends Actor {
 
     def receive = {
       case Select(query) => {
-        val rows = engine.executeSelect(query)
+        val rows = sparqlEngine.executeSelect(query)
         sender ! rows
       }
       case Construct(query) => {
-        val graph = engine.executeConstruct(query)
+        val graph = sparqlEngine.executeConstruct(query)
         sender ! graph
       }
       case Ask(query) => {
-        val b = engine.executeAsk(query)
+        val b = sparqlEngine.executeAsk(query)
         sender ! b
       }
     }
   }
 
-  val engineActor =
+  lazy val engineActor =
     factory.actorOf(
-      Props(new EngineActor(engine))
+      Props(new EngineActor(sparqlEngine))
         .withRouter(FromConfig())
         .withDispatcher("rdfstore-dispatcher"),
       "rdfstore")
@@ -71,6 +71,10 @@ object AsyncSPARQLEngine {
     engine: SPARQLEngine[Rdf, Sparql],
     system: ActorSystem)(
     implicit timeout: Timeout): AsyncSPARQLEngine[Rdf, Sparql] =
-      new AsyncSPARQLEngineBuilder(engine, system)
+      new AsyncSPARQLEngineBase[Rdf, Sparql] {
+        val sparqlEngine = engine
+        val factory = system
+        implicit val futuresTimeout = timeout
+      }
 
 }

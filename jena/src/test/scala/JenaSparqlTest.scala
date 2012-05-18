@@ -8,4 +8,4 @@ class JenaSparqlTest() extends SparqlTest[Jena, JenaSPARQL](
   JenaRDFXMLReader,
   JenaGraphIsomorphism,
   JenaSPARQLOperations,
-  graph => JenaSPARQLEngine(graph))
+  graph => JenaGraphQuery(graph))

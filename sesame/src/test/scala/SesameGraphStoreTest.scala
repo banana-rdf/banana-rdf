@@ -5,7 +5,7 @@ import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.repository.Repository
 import org.openrdf.repository.sail.SailRepository
 
-class SesameStoreTest() extends StoreTest[Sesame](
+class SesameGraphStoreTest() extends GraphStoreTest[Sesame](
   SesameOperations,
   SesameDiesel,
   SesameGraphUnion,

@@ -3,29 +3,19 @@ package org.w3.banana
 import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers._
-import akka.actor.ActorSystem
-import akka.util.Timeout
 
-abstract class AsyncSparqlQueryOnStoreTest[Store, Rdf <: RDF, Sparql <: SPARQL](
+abstract class SparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
   iso: GraphIsomorphism[Rdf],
   sparqlOps: SPARQLOperations[Rdf, Sparql],
-  underlyingStore: Store,
-  storeFunc: Store => RDFStore[Rdf],
-  engineFunc: Store => SPARQLEngine[Rdf, Sparql]
+  store: RDFStore[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import iso._
   import ops._
   import dsl._
   import sparqlOps._
-
-  val system = ActorSystem("jena-asynsparqlquery-test", AsyncRDFStore.DEFAULT_CONFIG)
-  implicit val timeout = Timeout(1000)
-  val store = storeFunc(underlyingStore)
-
-  val asyncEngine = AsyncSPARQLEngine(engineFunc(underlyingStore), system)
 
   val foaf = FOAFPrefix(ops)
 
@@ -50,10 +40,6 @@ abstract class AsyncSparqlQueryOnStoreTest[Store, Rdf <: RDF, Sparql <: SPARQL](
     store.addNamedGraph(IRI("http://example.com/graph2"), graph2)
   }
 
-  override def afterAll(): Unit = {
-    system.shutdown()
-  }
-
   "betehess must know henry" in {
 
     val query = AskQuery("""
@@ -66,11 +52,9 @@ ASK {
 }
 """)
 
-    for {
-      alexKnowsHenry <- asyncEngine.executeAsk(query)
-    } {
-      alexKnowsHenry must be (true)
-    }
+    val alexKnowsHenry = store.executeAsk(query)
+
+    alexKnowsHenry must be (true)
 
   }
 

@@ -5,15 +5,13 @@ import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.repository.Repository
 import org.openrdf.repository.sail.SailRepository
 
-class SesameQueryOnStoreTest() extends SparqlQueryOnStoreTest(
+class SesameSparqlEngineTest() extends SparqlEngineTest(
   SesameOperations,
   SesameDiesel,
   SesameGraphIsomorphism,
   SesameSPARQLOperations,
-  {
+  SesameStore {
     val repo = new SailRepository(new MemoryStore)
     repo.initialize()
     repo
-  },
-  (u: Repository) => SesameStore(u),
-  (u: Repository) => SesameStore(u))
+  })
