@@ -11,12 +11,12 @@ object JenaTurtleWriter extends TurtleWriter[Jena](JenaOperations) {
   
   import JenaOperations._
   
-  def write(graph: Jena#Graph, os: OutputStream, base: String): Validation[Throwable, Unit] = fromTryCatch {
+  def write(graph: Jena#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
     val model = ModelFactory.createModelForGraph(graph)
     model.getWriter("TURTLE").write(model, os, base)
   }
   
-  def write(graph: Jena#Graph, writer: Writer, base: String): Validation[Throwable, Unit] = fromTryCatch {
+  def write(graph: Jena#Graph, writer: Writer, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
     val model = ModelFactory.createModelForGraph(graph)
     model.getWriter("TURTLE").write(model, writer, base)
   }

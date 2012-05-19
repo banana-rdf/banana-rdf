@@ -7,23 +7,23 @@ import scalaz.Validation._
 
 trait RDFReader[Rdf <: RDF, Serialization <: RDFSerialization] {
   
-  def read(is: InputStream, base: String): Validation[Throwable, Rdf#Graph]
+  def read(is: InputStream, base: String): Validation[BananaException, Rdf#Graph]
   
-  def read(reader: Reader, base: String): Validation[Throwable, Rdf#Graph]
+  def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph]
   
-  def read(file: File, base: String): Validation[Throwable, Rdf#Graph] =
+  def read(file: File, base: String): Validation[BananaException, Rdf#Graph] =
     for {
-      fis <- fromTryCatch { new BufferedInputStream(new FileInputStream(file)) }
+      fis <- WrappedThrowable.fromTryCatch { new BufferedInputStream(new FileInputStream(file)) }
       graph <- read(fis, base)
     } yield graph
   
-  def read(file: File, base: String, encoding: String): Validation[Throwable, Rdf#Graph] =
+  def read(file: File, base: String, encoding: String): Validation[BananaException, Rdf#Graph] =
     for {
-      fis <- fromTryCatch { new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), encoding) }
+      fis <- WrappedThrowable.fromTryCatch { new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), encoding) }
       graph <- read(fis, base)
     } yield graph
   
-  def read(s: String, base: String): Validation[Throwable, Rdf#Graph] = {
+  def read(s: String, base: String): Validation[BananaException, Rdf#Graph] = {
     val reader = new StringReader(s)
     read(reader, base)
   }

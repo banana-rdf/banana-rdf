@@ -32,21 +32,21 @@ object SesameTurtleWriter extends TurtleWriter[Sesame](SesameOperations) {
     override def writeURI(uri: URI): Unit = write(uri, writer, baseURI)
   }
   
-  private def write(graph: Sesame#Graph, turtleWriter: STurtleWriter, base: String): Validation[Throwable, Unit] = fromTryCatch {
+  private def write(graph: Sesame#Graph, turtleWriter: STurtleWriter, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
     turtleWriter.startRDF()
     graph foreach turtleWriter.handleStatement
     turtleWriter.endRDF()
   }
   
-  def write(graph: Sesame#Graph, os: OutputStream, base: String): Validation[Throwable, Unit] =
+  def write(graph: Sesame#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] =
     for {
-      turtleWriter <- fromTryCatch { new TurtleWriterOS(os, base) }
+      turtleWriter <- WrappedThrowable.fromTryCatch { new TurtleWriterOS(os, base) }
       result <- write(graph, turtleWriter, base)
     } yield result
   
-  def write(graph: Sesame#Graph, writer: Writer, base: String): Validation[Throwable, Unit] =
+  def write(graph: Sesame#Graph, writer: Writer, base: String): Validation[BananaException, Unit] =
     for {
-      turtleWriter <- fromTryCatch { new TurtleWriterW(writer, base) }
+      turtleWriter <- WrappedThrowable.fromTryCatch { new TurtleWriterW(writer, base) }
       result <- write(graph, turtleWriter, base)
     } yield result
   

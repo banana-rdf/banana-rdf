@@ -9,16 +9,16 @@ abstract class TurtleWriter[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
   
   import ops._
   
-  def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[Throwable, Unit]
+  def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit]
   
-  def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[Throwable, Unit]
+  def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit]
   
-  def write(graph: Rdf#Graph, file: File, base: String): Validation[Throwable, Unit] = fromTryCatch {
+  def write(graph: Rdf#Graph, file: File, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
     val fos = new BufferedOutputStream(new FileOutputStream(file))
     write(graph, fos, base)
   }
   
-  def asString(graph: Rdf#Graph, base: String): Validation[Throwable, String] = fromTryCatch {
+  def asString(graph: Rdf#Graph, base: String): Validation[BananaException, String] = WrappedThrowable.fromTryCatch {
     val stringWriter = new StringWriter
     write(graph, stringWriter, base)
     stringWriter.toString

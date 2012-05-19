@@ -13,13 +13,13 @@ trait JenaGenericReader {
   
   import JenaOperations._
 
-  def read(is: InputStream, base: String): Validation[Throwable, Jena#Graph] = fromTryCatch {
+  def read(is: InputStream, base: String): Validation[BananaException, Jena#Graph] = WrappedThrowable.fromTryCatch {
     val model = ModelFactory.createDefaultModel()
     model.getReader(serializationLanguage).read(model, is, base)
     model.getGraph
   }
   
-  def read(reader: Reader, base: String): Validation[Throwable, Jena#Graph] = fromTryCatch {
+  def read(reader: Reader, base: String): Validation[BananaException, Jena#Graph] = WrappedThrowable.fromTryCatch {
     val model = ModelFactory.createDefaultModel()
     model.getReader(serializationLanguage).read(model, reader, base)
     model.getGraph

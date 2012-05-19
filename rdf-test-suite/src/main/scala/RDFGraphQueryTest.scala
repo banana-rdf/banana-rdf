@@ -12,6 +12,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL](
 ) extends WordSpec with MustMatchers {
 
   val projections = RDFNodeProjections(ops)
+  import projections._
 
   import ops._
   import iso._
@@ -35,7 +36,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = executeSelect(graph, query) map { row => projections.asString(getNode(row, "name")) getOrElse sys.error("") }
+    val names: Iterable[String] = executeSelect(graph, query) map { row => getNode(row, "name").asString getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
 

@@ -6,7 +6,7 @@
 package org.w3.banana.n3.nomo
 
 import org.w3.banana.n3.{TurtleParser, Listener}
-import org.w3.banana.{RDF, RDFReader, Turtle}
+import org.w3.banana._
 import java.io._
 import nomo.Accumulator
 import java.net.URI
@@ -36,7 +36,7 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
    * @param base of the document being fetched. I.e. the URL of the document!
    * @return  the graph or an error
    */
-  def read(is: InputStream, base: String): Validation[Throwable, RdfGraph] = {
+  def read(is: InputStream, base: String): Validation[BananaException, RdfGraph] = {
     read(new InputStreamReader(is, "UTF-8"), base)
   }
 
@@ -46,7 +46,7 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
    * @param base  of the document being fetched. I.e. the URL of the document!
    * @return the graph or an error
    */
-  def read(reader: Reader, base: String): Validation[Throwable, Rdf#Graph] = fromTryCatch {
+  def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph] = WrappedThrowable.fromTryCatch {
     val buf = new Array[Char](4096)
     val abase = if (null != base  && "" !=base ) Some(new URI(base)) else None
     import parser.P._

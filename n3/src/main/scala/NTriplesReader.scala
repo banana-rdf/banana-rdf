@@ -6,7 +6,7 @@
 package org.w3.banana.n3.nomo
 
 import org.w3.banana.n3.{NTriplesParser, Listener}
-import org.w3.banana.{RDF, RDFReader, Turtle}
+import org.w3.banana._
 import java.io._
 import nomo.Accumulator
 
@@ -35,7 +35,7 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
    *             being complete
    * @return the graph or an error
    */
-  def read(is: InputStream, base: String): Validation[Throwable, RdfGraph] = {
+  def read(is: InputStream, base: String): Validation[BananaException, RdfGraph] = {
     read(new InputStreamReader(is, "UTF-8"), base) //currently NTriples only supports ascii, and so utf8 will work.
   }
 
@@ -46,7 +46,7 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
    *             being complete
    * @return the graph or an error
    */
-  def read(reader: Reader, base: String): Validation[Throwable, Rdf#Graph] = fromTryCatch {
+  def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph] = WrappedThrowable.fromTryCatch {
     val buf = new Array[Char](1024)  //todo: how could one set the size of the buffer?
     import parser.P._
     var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =

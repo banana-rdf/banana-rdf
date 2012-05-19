@@ -28,7 +28,7 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
   
   import SesameOperations._
   
-  def read(is: InputStream, base: String): Validation[Throwable, Sesame#Graph] = fromTryCatch {
+  def read(is: InputStream, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
     val triples = new java.util.LinkedList[Statement]
     val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
@@ -37,7 +37,7 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
     new GraphImpl(triples)
   }
   
-  def read(reader: Reader, base: String): Validation[Throwable, Sesame#Graph] = fromTryCatch {
+  def read(reader: Reader, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
     val triples = new java.util.LinkedList[Statement]
     val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
@@ -54,7 +54,7 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
   
   import SesameOperations._
   
-  def read(is: InputStream, base: String): Validation[Throwable, Sesame#Graph] = fromTryCatch {
+  def read(is: InputStream, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
     val triples = new java.util.LinkedList[Statement]
     val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
@@ -63,7 +63,7 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
     new GraphImpl(triples)
   }
   
-  def read(reader: Reader, base: String): Validation[Throwable, Sesame#Graph] = fromTryCatch {
+  def read(reader: Reader, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
     val triples = new java.util.LinkedList[Statement]
     val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
