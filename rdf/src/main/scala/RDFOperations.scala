@@ -17,23 +17,23 @@ trait RDFOperations[Rdf <: RDF] {
   }
   val Graph: GraphCompanionObject
 
-  trait TripleCompanionObject extends Function3[Rdf#Node, Rdf#IRI, Rdf#Node, Rdf#Triple] {
-    def unapply(t: Rdf#Triple): Option[(Rdf#Node, Rdf#IRI, Rdf#Node)]
+  trait TripleCompanionObject extends Function3[Rdf#Node, Rdf#URI, Rdf#Node, Rdf#Triple] {
+    def unapply(t: Rdf#Triple): Option[(Rdf#Node, Rdf#URI, Rdf#Node)]
   }
   
   val Triple: TripleCompanionObject
 
   trait NodeCompanionObject {
-    def fold[T](node: Rdf#Node)(funIRI: Rdf#IRI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
+    def fold[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
   }
   
   val Node: NodeCompanionObject
   
-  trait IRICompanionObject extends Function1[String, Rdf#IRI] {
-    def unapply(i: Rdf#IRI): Option[String]
+  trait URICompanionObject extends Function1[String, Rdf#URI] {
+    def unapply(i: Rdf#URI): Option[String]
   }
   
-  val IRI : IRICompanionObject
+  val URI : URICompanionObject
 
   trait BNodeCompanionObject extends Function1[String, Rdf#BNode] with Function0[Rdf#BNode] {
     def unapply(bn: Rdf#BNode): Option[String]
@@ -47,9 +47,9 @@ trait RDFOperations[Rdf <: RDF] {
   
   val Literal: LiteralCompanionObject
   
-  trait TypedLiteralCompanionObject extends Function2[String, Rdf#IRI, Rdf#TypedLiteral] with Function1[String, Rdf#TypedLiteral] {
-    def unapply(tl: Rdf#TypedLiteral): Option[(String, Rdf#IRI)]
-    def apply(lexicalForm: String): Rdf#TypedLiteral = TypedLiteral(lexicalForm, IRI("http://www.w3.org/2001/XMLSchema#string"))
+  trait TypedLiteralCompanionObject extends Function2[String, Rdf#URI, Rdf#TypedLiteral] with Function1[String, Rdf#TypedLiteral] {
+    def unapply(tl: Rdf#TypedLiteral): Option[(String, Rdf#URI)]
+    def apply(lexicalForm: String): Rdf#TypedLiteral = TypedLiteral(lexicalForm, URI("http://www.w3.org/2001/XMLSchema#string"))
   }
   
   val TypedLiteral: TypedLiteralCompanionObject
@@ -68,14 +68,14 @@ trait RDFOperations[Rdf <: RDF] {
 
   // pimps
   
-  class IRIW(iri: Rdf#IRI) {
+  class URIW(iri: Rdf#URI) {
     def asString: String = {
-      val IRI(stringIRI) = iri
-      stringIRI
+      val URI(stringURI) = iri
+      stringURI
     }
   }
 
-  implicit def wrapIRI(iri: Rdf#IRI): IRIW = new IRIW(iri)
+  implicit def wrapURI(iri: Rdf#URI): URIW = new URIW(iri)
 
   class GraphW(graph: Rdf#Graph) {
     def toIterable: Iterable[Rdf#Triple] = Graph.toIterable(graph)
@@ -84,7 +84,7 @@ trait RDFOperations[Rdf <: RDF] {
   implicit def wrapGraph(graph: Rdf#Graph): GraphW = new GraphW(graph)
   implicit def graphAsIterable(graph: Rdf#Graph): Iterable[Rdf#Triple] = Graph.toIterable(graph)
   
-  implicit def tupleToTriple(tuple: (Rdf#Node, Rdf#IRI, Rdf#Node)): Rdf#Triple = Triple(tuple._1, tuple._2, tuple._3)
+  implicit def tupleToTriple(tuple: (Rdf#Node, Rdf#URI, Rdf#Node)): Rdf#Triple = Triple(tuple._1, tuple._2, tuple._3)
 
   class TripleW(triple: Rdf#Triple) {
     val Triple(subject, predicate, objectt) = triple
@@ -92,8 +92,8 @@ trait RDFOperations[Rdf <: RDF] {
   implicit def wrapTriple(triple: Rdf#Triple): TripleW = new TripleW(triple)
 
   class NodeW(node: Rdf#Node) {
-    def fold[T](funIRI: Rdf#IRI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T =
-      Node.fold(node)(funIRI, funBNode, funLiteral)
+    def fold[T](funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T =
+      Node.fold(node)(funURI, funBNode, funLiteral)
   }
   
   implicit def wrapNode(node: Rdf#Node): NodeW = new NodeW(node)
@@ -117,7 +117,7 @@ trait RDFOperations[Rdf <: RDF] {
   implicit def wrapFloatAsLiteral(f: Double): Rdf#TypedLiteral = TypedLiteral(f.toString, _xsd.double)
   
   class LiteralBuilder(lexicalForm: String) {
-    def datatype(datatype: Rdf#IRI): Rdf#TypedLiteral = TypedLiteral(lexicalForm, datatype)
+    def datatype(datatype: Rdf#URI): Rdf#TypedLiteral = TypedLiteral(lexicalForm, datatype)
     def lang(tag: String): Rdf#LangLiteral = LangLiteral(lexicalForm, Lang(tag))
     def § = TypedLiteral(lexicalForm, _xsd.string)
   }

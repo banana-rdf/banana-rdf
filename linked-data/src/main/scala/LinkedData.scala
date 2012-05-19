@@ -51,13 +51,13 @@ trait LinkedData[Rdf <: RDF] {
 
     def foreach(f: S => Unit): Unit
 
-    def followIRI(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]]
+    def followURI(predicate: Rdf#URI)(implicit ev: S =:= Rdf#URI): LD[Iterable[Rdf#Node]]
 
-    def follow(predicate: Rdf#IRI, max: Int = 10, maxDownloads: Int = 10)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
+    def follow(predicate: Rdf#URI, max: Int = 10, maxDownloads: Int = 10)(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]]
 
     def as[T](f: Rdf#Node => Option[T])(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[T]]
 
-    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]]
+    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#URI]]
 
     def asStrings(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[String]]
 
@@ -69,25 +69,25 @@ trait LinkedData[Rdf <: RDF] {
 
   def point[S](s: S): LD[S]
 
-  def goto(iri: Rdf#IRI): LD[Rdf#IRI]
+  def goto(iri: Rdf#URI): LD[Rdf#URI]
 
   /* enhanced syntax */
 
-  class IRIW(iri: Rdf#IRI) {
-    def follow(predicate: Rdf#IRI): LD[Iterable[Rdf#Node]] =
-      goto(iri).followIRI(predicate)
+  class URIW(iri: Rdf#URI) {
+    def follow(predicate: Rdf#URI): LD[Iterable[Rdf#Node]] =
+      goto(iri).followURI(predicate)
   }
 
-  implicit def wrapIRI(iri: Rdf#IRI): IRIW = new IRIW(iri)
+  implicit def wrapURI(iri: Rdf#URI): URIW = new URIW(iri)
 
-  class IRIsW(iris: Iterable[Rdf#Node]) {
-    def follow(predicate: Rdf#IRI, max: Int = 10, maxDownloads: Int = 10): LD[Iterable[Rdf#Node]] = {
+  class URIsW(iris: Iterable[Rdf#Node]) {
+    def follow(predicate: Rdf#URI, max: Int = 10, maxDownloads: Int = 10): LD[Iterable[Rdf#Node]] = {
       val irisLD = point(iris)
       irisLD.follow(predicate, max, maxDownloads)
     }
   }
 
-  implicit def wrapIRIs(iris: Iterable[Rdf#Node]): IRIsW = new IRIsW(iris)
+  implicit def wrapURIs(iris: Iterable[Rdf#Node]): URIsW = new URIsW(iris)
 
 }
 

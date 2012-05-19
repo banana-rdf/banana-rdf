@@ -24,27 +24,27 @@ object JenaOperations extends RDFOperations[Jena] {
   }
 
   object Triple extends TripleCompanionObject {
-    def apply(s: Jena#Node, p: Jena#IRI, o: Jena#Node): Jena#Triple = {
+    def apply(s: Jena#Node, p: Jena#URI, o: Jena#Node): Jena#Triple = {
       JenaTriple.create(s, p, o)
     }
-    def unapply(t: Jena#Triple): Option[(Jena#Node, Jena#IRI, Jena#Node)] =
+    def unapply(t: Jena#Triple): Option[(Jena#Node, Jena#URI, Jena#Node)] =
       (t.getSubject, t.getPredicate, t.getObject) match {
-        case (s, p: Jena#IRI, o) => Some((s, p, o))
+        case (s, p: Jena#URI, o) => Some((s, p, o))
         case _ => None
       }
   }
 
   object Node extends NodeCompanionObject {
-    def fold[T](node: Jena#Node)(funIRI: Jena#IRI => T, funBNode: Jena#BNode => T, funLiteral: Jena#Literal => T): T = node match {
-      case iri: Jena#IRI => funIRI(iri)
+    def fold[T](node: Jena#Node)(funURI: Jena#URI => T, funBNode: Jena#BNode => T, funLiteral: Jena#Literal => T): T = node match {
+      case iri: Jena#URI => funURI(iri)
       case bnode: Jena#BNode => funBNode(bnode)
       case literal: Jena#Literal => funLiteral(literal)
     }
   }
   
-  object IRI extends IRICompanionObject {
-    def apply(iriStr: String): Jena#IRI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
-    def unapply(node: Jena#IRI): Option[String] = if (node.isURI) Some(node.getURI) else None
+  object URI extends URICompanionObject {
+    def apply(iriStr: String): Jena#URI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
+    def unapply(node: Jena#URI): Option[String] = if (node.isURI) Some(node.getURI) else None
   }
 
   object BNode extends BNodeCompanionObject {
@@ -59,8 +59,8 @@ object JenaOperations extends RDFOperations[Jena] {
   }
 
   lazy val mapper = TypeMapper.getInstance
-  def jenaDatatype(datatype: Jena#IRI) = {
-    val IRI(iriString) = datatype
+  def jenaDatatype(datatype: Jena#URI) = {
+    val URI(iriString) = datatype
     mapper.getTypeByName(iriString)
   }
   
@@ -77,13 +77,13 @@ object JenaOperations extends RDFOperations[Jena] {
   }
 
   object TypedLiteral extends TypedLiteralCompanionObject {
-    def apply(lexicalForm: String, iri: Jena#IRI): Jena#TypedLiteral = {
+    def apply(lexicalForm: String, iri: Jena#URI): Jena#TypedLiteral = {
       JenaNode.createLiteral(lexicalForm, null, jenaDatatype(iri)).asInstanceOf[Node_Literal]
     }
-    def unapply(typedLiteral: Jena#TypedLiteral): Option[(String, Jena#IRI)] = {
+    def unapply(typedLiteral: Jena#TypedLiteral): Option[(String, Jena#URI)] = {
       val typ = typedLiteral.getLiteralDatatype
       if (typ != null)
-        Some((typedLiteral.getLiteralLexicalForm.toString, IRI(typ.getURI)))
+        Some((typedLiteral.getLiteralLexicalForm.toString, URI(typ.getURI)))
       else if (typedLiteral.getLiteralLanguage.isEmpty)
         Some((typedLiteral.getLiteralLexicalForm.toString, xsd.string))
       else

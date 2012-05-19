@@ -53,7 +53,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     new AsyncHttpClient(config)
   }
 
-  val kb: ConcurrentMap[Rdf#IRI, FutureValidation[LDError, Rdf#Graph]] = new ConcurrentHashMap[Rdf#IRI, FutureValidation[LDError, Rdf#Graph]]().asScala
+  val kb: ConcurrentMap[Rdf#URI, FutureValidation[LDError, Rdf#Graph]] = new ConcurrentHashMap[Rdf#URI, FutureValidation[LDError, Rdf#Graph]]().asScala
 
   def shutdown(): Unit = {
     logger.debug("shuting down the Linked Data facade")
@@ -62,10 +62,10 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     system.shutdown()
   }
 
-  def goto(iri: Rdf#IRI): LD[Rdf#IRI] = {
+  def goto(iri: Rdf#URI): LD[Rdf#URI] = {
     val supportDoc = supportDocument(iri)
     if (!kb.isDefinedAt(supportDoc)) {
-      val IRI(iri) = supportDoc
+      val URI(iri) = supportDoc
       val futureGraph: FutureValidation[LDError, Rdf#Graph] = delayedValidation {
         logger.debug("GET " + iri)
         val response = httpClient.prepareGet(iri).setHeader("Accept", "application/rdf+xml, text/rdf+n3, text/turtle").execute().get()
@@ -106,7 +106,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
 
     def foreach(f: S => Unit): Unit = underlying foreach f
 
-    def followIRI(predicate: Rdf#IRI)(implicit ev: S =:= Rdf#IRI): LD[Iterable[Rdf#Node]] = new LD(
+    def followURI(predicate: Rdf#URI)(implicit ev: S =:= Rdf#URI): LD[Iterable[Rdf#Node]] = new LD(
       for {
         subject ← underlying map ev
         supportDoc = supportDocument(subject)
@@ -118,7 +118,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     )
 
     def follow(
-      predicate: Rdf#IRI,
+      predicate: Rdf#URI,
       max: Int = 10,
       maxDownloads: Int = 10)(
       implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]] = {
@@ -126,7 +126,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
         val nodesFutureValidation: Iterable[FutureValidation[LDError, Iterable[Rdf#Node]]] =
           nodes.take(maxDownloads).map { (node: Rdf#Node) =>
             node.fold[FutureValidation[LDError, Iterable[Rdf#Node]]](
-              iri => goto(iri).followIRI(predicate).underlying,
+              iri => goto(iri).followURI(predicate).underlying,
               bn => immediateValidation(Success(Iterable.empty)),
               lit => immediateValidation(Success(Iterable.empty))
             )}
@@ -160,13 +160,13 @@ class LinkedDataMemoryKB[Rdf <: RDF](
         underlying map { nodes => ev(nodes).map(f).flatten }
       )
 
-    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#IRI]] = {
-      def f(node: Rdf#Node): Option[Rdf#IRI] = 
-        node.fold[Option[Rdf#IRI]](
+    def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#URI]] = {
+      def f(node: Rdf#Node): Option[Rdf#URI] = 
+        node.fold[Option[Rdf#URI]](
           iri ⇒ Some(iri),
           bnode ⇒ None,
           literal ⇒ None)
-      as[Rdf#IRI](f)
+      as[Rdf#URI](f)
     }
 
     def asStrings(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[String]] = {

@@ -27,30 +27,30 @@ object SesameOperations extends RDFOperations[Sesame] {
   }
   
   object Triple extends TripleCompanionObject {
-    def apply(s: Sesame#Node, p: Sesame#IRI, o: Sesame#Node): Sesame#Triple = { new StatementImpl(s.asInstanceOf[Resource], p, o)
+    def apply(s: Sesame#Node, p: Sesame#URI, o: Sesame#Node): Sesame#Triple = { new StatementImpl(s.asInstanceOf[Resource], p, o)
 //    s match {
 //      case s: Resource => new Triple(s, p, o)
 //      case _ => XXX what if the subject is a literal?
 //    }
     }
-    def unapply(t: Sesame#Triple): Option[(Sesame#Node, Sesame#IRI, Sesame#Node)] =
+    def unapply(t: Sesame#Triple): Option[(Sesame#Node, Sesame#URI, Sesame#Node)] =
       (t.getSubject, t.getPredicate, t.getObject) match {
-        case (s, p: Sesame#IRI, o) => Some((s, p, o))
+        case (s, p: Sesame#URI, o) => Some((s, p, o))
         case _ => None
       }
   }
   
   object Node extends NodeCompanionObject {
-    def fold[T](node: Sesame#Node)(funIRI: Sesame#IRI => T, funBNode: Sesame#BNode => T, funLiteral: Sesame#Literal => T): T = node match {
-      case iri: Sesame#IRI => funIRI(iri)
+    def fold[T](node: Sesame#Node)(funURI: Sesame#URI => T, funBNode: Sesame#BNode => T, funLiteral: Sesame#Literal => T): T = node match {
+      case iri: Sesame#URI => funURI(iri)
       case bnode: Sesame#BNode => funBNode(bnode)
       case literal: Sesame#Literal => funLiteral(literal)
     }
   }
   
-  object IRI extends IRICompanionObject {
-    def apply(iriStr: String): Sesame#IRI = ValueFactoryImpl.getInstance.createURI(iriStr).asInstanceOf[Sesame#IRI]
-    def unapply(node: Sesame#IRI): Option[String] = Some(node.toString)
+  object URI extends URICompanionObject {
+    def apply(iriStr: String): Sesame#URI = ValueFactoryImpl.getInstance.createURI(iriStr).asInstanceOf[Sesame#URI]
+    def unapply(node: Sesame#URI): Option[String] = Some(node.toString)
   }
   
   object BNode extends BNodeCompanionObject {
@@ -74,10 +74,10 @@ object SesameOperations extends RDFOperations[Sesame] {
   }
   
   object TypedLiteral extends TypedLiteralCompanionObject {
-    def apply(lexicalForm: String, iri: Sesame#IRI): Sesame#TypedLiteral = new LiteralImpl(lexicalForm, iri)
-    def unapply(typedLiteral: Sesame#TypedLiteral): Option[(String, Sesame#IRI)] =
+    def apply(lexicalForm: String, iri: Sesame#URI): Sesame#TypedLiteral = new LiteralImpl(lexicalForm, iri)
+    def unapply(typedLiteral: Sesame#TypedLiteral): Option[(String, Sesame#URI)] =
       (typedLiteral.getLabel, typedLiteral.getDatatype) match {
-        case (lexicalForm: String, iri: Sesame#IRI) if typedLiteral.getLanguage == null => {
+        case (lexicalForm: String, iri: Sesame#URI) if typedLiteral.getLanguage == null => {
           if (iri != null)
             Some(lexicalForm, iri)
           else

@@ -13,7 +13,7 @@ trait SesameGraphStore extends GraphStore[Sesame] {
 
   def store: Repository
 
-  def addNamedGraph(uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
+  def addNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>
       conn.remove(null: Resource, null, null, uri)
       conn.add(graph, uri)
@@ -21,7 +21,7 @@ trait SesameGraphStore extends GraphStore[Sesame] {
     store
   }
 
-  def appendToNamedGraph(uri: Sesame#IRI, graph: Sesame#Graph): Sesame#Store = {
+  def appendToNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>
       conn.add(graph, uri)
     }
@@ -36,7 +36,7 @@ trait SesameGraphStore extends GraphStore[Sesame] {
     def handleStatement(statement: Statement): Unit = graph.add(statement)
   }
 
-  def getNamedGraph(uri: Sesame#IRI): Sesame#Graph = {
+  def getNamedGraph(uri: Sesame#URI): Sesame#Graph = {
     val graph = new GraphImpl
     withConnection(store) { conn =>
       conn.export(new RDFCollector(graph), uri)
@@ -44,7 +44,7 @@ trait SesameGraphStore extends GraphStore[Sesame] {
     graph
   }
 
-  def removeGraph(uri: Sesame#IRI): Sesame#Store = {
+  def removeGraph(uri: Sesame#URI): Sesame#Store = {
     withConnection(store) { conn =>
       conn.remove(null: Resource, null, null, uri)
     }

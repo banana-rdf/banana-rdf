@@ -41,9 +41,9 @@ class Serializer[Rdf <: RDF](ops: RDFOperations[Rdf]) {
     { l: Rdf#Literal => literalAsN3(l) }
   )
   
-  def iriAsN3(iri: Rdf#IRI): String = {
-    val IRI(iriString) = iri
-    "<" + NTriplesParser.toIRI(iriString) + ">"
+  def iriAsN3(iri: Rdf#URI): String = {
+    val URI(iriString) = iri
+    "<" + NTriplesParser.toURI(iriString) + ">"
   }
   
   def literalAsN3(literal: Rdf#Literal): String = Literal.fold(literal) (
@@ -54,8 +54,8 @@ class Serializer[Rdf <: RDF](ops: RDFOperations[Rdf]) {
   def typedLiteralAsN3(typedLiteral: Rdf#TypedLiteral): String = typedLiteral match {
     case TypedLiteral(lexicalForm, datatype) if datatype == xsd.string =>
       "\"%s\"" format NTriplesParser.toAsciiLiteral(lexicalForm)
-    case TypedLiteral(lexicalForm, IRI(iri)) =>
-      "\"%s\"^^<%s>" format (NTriplesParser.toAsciiLiteral(lexicalForm), NTriplesParser.toIRI(iri))
+    case TypedLiteral(lexicalForm, URI(iri)) =>
+      "\"%s\"^^<%s>" format (NTriplesParser.toAsciiLiteral(lexicalForm), NTriplesParser.toURI(iri))
   }
   
 }

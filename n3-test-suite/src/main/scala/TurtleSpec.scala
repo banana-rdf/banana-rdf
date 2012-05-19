@@ -60,14 +60,14 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     all(res :_*)
   }
 
-  property("good IRIs") = secure {
+  property("good URIs") = secure {
     val results = for ((pure,encoded) <- uriPairs) yield {
       val iriRef = "<" + encoded + ">"
-      val res = P.IRI_REF(iriRef)
+      val res = P.URI_REF(iriRef)
 
       ("prefix line in='" + iriRef + "' result = '" + res + "'") |: all(
         res.isSuccess &&
-          (res.get == IRI(pure))
+          (res.get == URI(pure))
       )
     }
     all(results :_*)
@@ -119,25 +119,25 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
   property("good prefix line tests") = secure {
     val results = for ((origPfx,encodedPfx) <- zipPfx;
-                       (pureIRI,encodedIRI) <- uriPairs) yield {
+                       (pureURI,encodedURI) <- uriPairs) yield {
       try {
         val user = U
         val space1 = genSpaceOrComment.sample.get
         val space2 = genSpaceOrComment.sample.get
-        val preStr = "@prefix" + space1 + encodedPfx + space2 + "<" + encodedIRI + ">"
+        val preStr = "@prefix" + space1 + encodedPfx + space2 + "<" + encodedURI + ">"
         val res = P.prefixID(preStr)(user)
         val prefixes = user.prefixes
 
         ("prefix line in='" + preStr + "' result = " +res+ "user prefixes="+prefixes) |: all(
           res.isSuccess &&
           res.isSuccess ==> {  //&& in scalacheck evalutates both sides, hence this construct or we get a null pointer next
-            val (parsedPre,parsedIRI) = res.get
+            val (parsedPre,parsedURI) = res.get
             all(((origPfx == parsedPre+":") :| "original and parsed prefixes don't match") &&
-            ((IRI(pureIRI) == parsedIRI) :| "original and parsed IRI don't match ") &&
-            ((prefixes.get(parsedPre)  == Some(parsedIRI)) :| "parsed prefixes did not end up in user") &&
-            ((prefixes.get(origPfx.substring(0,origPfx.size-1))  == Some(IRI(pureIRI))) :|
+            ((URI(pureURI) == parsedURI) :| "original and parsed URI don't match ") &&
+            ((prefixes.get(parsedPre)  == Some(parsedURI)) :| "parsed prefixes did not end up in user") &&
+            ((prefixes.get(origPfx.substring(0,origPfx.size-1))  == Some(URI(pureURI))) :|
               "userPrefixHash["+origPfx+"] did not return the "+
-              " original iri "+pureIRI) )
+              " original iri "+pureURI) )
           }
         )
       } catch {
@@ -161,8 +161,8 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
         ("prefix line in='" + preStr + "' result = " +res) |: all(
           res.isSuccess &&
           res.isSuccess ==>
-            (( res.get == IRI(pure)) :| "the decoded base differs from the original one") &&
-            ((res.user.currentBase  == IRI(pure)) :| "base did not end up in user state")
+            (( res.get == URI(pure)) :| "the decoded base differs from the original one") &&
+            ((res.user.currentBase  == URI(pure)) :| "base did not end up in user state")
         )
       } catch {
         case e => {
@@ -220,7 +220,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   )
 
   property("test NTriples simple sentences") = secure {
-      val t=Triple(IRI("http://bblfish.net/#hjs"),IRI("http://xmlns.com/foaf/0.1/knows"), IRI("http://www.w3.org/People/Berners-Lee/card#i"))
+      val t=Triple(URI("http://bblfish.net/#hjs"),URI("http://xmlns.com/foaf/0.1/knows"), URI("http://www.w3.org/People/Berners-Lee/card#i"))
       val res = P.triples( "<http://bblfish.net/#hjs> <http://xmlns.com/foaf/0.1/knows> <http://www.w3.org/People/Berners-Lee/card#i> .")
     ("Initial Triple="+t+" res="+res+" res.user.queue="+res.user.queue) |: all (
       res.isSuccess  &&
@@ -233,12 +233,12 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   val rdf = RDFPrefix(ops)
   val xsd = XSDPrefix(ops)
 
-  val hjs=IRI("http://bblfish.net/#hjs")
-  val timbl = IRI("http://www.w3.org/People/Berners-Lee/card#i")
-  val presbrey = IRI("http://presbrey.mit.edu/foaf#presbrey")
+  val hjs=URI("http://bblfish.net/#hjs")
+  val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
+  val presbrey = URI("http://presbrey.mit.edu/foaf#presbrey")
   val t=Triple(hjs,foaf.knows, timbl)
   val t2=Triple(hjs,foaf.knows, presbrey)
-  val t3=Triple(hjs,foaf.mbox, IRI("mailto:henry.story@bblfish.net"))
+  val t3=Triple(hjs,foaf.mbox, URI("mailto:henry.story@bblfish.net"))
   val t4=Triple(hjs,foaf.name, LangLiteral("Henry Story",Lang("en")))
   val t5=Triple(hjs,foaf.name, TypedLiteral("bblfish"))
 
@@ -312,8 +312,8 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
      That he not busy being born
      Is busy dying.
 """
-  val bobDylan=IRI("http://dbpedia.org/resource/Bob_Dylan")
-  val t6= Triple(bobDylan,IRI("http://purl.org/dc/elements/1.1/created"),LangLiteral(lit1,Lang("en-us-poetic2")))
+  val bobDylan=URI("http://dbpedia.org/resource/Bob_Dylan")
+  val t6= Triple(bobDylan,URI("http://purl.org/dc/elements/1.1/created"),LangLiteral(lit1,Lang("en-us-poetic2")))
   val t7= Triple(bobDylan,foaf.name,LangLiteral("Bob Dylan",Lang("en")))
 
   property("test prefixes long literals and comments") = secure {
@@ -360,7 +360,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     )
   }
 
-  val hasCats = IRI("http://cats.edu/ont/has")
+  val hasCats = URI("http://cats.edu/ont/has")
 
   val t8 = Triple(hjs,hasCats,TypedLiteral("2",xsd.integer))
   val t8bis = Triple(hjs,hasCats,TypedLiteral("3.2",xsd.decimal))
@@ -576,8 +576,8 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
 
    property("debugging space") = secure {
-     val tr = Triple(IRI("http://example.org/resource15"),IRI("http://example.org/property"),BNode("anon"))
-     val tr2 = Triple(IRI("http://example.org/resource16"),IRI("http://example.org/property"),"\u00E9"§)
+     val tr = Triple(URI("http://example.org/resource15"),URI("http://example.org/property"),BNode("anon"))
+     val tr2 = Triple(URI("http://example.org/resource16"),URI("http://example.org/property"),"\u00E9"§)
      val doc = """<http://example.org/resource15> <http://example.org/property> _:anon.
      # \\u and \\U escapes
      # latin small letter e with acute symbol \u00E9 - 3 UTF-8 bytes #xC3 #A9

@@ -84,7 +84,7 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   // these are already provided by RDFOperations
   val xsd = "http://www.w3.org/2001/XMLSchema#"
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-  lazy val xsdString = IRI(xsd + "string")
+  lazy val xsdString = URI(xsd + "string")
 
   lazy val plainLit = (P.single('"')>>!literal<< P.single('\"'))
 
@@ -100,7 +100,7 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
 
   lazy val dot = P.single('.')
 
-  lazy val uriRef = ( P.single('<') >>! uriStr  <<! P.single('>').commit).map(i=>IRI(i))
+  lazy val uriRef = ( P.single('<') >>! uriStr  <<! P.single('>').commit).map(i=>URI(i))
   lazy val pred = uriRef
   lazy val subject = uriRef | bnode
   lazy val obj = uriRef | bnode | fullLiteral
@@ -202,7 +202,7 @@ object NTriplesParser {
    * For utf one should be able to devise more sophisticated rules for iri
    * construction.
    */
-  def toIRI(str: String) = {
+  def toURI(str: String) = {
     val b = new StringBuilder
     for (c <- str) {
       iri(c,b) || literal(c,b)

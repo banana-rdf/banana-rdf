@@ -4,7 +4,7 @@ import scalaz._
 
 trait RDFGraphTraversal[Rdf <: RDF] {
 
-  def getObjects(graph: Rdf#Graph, subject: Rdf#Node, predicate: Rdf#IRI): Iterable[Rdf#Node]
+  def getObjects(graph: Rdf#Graph, subject: Rdf#Node, predicate: Rdf#URI): Iterable[Rdf#Node]
 
-  def getPredicates(graph: Rdf#Graph, subject: Rdf#Node): Iterable[Rdf#IRI]
+  def getPredicates(graph: Rdf#Graph, subject: Rdf#Node): Iterable[Rdf#URI]
 }

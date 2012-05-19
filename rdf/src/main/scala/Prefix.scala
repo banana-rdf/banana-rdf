@@ -4,8 +4,8 @@ package org.w3.banana
 trait Prefix[Rdf <: RDF] {
   def prefixName: String
   def prefixIri: String
-  def apply(value: String): Rdf#IRI
-  def unapply(iri: Rdf#IRI): Option[String]
+  def apply(value: String): Rdf#URI
+  def unapply(iri: Rdf#URI): Option[String]
 }
 
 
@@ -15,10 +15,10 @@ object Prefix {
 }
 
 class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String, ops: RDFOperations[Rdf]) extends Prefix[Rdf] {
-  import ops.IRI
-  def apply(value: String): Rdf#IRI = IRI(prefixIri+value)
-  def unapply(iri: Rdf#IRI): Option[String] = {
-    val IRI(iriString) = iri
+  import ops.URI
+  def apply(value: String): Rdf#URI = URI(prefixIri+value)
+  def unapply(iri: Rdf#URI): Option[String] = {
+    val URI(iriString) = iri
     if (iriString.startsWith(prefixIri))
       Some(iriString.substring(prefixIri.length))
     else

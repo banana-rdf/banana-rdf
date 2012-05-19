@@ -8,21 +8,21 @@ class RDFTransformer[A <: RDF, B <: RDF](
     b.Graph(a.Graph.toIterable(graph) map transformTriple)
     
   def transformTriple(t: A#Triple): B#Triple = {
-    val a.Triple(s, a.IRI(iri), o) = t
+    val a.Triple(s, a.URI(iri), o) = t
     b.Triple(
       transformNode(s),
-      b.IRI(iri),
+      b.URI(iri),
       transformNode(o))
   }
   
   def transformNode(n: A#Node): B#Node = a.Node.fold(n) (
-    { case a.IRI(iri) => b.IRI(iri) },
+    { case a.URI(iri) => b.URI(iri) },
     { case a.BNode(label) => b.BNode(label) },
     { literal: A#Literal => transformLiteral(literal) }
   )
   
   def transformLiteral(literal: A#Literal): B#Literal = a.Literal.fold(literal) (
-    { case a.TypedLiteral(lexicalForm, a.IRI(datatypeIRI)) => b.TypedLiteral(lexicalForm, b.IRI(datatypeIRI)) },
+    { case a.TypedLiteral(lexicalForm, a.URI(datatypeURI)) => b.TypedLiteral(lexicalForm, b.URI(datatypeURI)) },
     { case a.LangLiteral(lexicalForm, a.Lang(lang)) => b.LangLiteral(lexicalForm, b.Lang(lang)) }
   )
   

@@ -25,16 +25,16 @@ class Diesel[Rdf <: RDF](
 
     import pointed.{ node => _node , graph }
 
-    def a(clazz: Rdf#IRI): PointedGraph[Rdf] = {
+    def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
       val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
       PointedGraph(node, newGraph)
     }
 
-    def --(p: Rdf#IRI): PointedGraphPredicate = new PointedGraphPredicate(pointed, p)
+    def --(p: Rdf#URI): PointedGraphPredicate = new PointedGraphPredicate(pointed, p)
 
-    def -<-(p: Rdf#IRI): PredicatePointedGraph = new PredicatePointedGraph(p, pointed)
+    def -<-(p: Rdf#URI): PredicatePointedGraph = new PredicatePointedGraph(p, pointed)
 
-    def /(p: Rdf#IRI): PointedGraphs[Rdf] = {
+    def /(p: Rdf#URI): PointedGraphs[Rdf] = {
       val nodes = getObjects(graph, node, p)
       PointedGraphs(nodes, graph)
     }
@@ -51,7 +51,7 @@ class Diesel[Rdf <: RDF](
 
     def iterator = nodes.iterator map { PointedGraph(_, graph) }
 
-    def /(p: Rdf#IRI): PointedGraphs[Rdf] = {
+    def /(p: Rdf#URI): PointedGraphs[Rdf] = {
       val ns = this flatMap { case PointedGraph(node, graph) => getObjects(graph, node, p) }
       PointedGraphs(ns, graph)
     }
@@ -77,7 +77,7 @@ class Diesel[Rdf <: RDF](
     
   }
 
-  class PointedGraphPredicate(pointed: PointedGraph[Rdf], p: Rdf#IRI) {
+  class PointedGraphPredicate(pointed: PointedGraph[Rdf], p: Rdf#URI) {
 
     def ->-(o: Rdf#Node, os: Rdf#Node*): PointedGraph[Rdf] = {
       val PointedGraph(s, acc) = pointed
@@ -116,7 +116,7 @@ class Diesel[Rdf <: RDF](
   }
 
 
-  case class PredicatePointedGraph(p: Rdf#IRI, pointed: PointedGraph[Rdf]) {
+  case class PredicatePointedGraph(p: Rdf#URI, pointed: PointedGraph[Rdf]) {
 
     def --(s: Rdf#Node): PointedGraph[Rdf] = {
       val PointedGraph(o, acc) = pointed
@@ -143,6 +143,6 @@ class Diesel[Rdf <: RDF](
 
   def bnode(label: String) = BNode(label)
 
-  def uri(s: String): Rdf#IRI = IRI(s)
+  def uri(s: String): Rdf#URI = URI(s)
 
 }

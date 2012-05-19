@@ -18,10 +18,10 @@ object Main {
     import ld._
 
 //    val namesLD = for {
-//      barack ← goto(IRI("http://dbpedia.org/resource/Barack_Obama"))
-//      family ← barack.follow(IRI("http://dbpedia.org/ontology/child"))
-//      members ← family.follow(IRI("http://dbpedia.org/property/members"))
-//      names ← members.follow(IRI("http://dbpedia.org/property/name")).asStrings
+//      barack ← goto(URI("http://dbpedia.org/resource/Barack_Obama"))
+//      family ← barack.follow(URI("http://dbpedia.org/ontology/child"))
+//      members ← family.follow(URI("http://dbpedia.org/property/members"))
+//      names ← members.follow(URI("http://dbpedia.org/property/name")).asStrings
 //    } yield names
 //
 //    val names = namesLD.timbl()
@@ -35,7 +35,7 @@ object Main {
     val foaf = Prefix("foaf", "http://xmlns.com/foaf/0.1/", JenaOperations)
 
     val resultLD = for {
-      bblfish ← goto(IRI("http://bblfish.net/people/henry/card#me"))
+      bblfish ← goto(URI("http://bblfish.net/people/henry/card#me"))
       person ← bblfish.follow(foaf("knows"))
       name <- person.follow(foaf("firstName"))
     } yield ((person, name))
@@ -45,7 +45,7 @@ object Main {
     println(result)
 
     val foo = for {
-      bblfish ← goto(IRI("http://bblfish.net/people/henry/card#me"))
+      bblfish ← goto(URI("http://bblfish.net/people/henry/card#me"))
       person ← bblfish.follow(foaf("knows"))
     } yield {
       for {

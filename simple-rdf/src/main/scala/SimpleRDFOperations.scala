@@ -12,18 +12,18 @@ object SimpleRDFOperations extends RDFOperations[SimpleRDF] {
   }
 
   object Triple extends TripleCompanionObject {
-    def apply(s: SimpleRDF#Node, p: SimpleRDF#IRI, o: SimpleRDF#Node) = SimpleModule.Triple(s, p, o)
+    def apply(s: SimpleRDF#Node, p: SimpleRDF#URI, o: SimpleRDF#Node) = SimpleModule.Triple(s, p, o)
     def unapply(t: SimpleRDF#Triple) = SimpleModule.Triple.unapply(t)
   }
   
   object Node extends NodeCompanionObject {
-    def fold[T](node: SimpleRDF#Node)(funIRI: SimpleRDF#IRI => T, funBNode: SimpleRDF#BNode => T, funLiteral: SimpleRDF#Literal => T) =
-      SimpleModule.Node.fold(node)(funIRI, funBNode, funLiteral)
+    def fold[T](node: SimpleRDF#Node)(funURI: SimpleRDF#URI => T, funBNode: SimpleRDF#BNode => T, funLiteral: SimpleRDF#Literal => T) =
+      SimpleModule.Node.fold(node)(funURI, funBNode, funLiteral)
   }
 
-  object IRI extends IRICompanionObject {
-    def apply(s: String) = SimpleModule.IRI(s)
-    def unapply(iri: SimpleRDF#IRI) = SimpleModule.IRI.unapply(iri)
+  object URI extends URICompanionObject {
+    def apply(s: String) = SimpleModule.URI(s)
+    def unapply(iri: SimpleRDF#URI) = SimpleModule.URI.unapply(iri)
   }
 
   object BNode extends BNodeCompanionObject {
@@ -38,7 +38,7 @@ object SimpleRDFOperations extends RDFOperations[SimpleRDF] {
   }
   
   object TypedLiteral extends TypedLiteralCompanionObject {
-    def apply(lexicalForm: String, datatype: SimpleRDF#IRI) = SimpleModule.TypedLiteral(lexicalForm, datatype)
+    def apply(lexicalForm: String, datatype: SimpleRDF#URI) = SimpleModule.TypedLiteral(lexicalForm, datatype)
     def unapply(tl: SimpleRDF#TypedLiteral) = SimpleModule.TypedLiteral.unapply(tl)
   }
   

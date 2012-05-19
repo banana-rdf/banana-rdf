@@ -21,8 +21,8 @@ class SesameGraphStoreTest() extends GraphStoreTest[Sesame](
   import store._
 
   "adding a named graph should not pollute the default graph" in {
-    addNamedGraph(IRI("http://example.com/foo"), graph)
-    val defaultGraph = getNamedGraph(null.asInstanceOf[Sesame#IRI])
+    addNamedGraph(URI("http://example.com/foo"), graph)
+    val defaultGraph = getNamedGraph(null.asInstanceOf[Sesame#URI])
     defaultGraph must have size(0)
   }
 

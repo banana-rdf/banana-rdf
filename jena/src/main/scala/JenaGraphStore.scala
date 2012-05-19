@@ -12,24 +12,24 @@ trait JenaGraphStore extends GraphStore[Jena] {
 
   /* RDFStore */
 
-  def addNamedGraph(uri: Jena#IRI, graph: Jena#Graph): Jena#Store = {
+  def addNamedGraph(uri: Jena#URI, graph: Jena#Graph): Jena#Store = {
     store.removeGraph(uri)
     store.addGraph(uri, graph)
     store
   }
 
-  def appendToNamedGraph(uri: Jena#IRI, graph: Jena#Graph): Jena#Store = {
+  def appendToNamedGraph(uri: Jena#URI, graph: Jena#Graph): Jena#Store = {
     Graph.toIterable(graph) foreach { case Triple(s, p, o) =>
       store.add(uri, s, p, o)
     }
     store
   }
 
-  def getNamedGraph(uri: Jena#IRI): Jena#Graph = {
+  def getNamedGraph(uri: Jena#URI): Jena#Graph = {
     store.getGraph(uri)
   }
 
-  def removeGraph(uri: Jena#IRI): Jena#Store = {
+  def removeGraph(uri: Jena#URI): Jena#Store = {
     store.removeGraph(uri)
     store
   }

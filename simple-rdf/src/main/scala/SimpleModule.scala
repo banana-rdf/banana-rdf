@@ -36,25 +36,25 @@ object SimpleModule {
     def toIterable(graph: Graph): Iterable[Triple] = graph.toIterable
   }
   
-  case class Triple(s: Node, p: IRI, o: Node)
+  case class Triple(s: Node, p: URI, o: Node)
   
   sealed trait Node
   
   object Node {
-    def fold[T](node: Node)(funIRI: IRI => T, funBNode: BNode => T, funLiteral: Literal => T): T = node match {
-      case iri: IRI => funIRI(iri)
+    def fold[T](node: Node)(funURI: URI => T, funBNode: BNode => T, funLiteral: Literal => T): T = node match {
+      case iri: URI => funURI(iri)
       case bnode: BNode => funBNode(bnode)
       case literal: Literal => funLiteral(literal)
     }
   }
 
-  case class IRI(iri: String) extends Node
+  case class URI(iri: String) extends Node
 
   case class BNode(label: String =nextId) extends Node
 
   sealed trait Literal extends Node {
     val lexicalForm: String
-    val datatype: IRI
+    val datatype: URI
   }
   
   object Literal {
@@ -64,10 +64,10 @@ object SimpleModule {
     }
   }
   
-  case class TypedLiteral(lexicalForm: String, datatype: IRI) extends Literal
+  case class TypedLiteral(lexicalForm: String, datatype: URI) extends Literal
   
   case class LangLiteral(lexicalForm: String, lang: Lang) extends Literal {
-    val datatype = IRI("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
+    val datatype = URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
   }
 
   type Lang = String

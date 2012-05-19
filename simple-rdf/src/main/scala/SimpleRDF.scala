@@ -6,7 +6,7 @@ trait SimpleRDF extends RDF {
   type Graph = SimpleModule.Graph
   type Triple = SimpleModule.Triple
   type Node = SimpleModule.Node
-  type IRI = SimpleModule.IRI
+  type URI = SimpleModule.URI
   type BNode = SimpleModule.BNode
   type Literal = SimpleModule.Literal
   type TypedLiteral = SimpleModule.TypedLiteral

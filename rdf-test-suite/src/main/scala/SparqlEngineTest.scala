@@ -36,8 +36,8 @@ abstract class SparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
   ).graph
 
   override def beforeAll(): Unit = {
-    store.addNamedGraph(IRI("http://example.com/graph"), graph)
-    store.addNamedGraph(IRI("http://example.com/graph2"), graph2)
+    store.addNamedGraph(URI("http://example.com/graph"), graph)
+    store.addNamedGraph(URI("http://example.com/graph2"), graph2)
   }
 
   "betehess must know henry" in {

@@ -76,8 +76,8 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   lazy val PLX=  (P.single('%')++hex++hex).map{case '%'++h1++h2=> "%"+h1+h2} | PN_LOCAL_ESC.map(_.toString)
 
   lazy val UCHAR = u_CHAR | U_CHAR
-  lazy val IRICHAR = UCHAR | CLOSE_ANGLE
-  lazy val IRICHARS = IRICHAR.commit.many1.map(_.toSeq.mkString)
+  lazy val URICHAR = UCHAR | CLOSE_ANGLE
+  lazy val URICHARS = URICHAR.commit.many1.map(_.toSeq.mkString)
   lazy val UCHARS = UCHAR.commit.many1.map(_.toSeq.mkString)
   lazy val PN_CHARS_BASE = single(pn_chars_base) | UCHAR
   lazy val PN_CHARS_U = PN_CHARS_BASE | P.single ('_')
@@ -103,24 +103,24 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val PNAME_NS =  (PN_PREFIX.optional << COLON).commit.map(prefix=>prefix.getOrElse(""))
 
-  lazy val IRI_REF =  P.single('<')>>!(P.takeWhile1(iri_char, err).commit.map(_.toSeq.mkString) |
-    IRICHARS).commit.many.mapResult{ r =>
+  lazy val URI_REF =  P.single('<')>>!(P.takeWhile1(iri_char, err).commit.map(_.toSeq.mkString) |
+    URICHARS).commit.many.mapResult{ r =>
       try {
         r.status.map(iri => r.user.resolve(iri.toSeq.mkString))
       } catch {
         case e: IRISyntaxException => {
           Failure(
-            Errors.Single("abedera IRI parsing problem at "+r.position+": "+e.getMessage, None ))
+            Errors.Single("abedera URI parsing problem at "+r.position+": "+e.getMessage, None ))
         } //todo: should this be a failure?
       }
   }<<P.single('>').commit
   lazy val PREFIX_Part1 = PREFIX >> SP >>! PNAME_NS
-  lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>IRI_REF)).mapResult{ r=>
+  lazy val prefixID =  (PREFIX_Part1 ++ (SP.optional>>URI_REF)).mapResult{ r=>
     r.status.map(pair=>r.user.addPrefix(pair._1,pair._2))
     r.status
   }
 
-  lazy val base = (BASE >> SP >>! IRI_REF).mapResult{ r =>
+  lazy val base = (BASE >> SP >>! URI_REF).mapResult{ r =>
     try {
       r.status.map{ iri => {r.user.alterBase(iri); iri}}
     } catch {
@@ -139,7 +139,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
 
   lazy val PrefixedName = (PNAME_NS ++! PN_LOCAL.optional).map{ case ns++local => PName(ns,local.getOrElse(""))}
 
-  lazy val IRIref = IRI_REF | PrefixedName.mapResult[Rdf#IRI]{ r =>
+  lazy val URIref = URI_REF | PrefixedName.mapResult[Rdf#URI]{ r =>
     r.status.flatMap{ pn =>
         //todo: work out how to set more friendly errors https://bitbucket.org/pchiusano/nomo/issue/7/errors
         r.user.resolve(pn).map(i=>Success(i)).getOrElse(
@@ -203,7 +203,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   lazy val RDFLiteral = {
     StringLit ++! (
       LANGTAG.map(tag => (lit: String) => LangLiteral(lit,tag)) |
-      ( P.word("^^")>>!IRIref ).commit.map (tp => (lit: String) => TypedLiteral(lit,tp)) )
+      ( P.word("^^")>>!URIref ).commit.map (tp => (lit: String) => TypedLiteral(lit,tp)) )
       .optional
   }.map {
     case str ++ Some(func) => func(str)
@@ -254,10 +254,10 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   }
 
   lazy val objBlank: P.Parser[Rdf#Node] =  blankNodePropertyList | collection
-  lazy val obj: P.Parser[Any] = (IRIref | literal | BlankNode | objBlank ).mapResult{r =>
+  lazy val obj: P.Parser[Any] = (URIref | literal | BlankNode | objBlank ).mapResult{r =>
     r.status.map{ node => { r.user.setObject(node); r } }
   }
-  lazy val predicate = IRIref
+  lazy val predicate = URIref
   lazy val verb =  ( predicate | P.single('a').as(rdf.typ) ).mapResult{ r =>
     r.status.map{ iri => { r.user.setVerb(iri); r } }
   }
@@ -268,7 +268,7 @@ class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
   lazy val VOL_SP = SP.optional >> P.single(';')
   lazy val predicateObjectList = (SP.optional>>verbObjectList).commit.delimitIgnore(VOL_SP) << VOL_SP.optional
 
-  lazy val subject = ( IRIref | BlankNode | objBlank).mapResult { r =>
+  lazy val subject = ( URIref | BlankNode | objBlank).mapResult { r =>
     r.status.map{ node => { r.user.pushSubject(node); node } }
   }
 

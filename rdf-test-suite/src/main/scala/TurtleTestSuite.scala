@@ -33,11 +33,11 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
   
   def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriples = prefix("ntriples/")
-    val creator = IRI("http://purl.org/dc/elements/1.1/creator")
-    val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
+    val creator = URI("http://purl.org/dc/elements/1.1/creator")
+    val publisher = URI("http://purl.org/dc/elements/1.1/publisher")
     val dave = "Dave Beckett".§
     val art = "Art Barstow".§
-    val w3org = IRI("http://www.w3.org/")
+    val w3org = URI("http://www.w3.org/")
     Graph(
       (ntriples, creator, dave),
       (ntriples, creator, art),

@@ -6,26 +6,26 @@ object RDFUtils {
 
 trait RDFUtils[Rdf <: RDF] { self =>
 
-  def supportDocument(iri: Rdf#IRI): Rdf#IRI
+  def supportDocument(iri: Rdf#URI): Rdf#URI
 
-  class IRIW(iri: Rdf#IRI) {
-    def supportDocument: Rdf#IRI =
+  class URIW(iri: Rdf#URI) {
+    def supportDocument: Rdf#URI =
       self.supportDocument(iri)
   }
 
-  implicit def wrapIRI(iri: Rdf#IRI) = new IRIW(iri)
+  implicit def wrapURI(iri: Rdf#URI) = new URIW(iri)
 }
 
 class RDFUtilsBuilder[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends RDFUtils[Rdf] {
 
   import ops._
 
-  def supportDocument(iri: Rdf#IRI): Rdf#IRI = {
-    val IRI(iriString) = iri
+  def supportDocument(iri: Rdf#URI): Rdf#URI = {
+    val URI(iriString) = iri
     val uri = new java.net.URI(iriString)
     import uri._
     val uriNoFrag = new java.net.URI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, null)
-    IRI(uriNoFrag.toString)
+    URI(uriNoFrag.toString)
   }
 
 }

@@ -6,10 +6,10 @@ package org.w3.banana.n3
 
 import collection.mutable
 import org.w3.banana._
-import java.net.{URISyntaxException, URI}
-import org.apache.abdera.i18n.iri.{IRISyntaxException, IRI => aIRI}
+import java.net.{URISyntaxException, URI => jURI}
+import org.apache.abdera.i18n.iri.{IRISyntaxException, IRI => aURI}
 
-//perhaps we should use this as our IRI?
+//perhaps we should use this as our URI?
 
 /**
  * An agent that collects triples as they are built up and places them in a
@@ -22,7 +22,7 @@ import org.apache.abdera.i18n.iri.{IRISyntaxException, IRI => aIRI}
  * For the moment there is a bit of security, and the code will throw exceptions at runtime
  * if something is done wrong. It should not be able to do it though.
  */
-case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[URI]=None) {
+case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None) {
 
   import ops._
 
@@ -31,7 +31,7 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[URI]=None)
   //we imagine that we are sending these elements to an agent.
   // todo: replace with more appropriate structure
   val queue: mutable.Queue[Rdf#Triple] = new mutable.Queue[Rdf#Triple]()
-  def sendTriple(subj: Rdf#Node, rel: Rdf#IRI, obj: Rdf#Node) = queue.enqueue(Triple(subj,rel,obj))
+  def sendTriple(subj: Rdf#Node, rel: Rdf#URI, obj: Rdf#Node) = queue.enqueue(Triple(subj,rel,obj))
   def sendTriple(t: Rdf#Triple) = queue.enqueue(t)
 
 
@@ -60,7 +60,7 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[URI]=None)
    */
   class PairMem(val subj: Rdf#Node) extends Mem {
     //rel is the relation to keep track of, or for lists the first element of the list
-    var rel : Rdf#IRI = _
+    var rel : Rdf#URI = _
     def send(obj: Rdf#Node) { sendTriple(subj,rel,obj) }
 
     def end {}
@@ -152,7 +152,7 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[URI]=None)
   /**
    * @param rel the relation
    */
-  def setVerb(rel: Rdf#IRI) {
+  def setVerb(rel: Rdf#URI) {
     val pm = context.head.asInstanceOf[PairMem]
     pm.rel=rel
   }
@@ -165,32 +165,32 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[URI]=None)
    * prefix related
    */
 
-  private val prefixs = new mutable.HashMap[String, Rdf#IRI]
+  private val prefixs = new mutable.HashMap[String, Rdf#URI]
   def prefixes = prefixs.toMap
 
-  def resolve(pname: PName): Option[Rdf#IRI] = {
-    prefixs.get(pname.prefix).map{ case IRI(pre)=> IRI(pre + pname.name)}
+  def resolve(pname: PName): Option[Rdf#URI] = {
+    prefixs.get(pname.prefix).map{ case URI(pre)=> URI(pre + pname.name)}
   }
 
-  var currentBase = base.map(u=>new aIRI(u))
+  var currentBase = base.map(u=>new aURI(u))
   @throws(classOf[IRISyntaxException])
-  def alterBase(newbase: Rdf#IRI) {
+  def alterBase(newbase: Rdf#URI) {
     currentBase = newbase match {
-      case IRI(i) => Some(new aIRI(i))
+      case URI(i) => Some(new aURI(i))
     }
   }
 
-  def addPrefix(name: String, value: Rdf#IRI) {
+  def addPrefix(name: String, value: Rdf#URI) {
     prefixs.put(name, value)
   }
 
   @throws(classOf[IRISyntaxException])
-  def resolve(iriStr: String): Rdf#IRI = {
+  def resolve(iriStr: String): Rdf#URI = {
      val iri = currentBase.map{ b=>
-       if ("#" == iriStr) new aIRI(b.toString+"#")
+       if ("#" == iriStr) new aURI(b.toString+"#")
        else b.resolve(iriStr)
-     }.getOrElse(new aIRI(iriStr))
-     IRI(iri.toString)
+     }.getOrElse(new aURI(iriStr))
+     URI(iri.toString)
   }
 
 

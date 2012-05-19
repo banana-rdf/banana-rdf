@@ -8,7 +8,7 @@ trait Jena extends RDF {
   type Graph = JenaGraph
   type Triple = JenaTriple
   type Node = JenaNode
-  type IRI = Node_URI
+  type URI = Node_URI
   type BNode = Node_Blank
   type Literal = Node_Literal
   type TypedLiteral = Node_Literal

@@ -35,7 +35,7 @@ class RDFNodeProjections[Rdf <: RDF](ops: RDFOperations[Rdf]) {
     
     def asDouble: Validation[BananaException, Double] = as[Double]
 
-    def asURI: Validation[BananaException, Rdf#IRI] = {
+    def asURI: Validation[BananaException, Rdf#URI] = {
       Node.fold(node)(
         iri => Success(iri),
         bnode => Failure(FailedConversion("asUri: " + node.toString + " is not a URI")),

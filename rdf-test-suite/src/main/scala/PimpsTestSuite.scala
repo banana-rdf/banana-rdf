@@ -10,10 +10,10 @@ extends WordSpec with MustMatchers {
   import ops._
   val xsd = XSDPrefix(ops)
   
-  "a tuple of (s: Node, p: IRI, o: Node)" must {
+  "a tuple of (s: Node, p: URI, o: Node)" must {
     
     val s = BNode("something")
-    val p = IRI("some:property")
+    val p = URI("some:property")
     val o = TypedLiteral("some value")
     // if it compiles, it means that the implicit it really there
     val tuple = (s, p, o)
@@ -28,10 +28,10 @@ extends WordSpec with MustMatchers {
   }
   
   "a node" must {
-    val node = IRI("foo")
+    val node = URI("foo")
     "be foldable" in {
       node fold (
-        { case IRI(iriString) => "foo" must equal (iriString) },
+        { case URI(iriString) => "foo" must equal (iriString) },
         { bnode => sys.error("should not be here") },
         { literal => sys.error("should not be here") }
       )
@@ -39,7 +39,7 @@ extends WordSpec with MustMatchers {
   }
   
   "a literal" must {
-    val literal = TypedLiteral("my-string", IRI("xsd:string"))
+    val literal = TypedLiteral("my-string", URI("xsd:string"))
     "be foldable" in {
       literal fold (
         { case TypedLiteral(lexicalForm, _) => "my-string" must equal (lexicalForm) },

@@ -69,12 +69,12 @@
 //    val parsedGraph = Graph(tr)
 //    assertEquals("should be three triples in graph",3,parsedGraph.size)
 //
-//    val ntriples = IRI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
-//    val creator = IRI("http://purl.org/dc/elements/1.1/creator")
-//    val publisher = IRI("http://purl.org/dc/elements/1.1/publisher")
+//    val ntriples = URI("http://www.w3.org/2001/sw/RDFCore/ntriples/")
+//    val creator = URI("http://purl.org/dc/elements/1.1/creator")
+//    val publisher = URI("http://purl.org/dc/elements/1.1/publisher")
 //    val dave = "Dave Beckett".§
 //    val art = "Art Barstow".§
-//    val w3org = IRI("http://www.w3.org/")
+//    val w3org = URI("http://www.w3.org/")
 //
 //    val expected =
 //      Graph(

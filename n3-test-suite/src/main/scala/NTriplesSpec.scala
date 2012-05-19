@@ -83,17 +83,17 @@ class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("
        val parsedUri = P.uriRef(uriref)
        ("result = " + parsedUri) |: all(
          (parsedUri.isSuccess :| "failure to parse") &&
-           (parsedUri.get.isInstanceOf[IRI] :| "not an IRI") &&
-           ((parsedUri.get == IRI(uri)) :| "iris don't match input")
+           (parsedUri.get.isInstanceOf[URI] :| "not an URI") &&
+           ((parsedUri.get == URI(uri)) :| "iris don't match input")
        )
      }
      all(res :_*)
    }
 
-  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ TypedLiteral(str, IRI(uri)) =>
-    val literal = '"'+NTriplesParser.toAsciiLiteral(str)+"\"^^<"+NTriplesParser.toIRI(uri)+">"
+  property("dataTypedLiteral") = forAll(genTypedLiteral) { case lit @ TypedLiteral(str, URI(uri)) =>
+    val literal = '"'+NTriplesParser.toAsciiLiteral(str)+"\"^^<"+NTriplesParser.toURI(uri)+">"
     val res = P.fullLiteral(literal)
-    val TypedLiteral(lit, IRI(dt_iri)) = res.get
+    val TypedLiteral(lit, URI(dt_iri)) = res.get
     ("literal="+literal+"\nresult = "+res) |: all (
        res.isSuccess  &&
        lit == str &&
@@ -196,7 +196,7 @@ class SpecTriplesGenerator[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
     "http://über.info/>"
   )
 
-  val encodedURIs = uris.map(u => NTriplesParser.toIRI(u))
+  val encodedURIs = uris.map(u => NTriplesParser.toURI(u))
 
   val uriPairs = uris.zip(encodedURIs)
 
@@ -219,21 +219,21 @@ class SpecTriplesGenerator[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
 
   def genUnicodeStr: Gen[String] = for(cs <- Gen.listOf(ntripleChar)) yield cs.mkString
 
-  def genIRI = Gen.oneOf(uris).map( u => IRI(u) )
+  def genURI = Gen.oneOf(uris).map( u => URI(u) )
 
   def genPlainLiteral = for (str <- genUnicodeStr) yield TypedLiteral(str)
   def genTypedLiteral = for (str <- genUnicodeStr;
-                             tpe <- genIRI) yield TypedLiteral(str, tpe)
+                             tpe <- genURI) yield TypedLiteral(str, tpe)
   def genLangLiteral = for (str <- genUnicodeStr;
                             lang <- genLangStr) yield LangLiteral(str, Lang(lang))
   def genBnode = Gen.identifier.map(id => BNode(id))
 
-  def genAnyNode = Gen.oneOf(genPlainLiteral, genTypedLiteral, genLangLiteral, genBnode, genIRI)
-  def genSubjNode = Gen.oneOf(genIRI, genBnode)
+  def genAnyNode = Gen.oneOf(genPlainLiteral, genTypedLiteral, genLangLiteral, genBnode, genURI)
+  def genSubjNode = Gen.oneOf(genURI, genBnode)
   def genRelation =
     for {
       subj <- genSubjNode
-      rel <- genIRI
+      rel <- genURI
       obj <- genAnyNode
     } yield Triple(subj, rel, obj)
   def genGraph = Gen.listOf(genRelation)
