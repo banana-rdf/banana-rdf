@@ -96,11 +96,16 @@ object YourProjectBuild extends Build {
 
   val n3Deps =
     Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
+
+  val pub = TaskKey[Unit]("pub")
   
   lazy val banana = Project(
     id = "banana",
     base = file("."),
-    settings = buildSettings ++ Seq(EclipseKeys.skipParents in ThisBuild := false),
+    settings = buildSettings ++ Seq(
+      EclipseKeys.skipParents in ThisBuild := false,
+      pub := (),
+      pub <<= pub.dependsOn(publish in rdf, publish in jena, publish in sesame)),
     aggregate = Seq(
       rdf,
       rdfTestSuite,
