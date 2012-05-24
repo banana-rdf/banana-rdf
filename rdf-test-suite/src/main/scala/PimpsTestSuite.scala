@@ -57,7 +57,7 @@ extends WordSpec with MustMatchers {
       val lit: Rdf#TypedLiteral = 42
       val TypedLiteral(lexicalForm, datatype) = lit
       lexicalForm must equal ("42")
-      datatype must equal (xsd.integer)
+      datatype must equal (xsd.int)
     }
   }
   

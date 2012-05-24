@@ -1,5 +1,6 @@
 package org.w3.banana
 
+import scalaz._
 
 trait Prefix[Rdf <: RDF] {
   def prefixName: String
@@ -16,6 +17,7 @@ object Prefix {
 
 class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String, ops: RDFOperations[Rdf]) extends Prefix[Rdf] {
   import ops.URI
+  override def toString: String = "Prefix(" + prefixName + ")"
   def apply(value: String): Rdf#URI = URI(prefixIri+value)
   def unapply(iri: Rdf#URI): Option[String] = {
     val URI(iriString) = iri
@@ -24,6 +26,11 @@ class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String, o
     else
       None
   }
+  def getLocalName(iri: Rdf#URI): Validation[BananaException, String] =
+    unapply(iri) match {
+      case None => Failure(LocalNameException(this.toString + " couldn't extract localname for " + iri.toString))
+      case Some(localname) => Success(localname)
+    }
 }
 
 
@@ -58,6 +65,7 @@ class XSDPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("xsd"
   val boolean = apply("boolean")
   val trueLit: Rdf#TypedLiteral = TypedLiteral("true", boolean)
   val falseLit: Rdf#TypedLiteral = TypedLiteral("false", boolean)
+  val dateTime = apply("dateTime")
 }
 
 

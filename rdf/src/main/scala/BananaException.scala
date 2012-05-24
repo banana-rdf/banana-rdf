@@ -19,3 +19,5 @@ object WrappedThrowable {
       case t => Failure(WrappedThrowable(t))
     }
 }
+
+case class LocalNameException(message: String) extends Exception(message) with BananaException

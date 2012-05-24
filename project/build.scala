@@ -64,6 +64,13 @@ object YourProjectBuild extends Build {
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
 
+  val jodaTime = "joda-time" % "joda-time" % "2.1"
+  val jodaConvert = "org.joda" % "joda-convert" % "1.2"
+
+  val jodatimeDeps = Seq(
+    libraryDependencies += jodaTime % "provided",
+    libraryDependencies += jodaConvert % "provided")
+
   val junitInterface = "com.novocode" % "junit-interface" % "0.8"
   val scalacheck = "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
   val scalatest = "org.scalatest" %% "scalatest" % "1.7.1"
@@ -122,6 +129,8 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += scalaz,
+      libraryDependencies += jodaTime,
+      libraryDependencies += jodaConvert,
       publishMavenStyle := true
     )
   )
@@ -130,7 +139,9 @@ object YourProjectBuild extends Build {
     id = "banana-rdf-test-suite",
     base = file("rdf-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ Seq(
-      libraryDependencies += akka
+      libraryDependencies += akka,
+      libraryDependencies += jodaTime,
+      libraryDependencies += jodaConvert
     )
   ) dependsOn (rdf)
 

@@ -21,6 +21,12 @@ class Diesel[Rdf <: RDF](
 
   val rdf = RDFPrefix(ops)
 
+  private val commonLiteralBinders = CommonLiteralBinders(ops)
+  implicit val stringBinder = commonLiteralBinders.StringBinder
+  implicit val intBinder = commonLiteralBinders.IntBinder
+  implicit val doubleBinder = commonLiteralBinders.DoubleBinder
+  implicit val dateTimeBinder = commonLiteralBinders.DateTimeBinder
+
   class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
     import pointed.{ node => _node , graph }
@@ -88,6 +94,18 @@ class Diesel[Rdf <: RDF](
           val triples: Iterable[Rdf#Triple] = (o :: os.toList) map { o => Triple(s, p, o) }
           Graph(triples) union acc
         }
+      PointedGraph(s, graph)
+    }
+
+    def ->-[T](o: T)(implicit binder: LiteralBinder[Rdf, T]): PointedGraph[Rdf] = {
+      val PointedGraph(s, acc) = pointed
+      val graph = acc union Graph(Triple(s, p, binder.toLiteral(o)))
+      PointedGraph(s, graph)
+    }
+
+    def ->-[T1, T2](o1: T1, o2: T2)(implicit b1: LiteralBinder[Rdf, T1], b2: LiteralBinder[Rdf, T2]): PointedGraph[Rdf] = {
+      val PointedGraph(s, acc) = pointed
+      val graph = acc union Graph(Triple(s, p, b1.toLiteral(o1)), Triple(s, p, b2.toLiteral(o2)))
       PointedGraph(s, graph)
     }
 

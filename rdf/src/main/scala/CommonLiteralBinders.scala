@@ -2,6 +2,7 @@ package org.w3.banana
 
 import scalaz._
 import scalaz.Validation._
+import org.joda.time.DateTime
 
 object CommonLiteralBinders {
 
@@ -41,7 +42,7 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
       Literal.fold(literal)(
         {
           case TypedLiteral(lexicalForm, datatype) =>
-            if (datatype == xsd.integer)
+            if (datatype == xsd.int)
               Success(lexicalForm.toInt)
             else
               Failure(FailedConversion(lexicalForm + " may be convertible to an Integer but has following datatype: " + datatype))
@@ -70,6 +71,29 @@ class CommonLiteralBinders[Rdf <: RDF](ops: RDFOperations[Rdf]) {
     }
 
     def toLiteral(t: Double): Rdf#Literal = TypedLiteral(t.toString, xsd.double)
+
+  }
+
+  implicit val DateTimeBinder: LiteralBinder[Rdf, DateTime] = new LiteralBinder[Rdf, DateTime] {
+
+    def fromLiteral(literal: Rdf#Literal): Validation[BananaException, DateTime] = {
+      Literal.fold(literal)(
+        {
+          case TypedLiteral(lexicalForm, datatype) =>
+            if (datatype == xsd.dateTime)
+              try {
+                Success(DateTime.parse(lexicalForm))
+              } catch {
+                case t => Failure(FailedConversion(literal.toString + " is of type xsd:dateTime but its lexicalForm could not be parsed: " + lexicalForm))
+              }
+            else
+              Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
+        },
+        langLiteral => Failure(FailedConversion(langLiteral + " is a langLiteral, you want to access its lexical form"))
+      )
+    }
+
+    def toLiteral(t: DateTime): Rdf#Literal = TypedLiteral(t.toString, xsd.dateTime)
 
   }
 

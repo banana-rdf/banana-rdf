@@ -123,20 +123,20 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
   "Diesel must understand Scala's native types" in {
 
-    val g: PointedGraph[Rdf] = (
+    val g = (
       bnode("betehess")
         -- foaf.name ->- "Alexandre"
         -- foaf.age ->- 29
         -- foaf.height ->- 1.80
-    )
+    ).graph
 
     val expectedGraph =
       Graph(
         Triple(BNode("betehess"), foaf.name, TypedLiteral("Alexandre", xsd.string)),
-        Triple(BNode("betehess"), foaf.age, TypedLiteral("29", xsd.integer)),
+        Triple(BNode("betehess"), foaf.age, TypedLiteral("29", xsd.int)),
         Triple(BNode("betehess"), foaf.height, TypedLiteral("1.8", xsd.double)))
 
-    assert(g.graph isIsomorphicWith expectedGraph)
+    assert(g isIsomorphicWith expectedGraph)
   }
 
   "Diesel must support RDF collections" in {
@@ -164,7 +164,8 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
     val expectedGraph = (
       bnode("betehess") -- foaf.name ->- l
     )
-
+println(g.graph)
+println(expectedGraph.graph)
     assert(g.graph isIsomorphicWith expectedGraph.graph)
   }
 

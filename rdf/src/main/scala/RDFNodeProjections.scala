@@ -13,7 +13,7 @@ class RDFNodeProjections[Rdf <: RDF](ops: RDFOperations[Rdf]) {
 
   import ops._
 
-  val commonLiteralBinders = CommonLiteralBinders(ops)
+  private val commonLiteralBinders = CommonLiteralBinders(ops)
   import commonLiteralBinders._
 
   class NodeW(node: Rdf#Node) {

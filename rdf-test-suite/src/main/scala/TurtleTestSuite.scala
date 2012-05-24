@@ -82,6 +82,8 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
       computedFooGraph <- reader.read(turtleString, foo)
     } yield computedFooGraph
     val g: Rdf#Graph = bar.fold( t => throw t, g => g )
+    println(fooGraph)
+    println(g)
     assert(fooGraph isIsomorphicWith g)
   }
   
