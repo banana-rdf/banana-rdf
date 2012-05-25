@@ -112,7 +112,7 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ Seq(
       EclipseKeys.skipParents in ThisBuild := false,
       pub := (),
-      pub <<= pub.dependsOn(publish in rdf, publish in jena, publish in sesame)),
+      pub <<= pub.dependsOn(publish in rdf, publish in n3, publish in jena, publish in sesame)),
     aggregate = Seq(
       rdf,
       rdfTestSuite,
