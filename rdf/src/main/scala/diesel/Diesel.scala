@@ -62,6 +62,9 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(ns, graph)
     }
 
+    def takeOption: Validation[BananaException, Option[Rdf#Node]] =
+      Success(Option(nodes.iterator.next))
+
     def takeOne: Validation[BananaException, Rdf#Node] = {
       val first = nodes.iterator.next
       if (first == null)
