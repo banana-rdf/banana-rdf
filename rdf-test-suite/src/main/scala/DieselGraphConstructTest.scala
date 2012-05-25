@@ -164,8 +164,6 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
     val expectedGraph = (
       bnode("betehess") -- foaf.name ->- l
     )
-println(g.graph)
-println(expectedGraph.graph)
     assert(g.graph isIsomorphicWith expectedGraph.graph)
   }
 
