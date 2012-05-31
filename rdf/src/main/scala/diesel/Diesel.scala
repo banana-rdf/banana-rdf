@@ -49,6 +49,24 @@ class Diesel[Rdf <: RDF](
 
     def predicates = getPredicates(graph, node)
 
+    def asList[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, List[T]] =
+      try {
+        var elems = List[T]()
+        var current = node
+        while(current != rdf.nil) {
+          (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
+            case (List(first), List(rest)) => {
+              elems ::= first.asLiteral.flatMap(binder.fromLiteral).fold(be => throw be, e => e)
+              current = rest
+            }
+            case _ => throw new FailedConversion("asList: couldn't decode a list")
+          }
+        }
+        Success(elems.reverse)
+      } catch {
+        case be: BananaException => Failure(be)
+      }
+
   }
 
   class PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]) extends Iterable[PointedGraph[Rdf]] {
@@ -62,10 +80,7 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(ns, graph)
     }
 
-    def takeOption: Validation[BananaException, Option[Rdf#Node]] =
-      Success(Option(nodes.iterator.next))
-
-    def takeOne: Validation[BananaException, Rdf#Node] = {
+    def takeOneNode: Validation[BananaException, Rdf#Node] = {
       val first = nodes.iterator.next
       if (first == null)
         Failure(WrongExpectation("not even one node"))
@@ -73,7 +88,24 @@ class Diesel[Rdf <: RDF](
         Success(first)
     }
 
-    def exactlyOne: Validation[BananaException, Rdf#Node] = {
+    def takeOneUri: Validation[BananaException, Rdf#URI] =
+      takeOneNode.flatMap(_.asUri)
+
+    def takeOne[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, T] =
+      takeOneNode.flatMap(_.as[T])
+
+    def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
+      val it = nodes.iterator
+      val first = it.next
+      if (first == null)
+        Failure(WrongExpectation("expected exactly one node but got 0"))
+      else if (it.hasNext)
+        Failure(WrongExpectation("expected exactly one node but got more than 1"))
+      else
+        Success(PointedGraph(first, graph))
+    }
+
+    def exactlyOneNode: Validation[BananaException, Rdf#Node] = {
       val it = nodes.iterator
       val first = it.next
       if (first == null)
@@ -83,6 +115,20 @@ class Diesel[Rdf <: RDF](
       else
         Success(first)
     }
+
+    def exactlyOneUri: Validation[BananaException, Rdf#URI] =
+      exactlyOneNode.flatMap(_.asUri)
+
+    def exactlyOne[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, T] =
+      exactlyOneNode.flatMap(_.as[T])
+
+    def asOption[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, Option[T]] = nodes.headOption match {
+      case None => Success(None)
+      case Some(node) => node.as[T] map (Some(_))
+    }
+
+    def asList[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, List[T]] =
+      exactlyOnePointedGraph flatMap (_.asList[T])
     
   }
 
@@ -119,6 +165,11 @@ class Diesel[Rdf <: RDF](
       PointedGraph(s, graph)
     }
 
+    def ->-[T](opt: Option[T])(implicit binder: LiteralBinder[Rdf, T]): PointedGraph[Rdf] = opt match {
+      case None => pointed
+      case Some(t) => this.->-(t)
+    }
+
     def ->-(collection: List[Rdf#Node]): PointedGraph[Rdf] = {
       var current: Rdf#Node = rdf.nil
       val triples = scala.collection.mutable.Set[Rdf#Triple]()
@@ -131,7 +182,7 @@ class Diesel[Rdf <: RDF](
       val PointedGraph(s, acc) = pointed
       triples += Triple(s, p, current)
       val graph = acc union Graph(triples)
-      PointedGraph(current, Graph(triples))
+      PointedGraph(s, graph)
     }
 
   }

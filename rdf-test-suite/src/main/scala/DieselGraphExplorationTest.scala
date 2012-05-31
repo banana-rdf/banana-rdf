@@ -28,6 +28,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
     uri("http://bertails.org/#betehess")
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.age ->- 29
+    -- foaf("foo") ->- List[Rdf#Node](1, 2, 3)
     -- foaf.knows ->- (
       uri("http://bblfish.net/#hjs")
       -- foaf.name ->- "Henry Story"
@@ -54,9 +55,9 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   "we must be able to project nodes to Scala types" in {
 
-    (betehess / foaf.age).exactlyOne.flatMap(_.asInt) must be (Success(29))
+    (betehess / foaf.age).exactlyOne[Int] must be (Success(29))
 
-    (betehess / foaf.knows / foaf.name).takeOne.flatMap(_.asString) must be (Success("Henry Story"))
+    (betehess / foaf.knows / foaf.name).takeOne[String] must be (Success("Henry Story"))
 
   }
 
@@ -64,6 +65,20 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
     val predicates = betehess.predicates.toList
     List(foaf.name, foaf.age, foaf.knows) foreach { p => predicates must contain (p) }
+
+  }
+
+  "we must be able to get rdf lists" in {
+
+    (betehess / foaf("foo")).asList[Int] must be (Success(List(1, 2, 3)))
+
+  }
+
+  "we must be able to optionally get objects" in {
+
+    (betehess / foaf.age).asOption[Int] must be (Success(Some(29)))
+
+    (betehess / foaf("unknown")).asOption[Int] must be (Success(None))
 
   }
 

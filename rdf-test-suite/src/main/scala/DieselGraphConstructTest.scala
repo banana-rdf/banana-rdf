@@ -7,7 +7,8 @@ import org.scalatest.matchers.MustMatchers
 import java.io._
 import org.scalatest.EitherValues._
 
-import scalaz.Validation
+import scalaz._
+import scalaz.Scalaz._
 import scalaz.Validation._
 
 abstract class DieselGraphConstructTest[Rdf <: RDF](
@@ -181,6 +182,43 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
     )
 
     assert(g.graph isIsomorphicWith expectedGraph.graph)
+  }
+
+
+  "providing a None as an object does not emit a triple" in {
+
+    val g = (
+      bnode("betehess")
+        -- foaf.name ->- "Alexandre"
+        -- foaf.age ->- none[Int]
+    ).graph
+
+    val expectedGraph = (
+      bnode("betehess") -- foaf.name ->- "Alexandre"
+    ).graph
+
+    assert(g isIsomorphicWith expectedGraph)
+
+  }
+
+
+
+  "providing a Some(t) as an object just emits the triple with t as an object" in {
+
+    val g = (
+      bnode("betehess")
+        -- foaf.name ->- "Alexandre"
+        -- foaf.age ->- some(42)
+    ).graph
+
+    val expectedGraph = (
+      bnode("betehess")
+        -- foaf.name ->- "Alexandre"
+        -- foaf.age ->- 42
+    ).graph
+
+    assert(g isIsomorphicWith expectedGraph)
+
   }
 
 
