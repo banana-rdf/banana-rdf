@@ -170,12 +170,12 @@ class Diesel[Rdf <: RDF](
       case Some(t) => this.->-(t)
     }
 
-    def ->-(collection: List[Rdf#Node]): PointedGraph[Rdf] = {
+    def ->-[T](collection: List[T])(implicit binder: LiteralBinder[Rdf, T]): PointedGraph[Rdf] = {
       var current: Rdf#Node = rdf.nil
       val triples = scala.collection.mutable.Set[Rdf#Triple]()
       collection.reverse foreach { a =>
         val newBNode = BNode()
-        triples += Triple(newBNode, rdf.first, a)
+        triples += Triple(newBNode, rdf.first, binder.toLiteral(a))
         triples += Triple(newBNode, rdf.rest, current)
         current = newBNode
       }

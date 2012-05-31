@@ -28,7 +28,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
     uri("http://bertails.org/#betehess")
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.age ->- 29
-    -- foaf("foo") ->- List[Rdf#Node](1, 2, 3)
+    -- foaf("foo") ->- List(1, 2, 3)
     -- foaf.knows ->- (
       uri("http://bblfish.net/#hjs")
       -- foaf.name ->- "Henry Story"

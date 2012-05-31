@@ -144,19 +144,19 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess")
-        -- foaf.name ->- List[Rdf#Node](29, bnode("bar"), "foo")
+        -- foaf.name ->- List(1, 2, 3)
     )
 
 
     val l: PointedGraph[Rdf] = (
       bnode()
-        -- rdf.first ->- 29
+        -- rdf.first ->- 1
         -- rdf.rest ->- (
           bnode()
-            -- rdf.first ->- bnode("bar")
+            -- rdf.first ->- 2
             -- rdf.rest ->- (
               bnode()
-                -- rdf.first ->- "foo"
+                -- rdf.first ->- 3
                 -- rdf.rest ->- rdf.nil
             )
         )
@@ -174,7 +174,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
   "Diesel must support RDF collections (empty list)" in {
 
     val g: PointedGraph[Rdf] = (
-      bnode("betehess") -- foaf.name ->- List[Rdf#Node]()
+      bnode("betehess") -- foaf.name ->- List[String]()
     )
 
     val expectedGraph = (
