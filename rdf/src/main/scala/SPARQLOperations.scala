@@ -27,8 +27,14 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
     SelectQuery(completeQuery)
   }
 
-  // def ConstructQuery(query: String): Sparql#ConstructQuery
+  def ConstructQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Sparql#ConstructQuery = {
+    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
+    ConstructQuery(completeQuery)
+  }
 
-  // def AskQuery(query: String): Sparql#AskQuery
+  def AskQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Sparql#AskQuery = {
+    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
+    AskQuery(completeQuery)
+  }
 
 }
