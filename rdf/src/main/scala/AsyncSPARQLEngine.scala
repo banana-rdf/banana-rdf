@@ -52,7 +52,7 @@ trait AsyncSPARQLEngineBase[Rdf <: RDF, Sparql <: SPARQL] extends AsyncSPARQLEng
       Props(new EngineActor(sparqlEngine))
         .withRouter(FromConfig())
         .withDispatcher("rdfstore-dispatcher"),
-      "rdfstore")
+      "sparql-engine")
 
   def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Sparql#Row]] =
     engineActor.?(Select(query)).asInstanceOf[Future[Iterable[Sparql#Row]]]

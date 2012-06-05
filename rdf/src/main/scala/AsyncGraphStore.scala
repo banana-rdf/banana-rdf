@@ -57,7 +57,7 @@ trait AsyncGraphStoreBase[Rdf <: RDF] extends AsyncGraphStore[Rdf] {
       Props(new RDFStoreActor(graphStore))
         .withRouter(FromConfig())
         .withDispatcher("rdfstore-dispatcher"),
-      "rdfstore")
+      "graph-store")
 
   def addNamedGraph(uri: Rdf#URI, graph: Rdf#Graph): Future[Unit] =
     storeActor.?(AddNamedGraph(uri, graph)).mapTo[Unit]
