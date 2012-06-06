@@ -19,6 +19,7 @@ class Diesel[Rdf <: RDF](
   import union._
   import graphTraversal._
 
+  val xsd = XSDPrefix(ops)
   val rdf = RDFPrefix(ops)
 
   private val commonLiteralBinders = CommonLiteralBinders(ops)
@@ -201,11 +202,27 @@ class Diesel[Rdf <: RDF](
 
   }
 
+  class GraphW(graph: Rdf#Graph) {
+
+    def getAllInstancesOf(clazz: Rdf#URI): Validation[BananaException, PointedGraphs[Rdf]] =
+      try {
+        val instances = getSubjects(graph, rdf("type"), clazz): Iterable[Rdf#Node]
+        Success(PointedGraphs(instances, graph))
+      } catch {
+        case be: BananaException => Failure(be)
+      }
+
+
+  }
+
+
   implicit def node2PointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(new PointedGraph[Rdf](node, Graph.empty))
 
   implicit def pointedGraph2PointedGraphW(pointed: PointedGraph[Rdf]): PointedGraphW = new PointedGraphW(pointed)
 
   implicit def multiplePointedGraph2PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]): PointedGraphsW = new PointedGraphsW(pointedGraphs)
+
+  implicit def graph2GraphW(graph: Rdf#Graph): GraphW = new GraphW(graph)
 
   def bnode(): Rdf#BNode = BNode()
 

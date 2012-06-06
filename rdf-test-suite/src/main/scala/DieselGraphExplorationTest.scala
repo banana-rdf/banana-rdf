@@ -25,13 +25,13 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
   val xsd = XSDPrefix(ops)
 
   val betehess: PointedGraph[Rdf] = (
-    uri("http://bertails.org/#betehess")
+    uri("http://bertails.org/#betehess").a(foaf.Person)
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.name ->- "Alexander".lang("en")
     -- foaf.age ->- 29
     -- foaf("foo") ->- List(1, 2, 3)
     -- foaf.knows ->- (
-      uri("http://bblfish.net/#hjs")
+      uri("http://bblfish.net/#hjs").a(foaf.Person)
       -- foaf.name ->- "Henry Story"
       -- foaf.currentProject ->- uri("http://webid.info/")
     )
@@ -116,6 +116,14 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
   "asking for exactly one pointed graph when there are more than one must fail" in {
 
     (betehess / foaf.name).exactlyOnePointedGraph must be ('failure)
+
+  }
+
+  "getAllInstancesOf must give all instances of a given class" in {
+
+    val persons = (betehess.graph.getAllInstancesOf(foaf.Person) getOrElse sys.error("")).nodes
+    
+    persons.toSet must be === (Set(uri("http://bertails.org/#betehess"), uri("http://bblfish.net/#hjs")))
 
   }
 

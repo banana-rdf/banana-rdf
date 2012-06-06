@@ -2,14 +2,14 @@ package org.w3.banana.sesame
 
 import org.w3.banana._
 import scala.collection.JavaConverters._
+import org.openrdf.model.Resource
+import org.openrdf.model.util._
 
 object SesameGraphTraversal extends RDFGraphTraversal[Sesame] {
 
   import SesameOperations._
 
   def getObjects(graph: Sesame#Graph, subject: Sesame#Node, predicate: Sesame#URI): Iterable[Sesame#Node] = {
-
-    import org.openrdf.model.util._
 
     def iterable(subject: org.openrdf.model.Resource) = new Iterable[Sesame#Node] {
       def iterator = GraphUtil.getObjectIterator(graph, subject, predicate).asScala
@@ -34,5 +34,10 @@ object SesameGraphTraversal extends RDFGraphTraversal[Sesame] {
       lit => Seq.empty
     )
   }
+
+  def getSubjects(graph: Sesame#Graph, predicate: Sesame#URI, obj: Sesame#Node): Iterable[Sesame#Node] =
+    new Iterable[Sesame#Node] {
+      def iterator = GraphUtil.getSubjectIterator(graph, predicate, obj).asScala
+    }
 
 }

@@ -34,9 +34,16 @@ object JenaGraphTraversal extends RDFGraphTraversal[Jena] {
   }
 
   def getPredicates(graph: Jena#Graph, subject: Jena#Node): Iterable[Jena#URI] = {
-    val triples: Iterator[Jena#URI] = graph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala map { triple => triple.getPredicate().asInstanceOf[Node_URI]}
+    val predicates: Iterator[Jena#URI] = graph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala map { triple => triple.getPredicate().asInstanceOf[Node_URI]}
     new Iterable[Jena#URI] {
-      def iterator = triples
+      def iterator = predicates
+    }
+  }
+
+  def getSubjects(graph: Jena#Graph, predicate: Jena#URI, obj: Jena#Node): Iterable[Jena#Node] = {
+    val subjects: Iterator[Jena#Node] = graph.find(JenaNode.ANY, JenaNode.ANY, obj).asScala map { triple => triple.getSubject()}
+    new Iterable[Jena#Node] {
+      def iterator = subjects
     }
   }
 
