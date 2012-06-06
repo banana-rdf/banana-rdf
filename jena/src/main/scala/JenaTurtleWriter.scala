@@ -7,19 +7,21 @@ import com.hp.hpl.jena.rdf.model._
 import scalaz.Validation
 import scalaz.Validation._
 
-object JenaTurtleWriter extends TurtleWriter[Jena](JenaOperations) {
-  
+class JenaWriter(syntax: String) extends BlockingWriter[Jena] {
+  val ops = JenaOperations
   import JenaOperations._
   
   def write(graph: Jena#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
     val model = ModelFactory.createModelForGraph(graph)
-    model.getWriter("TURTLE").write(model, os, base)
+    model.getWriter(syntax).write(model, os, base)
   }
   
   def write(graph: Jena#Graph, writer: Writer, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
     val model = ModelFactory.createModelForGraph(graph)
-    model.getWriter("TURTLE").write(model, writer, base)
+    model.getWriter(syntax).write(model, writer, base)
   }
-  
-  
 }
+
+object JenaTurtleWriter extends JenaWriter("TURTLE") with TurtleWriter[Jena]
+
+object JenaRdfXmlWriter extends JenaWriter("RDF/XML") with RdfXmlWriter[Jena]
