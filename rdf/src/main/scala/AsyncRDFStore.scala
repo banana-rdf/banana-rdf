@@ -14,7 +14,11 @@ object AsyncRDFStore {
 
   val DEFAULT_CONFIG = com.typesafe.config.ConfigFactory.parseString("""
 akka.actor.deployment {
-  /rdfstore {
+  /graph-store {
+    router = round-robin
+    nr-of-instances = 2
+  }
+  /sparql-engine {
     router = round-robin
     nr-of-instances = 2
   }

@@ -5,6 +5,7 @@ import com.hp.hpl.jena.sparql.core._
 
 class JenaAsyncSparqlEngineTest() extends AsyncSparqlEngineTest(
   JenaOperations,
+  JenaRDFXMLReader,
   JenaDiesel,
   JenaGraphIsomorphism,
   JenaSPARQLOperations,

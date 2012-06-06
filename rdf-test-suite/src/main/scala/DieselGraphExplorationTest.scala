@@ -27,6 +27,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
   val betehess: PointedGraph[Rdf] = (
     uri("http://bertails.org/#betehess")
     -- foaf.name ->- "Alexandre".lang("fr")
+    -- foaf.name ->- "Alexander".lang("en")
     -- foaf.age ->- 29
     -- foaf("foo") ->- List(1, 2, 3)
     -- foaf.knows ->- (
@@ -78,8 +79,45 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
     (betehess / foaf.age).asOption[Int] must be (Success(Some(29)))
 
+    (betehess / foaf.age).asOption[String] must be ('failure)
+
     (betehess / foaf("unknown")).asOption[Int] must be (Success(None))
 
   }
 
+  "asking for one (or exactly one) node when there is none must fail" in {
+
+    (betehess / foaf("unknown")).takeOneNode must be ('failure)
+
+    (betehess / foaf("unknown")).exactlyOneNode must be ('failure)
+
+  }
+
+  "asking for exactly one node when there are more than one must fail" in {
+
+    (betehess / foaf.name).exactlyOneNode must be ('failure)
+
+  }
+
+  "asking for one node when there is at least one must be a success" in {
+
+    (betehess / foaf.name).takeOneNode must be ('success)
+
+    (betehess / foaf.age).takeOneNode must be ('success)
+
+  }
+
+  "asking for exactly one pointed graph when there is none must fail" in {
+
+    (betehess / foaf("unknown")).exactlyOnePointedGraph must be ('failure)
+
+  }
+
+  "asking for exactly one pointed graph when there are more than one must fail" in {
+
+    (betehess / foaf.name).exactlyOnePointedGraph must be ('failure)
+
+  }
+
+  
 }

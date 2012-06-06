@@ -19,7 +19,7 @@ class Diesel[Rdf <: RDF](
   import union._
   import graphTraversal._
 
-  val rdf = RDFPrefix(ops)
+  private val rdf = RDFPrefix(ops)
 
   private val commonLiteralBinders = CommonLiteralBinders(ops)
   implicit val stringBinder = commonLiteralBinders.StringBinder
@@ -81,46 +81,42 @@ class Diesel[Rdf <: RDF](
     }
 
     def takeOneNode: Validation[BananaException, Rdf#Node] = {
-      val first = nodes.iterator.next
-      if (first == null)
-        Failure(WrongExpectation("not even one node"))
-      else
+      val it = nodes.iterator
+      if (! it.hasNext) {
+        Failure(WrongExpectation("expected exactly one node but got 0"))
+      } else {
+        val first = it.next
         Success(first)
+      }
     }
 
     def takeOneUri: Validation[BananaException, Rdf#URI] =
-      takeOneNode.flatMap(_.asUri)
+      takeOneNode flatMap (_.asUri)
 
     def takeOne[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, T] =
-      takeOneNode.flatMap(_.as[T])
+      takeOneNode flatMap (_.as[T])
 
-    def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
-      val it = nodes.iterator
-      val first = it.next
-      if (first == null)
-        Failure(WrongExpectation("expected exactly one node but got 0"))
-      else if (it.hasNext)
-        Failure(WrongExpectation("expected exactly one node but got more than 1"))
-      else
-        Success(PointedGraph(first, graph))
-    }
+    def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] =
+      this.exactlyOneNode map { PointedGraph(_, graph) }
 
     def exactlyOneNode: Validation[BananaException, Rdf#Node] = {
       val it = nodes.iterator
-      val first = it.next
-      if (first == null)
+      if (! it.hasNext) {
         Failure(WrongExpectation("expected exactly one node but got 0"))
-      else if (it.hasNext)
-        Failure(WrongExpectation("expected exactly one node but got more than 1"))
-      else
-        Success(first)
+      } else {
+        val first = it.next
+        if (it.hasNext)
+          Failure(WrongExpectation("expected exactly one node but got more than 1"))
+        else
+          Success(first)
+      }
     }
 
     def exactlyOneUri: Validation[BananaException, Rdf#URI] =
-      exactlyOneNode.flatMap(_.asUri)
+      exactlyOneNode flatMap (_.asUri)
 
     def exactlyOne[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, T] =
-      exactlyOneNode.flatMap(_.as[T])
+      exactlyOneNode flatMap (_.as[T])
 
     def asOption[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, Option[T]] = nodes.headOption match {
       case None => Success(None)

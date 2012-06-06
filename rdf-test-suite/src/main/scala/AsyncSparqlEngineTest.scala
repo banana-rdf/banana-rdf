@@ -5,9 +5,12 @@ import org.scalatest._
 import org.scalatest.matchers._
 import akka.actor.ActorSystem
 import akka.util.Timeout
+import akka.dispatch._
+import akka.util.duration._
 
 abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
+  reader: RDFReader[Rdf, RDFXML],
   dsl: Diesel[Rdf],
   iso: GraphIsomorphism[Rdf],
   sparqlOps: SPARQLOperations[Rdf, Sparql],
@@ -24,51 +27,83 @@ abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
 
   val asyncEngine = AsyncSPARQLEngine(store, system)
 
-  val foaf = FOAFPrefix(ops)
+  val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
-  val graph: Rdf#Graph = (
-    bnode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -- foaf.title ->- "Mr"
-  ).graph
-
-  val graph2: Rdf#Graph = (
-    bnode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -- foaf.knows ->- (
-        uri("http://bblfish.net/#hjs")
-          -- foaf.name ->- "Henry Story"
-          -- foaf.currentProject ->- uri("http://webid.info/")
-      )
-  ).graph
+  val graph = reader.read(file, "http://example.com") getOrElse sys.error("ouch")
 
   override def beforeAll(): Unit = {
     store.addNamedGraph(URI("http://example.com/graph"), graph)
-    store.addNamedGraph(URI("http://example.com/graph2"), graph2)
   }
 
   override def afterAll(): Unit = {
     system.shutdown()
   }
 
-  "betehess must know henry" in {
+  "new-tr.rdf must have Alexandre Bertails as an editor" in {
 
-    val query = AskQuery("""
-prefix foaf: <http://xmlns.com/foaf/0.1/>
+    val query = SelectQuery("""
+prefix : <http://www.w3.org/2001/02pd/rec54#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
 
-ASK {
-  GRAPH <http://example.com/graph2> {
-    [] foaf:knows <http://bblfish.net/#hjs>
+SELECT DISTINCT ?name WHERE {
+  graph <http://example.com/graph> {
+    ?thing :editor ?ed .
+    ?ed contact:fullName ?name
   }
 }
 """)
 
-    for {
-      alexKnowsHenry <- asyncEngine.executeAsk(query)
-    } {
-      alexKnowsHenry must be (true)
-    }
+    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second) map { row => getNode(row, "name").asString getOrElse sys.error("") }
+
+    names must contain ("Alexandre Bertails")
 
   }
+
+
+
+
+  "the identity SPARQL Construct must work as expected" in {
+
+    val query = ConstructQuery("""
+CONSTRUCT {
+  ?s ?p ?o
+} WHERE {
+  graph <http://example.com/graph> {
+    ?s ?p ?o
+  }
+}
+""")
+
+    val clonedGraph = Await.result(asyncEngine.executeConstruct(query), 1.second)
+
+    assert(clonedGraph isIsomorphicWith graph)
+
+  }
+
+
+
+  "Alexandre Bertails must appear as an editor in new-tr.rdf" in {
+
+    val query = AskQuery("""
+prefix : <http://www.w3.org/2001/02pd/rec54#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+
+ASK {
+  graph <http://example.com/graph> {
+    ?thing :editor ?ed .
+    ?ed contact:fullName "Alexandre Bertails"
+  }
+}
+""")
+
+    val alexIsThere = Await.result(asyncEngine.executeAsk(query), 1.second)
+
+    alexIsThere must be (true)
+
+  }
+
+
 
 }
