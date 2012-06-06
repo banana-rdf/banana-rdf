@@ -34,11 +34,33 @@ rdfstore-dispatcher {
       store: RDFStore[Rdf, Sparql],
       system: ActorSystem)(
       implicit timeout: Timeout): AsyncRDFStore[Rdf, Sparql] =
-    new AsyncRDFStore[Rdf, Sparql] with AsyncGraphStoreBase[Rdf] with AsyncSPARQLEngineBase[Rdf, Sparql] {
-      val graphStore = store
-      val sparqlEngine = store
-      val factory = system
-      implicit val futuresTimeout = timeout
+    new AsyncRDFStore[Rdf, Sparql] with AsyncGraphStore[Rdf] with AsyncSPARQLEngine[Rdf, Sparql] {
+
+      val asyncGraphStore = new AsyncGraphStoreBase[Rdf](store, system)(timeout)
+
+      def addNamedGraph(uri: Rdf#URI, graph: Rdf#Graph): Future[Unit] =
+        asyncGraphStore.addNamedGraph(uri, graph)
+
+      def appendToNamedGraph(uri: Rdf#URI, graph: Rdf#Graph): Future[Unit] =
+        asyncGraphStore.appendToNamedGraph(uri, graph)
+
+      def getNamedGraph(uri: Rdf#URI): Future[Rdf#Graph] =
+        asyncGraphStore.getNamedGraph(uri)
+
+      def removeGraph(uri: Rdf#URI): Future[Unit] =
+        asyncGraphStore.removeGraph(uri)
+
+      val asyncSparqlEngine = new AsyncSPARQLEngineBase(store, system)(timeout)
+
+      def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Sparql#Row]] =
+        asyncSparqlEngine.executeSelect(query)
+
+      def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph] =
+        asyncSparqlEngine.executeConstruct(query)
+
+      def executeAsk(query: Sparql#AskQuery): Future[Boolean] =
+        asyncSparqlEngine.executeAsk(query)
+
     }
   
 }

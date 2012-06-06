@@ -18,11 +18,11 @@ trait AsyncGraphStore[Rdf <: RDF] {
 
 }
 
-trait AsyncGraphStoreBase[Rdf <: RDF] extends AsyncGraphStore[Rdf] {
-
-  def graphStore: GraphStore[Rdf]
-  def factory: ActorRefFactory
-  implicit def futuresTimeout: Timeout
+class AsyncGraphStoreBase[Rdf <: RDF](
+    graphStore: GraphStore[Rdf],
+    factory: ActorRefFactory)(
+    implicit timeout: Timeout)
+extends AsyncGraphStore[Rdf] {
 
   case class AddNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)
   case class AppendToNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)
@@ -30,7 +30,7 @@ trait AsyncGraphStoreBase[Rdf <: RDF] extends AsyncGraphStore[Rdf] {
   case class RemoveGraph(uri: Rdf#URI)
 
   class RDFStoreActor(store: GraphStore[Rdf]) extends Actor {
-    
+
     def receive = {
       case AddNamedGraph(uri, graph) => {
         store.addNamedGraph(uri, graph)
@@ -52,7 +52,7 @@ trait AsyncGraphStoreBase[Rdf <: RDF] extends AsyncGraphStore[Rdf] {
 
   }
 
-  lazy val storeActor =
+  val storeActor =
     factory.actorOf(
       Props(new RDFStoreActor(graphStore))
         .withRouter(FromConfig())
@@ -79,10 +79,6 @@ object AsyncGraphStore {
       store: GraphStore[Rdf],
       system: ActorSystem)(
       implicit timeout: Timeout): AsyncGraphStore[Rdf] =
-    new AsyncGraphStoreBase[Rdf] {
-      val graphStore = store
-      val factory = system
-      implicit val futuresTimeout = timeout
-    }
+    new AsyncGraphStoreBase[Rdf](store, system)(timeout)
   
 }

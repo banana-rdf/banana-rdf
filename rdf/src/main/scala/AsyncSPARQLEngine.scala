@@ -19,11 +19,11 @@ trait AsyncSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
 
 }
 
-trait AsyncSPARQLEngineBase[Rdf <: RDF, Sparql <: SPARQL] extends AsyncSPARQLEngine[Rdf, Sparql] {
-
-  def sparqlEngine: SPARQLEngine[Rdf, Sparql]
-  def factory: ActorRefFactory
-  implicit def futuresTimeout: Timeout
+class AsyncSPARQLEngineBase[Rdf <: RDF, Sparql <: SPARQL](
+    sparqlEngine: SPARQLEngine[Rdf, Sparql],
+    factory: ActorRefFactory)(
+    implicit timeout: Timeout)
+extends AsyncSPARQLEngine[Rdf, Sparql] {
 
   case class Select(query: Sparql#SelectQuery)
   case class Construct(query: Sparql#ConstructQuery)
@@ -47,7 +47,7 @@ trait AsyncSPARQLEngineBase[Rdf <: RDF, Sparql <: SPARQL] extends AsyncSPARQLEng
     }
   }
 
-  lazy val engineActor =
+  val engineActor =
     factory.actorOf(
       Props(new EngineActor(sparqlEngine))
         .withRouter(FromConfig())
@@ -71,10 +71,6 @@ object AsyncSPARQLEngine {
     engine: SPARQLEngine[Rdf, Sparql],
     system: ActorSystem)(
     implicit timeout: Timeout): AsyncSPARQLEngine[Rdf, Sparql] =
-      new AsyncSPARQLEngineBase[Rdf, Sparql] {
-        val sparqlEngine = engine
-        val factory = system
-        implicit val futuresTimeout = timeout
-      }
+      new AsyncSPARQLEngineBase[Rdf, Sparql](engine, system)(timeout)
 
 }

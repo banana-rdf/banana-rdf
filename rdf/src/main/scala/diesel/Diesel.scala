@@ -19,7 +19,7 @@ class Diesel[Rdf <: RDF](
   import union._
   import graphTraversal._
 
-  private val rdf = RDFPrefix(ops)
+  val rdf = RDFPrefix(ops)
 
   private val commonLiteralBinders = CommonLiteralBinders(ops)
   implicit val stringBinder = commonLiteralBinders.StringBinder
