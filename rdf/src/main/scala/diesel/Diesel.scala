@@ -204,14 +204,10 @@ class Diesel[Rdf <: RDF](
 
   class GraphW(graph: Rdf#Graph) {
 
-    def getAllInstancesOf(clazz: Rdf#URI): Validation[BananaException, PointedGraphs[Rdf]] =
-      try {
-        val instances = getSubjects(graph, rdf("type"), clazz): Iterable[Rdf#Node]
-        Success(PointedGraphs(instances, graph))
-      } catch {
-        case be: BananaException => Failure(be)
-      }
-
+    def getAllInstancesOf(clazz: Rdf#URI): PointedGraphs[Rdf] = {
+      val instances = getSubjects(graph, rdf("type"), clazz): Iterable[Rdf#Node]
+      PointedGraphs(instances, graph)
+    }
 
   }
 

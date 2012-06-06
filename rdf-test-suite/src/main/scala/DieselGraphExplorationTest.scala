@@ -121,7 +121,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   "getAllInstancesOf must give all instances of a given class" in {
 
-    val persons = (betehess.graph.getAllInstancesOf(foaf.Person) getOrElse sys.error("")).nodes
+    val persons = betehess.graph.getAllInstancesOf(foaf.Person).nodes
     
     persons.toSet must be === (Set(uri("http://bertails.org/#betehess"), uri("http://bblfish.net/#hjs")))
 
