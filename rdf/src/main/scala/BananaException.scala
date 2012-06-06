@@ -3,6 +3,12 @@ package org.w3.banana
 import scalaz.{ Validation, Success, Failure }
 import scalaz.Validation._
 
+object BananaException {
+
+  implicit val validationBananaExceptionMonad = validationMonad[BananaException]
+
+}
+
 sealed trait BananaException extends Exception
 
 case class FailedConversion(message: String) extends Exception(message) with BananaException
