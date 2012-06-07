@@ -1,6 +1,5 @@
 package org.w3.banana
 
-import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers._
 import akka.actor.ActorSystem

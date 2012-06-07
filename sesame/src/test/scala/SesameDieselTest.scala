@@ -1,6 +1,6 @@
 package org.w3.banana.sesame
 
-import org.w3.banana.diesel._
+import org.w3.banana._
 
 class SesameDieselGraphConstructTest extends DieselGraphConstructTest[Sesame](SesameOperations, SesameDiesel, SesameGraphIsomorphism)
 

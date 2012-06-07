@@ -1,6 +1,5 @@
-package org.w3.banana.diesel
+package org.w3.banana
 
-import org.w3.banana._
 import scalaz._
 import scalaz.Scalaz._
 import scalaz.Validation._

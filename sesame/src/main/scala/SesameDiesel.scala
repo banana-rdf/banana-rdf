@@ -1,5 +1,5 @@
 package org.w3.banana.sesame
 
-import org.w3.banana.diesel._
+import org.w3.banana._
 
 object SesameDiesel extends Diesel(SesameOperations, SesameGraphUnion, SesameGraphTraversal)

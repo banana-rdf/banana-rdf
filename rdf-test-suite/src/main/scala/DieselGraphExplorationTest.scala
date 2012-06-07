@@ -1,6 +1,4 @@
-package org.w3.banana.diesel
-
-import org.w3.banana._
+package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
