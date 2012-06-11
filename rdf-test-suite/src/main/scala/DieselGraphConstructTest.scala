@@ -142,7 +142,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess")
-        -- foaf.name ->- List(1, 2, 3)
+        -- foaf.name -->- List(1, 2, 3)
     )
 
 
@@ -172,7 +172,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF](
   "Diesel must support RDF collections (empty list)" in {
 
     val g: PointedGraph[Rdf] = (
-      bnode("betehess") -- foaf.name ->- List[String]()
+      bnode("betehess") -- foaf.name -->- List[String]()
     )
 
     val expectedGraph = (

@@ -27,6 +27,7 @@ class Diesel[Rdf <: RDF](
   implicit val intBinder = commonBinders.IntBinder
   implicit val doubleBinder = commonBinders.DoubleBinder
   implicit val dateTimeBinder = commonBinders.DateTimeBinder
+  implicit def ListPointedGraphBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = commonBinders.ListPointedGraphBinder(binder)
 
   class NodeW(node: Rdf#Node) {
 
@@ -170,6 +171,14 @@ class Diesel[Rdf <: RDF](
       PointedGraph(s, graph)
     }
 
+    def -->-[T](o: T)(implicit binder: PointedGraphBinder[Rdf, T]): PointedGraph[Rdf] = {
+      val PointedGraph(s, acc) = pointed
+      val PointedGraph(oMainSubject, oGraph) = binder.toPointedGraph(o)
+      val triple = Triple(s, p, oMainSubject)
+      val graph = acc union oGraph union Graph(List(triple))
+      PointedGraph(s, graph)
+    }
+
     def ->-[T1, T2](o1: T1, o2: T2)(implicit b1: NodeBinder[Rdf, T1], b2: NodeBinder[Rdf, T2]): PointedGraph[Rdf] = {
       val PointedGraph(s, acc) = pointed
       val graph = acc union Graph(Triple(s, p, b1.toNode(o1)), Triple(s, p, b2.toNode(o2)))
@@ -185,23 +194,23 @@ class Diesel[Rdf <: RDF](
 
     def ->-[T](opt: Option[T])(implicit binder: NodeBinder[Rdf, T]): PointedGraph[Rdf] = opt match {
       case None => pointed
-      case Some(t) => this.->-(t)
+      case Some(t) => this.->-(t)(binder)
     }
 
-    def ->-[T](collection: List[T])(implicit binder: NodeBinder[Rdf, T]): PointedGraph[Rdf] = {
-      var current: Rdf#Node = rdf.nil
-      val triples = scala.collection.mutable.Set[Rdf#Triple]()
-      collection.reverse foreach { a =>
-        val newBNode = BNode()
-        triples += Triple(newBNode, rdf.first, binder.toNode(a))
-        triples += Triple(newBNode, rdf.rest, current)
-        current = newBNode
-      }
-      val PointedGraph(s, acc) = pointed
-      triples += Triple(s, p, current)
-      val graph = acc union Graph(triples)
-      PointedGraph(s, graph)
-    }
+    // def ->-[T](collection: List[T])(implicit binder: NodeBinder[Rdf, T]): PointedGraph[Rdf] = {
+    //   var current: Rdf#Node = rdf.nil
+    //   val triples = scala.collection.mutable.Set[Rdf#Triple]()
+    //   collection.reverse foreach { a =>
+    //     val newBNode = BNode()
+    //     triples += Triple(newBNode, rdf.first, binder.toNode(a))
+    //     triples += Triple(newBNode, rdf.rest, current)
+    //     current = newBNode
+    //   }
+    //   val PointedGraph(s, acc) = pointed
+    //   triples += Triple(s, p, current)
+    //   val graph = acc union Graph(triples)
+    //   PointedGraph(s, graph)
+    // }
 
   }
 

@@ -112,7 +112,17 @@ class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTravers
       }
     }
 
-    def toPointedGraph(t: List[T]): PointedGraph[Rdf] = null
+    def toPointedGraph(t: List[T]): PointedGraph[Rdf] = {
+      var current: Rdf#Node = __rdf.nil
+      val triples = scala.collection.mutable.Set[Rdf#Triple]()
+      t.reverse foreach { a =>
+        val newBNode = BNode()
+        triples += Triple(newBNode, __rdf.first, binder.toNode(a))
+        triples += Triple(newBNode, __rdf.rest, current)
+        current = newBNode
+      }
+      PointedGraph(current, Graph(triples))
+    }
 
   }
 
