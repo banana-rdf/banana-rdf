@@ -3,30 +3,24 @@ package org.w3.banana
 import scalaz._
 import scalaz.Scalaz._
 import scalaz.Validation._
+import NodeBinder._
 
 object RDFNodeProjections {
-  def apply[Rdf <: RDF](ops: RDFOperations[Rdf]): RDFNodeProjections[Rdf] =
-    new RDFNodeProjections[Rdf](ops)
+  def apply[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf]): RDFNodeProjections[Rdf] =
+    new RDFNodeProjections[Rdf]()(ops)
 }
 
-class RDFNodeProjections[Rdf <: RDF](ops: RDFOperations[Rdf]) {
+class RDFNodeProjections[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf]) {
 
   import ops._
 
-  private val commonLiteralBinders = CommonLiteralBinders(ops)
-  import commonLiteralBinders._
+  private val commonBinders = CommonBinders()(ops)
+  import commonBinders._
 
   class NodeW(node: Rdf#Node) {
 
-    def asLiteral: Validation[BananaException, Rdf#Literal] =
-      Node.fold(node)(
-        iri => Failure(FailedConversion(node.toString + " is not a literal")),
-        bnode => Failure(FailedConversion(node.toString + " is not a literal")),
-        literal => Success(literal)
-      )
-
-    def as[T](implicit binder: LiteralBinder[Rdf, T]): Validation[BananaException, T] =
-      asLiteral flatMap binder.fromLiteral
+    def as[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, T] =
+      asLiteral(node) flatMap binder.fromNode
       
     def asString: Validation[BananaException, String] = as[String]
     

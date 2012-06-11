@@ -11,7 +11,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL](
   graphQuery: RDFGraphQuery[Rdf, Sparql]
 ) extends WordSpec with MustMatchers {
 
-  val projections = RDFNodeProjections(ops)
+  val projections = RDFNodeProjections()(ops)
   import projections._
 
   import ops._

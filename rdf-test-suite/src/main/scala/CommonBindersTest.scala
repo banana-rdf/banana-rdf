@@ -5,17 +5,17 @@ import org.scalatest.matchers.MustMatchers
 import org.joda.time.DateTime
 import scalaz._
 
-abstract class CommonLiteralBindersTest[Rdf <: RDF](ops: RDFOperations[Rdf])
+abstract class CommonBindersTest[Rdf <: RDF](ops: RDFOperations[Rdf])
 extends WordSpec with MustMatchers {
   
-  val commonLiteralBinders = CommonLiteralBinders(ops)
+  val commonBinders = CommonBinders()(ops)
   import ops._
-  import commonLiteralBinders._
+  import commonBinders._
 
   "serializing and deserialiazing Joda DateTime" in {
     import DateTimeBinder._
     val dateTime = DateTime.now()
-    fromLiteral(toLiteral(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be (0)
+    fromNode(toNode(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be (0)
   }
 
 }
