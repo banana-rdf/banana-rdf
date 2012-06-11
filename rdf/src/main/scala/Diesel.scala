@@ -22,14 +22,32 @@ class Diesel[Rdf <: RDF](
   val xsd = XSDPrefix(ops)
   val rdf = RDFPrefix(ops)
 
-  private val commonBinders = CommonBinders()(ops)
+  private val commonBinders = CommonBinders()(ops, graphTraversal)
   implicit val stringBinder = commonBinders.StringBinder
   implicit val intBinder = commonBinders.IntBinder
   implicit val doubleBinder = commonBinders.DoubleBinder
   implicit val dateTimeBinder = commonBinders.DateTimeBinder
 
-  private val projections: RDFNodeProjections[Rdf] = RDFNodeProjections()(ops)
-  implicit def node2NodeW(node: Rdf#Node): RDFNodeProjections[Rdf]#NodeW = projections.node2NodeW(node)
+  class NodeW(node: Rdf#Node) {
+
+    def as[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, T] =
+      asLiteral(node)(ops) flatMap binder.fromNode
+      
+    def asString: Validation[BananaException, String] = as[String]
+    
+    def asInt: Validation[BananaException, Int] = as[Int]
+    
+    def asDouble: Validation[BananaException, Double] = as[Double]
+
+    def asUri: Validation[BananaException, Rdf#URI] = {
+      Node.fold(node)(
+        iri => Success(iri),
+        bnode => Failure(FailedConversion("asUri: " + node.toString + " is not a URI")),
+        literal => Failure(FailedConversion("asUri: " + node.toString + " is not a URI"))
+      )
+    }
+
+  }
 
   class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
@@ -214,6 +232,7 @@ class Diesel[Rdf <: RDF](
 
   }
 
+  implicit def node2NodeW(node: Rdf#Node): NodeW = new NodeW(node)
 
   implicit def node2PointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(new PointedGraph[Rdf](node, Graph.empty))
 

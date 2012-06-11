@@ -5,16 +5,15 @@ import org.scalatest.matchers._
 
 abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL](
   ops: RDFOperations[Rdf],
+  diesel: Diesel[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf],
   sparqlOperations: SPARQLOperations[Rdf, Sparql],
   graphQuery: RDFGraphQuery[Rdf, Sparql]
 ) extends WordSpec with MustMatchers {
 
-  val projections = RDFNodeProjections()(ops)
-  import projections._
-
   import ops._
+  import diesel._
   import iso._
   import sparqlOperations._
   import graphQuery._
