@@ -28,31 +28,31 @@ class Diesel[Rdf <: RDF](
   implicit val doubleBinder = commonBinders.DoubleBinder
   implicit val dateTimeBinder = commonBinders.DateTimeBinder
   implicit def ListPointedGraphBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = commonBinders.ListPointedGraphBinder(binder)
+  implicit val uriBinder = commonBinders.UriBinder
 
-  class NodeW(node: Rdf#Node) {
+  implicit def binder[T](implicit nodeBinder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
+    new PointedGraphBinder[Rdf, T] {
 
-    def as[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, T] =
-      asLiteral(node)(ops) flatMap binder.fromNode
-      
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] =
+        nodeBinder.fromNode(pointed.node)
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = PointedGraph(nodeBinder.toNode(t), ops.Graph.empty)
+
+    }
+
+
+  class PointedGraphW(pointed: PointedGraph[Rdf]) {
+
+    import pointed.graph
+
+    def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
+      binder.fromPointedGraph(pointed)
+
     def asString: Validation[BananaException, String] = as[String]
     
     def asInt: Validation[BananaException, Int] = as[Int]
     
     def asDouble: Validation[BananaException, Double] = as[Double]
-
-    def asUri: Validation[BananaException, Rdf#URI] = {
-      Node.fold(node)(
-        iri => Success(iri),
-        bnode => Failure(FailedConversion("asUri: " + node.toString + " is not a URI")),
-        literal => Failure(FailedConversion("asUri: " + node.toString + " is not a URI"))
-      )
-    }
-
-  }
-
-  class PointedGraphW(pointed: PointedGraph[Rdf]) {
-
-    import pointed.{ node => _node , graph }
 
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
       val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
@@ -68,27 +68,9 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(nodes, graph)
     }
 
-    def node: Rdf#Node = _node
+    def node: Rdf#Node = pointed.node
 
     def predicates = getPredicates(graph, node)
-
-    def asList[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, List[T]] =
-      try {
-        var elems = List[T]()
-        var current = node
-        while(current != rdf.nil) {
-          (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
-            case (List(first), List(rest)) => {
-              elems ::= binder.fromNode(first).fold(be => throw be, e => e)
-              current = rest
-            }
-            case _ => throw new FailedConversion("asList: couldn't decode a list")
-          }
-        }
-        Success(elems.reverse)
-      } catch {
-        case be: BananaException => Failure(be)
-      }
 
   }
 
@@ -103,26 +85,20 @@ class Diesel[Rdf <: RDF](
       PointedGraphs(ns, graph)
     }
 
-    def takeOneNode: Validation[BananaException, Rdf#Node] = {
+    def takeOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
       val it = nodes.iterator
       if (! it.hasNext) {
         Failure(WrongExpectation("expected exactly one node but got 0"))
       } else {
         val first = it.next
-        Success(first)
+        Success(PointedGraph(first, graph))
       }
     }
 
-    def takeOneUri: Validation[BananaException, Rdf#URI] =
-      takeOneNode flatMap (_.asUri)
+    def takeOneAs[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
+      takeOnePointedGraph flatMap (_.as[T])
 
-    def takeOne[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, T] =
-      takeOneNode flatMap (_.as[T])
-
-    def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] =
-      this.exactlyOneNode map { PointedGraph(_, graph) }
-
-    def exactlyOneNode: Validation[BananaException, Rdf#Node] = {
+    def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
       val it = nodes.iterator
       if (! it.hasNext) {
         Failure(WrongExpectation("expected exactly one node but got 0"))
@@ -131,24 +107,18 @@ class Diesel[Rdf <: RDF](
         if (it.hasNext)
           Failure(WrongExpectation("expected exactly one node but got more than 1"))
         else
-          Success(first)
+          Success(PointedGraph(first, graph))
       }
     }
 
-    def exactlyOneUri: Validation[BananaException, Rdf#URI] =
-      exactlyOneNode flatMap (_.asUri)
+    def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
+      exactlyOnePointedGraph flatMap (_.as[T])
 
-    def exactlyOne[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, T] =
-      exactlyOneNode flatMap (_.as[T])
-
-    def asOption[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, Option[T]] = nodes.headOption match {
+    def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Option[T]] = nodes.headOption match {
       case None => Success(None)
       case Some(node) => node.as[T] map (Some(_))
     }
 
-    def asList[T](implicit binder: NodeBinder[Rdf, T]): Validation[BananaException, List[T]] =
-      exactlyOnePointedGraph flatMap (_.asList[T])
-    
   }
 
   class PointedGraphPredicate(pointed: PointedGraph[Rdf], p: Rdf#URI) {
@@ -197,21 +167,6 @@ class Diesel[Rdf <: RDF](
       case Some(t) => this.->-(t)(binder)
     }
 
-    // def ->-[T](collection: List[T])(implicit binder: NodeBinder[Rdf, T]): PointedGraph[Rdf] = {
-    //   var current: Rdf#Node = rdf.nil
-    //   val triples = scala.collection.mutable.Set[Rdf#Triple]()
-    //   collection.reverse foreach { a =>
-    //     val newBNode = BNode()
-    //     triples += Triple(newBNode, rdf.first, binder.toNode(a))
-    //     triples += Triple(newBNode, rdf.rest, current)
-    //     current = newBNode
-    //   }
-    //   val PointedGraph(s, acc) = pointed
-    //   triples += Triple(s, p, current)
-    //   val graph = acc union Graph(triples)
-    //   PointedGraph(s, graph)
-    // }
-
   }
 
 
@@ -241,7 +196,7 @@ class Diesel[Rdf <: RDF](
 
   }
 
-  implicit def node2NodeW(node: Rdf#Node): NodeW = new NodeW(node)
+  implicit def node2PointedGraph(implicit node: Rdf#Node): PointedGraph[Rdf] = PointedGraph(node, Graph.empty)
 
   implicit def node2PointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(new PointedGraph[Rdf](node, Graph.empty))
 

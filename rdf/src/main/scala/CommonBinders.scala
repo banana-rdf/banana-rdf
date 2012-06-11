@@ -126,6 +126,21 @@ class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTravers
 
   }
 
+  implicit val UriBinder: NodeBinder[Rdf, Rdf#URI] = new NodeBinder[Rdf, Rdf#URI] {
+
+    def fromNode(node: Rdf#Node): Validation[BananaException, Rdf#URI] =
+      Node.fold(node)(
+        uri => Success(uri),
+        bnode => Failure(FailedConversion(node + " is a BNode while I was expecting a URI")),
+        literal => Failure(FailedConversion(node + " is a Literal while I was expecting a URI"))
+      )
+
+
+    def toNode(t: Rdf#URI): Rdf#Node = t
+
+  }
+
+
 
 
 }

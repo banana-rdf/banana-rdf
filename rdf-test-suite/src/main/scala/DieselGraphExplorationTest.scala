@@ -54,9 +54,9 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   "we must be able to project nodes to Scala types" in {
 
-    (betehess / foaf.age).exactlyOne[Int] must be (Success(29))
+    (betehess / foaf.age).takeOneAs[Int] must be (Success(29))
 
-    (betehess / foaf.knows / foaf.name).takeOne[String] must be (Success("Henry Story"))
+    (betehess / foaf.knows / foaf.name).as[String] must be (Success("Henry Story"))
 
   }
 
@@ -69,7 +69,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   "we must be able to get rdf lists" in {
 
-    (betehess / foaf("foo")).asList[Int] must be (Success(List(1, 2, 3)))
+    (betehess / foaf("foo")).as[List[Int]] must be (Success(List(1, 2, 3)))
 
   }
 
@@ -85,23 +85,23 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   "asking for one (or exactly one) node when there is none must fail" in {
 
-    (betehess / foaf("unknown")).takeOneNode must be ('failure)
+    (betehess / foaf("unknown")).takeOnePointedGraph must be ('failure)
 
-    (betehess / foaf("unknown")).exactlyOneNode must be ('failure)
+    (betehess / foaf("unknown")).exactlyOnePointedGraph must be ('failure)
 
   }
 
   "asking for exactly one node when there are more than one must fail" in {
 
-    (betehess / foaf.name).exactlyOneNode must be ('failure)
+    (betehess / foaf.name).exactlyOnePointedGraph must be ('failure)
 
   }
 
   "asking for one node when there is at least one must be a success" in {
 
-    (betehess / foaf.name).takeOneNode must be ('success)
+    (betehess / foaf.name).takeOnePointedGraph must be ('success)
 
-    (betehess / foaf.age).takeOneNode must be ('success)
+    (betehess / foaf.age).takeOnePointedGraph must be ('success)
 
   }
 
