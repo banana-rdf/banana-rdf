@@ -17,9 +17,15 @@ extends WordSpec with MustMatchers {
     fromNode(toNode(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be (0)
   }
 
-  "serializing and deserializing a List" in {
+  "serializing and deserializing a List of simple nodes" in {
     val binder = implicitly[PointedGraphBinder[Rdf, List[Int]]]
     val list = List(1, 2, 3)
+    binder.fromPointedGraph(binder.toPointedGraph(list)) must be === (Success(list))
+  }
+
+  "serializing and deserializing a List of complex types" in {
+    val binder = implicitly[PointedGraphBinder[Rdf, List[List[Int]]]]
+    val list = List(List(1, 2), List(3))
     binder.fromPointedGraph(binder.toPointedGraph(list)) must be === (Success(list))
   }
 
@@ -27,6 +33,13 @@ extends WordSpec with MustMatchers {
     val binder = implicitly[PointedGraphBinder[Rdf, (Int, String)]]
     val tuple = (42, "42")
     binder.fromPointedGraph(binder.toPointedGraph(tuple)) must be === (Success(tuple))
+  }
+
+  "serializing and deserializing a Map" in {
+    val binder = implicitly[PointedGraphBinder[Rdf, Map[String, List[Int]]]]
+    val map = Map("1" -> List(1, 2, 3), "2" -> List(4, 5))
+    binder.fromPointedGraph(binder.toPointedGraph(map)) must be === (Success(map))
+    binder.fromPointedGraph(binder.toPointedGraph(Map.empty)) must be === (Success(Map.empty))
   }
 
 }

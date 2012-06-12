@@ -80,7 +80,7 @@ this: Diesel[Rdf] =>
   }
 
   // if you have a binder for T, you get automatically a binder for List[T]
-  implicit def ListBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
+  implicit def ListBinder[T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
     def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, List[T]] = {
       import pointed.{ node , graph }
@@ -90,7 +90,8 @@ this: Diesel[Rdf] =>
         while(current != rdf.nil) {
           (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
             case (List(first), List(rest)) => {
-              elems ::= binder.fromNode(first).fold(be => throw be, e => e)
+              val firstPointed = PointedGraph(first, pointed.graph)
+              elems ::= binder.fromPointedGraph(firstPointed).fold(be => throw be, e => e)
               current = rest
             }
             case _ => throw new FailedConversion("asList: couldn't decode a list")
@@ -107,7 +108,9 @@ this: Diesel[Rdf] =>
       val triples = scala.collection.mutable.Set[Rdf#Triple]()
       t.reverse foreach { a =>
         val newBNode = BNode()
-        triples += Triple(newBNode, rdf.first, binder.toNode(a))
+        val pointed = binder.toPointedGraph(a)
+        triples += Triple(newBNode, rdf.first, pointed.node)
+        triples ++= pointed.graph
         triples += Triple(newBNode, rdf.rest, current)
         current = newBNode
       }
@@ -148,6 +151,17 @@ this: Diesel[Rdf] =>
 
   }
 
+
+  implicit def MapBinder[K, V](implicit kbinder: PointedGraphBinder[Rdf, K], vbinder: PointedGraphBinder[Rdf, V]): PointedGraphBinder[Rdf, Map[K, V]] = new PointedGraphBinder[Rdf, Map[K, V]] {
+
+    val binder = implicitly[PointedGraphBinder[Rdf, List[(K, V)]]]
+
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, Map[K, V]] = binder.fromPointedGraph(pointed) map { l => Map() ++ l }
+
+    def toPointedGraph(t: Map[K, V]): PointedGraph[Rdf] =
+      binder.toPointedGraph(t.toList)
+
+  }
 
 
 
