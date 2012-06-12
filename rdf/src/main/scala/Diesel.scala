@@ -23,7 +23,7 @@ extends CommonBinders[Rdf] {
   val xsd = XSDPrefix(ops)
   val rdf = RDFPrefix(ops)
 
-  implicit def binder[T](implicit nodeBinder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
+  implicit def nodeBinder2PointedGraphBinder[T](implicit nodeBinder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
     new PointedGraphBinder[Rdf, T] {
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] =

@@ -17,4 +17,16 @@ extends WordSpec with MustMatchers {
     fromNode(toNode(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be (0)
   }
 
+  "serializing and deserializing a List" in {
+    val binder = implicitly[PointedGraphBinder[Rdf, List[Int]]]
+    val list = List(1, 2, 3)
+    binder.fromPointedGraph(binder.toPointedGraph(list)) must be === (Success(list))
+  }
+
+  "serializing and deserializing a Tuple2" in {
+    val binder = implicitly[PointedGraphBinder[Rdf, (Int, String)]]
+    val tuple = (42, "42")
+    binder.fromPointedGraph(binder.toPointedGraph(tuple)) must be === (Success(tuple))
+  }
+
 }

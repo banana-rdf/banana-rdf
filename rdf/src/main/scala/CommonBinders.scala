@@ -80,7 +80,7 @@ this: Diesel[Rdf] =>
   }
 
   // if you have a binder for T, you get automatically a binder for List[T]
-  implicit def ListPointedGraphBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
+  implicit def ListBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
     def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, List[T]] = {
       import pointed.{ node , graph }
@@ -117,7 +117,7 @@ this: Diesel[Rdf] =>
   }
 
 
-  implicit def Tuple2PointedGraphBinder[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): PointedGraphBinder[Rdf, (T1, T2)] = new PointedGraphBinder[Rdf, (T1, T2)] {
+  implicit def Tuple2Binder[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): PointedGraphBinder[Rdf, (T1, T2)] = new PointedGraphBinder[Rdf, (T1, T2)] {
 
     def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, (T1, T2)] =
       for {
