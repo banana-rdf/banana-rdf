@@ -5,12 +5,11 @@ import org.scalatest.matchers.MustMatchers
 import org.joda.time.DateTime
 import scalaz._
 
-abstract class CommonBindersTest[Rdf <: RDF](ops: RDFOperations[Rdf], graphTraversal: RDFGraphTraversal[Rdf])
+abstract class CommonBindersTest[Rdf <: RDF](diesel: Diesel[Rdf])
 extends WordSpec with MustMatchers {
   
-  val commonBinders = CommonBinders()(ops, graphTraversal)
+  import diesel._
   import ops._
-  import commonBinders._
 
   "serializing and deserialiazing Joda DateTime" in {
     import DateTimeBinder._

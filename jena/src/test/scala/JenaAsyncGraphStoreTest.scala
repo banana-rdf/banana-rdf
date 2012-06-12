@@ -4,9 +4,7 @@ import org.w3.banana._
 import com.hp.hpl.jena.sparql.core._
 
 class JenaAsyncGraphStoreTest() extends AsyncGraphStoreTest[Jena](
-  JenaOperations,
   JenaDiesel,
-  JenaGraphUnion,
   JenaStore(DatasetGraphFactory.createMem()),
   JenaRDFXMLReader,
   JenaGraphIsomorphism)

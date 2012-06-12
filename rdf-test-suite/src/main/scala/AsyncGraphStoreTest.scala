@@ -6,17 +6,15 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 
 abstract class AsyncGraphStoreTest[Rdf <: RDF](
-  ops: RDFOperations[Rdf],
   dsl: Diesel[Rdf],
-  graphUnion: GraphUnion[Rdf],
   graphStore: GraphStore[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
-  import iso._
-  import ops._
   import dsl._
+  import ops._
+  import iso._
   import graphUnion._
 
   val system = ActorSystem("jena-asyncstore-test", AsyncRDFStore.DEFAULT_CONFIG)

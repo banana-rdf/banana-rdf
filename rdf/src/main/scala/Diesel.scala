@@ -7,28 +7,21 @@ import NodeBinder._
 
 object Diesel {
   def apply[Rdf <: RDF](ops: RDFOperations[Rdf], union: GraphUnion[Rdf], graphTraversal: RDFGraphTraversal[Rdf]): Diesel[Rdf] =
-    new Diesel(ops, union, graphTraversal)
+    new Diesel()(ops, union, graphTraversal)
 }
 
 class Diesel[Rdf <: RDF](
-  ops: RDFOperations[Rdf],
-  union: GraphUnion[Rdf],
-  graphTraversal: RDFGraphTraversal[Rdf]) {
+    implicit val ops: RDFOperations[Rdf],
+    val graphUnion: GraphUnion[Rdf],
+    val graphTraversal: RDFGraphTraversal[Rdf])
+extends CommonBinders[Rdf] {
 
   import ops._
-  import union._
+  import graphUnion._
   import graphTraversal._
 
   val xsd = XSDPrefix(ops)
   val rdf = RDFPrefix(ops)
-
-  private val commonBinders = CommonBinders()(ops, graphTraversal)
-  implicit val stringBinder = commonBinders.StringBinder
-  implicit val intBinder = commonBinders.IntBinder
-  implicit val doubleBinder = commonBinders.DoubleBinder
-  implicit val dateTimeBinder = commonBinders.DateTimeBinder
-  implicit def ListPointedGraphBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = commonBinders.ListPointedGraphBinder(binder)
-  implicit val uriBinder = commonBinders.UriBinder
 
   implicit def binder[T](implicit nodeBinder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
     new PointedGraphBinder[Rdf, T] {

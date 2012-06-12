@@ -5,34 +5,24 @@ import scalaz.Validation._
 import org.joda.time.DateTime
 import NodeBinder._
 
-object CommonBinders {
-
-  def apply[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTraversal: RDFGraphTraversal[Rdf]): CommonBinders[Rdf] =
-    new CommonBinders[Rdf]()
-
-}
-
-class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTraversal: RDFGraphTraversal[Rdf]) {
+trait CommonBinders[Rdf <: RDF] {
+this: Diesel[Rdf] =>
 
   import ops._
   import graphTraversal._
-
-  // prefixed by "__" just to avoid the silly name clashes despite the private modifier...
-  private val __xsd = XSDPrefix(ops)
-  private val __rdf = RDFPrefix(ops)
 
   implicit val StringBinder: NodeBinder[Rdf, String] = new NodeBinder[Rdf, String] {
 
     def fromNode(node: Rdf#Node): Validation[BananaException, String] =
       asTypedLiteral(node) flatMap {
         case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == __xsd.string)
+          if (datatype == xsd.string)
             Success(lexicalForm)
           else
             Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
       }
 
-    def toNode(t: String): Rdf#Node = TypedLiteral(t, __xsd.string)
+    def toNode(t: String): Rdf#Node = TypedLiteral(t, xsd.string)
 
   }
 
@@ -42,14 +32,14 @@ class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTravers
     def fromNode(node: Rdf#Node): Validation[BananaException, Int] = {
       asTypedLiteral(node) flatMap {
         case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == __xsd.int)
+          if (datatype == xsd.int)
             Success(lexicalForm.toInt)
           else
             Failure(FailedConversion(lexicalForm + " may be convertible to an Integer but has following datatype: " + datatype))
       }
     }
 
-    def toNode(t: Int): Rdf#Node = TypedLiteral(t.toString, __xsd.int)
+    def toNode(t: Int): Rdf#Node = TypedLiteral(t.toString, xsd.int)
 
   }
 
@@ -58,14 +48,14 @@ class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTravers
     def fromNode(node: Rdf#Node): Validation[BananaException, Double] = {
       asTypedLiteral(node) flatMap {
         case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == __xsd.double)
+          if (datatype == xsd.double)
             Success(lexicalForm.toDouble)
           else
             Failure(FailedConversion(lexicalForm + " may be convertible to an Double but has following datatype: " + datatype))
       }
     }
 
-    def toNode(t: Double): Rdf#Node = TypedLiteral(t.toString, __xsd.double)
+    def toNode(t: Double): Rdf#Node = TypedLiteral(t.toString, xsd.double)
 
   }
 
@@ -74,7 +64,7 @@ class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTravers
     def fromNode(node: Rdf#Node): Validation[BananaException, DateTime] = {
       asTypedLiteral(node) flatMap {
         case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == __xsd.dateTime)
+          if (datatype == xsd.dateTime)
             try {
               Success(DateTime.parse(lexicalForm))
             } catch {
@@ -85,20 +75,20 @@ class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTravers
       }
     }
 
-    def toNode(t: DateTime): Rdf#Node = TypedLiteral(t.toString, __xsd.dateTime)
+    def toNode(t: DateTime): Rdf#Node = TypedLiteral(t.toString, xsd.dateTime)
 
   }
 
   // if you have a binder for T, you get automatically a binder for List[T]
-  implicit def ListPointedGraphBinder[T](binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
+  implicit def ListPointedGraphBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
     def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, List[T]] = {
       import pointed.{ node , graph }
       var elems = List[T]()
       var current = node
       try {
-        while(current != __rdf.nil) {
-          (getObjects(graph, current, __rdf.first).toList, getObjects(graph, current, __rdf.rest).toList) match {
+        while(current != rdf.nil) {
+          (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
             case (List(first), List(rest)) => {
               elems ::= binder.fromNode(first).fold(be => throw be, e => e)
               current = rest
@@ -113,18 +103,36 @@ class CommonBinders[Rdf <: RDF]()(implicit ops: RDFOperations[Rdf], graphTravers
     }
 
     def toPointedGraph(t: List[T]): PointedGraph[Rdf] = {
-      var current: Rdf#Node = __rdf.nil
+      var current: Rdf#Node = rdf.nil
       val triples = scala.collection.mutable.Set[Rdf#Triple]()
       t.reverse foreach { a =>
         val newBNode = BNode()
-        triples += Triple(newBNode, __rdf.first, binder.toNode(a))
-        triples += Triple(newBNode, __rdf.rest, current)
+        triples += Triple(newBNode, rdf.first, binder.toNode(a))
+        triples += Triple(newBNode, rdf.rest, current)
         current = newBNode
       }
       PointedGraph(current, Graph(triples))
     }
 
   }
+
+
+  implicit def Tuple2PointedGraphBinder[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): PointedGraphBinder[Rdf, (T1, T2)] = new PointedGraphBinder[Rdf, (T1, T2)] {
+
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, (T1, T2)] =
+      for {
+        t1 <- (pointed / rdf("_1")).as[T1]
+        t2 <- (pointed / rdf("_2")).as[T2]
+      } yield (t1, t2)
+
+    def toPointedGraph(t: (T1, T2)): PointedGraph[Rdf] = (
+      bnode().a(rdf("Tuple2"))
+        -- rdf("_1") -->- t._1
+        -- rdf("_2") -->- t._2
+    )
+
+  }
+
 
   implicit val UriBinder: NodeBinder[Rdf, Rdf#URI] = new NodeBinder[Rdf, Rdf#URI] {
 

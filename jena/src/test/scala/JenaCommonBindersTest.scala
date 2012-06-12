@@ -2,4 +2,4 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-class JenaCommonBindersTest extends CommonBindersTest[Jena](JenaOperations, JenaGraphTraversal)
+class JenaCommonBindersTest extends CommonBindersTest[Jena](JenaDiesel)

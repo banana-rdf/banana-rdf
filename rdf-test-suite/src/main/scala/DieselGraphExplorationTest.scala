@@ -9,13 +9,12 @@ import scalaz._
 import scalaz.Validation._
 
 abstract class DieselGraphExplorationTest[Rdf <: RDF](
-  val ops: RDFOperations[Rdf],
-  val dsl: Diesel[Rdf],
-  val iso: GraphIsomorphism[Rdf]) extends WordSpec with MustMatchers {
+  diesel: Diesel[Rdf],
+  iso: GraphIsomorphism[Rdf]) extends WordSpec with MustMatchers {
 
   import org.scalatest.matchers.{BeMatcher, MatchResult}
+  import diesel._
   import ops._
-  import dsl._
   import iso._
 
   val rdf = RDFPrefix(ops)

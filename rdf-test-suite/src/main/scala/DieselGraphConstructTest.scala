@@ -10,19 +10,15 @@ import scalaz.Scalaz._
 import scalaz.Validation._
 
 abstract class DieselGraphConstructTest[Rdf <: RDF](
-  val ops: RDFOperations[Rdf],
-  val dsl: Diesel[Rdf],
+  val diesel: Diesel[Rdf],
   val iso: GraphIsomorphism[Rdf]) extends WordSpec with MustMatchers {
 
   import org.scalatest.matchers.{BeMatcher, MatchResult}
+  import diesel._
   import ops._
-  import dsl._
   import iso._
 
-  val rdf = RDFPrefix(ops)
-
   val foaf = FOAFPrefix(ops)
-  val xsd = XSDPrefix(ops)
 
   "Diesel must accept a GraphNode in the object position" in {
 
