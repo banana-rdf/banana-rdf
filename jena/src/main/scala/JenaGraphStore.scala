@@ -13,7 +13,7 @@ trait JenaGraphStore extends GraphStore[Jena] {
   /* RDFStore */
 
   def addNamedGraph(uri: Jena#URI, graph: Jena#Graph): Jena#Store = {
-    store.removeGraph(uri)
+//    store.removeGraph(uri)
     store.addGraph(uri, graph)
     store
   }
