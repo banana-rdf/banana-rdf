@@ -12,4 +12,6 @@ object SesameSPARQLOperations extends SPARQLOperations[Sesame, SesameSPARQL] {
 
   def AskQuery(query: String): SesameSPARQL#AskQuery = query
 
+  def Query(query: String): SesameSPARQL#Query = query
+
 }

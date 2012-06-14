@@ -6,6 +6,8 @@ import org.openrdf.query._
 
 trait SesameSPARQL extends SPARQL {
 
+  type Query = String
+
   type SelectQuery = String // TupleQuery
 
   type ConstructQuery = String // GraphQuery

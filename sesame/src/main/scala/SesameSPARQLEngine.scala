@@ -5,7 +5,7 @@ import org.w3.banana._
 import org.openrdf.model.{ Graph => SesameGraph, BNode => SesameBNode }
 import org.openrdf.repository._
 import SesameUtil.{ withConnection, toIterable }
-import org.openrdf.query.QueryLanguage
+import org.openrdf.query.{BooleanQuery, GraphQuery, TupleQuery, QueryLanguage}
 
 trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
 
@@ -29,4 +29,12 @@ trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
     booleanQuery.evaluate()
   }
 
+  def executeQuery(query: SesameSPARQL#Query): Any = withConnection(store) { conn =>
+    val preparedQuery = conn.prepareQuery(QueryLanguage.SPARQL, query, TODO)
+    preparedQuery match {
+      case tupleQuery: TupleQuery => toIterable(tupleQuery.evaluate())
+      case graphQuery: GraphQuery => toIterable(graphQuery.evaluate())
+      case askQuery : BooleanQuery => askQuery.evaluate()
+    }
+  }
 }

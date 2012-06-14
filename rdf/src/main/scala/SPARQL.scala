@@ -2,11 +2,13 @@ package org.w3.banana
 
 trait SPARQL {
 
-  type SelectQuery
+  type Query
 
-  type ConstructQuery
+  type SelectQuery <: Query
 
-  type AskQuery
+  type ConstructQuery  <: Query
+
+  type AskQuery <: Query
 
   type Row
 

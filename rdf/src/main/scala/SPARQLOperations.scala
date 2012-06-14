@@ -10,6 +10,8 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
   def AskQuery(query: String): Sparql#AskQuery
 
+  def Query(query: String): Sparql#Query
+
   /**************/
 
   private def buildQuery(query: String, prefixes: Seq[Prefix[Rdf]]): String = {

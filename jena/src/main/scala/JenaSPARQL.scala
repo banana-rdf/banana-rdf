@@ -2,15 +2,17 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-import com.hp.hpl.jena.query.{ Query, QuerySolution }
+import com.hp.hpl.jena.query.{ Query=>JenaQuery, QuerySolution }
 
 trait JenaSPARQL extends SPARQL {
 
-  type SelectQuery = Query
+  type Query = JenaQuery
 
-  type ConstructQuery = Query
+  type SelectQuery = JenaQuery
 
-  type AskQuery = Query
+  type ConstructQuery = JenaQuery
+
+  type AskQuery = JenaQuery
 
   type Row = QuerySolution
 

@@ -19,4 +19,6 @@ object JenaSPARQLOperations extends SPARQLOperations[Jena, JenaSPARQL] {
 
   def AskQuery(query: String): JenaSPARQL#AskQuery = QueryFactory.create(query)
 
+  def Query(query: String): JenaSPARQL#Query  = QueryFactory.create(query)
+
 }

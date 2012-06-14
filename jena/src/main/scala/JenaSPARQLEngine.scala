@@ -9,6 +9,7 @@ import scala.collection.JavaConverters._
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 
+
 trait JenaSPARQLEngine extends SPARQLEngine[Jena, JenaSPARQL] {
 
   def store: DatasetGraph
@@ -35,5 +36,14 @@ trait JenaSPARQLEngine extends SPARQLEngine[Jena, JenaSPARQL] {
     val result = qexec.execAsk()
     result
   }
+
+  def executeQuery(query: JenaSPARQL#Query): Any =
+    query.getQueryType match {
+      case Query.QueryTypeSelect => executeSelect(query)
+      case Query.QueryTypeConstruct => executeConstruct(query)
+      case Query.QueryTypeAsk  => executeAsk(query)
+    }
+
+
 
 }
