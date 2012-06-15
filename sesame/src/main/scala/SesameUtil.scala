@@ -1,9 +1,13 @@
 package org.w3.banana.sesame
 
 import org.openrdf.repository.{ Repository, RepositoryConnection }
-import org.openrdf.query.QueryResult
+import info.aduna.iteration.CloseableIteration
+import org.openrdf.query.{QueryEvaluationException, BindingSet}
+import org.openrdf.model.Statement
 
 object SesameUtil {
+
+  type QueryResult[T<: BindingSet] =  CloseableIteration[T, QueryEvaluationException]
 
   def withConnection[T](repository: Repository)(func: RepositoryConnection => T): T = {
     val conn = repository.getConnection()
@@ -14,12 +18,19 @@ object SesameUtil {
     result
   }
 
-  def toIterator[T](queryResult: QueryResult[T]): Iterator[T] = new Iterator[T] {
+  def toIterator[T<: BindingSet](queryResult: QueryResult[T]): Iterator[T] = new Iterator[T] {
     def hasNext: Boolean = queryResult.hasNext
     def next(): T = queryResult.next()
   }
 
-  def toIterable[T](queryResult: QueryResult[T]): Iterable[T] = new Iterable[T] {
+  def toIterable[T<: BindingSet](queryResult: QueryResult[T]): Iterable[T] = new Iterable[T] {
     def iterator = SesameUtil.toIterator(queryResult)
+  }
+
+  def toStatementIterable[T<: BindingSet](queryResult: QueryResult[T]): Iterable[Statement] = new Iterable[Statement] {
+    def iterator = new Iterator[Statement] {
+      def hasNext: Boolean = queryResult.hasNext
+      def next(): Statement = queryResult.next().asInstanceOf[Statement]
+    }
   }
 }

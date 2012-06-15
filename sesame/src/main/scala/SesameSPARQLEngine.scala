@@ -4,37 +4,42 @@ import org.w3.banana._
 
 import org.openrdf.model.{ Graph => SesameGraph, BNode => SesameBNode }
 import org.openrdf.repository._
+import sail.SailRepository
 import SesameUtil.{ withConnection, toIterable }
-import org.openrdf.query.{BooleanQuery, GraphQuery, TupleQuery, QueryLanguage}
+import org.openrdf.query._
+import scalaz.{Either3, Right3, Middle3, Left3}
+import org.openrdf.sail.Sail
+import org.openrdf.query.impl.EmptyBindingSet
+import info.aduna.iteration.CloseableIteration
 
 trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
 
-  def store: Repository
-  
+  def store: SailRepository
+
   val TODO = "http://w3.org/TODO#"
+  val empty = new EmptyBindingSet()
 
-  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[SesameSPARQL#Row] = withConnection(store) { conn =>
-    val tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query, TODO)
-    toIterable(tupleQuery.evaluate())
+  def connection = store.getConnection.getSailConnection
+
+  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[SesameSPARQL#Row] = {
+    //todo: one be able to specify binding sets. Jena also allows this
+    val it: CloseableIteration[_ <: BindingSet, QueryEvaluationException] =
+      connection.evaluate(query.getTupleExpr,null,empty,false)
+    toIterable(it)
   }
 
-  def executeConstruct(query: SesameSPARQL#ConstructQuery): SesameGraph = withConnection(store) { conn =>
-    val graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, query, TODO)
-    val triples = toIterable(graphQuery.evaluate())
-    SesameOperations.Graph(triples)
+  def executeConstruct(query: SesameSPARQL#ConstructQuery): SesameGraph = {
+    val it: CloseableIteration[_ <: BindingSet, QueryEvaluationException] =
+      connection.evaluate(query.getTupleExpr,null,empty,false)
+    val sit = SesameUtil.toStatementIterable(it)
+    SesameOperations.Graph(sit)
   }
   
-  def executeAsk(query: SesameSPARQL#AskQuery): Boolean =  withConnection(store) { conn =>
-    val booleanQuery = conn.prepareBooleanQuery(QueryLanguage.SPARQL, query, TODO)
-    booleanQuery.evaluate()
+  def executeAsk(query: SesameSPARQL#AskQuery): Boolean =  {
+    val it: CloseableIteration[_ <: BindingSet, QueryEvaluationException] =
+      connection.evaluate(query.getTupleExpr,null,empty,false)
+    it.hasNext
   }
 
-  def executeQuery(query: SesameSPARQL#Query): Any = withConnection(store) { conn =>
-    val preparedQuery = conn.prepareQuery(QueryLanguage.SPARQL, query, TODO)
-    preparedQuery match {
-      case tupleQuery: TupleQuery => toIterable(tupleQuery.evaluate())
-      case graphQuery: GraphQuery => toIterable(graphQuery.evaluate())
-      case askQuery : BooleanQuery => askQuery.evaluate()
-    }
-  }
+
 }

@@ -3,16 +3,17 @@ package org.w3.banana.sesame
 import org.w3.banana._
 
 import org.openrdf.query._
+import parser.{ParsedQuery, ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery}
 
 trait SesameSPARQL extends SPARQL {
 
-  type Query = String
+  type Query = ParsedQuery
 
-  type SelectQuery = String // TupleQuery
+  type SelectQuery = ParsedTupleQuery
 
-  type ConstructQuery = String // GraphQuery
+  type ConstructQuery = ParsedGraphQuery
 
-  type AskQuery = String // BooleanQuery
+  type AskQuery = ParsedBooleanQuery
 
   type Row = BindingSet
 

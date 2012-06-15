@@ -1,9 +1,13 @@
 package org.w3.banana
 
+import scalaz.{Left3, Right3, Middle3, Either3}
+
 /**
  * to execute SPARQL queries
  */
-trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
+trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL]  {
+
+  val ops: SPARQLOperations[Rdf,Sparql]
 
   def executeSelect(query: Sparql#SelectQuery): Iterable[Sparql#Row]
 
@@ -18,6 +22,12 @@ trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
    *         an Rdf#Graph if the query was a Construct query
    *         a boolean if the query was an ASK query
    */
-  def executeQuery(query: Sparql#Query): Any
+  def executeQuery(query: Sparql#Query): Either3[Iterable[Sparql#Row],Rdf#Graph,Boolean] =
+     ops.fold(query)(
+        select => Left3(executeSelect(select)),
+        construct => Middle3(executeConstruct(construct)),
+        ask => Right3(executeAsk(ask))
+     )
+
 
 }

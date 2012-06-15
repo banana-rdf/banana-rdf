@@ -12,6 +12,14 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
   def Query(query: String): Sparql#Query
 
+  /**
+   * A fold operation.
+   * The types returned will be very disjunctive. Consider having T be a scalaz.Either3
+   */
+  def fold[T](query: Sparql#Query)(select: Sparql#SelectQuery => T,
+                                   construct: Sparql#ConstructQuery => T,
+                                   ask: Sparql#AskQuery => T): T
+
   /**************/
 
   private def buildQuery(query: String, prefixes: Seq[Prefix[Rdf]]): String = {
