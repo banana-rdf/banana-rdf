@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import scalaz.Validation
+
 trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
   def getNode(row: Sparql#Row, v: String): Rdf#Node
@@ -9,6 +11,24 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
   def ConstructQuery(query: String): Sparql#ConstructQuery
 
   def AskQuery(query: String): Sparql#AskQuery
+
+  /**
+   * A general query constructor. When this is used it is usually
+   * because the query type is not known in advance, ( as when a query is received
+   * over the internet). As a result the response is a validation, as the query
+   * may not have been tested for validity.
+   * @param query a SPARQL query
+   * @return A validation containing the Query
+   */
+  def Query(query: String): Validation[Exception,Sparql#Query]
+
+  /**
+   * A fold operation.
+   * The types returned will be very disjunctive. Consider having T be a scalaz.Either3
+   */
+  def fold[T](query: Sparql#Query)(select: Sparql#SelectQuery => T,
+                                   construct: Sparql#ConstructQuery => T,
+                                   ask: Sparql#AskQuery => T): T
 
   /**************/
 

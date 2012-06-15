@@ -3,50 +3,55 @@ package org.w3.banana.sesame
 import org.w3.banana._
 import org.openrdf.model._
 import org.openrdf.model.impl._
-import org.openrdf.repository._
-import scala.collection.JavaConverters._
-import org.openrdf.query._
-import org.openrdf.rio.RDFHandler
 import SesameUtil.withConnection
+import org.openrdf.repository.sail.SailRepository
+import scala.collection.JavaConversions._
+import SesameUtil._
+import info.aduna.iteration.CloseableIteration
+import org.openrdf.sail.SailException
 
 trait SesameGraphStore extends GraphStore[Sesame] {
 
-  def store: Repository
+  def store: SailRepository
 
   def addNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>
-      conn.remove(null: Resource, null, null, uri)
-      conn.add(graph, uri)
+      conn.removeStatements(null: Resource, null, null, uri)
+      for (s: Statement<-graph.`match`(null,null,null)) {
+          conn.addStatement(s.getSubject,s.getPredicate,s.getObject,uri)
+      }
     }
     store
   }
 
   def appendToNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Sesame#Store = {
     withConnection(store) { conn =>
-      conn.add(graph, uri)
+      for (s: Statement<-graph.`match`(null,null,null))
+        conn.addStatement(s.getSubject,s.getPredicate,s.getObject,uri)
     }
     store
   }
 
-  class RDFCollector(graph: Sesame#Graph) extends RDFHandler {
-    def startRDF(): Unit = () // println("startRDF")
-    def endRDF(): Unit = () // println("endRDF")
-    def handleComment(comment: String): Unit = () // println("comment: "+comment)
-    def handleNamespace(prefix: String, uri: String): Unit = () // println("namespace")
-    def handleStatement(statement: Statement): Unit = graph.add(statement)
-  }
+  private def iter(st: CloseableIteration[_ <: Statement, SailException]) =
+    new Iterator[Statement] {
+      def hasNext: Boolean = st.hasNext
+      def next(): Statement = st.next().asInstanceOf[Statement]
+    }
 
   def getNamedGraph(uri: Sesame#URI): Sesame#Graph = {
+
+
     val graph = new GraphImpl
     withConnection(store) { conn =>
-      conn.export(new RDFCollector(graph), uri)
+      for (s: Statement<-iter(conn.getStatements(null,null,null,false,uri)))
+        graph.add(s)
     }
     graph
   }
 
   def removeGraph(uri: Sesame#URI): Sesame#Store = {
     withConnection(store) { conn =>
-      conn.remove(null: Resource, null, null, uri)
+      conn.removeStatements(null: Resource, null, null, uri)
     }
     store
   }

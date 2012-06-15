@@ -8,6 +8,8 @@ import com.hp.hpl.jena.query._
 import scala.collection.JavaConverters._
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
+import scalaz.{Right3, Middle3, Left3}
+
 
 trait JenaSPARQLEngine extends SPARQLEngine[Jena, JenaSPARQL] {
 
@@ -35,5 +37,6 @@ trait JenaSPARQLEngine extends SPARQLEngine[Jena, JenaSPARQL] {
     val result = qexec.execAsk()
     result
   }
+
 
 }
