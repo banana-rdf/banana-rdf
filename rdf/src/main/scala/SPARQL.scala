@@ -8,6 +8,4 @@ trait SPARQL {
 
   type AskQuery
 
-  type Row
-
 }

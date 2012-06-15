@@ -9,12 +9,13 @@ import scala.collection.JavaConverters._
 
 object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
 
-  def executeSelect(graph: JenaGraph, query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
+  def executeSelect(graph: JenaGraph, query: JenaSPARQL#SelectQuery): Iterable[PartialFunction[String, Jena#Node]] = {
     val model: Model = ModelFactory.createModelForGraph(graph)
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
-    new Iterable[JenaSPARQL#Row] {
-      def iterator = solutions.asScala
+    val pfs = solutions.asScala map JenaSPARQLEngine.toPartialFunction
+    new Iterable[PartialFunction[String, Jena#Node]] {
+      def iterator = pfs
     }
   }
 

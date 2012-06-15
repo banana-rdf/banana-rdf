@@ -1,7 +1,7 @@
 package org.w3.banana.sesame
 
 import org.openrdf.repository.{ Repository, RepositoryConnection }
-import org.openrdf.query.QueryResult
+import org.openrdf.query.{ QueryResult, BindingSet }
 
 object SesameUtil {
 
@@ -22,4 +22,11 @@ object SesameUtil {
   def toIterable[T](queryResult: QueryResult[T]): Iterable[T] = new Iterable[T] {
     def iterator = SesameUtil.toIterator(queryResult)
   }
+
+  def toPartialFunction(bs: BindingSet): PartialFunction[String, Sesame#Node] =
+    new PartialFunction[String, Sesame#Node] {
+      def apply(v: String): Sesame#Node = bs.getValue(v)
+      def isDefinedAt(v: String): Boolean = bs.hasBinding(v)
+    }
+
 }

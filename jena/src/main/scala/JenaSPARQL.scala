@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-import com.hp.hpl.jena.query.{ Query, QuerySolution }
+import com.hp.hpl.jena.query.Query
 
 trait JenaSPARQL extends SPARQL {
 
@@ -11,7 +11,5 @@ trait JenaSPARQL extends SPARQL {
   type ConstructQuery = Query
 
   type AskQuery = Query
-
-  type Row = QuerySolution
 
 }

@@ -2,8 +2,6 @@ package org.w3.banana
 
 trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
-  def getNode(row: Sparql#Row, v: String): Rdf#Node
-
   def SelectQuery(query: String): Sparql#SelectQuery
 
   def ConstructQuery(query: String): Sparql#ConstructQuery
