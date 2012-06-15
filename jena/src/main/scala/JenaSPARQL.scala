@@ -14,6 +14,4 @@ trait JenaSPARQL extends SPARQL {
 
   type AskQuery = JenaQuery
 
-  type Row = QuerySolution
-
 }

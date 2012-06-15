@@ -34,4 +34,11 @@ object SesameUtil {
       def next(): Statement = queryResult.next().asInstanceOf[Statement]
     }
   }
+
+  def toPartialFunction(bs: BindingSet): PartialFunction[String, Sesame#Node] =
+    new PartialFunction[String, Sesame#Node] {
+      def apply(v: String): Sesame#Node = bs.getValue(v)
+      def isDefinedAt(v: String): Boolean = bs.hasBinding(v)
+    }
+
 }

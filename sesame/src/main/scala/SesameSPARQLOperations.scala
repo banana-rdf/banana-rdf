@@ -10,8 +10,6 @@ object SesameSPARQLOperations extends SPARQLOperations[Sesame, SesameSPARQL] {
 
   private val p = new SPARQLParserFactory().getParser()
 
-  def getNode(row: SesameSPARQL#Row, v: String): Sesame#Node = row.getValue(v)
-
   def SelectQuery(query: String): SesameSPARQL#SelectQuery =
     p.parseQuery(query,"http://todo.example/").asInstanceOf[ParsedTupleQuery]
     

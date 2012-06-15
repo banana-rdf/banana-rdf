@@ -7,7 +7,7 @@ import scalaz.{Left3, Right3, Middle3, Either3}
  */
 trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL]  {
 
-  def executeSelect(query: Sparql#SelectQuery): Iterable[Sparql#Row]
+  def executeSelect(query: Sparql#SelectQuery): Iterable[PartialFunction[String, Rdf#Node]]
 
   def executeConstruct(query: Sparql#ConstructQuery): Rdf#Graph
 

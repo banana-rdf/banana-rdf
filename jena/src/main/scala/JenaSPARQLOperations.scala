@@ -9,11 +9,6 @@ import scalaz.{Failure, Success, Validation}
 
 object JenaSPARQLOperations extends SPARQLOperations[Jena, JenaSPARQL] {
 
-  def getNode(row: JenaSPARQL#Row, v: String): JenaNode = {
-    val node: RDFNode = row.get(v)
-    JenaGraphTraversal.toNode(node)
-  }
-
   def SelectQuery(query: String): JenaSPARQL#SelectQuery = QueryFactory.create(query)
 
   def ConstructQuery(query: String): JenaSPARQL#ConstructQuery = QueryFactory.create(query)

@@ -4,8 +4,6 @@ import scalaz.Validation
 
 trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
-  def getNode(row: Sparql#Row, v: String): Rdf#Node
-
   def SelectQuery(query: String): Sparql#SelectQuery
 
   def ConstructQuery(query: String): Sparql#ConstructQuery

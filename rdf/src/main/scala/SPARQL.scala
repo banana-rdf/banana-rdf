@@ -10,6 +10,4 @@ trait SPARQL {
 
   type AskQuery <: Query
 
-  type Row
-
 }

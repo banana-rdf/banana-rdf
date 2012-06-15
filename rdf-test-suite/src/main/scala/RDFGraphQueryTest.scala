@@ -35,7 +35,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = executeSelect(graph, query) map { row => getNode(row, "name").asString getOrElse sys.error("") }
+    val names: Iterable[String] = executeSelect(graph, query) map { row => row("name").asString getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
 

@@ -15,6 +15,4 @@ trait SesameSPARQL extends SPARQL {
 
   type AskQuery = ParsedBooleanQuery
 
-  type Row = BindingSet
-
 }

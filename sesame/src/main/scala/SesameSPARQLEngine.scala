@@ -3,7 +3,7 @@ package org.w3.banana.sesame
 import org.w3.banana._
 
 import org.openrdf.model.{ Graph => SesameGraph, BNode => SesameBNode }
-import SesameUtil.{ withConnection, toIterable }
+import SesameUtil.{ withConnection, toIterable, toPartialFunction }
 import org.openrdf.query.impl.EmptyBindingSet
 import org.openrdf.repository.sail.SailRepository
 
@@ -18,7 +18,7 @@ trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
     //todo: one be able to specify binding sets. Jena also allows this
     withConnection(store){ conn =>
       val it = conn.evaluate(query.getTupleExpr,null,empty,false)
-      toIterable(it)
+      toIterable(it) map toPartialFunction
     }
   }
 

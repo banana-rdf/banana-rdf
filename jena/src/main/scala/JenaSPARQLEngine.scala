@@ -11,16 +11,31 @@ import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 import scalaz.{Right3, Middle3, Left3}
 
 
+object JenaSPARQLEngine {
+
+  def toPartialFunction(qs: QuerySolution): PartialFunction[String, Jena#Node] =
+    new PartialFunction[String, Jena#Node] {
+      def apply(v: String): Jena#Node = {
+        val node: RDFNode = qs.get(v)
+        JenaGraphTraversal.toNode(node)
+      }
+      def isDefinedAt(v: String): Boolean =
+        qs.contains(v)
+    }
+
+}
+
 trait JenaSPARQLEngine extends SPARQLEngine[Jena, JenaSPARQL] {
 
   def store: DatasetGraph
 
-  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[JenaSPARQL#Row] = {
+  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[PartialFunction[String, Jena#Node]] = {
     val dataset = new GraphStoreBasic(store).toDataset
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
-    new Iterable[JenaSPARQL#Row] {
-      def iterator = solutions.asScala
+    val pfs = solutions.asScala map JenaSPARQLEngine.toPartialFunction
+    new Iterable[PartialFunction[String, Jena#Node]] {
+      def iterator = pfs
     }
   }
 
