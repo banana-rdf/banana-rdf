@@ -4,14 +4,15 @@ import org.openrdf.repository.{ Repository, RepositoryConnection }
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.query.{QueryEvaluationException, BindingSet}
 import org.openrdf.model.Statement
+import org.openrdf.repository.sail.SailRepository
+import org.openrdf.sail.SailConnection
 
 object SesameUtil {
 
   type QueryResult[T<: BindingSet] =  CloseableIteration[T, QueryEvaluationException]
 
-  def withConnection[T](repository: Repository)(func: RepositoryConnection => T): T = {
-    val conn = repository.getConnection()
-    conn.setAutoCommit(false)
+  def withConnection[T](repository: SailRepository)(func: SailConnection => T): T = {
+    val conn = repository.getConnection.getSailConnection
     val result = func(conn)
     conn.commit()
     conn.close()

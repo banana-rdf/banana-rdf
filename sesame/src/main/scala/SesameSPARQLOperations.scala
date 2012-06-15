@@ -3,6 +3,8 @@ package org.w3.banana.sesame
 import org.w3.banana._
 import org.openrdf.query.parser.sparql.SPARQLParserFactory
 import org.openrdf.query.parser.{ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery}
+import scalaz.{Failure, Success, Validation}
+import org.openrdf.query.MalformedQueryException
 
 object SesameSPARQLOperations extends SPARQLOperations[Sesame, SesameSPARQL] {
 
@@ -10,13 +12,21 @@ object SesameSPARQLOperations extends SPARQLOperations[Sesame, SesameSPARQL] {
 
   def getNode(row: SesameSPARQL#Row, v: String): Sesame#Node = row.getValue(v)
 
-  def SelectQuery(query: String): SesameSPARQL#SelectQuery = Query(query).asInstanceOf[ParsedTupleQuery]
+  def SelectQuery(query: String): SesameSPARQL#SelectQuery =
+    p.parseQuery(query,"http://todo.example/").asInstanceOf[ParsedTupleQuery]
     
-  def ConstructQuery(query: String): SesameSPARQL#ConstructQuery = Query(query).asInstanceOf[ParsedGraphQuery]
+  def ConstructQuery(query: String): SesameSPARQL#ConstructQuery =
+    p.parseQuery(query,"http://todo.example/").asInstanceOf[ParsedGraphQuery]
 
-  def AskQuery(query: String): SesameSPARQL#AskQuery = Query(query).asInstanceOf[ParsedBooleanQuery]
+  def AskQuery(query: String): SesameSPARQL#AskQuery =
+    p.parseQuery(query,"http://todo.example/").asInstanceOf[ParsedBooleanQuery]
 
-  def Query(query: String): SesameSPARQL#Query = p.parseQuery(query,"http://todo.example/")
+  def Query(query: String): Validation[Exception,SesameSPARQL#Query]  = try {
+    Success(p.parseQuery(query,"http://todo.example/"))
+  } catch {
+    case e: MalformedQueryException => Failure(e)
+  }
+
 
   def fold[T](query: SesameSPARQL#Query)(select: (SesameSPARQL#SelectQuery) => T,
                                          construct: (SesameSPARQL#ConstructQuery) => T,

@@ -7,8 +7,6 @@ import scalaz.{Left3, Right3, Middle3, Either3}
  */
 trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL]  {
 
-  val ops: SPARQLOperations[Rdf,Sparql]
-
   def executeSelect(query: Sparql#SelectQuery): Iterable[Sparql#Row]
 
   def executeConstruct(query: Sparql#ConstructQuery): Rdf#Graph
@@ -22,12 +20,20 @@ trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL]  {
    *         an Rdf#Graph if the query was a Construct query
    *         a boolean if the query was an ASK query
    */
-  def executeQuery(query: Sparql#Query): Either3[Iterable[Sparql#Row],Rdf#Graph,Boolean] =
-     ops.fold(query)(
-        select => Left3(executeSelect(select)),
-        construct => Middle3(executeConstruct(construct)),
-        ask => Right3(executeAsk(ask))
-     )
+  def executeQuery(query: Sparql#Query): Either3[Iterable[Sparql#Row],Rdf#Graph,Boolean]
 
+
+}
+
+trait SPARQLEngineSyntax[Rdf <: RDF, Sparql <: SPARQL] {
+  this: SPARQLEngine[Rdf,Sparql] =>
+
+   def ops: SPARQLOperations[Rdf,Sparql]
+
+   def executeQuery(query: Sparql#Query) = ops.fold(query)(
+    select => Left3(executeSelect(select)),
+    construct => Middle3(executeConstruct(construct)),
+    ask => Right3(executeAsk(ask))
+  )
 
 }

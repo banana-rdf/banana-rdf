@@ -7,6 +7,8 @@ import org.openrdf.repository.sail.SailRepository
 case class SesameStore(store: SailRepository)
 extends RDFStore[Sesame, SesameSPARQL]
 with SesameGraphStore
-with SesameSPARQLEngine {
-  val ops=SesameSPARQLOperations
+with SesameSPARQLEngine
+with SPARQLEngineSyntax[Sesame, SesameSPARQL] {
+  val ops = SesameSPARQLOperations
 }
+
