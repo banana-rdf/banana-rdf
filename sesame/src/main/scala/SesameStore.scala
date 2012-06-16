@@ -8,7 +8,7 @@ case class SesameStore(store: SailRepository)
 extends RDFStore[Sesame, SesameSPARQL]
 with SesameGraphStore
 with SesameSPARQLEngine
-with SPARQLEngineSyntax[Sesame, SesameSPARQL] {
+with OpenSPARQLEngine[Sesame, SesameSPARQL] {
   val ops = SesameSPARQLOperations
 }
 

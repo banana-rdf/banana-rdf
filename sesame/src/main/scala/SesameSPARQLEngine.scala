@@ -14,7 +14,7 @@ trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
   val TODO = "http://w3.org/TODO#"
   val empty = new EmptyBindingSet()
 
-  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[SesameSPARQL#Row] = {
+  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[PartialFunction[String, Sesame#Node]] = {
     //todo: one be able to specify binding sets. Jena also allows this
     withConnection(store){ conn =>
       val it = conn.evaluate(query.getTupleExpr,null,empty,false)
