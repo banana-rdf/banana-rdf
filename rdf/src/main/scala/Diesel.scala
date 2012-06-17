@@ -6,7 +6,7 @@ import scalaz.Validation._
 import NodeBinder._
 
 object Diesel {
-  def apply[Rdf <: RDF](ops: RDFOperations[Rdf], union: GraphUnion[Rdf], graphTraversal: RDFGraphTraversal[Rdf]): Diesel[Rdf] =
+  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf], union: GraphUnion[Rdf], graphTraversal: RDFGraphTraversal[Rdf]): Diesel[Rdf] =
     new Diesel()(ops, union, graphTraversal)
 }
 

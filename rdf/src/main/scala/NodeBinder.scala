@@ -9,6 +9,16 @@ trait NodeBinder[Rdf <: RDF, T] {
 
 object NodeBinder {
 
+  implicit def toPointedGraphBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
+    new PointedGraphBinder[Rdf, T] {
+
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] =
+        binder.fromNode(pointed.node)
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = PointedGraph(binder.toNode(t))
+    }
+
+
   def asLiteral[Rdf <: RDF](node: Rdf#Node)(implicit ops: RDFOperations[Rdf]): Validation[BananaException, Rdf#Literal] =
     ops.Node.fold(node)(
       iri => Failure(FailedConversion(node + " is an IRI while I was expecting a Literal")),
