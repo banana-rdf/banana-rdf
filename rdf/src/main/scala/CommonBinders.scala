@@ -29,13 +29,13 @@ this: Diesel[Rdf] =>
 
     def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, Int] = {
       val TypedLiteral(lexicalForm, datatype) = literal
-      if (datatype == xsd.int)
+      if (datatype == xsd.integer)
         Success(lexicalForm.toInt)
       else
         Failure(FailedConversion(lexicalForm + " may be convertible to an Integer but has following datatype: " + datatype))
     }
 
-    def toTypedLiteral(t: Int): Rdf#TypedLiteral = TypedLiteral(t.toString, xsd.int)
+    def toTypedLiteral(t: Int): Rdf#TypedLiteral = TypedLiteral(t.toString, xsd.integer)
 
   }
 
