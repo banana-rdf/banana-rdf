@@ -14,7 +14,10 @@ class Diesel[Rdf <: RDF]()(
     implicit val ops: RDFOperations[Rdf],
     val graphUnion: GraphUnion[Rdf],
     val graphTraversal: RDFGraphTraversal[Rdf])
-extends CommonBinders[Rdf] {
+extends CommonBinders[Rdf]
+with ListBinder[Rdf]
+with TupleBinder[Rdf]
+with MapBinder[Rdf] {
 
   import ops._
   import graphUnion._
