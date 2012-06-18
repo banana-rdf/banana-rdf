@@ -17,7 +17,8 @@ class Diesel[Rdf <: RDF]()(
 extends CommonBinders[Rdf]
 with ListBinder[Rdf]
 with TupleBinder[Rdf]
-with MapBinder[Rdf] {
+with MapBinder[Rdf]
+with EitherBinder[Rdf] {
 
   import ops._
   import graphUnion._
@@ -54,8 +55,15 @@ with MapBinder[Rdf] {
     def predicates = getPredicates(graph, node)
 
     def isA(clazz: Rdf#URI): Boolean = {
-      val classes = getObjects(graph, node, rdf("type"))
-      classes exists { _ == clazz }
+      def isAIfNodeOrBNode = {
+        val classes = getObjects(graph, node, rdf("type"))
+        classes exists { _ == clazz }
+      }
+      Node.fold(node)(
+        uri => isAIfNodeOrBNode,
+        bnode => isAIfNodeOrBNode,
+        literal => false
+      )
     }
 
   }

@@ -18,17 +18,6 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
   
   import org.scalatest.matchers.{BeMatcher, MatchResult}
   
-//  def beIsomorphicWithGeneral[M <: RDFModule](m: M)(iso: GraphIsomorphism[m.type])(right: m.Graph): BeMatcher[m.Graph] =
-//    new BeMatcher[m.Graph] {
-//      def apply(left: m.Graph) = MatchResult(
-//        iso.isomorphism(left, right),
-//        "left graph is isomorphic to right graph",
-//        "%s not isomorphic with %s" format (left.toString, right.toString)
-//      )
-//    }
-//  
-//  def isomorphicWith(right: m.Graph): BeMatcher[m.Graph] = beIsomorphicWithGeneral(m)(iso)(right)
-
   import ops._
   
   def graphBuilder(prefix: Prefix[Rdf]) = {

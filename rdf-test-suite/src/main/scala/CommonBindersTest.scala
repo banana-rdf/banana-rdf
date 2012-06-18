@@ -42,4 +42,14 @@ extends WordSpec with MustMatchers {
     binder.fromPointedGraph(binder.toPointedGraph(Map.empty)) must be === (Success(Map.empty))
   }
 
+  "serializing and deserializing an Either" in {
+    val binder = PointedGraphBinder[Rdf, Either[String, List[Int]]]
+    val StringPGBinder = PointedGraphBinder[Rdf, String]
+    val left = Left("foo")
+    val right = Right(List(1, 2, 3))
+    binder.fromPointedGraph(binder.toPointedGraph(left)) must be === (Success(left))
+    binder.fromPointedGraph(binder.toPointedGraph(right)) must be === (Success(right))
+    binder.fromPointedGraph(StringPGBinder.toPointedGraph("foo")) must be ('failure)
+  }
+
 }
