@@ -5,6 +5,10 @@ import scalaz.Validation._
 import org.joda.time.DateTime
 import NodeBinder._
 
+object CommonBinders {
+
+}
+
 trait CommonBinders[Rdf <: RDF] {
 this: Diesel[Rdf] =>
 
