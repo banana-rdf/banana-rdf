@@ -52,7 +52,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second) map { row => row("name").as[String] getOrElse sys.error("") }
+    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second) map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
 

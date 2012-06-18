@@ -1,11 +1,14 @@
 package org.w3.banana.sesame
 
+import org.w3.banana._
 import org.openrdf.repository.{ Repository, RepositoryConnection }
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.query.{QueryEvaluationException, BindingSet}
 import org.openrdf.model.Statement
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.SailConnection
+import scalaz.{ Validation, Success, Failure }
+import scala.collection.JavaConverters._
 
 object SesameUtil {
 
@@ -35,10 +38,19 @@ object SesameUtil {
     }
   }
 
-  def toPartialFunction(bs: BindingSet): PartialFunction[String, Sesame#Node] =
-    new PartialFunction[String, Sesame#Node] {
-      def apply(v: String): Sesame#Node = bs.getValue(v)
-      def isDefinedAt(v: String): Boolean = bs.hasBinding(v)
+  def toRow(bs: BindingSet): Row[Sesame] =
+    new Row[Sesame] {
+
+      def apply(v: String): Validation[BananaException, Sesame#Node] = {
+        val node = bs.getValue(v)
+        if (node == null)
+          Failure(VarNotFound("var " + v + " not found in BindingSet " + bs.toString))
+        else
+          Success(node)
+      }
+
+      def vars: Iterable[String] = bs.getBindingNames.asScala
+
     }
 
 }

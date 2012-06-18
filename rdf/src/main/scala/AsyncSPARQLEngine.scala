@@ -11,7 +11,7 @@ import akka.util.Timeout
  */
 trait AsyncSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
 
-  def executeSelect(query: Sparql#SelectQuery): Future[Iterable[PartialFunction[String, Rdf#Node]]]
+  def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Row[Rdf]]]
 
   def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph]
 
@@ -54,8 +54,8 @@ extends AsyncSPARQLEngine[Rdf, Sparql] {
         .withDispatcher("rdfstore-dispatcher"),
       "sparql-engine")
 
-  def executeSelect(query: Sparql#SelectQuery): Future[Iterable[PartialFunction[String, Rdf#Node]]] =
-    engineActor.?(Select(query)).asInstanceOf[Future[Iterable[PartialFunction[String, Rdf#Node]]]]
+  def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Row[Rdf]]] =
+    engineActor.?(Select(query)).asInstanceOf[Future[Iterable[Row[Rdf]]]]
 
   def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph] =
     engineActor.?(Construct(query)).asInstanceOf[Future[Rdf#Graph]]

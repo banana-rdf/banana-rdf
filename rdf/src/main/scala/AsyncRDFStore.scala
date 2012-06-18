@@ -61,7 +61,7 @@ rdfstore-dispatcher {
 
       val asyncSparqlEngine = new AsyncSPARQLEngineBase(store, system)(timeout)
 
-      def executeSelect(query: Sparql#SelectQuery): Future[Iterable[PartialFunction[String, Rdf#Node]]] =
+      def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Row[Rdf]]] =
         asyncSparqlEngine.executeSelect(query)
 
       def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph] =

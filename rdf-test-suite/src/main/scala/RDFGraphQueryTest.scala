@@ -10,7 +10,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL](
   iso: GraphIsomorphism[Rdf],
   sparqlOperations: SPARQLOperations[Rdf, Sparql],
   graphQuery: RDFGraphQuery[Rdf, Sparql]
-) extends WordSpec with MustMatchers {
+) extends WordSpec with MustMatchers with Inside {
 
   import ops._
   import diesel._
@@ -35,9 +35,15 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = executeSelect(graph, query) map { row => row("name").as[String] getOrElse sys.error("") }
+    val rows = executeSelect(graph, query).toList
+
+    val names: List[String] = rows map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
+
+    val row = rows(0)
+
+    row("unknown") must be ('failure)
 
   }
 
