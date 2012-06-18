@@ -5,8 +5,7 @@ import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.repository.Repository
 import org.openrdf.repository.sail.SailRepository
 
-class SesameSparqlEngineTest() extends SparqlEngineTest(
-  SesameOperations,
+class SesameSparqlEngineTest() extends SparqlEngineTest()(
   SesameDiesel,
   SesameGraphIsomorphism,
   SesameSPARQLOperations,

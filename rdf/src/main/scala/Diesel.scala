@@ -23,16 +23,7 @@ extends CommonBinders[Rdf] {
   val xsd = XSDPrefix(ops)
   val rdf = RDFPrefix(ops)
 
-  implicit def nodeBinder2PointedGraphBinder[T](implicit nodeBinder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
-    new PointedGraphBinder[Rdf, T] {
-
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] =
-        nodeBinder.fromNode(pointed.node)
-
-      def toPointedGraph(t: T): PointedGraph[Rdf] = PointedGraph(nodeBinder.toNode(t), ops.Graph.empty)
-
-    }
-
+  implicit def toPointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(PointedGraph(node))
 
   class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
@@ -40,12 +31,6 @@ extends CommonBinders[Rdf] {
 
     def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
       binder.fromPointedGraph(pointed)
-
-    def asString: Validation[BananaException, String] = as[String]
-    
-    def asInt: Validation[BananaException, Int] = as[Int]
-    
-    def asDouble: Validation[BananaException, Double] = as[Double]
 
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
       val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
@@ -107,9 +92,9 @@ extends CommonBinders[Rdf] {
     def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
       exactlyOnePointedGraph flatMap (_.as[T])
 
-    def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Option[T]] = nodes.headOption match {
+    def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Option[T]] = headOption match {
       case None => Success(None)
-      case Some(node) => node.as[T] map (Some(_))
+      case Some(pointed) => pointed.as[T] map (Some(_))
     }
 
   }
@@ -128,26 +113,6 @@ extends CommonBinders[Rdf] {
       PointedGraph(s, graph)
     }
 
-    def ->-[T](o: T)(implicit binder: NodeBinder[Rdf, T]): PointedGraph[Rdf] = {
-      val PointedGraph(s, acc) = pointed
-      val graph = acc union Graph(Triple(s, p, binder.toNode(o)))
-      PointedGraph(s, graph)
-    }
-
-    def -->-[T](o: T)(implicit binder: PointedGraphBinder[Rdf, T]): PointedGraph[Rdf] = {
-      val PointedGraph(s, acc) = pointed
-      val PointedGraph(oMainSubject, oGraph) = binder.toPointedGraph(o)
-      val triple = Triple(s, p, oMainSubject)
-      val graph = acc union oGraph union Graph(List(triple))
-      PointedGraph(s, graph)
-    }
-
-    def ->-[T1, T2](o1: T1, o2: T2)(implicit b1: NodeBinder[Rdf, T1], b2: NodeBinder[Rdf, T2]): PointedGraph[Rdf] = {
-      val PointedGraph(s, acc) = pointed
-      val graph = acc union Graph(Triple(s, p, b1.toNode(o1)), Triple(s, p, b2.toNode(o2)))
-      PointedGraph(s, graph)
-    }
-
     def ->-(pointedObject: PointedGraph[Rdf]): PointedGraph[Rdf] = {
       val PointedGraph(s, acc) = pointed
       val PointedGraph(o, graphObject) = pointedObject
@@ -155,7 +120,13 @@ extends CommonBinders[Rdf] {
       PointedGraph(s, graph)
     }
 
-    def ->-[T](opt: Option[T])(implicit binder: NodeBinder[Rdf, T]): PointedGraph[Rdf] = opt match {
+    def ->-[T](o: T)(implicit binder: PointedGraphBinder[Rdf, T]): PointedGraph[Rdf] = {
+      val PointedGraph(s, acc) = pointed
+      val pg = binder.toPointedGraph(o)
+      this.->-(pg)
+    }
+
+    def ->-[T](opt: Option[T])(implicit binder: PointedGraphBinder[Rdf, T]): PointedGraph[Rdf] = opt match {
       case None => pointed
       case Some(t) => this.->-(t)(binder)
     }
@@ -189,9 +160,20 @@ extends CommonBinders[Rdf] {
 
   }
 
-  implicit def node2PointedGraph(implicit node: Rdf#Node): PointedGraph[Rdf] = PointedGraph(node, Graph.empty)
+  /* looks like implicit resolution does not work if Rdf is not fixed...  */
 
-  implicit def node2PointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(new PointedGraph[Rdf](node, Graph.empty))
+  implicit def UriToNodeBinder[T](implicit binder: URIBinder[Rdf, T]): NodeBinder[Rdf, T] = URIBinder.toNodeBinder[Rdf, T](ops, binder)
+
+  implicit def TypedLiteralToLiteralBinder[T](implicit binder: TypedLiteralBinder[Rdf, T]): LiteralBinder[Rdf, T] = TypedLiteralBinder.toLiteralBinder[Rdf, T](ops, binder)
+
+  implicit def LangLiteralToLiteralBinder[T](implicit binder: LangLiteralBinder[Rdf, T]): LiteralBinder[Rdf, T] = LangLiteralBinder.toLiteralBinder[Rdf, T](ops, binder)
+
+  implicit def LiteralToNodeBinder[T](implicit binder: LiteralBinder[Rdf, T]): NodeBinder[Rdf, T] = LiteralBinder.toNodeBinder[Rdf, T](ops, binder)
+
+  implicit def NodeToPointedGraphBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] = NodeBinder.toPointedGraphBinder[Rdf, T](ops, binder)
+
+
+
 
   implicit def pointedGraph2PointedGraphW(pointed: PointedGraph[Rdf]): PointedGraphW = new PointedGraphW(pointed)
 

@@ -110,12 +110,6 @@ trait RDFOperations[Rdf <: RDF] {
 
   implicit def wrapLiteral(literal: Rdf#Literal): LiteralW = new LiteralW(literal)
   
-  implicit def wrapIntAsLiteral(i: Int): Rdf#TypedLiteral = TypedLiteral(i.toString, _xsd.int)
-  
-  implicit def wrapStringAsLiteral(s: String): Rdf#TypedLiteral = TypedLiteral(s, _xsd.string)
-  
-  implicit def wrapFloatAsLiteral(f: Double): Rdf#TypedLiteral = TypedLiteral(f.toString, _xsd.double)
-  
   class LiteralBuilder(lexicalForm: String) {
     def datatype(datatype: Rdf#URI): Rdf#TypedLiteral = TypedLiteral(lexicalForm, datatype)
     def lang(tag: String): Rdf#LangLiteral = LangLiteral(lexicalForm, Lang(tag))

@@ -11,18 +11,17 @@ this: Diesel[Rdf] =>
   import ops._
   import graphTraversal._
 
-  implicit val StringBinder: NodeBinder[Rdf, String] = new NodeBinder[Rdf, String] {
+  implicit val StringBinder: TypedLiteralBinder[Rdf, String] = new TypedLiteralBinder[Rdf, String] {
 
-    def fromNode(node: Rdf#Node): Validation[BananaException, String] =
-      asTypedLiteral(node) flatMap {
-        case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == xsd.string)
-            Success(lexicalForm)
-          else
-            Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
-      }
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, String] = {
+      val TypedLiteral(lexicalForm, datatype) = literal
+      if (datatype == xsd.string)
+        Success(lexicalForm)
+      else
+        Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
+    }
 
-    def toNode(t: String): Rdf#Node = TypedLiteral(t, xsd.string)
+    def toTypedLiteral(t: String): Rdf#TypedLiteral = TypedLiteral(t, xsd.string)
 
   }
 
@@ -130,8 +129,8 @@ this: Diesel[Rdf] =>
 
     def toPointedGraph(t: (T1, T2)): PointedGraph[Rdf] = (
       bnode().a(rdf("Tuple2"))
-        -- rdf("_1") -->- t._1
-        -- rdf("_2") -->- t._2
+        -- rdf("_1") ->- t._1
+        -- rdf("_2") ->- t._2
     )
 
   }

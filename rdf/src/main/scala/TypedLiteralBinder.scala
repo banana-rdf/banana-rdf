@@ -9,7 +9,7 @@ trait TypedLiteralBinder[Rdf <: RDF, T] {
 
 object TypedLiteralBinder {
 
-  implicit def toLiteralBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: TypedLiteralBinder[Rdf, T]): LiteralBinder[Rdf, T] =
+  def toLiteralBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: TypedLiteralBinder[Rdf, T]): LiteralBinder[Rdf, T] =
     new LiteralBinder[Rdf, T] {
 
       def fromLiteral(literal: Rdf#Literal): Validation[BananaException, T] =

@@ -8,8 +8,6 @@ import org.w3.banana._
 import org.w3.banana.n3._
 import nomo.NTriplesReader
 
-class SimpleModuleTest extends PimpsTestSuite(SimpleRDFOperations)
-
 object SimpleNTriplesStringParser
   extends n3.NTriplesParser(
     SimpleRDFOperations,

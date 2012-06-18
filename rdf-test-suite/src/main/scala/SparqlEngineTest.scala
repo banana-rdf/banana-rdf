@@ -4,16 +4,15 @@ import org.scalatest._
 import org.scalatest.matchers._
 
 abstract class SparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
-  ops: RDFOperations[Rdf],
-  dsl: Diesel[Rdf],
+  implicit diesel: Diesel[Rdf],
   iso: GraphIsomorphism[Rdf],
   sparqlOps: SPARQLOperations[Rdf, Sparql],
   store: RDFStore[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
+  import diesel._
   import iso._
   import ops._
-  import dsl._
   import sparqlOps._
 
   val foaf = FOAFPrefix(ops)

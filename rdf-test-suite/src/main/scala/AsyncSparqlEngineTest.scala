@@ -7,18 +7,17 @@ import akka.util.Timeout
 import akka.dispatch._
 import akka.util.duration._
 
-abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
-  ops: RDFOperations[Rdf],
-  reader: RDFReader[Rdf, RDFXML],
-  dsl: Diesel[Rdf],
+abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL]()(
+  implicit reader: RDFReader[Rdf, RDFXML],
+  diesel: Diesel[Rdf],
   iso: GraphIsomorphism[Rdf],
   sparqlOps: SPARQLOperations[Rdf, Sparql],
   store: RDFStore[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
+  import diesel._
   import iso._
   import ops._
-  import dsl._
   import sparqlOps._
 
   val system = ActorSystem("jena-asynsparqlquery-test", AsyncRDFStore.DEFAULT_CONFIG)
@@ -53,7 +52,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second) map { row => row("name").asString getOrElse sys.error("") }
+    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second) map { row => row("name").as[String] getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
 

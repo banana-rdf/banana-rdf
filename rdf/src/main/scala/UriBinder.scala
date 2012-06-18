@@ -9,7 +9,7 @@ trait URIBinder[Rdf <: RDF, T] {
 
 object URIBinder {
 
-  implicit def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: URIBinder[Rdf, T]): NodeBinder[Rdf, T] =
+  def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: URIBinder[Rdf, T]): NodeBinder[Rdf, T] =
     new NodeBinder[Rdf, T] {
 
       def fromNode(node: Rdf#Node): Validation[BananaException, T] =
