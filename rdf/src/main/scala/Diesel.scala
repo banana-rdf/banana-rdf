@@ -53,6 +53,11 @@ with MapBinder[Rdf] {
 
     def predicates = getPredicates(graph, node)
 
+    def isA(clazz: Rdf#URI): Boolean = {
+      val classes = getObjects(graph, node, rdf("type"))
+      classes exists { _ == clazz }
+    }
+
   }
 
   class PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]) extends Iterable[PointedGraph[Rdf]] {

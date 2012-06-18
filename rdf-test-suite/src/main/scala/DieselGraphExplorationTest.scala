@@ -124,5 +124,12 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF](
 
   }
 
+  "isA must test if a node belongs to a class" in {
+
+    betehess.isA(foaf.Person) must be (true)
+
+    betehess.isA(foaf("SomethingElse")) must be (false)
+
+  }
   
 }
