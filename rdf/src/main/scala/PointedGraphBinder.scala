@@ -9,4 +9,6 @@ trait PointedGraphBinder[Rdf <: RDF, T] {
 
 object PointedGraphBinder {
 
+  def apply[Rdf <: RDF, T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, T] = binder
+
 }

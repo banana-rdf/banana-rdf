@@ -18,7 +18,7 @@ extends WordSpec with MustMatchers {
   }
 
   "serializing and deserializing a List of simple nodes" in {
-    val binder = implicitly[PointedGraphBinder[Rdf, List[Int]]]
+    val binder = PointedGraphBinder[Rdf, List[Int]]
     val list = List(1, 2, 3)
     binder.fromPointedGraph(binder.toPointedGraph(list)) must be === (Success(list))
   }
@@ -30,13 +30,13 @@ extends WordSpec with MustMatchers {
   }
 
   "serializing and deserializing a Tuple2" in {
-    val binder = implicitly[PointedGraphBinder[Rdf, (Int, String)]]
+    val binder = PointedGraphBinder[Rdf, (Int, String)]
     val tuple = (42, "42")
     binder.fromPointedGraph(binder.toPointedGraph(tuple)) must be === (Success(tuple))
   }
 
   "serializing and deserializing a Map" in {
-    val binder = implicitly[PointedGraphBinder[Rdf, Map[String, List[Int]]]]
+    val binder = PointedGraphBinder[Rdf, Map[String, List[Int]]]
     val map = Map("1" -> List(1, 2, 3), "2" -> List(4, 5))
     binder.fromPointedGraph(binder.toPointedGraph(map)) must be === (Success(map))
     binder.fromPointedGraph(binder.toPointedGraph(Map.empty)) must be === (Success(Map.empty))
