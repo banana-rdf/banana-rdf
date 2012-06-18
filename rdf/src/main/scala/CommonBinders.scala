@@ -26,55 +26,49 @@ this: Diesel[Rdf] =>
   }
 
 
-  implicit val IntBinder: NodeBinder[Rdf, Int] = new NodeBinder[Rdf, Int] {
+  implicit val IntBinder: TypedLiteralBinder[Rdf, Int] = new TypedLiteralBinder[Rdf, Int] {
 
-    def fromNode(node: Rdf#Node): Validation[BananaException, Int] = {
-      asTypedLiteral(node) flatMap {
-        case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == xsd.int)
-            Success(lexicalForm.toInt)
-          else
-            Failure(FailedConversion(lexicalForm + " may be convertible to an Integer but has following datatype: " + datatype))
-      }
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, Int] = {
+      val TypedLiteral(lexicalForm, datatype) = literal
+      if (datatype == xsd.int)
+        Success(lexicalForm.toInt)
+      else
+        Failure(FailedConversion(lexicalForm + " may be convertible to an Integer but has following datatype: " + datatype))
     }
 
-    def toNode(t: Int): Rdf#Node = TypedLiteral(t.toString, xsd.int)
+    def toTypedLiteral(t: Int): Rdf#TypedLiteral = TypedLiteral(t.toString, xsd.int)
 
   }
 
-  implicit val DoubleBinder: NodeBinder[Rdf, Double] = new NodeBinder[Rdf, Double] {
+  implicit val DoubleBinder: TypedLiteralBinder[Rdf, Double] = new TypedLiteralBinder[Rdf, Double] {
 
-    def fromNode(node: Rdf#Node): Validation[BananaException, Double] = {
-      asTypedLiteral(node) flatMap {
-        case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == xsd.double)
-            Success(lexicalForm.toDouble)
-          else
-            Failure(FailedConversion(lexicalForm + " may be convertible to an Double but has following datatype: " + datatype))
-      }
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, Double] = {
+      val TypedLiteral(lexicalForm, datatype) = literal
+      if (datatype == xsd.double)
+        Success(lexicalForm.toDouble)
+      else
+        Failure(FailedConversion(lexicalForm + " may be convertible to an Double but has following datatype: " + datatype))
     }
 
-    def toNode(t: Double): Rdf#Node = TypedLiteral(t.toString, xsd.double)
+    def toTypedLiteral(t: Double): Rdf#TypedLiteral = TypedLiteral(t.toString, xsd.double)
 
   }
 
-  implicit val DateTimeBinder: NodeBinder[Rdf, DateTime] = new NodeBinder[Rdf, DateTime] {
+  implicit val DateTimeBinder: TypedLiteralBinder[Rdf, DateTime] = new TypedLiteralBinder[Rdf, DateTime] {
 
-    def fromNode(node: Rdf#Node): Validation[BananaException, DateTime] = {
-      asTypedLiteral(node) flatMap {
-        case TypedLiteral(lexicalForm, datatype) =>
-          if (datatype == xsd.dateTime)
-            try {
-              Success(DateTime.parse(lexicalForm))
-            } catch {
-              case t => Failure(FailedConversion(node.toString + " is of type xsd:dateTime but its lexicalForm could not be parsed: " + lexicalForm))
-            }
-          else
-            Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
-      }
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, DateTime] = {
+      val TypedLiteral(lexicalForm, datatype) = literal
+      if (datatype == xsd.dateTime)
+        try {
+          Success(DateTime.parse(lexicalForm))
+        } catch {
+          case t => Failure(FailedConversion(literal.toString + " is of type xsd:dateTime but its lexicalForm could not be parsed: " + lexicalForm))
+        }
+      else
+        Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
     }
 
-    def toNode(t: DateTime): Rdf#Node = TypedLiteral(t.toString, xsd.dateTime)
+    def toTypedLiteral(t: DateTime): Rdf#TypedLiteral = TypedLiteral(t.toString, xsd.dateTime)
 
   }
 
@@ -136,19 +130,7 @@ this: Diesel[Rdf] =>
   }
 
 
-  implicit val UriBinder: NodeBinder[Rdf, Rdf#URI] = new NodeBinder[Rdf, Rdf#URI] {
 
-    def fromNode(node: Rdf#Node): Validation[BananaException, Rdf#URI] =
-      Node.fold(node)(
-        uri => Success(uri),
-        bnode => Failure(FailedConversion(node + " is a BNode while I was expecting a URI")),
-        literal => Failure(FailedConversion(node + " is a Literal while I was expecting a URI"))
-      )
-
-
-    def toNode(t: Rdf#URI): Rdf#Node = t
-
-  }
 
 
   implicit def MapBinder[K, V](implicit kbinder: PointedGraphBinder[Rdf, K], vbinder: PointedGraphBinder[Rdf, V]): PointedGraphBinder[Rdf, Map[K, V]] = new PointedGraphBinder[Rdf, Map[K, V]] {

@@ -10,7 +10,7 @@ object Diesel {
     new Diesel()(ops, union, graphTraversal)
 }
 
-class Diesel[Rdf <: RDF](
+class Diesel[Rdf <: RDF]()(
     implicit val ops: RDFOperations[Rdf],
     val graphUnion: GraphUnion[Rdf],
     val graphTraversal: RDFGraphTraversal[Rdf])

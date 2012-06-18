@@ -14,7 +14,7 @@ extends WordSpec with MustMatchers {
   "serializing and deserialiazing Joda DateTime" in {
     import DateTimeBinder._
     val dateTime = DateTime.now()
-    fromNode(toNode(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be (0)
+    fromTypedLiteral(toTypedLiteral(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be (0)
   }
 
   "serializing and deserializing a List of simple nodes" in {
