@@ -5,21 +5,21 @@ import org.scalatest.matchers._
 import akka.actor.ActorSystem
 import akka.util.Timeout
 
-abstract class AsyncGraphStoreTest[Rdf <: RDF](
-  dsl: Diesel[Rdf],
-  graphStore: GraphStore[Rdf],
+abstract class AsyncGraphStoreTest[Rdf <: RDF, Sparql <: SPARQL](
+  diesel: Diesel[Rdf],
+  rdfStore: RDFStore[Rdf, Sparql],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf]
 ) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
-  import dsl._
+  import diesel._
   import ops._
   import iso._
   import graphUnion._
 
   val system = ActorSystem("jena-asyncstore-test", AsyncRDFStore.DEFAULT_CONFIG)
   implicit val timeout = Timeout(1000)
-  val store = AsyncGraphStore(graphStore, system)
+  val store = AsyncRDFStore(rdfStore, system)
 
   val foaf = FOAFPrefix(ops)
 

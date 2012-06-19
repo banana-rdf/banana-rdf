@@ -12,13 +12,12 @@ with AsyncSPARQLEngine[Rdf, Sparql]
 
 object AsyncRDFStore {
 
+  def apply[Rdf <: RDF, Sparql <: SPARQL](store: RDFStore[Rdf, Sparql], system: ActorSystem)(implicit timeout: Timeout): AsyncRDFStore[Rdf, Sparql] =
+    new AsyncRDFStoreBase[Rdf, Sparql](store, system)(timeout)
+
   val DEFAULT_CONFIG = com.typesafe.config.ConfigFactory.parseString("""
 akka.actor.deployment {
-  /graph-store {
-    router = round-robin
-    nr-of-instances = 1
-  }
-  /sparql-engine {
+  /rdfstore {
     router = round-robin
     nr-of-instances = 1
   }
@@ -38,38 +37,5 @@ rdfstore-dispatcher {
   }
 }
 """)
-
-  def apply[Rdf <: RDF, Sparql <: SPARQL](
-      store: RDFStore[Rdf, Sparql],
-      system: ActorSystem)(
-      implicit timeout: Timeout): AsyncRDFStore[Rdf, Sparql] =
-    new AsyncRDFStore[Rdf, Sparql] with AsyncGraphStore[Rdf] with AsyncSPARQLEngine[Rdf, Sparql] {
-
-      val asyncGraphStore = new AsyncGraphStoreBase[Rdf](store, system)(timeout)
-
-      def addNamedGraph(uri: Rdf#URI, graph: Rdf#Graph): Future[Unit] =
-        asyncGraphStore.addNamedGraph(uri, graph)
-
-      def appendToNamedGraph(uri: Rdf#URI, graph: Rdf#Graph): Future[Unit] =
-        asyncGraphStore.appendToNamedGraph(uri, graph)
-
-      def getNamedGraph(uri: Rdf#URI): Future[Rdf#Graph] =
-        asyncGraphStore.getNamedGraph(uri)
-
-      def removeGraph(uri: Rdf#URI): Future[Unit] =
-        asyncGraphStore.removeGraph(uri)
-
-      val asyncSparqlEngine = new AsyncSPARQLEngineBase(store, system)(timeout)
-
-      def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Row[Rdf]]] =
-        asyncSparqlEngine.executeSelect(query)
-
-      def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph] =
-        asyncSparqlEngine.executeConstruct(query)
-
-      def executeAsk(query: Sparql#AskQuery): Future[Boolean] =
-        asyncSparqlEngine.executeAsk(query)
-
-    }
   
 }
