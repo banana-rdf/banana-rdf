@@ -22,7 +22,8 @@ object WrappedThrowable {
     try {
       Success(body)
     } catch {
-      case t => Failure(WrappedThrowable(t))
+      // only catch exceptions that should be caught, let VM throwables through.
+      case t: Exception => Failure(WrappedThrowable(t))
     }
 }
 
