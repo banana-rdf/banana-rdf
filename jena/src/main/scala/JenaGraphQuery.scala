@@ -7,31 +7,37 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import scala.collection.JavaConverters._
 
-object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
+case class JenaGraphQuery(graph: Jena#Graph) extends RDFGraphQuery[Jena, JenaSPARQL](graph) {
 
-  def executeSelect(graph: JenaGraph, query: JenaSPARQL#SelectQuery): Iterable[Row[Jena]] = {
-    val model: Model = ModelFactory.createModelForGraph(graph)
-    val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
-    val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
-    val rows = solutions.asScala map JenaSPARQLEngine.toRow
+  lazy val model: Model =  ModelFactory.createModelForGraph(graph)
+
+  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[Row[Jena]] = {
+    val rows = executeSelectPlain(query).asScala map JenaSPARQLEngine.toRow
     new Iterable[Row[Jena]] {
       def iterator = rows
     }
   }
 
-  def executeConstruct(graph: JenaGraph, query: JenaSPARQL#ConstructQuery): JenaGraph = {
-    val model: Model = ModelFactory.createModelForGraph(graph)
+  def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     val result = qexec.execConstruct()
     result.getGraph()
   }
   
-  def executeAsk(graph: JenaGraph, query: JenaSPARQL#AskQuery): Boolean = {
-    val model: Model = ModelFactory.createModelForGraph(graph)
+  def executeAsk(query: JenaSPARQL#AskQuery): Boolean = {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     val result = qexec.execAsk()
     result
   }
 
-
+  /**
+   * This returns the underlying objects, which is useful when needing to serialise the answer
+   * for example
+   * @param query
+   * @return
+   */
+  def executeSelectPlain(query: JenaSPARQL#SelectQuery) = {
+    val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
+    qexec.execSelect()
+  }
 }

@@ -4,11 +4,12 @@ import org.w3.banana._
 import org.openrdf.repository.{ Repository, RepositoryConnection }
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.query.{QueryEvaluationException, BindingSet}
-import org.openrdf.model.Statement
+import org.openrdf.model.{URI, Resource, ValueFactory, Statement}
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.SailConnection
 import scalaz.{ Validation, Success, Failure }
 import scala.collection.JavaConverters._
+import org.openrdf.model.impl.StatementImpl
 
 object SesameUtil {
 
@@ -34,7 +35,13 @@ object SesameUtil {
   def toStatementIterable[T<: BindingSet](queryResult: QueryResult[T]): Iterable[Statement] = new Iterable[Statement] {
     def iterator = new Iterator[Statement] {
       def hasNext: Boolean = queryResult.hasNext
-      def next(): Statement = queryResult.next().asInstanceOf[Statement]
+      def next(): Statement = {
+        val binding = queryResult.next()
+        val subj = binding.getBinding("subject").getValue.asInstanceOf[Resource]
+        val pred = binding.getBinding("predicate").getValue.asInstanceOf[URI]
+        val obj = binding.getBinding("object").getValue
+        new StatementImpl(subj,pred,obj)
+      }
     }
   }
 

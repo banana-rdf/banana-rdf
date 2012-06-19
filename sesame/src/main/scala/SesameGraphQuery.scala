@@ -1,3 +1,5 @@
+package org.w3.banana.sesame
+
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.sail.Sail
@@ -15,30 +17,38 @@ import scalaz.Failure
  * and indeed this should extend to RDFGraphQuery(graph)
  *
  */
-object SesameGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
+case class SesameGraphQuery(graph: Sesame#Graph) extends RDFGraphQuery[Sesame, SesameSPARQL](graph) {
 
   /**
    * Sesame queries can only be made on stores, hence this is needed.
    * @param graph
    */
-  protected def makeStore(graph: Sesame#Graph) = {
+  lazy val store = {
     val store = new MemoryStore
     val sail = new SailRepository(store)
+    sail.initialize()
     val sailconn = sail.getConnection
     sailconn.add(graph)
     SesameStore(sail)
   }
 
-  def executeSelect(graph: Sesame#Graph, query: SesameSPARQL#SelectQuery): Iterable[Row[Sesame]] = {
-    makeStore(graph).executeSelect(query)
+  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[Row[Sesame]] = {
+    store.executeSelect(query)
   }
 
-  def executeConstruct(graph: Sesame#Graph, query: SesameSPARQL#ConstructQuery) = {
-    makeStore(graph).executeConstruct(query)
+  def executeConstruct(query: SesameSPARQL#ConstructQuery) = {
+    store.executeConstruct(query)
   }
 
-  def executeAsk(graph: Sesame#Graph, query: SesameSPARQL#AskQuery) = {
-    makeStore(graph).executeAsk(query)
-
+  def executeAsk(query: SesameSPARQL#AskQuery) = {
+    store.executeAsk(query)
   }
+
+  /**
+   * This returns the underlying objects, which is useful when needing to serialise the answer
+   * for example
+   * @param query
+   * @return
+   */
+  def executeSelectPlain(query: SesameSPARQL#SelectQuery) = store.executeSelectPlain(query)
 }

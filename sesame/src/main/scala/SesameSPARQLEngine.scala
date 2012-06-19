@@ -31,7 +31,9 @@ trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
   
   def executeAsk(query: SesameSPARQL#AskQuery): Boolean =
     withConnection(store) { conn =>
-        conn.evaluate(query.getTupleExpr, null, empty, false).hasNext
+        val res = conn.evaluate(query.getTupleExpr, null, empty, false)
+        val answer = res.hasNext
+      answer
     }
 
   /**

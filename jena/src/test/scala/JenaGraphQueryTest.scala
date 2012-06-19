@@ -9,4 +9,4 @@ class JenaGraphQueryTest() extends RDFGraphQueryTest[Jena, JenaSPARQL](
   JenaRDFXMLReader,
   JenaGraphIsomorphism,
   JenaSPARQLOperations,
-  JenaGraphQuery)
+  JenaGraphQuery.apply)
