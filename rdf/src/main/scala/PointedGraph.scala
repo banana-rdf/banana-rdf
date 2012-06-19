@@ -8,5 +8,3 @@ object PointedGraph {
     new PointedGraph[Rdf](node, ops.Graph.empty)
 
 }
-
-case class PointedGraphs[Rdf <: RDF](nodes: Iterable[Rdf#Node], graph: Rdf#Graph)

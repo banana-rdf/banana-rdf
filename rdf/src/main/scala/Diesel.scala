@@ -45,9 +45,9 @@ with EitherBinder[Rdf] {
 
     def -<-(p: Rdf#URI): PredicatePointedGraph = new PredicatePointedGraph(p, pointed)
 
-    def /(p: Rdf#URI): PointedGraphs[Rdf] = {
+    def /(p: Rdf#URI): PointedGraphs = {
       val nodes = getObjects(graph, node, p)
-      PointedGraphs(nodes, graph)
+      new PointedGraphs(nodes, graph)
     }
 
     def node: Rdf#Node = pointed.node
@@ -68,15 +68,13 @@ with EitherBinder[Rdf] {
 
   }
 
-  class PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]) extends Iterable[PointedGraph[Rdf]] {
-
-    import pointedGraphs.{ nodes, graph }
+  class PointedGraphs(val nodes: Iterable[Rdf#Node], val graph: Rdf#Graph) extends Iterable[PointedGraph[Rdf]] {
 
     def iterator = nodes.iterator map { PointedGraph(_, graph) }
 
-    def /(p: Rdf#URI): PointedGraphs[Rdf] = {
+    def /(p: Rdf#URI): PointedGraphs = {
       val ns = this flatMap { case PointedGraph(node, graph) => getObjects(graph, node, p) }
-      PointedGraphs(ns, graph)
+      new PointedGraphs(ns, graph)
     }
 
     def takeOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
@@ -169,9 +167,9 @@ with EitherBinder[Rdf] {
 
   class GraphW(graph: Rdf#Graph) {
 
-    def getAllInstancesOf(clazz: Rdf#URI): PointedGraphs[Rdf] = {
+    def getAllInstancesOf(clazz: Rdf#URI): PointedGraphs = {
       val instances = getSubjects(graph, rdf("type"), clazz): Iterable[Rdf#Node]
-      PointedGraphs(instances, graph)
+      new PointedGraphs(instances, graph)
     }
 
   }
@@ -192,8 +190,6 @@ with EitherBinder[Rdf] {
 
 
   implicit def pointedGraph2PointedGraphW(pointed: PointedGraph[Rdf]): PointedGraphW = new PointedGraphW(pointed)
-
-  implicit def multiplePointedGraph2PointedGraphsW(pointedGraphs: PointedGraphs[Rdf]): PointedGraphsW = new PointedGraphsW(pointedGraphs)
 
   implicit def graph2GraphW(graph: Rdf#Graph): GraphW = new GraphW(graph)
 
