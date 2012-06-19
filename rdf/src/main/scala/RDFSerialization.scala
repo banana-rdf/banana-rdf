@@ -1,7 +1,14 @@
 package org.w3.banana
 
+import collection.immutable.HashSet
 
-trait Language  {
+/**
+ * Sets of Languages grouped in some way
+ */
+
+abstract class Language(val mime: String)
+
+case class Languages(langs: Set[Language]) {
   /**
    * clean a mime header.
    * This is a  separate function, as many http libraries calculate it for the user
@@ -17,60 +24,55 @@ trait Language  {
    */
   def normalize(mime: String) = mime.trim.toLowerCase
 
+  lazy val mimeLangMap: Map[String,Language] = langs.map(lang=>(lang.mime,lang)).toMap
+
   /**
    * Find the language for this mime type
    *
    * @param mime an extracted normalised mime type
    */
-  def fromMime(mime: String): Option[Language]
-
+  def fromMime(mime: String): Option[Language] = mimeLangMap.get(mime)
 }
 
-sealed trait RDFQueryLang extends Language {
-  def fromMime(mime: String) = {
-    mime match {
-      case "application/sparql-query" => Some(SparqL)
-      case _ => None
-    }
-  }
-}
+// One would nearly like this set to grow so that whenever a new language is created it gets added to the set
+object AllLanguages extends Languages(RDFSerialisation.langs ++ RDFQueryLanguages.langs ++ AnswerLanguages.langs )
 
-object RDFQueryLang extends RDFQueryLang
+object RDFSerialisation extends Languages(HashSet(N3,Turtle,RDFXML,RDFaHTML,RDFaXHTML))
 
-trait SparqL extends RDFQueryLang
-case object SparqL extends SparqL
+object RDFQueryLanguages extends Languages(HashSet(SparqlQuery))
 
-sealed trait RDFSerialization extends Language {
-  def fromMime(mime: String): Option[RDFSerialization] = mime match {
-    case "text/n3" => Some(N3)
-    case "text/rdf+n3"=>Some(N3)
-    case "text/turtle" => Some(Turtle)
-    case "application/rdf+xml" => Some(RDFXML)
-    case "text/html" => Some(RDFaHTML)
-    case "application/xhtml+xml" => Some(RDFaXHTML)
-    case _ => None
-  }
-}
-object RDFSerialization extends RDFSerialization
+object AnswerLanguages extends Languages(HashSet(SparqlAnswerJson,SparqlAnswerXML))
 
-trait RDFXML extends RDFSerialization
+case object SparqlAnswerJson extends Language("application/sparql-results+json")
+case object SparqlAnswerXML extends Language("application/sparql-results+xml")
+
+case object SparqlQuery extends Language("application/sparql-query")
+
+//todo, deal with serialisations with multiple mime types
+//case object RDFSerialization extends Languages(N3,Turtle,RDFXML,RDFaHTML,RDFaXHTML)
+//  def fromMime(mime: String): Option[RDFSerialization] = mime match {
+//    case "text/n3" => Some(N3)
+//    case "text/rdf+n3"=>Some(N3)
+//    case "text/turtle" => Some(Turtle)
+//    case "application/rdf+xml" => Some(RDFXML)
+//    case "text/html" => Some(RDFaHTML)
+//    case "application/xhtml+xml" => Some(RDFaXHTML)
+//    case _ => None
+//  }
+//}
+//object RDFSerialization extends RDFSerialization
+
+class RDFXML extends Language("application/rdf+xml")
 case object RDFXML extends RDFXML
-
-trait RDFXMLAbbrev extends RDFXML
-case object RDFXMLAbbrev extends RDFXMLAbbrev
+case object RDFXMLAbbrev extends RDFXML
 
 
-trait N3 extends RDFSerialization
-case object N3 extends N3
+class N3(lang: String) extends Language(lang)
+case object N3 extends N3("text/n3")
 
-trait Turtle extends N3
-case object Turtle extends Turtle
+class Turtle(mime: String) extends N3(mime)
+case object Turtle extends Turtle("text/turtle")
 
-trait RDFa extends RDFSerialization
-case object RDFa extends RDFa
-
-trait RDFaXHTML extends RDFSerialization
-case object RDFaXHTML extends RDFa
-
-trait RDFaHTML extends RDFSerialization
-case object RDFaHTML extends RDFa
+case object RDFa extends Language("text/html")
+case object RDFaXHTML extends Language("application/xhtml+xml")
+case object RDFaHTML extends Language("text/html")

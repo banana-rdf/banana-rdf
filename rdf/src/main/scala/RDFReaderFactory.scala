@@ -7,7 +7,7 @@ import scalaz.Validation._
 
 trait RDFReaderFactory[Rdf <: RDF] {
 
-  def find(ser: RDFSerialization): Option[RDFReader[Rdf,_]] = ser match {
+  def find(ser: Language): Option[RDFReader[Rdf, Language]] = ser match {
     case RDFXML => Some(RDFXMLReader)
     case Turtle => Some(TurtleReader)
     case _ => None

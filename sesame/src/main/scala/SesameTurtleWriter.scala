@@ -2,16 +2,17 @@ package org.w3.banana.sesame
 
 import org.w3.banana._
 import java.io._
-import org.openrdf.rio.RDFWriter
 import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.openrdf.rio.rdfxml.{RDFXMLWriter => SRdfXmlWriter}
 import org.openrdf.model.URI
-import org.openrdf.model.impl.URIImpl
 
 import scalaz.Validation
-import scalaz.Validation._
 import org.openrdf.rio.RDFWriter
 import org.w3.banana.{TurtleWriter=>BananaTurtleWriter}
+import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
+import org.openrdf.query.resultio.TupleQueryResultWriter
+import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
+
 
 abstract class SesameWriter extends BlockingWriter[Sesame] {
   val ops = SesameOperations
@@ -69,4 +70,29 @@ object SesameRdfXmlWriter extends SesameWriter with RdfXmlWriter[Sesame] {
   def rdfWriter(os: OutputStream, base: String) = new SRdfXmlWriter(os)
 
   def rdfWriter(w: Writer, base: String) = new SRdfXmlWriter(w)
+}
+
+trait SesameSparqlWriter extends BlockingSparqlAnswerWriter[SesameSPARQL,SesameSPARQL#Answers] {
+  def writer(os: OutputStream) : TupleQueryResultWriter
+
+  def write(answers: SesameSPARQL#Answers, os: OutputStream) = {
+    val w = writer(os)
+    WrappedThrowable.fromTryCatch {
+      while(answers.hasNext) {
+        w.handleSolution(answers.next())
+      }
+    }
+  }
+}
+
+object SesameSparqlWriterXML extends SesameSparqlWriter {
+  def writer(os: OutputStream) = new SPARQLResultsXMLWriter(os)
+
+  val output = SparqlAnswerXML
+}
+
+object SesameSparqlWriterJSON extends SesameSparqlWriter {
+  def writer(os: OutputStream) = new SPARQLResultsJSONWriter(os)
+
+  val output = SparqlAnswerXML
 }

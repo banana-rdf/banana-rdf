@@ -10,4 +10,8 @@ trait SPARQL {
 
   type AskQuery <: Query
 
+  type Answers
+
+  type Answer
+
 }

@@ -42,6 +42,13 @@ trait JenaSPARQLEngine extends SPARQLEngine[Jena, JenaSPARQL] {
     }
   }
 
+  def executeSelectPlain(query: JenaSPARQL#SelectQuery): JenaSPARQL#Answers = {
+    val dataset = new GraphStoreBasic(store).toDataset
+    val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
+    qexec.execSelect()
+  }
+
+
   def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = {
     val dataset = new GraphStoreBasic(store).toDataset
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)

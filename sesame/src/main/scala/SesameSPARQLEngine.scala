@@ -34,5 +34,13 @@ trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
         conn.evaluate(query.getTupleExpr, null, empty, false).hasNext
     }
 
-
+  /**
+   * This returns the underlying objects, which is useful when needing to serialise the answer
+   * for example
+   * @param query
+   * @return
+   */
+  def executeSelectPlain(query: SesameSPARQL#SelectQuery) = withConnection(store) { conn =>
+    conn.evaluate(query.getTupleExpr,null,empty,false)
+  }
 }
