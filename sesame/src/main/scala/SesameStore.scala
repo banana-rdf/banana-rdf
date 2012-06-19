@@ -16,6 +16,12 @@ object SesameStore {
   def apply(store: SailRepository): RDFStore[Sesame, SesameSPARQL] =
     new SesameStore(store)
 
+  def iter(st: CloseableIteration[_ <: Statement, SailException]) =
+    new Iterator[Statement] {
+      def hasNext: Boolean = st.hasNext
+      def next(): Statement = st.next().asInstanceOf[Statement]
+    }
+
 }
 
 class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] {
@@ -23,29 +29,23 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
   def addNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
     withConnection(store) { conn =>
       conn.removeStatements(null: Resource, null, null, uri)
-      for (s: Statement<-graph.`match`(null,null,null)) {
-          conn.addStatement(s.getSubject,s.getPredicate,s.getObject,uri)
+      for (s: Statement <- graph.`match`(null, null, null)) {
+        conn.addStatement(s.getSubject, s.getPredicate, s.getObject, uri)
       }
     }
   }
 
   def appendToNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
     withConnection(store) { conn =>
-      for (s: Statement<-graph.`match`(null,null,null))
-        conn.addStatement(s.getSubject,s.getPredicate,s.getObject,uri)
+      for (s: Statement <- graph.`match`(null, null, null))
+        conn.addStatement(s.getSubject, s.getPredicate, s.getObject, uri)
     }
   }
-
-  private def iter(st: CloseableIteration[_ <: Statement, SailException]) =
-    new Iterator[Statement] {
-      def hasNext: Boolean = st.hasNext
-      def next(): Statement = st.next().asInstanceOf[Statement]
-    }
 
   def getNamedGraph(uri: Sesame#URI): Sesame#Graph = {
     val graph = new GraphImpl
     withConnection(store) { conn =>
-      for (s: Statement <- iter(conn.getStatements(null,null,null,false,uri)))
+      for (s: Statement <- SesameStore.iter(conn.getStatements(null, null, null, false, uri)))
         graph.add(s)
     }
     graph
