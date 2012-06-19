@@ -5,10 +5,12 @@ import scalaz.{Right3, Middle3, Left3, Either3}
 /**
  * to execute SPARQL queries on an RDF graph
  */
-abstract class RDFGraphQuery[Rdf <: RDF, Sparql <: SPARQL](graph: Rdf#Graph) extends SPARQLEngine[Rdf,Sparql]
+trait RDFGraphQuery[Rdf <: RDF, Sparql <: SPARQL] extends SPARQLEngine[Rdf,Sparql]  {
+  def graph: Rdf#Graph
+}
 
 trait OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL] {
-  this: RDFGraphQuery[Rdf,Sparql] =>
+  self: RDFGraphQuery[Rdf,Sparql] =>
 
   def ops: SPARQLOperations[Rdf,Sparql]
 
@@ -21,7 +23,7 @@ trait OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL] {
    *         an Rdf#Graph if the query was a Construct query
    *         a boolean if the query was an ASK query
    */
-  def executeQuery(graph: Rdf#Graph, query: Sparql#Query): Answer = ops.fold(query)(
+  def executeQuery(query: Sparql#Query): Answer = ops.fold(query)(
     select => Left3(executeSelect(select)),
     construct => Middle3(executeConstruct(construct)),
     ask => Right3(executeAsk(ask))

@@ -7,7 +7,7 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import scala.collection.JavaConverters._
 
-case class JenaGraphQuery(graph: Jena#Graph) extends RDFGraphQuery[Jena, JenaSPARQL](graph) {
+trait JenaRDFGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
 
   lazy val model: Model =  ModelFactory.createModelForGraph(graph)
 
@@ -40,4 +40,10 @@ case class JenaGraphQuery(graph: Jena#Graph) extends RDFGraphQuery[Jena, JenaSPA
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     qexec.execSelect()
   }
+}
+
+case class JenaGraphQuery(val graph: Jena#Graph) extends JenaRDFGraphQuery
+
+case class OpenJenaGraphQuery(val graph: Jena#Graph) extends JenaRDFGraphQuery with OpenGraphQuery[Jena,JenaSPARQL] {
+  def ops = JenaSPARQLOperations
 }

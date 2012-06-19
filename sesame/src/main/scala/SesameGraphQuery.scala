@@ -3,7 +3,7 @@ package org.w3.banana.sesame
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.sail.Sail
-import org.w3.banana.{Row, RDFGraphQuery}
+import org.w3.banana.{OpenGraphQuery, Row, RDFGraphQuery}
 import org.w3.banana.sesame.{SesameStore, Sesame, SesameSPARQL}
 import scalaz.Failure
 
@@ -17,7 +17,7 @@ import scalaz.Failure
  * and indeed this should extend to RDFGraphQuery(graph)
  *
  */
-case class SesameGraphQuery(graph: Sesame#Graph) extends RDFGraphQuery[Sesame, SesameSPARQL](graph) {
+trait SesameRDFGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
 
   /**
    * Sesame queries can only be made on stores, hence this is needed.
@@ -51,4 +51,12 @@ case class SesameGraphQuery(graph: Sesame#Graph) extends RDFGraphQuery[Sesame, S
    * @return
    */
   def executeSelectPlain(query: SesameSPARQL#SelectQuery) = store.executeSelectPlain(query)
+}
+
+case class SesameGraphQuery(graph: Sesame#Graph) extends SesameRDFGraphQuery
+
+case class OpenSesameGraphQuery(graph: Sesame#Graph)
+  extends SesameRDFGraphQuery
+  with OpenGraphQuery[Sesame, SesameSPARQL] {
+  def ops = SesameSPARQLOperations
 }
