@@ -13,7 +13,7 @@ object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
     val model: Model = ModelFactory.createModelForGraph(graph)
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
     val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
-    val rows = solutions.asScala map JenaSPARQLEngine.toRow
+    val rows = solutions.asScala map JenaStore.toRow
     new Iterable[Row[Jena]] {
       def iterator = rows
     }

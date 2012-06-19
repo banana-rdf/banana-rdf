@@ -1,10 +1,85 @@
 package org.w3.banana.sesame
 
 import org.w3.banana._
+import org.openrdf.model._
+import org.openrdf.model.impl._
+import SesameUtil.withConnection
 import org.openrdf.repository.sail.SailRepository
+import scala.collection.JavaConversions._
+import SesameUtil._
+import info.aduna.iteration.CloseableIteration
+import org.openrdf.sail.SailException
+import org.openrdf.query.impl.EmptyBindingSet
 
-case class SesameStore(store: SailRepository)
-extends RDFStore[Sesame, SesameSPARQL]
-with SesameGraphStore
-with SesameSPARQLEngine
+object SesameStore {
+
+  def apply(store: SailRepository): RDFStore[Sesame, SesameSPARQL] =
+    new SesameStore(store)
+
+}
+
+class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] {
+
+  def addNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
+    withConnection(store) { conn =>
+      conn.removeStatements(null: Resource, null, null, uri)
+      for (s: Statement<-graph.`match`(null,null,null)) {
+          conn.addStatement(s.getSubject,s.getPredicate,s.getObject,uri)
+      }
+    }
+  }
+
+  def appendToNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
+    withConnection(store) { conn =>
+      for (s: Statement<-graph.`match`(null,null,null))
+        conn.addStatement(s.getSubject,s.getPredicate,s.getObject,uri)
+    }
+  }
+
+  private def iter(st: CloseableIteration[_ <: Statement, SailException]) =
+    new Iterator[Statement] {
+      def hasNext: Boolean = st.hasNext
+      def next(): Statement = st.next().asInstanceOf[Statement]
+    }
+
+  def getNamedGraph(uri: Sesame#URI): Sesame#Graph = {
+    val graph = new GraphImpl
+    withConnection(store) { conn =>
+      for (s: Statement <- iter(conn.getStatements(null,null,null,false,uri)))
+        graph.add(s)
+    }
+    graph
+  }
+
+  def removeGraph(uri: Sesame#URI): Unit = {
+    withConnection(store) { conn =>
+      conn.removeStatements(null: Resource, null, null, uri)
+    }
+  }
+
+  val TODO = "http://w3.org/TODO#"
+
+  val empty = new EmptyBindingSet()
+
+  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[Row[Sesame]] = {
+    withConnection(store){ conn =>
+      val it = conn.evaluate(query.getTupleExpr, null, empty, false)
+      toIterable(it) map toRow
+    }
+  }
+
+  def executeConstruct(query: SesameSPARQL#ConstructQuery): Sesame#Graph =
+    withConnection(store){ conn =>
+      val it = conn.evaluate(query.getTupleExpr, null, empty, false)
+      val sit = SesameUtil.toStatementIterable(it)
+      SesameOperations.Graph(sit)
+    }
+
+  
+  def executeAsk(query: SesameSPARQL#AskQuery): Boolean =
+    withConnection(store) { conn =>
+      conn.evaluate(query.getTupleExpr, null, empty, false).hasNext
+    }
+
+}
 
