@@ -27,17 +27,17 @@ object JenaTurtleWriter extends JenaWriter("TURTLE") with TurtleWriter[Jena]
 
 object JenaRdfXmlWriter extends JenaWriter("RDF/XML") with RdfXmlWriter[Jena]
 
-object JenaSparqlXmlWriter extends BlockingSparqlAnswerWriter[JenaSPARQL,JenaSPARQL#Solutions] {
+object JenaSparqlXmlWriter extends BlockingSparqlAnswerWriter[JenaSPARQL,JenaSPARQL#Answers] {
 
-  def write(answers: JenaSPARQL#Solutions, os: OutputStream) = WrappedThrowable.fromTryCatch {
+  def write(answers: JenaSPARQL#Answers, os: OutputStream) = WrappedThrowable.fromTryCatch {
     new XMLOutput().format(os,answers)
   }
 
   val output = SparqlAnswerXML
 }
 
-object JenaSparqlJSONWriter extends BlockingSparqlAnswerWriter[JenaSPARQL,JenaSPARQL#Solutions] {
-  def write(answers: JenaSPARQL#Solutions, os: OutputStream) = WrappedThrowable.fromTryCatch {
+object JenaSparqlJSONWriter extends BlockingSparqlAnswerWriter[JenaSPARQL,JenaSPARQL#Answers] {
+  def write(answers: JenaSPARQL#Answers, os: OutputStream) = WrappedThrowable.fromTryCatch {
     new JSONOutput().format(os,answers)
   }
 

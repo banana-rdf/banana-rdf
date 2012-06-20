@@ -72,10 +72,10 @@ object SesameRdfXmlWriter extends SesameWriter with RdfXmlWriter[Sesame] {
   def rdfWriter(w: Writer, base: String) = new SRdfXmlWriter(w)
 }
 
-trait SesameSparqlWriter extends BlockingSparqlAnswerWriter[SesameSPARQL,SesameSPARQL#Solutions] {
+trait SesameSparqlWriter extends BlockingSparqlAnswerWriter[SesameSPARQL,SesameSPARQL#Answers] {
   def writer(os: OutputStream) : TupleQueryResultWriter
 
-  def write(answers: SesameSPARQL#Solutions, os: OutputStream) = {
+  def write(answers: SesameSPARQL#Answers, os: OutputStream) = {
     val w = writer(os)
     WrappedThrowable.fromTryCatch {
       while(answers.hasNext) {

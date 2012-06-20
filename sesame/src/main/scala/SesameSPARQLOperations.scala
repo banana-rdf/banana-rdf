@@ -5,9 +5,6 @@ import org.openrdf.query.parser.sparql.SPARQLParserFactory
 import org.openrdf.query.parser.{ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery}
 import scalaz.{Failure, Success, Validation}
 import org.openrdf.query.MalformedQueryException
-import sesame.SesameUtil._
-import scalaz.Failure
-import scalaz.Success
 
 object SesameSPARQLOperations extends SPARQLOperations[Sesame, SesameSPARQL] {
 
@@ -37,6 +34,4 @@ object SesameSPARQLOperations extends SPARQLOperations[Sesame, SesameSPARQL] {
     case qc: SesameSPARQL#ConstructQuery => construct(qc)
     case qa: SesameSPARQL#AskQuery => ask(qa)
   }
-
-  implicit def Rows(solutions: SesameSPARQL#Solutions) = SesameUtil.toIterable(solutions) map toRow
 }

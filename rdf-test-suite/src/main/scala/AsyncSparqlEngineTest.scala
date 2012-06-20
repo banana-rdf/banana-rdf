@@ -23,7 +23,7 @@ abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL]()(
   val system = ActorSystem("jena-asynsparqlquery-test", AsyncRDFStore.DEFAULT_CONFIG)
   implicit val timeout = Timeout(1000)
 
-  val asyncEngine = AsyncSPARQLEngine(store,sparqlOps, system)
+  val asyncEngine = AsyncSPARQLEngine(store, system)
 
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
