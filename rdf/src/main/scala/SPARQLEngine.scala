@@ -7,15 +7,7 @@ import scalaz.{Left3, Right3, Middle3, Either3}
  */
 trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL]  {
 
-  /**
-   * This returns the underlying objects, which is useful when needing to serialise the answer
-   * for example
-   * @param query
-   * @return
-   */
-  def executeSelectPlain(query: Sparql#SelectQuery): Sparql#Solutions
-
-  def executeSelect(query: Sparql#SelectQuery): Iterable[Row[Rdf]]
+  def executeSelect(query: Sparql#SelectQuery): Sparql#Solutions
 
   def executeConstruct(query: Sparql#ConstructQuery): Rdf#Graph
 

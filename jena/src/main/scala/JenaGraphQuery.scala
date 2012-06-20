@@ -11,11 +11,9 @@ trait JenaRDFGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
 
   lazy val model: Model =  ModelFactory.createModelForGraph(graph)
 
-  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[Row[Jena]] = {
-    val rows = executeSelectPlain(query).asScala map JenaSPARQLEngine.toRow
-    new Iterable[Row[Jena]] {
-      def iterator = rows
-    }
+  def executeSelect(query: JenaSPARQL#SelectQuery) = {
+    val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
+    qexec.execSelect()
   }
 
   def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = {
@@ -30,16 +28,6 @@ trait JenaRDFGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
     result
   }
 
-  /**
-   * This returns the underlying objects, which is useful when needing to serialise the answer
-   * for example
-   * @param query
-   * @return
-   */
-  def executeSelectPlain(query: JenaSPARQL#SelectQuery) = {
-    val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
-    qexec.execSelect()
-  }
 }
 
 case class JenaGraphQuery(val graph: Jena#Graph) extends JenaRDFGraphQuery
