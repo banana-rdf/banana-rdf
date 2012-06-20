@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.Validation
+import org.w3.banana.scalaz._
 
 trait PointedGraphBinder[Rdf <: RDF, T] {
   def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T]

@@ -8,8 +8,7 @@ import java.util.LinkedList
 
 import SesamePrefix._
 
-import scalaz.Validation
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
   override def handleStatement(st: Statement): Unit = st.getObject match {

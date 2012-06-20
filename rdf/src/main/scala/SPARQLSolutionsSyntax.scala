@@ -1,6 +1,5 @@
 package org.w3.banana
 
-import scalaz.Validation
 
 object SPARQLSolutionsSyntax {
 

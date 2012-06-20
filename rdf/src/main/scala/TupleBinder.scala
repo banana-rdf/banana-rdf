@@ -1,7 +1,6 @@
 package org.w3.banana
 
-import scalaz._
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 
 trait TupleBinder[Rdf <: RDF] {
 this: Diesel[Rdf] =>

@@ -2,8 +2,7 @@ package org.w3.banana
 
 import java.io._
 
-import scalaz.Validation
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 
 trait RDFReader[Rdf <: RDF, Serialization <: RDFSerialization] {
   

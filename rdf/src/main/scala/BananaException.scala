@@ -1,11 +1,10 @@
 package org.w3.banana
 
-import scalaz.{ Validation, Success, Failure }
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 
 object BananaException {
 
-  implicit val validationBananaExceptionMonad = validationMonad[BananaException]
+  //implicit val validationBananaExceptionMonad = validationMonad[BananaException]
 
 }
 

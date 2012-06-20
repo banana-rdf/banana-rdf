@@ -1,8 +1,6 @@
 package org.w3.banana
 
-import scalaz._
-import scalaz.Scalaz._
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 import NodeBinder._
 
 object Diesel {
