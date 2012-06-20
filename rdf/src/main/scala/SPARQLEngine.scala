@@ -13,7 +13,7 @@ trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL]  {
    * @param query
    * @return
    */
-  def executeSelectPlain(query: Sparql#SelectQuery): Sparql#Answers
+  def executeSelectPlain(query: Sparql#SelectQuery): Sparql#Solutions
 
   def executeSelect(query: Sparql#SelectQuery): Iterable[Row[Rdf]]
 

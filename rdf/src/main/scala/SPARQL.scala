@@ -10,8 +10,17 @@ trait SPARQL {
 
   type AskQuery <: Query
 
-  type Answers
+  /**
+   * A SPARQL Solution as defined
+   * http://www.w3.org/TR/sparql11-query/#sparqlSolutions
+   */
+  type Solution
 
-  type Answer
+  /**
+   * A SPARQL Solution Sequence as defined in
+   * http://www.w3.org/TR/sparql11-query/#sparqlSolutions
+   */
+  type Solutions
+
 
 }
