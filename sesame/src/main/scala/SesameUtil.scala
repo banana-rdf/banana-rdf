@@ -3,8 +3,8 @@ package org.w3.banana.sesame
 import org.w3.banana._
 import org.openrdf.repository.{ Repository, RepositoryConnection }
 import info.aduna.iteration.CloseableIteration
-import org.openrdf.query.{ QueryEvaluationException, BindingSet }
-import org.openrdf.model.{URI, Resource, Statement}
+import org.openrdf.query.{QueryEvaluationException, BindingSet}
+import org.openrdf.model.{URI, Resource, ValueFactory, Statement}
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.SailConnection
 import scalaz.{ Validation, Success, Failure }
@@ -40,7 +40,7 @@ object SesameUtil {
         val pred = binding.getBinding("predicate").getValue.asInstanceOf[URI]
         val obj = binding.getBinding("object").getValue
         new StatementImpl(subj,pred,obj)
-      }
+      } 
     }
   }
 

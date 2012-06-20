@@ -9,7 +9,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL](
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf],
   sparqlOperations: SPARQLOperations[Rdf, Sparql],
-  graphQuery: Rdf#Graph => RDFGraphQuery[Rdf, Sparql]
+  graphQuery: RDFGraphQuery[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with Inside {
 
   import ops._
@@ -35,7 +35,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val rows = graphQuery(graph).executeSelect(query).toIterable.toList
+    val rows = executeSelect(graph,query).toIterable.toList
 
     val names: List[String] = rows map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
@@ -59,7 +59,7 @@ CONSTRUCT {
 }
 """)
 
-    val clonedGraph = graphQuery(graph).executeConstruct(query)
+    val clonedGraph = executeConstruct(graph, query)
 
     assert(clonedGraph isIsomorphicWith graph)
 
@@ -79,7 +79,7 @@ ASK {
 }
 """)
 
-    val alexIsThere = graphQuery(graph).executeAsk(query)
+    val alexIsThere = executeAsk(graph, query)
 
     alexIsThere must be (true)
 

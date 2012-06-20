@@ -8,5 +8,5 @@ class SesameGraphQueryTest extends RDFGraphQueryTest[Sesame, SesameSPARQL](
     SesameRDFXMLReader,
     SesameGraphIsomorphism,
     SesameSPARQLOperations,
-    SesameGraphQuery.apply)
+    SesameGraphQuery)
 
