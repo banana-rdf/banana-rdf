@@ -14,7 +14,7 @@ trait OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL] {
 
   def ops: SPARQLOperations[Rdf,Sparql]
 
-  type Answer = Either3[scala.Iterable[Row[Rdf]], Rdf#Graph, Boolean]
+  type Answer = Either3[Sparql#Solutions, Rdf#Graph, Boolean]
 
   /**
    * This takes a generic query, and returns whatever type of object that query returns

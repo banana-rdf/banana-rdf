@@ -23,7 +23,7 @@ abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL]()(
   val system = ActorSystem("jena-asynsparqlquery-test", AsyncRDFStore.DEFAULT_CONFIG)
   implicit val timeout = Timeout(1000)
 
-  val asyncEngine = AsyncSPARQLEngine(store, system)
+  val asyncEngine = AsyncRDFStore(store, system)
 
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
@@ -52,7 +52,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second) map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
+    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second).toIterable map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
 

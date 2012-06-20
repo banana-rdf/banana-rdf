@@ -3,7 +3,7 @@ package org.w3.banana.sesame
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.sail.Sail
-import org.w3.banana.{OpenGraphQuery, Row, RDFGraphQuery}
+import org.w3.banana.{OpenGraphQuery, RDFGraphQuery}
 import org.w3.banana.sesame.{SesameStore, Sesame, SesameSPARQL}
 import scalaz.Failure
 
@@ -32,7 +32,7 @@ trait SesameRDFGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
     SesameStore(sail)
   }
 
-  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[Row[Sesame]] = {
+  def executeSelect(query: SesameSPARQL#SelectQuery) = {
     store.executeSelect(query)
   }
 
@@ -44,13 +44,6 @@ trait SesameRDFGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
     store.executeAsk(query)
   }
 
-  /**
-   * This returns the underlying objects, which is useful when needing to serialise the answer
-   * for example
-   * @param query
-   * @return
-   */
-  def executeSelectPlain(query: SesameSPARQL#SelectQuery) = store.executeSelectPlain(query)
 }
 
 case class SesameGraphQuery(graph: Sesame#Graph) extends SesameRDFGraphQuery

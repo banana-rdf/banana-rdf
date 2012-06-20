@@ -93,7 +93,8 @@ object YourProjectBuild extends Build {
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.0-incubating",
+      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1",
+      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1",
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
   
@@ -105,6 +106,7 @@ object YourProjectBuild extends Build {
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.6",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.6",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.6",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.6",
       libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % "2.6.6")
 
   val n3Deps =

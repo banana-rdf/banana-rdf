@@ -9,13 +9,14 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL](
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf],
   sparqlOperations: SPARQLOperations[Rdf, Sparql],
-  graphQuery: Rdf#Graph=>RDFGraphQuery[Rdf, Sparql]
+  graphQuery: Rdf#Graph => RDFGraphQuery[Rdf, Sparql]
 ) extends WordSpec with MustMatchers with Inside {
 
   import ops._
   import diesel._
   import iso._
   import sparqlOperations._
+  import graphQuery._
 
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
@@ -34,7 +35,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val rows = graphQuery(graph).executeSelect(query).toList
+    val rows = graphQuery(graph).executeSelect(query).toIterable.toList
 
     val names: List[String] = rows map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
