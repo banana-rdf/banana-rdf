@@ -34,6 +34,10 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
   def solutionIterator(solutions: Sparql#Solutions): Iterable[Sparql#Solution]
 
+  /* provides syntax for the Solution and Solutions */
+
+  implicit def solutionSyntax(solution: Sparql#Solution): SPARQLSolutionSyntax[Rdf, Sparql] = SPARQLSolutionSyntax(solution)(this)
+
   /**************/
 
   // TODO move all that stuff: there should be only function definitions here

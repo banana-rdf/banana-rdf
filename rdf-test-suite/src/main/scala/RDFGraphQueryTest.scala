@@ -37,13 +37,13 @@ SELECT DISTINCT ?name WHERE {
 
     val rows = solutionIterator(executeSelect(graph, query)).toList
 
-    val names: List[String] = rows map { row => getNode(row, "name").flatMap(_.as[String]) getOrElse sys.error("") }
+    val names: List[String] = rows map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
     names must contain ("Alexandre Bertails")
 
     val row = rows(0)
 
-    getNode(row, "unknown") must be ('failure)
+    row("unknown") must be ('failure)
 
   }
 
