@@ -29,7 +29,7 @@ trait TurtleWriter[Rdf <: RDF] extends BlockingWriter[Rdf]
 
 trait RdfXmlWriter[Rdf <: RDF] extends BlockingWriter[Rdf]
 
-trait BlockingSparqlAnswerWriter[Sparql<: SPARQL, Answers <: Sparql#Solutions] {
+trait BlockingSparqlAnswerWriter[Sparql<: SPARQL, Answers <: Sparql#Answers] {
   def output: Language
   def write(answers: Answers, os: OutputStream): Validation[BananaException, Unit]
 }
