@@ -38,6 +38,8 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
   implicit def solutionSyntax(solution: Sparql#Solution): SPARQLSolutionSyntax[Rdf, Sparql] = SPARQLSolutionSyntax(solution)(this)
 
+  implicit def solutionsSyntax(solutions: Sparql#Solutions): SPARQLSolutionsSyntax[Rdf, Sparql] = SPARQLSolutionsSyntax(solutions)(this)
+
   /**************/
 
   // TODO move all that stuff: there should be only function definitions here
