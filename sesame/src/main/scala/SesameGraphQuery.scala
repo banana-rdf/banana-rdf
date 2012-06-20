@@ -32,7 +32,7 @@ trait SesameRDFGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
     SesameStore(sail)
   }
 
-  def executeSelect(query: SesameSPARQL#SelectQuery) = {
+  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[Row[Sesame]] = {
     store.executeSelect(query)
   }
 
@@ -44,6 +44,13 @@ trait SesameRDFGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
     store.executeAsk(query)
   }
 
+  /**
+   * This returns the underlying objects, which is useful when needing to serialise the answer
+   * for example
+   * @param query
+   * @return
+   */
+  def executeSelectPlain(query: SesameSPARQL#SelectQuery) = store.executeSelectPlain(query)
 }
 
 case class SesameGraphQuery(graph: Sesame#Graph) extends SesameRDFGraphQuery

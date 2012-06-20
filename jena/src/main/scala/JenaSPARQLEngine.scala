@@ -32,7 +32,17 @@ trait JenaSPARQLEngine extends SPARQLEngine[Jena, JenaSPARQL] {
 
   def store: DatasetGraph
 
-  def executeSelect(query: JenaSPARQL#SelectQuery): JenaSPARQL#Solutions = {
+  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[Row[Jena]] = {
+    val dataset = new GraphStoreBasic(store).toDataset
+    val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
+    val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
+    val rows = solutions.asScala map JenaSPARQLEngine.toRow
+    new Iterable[Row[Jena]] {
+      def iterator = rows
+    }
+  }
+
+  def executeSelectPlain(query: JenaSPARQL#SelectQuery): JenaSPARQL#Answers = {
     val dataset = new GraphStoreBasic(store).toDataset
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     qexec.execSelect()

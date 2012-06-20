@@ -6,7 +6,6 @@ import com.hp.hpl.jena.query.{Query => JenaQuery, QueryException, QueryFactory}
 import com.hp.hpl.jena.graph.{ Node => JenaNode }
 import com.hp.hpl.jena.rdf.model.RDFNode
 import scalaz.{Failure, Success, Validation}
-import scala.collection.JavaConverters._
 
 object JenaSPARQLOperations extends SPARQLOperations[Jena, JenaSPARQL] {
 
@@ -31,7 +30,5 @@ object JenaSPARQLOperations extends SPARQLOperations[Jena, JenaSPARQL] {
       case JenaQuery.QueryTypeAsk => ask(query)
     }
 
-  def Rows(solutions: JenaSPARQL#Solutions) = new Iterable[Row[Jena]] {
-    def iterator = solutions.asScala map JenaSPARQLEngine.toRow
-  }
+
 }

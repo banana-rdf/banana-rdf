@@ -14,10 +14,12 @@ trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
   val TODO = "http://w3.org/TODO#"
   val empty = new EmptyBindingSet()
 
-  def executeSelect(query: SesameSPARQL#SelectQuery) = withConnection(store) { conn =>
-    conn.evaluate(query.getTupleExpr,null,empty,false)
+  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[Row[Sesame]] = {
+    withConnection(store){ conn =>
+      val it = conn.evaluate(query.getTupleExpr,null,empty,false)
+      toIterable(it) map toRow
+    }
   }
-
 
   def executeConstruct(query: SesameSPARQL#ConstructQuery): SesameGraph =
     withConnection(store){ conn =>
@@ -34,4 +36,13 @@ trait SesameSPARQLEngine extends SPARQLEngine[Sesame, SesameSPARQL] {
       answer
     }
 
+  /**
+   * This returns the underlying objects, which is useful when needing to serialise the answer
+   * for example
+   * @param query
+   * @return
+   */
+  def executeSelectPlain(query: SesameSPARQL#SelectQuery) = withConnection(store) { conn =>
+    conn.evaluate(query.getTupleExpr,null,empty,false)
+  }
 }
