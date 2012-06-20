@@ -61,10 +61,9 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
 
   val empty = new EmptyBindingSet()
 
-  def executeSelect(query: SesameSPARQL#SelectQuery): Iterable[Row[Sesame]] = {
+  def executeSelect(query: SesameSPARQL#SelectQuery): SesameSPARQL#Solutions = {
     withConnection(store){ conn =>
-      val it = conn.evaluate(query.getTupleExpr, null, empty, false)
-      toIterable(it) map toRow
+      conn.evaluate(query.getTupleExpr, null, empty, false)
     }
   }
 
@@ -74,7 +73,6 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
       val sit = SesameUtil.toStatementIterable(it)
       SesameOperations.Graph(sit)
     }
-
   
   def executeAsk(query: SesameSPARQL#AskQuery): Boolean =
     withConnection(store) { conn =>

@@ -19,20 +19,6 @@ object JenaStore {
     JenaStore(dataset)
   }
 
-  def toRow(qs: QuerySolution): Row[Jena] =
-    new Row[Jena] {
-      def apply(v: String): Validation[BananaException, Jena#Node] = {
-        val node: RDFNode = qs.get(v)
-        if (node == null)
-          Failure(VarNotFound("var " + v + " not found in QuerySolution " + qs.toString))
-        else
-          Success(JenaGraphTraversal.toNode(node))
-      }
-      def vars: Iterable[String] = new Iterable[String] {
-        def iterator = qs.varNames.asScala
-      }
-    }
-
 }
 
 class JenaStore(dataset: Dataset) extends RDFStore[Jena, JenaSPARQL] {
@@ -57,13 +43,10 @@ class JenaStore(dataset: Dataset) extends RDFStore[Jena, JenaSPARQL] {
     dg.removeGraph(uri)
   }
 
-  def executeSelect(query: JenaSPARQL#SelectQuery): Iterable[Row[Jena]] = {
+  def executeSelect(query: JenaSPARQL#SelectQuery): JenaSPARQL#Solutions = {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
-    val solutions: java.util.Iterator[QuerySolution] = qexec.execSelect()
-    val rows = solutions.asScala map JenaStore.toRow
-    new Iterable[Row[Jena]] {
-      def iterator = rows
-    }
+    val solutions = qexec.execSelect()
+    solutions
   }
 
   def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = {

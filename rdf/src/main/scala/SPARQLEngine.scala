@@ -5,7 +5,7 @@ package org.w3.banana
  */
 trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL]  {
 
-  def executeSelect(query: Sparql#SelectQuery): Iterable[Row[Rdf]]
+  def executeSelect(query: Sparql#SelectQuery): Sparql#Solutions
 
   def executeConstruct(query: Sparql#ConstructQuery): Rdf#Graph
 

@@ -74,8 +74,8 @@ extends AsyncRDFStore[Rdf, Sparql] {
   def removeGraph(uri: Rdf#URI): Future[Unit] =
     storeActor.?(RemoveGraph(uri)).mapTo[Unit]
 
-  def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Row[Rdf]]] =
-    storeActor.?(Select(query)).asInstanceOf[Future[Iterable[Row[Rdf]]]]
+  def executeSelect(query: Sparql#SelectQuery): Future[Sparql#Solutions] =
+    storeActor.?(Select(query)).asInstanceOf[Future[Sparql#Solutions]]
 
   def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph] =
     storeActor.?(Construct(query)).asInstanceOf[Future[Rdf#Graph]]

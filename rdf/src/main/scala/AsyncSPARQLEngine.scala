@@ -11,7 +11,7 @@ import akka.util.Timeout
  */
 trait AsyncSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
 
-  def executeSelect(query: Sparql#SelectQuery): Future[Iterable[Row[Rdf]]]
+  def executeSelect(query: Sparql#SelectQuery): Future[Sparql#Solutions]
 
   def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph]
 

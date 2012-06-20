@@ -28,7 +28,15 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
                                    construct: Sparql#ConstructQuery => T,
                                    ask: Sparql#AskQuery => T): T
 
+  def getNode(solution: Sparql#Solution, v: String): Validation[BananaException, Rdf#Node]
+
+  def varnames(solution: Sparql#Solution): Set[String]
+
+  def solutionIterator(solutions: Sparql#Solutions): Iterable[Sparql#Solution]
+
   /**************/
+
+  // TODO move all that stuff: there should be only function definitions here
 
   private def buildQuery(query: String, prefixes: Seq[Prefix[Rdf]]): String = {
     val builder = new java.lang.StringBuilder
