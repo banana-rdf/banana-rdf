@@ -21,6 +21,7 @@ trait AsyncSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
 
 class AsyncSPARQLEngineBase[Rdf <: RDF, Sparql <: SPARQL](
     sparqlEngine: SPARQLEngine[Rdf, Sparql],
+    sparqlOps: SPARQLOperations[Rdf, Sparql],
     factory: ActorRefFactory)(
     implicit timeout: Timeout)
 extends AsyncSPARQLEngine[Rdf, Sparql] {
@@ -33,7 +34,7 @@ extends AsyncSPARQLEngine[Rdf, Sparql] {
 
     def receive = {
       case Select(query) => {
-        val rows = sparqlEngine.executeSelect(query)
+        val rows = sparqlOps.Rows(sparqlEngine.executeSelect(query))
         sender ! rows
       }
       case Construct(query) => {
@@ -69,8 +70,9 @@ object AsyncSPARQLEngine {
 
   def apply[Rdf <: RDF, Sparql <: SPARQL](
     engine: SPARQLEngine[Rdf, Sparql],
+    sparqlOps: SPARQLOperations[Rdf,Sparql],
     system: ActorSystem)(
     implicit timeout: Timeout): AsyncSPARQLEngine[Rdf, Sparql] =
-      new AsyncSPARQLEngineBase[Rdf, Sparql](engine, system)(timeout)
+      new AsyncSPARQLEngineBase[Rdf, Sparql](engine, sparqlOps, system)(timeout)
 
 }

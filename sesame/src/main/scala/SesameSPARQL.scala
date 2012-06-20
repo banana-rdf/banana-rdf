@@ -15,8 +15,8 @@ trait SesameSPARQL extends SPARQL {
 
   type AskQuery = ParsedBooleanQuery
 
-  type Answers = info.aduna.iteration.CloseableIteration[_ <: org.openrdf.query.BindingSet, org.openrdf.query.QueryEvaluationException]
+  type Solutions = info.aduna.iteration.CloseableIteration[_ <: org.openrdf.query.BindingSet, org.openrdf.query.QueryEvaluationException]
 
-  type Answer = Binding
+  type Solution = Binding
 }
 
