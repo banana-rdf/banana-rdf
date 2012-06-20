@@ -5,8 +5,9 @@ import java.io._
 import scalaz.Validation
 import scalaz.Validation._
 
+
+
 trait BlockingWriter[Rdf <: RDF] {
-    val ops: RDFOperations[Rdf]
 
     def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit]
     def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit]
@@ -26,3 +27,8 @@ trait TurtleWriter[Rdf <: RDF] extends BlockingWriter[Rdf]
 
 
 trait RdfXmlWriter[Rdf <: RDF] extends BlockingWriter[Rdf]
+
+trait BlockingSparqlAnswerWriter[Sparql<: SPARQL, Answers <: Sparql#Solutions] {
+  def output: Language
+  def write(answers: Answers, os: OutputStream): Validation[BananaException, Unit]
+}

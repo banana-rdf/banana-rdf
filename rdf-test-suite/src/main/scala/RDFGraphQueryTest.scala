@@ -35,7 +35,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val rows = executeSelect(graph, query).toIterable.toList
+    val rows = executeSelect(graph,query).toIterable.toList
 
     val names: List[String] = rows map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
