@@ -9,6 +9,7 @@ import com.hp.hpl.jena.sparql.core.DatasetGraph
 import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 import scalaz.{ Validation, Success, Failure }
 import scala.collection.JavaConverters._
+import com.hp.hpl.jena.rdf.model.ModelFactory.createModelForGraph
 
 object JenaStore {
 
@@ -23,39 +24,69 @@ object JenaStore {
 
 class JenaStore(dataset: Dataset) extends RDFStore[Jena, JenaSPARQL] {
 
+  val supportsTransactions: Boolean = dataset.supportsTransactions()
+
   val dg: DatasetGraph = dataset.asDatasetGraph
 
-  def addNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = {
+  def readTransaction[T](body: => T): T = {
+    if (supportsTransactions) {
+      dataset.begin(ReadWrite.READ)
+      try {
+        body
+      } finally {
+        dataset.end()
+      }
+    } else {
+      body
+    }
+  }
+
+  def writeTransaction[T](body: => T): T = {
+    if (supportsTransactions) {
+      dataset.begin(ReadWrite.WRITE)
+      try {
+        val result = body
+        dataset.commit()
+        result
+      } finally {
+        dataset.end()
+      }
+    } else {
+      body
+    }
+  }
+
+  def addNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
     dg.addGraph(uri, graph)
   }
 
-  def appendToNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = {
+  def appendToNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
     Graph.toIterable(graph) foreach { case Triple(s, p, o) =>
       dg.add(uri, s, p, o)
     }
   }
 
-  def getNamedGraph(uri: Jena#URI): Jena#Graph = {
+  def getNamedGraph(uri: Jena#URI): Jena#Graph = readTransaction {
     dg.getGraph(uri)
   }
 
-  def removeGraph(uri: Jena#URI): Unit = {
+  def removeGraph(uri: Jena#URI): Unit = writeTransaction {
     dg.removeGraph(uri)
   }
 
-  def executeSelect(query: JenaSPARQL#SelectQuery): JenaSPARQL#Solutions = {
+  def executeSelect(query: JenaSPARQL#SelectQuery): JenaSPARQL#Solutions = readTransaction {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val solutions = qexec.execSelect()
     solutions
   }
 
-  def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = {
+  def executeConstruct(query: JenaSPARQL#ConstructQuery): JenaGraph = readTransaction {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val result = qexec.execConstruct()
     result.getGraph()
   }
 
-  def executeAsk(query: JenaSPARQL#AskQuery): Boolean = {
+  def executeAsk(query: JenaSPARQL#AskQuery): Boolean = readTransaction {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val result = qexec.execAsk()
     result
