@@ -7,12 +7,11 @@ package org.w3.banana.n3.nomo
 
 import org.w3.banana.n3.{TurtleParser, Listener}
 import org.w3.banana._
+import org.w3.banana.scalaz._
 import java.io._
 import nomo.Accumulator
 import java.net.URI
 
-import scalaz.Validation
-import scalaz.Validation._
 
 /**
  * A Traditional blocking Reader for the nomo based Turtle parser

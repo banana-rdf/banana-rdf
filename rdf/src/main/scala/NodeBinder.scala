@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz._
+import org.w3.banana.scalaz._
 
 trait NodeBinder[Rdf <: RDF, T] {
   def fromNode(node: Rdf#Node): Validation[BananaException, T]

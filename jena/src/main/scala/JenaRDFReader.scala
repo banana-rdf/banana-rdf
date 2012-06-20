@@ -4,8 +4,7 @@ import org.w3.banana._
 import java.io._
 import com.hp.hpl.jena.rdf.model.{RDFReader => _, _}
 
-import scalaz.Validation
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 
 trait JenaGenericReader {
   

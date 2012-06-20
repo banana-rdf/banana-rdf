@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz._
+import org.w3.banana.scalaz._
 
 trait URIBinder[Rdf <: RDF, T] {
   def fromUri(uri: Rdf#URI): Validation[BananaException, T]

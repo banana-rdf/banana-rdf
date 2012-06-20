@@ -68,7 +68,7 @@ object YourProjectBuild extends Build {
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
+  //val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -135,7 +135,7 @@ object YourProjectBuild extends Build {
     base = file("rdf"),
     settings = buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
-      libraryDependencies += scalaz,
+      //libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
       publishMavenStyle := true

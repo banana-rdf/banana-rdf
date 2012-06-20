@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz._
+import org.w3.banana.scalaz._
 
 trait Prefix[Rdf <: RDF] {
   def prefixName: String

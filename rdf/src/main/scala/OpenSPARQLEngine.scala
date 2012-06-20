@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.{ Left3, Right3, Middle3, Either3 }
+import org.w3.banana.scalaz._
 
 object OpenSPARQLEngine {
 

@@ -10,8 +10,7 @@ import org.w3.banana._
 import java.io._
 import nomo.Accumulator
 
-import scalaz.Validation
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 
 /**
  * A Traditional blocking Reader for the nomo based NTriples parser .

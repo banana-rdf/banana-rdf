@@ -1,9 +1,7 @@
 package org.w3.banana
 
 import java.io._
-
-import scalaz.Validation
-import scalaz.Validation._
+import org.w3.banana.scalaz._
 
 trait BlockingWriter[Rdf <: RDF] {
     val ops: RDFOperations[Rdf]
