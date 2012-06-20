@@ -8,7 +8,6 @@ import scalaz.Validation._
 
 
 trait BlockingWriter[Rdf <: RDF] {
-    def ops: RDFOperations[Rdf]
 
     def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit]
     def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit]
