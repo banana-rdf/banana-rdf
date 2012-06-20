@@ -2,10 +2,7 @@ package org.w3.banana.sesame
 
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
-import org.openrdf.sail.Sail
-import org.w3.banana.{RDFGraphQuery}
-import org.w3.banana.sesame.{SesameStore, Sesame, SesameSPARQL}
-import scalaz.Failure
+import org.w3.banana.{OpenGraphQuery, RDFGraphQuery}
 
 /**
  * Sesame Graph Queries are better made on stores, if multiple queries need
@@ -41,3 +38,6 @@ object SesameGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
 
   }
 }
+
+object OpenSesameGraphQuery extends OpenGraphQuery(SesameGraphQuery,SesameSPARQLOperations)
+

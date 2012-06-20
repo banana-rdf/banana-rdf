@@ -15,10 +15,9 @@ trait RDFGraphQuery[Rdf <: RDF, Sparql <: SPARQL] {
 
 }
 
-trait OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL] {
-  self: RDFGraphQuery[Rdf,Sparql] =>
+case class OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL](graphQuery: RDFGraphQuery[Rdf,Sparql], ops: SPARQLOperations[Rdf,Sparql]) {
 
-  def ops: SPARQLOperations[Rdf,Sparql]
+  import graphQuery._
 
   type Answer = Either3[Sparql#Solutions, Rdf#Graph, Boolean]
 

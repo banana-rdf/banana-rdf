@@ -2,10 +2,9 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
+import com.hp.hpl.jena.graph.{Graph => JenaGraph}
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
-import scala.collection.JavaConverters._
 
 object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
 
@@ -31,3 +30,5 @@ object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
   }
 
 }
+
+object OpenJenaGraphQuery extends OpenGraphQuery(JenaGraphQuery,JenaSPARQLOperations)
