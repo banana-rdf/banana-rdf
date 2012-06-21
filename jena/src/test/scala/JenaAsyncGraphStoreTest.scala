@@ -6,5 +6,5 @@ import com.hp.hpl.jena.sparql.core._
 class JenaAsyncGraphStoreTest() extends AsyncGraphStoreTest[Jena, JenaSPARQL](
   JenaDiesel,
   JenaStore(DatasetGraphFactory.createMem()),
-  JenaRDFXMLReader,
+  JenaRDFReader.RDFXMLReader,
   JenaGraphIsomorphism)

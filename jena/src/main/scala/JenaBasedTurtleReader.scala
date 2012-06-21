@@ -17,10 +17,10 @@ extends RDFReader[Rdf, Turtle] {
   private val jenaToM = new RDFTransformer[Jena, Rdf](JenaOperations, ops)
   
   def read(is: InputStream, base: String): Validation[BananaException, Rdf#Graph] =
-    JenaTurtleReader.read(is, base) map jenaToM.transform
+    JenaRDFReader.TurtleReader.read(is, base) map jenaToM.transform
   
   def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph] =
-    JenaTurtleReader.read(reader, base) map jenaToM.transform
+    JenaRDFReader.TurtleReader.read(reader, base) map jenaToM.transform
   
 }
 

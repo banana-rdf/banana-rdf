@@ -19,12 +19,11 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     val ops: RDFOperations[Rdf],
     val graphTraversal: RDFGraphTraversal[Rdf],
     val utils: RDFUtils[Rdf],
-    val readerFactory: RDFReaderFactory[Rdf]) extends LinkedData[Rdf] {
+    val readerSelector: RDFReaderSelector[Rdf]) extends LinkedData[Rdf] {
 
   import ops._
   import graphTraversal._
   import utils._
-  import readerFactory._
 
   val xsd = XSDPrefix(ops)
 
@@ -70,10 +69,10 @@ class LinkedDataMemoryKB[Rdf <: RDF](
         logger.debug("GET " + iri)
         val response = httpClient.prepareGet(iri).setHeader("Accept", "application/rdf+xml, text/rdf+n3, text/turtle").execute().get()
         val is = response.getResponseBodyAsStream()
-        response.getHeader("Content-Type").split(";")(0) match {
-          case "text/n3" | "text/turtle" => TurtleReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
-          case "application/rdf+xml" => RDFXMLReader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
-          case ct => Failure[LDError, Rdf#Graph](UnknownContentType(ct))
+        val ct = response.getHeader("Content-Type").split(";")(0)
+        readerSelector(MimeType(ct)) match {
+          case Some(reader) => reader.read(is, iri) failMap { t => ParsingError(t.getMessage) }
+          case None => Failure[LDError, Rdf#Graph](UnknownContentType(ct))
         }
       }
       kb.put(supportDoc, futureGraph)

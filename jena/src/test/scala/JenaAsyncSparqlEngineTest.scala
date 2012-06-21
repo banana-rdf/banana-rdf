@@ -4,7 +4,7 @@ import org.w3.banana._
 import com.hp.hpl.jena.sparql.core._
 
 class JenaAsyncSparqlEngineTest() extends AsyncSparqlEngineTest()(
-  JenaRDFXMLReader,
+  JenaRDFReader.RDFXMLReader,
   JenaDiesel,
   JenaGraphIsomorphism,
   JenaSPARQLOperations,
