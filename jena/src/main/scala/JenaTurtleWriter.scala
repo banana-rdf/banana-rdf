@@ -8,40 +8,26 @@ import scalaz.{Failure, Validation}
 import scalaz.Validation._
 import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput}
 
-class JenaWriter(syntax: String) extends BlockingWriter[Jena] {
-  val ops = JenaOperations
-  import JenaOperations._
+/**
+ * Write a graph out using the Jena engine
+ * @param ops
+ * @tparam Rdf
+ */
+class JenaBasedTurtleWriter[Rdf <: RDF](val ops: RDFOperations[Rdf])
+  extends RDFBlockingWriter[Rdf, Turtle] {
+
+  private val MtoJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
+
+  def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] =
+     JenaRDFBlockingWriter.TurtleWriter.write(MtoJena.transform(graph) ,os,base)
   
-  def write(graph: Jena#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
-    val model = ModelFactory.createModelForGraph(graph)
-    model.getWriter(syntax).write(model, os, base)
-  }
-  
-  def write(graph: Jena#Graph, writer: Writer, base: String): Validation[BananaException, Unit] = WrappedThrowable.fromTryCatch {
-    val model = ModelFactory.createModelForGraph(graph)
-    model.getWriter(syntax).write(model, writer, base)
-  }
+  def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit] =
+    JenaRDFBlockingWriter.TurtleWriter.write(MtoJena.transform(graph) ,writer,base)
 }
 
-object JenaTurtleWriter extends JenaWriter("TURTLE") with TurtleWriter[Jena]
-
-object JenaRdfXmlWriter extends JenaWriter("RDF/XML") with RdfXmlWriter[Jena]
-
-object JenaSparqlXmlWriter extends BlockingSparqlAnswerWriter[JenaSPARQL,JenaSPARQL#Solutions] {
-
-  def write(answers: JenaSPARQL#Solutions, os: OutputStream) = WrappedThrowable.fromTryCatch {
-    new XMLOutput().format(os,answers)
-  }
-
-  val output = SparqlAnswerXML
+object JenaBasedTurtleWriter {
+  def apply[Rdf <: RDF](ops: RDFOperations[Rdf]): JenaBasedTurtleWriter[Rdf] =
+    new JenaBasedTurtleWriter[Rdf](ops)
 }
 
-object JenaSparqlJSONWriter extends BlockingSparqlAnswerWriter[JenaSPARQL,JenaSPARQL#Solutions] {
-  def write(answers: JenaSPARQL#Solutions, os: OutputStream) = WrappedThrowable.fromTryCatch {
-    new JSONOutput().format(os,answers)
-  }
-
-  val output = SparqlAnswerJson
-
-}
 

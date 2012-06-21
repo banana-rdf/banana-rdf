@@ -6,8 +6,12 @@ import scalaz.Validation._
 
 /**
  * typeclass for an RDF Reader
+ *
+ * @tparam Rdf
+ * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
+ *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait RDFReader[Rdf <: RDF, +S] {
+trait RDFReader[Rdf <: RDF, +SyntaxType] {
   
   def read(is: InputStream, base: String): Validation[BananaException, Rdf#Graph]
   
