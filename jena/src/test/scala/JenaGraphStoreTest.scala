@@ -8,7 +8,7 @@ class JenaGraphStoreTest() extends GraphStoreTest[Jena](
   JenaDiesel,
   JenaGraphUnion,
   JenaStore(DatasetGraphFactory.createMem()),
-  JenaRDFXMLReader,
+  JenaRDFReader.RDFXMLReader,
   JenaGraphIsomorphism) {
 
   import JenaOperations._

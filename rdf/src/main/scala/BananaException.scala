@@ -17,6 +17,8 @@ case class WrongExpectation(message: String) extends Exception(message) with Ban
 
 case class WrappedThrowable(t: Throwable) extends Exception(t) with BananaException
 
+case class NoReader(mimetype: String) extends Exception("No RDFReader for " + mimetype) with BananaException
+
 object WrappedThrowable {
   def fromTryCatch[T](body: => T): Validation[WrappedThrowable, T] =
     try {

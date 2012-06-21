@@ -1,11 +1,13 @@
 package org.w3.banana
 
 import java.io._
-
 import scalaz.Validation
 import scalaz.Validation._
 
-trait RDFReader[Rdf <: RDF, Serialization <: RDFSerialization] {
+/**
+ * typeclass for an RDF Reader
+ */
+trait RDFReader[Rdf <: RDF, +S] {
   
   def read(is: InputStream, base: String): Validation[BananaException, Rdf#Graph]
   
@@ -29,3 +31,4 @@ trait RDFReader[Rdf <: RDF, Serialization <: RDFSerialization] {
   }
   
 }
+

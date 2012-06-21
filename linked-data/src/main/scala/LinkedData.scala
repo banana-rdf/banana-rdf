@@ -19,12 +19,12 @@ object LinkedData {
     ops: RDFOperations[Rdf],
     graphTraversal: RDFGraphTraversal[Rdf],
     utils: RDFUtils[Rdf],
-    readerFactory: RDFReaderFactory[Rdf]): LinkedData[Rdf] =
+    readerSelector: RDFReaderSelector[Rdf]): LinkedData[Rdf] =
     new LinkedDataMemoryKB(
       ops,
       graphTraversal,
       utils,
-      readerFactory)
+      readerSelector)
 
 }
 
