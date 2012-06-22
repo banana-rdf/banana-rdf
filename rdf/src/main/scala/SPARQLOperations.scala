@@ -10,6 +10,7 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
   def AskQuery(query: String): Sparql#AskQuery
 
+
   /**
    * A general query constructor. When this is used it is usually
    * because the query type is not known in advance, ( as when a query is received

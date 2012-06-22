@@ -61,9 +61,16 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
 
   val empty = new EmptyBindingSet()
 
+  /**
+   * Watch out connection is not closed here and neither is iterator.
+   * (what does that mean? please help out)
+   * @param query
+   * @return
+   */
   def executeSelect(query: SesameSPARQL#SelectQuery): SesameSPARQL#Solutions = {
     withConnection(store){ conn =>
-      conn.evaluate(query.getTupleExpr, null, empty, false)
+      val res = conn.evaluate(query.getTupleExpr, null, empty, false)
+      res
     }
   }
 
@@ -71,12 +78,17 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
     withConnection(store){ conn =>
       val it = conn.evaluate(query.getTupleExpr, null, empty, false)
       val sit = SesameUtil.toStatementIterable(it)
-      SesameOperations.Graph(sit)
+      val res = SesameOperations.Graph(sit)
+      it.close()
+      res
     }
   
   def executeAsk(query: SesameSPARQL#AskQuery): Boolean =
     withConnection(store) { conn =>
-      conn.evaluate(query.getTupleExpr, null, empty, false).hasNext
+      val it = conn.evaluate(query.getTupleExpr, null, empty, false)
+      val res = it.hasNext
+      it.close()
+      res
     }
 
 }

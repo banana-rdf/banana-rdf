@@ -2,14 +2,18 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers._
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter}
+import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 
-abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL](
+abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType](
   ops: RDFOperations[Rdf],
   diesel: Diesel[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   iso: GraphIsomorphism[Rdf],
   sparqlOperations: SPARQLOperations[Rdf, Sparql],
-  graphQuery: RDFGraphQuery[Rdf, Sparql]
+  graphQuery: RDFGraphQuery[Rdf, Sparql],
+  sparqlWriter: BlockingSparqlAnswerWriter[Sparql,SyntaxType],
+  sparqlReader: BlockingSparqlAnswerReader[Sparql,SyntaxType]
 ) extends WordSpec with MustMatchers with Inside {
 
   import ops._
@@ -34,16 +38,35 @@ SELECT DISTINCT ?name WHERE {
   ?ed contact:fullName ?name
 }
 """)
+    val answers = executeSelect(graph,query)
 
-    val rows = executeSelect(graph, query).toIterable.toList
+    def testAnswer(solutions: Sparql#Solutions) {
+      val rows = solutions.toIterable.toList
 
-    val names: List[String] = rows map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
+      val names: List[String] = rows map {
+        row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
+      }
 
-    names must contain ("Alexandre Bertails")
+      names must contain("Alexandre Bertails")
 
-    val row = rows(0)
+      val row = rows(0)
+      row("unknown") must be ('failure)
+    }
+    testAnswer(answers)
+    System.out.println("passed test 1")
 
-    row("unknown") must be ('failure)
+    val out = new ByteArrayOutputStream()
+    val serialisedAnswer = sparqlWriter.write(answers,out)
+
+    serialisedAnswer.isFailure must be (false)
+
+    System.out.println("SPARQL="+out.toByteArray)
+    val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
+
+    answr2.isFailure must be (false)
+
+    answr2.map(a=>testAnswer(a))
+
 
   }
 
