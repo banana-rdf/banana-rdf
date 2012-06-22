@@ -1,3 +1,5 @@
+package org.w3.banana.jena
+
 import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput}
 import java.io.{InputStream, OutputStream}
 import org.w3.banana._
