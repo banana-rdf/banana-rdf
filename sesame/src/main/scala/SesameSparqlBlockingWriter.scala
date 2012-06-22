@@ -33,19 +33,3 @@ object SesameSparqlBlockingWriter {
   implicit val SparqlAnswerXML = SesameSparqlBlockingWriter[SparqlAnswerXML]
 
 }
-
-trait SesameSparqlOutputSyntax[SyntaxType] {
-  def  writer(outputStream: OutputStream): TupleQueryResultWriter
-}
-
-object SesameSparqlOutputSyntax {
-
-  implicit val SparqlAnswerJson: SesameSparqlOutputSyntax[SparqlAnswerJson] = new SesameSparqlOutputSyntax[SparqlAnswerJson] {
-    def writer(outputStream: OutputStream) = new SPARQLResultsJSONWriter(outputStream)
-  }
-
-  implicit val SparqlAnswerXML: SesameSparqlOutputSyntax[SparqlAnswerXML] = new SesameSparqlOutputSyntax[SparqlAnswerXML] {
-    def writer(outputStream: OutputStream) = new SPARQLResultsXMLWriter(outputStream)
-  }
-
-}

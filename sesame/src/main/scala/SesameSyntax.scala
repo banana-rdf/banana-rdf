@@ -14,10 +14,6 @@ trait SesameSyntax[T] {
   def rdfWriter(wr: Writer, base: String): RDFWriter
 }
 
-//trait SesameSparqlOutputSyntax[T] {
-//  def formatter: OutputFormatter
-//}
-
 object SesameSyntax {
 
   implicit val RDFXML: SesameSyntax[RDFXML] = new SesameSyntax[RDFXML] {

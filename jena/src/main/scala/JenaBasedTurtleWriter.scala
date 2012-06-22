@@ -9,9 +9,9 @@ import scalaz.Validation._
 import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput}
 
 /**
- * Write a graph out using the Jena engine
- * @param ops
- * @tparam Rdf
+ * Write a graph out using the Jena serialisers
+ * @param ops  Rdf operations that will do the transformations of the graph to jena
+ * @tparam Rdf the rdf implementation of the given graph
  */
 class JenaBasedTurtleWriter[Rdf <: RDF](val ops: RDFOperations[Rdf])
   extends RDFBlockingWriter[Rdf, Turtle] {
