@@ -9,11 +9,17 @@ import scalaz.Validation._
 
 object JenaRDFReader {
 
-  import JenaSyntax._
+  import JenaGraphSyntax._
 
-  /** builds an RDFReader for Jena knowing the Jena String that identify a Reader */
-  def apply[T](implicit jenaSyntax: JenaSyntax[T]): RDFReader[Jena, T] =
-    new RDFReader[Jena, T] {
+  /**
+   * builds an RDFReader for Jena knowing the Jena String that identify a Reader
+   * @param jenaSyntax
+   * @tparam SyntaxType type of serialisation to write to. Usually a phantom type, useful for type class behavior and
+   *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
+   * @return  an RDFREader
+   */
+  def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType]): RDFReader[Jena, SyntaxType] =
+    new RDFReader[Jena, SyntaxType] {
 
       val serialization = jenaSyntax.value
 

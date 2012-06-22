@@ -1,5 +1,8 @@
 package org.w3.banana
 
+/**
+ * class of Transformers between different RDF frameworks
+ */
 class RDFTransformer[A <: RDF, B <: RDF](
     val a: RDFOperations[A],
     val b: RDFOperations[B]) {

@@ -2,11 +2,13 @@ package org.w3.banana
 
 /* some well-known mime-types so that we can refer to them in banana-rdf */
 
-trait RDFQueryLang
+trait SparqlQuery
 trait N3
 trait Turtle
 trait RDFXML
 trait RDFaXHTML
+trait SparqlAnswerJson
+trait SparqlAnswerXML
 
 
 /**
@@ -29,7 +31,7 @@ trait Syntax[T] {
  */
 object Syntax {
 
-  implicit val RDFQueryLang: Syntax[RDFQueryLang] = new Syntax[RDFQueryLang] {
+  implicit val RDFQueryLang: Syntax[SparqlQuery] = new Syntax[SparqlQuery] {
     val mimeTypes: List[MimeType] = List(MimeType("application/sparql-query"))
   }
 
@@ -47,6 +49,14 @@ object Syntax {
 
   implicit val RDFaXHTML: Syntax[RDFaXHTML] = new Syntax[RDFaXHTML] {
     val mimeTypes: List[MimeType] = List(MimeType("text/html"), MimeType("application/xhtml+xml"))
+  }
+
+  implicit val SparqlAnswerJson = new Syntax[SparqlAnswerJson] {
+    def mimeTypes = List(MimeType("application/sparql-results+json"))
+  }
+
+  implicit val SparqlAnswerXML = new Syntax[SparqlAnswerXML] {
+    def mimeTypes = List(MimeType("application/sparql-results+xml"))
   }
 
 }
