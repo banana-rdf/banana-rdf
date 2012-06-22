@@ -9,8 +9,8 @@ import scalaz.Either3
  */
 object JenaSparqlBlockingWriter  {
 
-  import JenaSparqlSyntax.SparqlAnswerJson
-  import JenaSparqlSyntax.SparqlAnswerXML
+  import JenaSparqlOutputSyntax.SparqlAnswerJson
+  import JenaSparqlOutputSyntax.SparqlAnswerXML
 
   def apply[SyntaxType](implicit jenaSparqlSyntax: JenaSparqlOutputSyntax[SyntaxType]):
   BlockingSparqlAnswerWriter[JenaSPARQL,SyntaxType] =
