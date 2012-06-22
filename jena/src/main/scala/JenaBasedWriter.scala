@@ -11,23 +11,20 @@ import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput}
 /**
  * Write a graph out using the Jena serialisers
  * @param ops  Rdf operations that will do the transformations of the graph to jena
+ * @param graphWriter picks  up a graphWriter for the syntaxType desired
  * @tparam Rdf the rdf implementation of the given graph
  */
-class JenaBasedTurtleWriter[Rdf <: RDF](val ops: RDFOperations[Rdf])
-  extends RDFBlockingWriter[Rdf, Turtle] {
+class JenaBasedWriter[Rdf <: RDF, SyntaxType](val ops: RDFOperations[Rdf])
+                                                   (implicit graphWriter: RDFBlockingWriter[Jena,SyntaxType])
+  extends RDFBlockingWriter[Rdf, SyntaxType] {
 
   private val MtoJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
 
   def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] =
-     JenaRDFBlockingWriter.TurtleWriter.write(MtoJena.transform(graph) ,os,base)
+     graphWriter.write(MtoJena.transform(graph) ,os,base)
   
   def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit] =
-    JenaRDFBlockingWriter.TurtleWriter.write(MtoJena.transform(graph) ,writer,base)
-}
-
-object JenaBasedTurtleWriter {
-  def apply[Rdf <: RDF](ops: RDFOperations[Rdf]): JenaBasedTurtleWriter[Rdf] =
-    new JenaBasedTurtleWriter[Rdf](ops)
+     graphWriter.write(MtoJena.transform(graph) ,writer,base)
 }
 
 
