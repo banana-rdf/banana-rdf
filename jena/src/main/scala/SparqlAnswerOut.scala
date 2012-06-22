@@ -8,20 +8,20 @@ import org.w3.banana.{SparqlAnswerXML, SparqlAnswerJson}
  * typeclass for serialising special
  * @tparam T
  */
-trait JenaSparqlOutputSyntax[T] {
+trait SparqlAnswerOut[T] {
   def formatter: OutputFormatter
 }
 
 
-object JenaSparqlOutputSyntax {
+object SparqlAnswerOut {
 
-  implicit val SparqlAnswerJson: JenaSparqlOutputSyntax[SparqlAnswerJson] =
-    new JenaSparqlOutputSyntax[SparqlAnswerJson] {
+  implicit val Json: SparqlAnswerOut[SparqlAnswerJson] =
+    new SparqlAnswerOut[SparqlAnswerJson] {
       def formatter = new JSONOutput()
     }
 
-  implicit val SparqlAnswerXML: JenaSparqlOutputSyntax[SparqlAnswerXML] =
-    new JenaSparqlOutputSyntax[SparqlAnswerXML] {
+  implicit val XML: SparqlAnswerOut[SparqlAnswerXML] =
+    new SparqlAnswerOut[SparqlAnswerXML] {
       def formatter = new XMLOutput()
     }
 

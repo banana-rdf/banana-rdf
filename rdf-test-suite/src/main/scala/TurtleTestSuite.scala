@@ -57,7 +57,7 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
  """
     val graph = reader.read(turtleString, rdfCore).fold( t => throw t, g => g )
     assert(referenceGraph isIsomorphicWith graph)
-    
+
   }
   
   "write simple graph as TURTLE string" in {

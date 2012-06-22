@@ -11,9 +11,9 @@ import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 /**
  * Creates a blocking SPARQL writer for the given syntax
  */
-object SesameSparqlBlockingWriter {
+object SparqlAnswerWriter {
 
-  def apply[SyntaxType](implicit sesameSparqlSyntax: SesameSparqlOutputSyntax[SyntaxType]) =
+  def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType]) =
     new BlockingSparqlAnswerWriter[SesameSPARQL, SyntaxType] {
 
       def write(answers: SesameSPARQL#Solutions, os: OutputStream) = {
@@ -28,8 +28,8 @@ object SesameSparqlBlockingWriter {
       def write(answer: Boolean, os: OutputStream) = null //todo
     }
 
-  implicit val SparqlAnswerJson = SesameSparqlBlockingWriter[SparqlAnswerJson]
+  implicit val Json = SparqlAnswerWriter[SparqlAnswerJson]
 
-  implicit val SparqlAnswerXML = SesameSparqlBlockingWriter[SparqlAnswerXML]
+  implicit val XML =  SparqlAnswerWriter[SparqlAnswerXML]
 
 }
