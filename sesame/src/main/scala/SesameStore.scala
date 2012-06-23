@@ -10,6 +10,8 @@ import SesameUtil._
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.sail.SailException
 import org.openrdf.query.impl.EmptyBindingSet
+import org.openrdf.query.parser.ParsedTupleQuery
+import org.openrdf.query.TupleQueryResult
 
 object SesameStore {
 
@@ -70,7 +72,13 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
   def executeSelect(query: SesameSPARQL#SelectQuery): SesameSPARQL#Solutions = {
     withConnection(store){ conn =>
       val res = conn.evaluate(query.getTupleExpr, null, empty, false)
-      res
+      new TupleQueryResult {
+        def hasNext = res.hasNext
+        def next() = res.next
+        def remove() { res.remove() }
+        def getBindingNames = List[String]() //how do I get the bindings?
+        def close() { res.close() }
+      }
     }
   }
 

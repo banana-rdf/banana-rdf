@@ -19,9 +19,12 @@ object SparqlAnswerWriter {
       def write(answers: SesameSPARQL#Solutions, os: OutputStream) = {
         WrappedThrowable.fromTryCatch {
           val w = sesameSparqlSyntax.writer(os)
+          w.startQueryResult(answers.getBindingNames)
           while(answers.hasNext) {
             w.handleSolution(answers.next())
           }
+          os.flush()
+          w.endQueryResult()
         }
       }
 

@@ -18,7 +18,6 @@ trait SesameSPARQL extends SPARQL {
 
   type Solution = BindingSet
 
-  // seriously?
-  type Solutions = CloseableIteration[_ <: BindingSet, QueryEvaluationException]
+  type Solutions = TupleQueryResult
 
 }

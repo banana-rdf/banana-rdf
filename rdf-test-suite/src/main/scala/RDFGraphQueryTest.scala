@@ -26,21 +26,23 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType](
 
   val graph = reader.read(file, "http://foo.com") getOrElse sys.error("ouch")
 
-  "new-tr.rdf must have Alexandre Bertails as an editor" in {
 
-    val query = SelectQuery("""
-prefix : <http://www.w3.org/2001/02pd/rec54#>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
 
-SELECT DISTINCT ?name WHERE {
-  ?thing :editor ?ed .
-  ?ed contact:fullName ?name
-}
-""")
-    val answers = executeSelect(graph,query)
 
-    def testAnswer(solutions: Sparql#Solutions) {
+
+
+  "new-tr.rdf " should {
+    val selectQueryStr = """prefix : <http://www.w3.org/2001/02pd/rec54#>
+                           |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                           |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+                           |
+                           |SELECT DISTINCT ?name WHERE {
+                           |  ?thing :editor ?ed .
+                           |  ?ed contact:fullName ?name
+                           |}
+                         """.stripMargin
+
+    def testAnswer(solutions: Sparql#Solutions) = {
       val rows = solutions.toIterable.toList
 
       val names: List[String] = rows map {
@@ -51,22 +53,30 @@ SELECT DISTINCT ?name WHERE {
 
       val row = rows(0)
       row("unknown") must be ('failure)
+      true
     }
-    testAnswer(answers)
 
-    val answers2 = executeSelect(graph,query) //we re-execute the query, as the underlying query often returns a read once structure
-    val out = new ByteArrayOutputStream()
-    val serialisedAnswer = sparqlWriter.write(answers2,out)
+    "have Alexandre Bertails as an editor" in {
+      val query = SelectQuery(selectQueryStr)
+      val answers = executeSelect(graph, query)
+      testAnswer(answers)
+    }
 
-    serialisedAnswer.isSuccess must be (true)
+    "the sparql answer should serialise and deserialise "  in {
+      val query = SelectQuery(selectQueryStr)
+      //in any case we must re-execute query, as the results returned can often only be read once
+      val answers = executeSelect(graph, query)
 
-    val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
+      val out = new ByteArrayOutputStream()
 
-    answr2.isSuccess must be (true)
+      val serialisedAnswer = sparqlWriter.write(answers, out)
+      assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
-    answr2.map(a=>testAnswer(a))
+      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
+      assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
 
-
+      answr2.map(a => assert(testAnswer(a), "the deserialised answer must pass the same tests as the original one"))
+    }
   }
 
 
@@ -103,7 +113,7 @@ ASK {
 
     val alexIsThere = executeAsk(graph, query)
 
-    alexIsThere must be (true)
+   assert(alexIsThere," query "+query+ "must return true")
 
   }
 
