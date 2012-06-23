@@ -53,17 +53,16 @@ SELECT DISTINCT ?name WHERE {
       row("unknown") must be ('failure)
     }
     testAnswer(answers)
-    System.out.println("passed test 1")
 
+    val answers2 = executeSelect(graph,query) //we re-execute the query, as the underlying query often returns a read once structure
     val out = new ByteArrayOutputStream()
-    val serialisedAnswer = sparqlWriter.write(answers,out)
+    val serialisedAnswer = sparqlWriter.write(answers2,out)
 
-    serialisedAnswer.isFailure must be (false)
+    serialisedAnswer.isSuccess must be (true)
 
-    System.out.println("SPARQL="+out.toByteArray)
     val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
 
-    answr2.isFailure must be (false)
+    answr2.isSuccess must be (true)
 
     answr2.map(a=>testAnswer(a))
 
