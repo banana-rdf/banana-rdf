@@ -77,19 +77,23 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
 
 
-  "the identity SPARQL Construct must work as expected" in {
+  "the identity SPARQL Construct " should {
 
     val query = ConstructQuery("""
-CONSTRUCT {
-  ?s ?p ?o
-} WHERE {
-  ?s ?p ?o
-}
-""")
+                   |CONSTRUCT {
+                   |  ?s ?p ?o
+                   |} WHERE {
+                   |  ?s ?p ?o
+                   |}
+                   |""".stripMargin)
 
-    val clonedGraph = executeConstruct(graph, query)
+    "work as expected " in {
 
-    assert(clonedGraph isIsomorphicWith graph)
+        val clonedGraph = executeConstruct(graph, query)
+
+        assert(clonedGraph isIsomorphicWith graph)
+    }
+
 
   }
 
@@ -118,30 +122,37 @@ ASK {
 
   "a SPARQL query constructor must accept Prefix objects" in {
 
-    val query1 = SelectQuery("""
+    val query1 = ConstructQuery("""
 prefix : <http://www.w3.org/2001/02pd/rec54#>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
 
-SELECT DISTINCT ?name WHERE {
+CONSTRUCT {
+  ?thing :editor ?ed .
+  ?ed contact:fullName ?name .
+}  WHERE {
   ?thing :editor ?ed .
   ?ed contact:fullName ?name
 }
-""")
+                             """)
 
     val base = Prefix("", "http://www.w3.org/2001/02pd/rec54#", ops)
     val rdf = RDFPrefix(ops)
     val contact = Prefix("contact", "http://www.w3.org/2000/10/swap/pim/contact#", ops)
 
-    val query2 = SelectQuery("""
-SELECT DISTINCT ?name WHERE {
-  ?thing :editor ?ed .
-  ?ed contact:fullName ?name
-}
-""", base, rdf, contact)
+    val query2 = ConstructQuery("""
+                               |CONSTRUCT {
+                               |  ?thing :editor ?ed .
+                               |  ?ed contact:fullName ?name .
+                               |}  WHERE {
+                               |  ?thing :editor ?ed .
+                               |  ?ed contact:fullName ?name
+                               |}""".stripMargin, base, rdf, contact)
 
-    query1 must be === query2
+    val contructed1 = executeConstruct(graph, query1)
+    val constructed2 = executeConstruct(graph, query2)
 
+    assert(contructed1 isIsomorphicWith constructed2,"the results of both queries should be isomorphic")
   }
 
 
