@@ -8,6 +8,9 @@ import org.scalatest.EitherValues._
 import scalaz.Validation
 import scalaz.Validation._
 
+object JenaWIP extends Tag("org.w3.banana.jenaWIP")
+object SesameWIP extends Tag("org.w3.banana.sesameWIP")
+
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
 extends WordSpec with MustMatchers {
   
@@ -63,7 +66,7 @@ extends WordSpec with MustMatchers {
     turtleString must not be ('empty)
   }
   
-  "works with relative uris" in {
+  "works with relative uris" taggedAs (JenaWIP) in {
     val bar = for {
       turtleString <- writer.asString(referenceGraph, rdfCore)
       computedFooGraph <- reader.read(turtleString, foo)

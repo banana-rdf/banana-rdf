@@ -56,6 +56,15 @@ object BuildSettings {
     )
   )
 
+
+  val jenaTestWIPFilter = Seq (
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
+  )
+
+  val sesameTestWIPFilter = Seq (
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.sesameWIP")
+  )
+
 }
 
 object YourProjectBuild extends Build {
@@ -155,7 +164,7 @@ object YourProjectBuild extends Build {
   lazy val jena = Project(
     id = "banana-jena",
     base = file("jena"),
-    settings = buildSettings ++ jenaDeps ++ testDeps ++ Seq(
+    settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
     )
   ) dependsOn (rdf, n3, rdfTestSuite % "test")
@@ -163,7 +172,7 @@ object YourProjectBuild extends Build {
   lazy val sesame = Project(
     id = "banana-sesame",
     base = file("sesame"),
-    settings = buildSettings ++ sesameDeps ++ testDeps
+    settings = buildSettings ++ sesameTestWIPFilter ++sesameDeps ++ testDeps
   ) dependsOn (rdf, n3, rdfTestSuite % "test")
   
   lazy val n3 = Project(

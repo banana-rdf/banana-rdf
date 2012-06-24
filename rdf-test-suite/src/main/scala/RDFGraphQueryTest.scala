@@ -94,7 +94,7 @@ CONSTRUCT {
   }
 
 
-  "Alexandre Bertails must appear as an editor in new-tr.rdf" in {
+  "Alexandre Bertails must appear as an editor in new-tr.rdf" taggedAs (SesameWIP) in {
 
     val query = AskQuery("""
 prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -116,7 +116,7 @@ ASK {
 
 
 
-  "a SPARQL query constructor must accept Prefix objects" in {
+  "a SPARQL query constructor must accept Prefix objects" taggedAs (SesameWIP) in {
 
     val query1 = SelectQuery("""
 prefix : <http://www.w3.org/2001/02pd/rec54#>
