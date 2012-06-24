@@ -15,16 +15,8 @@ object LinkedData {
    * <li>timbl() waits for the value to be there</li>
    * </ul>
    */
-  def inMemoryImpl[Rdf <: RDF](
-    ops: RDFOperations[Rdf],
-    graphTraversal: RDFGraphTraversal[Rdf],
-    utils: RDFUtils[Rdf],
-    readerSelector: RDFReaderSelector[Rdf]): LinkedData[Rdf] =
-    new LinkedDataMemoryKB(
-      ops,
-      graphTraversal,
-      utils,
-      readerSelector)
+  def inMemoryImpl[Rdf <: RDF](diesel: Diesel[Rdf], readerSelector: RDFReaderSelector[Rdf]): LinkedData[Rdf] =
+    new LinkedDataMemoryKB(diesel, readerSelector)
 
 }
 

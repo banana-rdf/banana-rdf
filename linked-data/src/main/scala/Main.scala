@@ -13,8 +13,9 @@ object Main {
     //    val ld = new LinkedData(SesameOperations, SesameProjections, SesameRDFUtils, SesameTurtleReader, SesameTurtleWriter)
 
     import JenaOperations._
+    import Jena.diesel._
 
-    val ld = LinkedData.inMemoryImpl(JenaOperations, JenaGraphTraversal, JenaRDFUtils, JenaRDFReader.ReaderSelector)
+    val ld = LinkedData.inMemoryImpl(Jena.diesel, JenaRDFReader.ReaderSelector)
     import ld._
 
 //    val namesLD = for {

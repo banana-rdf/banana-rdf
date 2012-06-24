@@ -14,6 +14,18 @@ trait Sesame extends RDF {
   type TypedLiteral = SesameLiteral
   type LangLiteral = SesameLiteral
   type Lang = String
+}
 
-  type Store = Repository
+object Sesame {
+
+  implicit val ops: RDFOperations[Sesame] = SesameOperations
+
+  implicit val diesel: Diesel[Sesame] = Diesel[Sesame]
+
+  implicit val rdfxmlReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
+
+  implicit val sparqlOps: SPARQLOperations[Sesame, SesameSPARQL] = SesameSPARQLOperations
+
+  implicit val graphQuery: RDFGraphQuery[Sesame, SesameSPARQL] = SesameGraphQuery
+
 }

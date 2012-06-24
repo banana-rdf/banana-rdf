@@ -6,7 +6,7 @@ import org.w3.banana.n3._
 
 object NTriplesStringParser
 extends NTriplesParser(
-  SesameOperations,
+  Sesame.diesel,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
@@ -14,7 +14,7 @@ extends NTriplesParser(
 
 object NTriplesSeqParser
 extends NTriplesParser(
-  SesameOperations,
+  Sesame.diesel,
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
@@ -22,7 +22,7 @@ extends NTriplesParser(
 
 object TurtleStringParser
   extends TurtleParser(
-    SesameOperations,
+    Sesame.diesel,
     Parsers(
       Monotypic.String,
       Errors.tree[Char],
@@ -30,7 +30,7 @@ object TurtleStringParser
 
 object TurtleSeqParser
   extends TurtleParser(
-    SesameOperations,
+    Sesame.diesel,
     Parsers(
       Monotypic.Seq[Char],
       Errors.tree[Char],

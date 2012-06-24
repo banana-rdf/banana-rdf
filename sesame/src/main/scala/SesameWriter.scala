@@ -11,6 +11,7 @@ import org.w3.banana._
 
 object SesameWriter {
 
+  import Sesame.diesel._
   import SesameOperations._
 
   def apply[SyntaxType](implicit sesameSyntax: SesameSyntax[SyntaxType]): RDFBlockingWriter[Sesame, SyntaxType] =
@@ -19,7 +20,7 @@ object SesameWriter {
       private def write(graph: Sesame#Graph, rdfWriter: RDFWriter, base: String): Validation[BananaException, Unit] =
         WrappedThrowable.fromTryCatch {
           rdfWriter.startRDF()
-          graph foreach rdfWriter.handleStatement
+          graph.toIterable foreach rdfWriter.handleStatement
           rdfWriter.endRDF()
         }
 

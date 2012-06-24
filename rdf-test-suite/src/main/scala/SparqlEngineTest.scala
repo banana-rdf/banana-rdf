@@ -4,14 +4,12 @@ import org.scalatest._
 import org.scalatest.matchers._
 
 abstract class SparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
+  store: RDFStore[Rdf, Sparql])(
   implicit diesel: Diesel[Rdf],
-  iso: GraphIsomorphism[Rdf],
-  sparqlOps: SPARQLOperations[Rdf, Sparql],
-  store: RDFStore[Rdf, Sparql]
-) extends WordSpec with MustMatchers with BeforeAndAfterAll {
+  sparqlOps: SPARQLOperations[Rdf, Sparql])
+extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
-  import iso._
   import ops._
   import sparqlOps._
 
@@ -34,8 +32,8 @@ abstract class SparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
   ).graph
 
   override def beforeAll(): Unit = {
-    store.addNamedGraph(URI("http://example.com/graph"), graph)
-    store.addNamedGraph(URI("http://example.com/graph2"), graph2)
+    store.addNamedGraph(uri("http://example.com/graph"), graph)
+    store.addNamedGraph(uri("http://example.com/graph2"), graph2)
   }
 
   "betehess must know henry" in {

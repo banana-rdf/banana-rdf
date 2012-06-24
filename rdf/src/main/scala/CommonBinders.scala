@@ -8,7 +8,6 @@ trait CommonBinders[Rdf <: RDF] {
 this: Diesel[Rdf] =>
 
   import ops._
-  import graphTraversal._
 
   implicit val StringBinder: TypedLiteralBinder[Rdf, String] = new TypedLiteralBinder[Rdf, String] {
 

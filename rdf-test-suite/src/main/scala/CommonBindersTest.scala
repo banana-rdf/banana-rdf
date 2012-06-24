@@ -5,7 +5,7 @@ import org.scalatest.matchers.MustMatchers
 import org.joda.time.DateTime
 import scalaz._
 
-abstract class CommonBindersTest[Rdf <: RDF](diesel: Diesel[Rdf])
+abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
 extends WordSpec with MustMatchers {
   
   import diesel._

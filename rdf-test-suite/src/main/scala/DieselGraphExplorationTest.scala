@@ -8,18 +8,12 @@ import org.scalatest.EitherValues._
 import scalaz._
 import scalaz.Validation._
 
-abstract class DieselGraphExplorationTest[Rdf <: RDF](
-  diesel: Diesel[Rdf],
-  iso: GraphIsomorphism[Rdf]) extends WordSpec with MustMatchers {
+abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
+extends WordSpec with MustMatchers {
 
-  import org.scalatest.matchers.{BeMatcher, MatchResult}
+  import org.scalatest.matchers.{ BeMatcher, MatchResult }
   import diesel._
   import ops._
-  import iso._
-
-  val rdf = RDFPrefix(ops)
-  val foaf = FOAFPrefix(ops)
-  val xsd = XSDPrefix(ops)
 
   val betehess: PointedGraph[Rdf] = (
     uri("http://bertails.org/#betehess").a(foaf.Person)

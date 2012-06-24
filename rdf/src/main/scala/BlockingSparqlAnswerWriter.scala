@@ -1,7 +1,6 @@
 package org.w3.banana
 
 import java.io.OutputStream
-import org.w3.banana.{BananaException, SPARQL}
 import scalaz.Validation
 
 /**

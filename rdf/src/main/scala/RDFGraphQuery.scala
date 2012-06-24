@@ -15,6 +15,7 @@ trait RDFGraphQuery[Rdf <: RDF, Sparql <: SPARQL] {
 
 }
 
+// TODO to be moved somewhere else please
 case class OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL](graphQuery: RDFGraphQuery[Rdf,Sparql], ops: SPARQLOperations[Rdf,Sparql]) {
 
   import graphQuery._

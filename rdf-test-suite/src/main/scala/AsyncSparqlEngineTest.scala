@@ -7,16 +7,14 @@ import akka.util.Timeout
 import akka.dispatch._
 import akka.util.duration._
 
-abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL]()(
+abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
+  store: RDFStore[Rdf, Sparql])(
   implicit reader: RDFReader[Rdf, RDFXML],
   diesel: Diesel[Rdf],
-  iso: GraphIsomorphism[Rdf],
-  sparqlOps: SPARQLOperations[Rdf, Sparql],
-  store: RDFStore[Rdf, Sparql]
-) extends WordSpec with MustMatchers with BeforeAndAfterAll {
+  sparqlOps: SPARQLOperations[Rdf, Sparql])
+extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
-  import iso._
   import ops._
   import sparqlOps._
 
@@ -30,7 +28,7 @@ abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL]()(
   val graph = reader.read(file, "http://example.com") getOrElse sys.error("ouch")
 
   override def beforeAll(): Unit = {
-    store.addNamedGraph(URI("http://example.com/graph"), graph)
+    store.addNamedGraph(uri("http://example.com/graph"), graph)
   }
 
   override def afterAll(): Unit = {

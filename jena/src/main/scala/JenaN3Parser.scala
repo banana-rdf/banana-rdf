@@ -6,7 +6,7 @@ import org.w3.banana.n3._
 
 object JenaNTriplesStringParser
 extends n3.NTriplesParser(
-  JenaOperations,
+  Jena.diesel,
   Parsers(
     Monotypic.String,
     Errors.tree[Char],
@@ -14,7 +14,7 @@ extends n3.NTriplesParser(
 
 object JenaNTriplesSeqParser
 extends n3.NTriplesParser(
-  JenaOperations,
+  Jena.diesel,
   Parsers(
     Monotypic.Seq[Char],
     Errors.tree[Char],
@@ -22,7 +22,7 @@ extends n3.NTriplesParser(
 
 object JenaTurtleStringParser
   extends n3.TurtleParser(
-    JenaOperations,
+    Jena.diesel,
     Parsers(
       Monotypic.String,
       Errors.tree[Char],
@@ -30,7 +30,7 @@ object JenaTurtleStringParser
 
 object JenaTurtleSeqParser
   extends n3.TurtleParser(
-    JenaOperations,
+    Jena.diesel,
     Parsers(
       Monotypic.Seq[Char],
       Errors.tree[Char],

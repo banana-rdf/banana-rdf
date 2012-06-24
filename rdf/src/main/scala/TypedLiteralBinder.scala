@@ -13,7 +13,7 @@ object TypedLiteralBinder {
     new LiteralBinder[Rdf, T] {
 
       def fromLiteral(literal: Rdf#Literal): Validation[BananaException, T] =
-        ops.Literal.fold(literal)(
+        ops.foldLiteral(literal)(
           tl => binder.fromTypedLiteral(tl),
           ll => Failure(FailedConversion(ll.toString + " is a LangLiteral, not a TypedLiteral"))
         )

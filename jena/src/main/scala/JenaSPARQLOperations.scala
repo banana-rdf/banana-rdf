@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-import com.hp.hpl.jena.query.{Query => JenaQuery, QueryException, QueryFactory}
+import com.hp.hpl.jena.query.{ Query => JenaQuery, QueryException, QueryFactory }
 import com.hp.hpl.jena.graph.{ Node => JenaNode }
 import com.hp.hpl.jena.rdf.model.RDFNode
 import scalaz.{ Failure, Success, Validation }
@@ -36,7 +36,7 @@ object JenaSPARQLOperations extends SPARQLOperations[Jena, JenaSPARQL] {
     if (node == null)
       Failure(VarNotFound("var " + v + " not found in QuerySolution " + solution.toString))
     else
-      Success(JenaGraphTraversal.toNode(node))
+      Success(JenaUtil.toNode(node))
   }
 
   def varnames(solution: JenaSPARQL#Solution): Set[String] = solution.varNames.asScala.toSet

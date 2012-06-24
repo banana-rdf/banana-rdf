@@ -1,15 +1,9 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import com.hp.hpl.jena.graph.Graph
+import Jena._
+import JenaRDFReader._
+import SparqlAnswerReader._
+import SparqlAnswerWriter._
 
-class JenaGraphQueryTest() extends RDFGraphQueryTest[Jena, JenaSPARQL,SparqlAnswerJson](
-  JenaOperations,
-  JenaDiesel,
-  JenaRDFReader.RDFXMLReader,
-  JenaGraphIsomorphism,
-  JenaSPARQLOperations,
-  JenaGraphQuery,
-  jena.SparqlAnswerWriter.Json,
-  jena.SparqlAnswerReader.Json
-  )
+class JenaGraphQueryTest extends RDFGraphQueryTest[Jena, JenaSPARQL, SparqlAnswerJson]

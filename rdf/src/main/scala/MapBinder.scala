@@ -7,7 +7,6 @@ trait MapBinder[Rdf <: RDF] {
 this: Diesel[Rdf] =>
 
   import ops._
-  import graphTraversal._
 
   implicit def MapBinder[K, V](implicit kbinder: PointedGraphBinder[Rdf, K], vbinder: PointedGraphBinder[Rdf, V]): PointedGraphBinder[Rdf, Map[K, V]] = new PointedGraphBinder[Rdf, Map[K, V]] {
 

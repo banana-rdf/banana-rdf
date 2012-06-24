@@ -2,6 +2,7 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 import JenaOperations._
+import Jena.diesel._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
@@ -61,7 +62,7 @@ class JenaStore(dataset: Dataset) extends RDFStore[Jena, JenaSPARQL] {
   }
 
   def appendToNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
-    Graph.toIterable(graph) foreach { case Triple(s, p, o) =>
+    graph.toIterable foreach { case Triple(s, p, o) =>
       dg.add(uri, s, p, o)
     }
   }

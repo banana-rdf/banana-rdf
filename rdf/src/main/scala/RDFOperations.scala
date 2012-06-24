@@ -9,114 +9,74 @@ package org.w3.banana
  */
 trait RDFOperations[Rdf <: RDF] {
 
-  trait GraphCompanionObject {
-    def empty: Rdf#Graph
-    def apply(elems: Rdf#Triple*): Rdf#Graph
-    def apply(it: Iterable[Rdf#Triple]): Rdf#Graph
-    def toIterable(graph: Rdf#Graph): Iterable[Rdf#Triple]
-  }
-  val Graph: GraphCompanionObject
+  // graph
 
-  trait TripleCompanionObject extends Function3[Rdf#Node, Rdf#URI, Rdf#Node, Rdf#Triple] {
-    def unapply(t: Rdf#Triple): Option[(Rdf#Node, Rdf#URI, Rdf#Node)]
-  }
-  
-  val Triple: TripleCompanionObject
+  def emptyGraph: Rdf#Graph
 
-  trait NodeCompanionObject {
-    def fold[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
-  }
-  
-  val Node: NodeCompanionObject
-  
-  trait URICompanionObject extends Function1[String, Rdf#URI] {
-    def unapply(i: Rdf#URI): Option[String]
-  }
-  
-  val URI : URICompanionObject
+  def makeGraph(it: Iterable[Rdf#Triple]): Rdf#Graph
 
-  trait BNodeCompanionObject extends Function1[String, Rdf#BNode] with Function0[Rdf#BNode] {
-    def unapply(bn: Rdf#BNode): Option[String]
-  }
-  
-  val BNode: BNodeCompanionObject
+  def graphToIterable(graph: Rdf#Graph): Iterable[Rdf#Triple]
 
-  trait LiteralCompanionObject {
-    def fold[T](literal: Rdf#Literal)(funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T): T
-  }
-  
-  val Literal: LiteralCompanionObject
-  
-  trait TypedLiteralCompanionObject extends Function2[String, Rdf#URI, Rdf#TypedLiteral] with Function1[String, Rdf#TypedLiteral] {
-    def unapply(tl: Rdf#TypedLiteral): Option[(String, Rdf#URI)]
-    def apply(lexicalForm: String): Rdf#TypedLiteral = TypedLiteral(lexicalForm, URI("http://www.w3.org/2001/XMLSchema#string"))
-  }
-  
-  val TypedLiteral: TypedLiteralCompanionObject
-  
-  trait LangLiteralCompanionObject extends Function2[String, Rdf#Lang, Rdf#LangLiteral] {
-    def unapply(ll: Rdf#LangLiteral): Option[(String, Rdf#Lang)]
-  }
-  
-  val LangLiteral: LangLiteralCompanionObject
-  
-  trait LangCompanionObject extends Function1[String, Rdf#Lang] {
-    def unapply(l: Rdf#Lang): Option[String]
-  }
-  
-  val Lang: LangCompanionObject
+  // triple
 
-  // pimps
-  
-  class URIW(iri: Rdf#URI) {
-    def asString: String = {
-      val URI(stringURI) = iri
-      stringURI
-    }
-  }
+  def makeTriple(s: Rdf#Node, p: Rdf#URI, o: Rdf#Node): Rdf#Triple
 
-  implicit def wrapURI(iri: Rdf#URI): URIW = new URIW(iri)
+  def fromTriple(triple: Rdf#Triple): (Rdf#Node, Rdf#URI, Rdf#Node)
 
-  class GraphW(graph: Rdf#Graph) {
-    def toIterable: Iterable[Rdf#Triple] = Graph.toIterable(graph)
-  }
-  
-  implicit def wrapGraph(graph: Rdf#Graph): GraphW = new GraphW(graph)
-  implicit def graphAsIterable(graph: Rdf#Graph): Iterable[Rdf#Triple] = Graph.toIterable(graph)
-  
-  implicit def tupleToTriple(tuple: (Rdf#Node, Rdf#URI, Rdf#Node)): Rdf#Triple = Triple(tuple._1, tuple._2, tuple._3)
+  // node
 
-  class TripleW(triple: Rdf#Triple) {
-    val Triple(subject, predicate, objectt) = triple
-  }
-  implicit def wrapTriple(triple: Rdf#Triple): TripleW = new TripleW(triple)
+  def foldNode[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
 
-  class NodeW(node: Rdf#Node) {
-    def fold[T](funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T =
-      Node.fold(node)(funURI, funBNode, funLiteral)
-  }
-  
-  implicit def wrapNode(node: Rdf#Node): NodeW = new NodeW(node)
-  
-  class LiteralW(literal: Rdf#Literal) {
-    def lexicalForm = Literal.fold(literal) (
-      { case TypedLiteral(s, _) => s },
-      { case LangLiteral(s, _) => s }
-    )
-    def fold[T](funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T): T = Literal.fold(literal)(funTL, funLL)
-  }
-  
-  private val _xsd = XSDPrefix(this)
+  // URI
 
-  implicit def wrapLiteral(literal: Rdf#Literal): LiteralW = new LiteralW(literal)
-  
-  class LiteralBuilder(lexicalForm: String) {
-    def datatype(datatype: Rdf#URI): Rdf#TypedLiteral = TypedLiteral(lexicalForm, datatype)
-    def lang(tag: String): Rdf#LangLiteral = LangLiteral(lexicalForm, Lang(tag))
-    def § = TypedLiteral(lexicalForm, _xsd.string)
-  }
-  
-  implicit def wrapStringInLiteralBuilder(lexicalForm: String): LiteralBuilder = new LiteralBuilder(lexicalForm)
+  def makeUri(s: String): Rdf#URI
 
+  def fromUri(uri: Rdf#URI): String
   
+  // bnode
+
+  def makeBNode(): Rdf#BNode
+
+  def makeBNodeLabel(s: String): Rdf#BNode
+
+  def fromBNode(bn: Rdf#BNode): String
+
+  // literal
+
+  def foldLiteral[T](literal: Rdf#Literal)(funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T): T
+
+  // typed literal
+  
+  def makeTypedLiteral(lexicalForm: String, datatype: Rdf#URI): Rdf#TypedLiteral
+
+  def fromTypedLiteral(tl: Rdf#TypedLiteral): (String, Rdf#URI)
+  
+  // lang literal
+
+  def makeLangLiteral(lexicalForm: String, lang: Rdf#Lang): Rdf#LangLiteral
+
+  def fromLangLiteral(ll: Rdf#LangLiteral): (String, Rdf#Lang)
+
+  // lang
+  
+  def makeLang(s: String): Rdf#Lang
+
+  def fromLang(l: Rdf#Lang): String
+
+  // graph traversal
+
+  def getObjects(graph: Rdf#Graph, subject: Rdf#Node, predicate: Rdf#URI): Iterable[Rdf#Node]
+
+  def getPredicates(graph: Rdf#Graph, subject: Rdf#Node): Iterable[Rdf#URI]
+
+  def getSubjects(graph: Rdf#Graph, predicate: Rdf#URI, obj: Rdf#Node): Iterable[Rdf#Node]
+
+  // graph union
+
+  def union(left: Rdf#Graph, right: Rdf#Graph): Rdf#Graph
+
+  // graph isomorphism
+
+  def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
+
 }

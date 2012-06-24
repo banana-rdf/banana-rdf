@@ -10,6 +10,4 @@ trait RDF {
   type TypedLiteral <: Literal
   type LangLiteral <: Literal
   type Lang
-
-  type Store
 }

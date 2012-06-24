@@ -31,11 +31,12 @@ import org.w3.banana._
  * @tparam U The Listener, which keeps prefixes and sends its results on
  */
 class TurtleParser[Rdf <: RDF, F, X, U <: Listener[Rdf]](
-    val ops: RDFOperations[Rdf],
+    val diesel: Diesel[Rdf],
     val P: Parsers[F, Char, TreeMsg, X, U]) {
   
   import TurtleParser._
   import P.++
+  import diesel._
   import ops._
   import NTriplesParser.hexVal
   import Errors.msg

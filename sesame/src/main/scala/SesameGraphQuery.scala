@@ -39,5 +39,5 @@ object SesameGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
   }
 }
 
-object OpenSesameGraphQuery extends OpenGraphQuery(SesameGraphQuery,SesameSPARQLOperations)
+object OpenSesameGraphQuery extends OpenGraphQuery(SesameGraphQuery, SesameSPARQLOperations)
 

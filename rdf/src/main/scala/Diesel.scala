@@ -6,26 +6,30 @@ import scalaz.Validation._
 import NodeBinder._
 
 object Diesel {
-  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf], union: GraphUnion[Rdf], graphTraversal: RDFGraphTraversal[Rdf]): Diesel[Rdf] =
-    new Diesel()(ops, union, graphTraversal)
+  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): Diesel[Rdf] = new Diesel()(ops)
 }
 
-class Diesel[Rdf <: RDF]()(
-    implicit val ops: RDFOperations[Rdf],
-    val graphUnion: GraphUnion[Rdf],
-    val graphTraversal: RDFGraphTraversal[Rdf])
-extends CommonBinders[Rdf]
+class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
+extends syntax.RDFOperationsSyntax[Rdf]
+with syntax.GraphSyntax[Rdf]
+with syntax.NodeSyntax[Rdf]
+with syntax.URISyntax[Rdf]
+with syntax.LiteralSyntax[Rdf]
+with syntax.TypedLiteralSyntax[Rdf]
+with syntax.LangLiteralSyntax[Rdf]
+with syntax.StringSyntax[Rdf]
+with CommonBinders[Rdf]
 with ListBinder[Rdf]
 with TupleBinder[Rdf]
 with MapBinder[Rdf]
 with EitherBinder[Rdf] {
 
   import ops._
-  import graphUnion._
-  import graphTraversal._
 
   val xsd = XSDPrefix(ops)
   val rdf = RDFPrefix(ops)
+  val dc = DCPrefix(ops)
+  val foaf = FOAFPrefix(ops)
 
   implicit def toPointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(PointedGraph(node))
 
@@ -37,7 +41,7 @@ with EitherBinder[Rdf] {
       binder.fromPointedGraph(pointed)
 
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
-      val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
+      val newGraph = union(graph, Graph(Triple(node, rdf("type"), clazz)))
       PointedGraph(node, newGraph)
     }
 
@@ -59,7 +63,7 @@ with EitherBinder[Rdf] {
         val classes = getObjects(graph, node, rdf("type"))
         classes exists { _ == clazz }
       }
-      Node.fold(node)(
+      node.fold(
         uri => isAIfNodeOrBNode,
         bnode => isAIfNodeOrBNode,
         literal => false
@@ -117,9 +121,10 @@ with EitherBinder[Rdf] {
 
     def ->-(o: Rdf#Node, os: Rdf#Node*): PointedGraph[Rdf] = {
       val PointedGraph(s, acc) = pointed
-      val graph =
+      val graph: Rdf#Graph =
         if (os.isEmpty) {
-          acc union Graph(Triple(s, p, o))
+          val g = Graph(Triple(s, p, o))
+          graphWrapper(acc).union(g)
         } else {
           val triples: Iterable[Rdf#Triple] = (o :: os.toList) map { o => Triple(s, p, o) }
           Graph(triples) union acc
@@ -192,11 +197,5 @@ with EitherBinder[Rdf] {
   implicit def pointedGraph2PointedGraphW(pointed: PointedGraph[Rdf]): PointedGraphW = new PointedGraphW(pointed)
 
   implicit def graph2GraphW(graph: Rdf#Graph): GraphW = new GraphW(graph)
-
-  def bnode(): Rdf#BNode = BNode()
-
-  def bnode(label: String) = BNode(label)
-
-  def uri(s: String): Rdf#URI = URI(s)
 
 }

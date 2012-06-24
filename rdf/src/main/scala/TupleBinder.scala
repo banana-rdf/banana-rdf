@@ -7,7 +7,6 @@ trait TupleBinder[Rdf <: RDF] {
 this: Diesel[Rdf] =>
 
   import ops._
-  import graphTraversal._
 
   implicit def Tuple2Binder[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): PointedGraphBinder[Rdf, (T1, T2)] = new PointedGraphBinder[Rdf, (T1, T2)] {
 

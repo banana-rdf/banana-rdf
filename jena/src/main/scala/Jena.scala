@@ -14,6 +14,25 @@ trait Jena extends RDF {
   type TypedLiteral = Node_Literal
   type LangLiteral = Node_Literal
   type Lang = String
+}
 
-  type Store = DatasetGraph
+
+object Jena {
+
+  implicit val ops: RDFOperations[Jena] = JenaOperations
+
+  implicit val diesel: Diesel[Jena] = Diesel[Jena]
+
+  implicit val sparqlOps: SPARQLOperations[Jena, JenaSPARQL] = JenaSPARQLOperations
+
+  implicit val graphQuery: RDFGraphQuery[Jena, JenaSPARQL] = JenaGraphQuery
+
+  implicit val nTriplesStringParser = JenaNTriplesStringParser
+
+  implicit val nTriplesSeqParser = JenaNTriplesSeqParser
+
+  implicit val turtleStringParser = JenaTurtleStringParser
+
+  implicit val turtleSeqParser = JenaTurtleSeqParser
+
 }

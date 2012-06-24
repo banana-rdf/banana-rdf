@@ -13,7 +13,7 @@ object LiteralBinder {
     new NodeBinder[Rdf, T] {
 
       def fromNode(node: Rdf#Node): Validation[BananaException, T] =
-        ops.Node.fold(node)(
+        ops.foldNode(node)(
           uri => Failure(FailedConversion(node + " is a URI, not a Literal")),
           bnode => Failure(FailedConversion(node + " is a BNode, not a Literal")),
           literal => binder.fromLiteral(literal)

@@ -124,7 +124,6 @@ object YourProjectBuild extends Build {
     aggregate = Seq(
       rdf,
       rdfTestSuite,
-      simpleRdf,
       n3,
 //      n3TestSuite,
       jena,
@@ -153,12 +152,6 @@ object YourProjectBuild extends Build {
     )
   ) dependsOn (rdf)
 
-  val simpleRdf = Project(
-    id = "banana-simple-rdf",
-    base = file("simple-rdf"),
-    settings = buildSettings ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test", jena % "test")
-  
   lazy val jena = Project(
     id = "banana-jena",
     base = file("jena"),
@@ -183,7 +176,7 @@ object YourProjectBuild extends Build {
     id = "banana-n3-test-suite",
     base = file("n3-test-suite"),
     settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (n3, jena % "test", sesame % "test", simpleRdf % "test")
+  ) dependsOn (n3, jena % "test", sesame % "test")
 
   lazy val linkedData = Project(
     id = "banana-linked-data",

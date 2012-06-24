@@ -27,9 +27,10 @@ import org.w3.banana._
 
 //todo: can't work out how to get the right dependent type for ListenerAgent. Should be ListenerAgent[m.Triple]
 class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
-    val ops: RDFOperations[Rdf],
+    val diesel: Diesel[Rdf],
     val P: Parsers[F, Char, E, X, U]) {
   
+  import diesel._
   import ops._
   import NTriplesParser.hexVal
 

@@ -8,7 +8,7 @@ object JenaPrefix {
 
   val xsd = XSDPrefix(JenaOperations)
 
-  val dc = DcPrefix(JenaOperations)
+  val dc = DCPrefix(JenaOperations)
 
   val foaf = RDFPrefix(JenaOperations)
 

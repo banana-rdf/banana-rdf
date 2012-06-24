@@ -21,12 +21,12 @@ import scalaz.Validation._
  */
 
 class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, X, Listener[Rdf]])
-  extends RDFReader[Rdf, Turtle] {
+extends RDFReader[Rdf, Turtle] {
 
   // I don't know why, but this trick makes the presentation compiler happier
   type RdfGraph = Rdf#Graph
 
-  import parser.ops
+  import parser.diesel.ops
   
   /**
    *
@@ -56,7 +56,7 @@ class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, 
       state = state._1.feedChunked(buf.slice(0,read), state._2)
     }
     val result = state._1.result(state._2)
-    ops.Graph(result.user.queue:_*)
+    ops.makeGraph(result.user.queue.toIterable)
   }
 
 }

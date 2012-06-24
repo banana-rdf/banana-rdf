@@ -86,7 +86,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
     withConnection(store){ conn =>
       val it = conn.evaluate(query.getTupleExpr, null, empty, false)
       val sit = SesameUtil.toStatementIterable(it)
-      val res = SesameOperations.Graph(sit)
+      val res = SesameOperations.makeGraph(sit)
       it.close()
       res
     }

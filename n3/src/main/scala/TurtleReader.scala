@@ -22,12 +22,12 @@ import scalaz.Validation._
  */
 
 class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listener[Rdf]])
-  extends RDFReader[Rdf, Turtle] {
+extends RDFReader[Rdf, Turtle] {
 
   // I don't know why, but this trick makes the presentation compiler happier
   type RdfGraph = Rdf#Graph
 
-  import parser.ops
+  import parser.diesel.ops
   
   /**
    *
@@ -57,7 +57,7 @@ class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listene
     }
     val result = state._1.result(state._2)
     if (result.isSuccess) {
-      ops.Graph(result.user.queue:_*)
+      ops.makeGraph(result.user.queue.toIterable)
     } else throw new Throwable(result.toString())  //todo, clearly this is not what we want
   }
 

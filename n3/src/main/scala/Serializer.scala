@@ -18,37 +18,37 @@ import org.w3.banana._
  * @since 02/02/2012
  */
 
-class Serializer[Rdf <: RDF](ops: RDFOperations[Rdf]) {
-  
+class Serializer[Rdf <: RDF](diesel: Diesel[Rdf]) {
+
+  import diesel._
   import ops._
 
-  val xsd = XSDPrefix(ops)
-  
-//  val pimps = new Pimps(m)
-//  import pimps._
-  
   def asN3(graph: Rdf#Graph): String =
-    graph map tripleAsN3 mkString "\n"
+    graphToIterable(graph) map tripleAsN3 mkString "\n"
 
   def tripleAsN3(triple: Rdf#Triple): String = {
-    val Triple(s, p, o) = triple
+    val (s, p, o) = fromTriple(triple)
     "%s %s %s ." format (nodeAsN3(s), iriAsN3(p), nodeAsN3(o))
   }
   
-  def nodeAsN3(node: Rdf#Node): String = Node.fold(node) (
+  def nodeAsN3(node: Rdf#Node): String = foldNode(node) (
     iriAsN3,
-    { case BNode(bnode) => "_:" + bnode },
-    { l: Rdf#Literal => literalAsN3(l) }
+    bnode => "_:" + fromBNode(bnode),
+    literal => literalAsN3(literal)
   )
   
   def iriAsN3(iri: Rdf#URI): String = {
-    val URI(iriString) = iri
+    val iriString = fromUri(iri)
     "<" + NTriplesParser.toURI(iriString) + ">"
   }
   
-  def literalAsN3(literal: Rdf#Literal): String = Literal.fold(literal) (
-    { typedLiteral: Rdf#TypedLiteral => typedLiteralAsN3(typedLiteral) },
-    { case LangLiteral(lexicalForm, Lang(lang)) => "\"%s\"@%s" format (NTriplesParser.toAsciiLiteral(lexicalForm), lang) }
+  def literalAsN3(literal: Rdf#Literal): String = foldLiteral(literal) (
+    typedLiteral => typedLiteralAsN3(typedLiteral),
+    langLiteral => {
+      val (lexicalForm, lang) = fromLangLiteral(langLiteral)
+      val langString = fromLang(lang)
+      "\"%s\"@%s" format (NTriplesParser.toAsciiLiteral(lexicalForm), langString)
+    }
   )
   
   def typedLiteralAsN3(typedLiteral: Rdf#TypedLiteral): String = typedLiteral match {

@@ -21,10 +21,10 @@ object SparqlAnswerWriter  {
       def write(answer: Boolean, os: OutputStream) = null //todo
     }
 
-  implicit val Json: BlockingSparqlAnswerWriter[JenaSPARQL,SparqlAnswerJson] =
+  implicit val Json: BlockingSparqlAnswerWriter[JenaSPARQL, SparqlAnswerJson] =
     SparqlAnswerWriter[SparqlAnswerJson]
 
-  implicit val XML: BlockingSparqlAnswerWriter[JenaSPARQL,SparqlAnswerXML]  =
+  implicit val XML: BlockingSparqlAnswerWriter[JenaSPARQL, SparqlAnswerXML]  =
     SparqlAnswerWriter[SparqlAnswerXML]
 
 }

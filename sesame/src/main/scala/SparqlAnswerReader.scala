@@ -22,7 +22,7 @@ object SparqlAnswerReader {
   implicit val Json: BlockingSparqlAnswerReader[SesameSPARQL, SparqlAnswerJson] =
     SparqlAnswerReader[SparqlAnswerJson]
 
-  implicit val XML: BlockingSparqlAnswerReader[SesameSPARQL, SparqlAnswerXML] =
+  implicit val forXML: BlockingSparqlAnswerReader[SesameSPARQL, SparqlAnswerXML] =
     SparqlAnswerReader[SparqlAnswerXML]
 
 }

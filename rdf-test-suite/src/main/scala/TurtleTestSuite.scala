@@ -8,29 +8,27 @@ import org.scalatest.EitherValues._
 import scalaz.Validation
 import scalaz.Validation._
 
-abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends WordSpec with MustMatchers {
+abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
+extends WordSpec with MustMatchers {
   
   val reader: RDFReader[Rdf, Turtle]
   val writer: RDFBlockingWriter[Rdf, Turtle]
-  val iso: GraphIsomorphism[Rdf]
-  
-  import iso._
-  
-  import org.scalatest.matchers.{BeMatcher, MatchResult}
-  
+  import diesel._
   import ops._
+  
+  import org.scalatest.matchers.{ BeMatcher, MatchResult }
   
   def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriples = prefix("ntriples/")
-    val creator = URI("http://purl.org/dc/elements/1.1/creator")
-    val publisher = URI("http://purl.org/dc/elements/1.1/publisher")
-    val dave = "Dave Beckett".§
-    val art = "Art Barstow".§
-    val w3org = URI("http://www.w3.org/")
+    val creator = uri("http://purl.org/dc/elements/1.1/creator")
+    val publisher = uri("http://purl.org/dc/elements/1.1/publisher")
+    val dave = TypedLiteral("Dave Beckett")
+    val art = TypedLiteral("Art Barstow")
+    val w3org = uri("http://www.w3.org/")
     Graph(
-      (ntriples, creator, dave),
-      (ntriples, creator, art),
-      (ntriples, publisher, w3org)
+      Triple(ntriples, creator, dave),
+      Triple(ntriples, creator, art),
+      Triple(ntriples, publisher, w3org)
     )
   }
   
@@ -47,7 +45,7 @@ abstract class TurtleTestSuite[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends 
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
     val graph = reader.read(file, file.toURI.toString).fold( t => throw t, g => g )
 //    graph.fold( _.printStackTrace, r => println(r.size))
-    graph.size must equal (77)
+    graph.toIterable.size must equal (77)
   }
   
   "read simple TURTLE String" in {

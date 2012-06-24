@@ -7,7 +7,6 @@ trait EitherBinder[Rdf <: RDF] {
 this: Diesel[Rdf] =>
 
   import ops._
-  import graphTraversal._
 
   implicit def EitherBinder[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): PointedGraphBinder[Rdf, Either[T1, T2]] = new PointedGraphBinder[Rdf, Either[T1, T2]] {
 

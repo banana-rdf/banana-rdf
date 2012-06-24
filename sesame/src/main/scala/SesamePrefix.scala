@@ -8,7 +8,7 @@ object SesamePrefix {
 
   val xsd = XSDPrefix(SesameOperations)
 
-  val dc = DcPrefix(SesameOperations)
+  val dc = DCPrefix(SesameOperations)
 
   val foaf = RDFPrefix(SesameOperations)
 

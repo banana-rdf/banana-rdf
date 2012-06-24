@@ -1,9 +1,10 @@
 package org.w3.banana.jena
 
-import org.w3.banana.{Turtle, TurtleTestSuite}
+import org.w3.banana._
+import Jena._
+import JenaRDFBlockingWriter._
 
-class JenaTurtleTest extends TurtleTestSuite(JenaOperations) {
+class JenaTurtleTest extends TurtleTestSuite[Jena] {
   val reader = JenaRDFReader.TurtleReader
   val writer = JenaRDFBlockingWriter[Turtle]
-  val iso = JenaGraphIsomorphism
 }

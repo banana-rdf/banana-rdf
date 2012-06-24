@@ -16,16 +16,11 @@ import org.w3.util.Pimps._
 import scalaz._
 
 class LinkedDataMemoryKB[Rdf <: RDF](
-    val ops: RDFOperations[Rdf],
-    val graphTraversal: RDFGraphTraversal[Rdf],
-    val utils: RDFUtils[Rdf],
-    val readerSelector: RDFReaderSelector[Rdf]) extends LinkedData[Rdf] {
+    diesel: Diesel[Rdf],
+    readerSelector: RDFReaderSelector[Rdf]) extends LinkedData[Rdf] {
 
+  import diesel._
   import ops._
-  import graphTraversal._
-  import utils._
-
-  val xsd = XSDPrefix(ops)
 
   val logger = new Object {
     def debug(msg: => String): Unit = println(msg)
@@ -62,7 +57,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   }
 
   def goto(iri: Rdf#URI): LD[Rdf#URI] = {
-    val supportDoc = supportDocument(iri)
+    val supportDoc = iri.supportDocument
     if (!kb.isDefinedAt(supportDoc)) {
       val URI(iri) = supportDoc
       val futureGraph: FutureValidation[LDError, Rdf#Graph] = delayedValidation {
@@ -108,7 +103,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     def followURI(predicate: Rdf#URI)(implicit ev: S =:= Rdf#URI): LD[Iterable[Rdf#Node]] = new LD(
       for {
         subject ← underlying map ev
-        supportDoc = supportDocument(subject)
+        supportDoc = subject.supportDocument
         graph ← kb.get(supportDoc) getOrElse sys.error("something is really wrong")
       } yield {
         val objects = getObjects(graph, subject, predicate)

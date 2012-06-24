@@ -1,112 +1,187 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
+import JenaUtil._
 import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
 import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 import scala.collection.JavaConverters._
-
-import JenaPrefix._
+import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
+import com.hp.hpl.jena.rdf.model.ResourceFactory._
+import com.hp.hpl.jena.util.iterator._
 
 object JenaOperations extends RDFOperations[Jena] {
 
-  object Graph extends GraphCompanionObject {
-    def empty: Jena#Graph = Factory.createDefaultGraph
-    def apply(elems: Jena#Triple*): Jena#Graph = apply(elems.toIterable)
-    def apply(it: Iterable[Jena#Triple]): Jena#Graph = {
-      val graph = empty
-      it foreach { t => graph add t }
-      graph
-    }
-    def toIterable(graph: Jena#Graph): Iterable[Jena#Triple] = new Iterable[Jena#Triple] {
-      val iterator = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala
-    }
+  // graph
+
+  def emptyGraph: Jena#Graph = Factory.createDefaultGraph
+
+  def makeGraph(it: Iterable[Jena#Triple]): Jena#Graph = {
+    val graph = emptyGraph
+    it foreach { t => graph add t }
+    graph
   }
 
-  object Triple extends TripleCompanionObject {
-    def apply(s: Jena#Node, p: Jena#URI, o: Jena#Node): Jena#Triple = {
-      JenaTriple.create(s, p, o)
-    }
-    def unapply(t: Jena#Triple): Option[(Jena#Node, Jena#URI, Jena#Node)] =
-      (t.getSubject, t.getPredicate, t.getObject) match {
-        case (s, p: Jena#URI, o) => Some((s, p, o))
-        case _ => None
-      }
+  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] = new Iterable[Jena#Triple] {
+    val iterator = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala
   }
 
-  object Node extends NodeCompanionObject {
-    def fold[T](node: Jena#Node)(funURI: Jena#URI => T, funBNode: Jena#BNode => T, funLiteral: Jena#Literal => T): T = node match {
-      case iri: Jena#URI => funURI(iri)
-      case bnode: Jena#BNode => funBNode(bnode)
-      case literal: Jena#Literal => funLiteral(literal)
-    }
+  // triple
+
+  def makeTriple(s: Jena#Node, p: Jena#URI, o: Jena#Node): Jena#Triple = {
+    JenaTriple.create(s, p, o)
   }
+
+  def fromTriple(t: Jena#Triple): (Jena#Node, Jena#URI, Jena#Node) = {
+    val s = t.getSubject
+    val p = t.getPredicate
+    val o = t.getObject
+    if (p.isInstanceOf[Jena#URI])
+      (s, p.asInstanceOf[Jena#URI], o)
+    else      
+      throw new RuntimeException("fromTriple: predicate " + p.toString + " must be a URI")
+  }
+
+  // node
+
+  def foldNode[T](node: Jena#Node)(funURI: Jena#URI => T, funBNode: Jena#BNode => T, funLiteral: Jena#Literal => T): T = node match {
+    case iri: Jena#URI => funURI(iri)
+    case bnode: Jena#BNode => funBNode(bnode)
+    case literal: Jena#Literal => funLiteral(literal)
+  }
+
+  // URI
   
-  object URI extends URICompanionObject {
-    def apply(iriStr: String): Jena#URI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
-    def unapply(node: Jena#URI): Option[String] = if (node.isURI) Some(node.getURI) else None
+  def makeUri(iriStr: String): Jena#URI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
+
+  def fromUri(node: Jena#URI): String =
+    if (node.isURI)
+      node.getURI
+    else
+      throw new RuntimeException("fromUri: " + node.toString() + " must be a URI")
+
+  // bnode
+
+  def makeBNode() = JenaNode.createAnon().asInstanceOf[Node_Blank]
+
+  def makeBNodeLabel(label: String): Jena#BNode = {
+    val id = AnonId.create(label)
+    JenaNode.createAnon(id).asInstanceOf[Node_Blank]
   }
 
-  object BNode extends BNodeCompanionObject {
-    def apply() = JenaNode.createAnon().asInstanceOf[Node_Blank]
-    def apply(label: String): Jena#BNode = {
-      val id = AnonId.create(label)
-      JenaNode.createAnon(id).asInstanceOf[Node_Blank]
-    }
-    def unapply(bn: Jena#BNode): Option[String] =
-      if (bn.isBlank) Some(bn.getBlankNodeId.getLabelString) else None
+  def fromBNode(bn: Jena#BNode): String =
+    if (bn.isBlank)
+      bn.getBlankNodeId.getLabelString
+    else
+      throw new RuntimeException("fromBNode: " + bn.toString + " must be a BNode")
 
-  }
+  // literal
 
   lazy val mapper = TypeMapper.getInstance
+
   def jenaDatatype(datatype: Jena#URI) = {
-    val URI(iriString) = datatype
+    val iriString = fromUri(datatype)
     mapper.getTypeByName(iriString)
   }
   
-  object Literal extends LiteralCompanionObject {
-    /**
-     * LangLiteral are not different types in Jena
-     * we can discriminate on the lang tag presence
-     */
-    def fold[T](literal: Jena#Literal)(funTL: Jena#TypedLiteral => T, funLL: Jena#LangLiteral => T): T = literal match {
-      case typedLiteral: Jena#TypedLiteral if literal.getLiteralLanguage == null || literal.getLiteralLanguage.isEmpty =>
-        funTL(typedLiteral)
-      case langLiteral: Jena#LangLiteral => funLL(langLiteral)
+  /**
+   * LangLiteral are not different types in Jena
+   * we can discriminate on the lang tag presence
+   */
+  def foldLiteral[T](literal: Jena#Literal)(funTL: Jena#TypedLiteral => T, funLL: Jena#LangLiteral => T): T = literal match {
+    case typedLiteral: Jena#TypedLiteral if literal.getLiteralLanguage == null || literal.getLiteralLanguage.isEmpty =>
+      funTL(typedLiteral)
+    case langLiteral: Jena#LangLiteral => funLL(langLiteral)
+  }
+
+  // typed literal
+
+  def makeTypedLiteral(lexicalForm: String, iri: Jena#URI): Jena#TypedLiteral = {
+    JenaNode.createLiteral(lexicalForm, null, jenaDatatype(iri)).asInstanceOf[Node_Literal]
+  }
+
+  def fromTypedLiteral(typedLiteral: Jena#TypedLiteral): (String, Jena#URI) = {
+    val typ = typedLiteral.getLiteralDatatype
+    if (typ != null)
+      (typedLiteral.getLiteralLexicalForm.toString, makeUri(typ.getURI))
+    else if (typedLiteral.getLiteralLanguage.isEmpty)
+      (typedLiteral.getLiteralLexicalForm.toString, makeUri("http://www.w3.org/2001/XMLSchema#string"))
+    else
+      throw new RuntimeException("fromTypedLiteral: " + typedLiteral.toString() + " must be a TypedLiteral")
+  }
+
+  // lang literal
+  
+  def makeLangLiteral(lexicalForm: String, lang: Jena#Lang): Jena#LangLiteral = {
+    val langString = fromLang(lang)
+    JenaNode.createLiteral(lexicalForm, langString, null).asInstanceOf[Node_Literal]
+  }
+
+  def fromLangLiteral(langLiteral: Jena#LangLiteral): (String, Jena#Lang) = {
+    val l = langLiteral.getLiteralLanguage
+    if (l != "")
+      (langLiteral.getLiteralLexicalForm.toString, makeLang(l))
+    else
+      throw new RuntimeException("fromLangLiteral: " + langLiteral.toString() + " must be a LangLiteral")
+  }
+
+  // lang
+  
+  def makeLang(langString: String) = langString
+
+  def fromLang(lang: Jena#Lang) = lang
+
+  // graph traversal
+
+    def getObjects(graph: Jena#Graph, subject: Jena#Node, predicate: Jena#URI): Iterable[Jena#Node] = {
+    val model = ModelFactory.createModelForGraph(graph)
+    val subjectResource = foldNode(subject)(
+      uri => model.createResource(fromUri(uri)),
+      bnode => {
+        val label = fromBNode(bnode)
+        model.createResource(new AnonId(label))
+      },
+      lit => throw new RuntimeException("shouldn't use a literal here")
+    )
+    val p = fromUri(predicate)
+    val it: Iterator[Jena#Node] = model.listObjectsOfProperty(subjectResource, createProperty(p)).asScala map toNode
+    new Iterable[Jena#Node] {
+      def iterator = it
     }
   }
 
-  object TypedLiteral extends TypedLiteralCompanionObject {
-    def apply(lexicalForm: String, iri: Jena#URI): Jena#TypedLiteral = {
-      JenaNode.createLiteral(lexicalForm, null, jenaDatatype(iri)).asInstanceOf[Node_Literal]
-    }
-    def unapply(typedLiteral: Jena#TypedLiteral): Option[(String, Jena#URI)] = {
-      val typ = typedLiteral.getLiteralDatatype
-      if (typ != null)
-        Some((typedLiteral.getLiteralLexicalForm.toString, URI(typ.getURI)))
-      else if (typedLiteral.getLiteralLanguage.isEmpty)
-        Some((typedLiteral.getLiteralLexicalForm.toString, xsd.string))
-      else
-        None
+  def getPredicates(graph: Jena#Graph, subject: Jena#Node): Iterable[Jena#URI] = {
+    val predicates: Iterator[Jena#URI] = graph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala map { triple => triple.getPredicate().asInstanceOf[Node_URI]}
+    new Iterable[Jena#URI] {
+      def iterator = predicates
     }
   }
-  
-  object LangLiteral extends LangLiteralCompanionObject {
-    def apply(lexicalForm: String, lang: Jena#Lang): Jena#LangLiteral = {
-      val Lang(langString) = lang
-      JenaNode.createLiteral(lexicalForm, langString, null).asInstanceOf[Node_Literal]
+
+  def getSubjects(graph: Jena#Graph, predicate: Jena#URI, obj: Jena#Node): Iterable[Jena#Node] = {
+    val subjects: Iterator[Jena#Node] = graph.find(JenaNode.ANY, JenaNode.ANY, obj).asScala map { triple => fromTriple(triple)._1 }
+    new Iterable[Jena#Node] {
+      def iterator = subjects
     }
-    def unapply(langLiteral: Jena#LangLiteral): Option[(String, Jena#Lang)] = {
-      val l = langLiteral.getLiteralLanguage
-      if (l != "")
-        Some((langLiteral.getLiteralLexicalForm.toString, Lang(l)))
-      else
-        None
+  }  
+
+  // graph union
+
+  def union(left: Jena#Graph, right: Jena#Graph): Jena#Graph = {
+    if (left.isEmpty)
+      right
+    else if (right.isEmpty)
+      left
+    else {
+      val graph = Factory.createDefaultGraph
+      graphToIterable(left) foreach { t => graph add t }
+      graphToIterable(right) foreach { t => graph add t }
+      graph
     }
   }
-  
-  object Lang extends LangCompanionObject {
-    def apply(langString: String) = langString
-    def unapply(lang: Jena#Lang) = Some(lang)
-  }
+
+  // graph isomorphism
+
+  def isomorphism(left: Jena#Graph, right: Jena#Graph): Boolean =
+    left isIsomorphicWith right
+
 }

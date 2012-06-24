@@ -31,7 +31,7 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
   //we imagine that we are sending these elements to an agent.
   // todo: replace with more appropriate structure
   val queue: mutable.Queue[Rdf#Triple] = new mutable.Queue[Rdf#Triple]()
-  def sendTriple(subj: Rdf#Node, rel: Rdf#URI, obj: Rdf#Node) = queue.enqueue(Triple(subj,rel,obj))
+  def sendTriple(subj: Rdf#Node, rel: Rdf#URI, obj: Rdf#Node) = queue.enqueue(makeTriple(subj,rel,obj))
   def sendTriple(t: Rdf#Triple) = queue.enqueue(t)
 
 
@@ -92,7 +92,7 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
 
    //subject of individual triples constructed in the list
    private def newSubject(): Rdf#Node = {
-      val subj: Rdf#Node = BNode().asInstanceOf[Rdf#Node]
+      val subj: Rdf#Node = makeBNode()
       if (first == rdf.nil) first = subj
       previousSubject = subj
      subj
@@ -169,15 +169,13 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
   def prefixes = prefixs.toMap
 
   def resolve(pname: PName): Option[Rdf#URI] = {
-    prefixs.get(pname.prefix).map{ case URI(pre)=> URI(pre + pname.name)}
+    prefixs.get(pname.prefix).map{ pre => makeUri(fromUri(pre) + pname.name)}
   }
 
   var currentBase = base.map(u=>new aURI(u))
   @throws(classOf[IRISyntaxException])
   def alterBase(newbase: Rdf#URI) {
-    currentBase = newbase match {
-      case URI(i) => Some(new aURI(i))
-    }
+    currentBase = Some(new aURI(fromUri(newbase)))
   }
 
   def addPrefix(name: String, value: Rdf#URI) {
@@ -190,7 +188,7 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
        if ("#" == iriStr) new aURI(b.toString+"#")
        else b.resolve(iriStr)
      }.getOrElse(new aURI(iriStr))
-     URI(iri.toString)
+     makeUri(iri.toString)
   }
 
 

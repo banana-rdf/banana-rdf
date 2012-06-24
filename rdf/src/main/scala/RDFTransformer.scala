@@ -8,25 +8,34 @@ class RDFTransformer[A <: RDF, B <: RDF](
     val b: RDFOperations[B]) {
 
   def transform(graph: A#Graph): B#Graph =
-    b.Graph(a.Graph.toIterable(graph) map transformTriple)
+    b.makeGraph(a.graphToIterable(graph) map transformTriple)
     
-  def transformTriple(t: A#Triple): B#Triple = {
-    val a.Triple(s, a.URI(iri), o) = t
-    b.Triple(
+  def transformTriple(triple: A#Triple): B#Triple = {
+    val (s, p, o) = a.fromTriple(triple)
+    val pString = a.fromUri(p)
+    b.makeTriple(
       transformNode(s),
-      b.URI(iri),
+      b.makeUri(pString),
       transformNode(o))
   }
   
-  def transformNode(n: A#Node): B#Node = a.Node.fold(n) (
-    { case a.URI(iri) => b.URI(iri) },
-    { case a.BNode(label) => b.BNode(label) },
-    { literal: A#Literal => transformLiteral(literal) }
+  def transformNode(node: A#Node): B#Node = a.foldNode(node) (
+    uri => b.makeUri(a.fromUri(uri)),
+    bnode => b.makeBNodeLabel(a.fromBNode(bnode)),
+    literal => transformLiteral(literal)
   )
   
-  def transformLiteral(literal: A#Literal): B#Literal = a.Literal.fold(literal) (
-    { case a.TypedLiteral(lexicalForm, a.URI(datatypeURI)) => b.TypedLiteral(lexicalForm, b.URI(datatypeURI)) },
-    { case a.LangLiteral(lexicalForm, a.Lang(lang)) => b.LangLiteral(lexicalForm, b.Lang(lang)) }
+  def transformLiteral(literal: A#Literal): B#Literal = a.foldLiteral(literal) (
+    tl => {
+      val (lexicalForm, datatypeUri) = a.fromTypedLiteral(tl)
+      val datatype = a.fromUri(datatypeUri)
+      b.makeTypedLiteral(lexicalForm, b.makeUri(datatype))
+    },
+    ll => {
+      val (lexicalForm, lang) = a.fromLangLiteral(ll)
+      val langString = a.fromLang(lang)
+      b.makeLangLiteral(lexicalForm, b.makeLang(langString))
+    }
   )
   
 }

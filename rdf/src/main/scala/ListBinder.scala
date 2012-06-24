@@ -7,7 +7,6 @@ trait ListBinder[Rdf <: RDF] {
 this: Diesel[Rdf] =>
 
   import ops._
-  import graphTraversal._
 
   implicit def ListBinder[T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
@@ -36,10 +35,10 @@ this: Diesel[Rdf] =>
       var current: Rdf#Node = rdf.nil
       val triples = scala.collection.mutable.Set[Rdf#Triple]()
       t.reverse foreach { a =>
-        val newBNode = BNode()
+        val newBNode = bnode()
         val pointed = binder.toPointedGraph(a)
         triples += Triple(newBNode, rdf.first, pointed.node)
-        triples ++= pointed.graph
+        triples ++= pointed.graph.toIterable
         triples += Triple(newBNode, rdf.rest, current)
         current = newBNode
       }

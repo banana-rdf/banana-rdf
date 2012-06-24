@@ -16,21 +16,27 @@ object Prefix {
 }
 
 class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String, ops: RDFOperations[Rdf]) extends Prefix[Rdf] {
-  import ops.URI
+
+  import ops._
+
   override def toString: String = "Prefix(" + prefixName + ")"
-  def apply(value: String): Rdf#URI = URI(prefixIri+value)
+
+  def apply(value: String): Rdf#URI = makeUri(prefixIri + value)
+
   def unapply(iri: Rdf#URI): Option[String] = {
-    val URI(iriString) = iri
-    if (iriString.startsWith(prefixIri))
-      Some(iriString.substring(prefixIri.length))
+    val uriString = fromUri(iri)
+    if (uriString.startsWith(prefixIri))
+      Some(uriString.substring(prefixIri.length))
     else
       None
   }
+
   def getLocalName(iri: Rdf#URI): Validation[BananaException, String] =
     unapply(iri) match {
       case None => Failure(LocalNameException(this.toString + " couldn't extract localname for " + iri.toString))
       case Some(localname) => Success(localname)
     }
+
 }
 
 
@@ -63,17 +69,17 @@ class XSDPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("xsd"
   val decimal = apply("decimal")
   val double = apply("double")
   val boolean = apply("boolean")
-  val trueLit: Rdf#TypedLiteral = TypedLiteral("true", boolean)
-  val falseLit: Rdf#TypedLiteral = TypedLiteral("false", boolean)
+  val trueLit: Rdf#TypedLiteral = makeTypedLiteral("true", boolean)
+  val falseLit: Rdf#TypedLiteral = makeTypedLiteral("false", boolean)
   val dateTime = apply("dateTime")
 }
 
 
-object DcPrefix {
-  def apply[Rdf <: RDF](ops: RDFOperations[Rdf]) = new DcPrefix(ops)
+object DCPrefix {
+  def apply[Rdf <: RDF](ops: RDFOperations[Rdf]) = new DCPrefix(ops)
 }
 
-class DcPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/elements/1.1/", ops) {
+class DCPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/elements/1.1/", ops) {
 
 }
 

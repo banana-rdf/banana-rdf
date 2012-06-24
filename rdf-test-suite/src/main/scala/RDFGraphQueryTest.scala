@@ -2,23 +2,19 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers._
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter}
+import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 
-abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType](
-  ops: RDFOperations[Rdf],
-  diesel: Diesel[Rdf],
+abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
+  implicit diesel: Diesel[Rdf],
   reader: RDFReader[Rdf, RDFXML],
-  iso: GraphIsomorphism[Rdf],
   sparqlOperations: SPARQLOperations[Rdf, Sparql],
   graphQuery: RDFGraphQuery[Rdf, Sparql],
-  sparqlWriter: BlockingSparqlAnswerWriter[Sparql,SyntaxType],
-  sparqlReader: BlockingSparqlAnswerReader[Sparql,SyntaxType]
+  sparqlWriter: BlockingSparqlAnswerWriter[Sparql, SyntaxType],
+  sparqlReader: BlockingSparqlAnswerReader[Sparql, SyntaxType]
 ) extends WordSpec with MustMatchers with Inside {
 
-  import ops._
   import diesel._
-  import iso._
   import sparqlOperations._
   import graphQuery._
 

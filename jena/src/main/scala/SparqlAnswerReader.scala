@@ -15,12 +15,12 @@ object SparqlAnswerReader {
   BlockingSparqlAnswerReader[JenaSPARQL, Syntax] =
     new BlockingSparqlAnswerReader[JenaSPARQL, Syntax] {
 
-      def read(in: InputStream) = WrappedThrowable.fromTryCatch{
+      def read(in: InputStream) = WrappedThrowable.fromTryCatch {
         jenaSparqlSyntax.parse(in)
       }
     }
 
-  implicit val Json: BlockingSparqlAnswerReader[JenaSPARQL, SparqlAnswerJson] =
+  implicit val forJson: BlockingSparqlAnswerReader[JenaSPARQL, SparqlAnswerJson] =
     SparqlAnswerReader[SparqlAnswerJson]
 
   implicit val XML: BlockingSparqlAnswerReader[JenaSPARQL, SparqlAnswerXML] =
