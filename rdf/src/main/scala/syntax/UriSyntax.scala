@@ -28,6 +28,12 @@ this: RDFOperationsSyntax[Rdf] =>
       ops.makeUri(uriWithFrag.toString)
     }
 
+    def fragment: Option[String] = {
+      val uriString = ops.fromUri(uri)
+      val juri = new jURI(uriString)
+      Option(juri.getFragment)
+    }
+
   }
 
 }

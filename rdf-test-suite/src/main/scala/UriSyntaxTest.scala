@@ -17,5 +17,12 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends
     uri.fragment("bar") must be (URI("http://example.com/foo#bar"))
   }
 
+  "URI.fragment should return the fragment part of a URI" in {
+    val uri = URI("http://example.com/foo#bar")
+    uri.fragment must be (Some("bar"))
+
+    val uriNoFrag = URI("http://example.com/foo")
+    uriNoFrag.fragment must be (None)
+  }  
 
 }
