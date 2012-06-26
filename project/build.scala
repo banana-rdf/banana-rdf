@@ -129,7 +129,7 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ Seq(
       EclipseKeys.skipParents in ThisBuild := false,
       pub := (),
-      pub <<= pub.dependsOn(publish in rdf, publish in n3, publish in jena, publish in sesame)),
+      pub <<= pub.dependsOn(publish in rdf, publish in jena, publish in sesame)),
     aggregate = Seq(
       rdf,
       rdfTestSuite,
@@ -167,19 +167,27 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, n3, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test")
   
   lazy val sesame = Project(
     id = "banana-sesame",
     base = file("sesame"),
-    settings = buildSettings ++ sesameTestWIPFilter ++sesameDeps ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test")
+    settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps
+  ) dependsOn (rdf, rdfTestSuite % "test")
   
   lazy val n3 = Project(
     id = "banana-n3",
     base = file("n3"),
     settings = buildSettings ++ jenaDeps ++ n3Deps
   ) dependsOn (rdf)
+
+  lazy val jenaN3 = Project(
+    id = "banana-jena-n3",
+    base = file("jena-n3"),
+    settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
+      libraryDependencies += akka
+    )
+  ) dependsOn (rdf, jena, n3, rdfTestSuite % "test")
   
   lazy val n3TestSuite = Project(
     id = "banana-n3-test-suite",
