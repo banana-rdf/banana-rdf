@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 import JenaOperations._
-import Jena.diesel._
+import JenaDiesel._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
