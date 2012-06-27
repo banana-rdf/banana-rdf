@@ -44,6 +44,7 @@ extends WordSpec with MustMatchers {
     val result = union(foo, bar)
     isomorphism(foo, fooReference) must be (true)
     isomorphism(bar, barReference) must be (true)
+    isomorphism(foo, bar) must be (false)
     isomorphism(foobar, result) must be (true)
   }
 

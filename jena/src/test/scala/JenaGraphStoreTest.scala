@@ -4,8 +4,10 @@ import org.w3.banana._
 import com.hp.hpl.jena.sparql.core._
 import Jena._
 import JenaRDFReader._
+import com.hp.hpl.jena.tdb.TDBFactory
 
-class JenaGraphStoreTest() extends GraphStoreTest[Jena](JenaStore(DatasetGraphFactory.createMem())) {
+
+abstract class AbstractJenaGraphStoreTest(val jenaStore: RDFStore[Jena, JenaSPARQL]) extends GraphStoreTest[Jena](jenaStore) {
 
   import JenaOperations._
 
@@ -16,3 +18,8 @@ class JenaGraphStoreTest() extends GraphStoreTest[Jena](JenaStore(DatasetGraphFa
   }
 
 }
+
+class MemJenaGraphStore extends AbstractJenaGraphStoreTest(JenaStore(DatasetGraphFactory.createMem()))
+
+class TDBJenaGraphStore extends AbstractJenaGraphStoreTest(JenaStore(TDBFactory.createDataset("test.tdb")))
+
