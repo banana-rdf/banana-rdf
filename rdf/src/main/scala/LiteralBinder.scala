@@ -22,4 +22,14 @@ object LiteralBinder {
       def toNode(t: T): Rdf#Node = binder.toLiteral(t)
     }
 
+  def naturalBinder[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): LiteralBinder[Rdf, Rdf#Literal] =
+    new LiteralBinder[Rdf, Rdf#Literal] {
+      
+      def fromLiteral(literal: Rdf#Literal): Validation[BananaException, Rdf#Literal] =
+        Success(literal)
+
+      def toLiteral(t: Rdf#Literal): Rdf#Literal = t
+      
+    }
+
 }
