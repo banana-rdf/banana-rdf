@@ -15,7 +15,7 @@ object RDFReaderSelector {
   def apply[Rdf <: RDF, T](implicit syntax: Syntax[T], reader: RDFReader[Rdf, T]): RDFReaderSelector[Rdf] =
     new RDFReaderSelector[Rdf] {
       def apply(mime: MimeType): Option[RDFReader[Rdf, Any]] =
-        if (syntax.mimeTypes contains mime)
+        if (syntax.mimeTypes.list contains mime)
           Some(reader)
         else
           None
