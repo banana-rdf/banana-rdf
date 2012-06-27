@@ -24,9 +24,9 @@ object MimeType {
  * @param mime the string should be in "tpe/subtype" format, but this is not checked
  */
 case class MimeType(mime: String) {
-  lazy val (tpe,subType) = {
+  lazy val Array(tpe,subType) = {
     val res = mime.split("/")
-    if (res.size!=2) ("nothing","nothing")
+    if (res.size!=2) Array("broken","mime")
     else res
   }
 }
