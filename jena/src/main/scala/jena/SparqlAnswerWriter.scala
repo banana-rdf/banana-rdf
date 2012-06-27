@@ -27,4 +27,8 @@ object SparqlAnswerWriter  {
   implicit val XML: BlockingSparqlAnswerWriter[JenaSPARQL, SparqlAnswerXML]  =
     SparqlAnswerWriter[SparqlAnswerXML]
 
+  implicit val WriterSelector: RDFWriterSelector[JenaSPARQL#Solutions] =
+    RDFWriterSelector[JenaSPARQL#Solutions, SparqlAnswerXML] combineWith
+      RDFWriterSelector[JenaSPARQL#Solutions, SparqlAnswerJson]
+
 }

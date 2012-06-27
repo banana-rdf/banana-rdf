@@ -1,11 +1,8 @@
 package org.w3.banana.sesame
 
-import org.w3.banana.{SparqlAnswerXML, SparqlAnswerJson, WrappedThrowable, BlockingSparqlAnswerWriter}
-import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
-import java.io.OutputStream
-import org.openrdf.query.TupleQueryResult
-import org.openrdf.query.resultio.TupleQueryResultWriter
-import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
+import org.w3.banana._
+import jena.RDFWriterSelector
+import java.io.{Writer, OutputStream}
 
 
 /**
@@ -34,5 +31,9 @@ object SparqlAnswerWriter {
   implicit val Json = SparqlAnswerWriter[SparqlAnswerJson]
 
   implicit val XML =  SparqlAnswerWriter[SparqlAnswerXML]
+
+  implicit val WriterSelector: RDFWriterSelector[SesameSPARQL#Solutions] =
+    RDFWriterSelector[SesameSPARQL#Solutions, SparqlAnswerXML] combineWith
+      RDFWriterSelector[SesameSPARQL#Solutions, SparqlAnswerJson]
 
 }
