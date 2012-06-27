@@ -27,12 +27,4 @@ object Jena {
 
   implicit val graphQuery: RDFGraphQuery[Jena, JenaSPARQL] = JenaGraphQuery
 
-//  implicit val nTriplesStringParser = JenaNTriplesStringParser
-//
-//  implicit val nTriplesSeqParser = JenaNTriplesSeqParser
-//
-//  implicit val turtleStringParser = JenaTurtleStringParser
-//
-//  implicit val turtleSeqParser = JenaTurtleSeqParser
-
 }

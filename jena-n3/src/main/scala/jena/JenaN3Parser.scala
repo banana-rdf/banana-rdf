@@ -4,6 +4,18 @@ import nomo.{Accumulators, Errors, Monotypic, Parsers}
 import org.w3.banana._
 import org.w3.banana.n3._
 
+object JenaN3Parser {
+
+  implicit val nTriplesStringParser = JenaNTriplesStringParser
+
+  implicit val nTriplesSeqParser = JenaNTriplesSeqParser
+
+  implicit val turtleStringParser = JenaTurtleStringParser
+
+  implicit val turtleSeqParser = JenaTurtleSeqParser
+
+}
+
 object JenaNTriplesStringParser
 extends n3.NTriplesParser(
   Jena.diesel,

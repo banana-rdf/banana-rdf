@@ -1,6 +1,7 @@
 package org.w3.banana.syntax
 
 import org.w3.banana._
+import java.net.{ URI => jURI }
 
 trait URISyntax[Rdf <: RDF] {
 this: RDFOperationsSyntax[Rdf] =>
@@ -11,12 +12,26 @@ this: RDFOperationsSyntax[Rdf] =>
 
     def getString: String = ops.fromUri(uri)
 
-    def supportDocument: Rdf#URI = {
+    def fragmentLess: Rdf#URI = {
       val uriString = ops.fromUri(uri)
-      val jUri = new java.net.URI(uriString)
-      import jUri._
-      val uriNoFrag = new java.net.URI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, null)
+      val juri = new jURI(uriString)
+      import juri._
+      val uriNoFrag = new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, null)
       ops.makeUri(uriNoFrag.toString)
+    }
+
+    def fragment(frag: String): Rdf#URI = {
+      val uriString = ops.fromUri(uri)
+      val juri = new jURI(uriString)
+      import juri._
+      val uriWithFrag = new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, frag)
+      ops.makeUri(uriWithFrag.toString)
+    }
+
+    def fragment: Option[String] = {
+      val uriString = ops.fromUri(uri)
+      val juri = new jURI(uriString)
+      Option(juri.getFragment)
     }
 
   }

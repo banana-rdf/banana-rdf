@@ -1,7 +1,7 @@
 Banana RDF
 ==========
 
-[![Build Status](https://secure.travis-ci.org/un-jon/banana-rdf.png?branch=master)](http://travis-ci.org/un-jon/banana-rdf)
+[![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png?branch=master)](http://travis-ci.org/un-jon/banana-rdf)
 
 An RDF library in Scala
 -----------------------
@@ -21,6 +21,15 @@ You only need a recent version of Java, that's all:
     $ git clone git@github.com:w3c/banana-rdf.git
     $ cd banana-rdf
     $ ./sbt
+
+
+Generate documentation
+-------------------------
+
+    $ ./sbt doc
+    $ open full/target/scala-2.9.1/api/index.html
+    or
+    $ open full/target/scala-2.9.1/api.sxr/index.html
 
 Licence
 -------

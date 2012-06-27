@@ -17,6 +17,11 @@ object JenaUtil {
 
   def toNode(rdfNode: RDFNode): Jena#Node = rdfNode.visitWith(toNodeVisitor).asInstanceOf[Jena#Node]
 
-
+  // usefull when you want to dump a graph for debugging :-)
+  def dump[Rdf <: RDF](graph: Rdf#Graph)(implicit ops: RDFOperations[Rdf]): Unit = {
+    val mToJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
+    val jenaGraph = mToJena.transform(graph)
+    println(JenaRDFBlockingWriter.TurtleWriter.asString(jenaGraph, ""))
+  }
 
 }

@@ -57,7 +57,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
   }
 
   def goto(iri: Rdf#URI): LD[Rdf#URI] = {
-    val supportDoc = iri.supportDocument
+    val supportDoc = iri.fragmentLess
     if (!kb.isDefinedAt(supportDoc)) {
       val URI(iri) = supportDoc
       val futureGraph: FutureValidation[LDError, Rdf#Graph] = delayedValidation {
@@ -103,7 +103,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     def followURI(predicate: Rdf#URI)(implicit ev: S =:= Rdf#URI): LD[Iterable[Rdf#Node]] = new LD(
       for {
         subject ← underlying map ev
-        supportDoc = subject.supportDocument
+        supportDoc = subject.fragmentLess
         graph ← kb.get(supportDoc) getOrElse sys.error("something is really wrong")
       } yield {
         val objects = getObjects(graph, subject, predicate)

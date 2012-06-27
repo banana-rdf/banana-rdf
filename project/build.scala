@@ -56,9 +56,21 @@ object BuildSettings {
     )
   )
 
+
+
+
+
+  val jenaTestWIPFilter = Seq (
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
+  )
+
+  val sesameTestWIPFilter = Seq (
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.sesameWIP")
+  )
+
 }
 
-object YourProjectBuild extends Build {
+object BananaRdfBuild extends Build {
 
   import BuildSettings._
   
@@ -113,6 +125,41 @@ object YourProjectBuild extends Build {
     Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
 
   val pub = TaskKey[Unit]("pub")
+
+  lazy val full = {
+    def sxrOptions(baseDir: File, sourceDirs: Seq[Seq[File]]): Seq[String] = {
+      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.9.0-0.2.7.jar").asFile.getAbsolutePath
+      val baseDirs = sourceDirs.flatten
+      val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
+      Seq(xplugin, sxrBaseDir)
+    }
+
+    val projects = Seq(rdf, jena, sesame, n3)
+    val allSources           = TaskKey[Seq[Seq[File]]]("all-sources")
+    val allSourceDirectories = SettingKey[Seq[Seq[File]]]("all-source-directories")
+
+    Project(
+      id = "full",
+      base = file("full"),
+      dependencies = Seq(rdf, jena, sesame, n3),
+      settings     = buildSettings ++ Seq(
+        allSources           <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
+        allSourceDirectories <<= projects.map(sourceDirectories in Compile in _).join,
+
+        // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
+        (sources in Compile) <<= (allSources).map(_.flatten),
+
+        // Avoid compiling the sources here; we just are after scaladoc.
+        (compile in Compile) := inc.Analysis.Empty,
+
+        // Include SXR in the Scaladoc Build to generated HTML annotated sources.
+        scalacOptions in (Compile, doc) <++= (baseDirectory, allSourceDirectories).map {
+          (bd, asd) => sxrOptions(bd, asd)
+        }
+      )
+    )
+  }
+
   
   lazy val banana = Project(
     id = "banana",
@@ -120,7 +167,7 @@ object YourProjectBuild extends Build {
     settings = buildSettings ++ Seq(
       EclipseKeys.skipParents in ThisBuild := false,
       pub := (),
-      pub <<= pub.dependsOn(publish in rdf, publish in n3, publish in jena, publish in sesame)),
+      pub <<= pub.dependsOn(publish in rdf, publish in jena, publish in sesame)),
     aggregate = Seq(
       rdf,
       rdfTestSuite,
@@ -128,6 +175,7 @@ object YourProjectBuild extends Build {
 //      n3TestSuite,
       jena,
       sesame,
+      full,
       linkedData))
   
   lazy val rdf = Project(
@@ -155,22 +203,30 @@ object YourProjectBuild extends Build {
   lazy val jena = Project(
     id = "banana-jena",
     base = file("jena"),
-    settings = buildSettings ++ jenaDeps ++ testDeps ++ Seq(
+    settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, n3, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test")
   
   lazy val sesame = Project(
     id = "banana-sesame",
     base = file("sesame"),
-    settings = buildSettings ++ sesameDeps ++ testDeps
-  ) dependsOn (rdf, n3, rdfTestSuite % "test")
+    settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps
+  ) dependsOn (rdf, rdfTestSuite % "test")
   
   lazy val n3 = Project(
     id = "banana-n3",
     base = file("n3"),
     settings = buildSettings ++ jenaDeps ++ n3Deps
   ) dependsOn (rdf)
+
+  lazy val jenaN3 = Project(
+    id = "banana-jena-n3",
+    base = file("jena-n3"),
+    settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
+      libraryDependencies += akka
+    )
+  ) dependsOn (rdf, jena, n3, rdfTestSuite % "test")
   
   lazy val n3TestSuite = Project(
     id = "banana-n3-test-suite",
