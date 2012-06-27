@@ -15,7 +15,7 @@ trait SparqlAnswerXML
  * typeclass for a Syntax
  * It must say the mime-types that are associated to it
  */
-trait Syntax[T] {
+trait Syntax[+T] {
 
   /**
    * the mime-types for this syntax

@@ -1,24 +1,27 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput}
-import java.io.OutputStream
+import java.io.{Writer, OutputStream}
 import org.w3.banana._
-import jena._
-import scalaz.Either3
+import scalaz.Validation
 
 /**
  * Creates a blocking SPARQL writer for the given syntax
  */
 object SparqlAnswerWriter  {
 
-  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerOut[Syntax]):
-  BlockingSparqlAnswerWriter[JenaSPARQL,Syntax] =
-    new BlockingSparqlAnswerWriter[JenaSPARQL,Syntax] {
+  def apply[SyntaxType](implicit jenaSparqlSyntax: SparqlAnswerOut[SyntaxType],
+                    syntax: Syntax[SyntaxType])
+  :  BlockingSparqlAnswerWriter[JenaSPARQL,SyntaxType] =
+    new BlockingSparqlAnswerWriter[JenaSPARQL, SyntaxType] {
 
-      def write(answers: JenaSPARQL#Solutions, os: OutputStream) = WrappedThrowable.fromTryCatch {
-        jenaSparqlSyntax.formatter.format(os, answers)
-      }
-      def write(answer: Boolean, os: OutputStream) = null //todo
+      def write(answers: JenaSPARQL#Solutions, os: OutputStream, base: String ) =
+        WrappedThrowable.fromTryCatch {
+          jenaSparqlSyntax.formatter.format(os, answers)
+        }
+
+      def write(input: JenaSPARQL#Solutions, writer: Writer, base: String ) = null
+
+      def syntax[S >: SyntaxType] = syntax
     }
 
   implicit val Json: BlockingSparqlAnswerWriter[JenaSPARQL, SparqlAnswerJson] =

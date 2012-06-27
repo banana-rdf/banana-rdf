@@ -10,10 +10,11 @@ import java.io.{Writer, OutputStream}
  */
 object SparqlAnswerWriter {
 
-  def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType]) =
+  def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType],
+                         syntax: Syntax[SyntaxType]) =
     new BlockingSparqlAnswerWriter[SesameSPARQL, SyntaxType] {
 
-      def write(answers: SesameSPARQL#Solutions, os: OutputStream) = {
+      def write(answers: SesameSPARQL#Solutions, os: OutputStream, base: String = "") = {
         WrappedThrowable.fromTryCatch {
           val w = sesameSparqlSyntax.writer(os)
           w.startQueryResult(answers.getBindingNames)
@@ -25,7 +26,9 @@ object SparqlAnswerWriter {
         }
       }
 
-      def write(answer: Boolean, os: OutputStream) = null //todo
+      def write(input: SesameSPARQL#Solutions, writer: Writer, base: String) = null
+
+      def syntax[S >: SyntaxType] = syntax
     }
 
   implicit val Json = SparqlAnswerWriter[SparqlAnswerJson]

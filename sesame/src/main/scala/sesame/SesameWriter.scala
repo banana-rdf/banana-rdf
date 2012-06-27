@@ -14,7 +14,8 @@ object SesameWriter {
   import Sesame.diesel._
   import SesameOperations._
 
-  def apply[SyntaxType](implicit sesameSyntax: SesameSyntax[SyntaxType]): RDFBlockingWriter[Sesame, SyntaxType] =
+  def apply[SyntaxType](implicit sesameSyntax: SesameSyntax[SyntaxType],
+                         syntax: Syntax[SyntaxType]): RDFBlockingWriter[Sesame, SyntaxType] =
     new RDFBlockingWriter[Sesame, SyntaxType] {
 
       private def write(graph: Sesame#Graph, rdfWriter: RDFWriter, base: String): Validation[BananaException, Unit] =
@@ -23,6 +24,8 @@ object SesameWriter {
           graph.toIterable foreach rdfWriter.handleStatement
           rdfWriter.endRDF()
         }
+
+      def syntax[S >: SyntaxType] = syntax
 
       def write(graph: Sesame#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] =
         for {
@@ -39,6 +42,8 @@ object SesameWriter {
           }
           result <- write(graph, rdfWriter, base)
         } yield result
+
+
     }
 
   implicit val RDFXMLWriter: RDFBlockingWriter[Sesame, RDFXML] = SesameWriter[RDFXML]

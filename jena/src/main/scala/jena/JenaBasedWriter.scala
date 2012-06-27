@@ -15,7 +15,8 @@ import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput}
  * @tparam Rdf the rdf implementation of the given graph
  */
 class JenaBasedWriter[Rdf <: RDF, SyntaxType](val ops: RDFOperations[Rdf])
-                                                   (implicit graphWriter: RDFBlockingWriter[Jena,SyntaxType])
+                                             (implicit graphWriter: RDFBlockingWriter[Jena,SyntaxType],
+                                                       syntax: Syntax[SyntaxType])
   extends RDFBlockingWriter[Rdf, SyntaxType] {
 
   private val MtoJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
@@ -25,6 +26,8 @@ class JenaBasedWriter[Rdf <: RDF, SyntaxType](val ops: RDFOperations[Rdf])
   
   def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit] =
      graphWriter.write(MtoJena.transform(graph) ,writer,base)
+
+  def syntax[S >: SyntaxType] = syntax
 }
 
 
