@@ -95,26 +95,48 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
     }
 
 
+
+
   }
 
 
-  "Alexandre Bertails must appear as an editor in new-tr.rdf" taggedAs (SesameWIP) in {
+  "ASK Query on new-tr.rdf" should {
 
     val query = AskQuery("""
-prefix : <http://www.w3.org/2001/02pd/rec54#>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+                           |prefix : <http://www.w3.org/2001/02pd/rec54#>
+                           |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                           |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+                           |
+                           |ASK {
+                           |  ?thing :editor ?ed .
+                           |  ?ed contact:fullName "Alexandre Bertails"
+                           |}""".stripMargin)
 
-ASK {
-  ?thing :editor ?ed .
-  ?ed contact:fullName "Alexandre Bertails"
-}
-""")
 
-    val alexIsThere = executeAsk(graph, query)
+    "Alexandre Bertails must appear as an editor in new-tr.rdf" taggedAs (SesameWIP) in {
+        val alexIsThere = executeAsk(graph, query)
 
-   assert(alexIsThere," query "+query+ "must return true")
+        assert(alexIsThere," query "+query+ "must return true")
+    }
 
+    "the sparql answer should serialise and deserialise "  in {
+      //in any case we must re-execute query, as the results returned can often only be read once
+      val answers = executeAsk(graph, query)
+
+      val out = new ByteArrayOutputStream()
+
+      val serialisedAnswer = BooleanWriter.WriterSelector(MediaRange("application/sparql-results+json")).map{
+        l =>
+        l.write(answers, out,"")
+      }.getOrElse(fail("could not find sparkql boolean writer for json"))
+
+      assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
+
+//      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
+//      assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
+//
+//      answr2.map(a => assert(testAnswer(a), "the deserialised answer must pass the same tests as the original one"))
+    }
   }
 
 
