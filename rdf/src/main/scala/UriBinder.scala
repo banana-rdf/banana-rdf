@@ -22,4 +22,13 @@ object URIBinder {
       def toNode(t: T): Rdf#Node = binder.toUri(t)
     }
 
+  def naturalBinder[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): URIBinder[Rdf, Rdf#URI] =
+    new URIBinder[Rdf, Rdf#URI] {
+      
+      def fromUri(uri: Rdf#URI): Validation[BananaException, Rdf#URI] = Success(uri)
+
+      def toUri(t: Rdf#URI): Rdf#URI = t
+      
+    }
+
 }
