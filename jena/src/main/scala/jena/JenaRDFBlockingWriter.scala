@@ -13,10 +13,10 @@ object JenaRDFBlockingWriter {
   import JenaGraphSyntax._
 
   def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType],
-                         syntax: Syntax[SyntaxType]): RDFBlockingWriter[Jena, SyntaxType] =
+                         syntaxtp: Syntax[SyntaxType]): RDFBlockingWriter[Jena, SyntaxType] =
     new RDFBlockingWriter[Jena, SyntaxType] {
 
-      def syntax[S >: SyntaxType]: Syntax[S] = syntax
+      def syntax[S >: SyntaxType]: Syntax[S] = syntaxtp
 
       val serialization = jenaSyntax.value
 
