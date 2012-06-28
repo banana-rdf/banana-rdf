@@ -11,7 +11,7 @@ import scalaz.Validation._
  * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
  *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait RDFReader[Rdf <: RDF, SyntaxType] extends BlockingReader[Rdf#Graph,SyntaxType]
+trait RDFReader[Rdf <: RDF, +SyntaxType] extends BlockingReader[Rdf#Graph,SyntaxType]
 
 
 trait BlockingReader[Result, +SyntaxType] {
