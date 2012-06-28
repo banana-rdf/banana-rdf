@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.{Right3, Middle3, Left3, Either3}
+import scalaz.{ Right3, Middle3, Left3, Either3 }
 
 /**
  * to execute SPARQL queries on an RDF graph
@@ -16,7 +16,7 @@ trait RDFGraphQuery[Rdf <: RDF, Sparql <: SPARQL] {
 }
 
 // TODO to be moved somewhere else please
-case class OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL](graphQuery: RDFGraphQuery[Rdf,Sparql], ops: SPARQLOperations[Rdf,Sparql]) {
+case class OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL](graphQuery: RDFGraphQuery[Rdf, Sparql], ops: SPARQLOperations[Rdf, Sparql]) {
 
   import graphQuery._
 
@@ -30,9 +30,9 @@ case class OpenGraphQuery[Rdf <: RDF, Sparql <: SPARQL](graphQuery: RDFGraphQuer
    *         a boolean if the query was an ASK query
    */
   def executeQuery(graph: Rdf#Graph, query: Sparql#Query): Answer = ops.fold(query)(
-    select => Left3(executeSelect(graph,select)),
-    construct => Middle3(executeConstruct(graph,construct)),
-    ask => Right3(executeAsk(graph,ask))
+    select => Left3(executeSelect(graph, select)),
+    construct => Middle3(executeConstruct(graph, construct)),
+    ask => Right3(executeAsk(graph, ask))
   )
 
 }

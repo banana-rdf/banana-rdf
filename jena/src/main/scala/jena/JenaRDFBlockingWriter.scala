@@ -1,9 +1,8 @@
 package org.w3.banana.jena
 
-import org.w3.banana.{Turtle, RDFXML, WrappedThrowable, RDFBlockingWriter}
-import java.io.{OutputStream, Writer}
+import org.w3.banana.{ Turtle, RDFXML, WrappedThrowable, RDFBlockingWriter }
+import java.io.{ OutputStream, Writer }
 import com.hp.hpl.jena.rdf.model.ModelFactory
-
 
 /**
  * Create an Blocking RDF Writer using Jena's serialisers

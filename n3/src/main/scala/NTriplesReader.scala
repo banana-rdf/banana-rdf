@@ -5,7 +5,7 @@
 
 package org.w3.banana.n3.nomo
 
-import org.w3.banana.n3.{NTriplesParser, Listener}
+import org.w3.banana.n3.{ NTriplesParser, Listener }
 import org.w3.banana._
 import java.io._
 import nomo.Accumulator
@@ -21,13 +21,13 @@ import scalaz.Validation._
  */
 
 class NTriplesReader[Rdf <: RDF, F, E, X](val parser: NTriplesParser[Rdf, F, E, X, Listener[Rdf]])
-extends RDFReader[Rdf, Turtle] {
+    extends RDFReader[Rdf, Turtle] {
 
   // I don't know why, but this trick makes the presentation compiler happier
   type RdfGraph = Rdf#Graph
 
   import parser.diesel.ops
-  
+
   /**
    *
    * @param is an ASCII data containing input stream (UTF-8) may work too
@@ -47,13 +47,13 @@ extends RDFReader[Rdf, Turtle] {
    * @return the graph or an error
    */
   def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph] = WrappedThrowable.fromTryCatch {
-    val buf = new Array[Char](1024)  //todo: how could one set the size of the buffer?
+    val buf = new Array[Char](1024) //todo: how could one set the size of the buffer?
     import parser.P._
     var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
       (parser.nTriples, parser.P.annotator(new Listener(ops, None)))
-    var read =0
+    var read = 0
     while ({ read = reader.read(buf); read > -1 }) {
-      state = state._1.feedChunked(buf.slice(0,read), state._2)
+      state = state._1.feedChunked(buf.slice(0, read), state._2)
     }
     val result = state._1.result(state._2)
     ops.makeGraph(result.user.queue.toIterable)

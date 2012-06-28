@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 import SesamePrefix._
 
 object SesameOperations extends RDFOperations[Sesame] {
-  
+
   // graph
 
   def emptyGraph: Sesame#Graph = new GraphImpl
@@ -23,7 +23,7 @@ object SesameOperations extends RDFOperations[Sesame] {
   def graphToIterable(graph: Sesame#Graph): Iterable[Sesame#Triple] = graph.asScala
 
   // triple
-  
+
   def makeTriple(s: Sesame#Node, p: Sesame#URI, o: Sesame#Node): Sesame#Triple = new StatementImpl(s.asInstanceOf[Resource], p, o)
 
   def fromTriple(t: Sesame#Triple): (Sesame#Node, Sesame#URI, Sesame#Node) = {
@@ -32,7 +32,7 @@ object SesameOperations extends RDFOperations[Sesame] {
     val o = t.getObject
     if (p.isInstanceOf[Sesame#URI])
       (s, p.asInstanceOf[Sesame#URI], o)
-    else      
+    else
       throw new RuntimeException("fromTriple: predicate " + p.toString + " must be a URI")
   }
 
@@ -45,13 +45,13 @@ object SesameOperations extends RDFOperations[Sesame] {
   }
 
   // URI
-  
+
   def makeUri(iriStr: String): Sesame#URI = ValueFactoryImpl.getInstance.createURI(iriStr).asInstanceOf[Sesame#URI]
 
   def fromUri(node: Sesame#URI): String = node.toString
 
   // bnode
-  
+
   def makeBNode() = ValueFactoryImpl.getInstance().createBNode()
 
   def makeBNodeLabel(label: String): Sesame#BNode = new BNodeImpl(label)
@@ -59,8 +59,8 @@ object SesameOperations extends RDFOperations[Sesame] {
   def fromBNode(bn: Sesame#BNode): String = bn.getID
 
   // literal
-  
-  def foldLiteral[T](literal: Sesame#Literal)(funTL: Sesame#TypedLiteral => T, funLL: Sesame#LangLiteral => T): T = 
+
+  def foldLiteral[T](literal: Sesame#Literal)(funTL: Sesame#TypedLiteral => T, funLL: Sesame#LangLiteral => T): T =
     literal match {
       case typedLiteral: Sesame#TypedLiteral if literal.getLanguage == null || literal.getLanguage.isEmpty =>
         funTL(typedLiteral)
@@ -68,7 +68,7 @@ object SesameOperations extends RDFOperations[Sesame] {
     }
 
   // typed literal
-  
+
   def makeTypedLiteral(lexicalForm: String, iri: Sesame#URI): Sesame#TypedLiteral = new LiteralImpl(lexicalForm, iri)
 
   def fromTypedLiteral(typedLiteral: Sesame#TypedLiteral): (String, Sesame#URI) = {
@@ -85,21 +85,20 @@ object SesameOperations extends RDFOperations[Sesame] {
   }
 
   // lang literal
-  
+
   def makeLangLiteral(lexicalForm: String, lang: Sesame#Lang): Sesame#LangLiteral = {
-      val langString = fromLang(lang)
-      new LiteralImpl(lexicalForm, langString)
-    }
+    val langString = fromLang(lang)
+    new LiteralImpl(lexicalForm, langString)
+  }
 
   def fromLangLiteral(langLiteral: Sesame#LangLiteral): (String, Sesame#Lang) = {
     val l = langLiteral.getLanguage
     if (l != null && l != "")
       (langLiteral.getLabel, makeLang(l))
     else
-        throw new RuntimeException("fromLangLiteral: " + langLiteral.toString() + " must be a LangLiteral")
+      throw new RuntimeException("fromLangLiteral: " + langLiteral.toString() + " must be a LangLiteral")
   }
 
-  
   // lang
 
   def makeLang(langString: String) = langString
@@ -113,7 +112,7 @@ object SesameOperations extends RDFOperations[Sesame] {
     def iterable(subject: org.openrdf.model.Resource) = new Iterable[Sesame#Node] {
       def iterator = GraphUtil.getObjectIterator(graph, subject, predicate).asScala
     }
-    
+
     foldNode(subject)(
       iri => iterable(iri),
       bnode => iterable(bnode),

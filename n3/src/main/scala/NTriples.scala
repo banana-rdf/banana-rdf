@@ -9,7 +9,6 @@ import _root_.nomo._
 import scala.collection.mutable
 import org.w3.banana._
 
-
 /**
  * Async Parser for the simplest of all RDF encodings: NTriples
  * http://www.w3.org/TR/rdf-testcases/#ntriples
@@ -29,7 +28,7 @@ import org.w3.banana._
 class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
     val diesel: Diesel[Rdf],
     val P: Parsers[F, Char, E, X, U]) {
-  
+
   import diesel._
   import ops._
   import NTriplesParser.hexVal
@@ -39,55 +38,53 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   def hex = P.anyOf(hexadecimalChars)
 
   /** Parses the single token given that matches the function */
-  def single(isC: Char => Boolean ): P.Parser[Char] = P.any mapResult (s =>
-    s.status.flatMap(i => if (isC(i) ) Success(i) else Failure(P.err.single(i, s.position))))
+  def single(isC: Char => Boolean): P.Parser[Char] = P.any mapResult (s =>
+    s.status.flatMap(i => if (isC(i)) Success(i) else Failure(P.err.single(i, s.position))))
 
   val lang = P.takeWhile1(c => alpha_digit_dash.contains(c.toLower),
-    pos => P.err.single('!',pos)).map(l => Lang(l.toSeq.mkString))
+    pos => P.err.single('!', pos)).map(l => Lang(l.toSeq.mkString))
 
-  val space1 = P.takeWhile1( c => c == ' '|| c == '\t', pos => P.err.single('!',pos))
-  val space = P.takeWhile( c => c == ' '|| c == '\t' )
+  val space1 = P.takeWhile1(c => c == ' ' || c == '\t', pos => P.err.single('!', pos))
+  val space = P.takeWhile(c => c == ' ' || c == '\t')
 
-  val anySpace =  P.takeWhile(_.isWhitespace )
-  val eoln =  P.takeWhile1(c=> '\r'==c || '\n'==c,err)
+  val anySpace = P.takeWhile(_.isWhitespace)
+  val eoln = P.takeWhile1(c => '\r' == c || '\n' == c, err)
 
-  def isUriChar(c: Char) = ( ! c.isWhitespace) && c != '<' && c != '>'  &&
-    c> 0x1F &&  (c < 0x7F || c > 0x9F )  //control characters
-
+  def isUriChar(c: Char) = (!c.isWhitespace) && c != '<' && c != '>' &&
+    c > 0x1F && (c < 0x7F || c > 0x9F) //control characters
 
   import P.++
-  
-  lazy val bnode = P.word("_:")>>!P.takeWhile1(_.isLetterOrDigit,pos => P.err.single('!',pos)).commit.map (n=>BNode(n.toSeq.mkString))
 
+  lazy val bnode = P.word("_:") >>! P.takeWhile1(_.isLetterOrDigit, pos => P.err.single('!', pos)).commit.map(n => BNode(n.toSeq.mkString))
 
-  lazy val u_CHAR = (P.word("\\u")>>!hex++hex++hex++hex).commit map {
-    case c1++c2++c3++c4 => hexVal(c1,c2,c3,c4)
+  lazy val u_CHAR = (P.word("\\u") >>! hex ++ hex ++ hex ++ hex).commit map {
+    case c1 ++ c2 ++ c3 ++ c4 => hexVal(c1, c2, c3, c4)
   }
-  lazy val U_CHAR = (P.word("\\U")>>hex++hex++hex++hex++hex++hex++hex++hex).commit map {
-    case c1++c2++c3++c4++c5++c6++c7++c8 => hexVal(c1,c2,c3,c4,c5,c6,c7,c8)
+  lazy val U_CHAR = (P.word("\\U") >> hex ++ hex ++ hex ++ hex ++ hex ++ hex ++ hex ++ hex).commit map {
+    case c1 ++ c2 ++ c3 ++ c4 ++ c5 ++ c6 ++ c7 ++ c8 => hexVal(c1, c2, c3, c4, c5, c6, c7, c8)
   }
-  lazy val lt_tab = P.word("\\t").map(c=>0x9.toChar)
-  lazy val lt_cr = P.word("\\r").map(c=>0xD.toChar)
-  lazy val lt_nl = P.word("\\n").map(c=>0xA.toChar)
-  lazy val lt_slash = P.word("\\\\").map(c=>'\\')
-  lazy val lt_quote = P.word("\\\"").map(c=>'"'.toChar)
+  lazy val lt_tab = P.word("\\t").map(c => 0x9.toChar)
+  lazy val lt_cr = P.word("\\r").map(c => 0xD.toChar)
+  lazy val lt_nl = P.word("\\n").map(c => 0xA.toChar)
+  lazy val lt_slash = P.word("\\\\").map(c => '\\')
+  lazy val lt_quote = P.word("\\\"").map(c => '"'.toChar)
 
-  val err = (pos: X) => P.err.single('!',pos)
+  val err = (pos: X) => P.err.single('!', pos)
   lazy val literal = (
-      P.takeWhile1(c=> c!= '\\' && c != '"', err).map(_.toSeq.mkString) |
-        u_CHAR | U_CHAR | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote
-    ).many.commit.map(l=> l.toSeq.mkString)
+    P.takeWhile1(c => c != '\\' && c != '"', err).map(_.toSeq.mkString) |
+    u_CHAR | U_CHAR | lt_tab | lt_cr | lt_nl | lt_slash | lt_quote
+  ).many.commit.map(l => l.toSeq.mkString)
 
-  lazy val uriStr = (P.takeWhile1(isUriChar(_),err).map (_.toSeq.mkString) | u_CHAR | U_CHAR |
-      lt_slash | lt_quote
-    ).commit.many1.map(_.toSeq.mkString)
+  lazy val uriStr = (P.takeWhile1(isUriChar(_), err).map(_.toSeq.mkString) | u_CHAR | U_CHAR |
+    lt_slash | lt_quote
+  ).commit.many1.map(_.toSeq.mkString)
 
   // these are already provided by RDFOperations
   val xsd = "http://www.w3.org/2001/XMLSchema#"
   val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   lazy val xsdString = URI(xsd + "string")
 
-  lazy val plainLit = (P.single('"')>>!literal<< P.single('\"'))
+  lazy val plainLit = (P.single('"') >>! literal << P.single('\"'))
 
   lazy val fullLiteral = plainLit ++! (typeFunc | langFunc).optional map {
     case lexicalForm ++ None => TypedLiteral(lexicalForm)
@@ -98,36 +95,33 @@ class NTriplesParser[Rdf <: RDF, F, E, X, U <: Listener[Rdf]](
   lazy val typeFunc = (P.word("^^") >>! uriRef) map Left.apply
   lazy val langFunc = (P.word("@") >>! lang) map Right.apply
 
-
   lazy val dot = P.single('.')
 
-  lazy val uriRef = ( P.single('<') >>! uriStr  <<! P.single('>').commit).map(i=>URI(i))
+  lazy val uriRef = (P.single('<') >>! uriStr <<! P.single('>').commit).map(i => URI(i))
   lazy val pred = uriRef
   lazy val subject = uriRef | bnode
   lazy val obj = uriRef | bnode | fullLiteral
-  lazy val nTriple = (subject++!(space1>>!pred)++!(space1>>!obj)).map{case s++r++o=> Triple(s,r,o)} << (space>>!dot>>!space)
-  lazy val comment = P.single('#').commit <<! P.takeWhile(c =>c != '\r' && c != '\n' )
-  lazy val line = space >>! ( nTriple.map(Some(_)) | comment.as(None)| P.unit(None) )
+  lazy val nTriple = (subject ++! (space1 >>! pred) ++! (space1 >>! obj)).map { case s ++ r ++ o => Triple(s, r, o) } << (space >>! dot >>! space)
+  lazy val comment = P.single('#').commit <<! P.takeWhile(c => c != '\r' && c != '\n')
+  lazy val line = space >>! (nTriple.map(Some(_)) | comment.as(None) | P.unit(None))
 
   /** function that parse NTriples and send results to user in a streaming fashion */
-  lazy val nTriples = (line.mapResult{ r=>
+  lazy val nTriples = (line.mapResult { r =>
     r.get match {
-        case Some(t) => r.user.sendTriple(t);
-        case None => ()
-      }
-      r.status
-  } ).delimitIgnore(eoln.commit)
-  
+      case Some(t) => r.user.sendTriple(t);
+      case None => ()
+    }
+    r.status
+  }).delimitIgnore(eoln.commit)
+
   /** function that parses NTriples and return result to caller as a list */
   lazy val nTriplesList = line.delimit(eoln.commit).map(_.flatten)
-
 
 }
 
 object NTriplesParser {
 
-  val hexChar = Array( '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
-
+  val hexChar = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F');
 
   private def hex(c: Char) = {
     val b = new StringBuilder(6)
@@ -177,22 +171,22 @@ object NTriplesParser {
     true
   }
 
-  def hexVal(h1: Char,h2: Char,h3: Char,h4: Char) = (
-      (Character.digit(h1,16)<<12) | (Character.digit(h2,16)<<8) | (Character.digit(h3,16)<<4) | Character.digit(h4,16)
-    ).toChar
+  def hexVal(h1: Char, h2: Char, h3: Char, h4: Char) = (
+    (Character.digit(h1, 16) << 12) | (Character.digit(h2, 16) << 8) | (Character.digit(h3, 16) << 4) | Character.digit(h4, 16)
+  ).toChar
 
-  def hexVal(h1: Char,h2: Char,h3: Char,h4: Char,h5: Char,h6: Char, h7: Char, h8: Char) = (
-    (Character.digit(h1,16)<<28) | (Character.digit(h2,16)<<24) | (Character.digit(h3,16)<<20) | Character.digit(h4,16)<<16|
-    (Character.digit(h5,16)<<12) | (Character.digit(h6,16)<<8) | (Character.digit(h7,16)<<4) | Character.digit(h8,16)
-    ).toChar
+  def hexVal(h1: Char, h2: Char, h3: Char, h4: Char, h5: Char, h6: Char, h7: Char, h8: Char) = (
+    (Character.digit(h1, 16) << 28) | (Character.digit(h2, 16) << 24) | (Character.digit(h3, 16) << 20) | Character.digit(h4, 16) << 16 |
+    (Character.digit(h5, 16) << 12) | (Character.digit(h6, 16) << 8) | (Character.digit(h7, 16) << 4) | Character.digit(h8, 16)
+  ).toChar
 
   /**
    * encode a string so that it can appear in a ASCII only Literal
-   **/
+   */
   def toAsciiLiteral(str: String) = {
     val b = new StringBuilder
-    for (c <- str)  {
-      literal(c,b)
+    for (c <- str) {
+      literal(c, b)
     }
     b.toString()
   }
@@ -206,11 +200,10 @@ object NTriplesParser {
   def toURI(str: String) = {
     val b = new StringBuilder
     for (c <- str) {
-      iri(c,b) || literal(c,b)
+      iri(c, b) || literal(c, b)
     }
     b.toString
   }
-  
-}
 
+}
 

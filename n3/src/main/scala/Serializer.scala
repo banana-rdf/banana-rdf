@@ -30,19 +30,19 @@ class Serializer[Rdf <: RDF](diesel: Diesel[Rdf]) {
     val (s, p, o) = fromTriple(triple)
     "%s %s %s ." format (nodeAsN3(s), iriAsN3(p), nodeAsN3(o))
   }
-  
-  def nodeAsN3(node: Rdf#Node): String = foldNode(node) (
+
+  def nodeAsN3(node: Rdf#Node): String = foldNode(node)(
     iriAsN3,
     bnode => "_:" + fromBNode(bnode),
     literal => literalAsN3(literal)
   )
-  
+
   def iriAsN3(iri: Rdf#URI): String = {
     val iriString = fromUri(iri)
     "<" + NTriplesParser.toURI(iriString) + ">"
   }
-  
-  def literalAsN3(literal: Rdf#Literal): String = foldLiteral(literal) (
+
+  def literalAsN3(literal: Rdf#Literal): String = foldLiteral(literal)(
     typedLiteral => typedLiteralAsN3(typedLiteral),
     langLiteral => {
       val (lexicalForm, lang) = fromLangLiteral(langLiteral)
@@ -50,12 +50,12 @@ class Serializer[Rdf <: RDF](diesel: Diesel[Rdf]) {
       "\"%s\"@%s" format (NTriplesParser.toAsciiLiteral(lexicalForm), langString)
     }
   )
-  
+
   def typedLiteralAsN3(typedLiteral: Rdf#TypedLiteral): String = typedLiteral match {
     case TypedLiteral(lexicalForm, datatype) if datatype == xsd.string =>
       "\"%s\"" format NTriplesParser.toAsciiLiteral(lexicalForm)
     case TypedLiteral(lexicalForm, URI(iri)) =>
       "\"%s\"^^<%s>" format (NTriplesParser.toAsciiLiteral(lexicalForm), NTriplesParser.toURI(iri))
   }
-  
+
 }

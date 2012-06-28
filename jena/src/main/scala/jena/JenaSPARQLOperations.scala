@@ -23,8 +23,8 @@ object JenaSPARQLOperations extends SPARQLOperations[Jena, JenaSPARQL] {
   }
 
   def fold[T](query: JenaSPARQL#Query)(select: JenaSPARQL#SelectQuery => T,
-                                       construct: JenaSPARQL#ConstructQuery => T,
-                                       ask: JenaSPARQL#AskQuery => T) =
+    construct: JenaSPARQL#ConstructQuery => T,
+    ask: JenaSPARQL#AskQuery => T) =
     query.getQueryType match {
       case JenaQuery.QueryTypeSelect => select(query)
       case JenaQuery.QueryTypeConstruct => construct(query)

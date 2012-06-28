@@ -6,13 +6,12 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 
 abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
-  implicit diesel: Diesel[Rdf],
-  reader: RDFReader[Rdf, RDFXML],
-  sparqlOperations: SPARQLOperations[Rdf, Sparql],
-  graphQuery: RDFGraphQuery[Rdf, Sparql],
-  sparqlWriter: BlockingSparqlAnswerWriter[Sparql, SyntaxType],
-  sparqlReader: BlockingSparqlAnswerReader[Sparql, SyntaxType]
-) extends WordSpec with MustMatchers with Inside {
+    implicit diesel: Diesel[Rdf],
+    reader: RDFReader[Rdf, RDFXML],
+    sparqlOperations: SPARQLOperations[Rdf, Sparql],
+    graphQuery: RDFGraphQuery[Rdf, Sparql],
+    sparqlWriter: BlockingSparqlAnswerWriter[Sparql, SyntaxType],
+    sparqlReader: BlockingSparqlAnswerReader[Sparql, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
   import diesel._
   import sparqlOperations._
@@ -21,11 +20,6 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(file, "http://foo.com") getOrElse sys.error("ouch")
-
-
-
-
-
 
   "new-tr.rdf " should {
     val selectQueryStr = """prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -48,7 +42,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
       names must contain("Alexandre Bertails")
 
       val row = rows(0)
-      row("unknown") must be ('failure)
+      row("unknown") must be('failure)
       true
     }
 
@@ -58,7 +52,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
       testAnswer(answers)
     }
 
-    "the sparql answer should serialise and deserialise "  in {
+    "the sparql answer should serialise and deserialise " in {
       val query = SelectQuery(selectQueryStr)
       //in any case we must re-execute query, as the results returned can often only be read once
       val answers = executeSelect(graph, query)
@@ -75,8 +69,6 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
     }
   }
 
-
-
   "the identity SPARQL Construct " should {
 
     val query = ConstructQuery("""
@@ -89,14 +81,12 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
     "work as expected " in {
 
-        val clonedGraph = executeConstruct(graph, query)
+      val clonedGraph = executeConstruct(graph, query)
 
-        assert(clonedGraph isIsomorphicWith graph)
+      assert(clonedGraph isIsomorphicWith graph)
     }
 
-
   }
-
 
   "Alexandre Bertails must appear as an editor in new-tr.rdf" taggedAs (SesameWIP) in {
 
@@ -113,12 +103,9 @@ ASK {
 
     val alexIsThere = executeAsk(graph, query)
 
-   assert(alexIsThere," query "+query+ "must return true")
+    assert(alexIsThere, " query " + query + "must return true")
 
   }
-
-
-
 
   "a SPARQL query constructor must accept Prefix objects" taggedAs (SesameWIP) in {
 
@@ -152,8 +139,7 @@ CONSTRUCT {
     val contructed1 = executeConstruct(graph, query1)
     val constructed2 = executeConstruct(graph, query2)
 
-    assert(contructed1 isIsomorphicWith constructed2,"the results of both queries should be isomorphic")
+    assert(contructed1 isIsomorphicWith constructed2, "the results of both queries should be isomorphic")
   }
-
 
 }

@@ -7,8 +7,8 @@ import akka.routing._
 import akka.util.Timeout
 
 trait AsyncRDFStore[Rdf <: RDF, Sparql <: SPARQL]
-extends AsyncGraphStore[Rdf]
-with AsyncSPARQLEngine[Rdf, Sparql]
+  extends AsyncGraphStore[Rdf]
+  with AsyncSPARQLEngine[Rdf, Sparql]
 
 object AsyncRDFStore {
 
@@ -37,5 +37,5 @@ rdfstore-dispatcher {
   }
 }
 """)
-  
+
 }

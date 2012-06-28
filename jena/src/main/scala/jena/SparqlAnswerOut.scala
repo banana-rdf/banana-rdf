@@ -1,8 +1,7 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.sparql.resultset.{XMLOutput, JSONOutput, OutputFormatter}
-import org.w3.banana.{SparqlAnswerXML, SparqlAnswerJson}
-
+import com.hp.hpl.jena.sparql.resultset.{ XMLOutput, JSONOutput, OutputFormatter }
+import org.w3.banana.{ SparqlAnswerXML, SparqlAnswerJson }
 
 /**
  * typeclass for serialising special
@@ -11,7 +10,6 @@ import org.w3.banana.{SparqlAnswerXML, SparqlAnswerJson}
 trait SparqlAnswerOut[T] {
   def formatter: OutputFormatter
 }
-
 
 object SparqlAnswerOut {
 
@@ -24,7 +22,6 @@ object SparqlAnswerOut {
     new SparqlAnswerOut[SparqlAnswerXML] {
       def formatter = new XMLOutput()
     }
-
 
 }
 

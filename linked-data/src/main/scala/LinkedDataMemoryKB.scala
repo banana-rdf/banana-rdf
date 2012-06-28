@@ -9,7 +9,7 @@ import akka.dispatch._
 import akka.util._
 import akka.util.duration._
 import com.ning.http.client._
-import java.util.concurrent.{ConcurrentHashMap, ExecutorService, Executors, Future ⇒ jFuture}
+import java.util.concurrent.{ ConcurrentHashMap, ExecutorService, Executors, Future ⇒ jFuture }
 import org.w3.util._
 import org.w3.util.FutureValidation._
 import org.w3.util.Pimps._
@@ -115,7 +115,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       predicate: Rdf#URI,
       max: Int = 10,
       maxDownloads: Int = 10)(
-      implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]] = {
+        implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#Node]] = {
       val f = underlying.map(ev) flatMap { (nodes: Iterable[Rdf#Node]) ⇒
         val nodesFutureValidation: Iterable[FutureValidation[LDError, Iterable[Rdf#Node]]] =
           nodes.take(maxDownloads).map { (node: Rdf#Node) =>
@@ -123,7 +123,8 @@ class LinkedDataMemoryKB[Rdf <: RDF](
               iri => goto(iri).followURI(predicate).underlying,
               bn => immediateValidation(Success(Iterable.empty)),
               lit => immediateValidation(Success(Iterable.empty))
-            )}
+            )
+          }
         val nodesFuture: Iterable[Future[Validation[LDError, Iterable[Rdf#Node]]]] =
           nodesFutureValidation map { _.asFuture }
         implicit val timeout: Timeout = 10.seconds
@@ -135,7 +136,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
         val futureNodes: Future[Iterable[Validation[LDError, Iterable[Rdf#Node]]]] =
           Future.sequence {
             val foo = stream.take(max).toSeq
-            println(";;; "+foo.size)
+            println(";;; " + foo.size)
             foo
           }
         // as some point, we'll want to accumulate the errors somewhere,
@@ -155,7 +156,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
       )
 
     def asURIs(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Rdf#URI]] = {
-      def f(node: Rdf#Node): Option[Rdf#URI] = 
+      def f(node: Rdf#Node): Option[Rdf#URI] =
         node.fold[Option[Rdf#URI]](
           iri ⇒ Some(iri),
           bnode ⇒ None,
@@ -183,7 +184,7 @@ class LinkedDataMemoryKB[Rdf <: RDF](
     }
 
     def asInts(implicit ev: S =:= Iterable[Rdf#Node]): LD[Iterable[Int]] = {
-      def f(node: Rdf#Node): Option[Int] = 
+      def f(node: Rdf#Node): Option[Int] =
         node.fold[Option[Int]](
           iri ⇒ None,
           bnode ⇒ None,

@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput}
-import java.io.{InputStream, OutputStream}
+import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, XMLOutput }
+import java.io.{ InputStream, OutputStream }
 import org.w3.banana._
 import jena._
 import scalaz.Either3
@@ -11,8 +11,7 @@ import scalaz.Either3
  */
 object SparqlAnswerReader {
 
-  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]):
-  BlockingSparqlAnswerReader[JenaSPARQL, Syntax] =
+  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]): BlockingSparqlAnswerReader[JenaSPARQL, Syntax] =
     new BlockingSparqlAnswerReader[JenaSPARQL, Syntax] {
 
       def read(in: InputStream) = WrappedThrowable.fromTryCatch {

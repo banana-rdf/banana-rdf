@@ -9,10 +9,10 @@ import akka.util.duration._
 
 abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
   store: RDFStore[Rdf, Sparql])(
-  implicit reader: RDFReader[Rdf, RDFXML],
-  diesel: Diesel[Rdf],
-  sparqlOps: SPARQLOperations[Rdf, Sparql])
-extends WordSpec with MustMatchers with BeforeAndAfterAll {
+    implicit reader: RDFReader[Rdf, RDFXML],
+    diesel: Diesel[Rdf],
+    sparqlOps: SPARQLOperations[Rdf, Sparql])
+    extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
   import ops._
@@ -52,12 +52,9 @@ SELECT DISTINCT ?name WHERE {
 
     val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second).toIterable map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
-    names must contain ("Alexandre Bertails")
+    names must contain("Alexandre Bertails")
 
   }
-
-
-
 
   "the identity SPARQL Construct must work as expected" in {
 
@@ -77,8 +74,6 @@ CONSTRUCT {
 
   }
 
-
-
   "Alexandre Bertails must appear as an editor in new-tr.rdf" in {
 
     val query = AskQuery("""
@@ -96,10 +91,8 @@ ASK {
 
     val alexIsThere = Await.result(asyncEngine.executeAsk(query), 1.second)
 
-    alexIsThere must be (true)
+    alexIsThere must be(true)
 
   }
-
-
 
 }

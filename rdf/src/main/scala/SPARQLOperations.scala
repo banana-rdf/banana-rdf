@@ -10,7 +10,6 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
 
   def AskQuery(query: String): Sparql#AskQuery
 
-
   /**
    * A general query constructor. When this is used it is usually
    * because the query type is not known in advance, ( as when a query is received
@@ -19,15 +18,15 @@ trait SPARQLOperations[Rdf <: RDF, Sparql <: SPARQL] {
    * @param query a SPARQL query
    * @return A validation containing the Query
    */
-  def Query(query: String): Validation[Exception,Sparql#Query]
+  def Query(query: String): Validation[Exception, Sparql#Query]
 
   /**
    * A fold operation.
    * The types returned will be very disjunctive. Consider having T be a scalaz.Either3
    */
   def fold[T](query: Sparql#Query)(select: Sparql#SelectQuery => T,
-                                   construct: Sparql#ConstructQuery => T,
-                                   ask: Sparql#AskQuery => T): T
+    construct: Sparql#ConstructQuery => T,
+    ask: Sparql#AskQuery => T): T
 
   def getNode(solution: Sparql#Solution, v: String): Validation[BananaException, Rdf#Node]
 

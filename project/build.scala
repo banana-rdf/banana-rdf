@@ -2,12 +2,14 @@ import sbt._
 import sbt.Keys._
 import org.ensime.sbt.Plugin.Settings.ensimeConfig
 import org.ensime.sbt.util.SExp._
+import com.typesafe.sbtscalariform.ScalariformPlugin._
+import scalariform.formatter.preferences._
 
 object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings ++ Seq (
+  val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ Seq (
     organization := "org.w3",
     version      := "0.3-SNAPSHOT",
 //    version      := "x04-SNAPSHOT",

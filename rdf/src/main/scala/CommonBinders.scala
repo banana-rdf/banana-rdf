@@ -5,7 +5,7 @@ import scalaz.Validation._
 import org.joda.time.DateTime
 
 trait CommonBinders[Rdf <: RDF] {
-this: Diesel[Rdf] =>
+  this: Diesel[Rdf] =>
 
   import ops._
 
@@ -22,7 +22,6 @@ this: Diesel[Rdf] =>
     def toTypedLiteral(t: String): Rdf#TypedLiteral = TypedLiteral(t, xsd.string)
 
   }
-
 
   implicit val IntBinder: TypedLiteralBinder[Rdf, Int] = new TypedLiteralBinder[Rdf, Int] {
 
@@ -69,6 +68,5 @@ this: Diesel[Rdf] =>
     def toTypedLiteral(t: DateTime): Rdf#TypedLiteral = TypedLiteral(t.toString, xsd.dateTime)
 
   }
-
 
 }

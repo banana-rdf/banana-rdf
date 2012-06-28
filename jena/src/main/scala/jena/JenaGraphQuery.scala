@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph}
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 
@@ -21,7 +21,7 @@ object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
     val result = qexec.execConstruct()
     result.getGraph()
   }
-  
+
   def executeAsk(graph: JenaGraph, query: JenaSPARQL#AskQuery): Boolean = {
     val model: Model = ModelFactory.createModelForGraph(graph)
     val qexec: QueryExecution = QueryExecutionFactory.create(query, model)
@@ -31,4 +31,4 @@ object JenaGraphQuery extends RDFGraphQuery[Jena, JenaSPARQL] {
 
 }
 
-object OpenJenaGraphQuery extends OpenGraphQuery(JenaGraphQuery,JenaSPARQLOperations)
+object OpenJenaGraphQuery extends OpenGraphQuery(JenaGraphQuery, JenaSPARQLOperations)

@@ -10,19 +10,19 @@ object Diesel {
 }
 
 class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
-extends syntax.RDFOperationsSyntax[Rdf]
-with syntax.GraphSyntax[Rdf]
-with syntax.NodeSyntax[Rdf]
-with syntax.URISyntax[Rdf]
-with syntax.LiteralSyntax[Rdf]
-with syntax.TypedLiteralSyntax[Rdf]
-with syntax.LangLiteralSyntax[Rdf]
-with syntax.StringSyntax[Rdf]
-with CommonBinders[Rdf]
-with ListBinder[Rdf]
-with TupleBinder[Rdf]
-with MapBinder[Rdf]
-with EitherBinder[Rdf] {
+    extends syntax.RDFOperationsSyntax[Rdf]
+    with syntax.GraphSyntax[Rdf]
+    with syntax.NodeSyntax[Rdf]
+    with syntax.URISyntax[Rdf]
+    with syntax.LiteralSyntax[Rdf]
+    with syntax.TypedLiteralSyntax[Rdf]
+    with syntax.LangLiteralSyntax[Rdf]
+    with syntax.StringSyntax[Rdf]
+    with CommonBinders[Rdf]
+    with ListBinder[Rdf]
+    with TupleBinder[Rdf]
+    with MapBinder[Rdf]
+    with EitherBinder[Rdf] {
 
   import ops._
 
@@ -83,7 +83,7 @@ with EitherBinder[Rdf] {
 
     def takeOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
       val it = nodes.iterator
-      if (! it.hasNext) {
+      if (!it.hasNext) {
         Failure(WrongExpectation("expected exactly one node but got 0"))
       } else {
         val first = it.next
@@ -96,7 +96,7 @@ with EitherBinder[Rdf] {
 
     def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
       val it = nodes.iterator
-      if (! it.hasNext) {
+      if (!it.hasNext) {
         Failure(WrongExpectation("expected exactly one node but got 0"))
       } else {
         val first = it.next
@@ -152,7 +152,6 @@ with EitherBinder[Rdf] {
 
   }
 
-
   case class PredicatePointedGraph(p: Rdf#URI, pointed: PointedGraph[Rdf]) {
 
     def --(s: Rdf#Node): PointedGraph[Rdf] = {
@@ -198,7 +197,6 @@ with EitherBinder[Rdf] {
   implicit val PGBUri: PointedGraphBinder[Rdf, Rdf#URI] = NodeToPointedGraphBinder(UriToNodeBinder(URIBinder.naturalBinder[Rdf]))
 
   implicit val PGBLiteral: PointedGraphBinder[Rdf, Rdf#Literal] = NodeToPointedGraphBinder(LiteralToNodeBinder(LiteralBinder.naturalBinder[Rdf]))
-
 
   implicit def pointedGraph2PointedGraphW(pointed: PointedGraph[Rdf]): PointedGraphW = new PointedGraphW(pointed)
 

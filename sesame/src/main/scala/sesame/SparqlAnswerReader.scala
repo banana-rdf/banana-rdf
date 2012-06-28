@@ -1,6 +1,5 @@
 package org.w3.banana.sesame
 
-
 import java.io.InputStream
 import org.w3.banana._
 import org.openrdf.query.resultio.QueryResultIO
@@ -10,12 +9,11 @@ import org.openrdf.query.resultio.QueryResultIO
  */
 object SparqlAnswerReader {
 
-  def apply[Syntax](implicit sesameSparqlSyntax: SparqlAnswerIn[Syntax]):
-  BlockingSparqlAnswerReader[SesameSPARQL, Syntax] =
+  def apply[Syntax](implicit sesameSparqlSyntax: SparqlAnswerIn[Syntax]): BlockingSparqlAnswerReader[SesameSPARQL, Syntax] =
     new BlockingSparqlAnswerReader[SesameSPARQL, Syntax] {
 
       def read(in: InputStream) = WrappedThrowable.fromTryCatch {
-        QueryResultIO.parse(in,sesameSparqlSyntax.format)
+        QueryResultIO.parse(in, sesameSparqlSyntax.format)
       }
     }
 

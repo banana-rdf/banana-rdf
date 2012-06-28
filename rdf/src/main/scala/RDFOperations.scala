@@ -32,7 +32,7 @@ trait RDFOperations[Rdf <: RDF] {
   def makeUri(s: String): Rdf#URI
 
   def fromUri(uri: Rdf#URI): String
-  
+
   // bnode
 
   def makeBNode(): Rdf#BNode
@@ -46,11 +46,11 @@ trait RDFOperations[Rdf <: RDF] {
   def foldLiteral[T](literal: Rdf#Literal)(funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T): T
 
   // typed literal
-  
+
   def makeTypedLiteral(lexicalForm: String, datatype: Rdf#URI): Rdf#TypedLiteral
 
   def fromTypedLiteral(tl: Rdf#TypedLiteral): (String, Rdf#URI)
-  
+
   // lang literal
 
   def makeLangLiteral(lexicalForm: String, lang: Rdf#Lang): Rdf#LangLiteral
@@ -58,7 +58,7 @@ trait RDFOperations[Rdf <: RDF] {
   def fromLangLiteral(ll: Rdf#LangLiteral): (String, Rdf#Lang)
 
   // lang
-  
+
   def makeLang(s: String): Rdf#Lang
 
   def fromLang(l: Rdf#Lang): String

@@ -6,15 +6,15 @@ import org.joda.time.DateTime
 import scalaz._
 
 abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
-extends WordSpec with MustMatchers {
-  
+    extends WordSpec with MustMatchers {
+
   import diesel._
   import ops._
 
   "serializing and deserialiazing Joda DateTime" in {
     import DateTimeBinder._
     val dateTime = DateTime.now()
-    fromTypedLiteral(toTypedLiteral(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be (0)
+    fromTypedLiteral(toTypedLiteral(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be(0)
   }
 
   "serializing and deserializing a List of simple nodes" in {
@@ -49,7 +49,7 @@ extends WordSpec with MustMatchers {
     val right = Right(List(1, 2, 3))
     binder.fromPointedGraph(binder.toPointedGraph(left)) must be === (Success(left))
     binder.fromPointedGraph(binder.toPointedGraph(right)) must be === (Success(right))
-    binder.fromPointedGraph(StringPGBinder.toPointedGraph("foo")) must be ('failure)
+    binder.fromPointedGraph(StringPGBinder.toPointedGraph("foo")) must be('failure)
   }
 
 }

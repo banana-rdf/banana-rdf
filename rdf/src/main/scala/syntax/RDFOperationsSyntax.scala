@@ -22,7 +22,7 @@ trait RDFOperationsSyntax[Rdf <: RDF] {
     def apply(s: Rdf#Node, p: Rdf#URI, o: Rdf#Node): Rdf#Triple = ops.makeTriple(s, p, o)
     def unapply(triple: Rdf#Triple): Option[(Rdf#Node, Rdf#URI, Rdf#Node)] = Some(ops.fromTriple(triple))
   }
-  
+
   object Triple extends TripleCompanionObject
 
   // URI
@@ -31,7 +31,7 @@ trait RDFOperationsSyntax[Rdf <: RDF] {
     def apply(s: String): Rdf#URI = ops.makeUri(s)
     def unapply(uri: Rdf#URI): Option[String] = Some(ops.fromUri(uri))
   }
-  
+
   object URI extends URICompanionObject
 
   // alternative for building URIs
@@ -59,7 +59,7 @@ trait RDFOperationsSyntax[Rdf <: RDF] {
     def apply(lexicalForm: String, datatype: Rdf#URI): Rdf#TypedLiteral = ops.makeTypedLiteral(lexicalForm, datatype)
     def apply(lexicalForm: String): Rdf#TypedLiteral = ops.makeTypedLiteral(lexicalForm, ops.makeUri("http://www.w3.org/2001/XMLSchema#string"))
   }
-  
+
   object TypedLiteral extends TypedLiteralCompanionObject
 
   // lang literal
@@ -68,7 +68,7 @@ trait RDFOperationsSyntax[Rdf <: RDF] {
     def apply(lexicalForm: String, lang: Rdf#Lang): Rdf#LangLiteral = ops.makeLangLiteral(lexicalForm, lang)
     def unapply(ll: Rdf#LangLiteral): Option[(String, Rdf#Lang)] = Some(ops.fromLangLiteral(ll))
   }
-  
+
   object LangLiteral extends LangLiteralCompanionObject
 
   // lang
@@ -79,5 +79,5 @@ trait RDFOperationsSyntax[Rdf <: RDF] {
   }
 
   object Lang extends LangCompanionObject
-  
+
 }

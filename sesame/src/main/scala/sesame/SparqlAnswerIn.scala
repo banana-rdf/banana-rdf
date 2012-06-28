@@ -1,10 +1,9 @@
 package org.w3.banana.sesame
 
 import java.io.InputStream
-import org.w3.banana.{SparqlAnswerXML, SparqlAnswerJson}
+import org.w3.banana.{ SparqlAnswerXML, SparqlAnswerJson }
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLParserFactory
 import org.openrdf.query.resultio.TupleQueryResultFormat
-
 
 /**
  * typeclass for serialising special
@@ -13,7 +12,6 @@ import org.openrdf.query.resultio.TupleQueryResultFormat
 trait SparqlAnswerIn[T] {
   def format: TupleQueryResultFormat
 }
-
 
 object SparqlAnswerIn {
 
@@ -26,7 +24,6 @@ object SparqlAnswerIn {
     new SparqlAnswerIn[SparqlAnswerXML] {
       val format = TupleQueryResultFormat.SPARQL
     }
-
 
 }
 

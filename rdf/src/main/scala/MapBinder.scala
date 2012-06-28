@@ -4,7 +4,7 @@ import scalaz._
 import scalaz.Validation._
 
 trait MapBinder[Rdf <: RDF] {
-this: Diesel[Rdf] =>
+  this: Diesel[Rdf] =>
 
   import ops._
 

@@ -1,13 +1,12 @@
 package org.w3.banana.sesame
 
 import java.io._
-import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
-import org.openrdf.rio.rdfxml.{RDFXMLWriter => SRdfXmlWriter}
+import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
+import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 
 import scalaz.Validation
 import org.openrdf.rio.RDFWriter
 import org.w3.banana._
-
 
 object SesameWriter {
 
@@ -45,8 +44,6 @@ object SesameWriter {
 
   implicit val TurtleWriter: RDFBlockingWriter[Sesame, Turtle] = SesameWriter[Turtle]
 
-//  implicit val ReaderSelector: RDFBlockingWriter[Sesame] = RDFReaderSelector[Sesame, RDFXML] combineWith RDFReaderSelector[Sesame, Turtle]
-
-
+  //  implicit val ReaderSelector: RDFBlockingWriter[Sesame] = RDFReaderSelector[Sesame, RDFXML] combineWith RDFReaderSelector[Sesame, Turtle]
 
 }
