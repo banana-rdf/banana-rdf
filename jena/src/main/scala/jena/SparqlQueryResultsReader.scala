@@ -14,7 +14,7 @@ object SparqlQueryResultsReader {
 
   type Answer = Either[JenaSPARQL#Solutions,Boolean]
 
-  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]): BlockingReader[Answer, Syntax] =
+  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[JenaSPARQL, Syntax] =
     new SparqlQueryResultsReader[JenaSPARQL, Syntax] {
 
       def read(in: InputStream, base: String =""):Validation[BananaException,Answer] =
@@ -32,10 +32,10 @@ object SparqlQueryResultsReader {
       def read(reader: Reader, base: String) = throw new NotImplementedException
     }
 
-  implicit val forJson: BlockingReader[Answer, SparqlAnswerJson] =
+  implicit val forJson: SparqlQueryResultsReader[JenaSPARQL,SparqlAnswerJson] =
     SparqlQueryResultsReader[SparqlAnswerJson]
 
-  implicit val XML: BlockingReader[Answer, SparqlAnswerXML] =
+  implicit val XML: SparqlQueryResultsReader[JenaSPARQL,SparqlAnswerXML] =
     SparqlQueryResultsReader[SparqlAnswerXML]
 
   implicit val ReaderSelector: ReaderSelector[Answer] =

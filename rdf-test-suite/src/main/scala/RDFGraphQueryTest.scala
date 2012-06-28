@@ -7,7 +7,7 @@ import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 
 abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
   implicit diesel: Diesel[Rdf],
-  reader: RDFReader[Rdf, RDFXML],
+  reader: BlockingReader[Rdf#Graph, RDFXML],
   sparqlOperations: SPARQLOperations[Rdf, Sparql],
   graphQuery: RDFGraphQuery[Rdf, Sparql],
   sparqlWriter: SparqlSolutionsWriter[Sparql, SyntaxType],

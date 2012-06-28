@@ -8,7 +8,7 @@ import java.io.{Writer, OutputStream}
 /**
  * Creates a blocking SPARQL writer for the given syntax
  */
-object SparqlAnswerWriter {
+object SparqlSolutionsWriter {
 
   def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType],
                          syntax: Syntax[SyntaxType]) =
@@ -31,9 +31,9 @@ object SparqlAnswerWriter {
       def syntax[S >: SyntaxType] = syntax
     }
 
-  implicit val Json = SparqlAnswerWriter[SparqlAnswerJson]
+  implicit val Json = SparqlSolutionsWriter[SparqlAnswerJson]
 
-  implicit val XML =  SparqlAnswerWriter[SparqlAnswerXML]
+  implicit val XML =  SparqlSolutionsWriter[SparqlAnswerXML]
 
   implicit val WriterSelector: RDFWriterSelector[SesameSPARQL#Solutions] =
     RDFWriterSelector[SesameSPARQL#Solutions, SparqlAnswerXML] combineWith
