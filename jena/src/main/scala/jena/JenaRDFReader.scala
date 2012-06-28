@@ -16,7 +16,7 @@ object JenaRDFReader {
    *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
    * @return  an RDFREader
    */
-  def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType]): BlockingReader[Jena#Graph, SyntaxType] =
+  def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType]): RDFReader[Jena, SyntaxType] =
     new RDFReader[Jena, SyntaxType] {
 
       val serialization = jenaSyntax.value
@@ -35,9 +35,9 @@ object JenaRDFReader {
   
     }
 
-  implicit val RDFXMLReader: BlockingReader[Jena#Graph, RDFXML] = JenaRDFReader[RDFXML]
+  implicit val RDFXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader[RDFXML]
 
-  implicit val TurtleReader: BlockingReader[Jena#Graph, Turtle] = JenaRDFReader[Turtle]
+  implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]
 
   implicit val ReaderSelector: ReaderSelector[Jena#Graph] =
     ReaderSelector2[Jena#Graph, RDFXML] combineWith ReaderSelector2[Jena#Graph, Turtle]
