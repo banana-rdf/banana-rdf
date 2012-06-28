@@ -9,7 +9,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException
 /**
  * Creates a blocking SPARQL writer for the given syntax
  */
-object SparqlAnswerReader {
+object SparqlQueryResultsReader {
 
   def apply[Syntax](implicit sesameSparqlSyntax: SparqlAnswerIn[Syntax]):
   SparqlQueryResultsReader[SesameSPARQL, Syntax] =
@@ -18,15 +18,16 @@ object SparqlAnswerReader {
       def read(in: InputStream, base: String) = throw new NotImplementedException
 //        WrappedThrowable.fromTryCatch {
 //        val res = QueryResultIO.parse(in,sesameSparqlSyntax.format)
+//        res
 //      }
 
       def read(reader: Reader, base: String) = throw new NotImplementedException
     }
 
   implicit val Json: SparqlQueryResultsReader[SesameSPARQL, SparqlAnswerJson] =
-    SparqlAnswerReader[SparqlAnswerJson]
+    SparqlQueryResultsReader[SparqlAnswerJson]
 
   implicit val forXML: SparqlQueryResultsReader[SesameSPARQL, SparqlAnswerXML] =
-    SparqlAnswerReader[SparqlAnswerXML]
+    SparqlQueryResultsReader[SparqlAnswerXML]
 
 }
