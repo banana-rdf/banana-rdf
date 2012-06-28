@@ -17,7 +17,7 @@ import scalaz._
 
 class LinkedDataMemoryKB[Rdf <: RDF](
     diesel: Diesel[Rdf],
-    readerSelector: RDFReaderSelector[Rdf]) extends LinkedData[Rdf] {
+    readerSelector: ReaderSelector[Rdf#Graph]) extends LinkedData[Rdf] {
 
   import diesel._
   import ops._

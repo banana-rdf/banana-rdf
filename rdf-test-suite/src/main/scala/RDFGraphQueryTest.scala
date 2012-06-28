@@ -68,10 +68,15 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
       val serialisedAnswer = sparqlWriter.write(answers, out,"")
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
-      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
+      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray),"")
       assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
 
-      answr2.map(a => assert(testAnswer(a), "the deserialised answer must pass the same tests as the original one"))
+
+      answr2.map{a =>
+        assert(a.isLeft,"Select answers return Sparql#Solutions, not booleans ")
+        val solutions = a.left.get
+        assert(testAnswer(solutions), "the deserialised answer must pass the same tests as the original one")
+      }
     }
   }
 
@@ -132,10 +137,14 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
-//      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
-//      assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
-//
-//      answr2.map(a => assert(testAnswer(a), "the deserialised answer must pass the same tests as the original one"))
+      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray),"")
+      assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
+
+      answr2.map{a =>
+        assert(a.isRight,"The answer to a ASK is a boolean")
+        val result = a.right.get
+        assert(result," query "+query+ "must return true")
+      }
     }
   }
 

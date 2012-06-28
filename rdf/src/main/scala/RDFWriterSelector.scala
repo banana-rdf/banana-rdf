@@ -11,7 +11,7 @@ trait RDFWriterSelector[Obj] extends (MediaRange => Option[BlockingWriter[Obj, A
 }
 
 
-/** RDFReaderSelector proposes some helpers to build selectors */
+/** ReaderWriterSelector proposes some helpers to build selectors */
 object RDFWriterSelector {
 
   def apply[Obj, T](implicit syntax: Syntax[T], writer: BlockingWriter[Obj, T]): RDFWriterSelector[Obj] =

@@ -5,18 +5,15 @@ import scalaz.Validation
 import scalaz.Validation._
 
 /**
- * typeclass for an RDF Reader
+ * typeclass for an RDF BlockingReader that returns Graphs
+ * (probably should move the other methods down to BlockingReader!)
  *
  * @tparam Rdf
  * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
  *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait RDFReader[Rdf <: RDF, +SyntaxType] {
-  
-  def read(is: InputStream, base: String): Validation[BananaException, Rdf#Graph]
-  
-  def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph]
-  
+trait RDFReader[Rdf <: RDF, SyntaxType] extends BlockingReader[Rdf#Graph,SyntaxType] {
+
   def read(file: File, base: String): Validation[BananaException, Rdf#Graph] =
     for {
       fis <- WrappedThrowable.fromTryCatch { new BufferedInputStream(new FileInputStream(file)) }
@@ -36,3 +33,10 @@ trait RDFReader[Rdf <: RDF, +SyntaxType] {
   
 }
 
+
+trait BlockingReader[Result, +SyntaxType] {
+  def read(is: InputStream, base: String): Validation[BananaException, Result]
+
+  def read(reader: java.io.Reader, base: String): Validation[BananaException, Result]
+
+}

@@ -1,7 +1,7 @@
 package org.w3.banana.sesame
 
 
-import java.io.InputStream
+import java.io.{Reader, InputStream}
 import org.w3.banana._
 import org.openrdf.query.resultio.QueryResultIO
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
@@ -15,9 +15,12 @@ object SparqlAnswerReader {
   SparqlQueryResultsReader[SesameSPARQL, Syntax] =
     new SparqlQueryResultsReader[SesameSPARQL, Syntax] {
 
-      def read(in: InputStream) =  WrappedThrowable.fromTryCatch {
-        QueryResultIO.parse(in,sesameSparqlSyntax.format)
-      }
+      def read(in: InputStream, base: String) = throw new NotImplementedException
+//        WrappedThrowable.fromTryCatch {
+//        val res = QueryResultIO.parse(in,sesameSparqlSyntax.format)
+//      }
+
+      def read(reader: Reader, base: String) = throw new NotImplementedException
     }
 
   implicit val Json: SparqlQueryResultsReader[SesameSPARQL, SparqlAnswerJson] =

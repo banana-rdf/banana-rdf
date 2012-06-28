@@ -15,7 +15,7 @@ object LinkedData {
    * <li>timbl() waits for the value to be there</li>
    * </ul>
    */
-  def inMemoryImpl[Rdf <: RDF](diesel: Diesel[Rdf], readerSelector: RDFReaderSelector[Rdf]): LinkedData[Rdf] =
+  def inMemoryImpl[Rdf <: RDF](diesel: Diesel[Rdf], readerSelector: ReaderSelector[Rdf#Graph]): LinkedData[Rdf] =
     new LinkedDataMemoryKB(diesel, readerSelector)
 
 }

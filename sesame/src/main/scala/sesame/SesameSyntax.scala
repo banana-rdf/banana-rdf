@@ -8,7 +8,7 @@ import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.openrdf.rio.rdfxml.{RDFXMLWriter => SRdfXmlWriter}
 import org.openrdf.model.URI
 
-/**typeclass that reflects a Jena String that can be used to construct a Reader */
+/**typeclass that reflects a Jena String that can be used to construct a BlockingReader */
 trait SesameSyntax[T] {
   def rdfWriter(os: OutputStream, base: String): RDFWriter
   def rdfWriter(wr: Writer, base: String): RDFWriter
