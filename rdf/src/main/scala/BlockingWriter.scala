@@ -1,7 +1,6 @@
 package org.w3.banana
 
 import java.io.{Writer, OutputStream}
-import org.w3.banana.{MimeType, BananaException}
 import scalaz.Validation
 
 /**
