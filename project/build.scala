@@ -9,7 +9,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++ Seq (
     organization := "org.w3",
-    version      := "0.3-SNAPSHOT",
+    version      := "0.3hjs-SNAPSHOT",
 //    version      := "x04-SNAPSHOT",
     scalaVersion := "2.9.1",
     crossScalaVersions := Seq("2.9.1", "2.9.2"),
