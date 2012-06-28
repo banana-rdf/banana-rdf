@@ -12,7 +12,7 @@ object SparqlAnswerWriter {
 
   def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType],
                          syntax: Syntax[SyntaxType]) =
-    new BlockingSparqlAnswerWriter[SesameSPARQL, SyntaxType] {
+    new SparqlSolutionsWriter[SesameSPARQL, SyntaxType] {
 
       def write(answers: SesameSPARQL#Solutions, os: OutputStream, base: String = "") = {
         WrappedThrowable.fromTryCatch {
