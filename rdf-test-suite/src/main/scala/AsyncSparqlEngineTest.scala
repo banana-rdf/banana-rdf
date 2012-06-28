@@ -9,7 +9,7 @@ import akka.util.duration._
 
 abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
   store: RDFStore[Rdf, Sparql])(
-  implicit reader: RDFReader[Rdf, RDFXML],
+  implicit reader: BlockingReader[Rdf#Graph, RDFXML],
   diesel: Diesel[Rdf],
   sparqlOps: SPARQLOperations[Rdf, Sparql])
 extends WordSpec with MustMatchers with BeforeAndAfterAll {
