@@ -1,6 +1,6 @@
 package org.w3.banana.jena
 
-import org.w3.banana.{ Turtle, RDFXML, WrappedThrowable, RDFBlockingWriter }
+import org.w3.banana._
 import java.io.{ OutputStream, Writer }
 import com.hp.hpl.jena.rdf.model.ModelFactory
 
@@ -11,8 +11,11 @@ object JenaRDFBlockingWriter {
 
   import JenaGraphSyntax._
 
-  def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType]): RDFBlockingWriter[Jena, SyntaxType] =
+  def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType],
+    syntaxtp: Syntax[SyntaxType]): RDFBlockingWriter[Jena, SyntaxType] =
     new RDFBlockingWriter[Jena, SyntaxType] {
+
+      def syntax[S >: SyntaxType]: Syntax[S] = syntaxtp
 
       val serialization = jenaSyntax.value
 
@@ -31,5 +34,8 @@ object JenaRDFBlockingWriter {
   implicit val RDFXMLWriter: RDFBlockingWriter[Jena, RDFXML] = JenaRDFBlockingWriter[RDFXML]
 
   implicit val TurtleWriter: RDFBlockingWriter[Jena, Turtle] = JenaRDFBlockingWriter[Turtle]
+
+  implicit val WriterSelector: RDFWriterSelector[Jena#Graph] =
+    RDFWriterSelector[Jena#Graph, RDFXML] combineWith RDFWriterSelector[Jena#Graph, Turtle]
 
 }

@@ -15,7 +15,7 @@ object Main {
     import JenaOperations._
     import JenaDiesel._
 
-    val ld = LinkedData.inMemoryImpl(JenaDiesel, JenaRDFReader.ReaderSelector)
+    val ld = LinkedData.inMemoryImpl[Jena](JenaDiesel, JenaRDFReader.ReaderSelector)
     import ld._
 
     //    val namesLD = for {
