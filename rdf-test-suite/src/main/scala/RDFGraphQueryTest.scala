@@ -130,7 +130,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = BooleanWriter.WriterSelector(MediaRange("application/sparql-results+json")).map{
+      val serialisedAnswer = BooleanWriter.WriterSelector(MediaRange(sparqlWriter.syntax.mime)).map{
         l =>
         l.write(answers, out,"")
       }.getOrElse(fail("could not find sparkql boolean writer for json"))
