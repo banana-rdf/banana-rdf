@@ -22,7 +22,8 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     with ListBinder[Rdf]
     with TupleBinder[Rdf]
     with MapBinder[Rdf]
-    with EitherBinder[Rdf] {
+    with EitherBinder[Rdf]
+    with ObjectBinderDSL[Rdf] {
 
   import ops._
 
