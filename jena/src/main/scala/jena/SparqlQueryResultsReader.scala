@@ -32,10 +32,10 @@ object SparqlQueryResultsReader {
       def read(reader: Reader, base: String) = throw new NotImplementedException
     }
 
-  implicit val forJson: SparqlQueryResultsReader[JenaSPARQL,SparqlAnswerJson] =
+  implicit val JsonSparqlQueryResultsReader: SparqlQueryResultsReader[JenaSPARQL,SparqlAnswerJson] =
     SparqlQueryResultsReader[SparqlAnswerJson]
 
-  implicit val XML: SparqlQueryResultsReader[JenaSPARQL,SparqlAnswerXML] =
+  implicit val XMLSparqlQueryResultsReader: SparqlQueryResultsReader[JenaSPARQL,SparqlAnswerXML] =
     SparqlQueryResultsReader[SparqlAnswerXML]
 
   implicit val ReaderSelector: ReaderSelector[Answer] =
