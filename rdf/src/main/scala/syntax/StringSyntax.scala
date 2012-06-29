@@ -3,7 +3,7 @@ package org.w3.banana.syntax
 import org.w3.banana._
 
 trait StringSyntax[Rdf <: RDF] {
-this: RDFOperationsSyntax[Rdf] =>
+  this: RDFOperationsSyntax[Rdf] =>
 
   implicit def stringWrapper(s: String): StringW = new StringW(s)
 

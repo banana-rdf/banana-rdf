@@ -62,8 +62,9 @@ class JenaStore(dataset: Dataset) extends RDFStore[Jena, JenaSPARQL] {
   }
 
   def appendToNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
-    graph.toIterable foreach { case Triple(s, p, o) =>
-      dg.add(uri, s, p, o)
+    graph.toIterable foreach {
+      case Triple(s, p, o) =>
+        dg.add(uri, s, p, o)
     }
   }
 

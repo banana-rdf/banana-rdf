@@ -10,7 +10,7 @@ import scalaz.Scalaz._
 import scalaz.Validation._
 
 abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
-extends WordSpec with MustMatchers {
+    extends WordSpec with MustMatchers {
 
   import org.scalatest.matchers.{ BeMatcher, MatchResult }
   import diesel._
@@ -19,8 +19,8 @@ extends WordSpec with MustMatchers {
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess")
-        -- foaf.name ->- "Alexandre".lang("fr")
-        -- foaf.title ->- "Mr"
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.title ->- "Mr"
     )
 
     val expectedGraph =
@@ -29,23 +29,19 @@ extends WordSpec with MustMatchers {
         Triple(bnode("betehess"), foaf.title, TypedLiteral("Mr")))
 
     assert(g.graph isIsomorphicWith expectedGraph)
-    
 
   }
-
-
-
 
   "Diesel must construct a simple GraphNode" in {
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess")
-        -- foaf.name ->- "Alexandre".lang("fr")
-        -- foaf.knows ->- (
-          uri("http://bblfish.net/#hjs")
-            -- foaf.name ->- "Henry Story"
-            -- foaf.currentProject ->- uri("http://webid.info/")
-        )
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.knows ->- (
+        uri("http://bblfish.net/#hjs")
+        -- foaf.name ->- "Henry Story"
+        -- foaf.currentProject ->- uri("http://webid.info/")
+      )
     )
 
     val expectedGraph =
@@ -58,16 +54,14 @@ extends WordSpec with MustMatchers {
     assert(g.graph isIsomorphicWith expectedGraph)
   }
 
-
-
   "Diesel must accept triples written in the inverse order o-p-s using <--" in {
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess")
-        -- foaf.name ->- "Alexandre".lang("fr")
-        -<- foaf.knows -- (
-          uri("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story"
-        )
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -<- foaf.knows -- (
+        uri("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story"
+      )
     )
 
     val expectedGraph =
@@ -79,12 +73,11 @@ extends WordSpec with MustMatchers {
     assert(g.graph isIsomorphicWith expectedGraph)
   }
 
-
   "Diesel must allow easy use of rdf:type through the method 'a'" in {
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess").a(foaf.Person)
-        -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.name ->- "Alexandre".lang("fr")
     )
 
     val expectedGraph =
@@ -94,8 +87,6 @@ extends WordSpec with MustMatchers {
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
-
-
 
   "Diesel must allow objectList definition" in {
 
@@ -110,14 +101,13 @@ extends WordSpec with MustMatchers {
     assert(g.graph isIsomorphicWith expectedGraph)
   }
 
-
   "Diesel must understand Scala's native types" in {
 
     val g = (
       bnode("betehess")
-        -- foaf.name ->- "Alexandre"
-        -- foaf.age ->- 29
-        -- foaf.height ->- 1.80
+      -- foaf.name ->- "Alexandre"
+      -- foaf.age ->- 29
+      -- foaf.height ->- 1.80
     ).graph
 
     val expectedGraph =
@@ -133,22 +123,21 @@ extends WordSpec with MustMatchers {
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess")
-        -- foaf.name ->- List(1, 2, 3)
+      -- foaf.name ->- List(1, 2, 3)
     )
-
 
     val l: PointedGraph[Rdf] = (
       bnode()
-        -- rdf.first ->- 1
+      -- rdf.first ->- 1
+      -- rdf.rest ->- (
+        bnode()
+        -- rdf.first ->- 2
         -- rdf.rest ->- (
           bnode()
-            -- rdf.first ->- 2
-            -- rdf.rest ->- (
-              bnode()
-                -- rdf.first ->- 3
-                -- rdf.rest ->- rdf.nil
-            )
+          -- rdf.first ->- 3
+          -- rdf.rest ->- rdf.nil
         )
+      )
     )
 
     val expectedGraph = (
@@ -156,9 +145,6 @@ extends WordSpec with MustMatchers {
     )
     assert(g.graph isIsomorphicWith expectedGraph.graph)
   }
-
-
-
 
   "Diesel must support RDF collections (empty list)" in {
 
@@ -173,13 +159,12 @@ extends WordSpec with MustMatchers {
     assert(g.graph isIsomorphicWith expectedGraph.graph)
   }
 
-
   "providing a None as an object does not emit a triple" in {
 
     val g = (
       bnode("betehess")
-        -- foaf.name ->- "Alexandre"
-        -- foaf.age ->- none[Int]
+      -- foaf.name ->- "Alexandre"
+      -- foaf.age ->- none[Int]
     ).graph
 
     val expectedGraph = (
@@ -190,26 +175,22 @@ extends WordSpec with MustMatchers {
 
   }
 
-
-
   "providing a Some(t) as an object just emits the triple with t as an object" in {
 
     val g = (
       bnode("betehess")
-        -- foaf.name ->- "Alexandre"
-        -- foaf.age ->- some(42)
+      -- foaf.name ->- "Alexandre"
+      -- foaf.age ->- some(42)
     ).graph
 
     val expectedGraph = (
       bnode("betehess")
-        -- foaf.name ->- "Alexandre"
-        -- foaf.age ->- 42
+      -- foaf.name ->- "Alexandre"
+      -- foaf.age ->- 42
     ).graph
 
     assert(g isIsomorphicWith expectedGraph)
 
   }
-
-
 
 }

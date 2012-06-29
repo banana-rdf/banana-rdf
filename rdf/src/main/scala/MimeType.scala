@@ -24,36 +24,36 @@ object MimeType {
  * @param mime the string should be in "tpe/subtype" format, but this is not checked
  */
 case class MimeType(mime: String) {
-  lazy val Array(tpe,subType) = {
+  lazy val Array(tpe, subType) = {
     val res = mime.split("/")
-    if (res.size!=2) Array("broken","mime")
+    if (res.size != 2) Array("broken", "mime")
     else res
   }
 }
 
 object MediaRange {
   def apply(range: String) = {
-    if ( range == "*/*") AnyMedia
+    if (range == "*/*") AnyMedia
     else {
-      val res =  range.split("/")
+      val res = range.split("/")
       if (res.size != 2) NoMedia
-      else if ("*"==res(0)) AnyMedia
+      else if ("*" == res(0)) AnyMedia
       else {
-         new MediaRange(res(0),res(1))
+        new MediaRange(res(0), res(1))
       }
     }
   }
 }
 
-object AnyMedia extends MediaRange("*","*") {
+object AnyMedia extends MediaRange("*", "*") {
   override def matches(mime: MimeType) = true
 }
 
-object NoMedia extends MediaRange("-","-") {
+object NoMedia extends MediaRange("-", "-") {
   override def matches(mime: MimeType) = false
 }
 
 class MediaRange protected (val range: String, val subRange: String) {
   def matches(mime: MimeType) =
-    ( range == mime.tpe ) && ( (subRange == "*") || (subRange == mime.subType) )
+    (range == mime.tpe) && ((subRange == "*") || (subRange == mime.subType))
 }

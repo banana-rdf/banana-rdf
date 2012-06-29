@@ -15,7 +15,7 @@ trait TripleSyntax[Rdf <: RDF] {
   class TripleW(triple: Rdf#Triple) {
 
     val (subject, predicate, objectt) = ops.fromTriple(triple)
-    
+
   }
 
 }

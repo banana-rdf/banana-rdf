@@ -12,11 +12,11 @@ trait ReaderSelector[Answer] extends (MimeType => Option[BlockingReader[Answer, 
 /**
  * ReaderSelector2 proposes some helpers to build selectors
  * ( The '2' is there because I had difficulties compiling witohut )
- * */
+ */
 object ReaderSelector2 {
 
   def apply[Result, SyntaxType](implicit syntax: Syntax[SyntaxType],
-                                         reader: BlockingReader[Result, SyntaxType]): ReaderSelector[Result] =
+    reader: BlockingReader[Result, SyntaxType]): ReaderSelector[Result] =
     new ReaderSelector[Result] {
       def apply(mime: MimeType): Option[BlockingReader[Result, Any]] =
         if (syntax.mimeTypes.list contains mime)

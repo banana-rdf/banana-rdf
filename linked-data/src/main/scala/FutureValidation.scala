@@ -46,7 +46,7 @@ class FutureValidation[+F, +S] private (private val futureValidation: Future[Val
     new FutureValidation(futureResult)
   }
 
-  def map[T](f: S => T): FutureValidation[F, T] = 
+  def map[T](f: S => T): FutureValidation[F, T] =
     new FutureValidation(futureValidation map { _ map f })
 
   def foreach(f: S => Unit): Unit =
@@ -61,7 +61,7 @@ class FutureValidation[+F, +S] private (private val futureValidation: Future[Val
 
   def toFuture[T](
     implicit evF: F <:< T,
-    evS: S <:< T): Future[T] = futureValidation.map{ _.fold(evF, evS) }
+    evS: S <:< T): Future[T] = futureValidation.map { _.fold(evF, evS) }
 
 }
 

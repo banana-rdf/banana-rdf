@@ -1,15 +1,15 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import com.hp.hpl.jena.sparql.resultset.{JSONOutput, XMLOutput, OutputFormatter}
+import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, XMLOutput, OutputFormatter }
 
 /**
  * class that keeps track of the names Jena uses for its serialisers
- * typeclass  used to construct a BlockingReader */
+ * typeclass  used to construct a BlockingReader
+ */
 trait JenaGraphSyntax[T] {
   val value: String
 }
-
 
 object JenaGraphSyntax {
 

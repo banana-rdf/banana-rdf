@@ -11,14 +11,12 @@ import scalaz.Validation._
  * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
  *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait RDFReader[Rdf <: RDF, +SyntaxType] extends BlockingReader[Rdf#Graph,SyntaxType]
-
+trait RDFReader[Rdf <: RDF, +SyntaxType] extends BlockingReader[Rdf#Graph, SyntaxType]
 
 trait BlockingReader[Result, +SyntaxType] {
   def read(is: InputStream, base: String): Validation[BananaException, Result]
 
   def read(reader: java.io.Reader, base: String): Validation[BananaException, Result]
-
 
   def read(file: File, base: String): Validation[BananaException, Result] =
     for {

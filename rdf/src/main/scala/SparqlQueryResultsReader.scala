@@ -17,4 +17,4 @@ import scalaz.Validation
  *                     for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
 trait SparqlQueryResultsReader[Sparql <: SPARQL, +SyntaxType]
-  extends BlockingReader[Either[Sparql#Solutions,Boolean],SyntaxType]
+  extends BlockingReader[Either[Sparql#Solutions, Boolean], SyntaxType]

@@ -20,12 +20,12 @@ object NodeBinder {
 
   def naturalBinder[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): NodeBinder[Rdf, Rdf#Node] =
     new NodeBinder[Rdf, Rdf#Node] {
-      
+
       def fromNode(node: Rdf#Node): Validation[BananaException, Rdf#Node] =
         Success(node)
 
       def toNode(t: Rdf#Node): Rdf#Node = t
-      
+
     }
 
 }

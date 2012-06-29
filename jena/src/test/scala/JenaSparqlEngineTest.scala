@@ -6,4 +6,3 @@ import Jena._
 
 class JenaSparqlEngineTest() extends SparqlEngineTest(JenaStore(DatasetGraphFactory.createMem()))
 
-  

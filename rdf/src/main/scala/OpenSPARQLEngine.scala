@@ -4,12 +4,12 @@ import scalaz.{ Left3, Right3, Middle3, Either3 }
 
 object OpenSPARQLEngine {
 
-  def apply[Rdf <: RDF, Sparql <: SPARQL](implicit ops: SPARQLOperations[Rdf,Sparql], sparqlEngine: SPARQLEngine[Rdf,Sparql]): OpenSPARQLEngine[Rdf, Sparql] =
+  def apply[Rdf <: RDF, Sparql <: SPARQL](implicit ops: SPARQLOperations[Rdf, Sparql], sparqlEngine: SPARQLEngine[Rdf, Sparql]): OpenSPARQLEngine[Rdf, Sparql] =
     new OpenSPARQLEngine[Rdf, Sparql](sparqlEngine)(ops)
 
 }
 
-class OpenSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL](sparqlEngine: SPARQLEngine[Rdf,Sparql])(implicit ops: SPARQLOperations[Rdf,Sparql]) {
+class OpenSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL](sparqlEngine: SPARQLEngine[Rdf, Sparql])(implicit ops: SPARQLOperations[Rdf, Sparql]) {
 
   import sparqlEngine._
 
@@ -20,7 +20,7 @@ class OpenSPARQLEngine[Rdf <: RDF, Sparql <: SPARQL](sparqlEngine: SPARQLEngine[
    *         an Rdf#Graph if the query was a Construct query
    *         a boolean if the query was an ASK query
    */
-   def executeQuery(query: Sparql#Query) = ops.fold(query)(
+  def executeQuery(query: Sparql#Query) = ops.fold(query)(
     select => Left3(executeSelect(select)),
     construct => Middle3(executeConstruct(construct)),
     ask => Right3(executeAsk(ask))

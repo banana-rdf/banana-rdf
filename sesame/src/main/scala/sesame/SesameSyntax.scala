@@ -1,11 +1,10 @@
 package org.w3.banana.sesame
 
-
 import org.w3.banana._
 import org.openrdf.rio.RDFWriter
-import java.io.{Writer, OutputStream}
-import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
-import org.openrdf.rio.rdfxml.{RDFXMLWriter => SRdfXmlWriter}
+import java.io.{ Writer, OutputStream }
+import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
+import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 import org.openrdf.model.URI
 
 /**typeclass that reflects a Jena String that can be used to construct a BlockingReader */

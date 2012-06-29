@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import java.io.{Writer, OutputStream}
+import java.io.{ Writer, OutputStream }
 import scalaz.Validation
 
 /**

@@ -9,7 +9,6 @@ trait Prefix[Rdf <: RDF] {
   def unapply(iri: Rdf#URI): Option[String]
 }
 
-
 object Prefix {
   def apply[Rdf <: RDF](prefixName: String, prefixIri: String, ops: RDFOperations[Rdf]) =
     new PrefixBuilder(prefixName, prefixIri, ops)
@@ -39,8 +38,6 @@ class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String, o
 
 }
 
-
-
 object RDFPrefix {
   def apply[Rdf <: RDF](ops: RDFOperations[Rdf]) = new RDFPrefix(ops)
 }
@@ -52,9 +49,6 @@ class RDFPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("rdf"
   val rest = apply("rest")
   val nil = apply("nil")
 }
-
-
-
 
 object XSDPrefix {
   def apply[Rdf <: RDF](ops: RDFOperations[Rdf]) = new XSDPrefix(ops)
@@ -74,7 +68,6 @@ class XSDPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("xsd"
   val dateTime = apply("dateTime")
 }
 
-
 object DCPrefix {
   def apply[Rdf <: RDF](ops: RDFOperations[Rdf]) = new DCPrefix(ops)
 }
@@ -82,9 +75,6 @@ object DCPrefix {
 class DCPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/elements/1.1/", ops) {
 
 }
-
-
-
 
 object FOAFPrefix {
   def apply[Rdf <: RDF](ops: RDFOperations[Rdf]) = new FOAFPrefix(ops)

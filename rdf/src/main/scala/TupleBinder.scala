@@ -4,7 +4,7 @@ import scalaz._
 import scalaz.Validation._
 
 trait TupleBinder[Rdf <: RDF] {
-this: Diesel[Rdf] =>
+  this: Diesel[Rdf] =>
 
   import ops._
 
@@ -18,12 +18,11 @@ this: Diesel[Rdf] =>
 
     def toPointedGraph(t: (T1, T2)): PointedGraph[Rdf] = (
       bnode().a(rdf("Tuple2"))
-        -- rdf("_1") ->- t._1
-        -- rdf("_2") ->- t._2
+      -- rdf("_1") ->- t._1
+      -- rdf("_2") ->- t._2
     )
 
   }
-
 
   implicit def Tuple3Binder[T1, T2, T3](
     implicit b1: PointedGraphBinder[Rdf, T1],
@@ -39,12 +38,11 @@ this: Diesel[Rdf] =>
 
     def toPointedGraph(t: (T1, T2, T3)): PointedGraph[Rdf] = (
       bnode().a(rdf("Tuple3"))
-        -- rdf("_1") ->- t._1
-        -- rdf("_2") ->- t._2
-        -- rdf("_3") ->- t._3
+      -- rdf("_1") ->- t._1
+      -- rdf("_2") ->- t._2
+      -- rdf("_3") ->- t._3
     )
 
   }
-
 
 }

@@ -12,7 +12,7 @@ class JenaGraphStoreTest() extends GraphStoreTest[Jena](JenaStore(DatasetGraphFa
   "adding a named graph should not pollute the default graph" in {
     store.addNamedGraph(makeUri("http://example.com/foo"), graph)
     val defaultGraph = store.getNamedGraph(null.asInstanceOf[Jena#URI])
-    defaultGraph must have size(0)
+    defaultGraph must have size (0)
   }
 
 }

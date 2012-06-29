@@ -25,9 +25,9 @@ trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
 }
 
 object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
-  
+
   import SesameOperations._
-  
+
   def read(is: InputStream, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
     val triples = new java.util.LinkedList[Statement]
@@ -36,7 +36,7 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
     turtleParser.parse(is, base)
     new GraphImpl(triples)
   }
-  
+
   def read(reader: Reader, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
     val triples = new java.util.LinkedList[Statement]
@@ -45,15 +45,13 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
     turtleParser.parse(reader, base)
     new GraphImpl(triples)
   }
-  
+
 }
 
-
-
 object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
-  
+
   import SesameOperations._
-  
+
   def read(is: InputStream, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
     val triples = new java.util.LinkedList[Statement]
@@ -62,7 +60,7 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
     parser.parse(is, base)
     new GraphImpl(triples)
   }
-  
+
   def read(reader: Reader, base: String): Validation[BananaException, Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
     val triples = new java.util.LinkedList[Statement]
@@ -71,5 +69,5 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
     parser.parse(reader, base)
     new GraphImpl(triples)
   }
-  
+
 }

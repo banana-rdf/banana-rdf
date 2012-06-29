@@ -11,7 +11,6 @@ trait SparqlAnswerJson
 trait SparqlAnswerXML
 import scalaz.NonEmptyList
 
-
 /**
  * typeclass for a Syntax
  * It must say the mime-types that are associated to it

@@ -5,27 +5,27 @@ import org.scalatest.matchers._
 
 abstract class GraphStoreTest[Rdf <: RDF](
   val store: GraphStore[Rdf])(
-  implicit diesel: Diesel[Rdf],
-  reader: RDFReader[Rdf, RDFXML])
-extends WordSpec with MustMatchers {
+    implicit diesel: Diesel[Rdf],
+    reader: RDFReader[Rdf, RDFXML])
+    extends WordSpec with MustMatchers {
 
   import diesel._
   import ops._
 
   val graph: Rdf#Graph = (
     bnode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -- foaf.title ->- "Mr"
+    -- foaf.name ->- "Alexandre".lang("fr")
+    -- foaf.title ->- "Mr"
   ).graph
 
   val graph2: Rdf#Graph = (
     bnode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -- foaf.knows ->- (
-        uri("http://bblfish.net/#hjs")
-          -- foaf.name ->- "Henry Story"
-          -- foaf.currentProject ->- uri("http://webid.info/")
-      )
+    -- foaf.name ->- "Alexandre".lang("fr")
+    -- foaf.knows ->- (
+      uri("http://bblfish.net/#hjs")
+      -- foaf.name ->- "Henry Story"
+      -- foaf.currentProject ->- uri("http://webid.info/")
+    )
   ).graph
 
   "getNamedGraph should retrieve the graph added with addNamedGraph" in {
@@ -44,6 +44,5 @@ extends WordSpec with MustMatchers {
     val unionGraph = union(graph, graph2)
     assert(unionGraph isIsomorphicWith retrievedGraph)
   }
-
 
 }

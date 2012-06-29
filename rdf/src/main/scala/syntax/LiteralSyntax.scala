@@ -3,7 +3,7 @@ package org.w3.banana.syntax
 import org.w3.banana._
 
 trait LiteralSyntax[Rdf <: RDF] {
-this: RDFOperationsSyntax[Rdf] =>
+  this: RDFOperationsSyntax[Rdf] =>
 
   implicit def literalWrapper(literal: Rdf#Literal): LiteralW = new LiteralW(literal)
 
@@ -17,7 +17,7 @@ this: RDFOperationsSyntax[Rdf] =>
         tl => ops.fromTypedLiteral(tl)._1,
         ll => ops.fromLangLiteral(ll)._1
       )
-    
+
   }
 
 }

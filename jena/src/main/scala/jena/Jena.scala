@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 
 trait Jena extends RDF {
@@ -15,7 +15,6 @@ trait Jena extends RDF {
   type LangLiteral = Node_Literal
   type Lang = String
 }
-
 
 object Jena {
 

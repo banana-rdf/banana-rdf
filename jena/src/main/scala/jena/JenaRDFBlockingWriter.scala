@@ -1,9 +1,8 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import java.io.{OutputStream, Writer}
+import java.io.{ OutputStream, Writer }
 import com.hp.hpl.jena.rdf.model.ModelFactory
-
 
 /**
  * Create an Blocking RDF Writer using Jena's serialisers
@@ -13,7 +12,7 @@ object JenaRDFBlockingWriter {
   import JenaGraphSyntax._
 
   def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType],
-                         syntaxtp: Syntax[SyntaxType]): RDFBlockingWriter[Jena, SyntaxType] =
+    syntaxtp: Syntax[SyntaxType]): RDFBlockingWriter[Jena, SyntaxType] =
     new RDFBlockingWriter[Jena, SyntaxType] {
 
       def syntax[S >: SyntaxType]: Syntax[S] = syntaxtp

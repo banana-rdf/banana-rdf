@@ -5,7 +5,7 @@
 
 package org.w3.banana.n3.nomo
 
-import org.w3.banana.n3.{TurtleParser, Listener}
+import org.w3.banana.n3.{ TurtleParser, Listener }
 import org.w3.banana._
 import java.io._
 import nomo.Accumulator
@@ -22,13 +22,13 @@ import scalaz.Validation._
  */
 
 class TurtleReader[Rdf <: RDF, F, X](val parser: TurtleParser[Rdf, F, X, Listener[Rdf]])
-extends RDFReader[Rdf, Turtle] {
+    extends RDFReader[Rdf, Turtle] {
 
   // I don't know why, but this trick makes the presentation compiler happier
   type RdfGraph = Rdf#Graph
 
   import parser.diesel.ops
-  
+
   /**
    *
    * @param is an input stream containing the data. There is no input stream detection mechanism,
@@ -48,17 +48,17 @@ extends RDFReader[Rdf, Turtle] {
    */
   def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph] = WrappedThrowable.fromTryCatch {
     val buf = new Array[Char](4096)
-    val abase = if (null != base  && "" !=base ) Some(new URI(base)) else None
+    val abase = if (null != base && "" != base) Some(new URI(base)) else None
     import parser.P._
     var state: Pair[Parser[Unit], Accumulator[Char, X, Listener[Rdf]]] =
       (parser.turtleDoc, parser.P.annotator(new Listener(ops, abase)))
-    Iterator continually reader.read(buf) takeWhile (-1 !=) foreach  { read =>
-      state = state._1.feedChunked(buf.slice(0,read), state._2, read)
+    Iterator continually reader.read(buf) takeWhile (-1 !=) foreach { read =>
+      state = state._1.feedChunked(buf.slice(0, read), state._2, read)
     }
     val result = state._1.result(state._2)
     if (result.isSuccess) {
       ops.makeGraph(result.user.queue.toIterable)
-    } else throw new Throwable(result.toString())  //todo, clearly this is not what we want
+    } else throw new Throwable(result.toString()) //todo, clearly this is not what we want
   }
 
 }

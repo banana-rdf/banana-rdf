@@ -4,18 +4,18 @@ import scalaz._
 import scalaz.Validation._
 
 trait ListBinder[Rdf <: RDF] {
-this: Diesel[Rdf] =>
+  this: Diesel[Rdf] =>
 
   import ops._
 
   implicit def ListBinder[T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
     def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, List[T]] = {
-      import pointed.{ node , graph }
+      import pointed.{ node, graph }
       var elems = List[T]()
       var current = node
       try {
-        while(current != rdf.nil) {
+        while (current != rdf.nil) {
           (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
             case (List(first), List(rest)) => {
               val firstPointed = PointedGraph(first, pointed.graph)

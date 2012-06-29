@@ -6,8 +6,8 @@ package org.w3.banana.n3
 
 import collection.mutable
 import org.w3.banana._
-import java.net.{URISyntaxException, URI => jURI}
-import org.apache.abdera.i18n.iri.{IRISyntaxException, IRI => aURI}
+import java.net.{ URISyntaxException, URI => jURI }
+import org.apache.abdera.i18n.iri.{ IRISyntaxException, IRI => aURI }
 
 //perhaps we should use this as our URI?
 
@@ -22,7 +22,7 @@ import org.apache.abdera.i18n.iri.{IRISyntaxException, IRI => aURI}
  * For the moment there is a bit of security, and the code will throw exceptions at runtime
  * if something is done wrong. It should not be able to do it though.
  */
-case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None) {
+case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI] = None) {
 
   import ops._
 
@@ -31,9 +31,8 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
   //we imagine that we are sending these elements to an agent.
   // todo: replace with more appropriate structure
   val queue: mutable.Queue[Rdf#Triple] = new mutable.Queue[Rdf#Triple]()
-  def sendTriple(subj: Rdf#Node, rel: Rdf#URI, obj: Rdf#Node) = queue.enqueue(makeTriple(subj,rel,obj))
+  def sendTriple(subj: Rdf#Node, rel: Rdf#URI, obj: Rdf#Node) = queue.enqueue(makeTriple(subj, rel, obj))
   def sendTriple(t: Rdf#Triple) = queue.enqueue(t)
-
 
   trait Mem {
     /**
@@ -60,8 +59,8 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
    */
   class PairMem(val subj: Rdf#Node) extends Mem {
     //rel is the relation to keep track of, or for lists the first element of the list
-    var rel : Rdf#URI = _
-    def send(obj: Rdf#Node) { sendTriple(subj,rel,obj) }
+    var rel: Rdf#URI = _
+    def send(obj: Rdf#Node) { sendTriple(subj, rel, obj) }
 
     def end {}
   }
@@ -78,37 +77,38 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
     //    a rel () .
     // which is equivalent to
     //    a rel rdf:nil .
-   private var first: Rdf#Node = rdf.nil
+    private var first: Rdf#Node = rdf.nil
 
-   /** the subject of the whole list. Is only known when the list is shown to be either empty or
-    * when the first element has been found */
-   def subj = rdf.first
+    /**
+     * the subject of the whole list. Is only known when the list is shown to be either empty or
+     * when the first element has been found
+     */
+    def subj = rdf.first
 
     /**
      * The previous subject so that one can construct
      *     previousSubject rdf:next newSubject .
      */
-   private var previousSubject: Rdf#Node = rdf.first
+    private var previousSubject: Rdf#Node = rdf.first
 
-   //subject of individual triples constructed in the list
-   private def newSubject(): Rdf#Node = {
+    //subject of individual triples constructed in the list
+    private def newSubject(): Rdf#Node = {
       val subj: Rdf#Node = makeBNode()
       if (first == rdf.nil) first = subj
       previousSubject = subj
-     subj
+      subj
     }
 
-   def send(obj: Rdf#Node) {
-     val previous = previousSubject
-     val subj = newSubject()
-     if (previous != rdf.nil) sendTriple(previous,rdf.rest,subj) //else this is the first element of the list
-     sendTriple(subj,rdf.first,obj)
-   }
+    def send(obj: Rdf#Node) {
+      val previous = previousSubject
+      val subj = newSubject()
+      if (previous != rdf.nil) sendTriple(previous, rdf.rest, subj) //else this is the first element of the list
+      sendTriple(subj, rdf.first, obj)
+    }
 
     def end {
-      if (first!=rdf.nil) sendTriple(previousSubject,rdf.rest,rdf.nil)
+      if (first != rdf.nil) sendTriple(previousSubject, rdf.rest, rdf.nil)
     }
-
 
   }
 
@@ -148,13 +148,12 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
     context.push(new ListMem())
   }
 
-
   /**
    * @param rel the relation
    */
   def setVerb(rel: Rdf#URI) {
     val pm = context.head.asInstanceOf[PairMem]
-    pm.rel=rel
+    pm.rel = rel
   }
 
   def setObject(obj: Rdf#Node) {
@@ -169,10 +168,10 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
   def prefixes = prefixs.toMap
 
   def resolve(pname: PName): Option[Rdf#URI] = {
-    prefixs.get(pname.prefix).map{ pre => makeUri(fromUri(pre) + pname.name)}
+    prefixs.get(pname.prefix).map { pre => makeUri(fromUri(pre) + pname.name) }
   }
 
-  var currentBase = base.map(u=>new aURI(u))
+  var currentBase = base.map(u => new aURI(u))
   @throws(classOf[IRISyntaxException])
   def alterBase(newbase: Rdf#URI) {
     currentBase = Some(new aURI(fromUri(newbase)))
@@ -184,13 +183,12 @@ case class Listener[Rdf <: RDF](ops: RDFOperations[Rdf], base: Option[jURI]=None
 
   @throws(classOf[IRISyntaxException])
   def resolve(iriStr: String): Rdf#URI = {
-     val iri = currentBase.map{ b=>
-       if ("#" == iriStr) new aURI(b.toString+"#")
-       else b.resolve(iriStr)
-     }.getOrElse(new aURI(iriStr))
-     makeUri(iri.toString)
+    val iri = currentBase.map { b =>
+      if ("#" == iriStr) new aURI(b.toString + "#")
+      else b.resolve(iriStr)
+    }.getOrElse(new aURI(iriStr))
+    makeUri(iri.toString)
   }
-
 
 }
 

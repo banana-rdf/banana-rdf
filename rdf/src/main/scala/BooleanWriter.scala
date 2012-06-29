@@ -1,13 +1,11 @@
 package org.w3.banana
 
-import java.io.{OutputStream, Writer}
+import java.io.{ OutputStream, Writer }
 import jena.RDFWriterSelector
-
 
 trait BooleanWriter[+SyntaxType] extends BlockingWriter[Boolean, SyntaxType]
 
 object BooleanWriter {
-
 
   /**
    * <a href="http://www.w3.org/TR/sparql11-results-json/">SPARQL 1.1 Query Results JSON Format</a>
@@ -36,7 +34,6 @@ object BooleanWriter {
 
     def syntax[S >: SparqlAnswerXML] = Syntax.SparqlAnswerXML
   }
-
 
   implicit val WriterSelector: RDFWriterSelector[Boolean] =
     RDFWriterSelector[Boolean, SparqlAnswerXML] combineWith

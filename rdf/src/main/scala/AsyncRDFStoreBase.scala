@@ -7,10 +7,10 @@ import akka.routing._
 import akka.util.Timeout
 
 class AsyncRDFStoreBase[Rdf <: RDF, Sparql <: SPARQL](
-    store: RDFStore[Rdf, Sparql],
-    factory: ActorRefFactory)(
+  store: RDFStore[Rdf, Sparql],
+  factory: ActorRefFactory)(
     implicit timeout: Timeout)
-extends AsyncRDFStore[Rdf, Sparql] {
+    extends AsyncRDFStore[Rdf, Sparql] {
 
   case class AddNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)
   case class AppendToNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)

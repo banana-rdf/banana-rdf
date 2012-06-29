@@ -18,19 +18,16 @@ object Main {
     val ld = LinkedData.inMemoryImpl[Jena](JenaDiesel, JenaRDFReader.ReaderSelector)
     import ld._
 
-//    val namesLD = for {
-//      barack ← goto(URI("http://dbpedia.org/resource/Barack_Obama"))
-//      family ← barack.follow(URI("http://dbpedia.org/ontology/child"))
-//      members ← family.follow(URI("http://dbpedia.org/property/members"))
-//      names ← members.follow(URI("http://dbpedia.org/property/name")).asStrings
-//    } yield names
-//
-//    val names = namesLD.timbl()
-//
-//    println(names)
-
-
-
+    //    val namesLD = for {
+    //      barack ← goto(URI("http://dbpedia.org/resource/Barack_Obama"))
+    //      family ← barack.follow(URI("http://dbpedia.org/ontology/child"))
+    //      members ← family.follow(URI("http://dbpedia.org/property/members"))
+    //      names ← members.follow(URI("http://dbpedia.org/property/name")).asStrings
+    //    } yield names
+    //
+    //    val names = namesLD.timbl()
+    //
+    //    println(names)
 
     val cert = Prefix("cert", "http://www.w3.org/ns/auth/cert#", JenaOperations)
     val foaf = Prefix("foaf", "http://xmlns.com/foaf/0.1/", JenaOperations)
@@ -58,7 +55,6 @@ object Main {
     }
 
     foo.timbl()
-
 
     ld.shutdown()
 

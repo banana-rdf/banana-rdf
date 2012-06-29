@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import java.io.{Writer, OutputStream}
+import java.io.{ Writer, OutputStream }
 import scalaz.Validation
 
 /**
@@ -10,5 +10,5 @@ import scalaz.Validation
  * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
  *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait SparqlSolutionsWriter[Sparql <: SPARQL, +SyntaxType] extends BlockingWriter[Sparql#Solutions,SyntaxType]
+trait SparqlSolutionsWriter[Sparql <: SPARQL, +SyntaxType] extends BlockingWriter[Sparql#Solutions, SyntaxType]
 

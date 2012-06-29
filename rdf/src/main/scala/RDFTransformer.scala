@@ -9,7 +9,7 @@ class RDFTransformer[A <: RDF, B <: RDF](
 
   def transform(graph: A#Graph): B#Graph =
     b.makeGraph(a.graphToIterable(graph) map transformTriple)
-    
+
   def transformTriple(triple: A#Triple): B#Triple = {
     val (s, p, o) = a.fromTriple(triple)
     val pString = a.fromUri(p)
@@ -18,14 +18,14 @@ class RDFTransformer[A <: RDF, B <: RDF](
       b.makeUri(pString),
       transformNode(o))
   }
-  
-  def transformNode(node: A#Node): B#Node = a.foldNode(node) (
+
+  def transformNode(node: A#Node): B#Node = a.foldNode(node)(
     uri => b.makeUri(a.fromUri(uri)),
     bnode => b.makeBNodeLabel(a.fromBNode(bnode)),
     literal => transformLiteral(literal)
   )
-  
-  def transformLiteral(literal: A#Literal): B#Literal = a.foldLiteral(literal) (
+
+  def transformLiteral(literal: A#Literal): B#Literal = a.foldLiteral(literal)(
     tl => {
       val (lexicalForm, datatypeUri) = a.fromTypedLiteral(tl)
       val datatype = a.fromUri(datatypeUri)
@@ -37,5 +37,5 @@ class RDFTransformer[A <: RDF, B <: RDF](
       b.makeLangLiteral(lexicalForm, b.makeLang(langString))
     }
   )
-  
+
 }

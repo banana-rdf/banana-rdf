@@ -1,11 +1,9 @@
 package org.w3.banana.jena
 
-
-import com.hp.hpl.jena.query.{ResultSet, ResultSetFactory}
+import com.hp.hpl.jena.query.{ ResultSet, ResultSetFactory }
 import java.io.InputStream
-import org.w3.banana.{SparqlAnswerXML, SparqlAnswerJson}
-import com.hp.hpl.jena.sparql.resultset.{XMLInput, JSONInput, SPARQLResult}
-
+import org.w3.banana.{ SparqlAnswerXML, SparqlAnswerJson }
+import com.hp.hpl.jena.sparql.resultset.{ XMLInput, JSONInput, SPARQLResult }
 
 /**
  * typeclass for serialising special
@@ -14,7 +12,6 @@ import com.hp.hpl.jena.sparql.resultset.{XMLInput, JSONInput, SPARQLResult}
 trait SparqlAnswerIn[T] {
   def parse(in: InputStream): SPARQLResult
 }
-
 
 object SparqlAnswerIn {
 
@@ -27,7 +24,6 @@ object SparqlAnswerIn {
     new SparqlAnswerIn[SparqlAnswerXML] {
       def parse(in: InputStream) = XMLInput.make(in)
     }
-
 
 }
 

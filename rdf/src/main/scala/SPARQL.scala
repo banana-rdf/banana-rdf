@@ -6,7 +6,7 @@ trait SPARQL {
 
   type SelectQuery <: Query
 
-  type ConstructQuery  <: Query
+  type ConstructQuery <: Query
 
   type AskQuery <: Query
 

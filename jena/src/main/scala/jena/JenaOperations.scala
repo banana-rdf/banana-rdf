@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 import JenaUtil._
-import com.hp.hpl.jena.graph.{Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _}
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
 import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
 import scala.collection.JavaConverters._
@@ -38,7 +38,7 @@ object JenaOperations extends RDFOperations[Jena] {
     val o = t.getObject
     if (p.isInstanceOf[Jena#URI])
       (s, p.asInstanceOf[Jena#URI], o)
-    else      
+    else
       throw new RuntimeException("fromTriple: predicate " + p.toString + " must be a URI")
   }
 
@@ -51,7 +51,7 @@ object JenaOperations extends RDFOperations[Jena] {
   }
 
   // URI
-  
+
   def makeUri(iriStr: String): Jena#URI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
 
   def fromUri(node: Jena#URI): String =
@@ -83,7 +83,7 @@ object JenaOperations extends RDFOperations[Jena] {
     val iriString = fromUri(datatype)
     mapper.getTypeByName(iriString)
   }
-  
+
   /**
    * LangLiteral are not different types in Jena
    * we can discriminate on the lang tag presence
@@ -111,7 +111,7 @@ object JenaOperations extends RDFOperations[Jena] {
   }
 
   // lang literal
-  
+
   def makeLangLiteral(lexicalForm: String, lang: Jena#Lang): Jena#LangLiteral = {
     val langString = fromLang(lang)
     JenaNode.createLiteral(lexicalForm, langString, null).asInstanceOf[Node_Literal]
@@ -126,14 +126,14 @@ object JenaOperations extends RDFOperations[Jena] {
   }
 
   // lang
-  
+
   def makeLang(langString: String) = langString
 
   def fromLang(lang: Jena#Lang) = lang
 
   // graph traversal
 
-    def getObjects(graph: Jena#Graph, subject: Jena#Node, predicate: Jena#URI): Iterable[Jena#Node] = {
+  def getObjects(graph: Jena#Graph, subject: Jena#Node, predicate: Jena#URI): Iterable[Jena#Node] = {
     val model = ModelFactory.createModelForGraph(graph)
     val subjectResource = foldNode(subject)(
       uri => model.createResource(fromUri(uri)),
@@ -151,7 +151,7 @@ object JenaOperations extends RDFOperations[Jena] {
   }
 
   def getPredicates(graph: Jena#Graph, subject: Jena#Node): Iterable[Jena#URI] = {
-    val predicates: Iterator[Jena#URI] = graph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala map { triple => triple.getPredicate().asInstanceOf[Node_URI]}
+    val predicates: Iterator[Jena#URI] = graph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala map { triple => triple.getPredicate().asInstanceOf[Node_URI] }
     new Iterable[Jena#URI] {
       def iterator = predicates
     }
@@ -162,7 +162,7 @@ object JenaOperations extends RDFOperations[Jena] {
     new Iterable[Jena#Node] {
       def iterator = subjects
     }
-  }  
+  }
 
   // graph union
 

@@ -4,7 +4,7 @@ import scalaz._
 import scalaz.Validation._
 
 trait EitherBinder[Rdf <: RDF] {
-this: Diesel[Rdf] =>
+  this: Diesel[Rdf] =>
 
   import ops._
 
@@ -12,9 +12,9 @@ this: Diesel[Rdf] =>
 
     def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, Either[T1, T2]] = {
       if (pointed isA rdf("Left"))
-        (pointed / rdf("left")).as[T1] flatMap ( v => Success(Left(v)) )
+        (pointed / rdf("left")).as[T1] flatMap (v => Success(Left(v)))
       else if (pointed isA rdf("Right"))
-        (pointed / rdf("right")).as[T2] flatMap ( v => Success(Right(v)) )
+        (pointed / rdf("right")).as[T2] flatMap (v => Success(Right(v)))
       else
         Failure(FailedConversion(pointed.toString + " is not an Either"))
     }
