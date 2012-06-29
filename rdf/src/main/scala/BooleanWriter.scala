@@ -15,7 +15,7 @@ object BooleanWriter {
   implicit val Json = new SimpleBooleanWriter[SparqlAnswerJson] {
     def format(result: Boolean) =
       """{
-        |  "head": {}
+        |  "head": {},
         |  "boolean" : %s
         |}
         | """.stripMargin.format(result)

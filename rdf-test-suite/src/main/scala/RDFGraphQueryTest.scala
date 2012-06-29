@@ -27,7 +27,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
 
 
-  "new-tr.rdf " should {
+  "SELECT DISTINCT query in new-tr.rdf " should {
     val selectQueryStr = """prefix : <http://www.w3.org/2001/02pd/rec54#>
                            |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                            |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
@@ -118,7 +118,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
                            |}""".stripMargin)
 
 
-    "Alexandre Bertails must appear as an editor in new-tr.rdf" taggedAs (SesameWIP) in {
+    "Alexandre Bertails must appear as an editor in new-tr.rdf"  in { //was: taggedAs (SesameWIP)
         val alexIsThere = executeAsk(graph, query)
 
         assert(alexIsThere," query "+query+ "must return true")
@@ -150,8 +150,8 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
 
 
-
-  "a SPARQL query constructor must accept Prefix objects" taggedAs (SesameWIP) in {
+  //taggedAs (SesameWIP)
+  "a SPARQL query constructor must accept Prefix objects"  in {
 
     val query1 = ConstructQuery("""
 prefix : <http://www.w3.org/2001/02pd/rec54#>
