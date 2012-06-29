@@ -93,17 +93,33 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
   "ASK Query on simple graph" should {
 
     val simple: PointedGraph[Rdf] = (
-      bnode("i")  -- foaf.name ->- "Henry".lang("en")
+      bnode("thing") -- URI("http://www.w3.org/2001/02pd/rec54#editor") ->- ( bnode("i")
+             -- foaf.name ->- "Henry".lang("en")
+        )
       )
 
-    val q1 = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/name> ?name }")
+    val yesQuery = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/name> ?name }")
+    val noQuery = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/knows> ?name }")
+    val yesQuery2 = AskQuery(
+      """| Prefix : <http://www.w3.org/2001/02pd/rec54#>
+         | ASK { ?thing :editor [ <http://xmlns.com/foaf/0.1/name> ?name ] }""".stripMargin)
 
-    "simplefoaf contains at least one person" in {
-
-      val personInFoaf = executeAsk(simple.graph, q1)
-
-      assert(personInFoaf, " query " + q1 + " must return true")
+    "simple graph contains at least one named person" in {
+      val personInFoaf = executeAsk(simple.graph, yesQuery)
+      assert(personInFoaf, " query " + yesQuery + " must return true")
     }
+
+    "simple graph contains no foaf:knows relation" in {
+      val knowRelInFoaf = executeAsk(simple.graph, noQuery)
+      assert(!knowRelInFoaf, " query " + noQuery + " must return false")
+    }
+
+    "more advanced query is ok" in {
+      val objectHasNamedEditor = executeAsk(simple.graph, yesQuery2)
+      assert(objectHasNamedEditor, " query " + yesQuery2 + " must return true")
+    }
+
+
 
   }
 
