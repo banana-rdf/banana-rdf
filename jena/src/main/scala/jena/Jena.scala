@@ -20,7 +20,7 @@ object Jena {
 
   implicit val ops: RDFOperations[Jena] = JenaOperations
 
-  implicit val diesel: Diesel[Jena] = JenaDiesel
+  implicit val diesel: Diesel[Jena] = Diesel[Jena]
 
   implicit val sparqlOps: SPARQLOperations[Jena, JenaSPARQL] = JenaSPARQLOperations
 

@@ -9,7 +9,7 @@ object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ Seq (
+  val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
     version      := "0.3-SNAPSHOT",
 //    version      := "x04-SNAPSHOT",

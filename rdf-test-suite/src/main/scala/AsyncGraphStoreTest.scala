@@ -8,7 +8,7 @@ import akka.util.Timeout
 abstract class AsyncGraphStoreTest[Rdf <: RDF, Sparql <: SPARQL](
   rdfStore: RDFStore[Rdf, Sparql])(
     implicit diesel: Diesel[Rdf],
-    reader: RDFReader[Rdf, RDFXML])
+    reader: BlockingReader[Rdf#Graph, RDFXML])
     extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._

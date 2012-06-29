@@ -1,9 +1,11 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
-import Jena._
-import JenaRDFReader._
-import SparqlAnswerReader._
-import SparqlAnswerWriter._
+import org.w3.banana.{ SparqlAnswerXML, SparqlAnswerJson, RDFGraphQueryTest }
 
-class JenaGraphQueryTest extends RDFGraphQueryTest[Jena, JenaSPARQL, SparqlAnswerJson]
+import org.w3.banana.jena.JenaRDFReader._
+import org.w3.banana.jena.SparqlQueryResultsReader.{ XMLSparqlQueryResultsReader, JsonSparqlQueryResultsReader }
+import org.w3.banana.jena.SparqlSolutionsWriter._
+
+class JenaGraphQueryTestJson extends RDFGraphQueryTest[Jena, JenaSPARQL, SparqlAnswerJson]
+
+class JenaGraphQueryTestXml extends RDFGraphQueryTest[Jena, JenaSPARQL, SparqlAnswerXML]

@@ -2,8 +2,7 @@ package org.w3.banana
 
 import java.io._
 
-import scalaz.{ Either3, Validation }
-import scalaz.Validation._
+import scalaz.Validation
 
 /**
  * typeclass for an RDF Writer that is blocking.
@@ -12,7 +11,7 @@ import scalaz.Validation._
  * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
  *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait RDFBlockingWriter[Rdf <: RDF, +SyntaxType] {
+trait RDFBlockingWriter[Rdf <: RDF, +SyntaxType] extends BlockingWriter[Rdf#Graph, SyntaxType] {
 
   def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit]
   def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit]
