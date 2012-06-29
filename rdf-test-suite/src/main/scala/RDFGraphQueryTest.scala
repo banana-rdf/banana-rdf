@@ -59,13 +59,13 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = sparqlWriter.write(answers, out)
+      val serialisedAnswer = sparqlWriter.write(answers, out,"")
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
-      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
+      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray),"")
       assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
 
-      answr2.map(a => assert(testAnswer(a), "the deserialised answer must pass the same tests as the original one"))
+      answr2.map(a => assert(testAnswer(a.left.get), "the deserialised answer must pass the same tests as the original one"))
     }
   }
 
