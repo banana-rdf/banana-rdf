@@ -90,6 +90,22 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
 
   }
+  "ASK Query on simple graph" should {
+
+    val simple: PointedGraph[Rdf] = (
+      bnode("i")  -- foaf.name ->- "Henry".lang("en")
+      )
+
+    val q1 = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/name> ?name }")
+
+    "simplefoaf contains at least one person" in {
+
+      val personInFoaf = executeAsk(simple.graph, q1)
+
+      assert(personInFoaf, " query " + q1 + " must return true")
+    }
+
+  }
 
   "ASK Query on new-tr.rdf" should {
 
@@ -106,7 +122,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
     "Alexandre Bertails must appear as an editor in new-tr.rdf" in { //was: taggedAs (SesameWIP)
       val alexIsThere = executeAsk(graph, query)
 
-      assert(alexIsThere, " query " + query + "must return true")
+      assert(alexIsThere, " query " + query + " must return true")
     }
 
     "the sparql answer should serialise and deserialise " in {
