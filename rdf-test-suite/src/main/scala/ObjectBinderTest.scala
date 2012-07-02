@@ -2,6 +2,7 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
+import scalaz.Validation
 
 abstract class ObjectBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
 
@@ -14,11 +15,18 @@ abstract class ObjectBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
 
     val clazz = uri("http://example.com/T#class")
 
-    val binder: SealedBinder[Rdf, T] =
-      ObjectBinder.sealedB[T](Foo.binder, Bar.binder) {
-        case _: Foo => toPGB[T, Foo](Foo.binder)
-        case Bar => Bar.binder
+    val binder: PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] =
+        Foo.binder.fromPointedGraph(pointed) orElse Bar.binder.fromPointedGraph(pointed)
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = t match {
+        case foo: Foo => Foo.binder.toPointedGraph(foo)
+        case Bar => Bar.binder.toPointedGraph(Bar)
       }
+
+
+    }
 
   }
 
@@ -39,10 +47,6 @@ abstract class ObjectBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
         .property(i).property(j).bind(Foo.apply, Foo.unapply)
         .instanceOf(T.clazz).instanceOf(Foo.clazz)
         .uriBinder(uriBinder)
-
-    implicitly[Foo <:< T]
-
-    implicitly[ToPGB[T] <:< ToPGB[Foo]]
 
   }
 

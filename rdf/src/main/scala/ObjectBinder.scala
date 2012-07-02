@@ -20,23 +20,6 @@ trait SealedBinder[Rdf <: RDF, T] extends PointedGraphBinder[Rdf, T]
 trait ObjectBinderDSL[Rdf <: RDF] {
   self: Diesel[Rdf] =>
 
-  trait FromPGB[+T] {
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T]
-  }
-
-  trait ToPGB[-T] {
-    def toPointedGraph(t: T): PointedGraph[Rdf]
-  }
-
-  implicit def fromPGB[T, S >: T](binder: PointedGraphBinder[Rdf, T]): FromPGB[S] = new FromPGB[S] {
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, S] =
-      binder.fromPointedGraph(pointed)
-  }
-
-  implicit def toPGB[T, S <: T](binder: PointedGraphBinder[Rdf, T]): ToPGB[S] = new ToPGB[S] {
-    def toPointedGraph(s: S): PointedGraph[Rdf] = binder.toPointedGraph(s)
-  }
-
   def property[T](uri: Rdf#URI)(implicit binder: PointedGraphBinder[Rdf, T]): Property[Rdf, T] =
     Property[Rdf, T](uri, binder)
 
@@ -90,20 +73,6 @@ trait ObjectBinderDSL[Rdf <: RDF] {
       def toUri(t: T): Rdf#URI = constUri
 
     }))
-
-//    def sealedB[S, T](fromPGBs: FromPGB[S]*)(toPGBSelector: T => ToPGB[T]): SealedBinder[Rdf, T] = SealedBinderBase[T](fromPGBs: _*)(toPGBSelector)
-
-    def sealedB[T, S <: T](pgbs: FromPGB[T]*)(selector: S => ToPGB[S]): SealedBinder[T, S] = SealedBinderBase[T, S](pgbs: _*)(selector)
-
-
-  }
-
-  case class SealedBinderBase[T, S <: T](pgbs: FromPGB[T]*)(selector: S => ToPGB[S]) extends SealedBinder[Rdf, T] {
-
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = null
-  
-    def toPointedGraph(t: T): PointedGraph[Rdf] =
-      selector(t).toPointedGraph(t)
 
   }
 
