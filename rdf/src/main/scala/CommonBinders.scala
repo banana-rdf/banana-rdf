@@ -3,6 +3,7 @@ package org.w3.banana
 import scalaz._
 import scalaz.Validation._
 import org.joda.time.DateTime
+import java.util.UUID
 
 trait CommonBinders[Rdf <: RDF] {
   this: Diesel[Rdf] =>
@@ -20,6 +21,21 @@ trait CommonBinders[Rdf <: RDF] {
     }
 
     def toTypedLiteral(t: String): Rdf#TypedLiteral = TypedLiteral(t, xsd.string)
+
+  }
+
+  // TODO: find a better datatype than xsd:string
+  implicit val UUIDBinder: TypedLiteralBinder[Rdf, UUID] = new TypedLiteralBinder[Rdf, UUID] {
+
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, UUID] = {
+      val TypedLiteral(lexicalForm, datatype) = literal
+      if (datatype == xsd.string)
+        try { Success(UUID.fromString(lexicalForm)) } catch { case _: IllegalArgumentException => Failure(FailedConversion(lexicalForm + " cannot be made a java.util.UUID")) }
+      else
+        Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
+    }
+
+    def toTypedLiteral(t: UUID): Rdf#TypedLiteral = TypedLiteral(t.toString, xsd.string)
 
   }
 

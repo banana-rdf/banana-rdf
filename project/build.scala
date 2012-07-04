@@ -19,6 +19,7 @@ object BuildSettings {
     parallelExecution in Test := false,
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+    resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
     ensimeConfig := sexp(
       key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
@@ -83,6 +84,7 @@ object BananaRdfBuild extends Build {
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
+  val shapeless = "com.chuusai" %% "shapeless" % "1.2.2"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -186,6 +188,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += scalaz,
+      libraryDependencies += shapeless,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
       publishMavenStyle := true
