@@ -8,11 +8,13 @@ object RecordBinder {
   // it separates the current found subject and the Predicate/Object pairs found at some point
   type Acc[Rdf <: RDF] = (Rdf#Node, List[(Rdf#URI, PointedGraph[Rdf])])
 
+  type PGBElem[Rdf <: RDF, T] = Either[URIBinder[Rdf, T], (Rdf#URI, PointedGraphBinder[Rdf, T])]
+
   private def m[Rdf <: RDF, T](acc: Acc[Rdf], t: T, elem: PGBElem[Rdf, T]): Acc[Rdf] = {
     val (subject, pos) = acc
-    elem.either match {
-      case Left(pgbS) => (pgbS.makeSubject(t), pos)
-      case Right(pgbPO) => (subject, (pgbPO.predicate, pgbPO.binder.toPointedGraph(t)) :: pos)
+    elem match {
+      case Left(uriBinder) => (uriBinder.toUri(t), pos)
+      case Right((predicate, oBinder)) => (subject, (predicate, oBinder.toPointedGraph(t)) :: pos)
     }
   }
 
@@ -70,18 +72,10 @@ trait RecordBinder[Rdf <: RDF] {
   /**
    * declares a Property/Object element where T is in the object position
    */
-  def property[T](uri: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): PGBElem[Rdf, T] = {
+  def property[T](uri: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): PGBElem[Rdf, T] =
+    Right((uri, objectBinder))
 
-    val pgbPO = new PGBPredicateObject[Rdf, T] {
-      val predicate = uri
-      val binder = objectBinder
-    }
-
-    new PGBElem[Rdf, T] {
-      val either = Right(pgbPO)
-    }
-
-  }
+  implicit def URIBinderToPGBElem[T](uriBinder: URIBinder[Rdf, T]): PGBElem[Rdf, T] = Left(uriBinder)
 
   /**
    * declares a uri template where an object T can be extracted from the URI
@@ -93,37 +87,32 @@ trait RecordBinder[Rdf <: RDF] {
    * for now, supports only exactly one group in the regex
    * for now, we assume that T.toString does the right thing. TODO: use Show[T]
    */
-  def uriTemplate[T](template: String)(f: String => Validation[BananaException, T]): PGBElem[Rdf, T] = {
+  def uriTemplate[T](template: String)(f: String => Validation[BananaException, T]): URIBinder[Rdf, T] =
+    new URIBinder[Rdf, T] {
 
-    val pgbS = new PGBSubject[Rdf, T] {
       // replace the pattern with (.+?) and make sure that the entire string is read
       val regex = {
         val t = template.replaceAll("""\{.+?\}""", "(.+?)")
         ("^.*?" + t + "$").r
       }
 
-      def makeSubject(t: T): Rdf#URI = {
+      def toUri(t: T): Rdf#URI = {
         val subject = template.replaceAll("""\{.*?\}""", t.toString())
         makeUri(subject)
       }
 
-      def extract(subject: Rdf#URI): Validation[BananaException, T] = {
-        regex findFirstIn fromUri(subject) match {
+      def fromUri(subject: Rdf#URI): Validation[BananaException, T] = {
+        regex findFirstIn ops.fromUri(subject) match {
           case Some(regex(id)) => f(id)
           case None => Failure(WrongExpectation("could not apply template " + template + " to " + subject.toString))
         }
       }
     }
 
-    new PGBElem[Rdf, T] {
-      val either = Left(pgbS)
-    }
-  }
-
   /** extract some graph information from a pointed graph and an declared element */
-  private def extract[T](pointed: PointedGraph[Rdf], elem: PGBElem[Rdf, T]): Validation[BananaException, T] = elem.either match {
-    case Left(pgbS) => pointed.as[Rdf#URI] flatMap pgbS.extract
-    case Right(pgbPO) => (pointed / pgbPO.predicate).as[T](pgbPO.binder)
+  private def extract[T](pointed: PointedGraph[Rdf], elem: PGBElem[Rdf, T]): Validation[BananaException, T] = elem match {
+    case Left(uriBinder) => pointed.as[Rdf#URI] flatMap uriBinder.fromUri
+    case Right((predicate, oBinder)) => (pointed / predicate).as[T](oBinder)
   }
 
   /**
