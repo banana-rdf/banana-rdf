@@ -1,17 +1,12 @@
 package org.w3.banana
 
-import scalaz.{ Validation, Success, Failure }
+import scalaz.{ Validation, Success, Failure, _ }
+import scalaz.Scalaz._
 import shapeless._
 import shapeless.HList._
 import shapeless.Tuples._
 
-trait PGBElemAux {
-  type valueType
-}
-
-trait PGBElem[Rdf <: RDF, T] extends PGBElemAux {
-
-  type valueType = T
+trait PGBElem[Rdf <: RDF, T] {
 
   def either: Either[PGBSubject[Rdf, T], PGBPredicateObject[Rdf, T]]
 
@@ -34,9 +29,40 @@ trait PGBPredicateObject[Rdf <: RDF, T] {
 }
 
 
+object RecordBinder {
+
+  type Acc[Rdf <: RDF] = (Rdf#Node, List[(Rdf#URI, PointedGraph[Rdf])])
+
+  def m[Rdf <: RDF, T](acc: Acc[Rdf], t: T, elem: PGBElem[Rdf, T]): Acc[Rdf] = {
+    val (subject, pos) = acc
+    elem.either match {
+      case Left(pgbS) => (pgbS.makeSubject(t), pos)
+      case Right(pgbPO) => (subject, (pgbPO.predicate, pgbPO.binder.toPointedGraph(t)) :: pos)
+    }
+  }
+
+  def accStart[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): Acc[Rdf] = (ops.makeBNode(), List.empty)
+
+  def accToGraph[Rdf <: RDF](acc: Acc[Rdf])(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
+    val (subject, pos) = acc
+    var triples: Set[Rdf#Triple] = Set.empty
+    for (po <- pos) {
+      val (p, pg) = po
+      triples += ops.makeTriple(subject, p, pg.node)
+      triples ++= ops.graphToIterable(pg.graph)
+    }
+    PointedGraph(subject, ops.makeGraph(triples))
+  }
+
+}
+
+
+
+
 trait RecordBinder[Rdf <: RDF] {
   self: Diesel[Rdf] =>
 
+  import RecordBinder._
   import ops._
 
   def property[T](uri: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): PGBElem[Rdf, T] = {
@@ -82,116 +108,32 @@ trait RecordBinder[Rdf <: RDF] {
     }
   }
 
-  type Acc = (Rdf#Node, List[(Rdf#URI, PointedGraph[Rdf])])
-
-  import Poly._
-
-  object makePG extends Poly2 {
-    implicit def caseAccPGBElem[T](implicit t: T) = at[Acc, PGBElem[Rdf, T]] { (acc, elem) =>
-      val (subject, pos) = acc
-        elem.either match {
-          case Left(pgbS) => (pgbS.makeSubject(t): Rdf#Node, pos): Acc
-          case Right(pgbPO) => null.asInstanceOf[Acc]
-        }
-      }
-    }
-
-  val accStart: Acc = (bnode(), List.empty)
-
-  def accToGraph(acc: Acc): PointedGraph[Rdf] = {
-    val (subject, pos) = acc
-    var triples: Set[Rdf#Triple] = Set.empty
-    for (po <- pos) {
-      val (p, pg) = po
-      triples += Triple(subject, p, pg.node)
-      triples ++= graphToIterable(pg.graph)
-    }
-    PointedGraph(subject, makeGraph(triples))
+  private def extract[T](pointed: PointedGraph[Rdf], elem: PGBElem[Rdf, T]): Validation[BananaException, T] = elem.either match {
+    case Left(pgbS) => pointed.as[Rdf#URI] flatMap pgbS.extract
+    case Right(pgbPO) => (pointed / pgbPO.predicate).as[T](pgbPO.binder)
   }
 
   def pgb[T] = new Object {
     def apply[A1](a1: PGBElem[Rdf, A1])(apply: A1 => T, unapply: T => Option[A1]) = null
 
-    def apply[A1, A2](a1: PGBElem[Rdf, A1], a2: PGBElem[Rdf, A2])(_apply: (A1, A2) => T, unapply: T => Option[(A1, A2)]) = {
-      val hlist = (a1, a2).hlisted
+    def apply[T1, T2](el1: PGBElem[Rdf, T1], el2: PGBElem[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
-        implicit val Some((a1, a2)) = unapply(t)
-        val acc = hlist.foldLeft(accStart)(makePG)
+        val Some((t1, t2)) = unapply(t)
+        val acc = m(m(accStart, t1, el1), t2, el2)
         accToGraph(acc)
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        
-        object toElem extends Poly1 {
-          implicit def casePGBElem[T] = at[PGBElem[Rdf, T]] { elem =>
-            elem.either match {
-              case Left(pgbS) => null.asInstanceOf[Validation[BananaException, T]]
-              case Right(pgbPO) => null.asInstanceOf[Validation[BananaException, T]]
-
-            }
-          }
-        }
-        import toElem._
-
-        object reducer extends Poly2 {
-          implicit def foo[T1, T2] = at[Validation[BananaException, T1], Validation[BananaException, T2]] { (v1, v2) => for { t1 <- v1; t2 <- v2 } yield ((t1, t2)) }
-        }
-
-        import reducer._
-
-        val validation: Validation[BananaException, (A1, A2)] = hlist.map(toElem).reduceLeft(reducer)
-
-        validation map _apply
+        val v1 = extract(pointed, el1)
+        val v2 = extract(pointed, el2)
+        for (t1 <- v1; t2 <- v2) yield apply(t1, t2)
       }
 
-      null
     }
 
     def apply[A1, A2, A3](a1: PGBElem[Rdf, A1], a2: PGBElem[Rdf, A2], a3: PGBElem[Rdf, A3])(apply: (A1, A2, A3) => T, unapply: T => Option[(A1, A2, A3)]) = null
 
   }
-
-//  case class PropertiesBuilder1[T1] private[banana] (p1: Property[Rdf, T1]) {
-//
-//    def bind[T](apply: T1 => T, unapply: T => Option[T1]): ComplexBinderBase[T] = {
-//
-//      val fromPG: PointedGraph[Rdf] => Validation[BananaException, T] =
-//        (pointed: PointedGraph[Rdf]) => {
-//          for {
-//            t1 <- (pointed / p1.uri).as[T1](p1.binder)
-//          } yield {
-//            apply(t1)
-//          }
-//        }
-//
-//      val toPG: (Rdf#Node, T) => PointedGraph[Rdf] =
-//        (subject: Rdf#Node, t: T) => {
-//          val t1 = unapply(t).get
-//          subject.--(p1.uri).->-(t1)(p1.binder)
-//        }
-//
-//      ComplexBinderBase(fromPG, toPG)
-//
-//    }
-
-//    def constant[T](constObj: T, constUri: Rdf#URI): PointedGraphBinder[Rdf, T] = NodeToPointedGraphBinder(UriToNodeBinder( new URIBinder[Rdf, T] {
-//
-//      def fromUri(uri: Rdf#URI): Validation[BananaException, T] =
-//        if (constUri == uri)
-//          Success(constObj)
-//        else
-//          Failure(WrongExpectation("was expecting the constant URI " + constUri + " but got " + uri))
-//  
-//      def toUri(t: T): Rdf#URI = constUri
-//
-//    }))
-//
-//  }
-
-
-  
-
-  
   
 }

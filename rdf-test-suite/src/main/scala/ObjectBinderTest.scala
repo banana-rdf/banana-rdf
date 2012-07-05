@@ -10,7 +10,7 @@ abstract class ObjectBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
   import diesel._
   import ops._
 
-  case class Person(id: UUID, name: String)
+  case class Person(id: UUID, name: String, address: Address)
 
   object Person {
 
@@ -18,22 +18,15 @@ abstract class ObjectBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
       try { Success(UUID.fromString(uuid)) } catch { case _: IllegalArgumentException => Failure(WrongExpectation(uuid + " cannot be made a UUID")) }
     }
     val name = property[String](foaf.name)
+    val address = property[Address](foaf.address)
 
-    implicit val binder = pgb[Person](uri, name)(Person.apply, Person.unapply)
+
+//    implicit val binder = pgb[Person](uri, name)(Person.apply, Person.unapp
+
+
+//    implicit val binder = pgb[Person](uri, name, address)(Person.apply, Person.unapply)
 
   }
-
-//  case class Person(id: UUID, name: String, address: Address)
-//
-//  object Person {
-//
-//    val uri = absoluteUri[UUID]("http://example.com/person/{id}", "id")
-//    val name = property[String](foaf.name)
-//    val address = property[Address](foaf.address)
-//
-//    implicit val binder = pgb[Person]((uri, name, address))(Person.apply, Person.unapply)
-//
-//  }
 //
 //  sealed trait Address
 //

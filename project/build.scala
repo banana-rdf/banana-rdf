@@ -13,11 +13,11 @@ object BuildSettings {
     organization := "org.w3",
     version      := "0.3-SNAPSHOT",
 //    version      := "x04-SNAPSHOT",
-    scalaVersion := "2.9.1",
+    scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.1", "2.9.2"),
 
     parallelExecution in Test := false,
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
