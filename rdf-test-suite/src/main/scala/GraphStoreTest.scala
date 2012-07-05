@@ -28,6 +28,12 @@ abstract class GraphStoreTest[Rdf <: RDF](
     )
   ).graph
 
+  val foo: Rdf#Graph = (
+    uri("http://example.com/foo")
+    -- rdf("foo") ->- "foo"
+    -- rdf("bar") ->- "bar"
+  ).graph
+
   "getNamedGraph should retrieve the graph added with addNamedGraph" in {
     store.addNamedGraph(uri("http://example.com/graph"), graph)
     store.addNamedGraph(uri("http://example.com/graph2"), graph2)
@@ -43,6 +49,17 @@ abstract class GraphStoreTest[Rdf <: RDF](
     val retrievedGraph = store.getNamedGraph(uri("http://example.com/graph"))
     val unionGraph = union(graph, graph2)
     assert(unionGraph isIsomorphicWith retrievedGraph)
+  }
+
+  "addNamedGraph should drop the existing graph" in {
+    val u = uri("http://example.com/graph")
+
+    store.addNamedGraph(u, foo)
+    store.addNamedGraph(u, graph)
+    val retrievedGraph = store.getNamedGraph(u)
+
+    assert(!(graph isIsomorphicWith foo))
+    assert(retrievedGraph isIsomorphicWith graph)
   }
 
 }
