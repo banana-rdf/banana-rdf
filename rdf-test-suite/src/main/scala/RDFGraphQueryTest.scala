@@ -52,24 +52,22 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
       testAnswer(answers)
     }
 
-    "the sparql answer should serialise and deserialise "  in {
+    "the sparql answer should serialise and deserialise " in {
       val query = SelectQuery(selectQueryStr)
       //in any case we must re-execute query, as the results returned can often only be read once
       val answers = executeSelect(graph, query)
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = sparqlWriter.write(answers, out,"")
+      val serialisedAnswer = sparqlWriter.write(answers, out, "")
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
-      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray),"")
+      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
       assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
 
       answr2.map(a => assert(testAnswer(a.left.get), "the deserialised answer must pass the same tests as the original one"))
     }
   }
-
-
 
   "the identity SPARQL Construct " should {
 
@@ -88,15 +86,14 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
       assert(clonedGraph isIsomorphicWith graph)
     }
 
-
   }
   "ASK Query on simple graph" should {
 
     val simple: PointedGraph[Rdf] = (
-      bnode("thing") -- URI("http://www.w3.org/2001/02pd/rec54#editor") ->- ( bnode("i")
-             -- foaf.name ->- "Henry".lang("en")
-        )
+      bnode("thing") -- URI("http://www.w3.org/2001/02pd/rec54#editor") ->- (bnode("i")
+        -- foaf.name ->- "Henry".lang("en")
       )
+    )
 
     val yesQuery = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/name> ?name }")
     val noQuery = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/knows> ?name }")
@@ -118,8 +115,6 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
       val objectHasNamedEditor = executeAsk(simple.graph, yesQuery2)
       assert(objectHasNamedEditor, " query " + yesQuery2 + " must return true")
     }
-
-
 
   }
 

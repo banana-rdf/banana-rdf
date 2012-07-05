@@ -25,6 +25,5 @@ object SparqlAnswerIn {
       def parse(in: InputStream) = XMLInput.make(in)
     }
 
-
 }
 

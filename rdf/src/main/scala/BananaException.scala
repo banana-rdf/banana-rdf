@@ -2,10 +2,13 @@ package org.w3.banana
 
 import scalaz.{ Validation, Success, Failure }
 import scalaz.Validation._
+import scalaz.Semigroup.firstSemigroup
 
 object BananaException {
 
   implicit val validationBananaExceptionMonad = validationMonad[BananaException]
+
+  implicit val bananaExceptionSemiGroup = firstSemigroup[BananaException]
 
 }
 
