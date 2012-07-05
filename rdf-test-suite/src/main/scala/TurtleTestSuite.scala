@@ -36,12 +36,12 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
   }
 
   val rdfCore = "http://www.w3.org/2001/sw/RDFCore/"
-  val rdfCorePrefix = Prefix("rdf", rdfCore, ops)
+  val rdfCorePrefix = Prefix("rdf", rdfCore)
   val referenceGraph = graphBuilder(rdfCorePrefix)
 
   // TODO: there is a bug in Sesame with hash uris as prefix
   val foo = "http://example.com/foo/"
-  val fooPrefix = Prefix("foo", foo, ops)
+  val fooPrefix = Prefix("foo", foo)
   val fooGraph = graphBuilder(fooPrefix)
 
   "read TURTLE version of timbl's card" in {

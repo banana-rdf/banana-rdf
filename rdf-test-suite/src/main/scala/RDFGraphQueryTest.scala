@@ -177,9 +177,9 @@ CONSTRUCT {
 }
                              """)
 
-    val base = Prefix("", "http://www.w3.org/2001/02pd/rec54#", ops)
-    val rdf = RDFPrefix(ops)
-    val contact = Prefix("contact", "http://www.w3.org/2000/10/swap/pim/contact#", ops)
+    val base = Prefix[Rdf]("", "http://www.w3.org/2001/02pd/rec54#")
+    val rdf = RDFPrefix[Rdf]
+    val contact = Prefix[Rdf]("contact", "http://www.w3.org/2000/10/swap/pim/contact#")
 
     val query2 = ConstructQuery("""
                                |CONSTRUCT {
