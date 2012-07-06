@@ -4,7 +4,7 @@ import java.io.OutputStream
 import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
 import org.openrdf.query.resultio.TupleQueryResultWriter
-import org.w3.banana.{ SparqlAnswerXML, SparqlAnswerJson }
+import org.w3.banana._
 
 /**
  * Sparql Output Syntaxes for Sesame, dependent on a SyntaxType for type classes

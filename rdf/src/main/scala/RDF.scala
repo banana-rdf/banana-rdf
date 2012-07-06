@@ -1,6 +1,7 @@
 package org.w3.banana
 
 trait RDF {
+  // types related to the RDF datamodel
   type Graph
   type Triple
   type Node
@@ -10,4 +11,12 @@ trait RDF {
   type TypedLiteral <: Literal
   type LangLiteral <: Literal
   type Lang
+
+  // types related to SPARQL
+  type Query
+  type SelectQuery <: Query
+  type ConstructQuery <: Query
+  type AskQuery <: Query
+  type Solution
+  type Solutions
 }

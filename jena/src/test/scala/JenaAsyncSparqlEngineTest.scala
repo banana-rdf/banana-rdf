@@ -5,5 +5,5 @@ import com.hp.hpl.jena.sparql.core._
 import Jena._
 import JenaRDFReader._
 
-class JenaAsyncSparqlEngineTest() extends AsyncSparqlEngineTest[Jena, JenaSPARQL](JenaStore(DatasetGraphFactory.createMem()))
+class JenaAsyncSparqlEngineTest() extends AsyncSparqlEngineTest[Jena](JenaStore(DatasetGraphFactory.createMem()))
 

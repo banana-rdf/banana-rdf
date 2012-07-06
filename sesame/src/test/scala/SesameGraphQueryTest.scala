@@ -5,4 +5,4 @@ import Sesame._
 import SparqlQueryResultsReader._
 import SparqlSolutionsWriter._
 
-class SesameGraphQueryTest extends RDFGraphQueryTest[Sesame, SesameSPARQL, SparqlAnswerXML]
+class SesameGraphQueryTest extends RDFGraphQueryTest[Sesame, SparqlAnswerXML]

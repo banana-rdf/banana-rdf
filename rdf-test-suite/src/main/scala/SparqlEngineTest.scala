@@ -3,10 +3,10 @@ package org.w3.banana
 import org.scalatest._
 import org.scalatest.matchers._
 
-abstract class SparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
-  store: RDFStore[Rdf, Sparql])(
+abstract class SparqlEngineTest[Rdf <: RDF](
+  store: RDFStore[Rdf])(
     implicit diesel: Diesel[Rdf],
-    sparqlOps: SPARQLOperations[Rdf, Sparql])
+    sparqlOps: SPARQLOperations[Rdf])
     extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._

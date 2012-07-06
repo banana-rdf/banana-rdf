@@ -16,5 +16,5 @@ import scalaz.Validation
  * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
  *                     for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait SparqlQueryResultsReader[Sparql <: SPARQL, +SyntaxType]
-  extends BlockingReader[Either[Sparql#Solutions, Boolean], SyntaxType]
+trait SparqlQueryResultsReader[Rdf <: RDF, +SyntaxType]
+  extends BlockingReader[Either[Rdf#Solutions, Boolean], SyntaxType]

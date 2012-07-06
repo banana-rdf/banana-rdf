@@ -3,12 +3,12 @@ package org.w3.banana
 /**
  * to execute SPARQL queries
  */
-trait SPARQLEngine[Rdf <: RDF, Sparql <: SPARQL] {
+trait SPARQLEngine[Rdf <: RDF] {
 
-  def executeSelect(query: Sparql#SelectQuery): Sparql#Solutions
+  def executeSelect(query: Rdf#SelectQuery): Rdf#Solutions
 
-  def executeConstruct(query: Sparql#ConstructQuery): Rdf#Graph
+  def executeConstruct(query: Rdf#ConstructQuery): Rdf#Graph
 
-  def executeAsk(query: Sparql#AskQuery): Boolean
+  def executeAsk(query: Rdf#AskQuery): Boolean
 
 }

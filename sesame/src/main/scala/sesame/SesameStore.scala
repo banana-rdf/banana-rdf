@@ -15,7 +15,7 @@ import org.openrdf.query.TupleQueryResult
 
 object SesameStore {
 
-  def apply(store: SailRepository): RDFStore[Sesame, SesameSPARQL] =
+  def apply(store: SailRepository): RDFStore[Sesame] =
     new SesameStore(store)
 
   def iter(st: CloseableIteration[_ <: Statement, SailException]) =
@@ -26,7 +26,7 @@ object SesameStore {
 
 }
 
-class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] {
+class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
 
   def addNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
     withConnection(store) { conn =>
@@ -69,7 +69,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
    * @param query
    * @return
    */
-  def executeSelect(query: SesameSPARQL#SelectQuery): SesameSPARQL#Solutions = {
+  def executeSelect(query: Sesame#SelectQuery): Sesame#Solutions = {
     withConnection(store) { conn =>
       val res = conn.evaluate(query.getTupleExpr, null, empty, false)
       new TupleQueryResult {
@@ -82,7 +82,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
     }
   }
 
-  def executeConstruct(query: SesameSPARQL#ConstructQuery): Sesame#Graph =
+  def executeConstruct(query: Sesame#ConstructQuery): Sesame#Graph =
     withConnection(store) { conn =>
       val it = conn.evaluate(query.getTupleExpr, null, empty, false)
       val sit = SesameUtil.toStatementIterable(it)
@@ -91,7 +91,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame, SesameSPARQL] 
       res
     }
 
-  def executeAsk(query: SesameSPARQL#AskQuery): Boolean =
+  def executeAsk(query: Sesame#AskQuery): Boolean =
     withConnection(store) { conn =>
       val it = conn.evaluate(query.getTupleExpr, null, empty, false)
       val res = it.hasNext

@@ -11,9 +11,9 @@ object SparqlSolutionsWriter {
 
   def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType],
     syntax: Syntax[SyntaxType]) =
-    new SparqlSolutionsWriter[SesameSPARQL, SyntaxType] {
+    new SparqlSolutionsWriter[Sesame, SyntaxType] {
 
-      def write(answers: SesameSPARQL#Solutions, os: OutputStream, base: String = "") = {
+      def write(answers: Sesame#Solutions, os: OutputStream, base: String = "") = {
         WrappedThrowable.fromTryCatch {
           val w = sesameSparqlSyntax.writer(os)
           w.startQueryResult(answers.getBindingNames)
@@ -25,7 +25,7 @@ object SparqlSolutionsWriter {
         }
       }
 
-      def write(input: SesameSPARQL#Solutions, writer: Writer, base: String) = null
+      def write(input: Sesame#Solutions, writer: Writer, base: String) = null
 
       def syntax[S >: SyntaxType] = syntax
     }
@@ -34,8 +34,8 @@ object SparqlSolutionsWriter {
 
   implicit val XML = SparqlSolutionsWriter[SparqlAnswerXML]
 
-  implicit val WriterSelector: RDFWriterSelector[SesameSPARQL#Solutions] =
-    RDFWriterSelector[SesameSPARQL#Solutions, SparqlAnswerXML] combineWith
-      RDFWriterSelector[SesameSPARQL#Solutions, SparqlAnswerJson]
+  implicit val WriterSelector: RDFWriterSelector[Sesame#Solutions] =
+    RDFWriterSelector[Sesame#Solutions, SparqlAnswerXML] combineWith
+      RDFWriterSelector[Sesame#Solutions, SparqlAnswerXML]
 
 }

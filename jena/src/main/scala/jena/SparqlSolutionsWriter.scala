@@ -10,27 +10,27 @@ import scalaz.Validation
 object SparqlSolutionsWriter {
 
   def apply[SyntaxType](implicit jenaSparqlSyntax: SparqlAnswerOut[SyntaxType],
-    syntaxTp: Syntax[SyntaxType]): SparqlSolutionsWriter[JenaSPARQL, SyntaxType] =
-    new SparqlSolutionsWriter[JenaSPARQL, SyntaxType] {
+    syntaxTp: Syntax[SyntaxType]): SparqlSolutionsWriter[Jena, SyntaxType] =
+    new SparqlSolutionsWriter[Jena, SyntaxType] {
 
-      def write(answers: JenaSPARQL#Solutions, os: OutputStream, base: String) =
+      def write(answers: Jena#Solutions, os: OutputStream, base: String) =
         WrappedThrowable.fromTryCatch {
           jenaSparqlSyntax.formatter.format(os, answers)
         }
 
-      def write(input: JenaSPARQL#Solutions, writer: Writer, base: String) = null
+      def write(input: Jena#Solutions, writer: Writer, base: String) = null
 
       def syntax[S >: SyntaxType] = syntaxTp
     }
 
-  implicit val Json: SparqlSolutionsWriter[JenaSPARQL, SparqlAnswerJson] =
+  implicit val Json: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     SparqlSolutionsWriter[SparqlAnswerJson]
 
-  implicit val XML: SparqlSolutionsWriter[JenaSPARQL, SparqlAnswerXML] =
+  implicit val XML: SparqlSolutionsWriter[Jena, SparqlAnswerXML] =
     SparqlSolutionsWriter[SparqlAnswerXML]
 
-  implicit val WriterSelector: RDFWriterSelector[JenaSPARQL#Solutions] =
-    RDFWriterSelector[JenaSPARQL#Solutions, SparqlAnswerXML] combineWith
-      RDFWriterSelector[JenaSPARQL#Solutions, SparqlAnswerJson]
+  implicit val WriterSelector: RDFWriterSelector[Jena#Solutions] =
+    RDFWriterSelector[Jena#Solutions, SparqlAnswerXML] combineWith
+      RDFWriterSelector[Jena#Solutions, SparqlAnswerXML]
 
 }

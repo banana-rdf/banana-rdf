@@ -31,15 +31,15 @@ import scalaz.Validation
  */
 object SparqlQueryResultsReader {
 
-  def apply[Syntax](implicit sesameSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[SesameSPARQL, Syntax] =
-    new SparqlQueryResultsReader[SesameSPARQL, Syntax] {
+  def apply[Syntax](implicit sesameSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[Sesame, Syntax] =
+    new SparqlQueryResultsReader[Sesame, Syntax] {
 
       def read(in: InputStream, base: String) = {
         val bytes: Array[Byte] = Iterator.continually(in.read).takeWhile(-1 !=).map(_.toByte).toArray
         parse(bytes)
       }
 
-      def parse(bytes: Array[Byte]): Validation[BananaException, Either[SesameSPARQL#Solutions, Boolean]] = {
+      def parse(bytes: Array[Byte]): Validation[BananaException, Either[Sesame#Solutions, Boolean]] = {
         WrappedThrowable.fromTryCatch {
           try {
             Left(QueryResultIO.parse(new ByteArrayInputStream(bytes),
@@ -61,10 +61,10 @@ object SparqlQueryResultsReader {
 
     }
 
-  implicit val Json: SparqlQueryResultsReader[SesameSPARQL, SparqlAnswerJson] =
+  implicit val Json: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
     SparqlQueryResultsReader[SparqlAnswerJson]
 
-  implicit val forXML: SparqlQueryResultsReader[SesameSPARQL, SparqlAnswerXML] =
+  implicit val forXML: SparqlQueryResultsReader[Sesame, SparqlAnswerXML] =
     SparqlQueryResultsReader[SparqlAnswerXML]
 
 }

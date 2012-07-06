@@ -1,7 +1,7 @@
 package org.w3.banana.sesame
 
 import java.io.InputStream
-import org.w3.banana.{ SparqlAnswerXML, SparqlAnswerJson }
+import org.w3.banana._
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLParserFactory
 import org.openrdf.query.resultio.{ BooleanQueryResultFormat, TupleQueryResultFormat }
 

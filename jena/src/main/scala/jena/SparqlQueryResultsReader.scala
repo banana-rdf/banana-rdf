@@ -12,10 +12,10 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException
  */
 object SparqlQueryResultsReader {
 
-  type Answer = Either[JenaSPARQL#Solutions, Boolean]
+  type Answer = Either[Jena#Solutions, Boolean]
 
-  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[JenaSPARQL, Syntax] =
-    new SparqlQueryResultsReader[JenaSPARQL, Syntax] {
+  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[Jena, Syntax] =
+    new SparqlQueryResultsReader[Jena, Syntax] {
 
       def read(in: InputStream, base: String = ""): Validation[BananaException, Answer] =
         WrappedThrowable.fromTryCatch {
@@ -32,10 +32,10 @@ object SparqlQueryResultsReader {
       def read(reader: Reader, base: String) = throw new NotImplementedException
     }
 
-  implicit val JsonSparqlQueryResultsReader: SparqlQueryResultsReader[JenaSPARQL, SparqlAnswerJson] =
+  implicit val JsonSparqlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
     SparqlQueryResultsReader[SparqlAnswerJson]
 
-  implicit val XMLSparqlQueryResultsReader: SparqlQueryResultsReader[JenaSPARQL, SparqlAnswerXML] =
+  implicit val XMLSparqlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerXML] =
     SparqlQueryResultsReader[SparqlAnswerXML]
 
   implicit val ReaderSelector: ReaderSelector[Answer] =

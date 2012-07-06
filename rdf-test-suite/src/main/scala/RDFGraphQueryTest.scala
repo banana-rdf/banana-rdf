@@ -5,13 +5,13 @@ import org.scalatest.matchers._
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 
-abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
+abstract class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     implicit diesel: Diesel[Rdf],
     reader: BlockingReader[Rdf#Graph, RDFXML],
-    sparqlOperations: SPARQLOperations[Rdf, Sparql],
-    graphQuery: RDFGraphQuery[Rdf, Sparql],
-    sparqlWriter: SparqlSolutionsWriter[Sparql, SyntaxType],
-    sparqlReader: SparqlQueryResultsReader[Sparql, SyntaxType]) extends WordSpec with MustMatchers with Inside {
+    sparqlOperations: SPARQLOperations[Rdf],
+    graphQuery: RDFGraphQuery[Rdf],
+    sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
+    sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
   import diesel._
   import sparqlOperations._
@@ -32,7 +32,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
                            |}
                          """.stripMargin
 
-    def testAnswer(solutions: Sparql#Solutions) = {
+    def testAnswer(solutions: Rdf#Solutions) = {
       val rows = solutions.toIterable.toList
 
       val names: List[String] = rows map {
