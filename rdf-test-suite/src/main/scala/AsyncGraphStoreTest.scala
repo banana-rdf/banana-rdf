@@ -14,7 +14,7 @@ abstract class AsyncGraphStoreTest[Rdf <: RDF, Sparql <: SPARQL](
   import diesel._
   import ops._
 
-  val system = ActorSystem("jena-asyncstore-test", AsyncRDFStore.DEFAULT_CONFIG)
+  val system = ActorSystem("jena-asyncstore-test", util.AkkaDefaults.DEFAULT_CONFIG)
   implicit val timeout = Timeout(1000)
   val store = AsyncRDFStore(rdfStore, system)
 

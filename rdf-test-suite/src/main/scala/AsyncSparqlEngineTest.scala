@@ -18,7 +18,7 @@ abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
   import ops._
   import sparqlOps._
 
-  val system = ActorSystem("jena-asynsparqlquery-test", AsyncRDFStore.DEFAULT_CONFIG)
+  val system = ActorSystem("jena-asynsparqlquery-test", util.AkkaDefaults.DEFAULT_CONFIG)
   implicit val timeout = Timeout(1000)
 
   val asyncEngine = AsyncRDFStore(store, system)
