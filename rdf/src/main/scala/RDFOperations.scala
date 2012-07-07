@@ -75,6 +75,11 @@ trait RDFOperations[Rdf <: RDF] {
 
   def union(left: Rdf#Graph, right: Rdf#Graph): Rdf#Graph
 
+  def union(tOfGraph : Traversable[Rdf#Graph]): Rdf#Graph = {
+     //Default ugly implementation
+     tOfGraph.fold(this.emptyGraph)((g1,g2) => this.union(g1,g2))
+  }
+
   // graph isomorphism
 
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
