@@ -1,18 +1,16 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import JenaOperations._
 import java.io._
 import com.hp.hpl.jena.rdf.model.{ RDFReader => _, _ }
 import scalaz.Validation
-import scalaz.Validation._
 
 object JenaRDFReader {
 
   import JenaGraphSyntax._
 
   /**
-   * builds an RDFReader for Jena knowing the Jena String that identify a Reader
+   * builds an RDFReader for Jena knowing the Jena String that identify a BlockingReader
    * @param jenaSyntax
    * @tparam SyntaxType type of serialisation to write to. Usually a phantom type, useful for type class behavior and
    *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
@@ -41,6 +39,7 @@ object JenaRDFReader {
 
   implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]
 
-  implicit val ReaderSelector: RDFReaderSelector[Jena] = RDFReaderSelector[Jena, RDFXML] combineWith RDFReaderSelector[Jena, Turtle]
+  implicit val ReaderSelector: ReaderSelector[Jena#Graph] =
+    ReaderSelector2[Jena#Graph, RDFXML] combineWith ReaderSelector2[Jena#Graph, Turtle]
 
 }

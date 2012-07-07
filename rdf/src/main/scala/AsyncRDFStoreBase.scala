@@ -6,21 +6,21 @@ import akka.pattern.ask
 import akka.routing._
 import akka.util.Timeout
 
-class AsyncRDFStoreBase[Rdf <: RDF, Sparql <: SPARQL](
-  store: RDFStore[Rdf, Sparql],
+class AsyncRDFStoreBase[Rdf <: RDF](
+  store: RDFStore[Rdf],
   factory: ActorRefFactory)(
     implicit timeout: Timeout)
-    extends AsyncRDFStore[Rdf, Sparql] {
+    extends AsyncRDFStore[Rdf] {
 
   case class AddNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)
   case class AppendToNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)
   case class GetNamedGraph(uri: Rdf#URI)
   case class RemoveGraph(uri: Rdf#URI)
-  case class Select(query: Sparql#SelectQuery)
-  case class Construct(query: Sparql#ConstructQuery)
-  case class Ask(query: Sparql#AskQuery)
+  case class Select(query: Rdf#SelectQuery)
+  case class Construct(query: Rdf#ConstructQuery)
+  case class Ask(query: Rdf#AskQuery)
 
-  class RDFStoreActor(store: RDFStore[Rdf, Sparql]) extends Actor {
+  class RDFStoreActor(store: RDFStore[Rdf]) extends Actor {
 
     def receive = {
       case AddNamedGraph(uri, graph) => {
@@ -74,13 +74,13 @@ class AsyncRDFStoreBase[Rdf <: RDF, Sparql <: SPARQL](
   def removeGraph(uri: Rdf#URI): Future[Unit] =
     storeActor.?(RemoveGraph(uri)).mapTo[Unit]
 
-  def executeSelect(query: Sparql#SelectQuery): Future[Sparql#Solutions] =
-    storeActor.?(Select(query)).asInstanceOf[Future[Sparql#Solutions]]
+  def executeSelect(query: Rdf#SelectQuery): Future[Rdf#Solutions] =
+    storeActor.?(Select(query)).asInstanceOf[Future[Rdf#Solutions]]
 
-  def executeConstruct(query: Sparql#ConstructQuery): Future[Rdf#Graph] =
+  def executeConstruct(query: Rdf#ConstructQuery): Future[Rdf#Graph] =
     storeActor.?(Construct(query)).asInstanceOf[Future[Rdf#Graph]]
 
-  def executeAsk(query: Sparql#AskQuery): Future[Boolean] =
+  def executeAsk(query: Rdf#AskQuery): Future[Boolean] =
     storeActor.?(Ask(query)).asInstanceOf[Future[Boolean]]
 
 }

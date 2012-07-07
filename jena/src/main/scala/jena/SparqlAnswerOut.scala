@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
 import com.hp.hpl.jena.sparql.resultset.{ XMLOutput, JSONOutput, OutputFormatter }
-import org.w3.banana.{ SparqlAnswerXML, SparqlAnswerJson }
+import org.w3.banana._
 
 /**
  * typeclass for serialising special

@@ -4,11 +4,11 @@ import scalaz.Validation
 
 object SPARQLSolutionSyntax {
 
-  def apply[Rdf <: RDF, Sparql <: SPARQL](solution: Sparql#Solution)(implicit sparqlOps: SPARQLOperations[Rdf, Sparql]) = new SPARQLSolutionSyntax[Rdf, Sparql](solution)(sparqlOps)
+  def apply[Rdf <: RDF](solution: Rdf#Solution)(implicit sparqlOps: SPARQLOperations[Rdf]) = new SPARQLSolutionSyntax[Rdf](solution)(sparqlOps)
 
 }
 
-class SPARQLSolutionSyntax[Rdf <: RDF, Sparql <: SPARQL](solution: Sparql#Solution)(implicit sparqlOps: SPARQLOperations[Rdf, Sparql]) {
+class SPARQLSolutionSyntax[Rdf <: RDF](solution: Rdf#Solution)(implicit sparqlOps: SPARQLOperations[Rdf]) {
 
   def apply(v: String): Validation[BananaException, Rdf#Node] =
     sparqlOps.getNode(solution, v)

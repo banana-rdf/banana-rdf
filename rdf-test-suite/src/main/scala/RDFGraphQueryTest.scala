@@ -5,13 +5,13 @@ import org.scalatest.matchers._
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream
 
-abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
+abstract class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     implicit diesel: Diesel[Rdf],
-    reader: RDFReader[Rdf, RDFXML],
-    sparqlOperations: SPARQLOperations[Rdf, Sparql],
-    graphQuery: RDFGraphQuery[Rdf, Sparql],
-    sparqlWriter: BlockingSparqlAnswerWriter[Sparql, SyntaxType],
-    sparqlReader: BlockingSparqlAnswerReader[Sparql, SyntaxType]) extends WordSpec with MustMatchers with Inside {
+    reader: BlockingReader[Rdf#Graph, RDFXML],
+    sparqlOperations: SPARQLOperations[Rdf],
+    graphQuery: RDFGraphQuery[Rdf],
+    sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
+    sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
   import diesel._
   import sparqlOperations._
@@ -21,7 +21,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
   val graph = reader.read(file, "http://foo.com") getOrElse sys.error("ouch")
 
-  "new-tr.rdf " should {
+  "SELECT DISTINCT query in new-tr.rdf " should {
     val selectQueryStr = """prefix : <http://www.w3.org/2001/02pd/rec54#>
                            |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                            |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
@@ -32,7 +32,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
                            |}
                          """.stripMargin
 
-    def testAnswer(solutions: Sparql#Solutions) = {
+    def testAnswer(solutions: Rdf#Solutions) = {
       val rows = solutions.toIterable.toList
 
       val names: List[String] = rows map {
@@ -59,13 +59,13 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = sparqlWriter.write(answers, out)
+      val serialisedAnswer = sparqlWriter.write(answers, out, "")
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
-      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray))
+      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
       assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
 
-      answr2.map(a => assert(testAnswer(a), "the deserialised answer must pass the same tests as the original one"))
+      answr2.map(a => assert(testAnswer(a.left.get), "the deserialised answer must pass the same tests as the original one"))
     }
   }
 
@@ -87,27 +87,81 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, Sparql <: SPARQL, SyntaxType]()(
     }
 
   }
+  "ASK Query on simple graph" should {
 
-  "Alexandre Bertails must appear as an editor in new-tr.rdf" taggedAs (SesameWIP) in {
+    val simple: PointedGraph[Rdf] = (
+      bnode("thing") -- URI("http://www.w3.org/2001/02pd/rec54#editor") ->- (bnode("i")
+        -- foaf.name ->- "Henry".lang("en")
+      )
+    )
 
-    val query = AskQuery("""
-prefix : <http://www.w3.org/2001/02pd/rec54#>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+    val yesQuery = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/name> ?name }")
+    val noQuery = AskQuery("ASK { ?thing <http://xmlns.com/foaf/0.1/knows> ?name }")
+    val yesQuery2 = AskQuery(
+      """| Prefix : <http://www.w3.org/2001/02pd/rec54#>
+         | ASK { ?thing :editor [ <http://xmlns.com/foaf/0.1/name> ?name ] }""".stripMargin)
 
-ASK {
-  ?thing :editor ?ed .
-  ?ed contact:fullName "Alexandre Bertails"
-}
-""")
+    "simple graph contains at least one named person" in {
+      val personInFoaf = executeAsk(simple.graph, yesQuery)
+      assert(personInFoaf, " query " + yesQuery + " must return true")
+    }
 
-    val alexIsThere = executeAsk(graph, query)
+    "simple graph contains no foaf:knows relation" in {
+      val knowRelInFoaf = executeAsk(simple.graph, noQuery)
+      assert(!knowRelInFoaf, " query " + noQuery + " must return false")
+    }
 
-    assert(alexIsThere, " query " + query + "must return true")
+    "more advanced query is ok" in {
+      val objectHasNamedEditor = executeAsk(simple.graph, yesQuery2)
+      assert(objectHasNamedEditor, " query " + yesQuery2 + " must return true")
+    }
 
   }
 
-  "a SPARQL query constructor must accept Prefix objects" taggedAs (SesameWIP) in {
+  "ASK Query on new-tr.rdf" should {
+
+    val query = AskQuery("""
+                           |prefix : <http://www.w3.org/2001/02pd/rec54#>
+                           |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                           |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+                           |
+                           |ASK {
+                           |  ?thing :editor ?ed .
+                           |  ?ed contact:fullName "Alexandre Bertails"
+                           |}""".stripMargin)
+
+    "Alexandre Bertails must appear as an editor in new-tr.rdf" in { //was: taggedAs (SesameWIP)
+      val alexIsThere = executeAsk(graph, query)
+
+      assert(alexIsThere, " query " + query + " must return true")
+    }
+
+    "the sparql answer should serialise and deserialise " in {
+      //in any case we must re-execute query, as the results returned can often only be read once
+      val answers = executeAsk(graph, query)
+
+      val out = new ByteArrayOutputStream()
+
+      val serialisedAnswer = BooleanWriter.WriterSelector(MediaRange(sparqlWriter.syntax.mime)).map {
+        l =>
+          l.write(answers, out, "")
+      }.getOrElse(fail("could not find sparkql boolean writer for json"))
+
+      assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
+
+      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
+      assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
+
+      answr2.map { a =>
+        assert(a.isRight, "The answer to a ASK is a boolean")
+        val result = a.right.get
+        assert(result, " query " + query + "must return true")
+      }
+    }
+  }
+
+  //taggedAs (SesameWIP)
+  "a SPARQL query constructor must accept Prefix objects" in {
 
     val query1 = ConstructQuery("""
 prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -123,9 +177,9 @@ CONSTRUCT {
 }
                              """)
 
-    val base = Prefix("", "http://www.w3.org/2001/02pd/rec54#", ops)
-    val rdf = RDFPrefix(ops)
-    val contact = Prefix("contact", "http://www.w3.org/2000/10/swap/pim/contact#", ops)
+    val base = Prefix[Rdf]("", "http://www.w3.org/2001/02pd/rec54#")
+    val rdf = RDFPrefix[Rdf]
+    val contact = Prefix[Rdf]("contact", "http://www.w3.org/2000/10/swap/pim/contact#")
 
     val query2 = ConstructQuery("""
                                |CONSTRUCT {

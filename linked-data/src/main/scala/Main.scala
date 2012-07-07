@@ -15,7 +15,7 @@ object Main {
     import JenaOperations._
     import JenaDiesel._
 
-    val ld = LinkedData.inMemoryImpl(JenaDiesel, JenaRDFReader.ReaderSelector)
+    val ld = LinkedData.inMemoryImpl[Jena](JenaDiesel, JenaRDFReader.ReaderSelector)
     import ld._
 
     //    val namesLD = for {
@@ -29,8 +29,8 @@ object Main {
     //
     //    println(names)
 
-    val cert = Prefix("cert", "http://www.w3.org/ns/auth/cert#", JenaOperations)
-    val foaf = Prefix("foaf", "http://xmlns.com/foaf/0.1/", JenaOperations)
+    val cert = Prefix[Jena]("cert", "http://www.w3.org/ns/auth/cert#")
+    val foaf = Prefix[Jena]("foaf", "http://xmlns.com/foaf/0.1/")
 
     val resultLD = for {
       bblfish ← goto(URI("http://bblfish.net/people/henry/card#me"))

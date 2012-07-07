@@ -7,18 +7,18 @@ import akka.util.Timeout
 import akka.dispatch._
 import akka.util.duration._
 
-abstract class AsyncSparqlEngineTest[Rdf <: RDF, Sparql <: SPARQL](
-  store: RDFStore[Rdf, Sparql])(
-    implicit reader: RDFReader[Rdf, RDFXML],
+abstract class AsyncSparqlEngineTest[Rdf <: RDF](
+  store: RDFStore[Rdf])(
+    implicit reader: BlockingReader[Rdf#Graph, RDFXML],
     diesel: Diesel[Rdf],
-    sparqlOps: SPARQLOperations[Rdf, Sparql])
+    sparqlOps: SPARQLOperations[Rdf])
     extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
   import ops._
   import sparqlOps._
 
-  val system = ActorSystem("jena-asynsparqlquery-test", AsyncRDFStore.DEFAULT_CONFIG)
+  val system = ActorSystem("jena-asynsparqlquery-test", util.AkkaDefaults.DEFAULT_CONFIG)
   implicit val timeout = Timeout(1000)
 
   val asyncEngine = AsyncRDFStore(store, system)

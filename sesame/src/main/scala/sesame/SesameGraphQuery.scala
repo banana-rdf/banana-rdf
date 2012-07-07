@@ -10,7 +10,7 @@ import org.w3.banana.{ OpenGraphQuery, RDFGraphQuery }
  * for each query.
  * ?? Sesame has ways to add warnings to compilations...
  */
-object SesameGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
+object SesameGraphQuery extends RDFGraphQuery[Sesame] {
 
   /**
    * Sesame queries can only be made on stores, hence this is needed.
@@ -25,15 +25,15 @@ object SesameGraphQuery extends RDFGraphQuery[Sesame, SesameSPARQL] {
     SesameStore(sail)
   }
 
-  def executeSelect(graph: Sesame#Graph, query: SesameSPARQL#SelectQuery) = {
+  def executeSelect(graph: Sesame#Graph, query: Sesame#SelectQuery) = {
     makeStore(graph).executeSelect(query)
   }
 
-  def executeConstruct(graph: Sesame#Graph, query: SesameSPARQL#ConstructQuery) = {
+  def executeConstruct(graph: Sesame#Graph, query: Sesame#ConstructQuery) = {
     makeStore(graph).executeConstruct(query)
   }
 
-  def executeAsk(graph: Sesame#Graph, query: SesameSPARQL#AskQuery) = {
+  def executeAsk(graph: Sesame#Graph, query: Sesame#AskQuery) = {
     makeStore(graph).executeAsk(query)
 
   }
