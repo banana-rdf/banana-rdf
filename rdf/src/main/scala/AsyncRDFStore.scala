@@ -6,9 +6,7 @@ import akka.pattern.ask
 import akka.routing._
 import akka.util.Timeout
 
-trait AsyncRDFStore[Rdf <: RDF]
-  extends AsyncGraphStore[Rdf]
-  with AsyncSPARQLEngine[Rdf]
+trait AsyncRDFStore[Rdf <: RDF] extends MRDFStore[Rdf, Future]
 
 object AsyncRDFStore {
 

@@ -1,14 +1,8 @@
 package org.w3.banana
 
+import scalaz.Id
+
 /**
  * to execute SPARQL queries
  */
-trait SPARQLEngine[Rdf <: RDF] {
-
-  def executeSelect(query: Rdf#SelectQuery): Rdf#Solutions
-
-  def executeConstruct(query: Rdf#ConstructQuery): Rdf#Graph
-
-  def executeAsk(query: Rdf#AskQuery): Boolean
-
-}
+trait SPARQLEngine[Rdf <: RDF] extends MSPARQLEngine[Rdf, Id]
