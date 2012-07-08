@@ -42,7 +42,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       binder.fromPointedGraph(pointed)
 
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
-      val newGraph = union(graph, Graph(Triple(node, rdf("type"), clazz)))
+      val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
       PointedGraph(node, newGraph)
     }
 

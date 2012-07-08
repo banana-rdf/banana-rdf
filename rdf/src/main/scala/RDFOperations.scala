@@ -72,16 +72,9 @@ trait RDFOperations[Rdf <: RDF] {
   def getSubjects(graph: Rdf#Graph, predicate: Rdf#URI, obj: Rdf#Node): Iterable[Rdf#Node]
 
   // graph union
-
-  def union(left: Rdf#Graph, right: Rdf#Graph): Rdf#Graph
-
-  def union(tOfGraph : Traversable[Rdf#Graph]): Rdf#Graph = {
-     //Default ugly implementation
-     tOfGraph.fold(this.emptyGraph)((g1,g2) => this.union(g1,g2))
-  }
+  def union(graphs : Traversable[Rdf#Graph]): Rdf#Graph
 
   // graph isomorphism
-
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
 
 }

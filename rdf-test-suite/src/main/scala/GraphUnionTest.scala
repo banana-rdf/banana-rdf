@@ -41,11 +41,21 @@ abstract class GraphUnionTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
   ).graph
 
   "union must compute the union of two graphs, and should not touch the graphs" in {
-    val result = union(foo, bar)
+    val result = union(foo :: bar :: Nil )
     isomorphism(foo, fooReference) must be(true)
     isomorphism(bar, barReference) must be(true)
     isomorphism(foo, bar) must be(false)
     isomorphism(foobar, result) must be(true)
+  }
+
+  "union of Nil must return an empty graph" in {
+    val result: Rdf#Graph = union(Nil)
+    isomorphism(result, emptyGraph) must be(true)
+  }
+
+  "union of a single graph must return an isomorphic graph" in {
+    val result = union(foo :: Nil)
+    isomorphism(result, foo) must be(true)
   }
 
 }
