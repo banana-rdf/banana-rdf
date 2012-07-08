@@ -166,15 +166,12 @@ object JenaOperations extends RDFOperations[Jena] {
 
   // graph union
 
-  def union(left: Jena#Graph, right: Jena#Graph): Jena#Graph = union(left :: right :: Nil)
-
-  override def union(tOfGraph: Traversable[Jena#Graph]): Jena#Graph = {
-    tOfGraph match {
-      case Nil => this.emptyGraph
+  def union(graphs: Traversable[Jena#Graph]): Jena#Graph = {
+    graphs match {
       case x::Nil => x
       case _ =>
         val graph = Factory.createDefaultGraph
-        tOfGraph.foreach(g => graphToIterable(g).foreach {
+        graphs.foreach(g => graphToIterable(g).foreach {
           t => graph add t
         })
         graph
