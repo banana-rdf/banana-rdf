@@ -4,12 +4,11 @@ import org.scalatest._
 import org.scalatest.matchers._
 import scalaz._
 import Scalaz._
-import akka.dispatch.Future
 
 
 abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
                                                  reader: BlockingReader[Rdf#Graph, RDFXML],
-                                                 cmonad: Bind[M]) extends WordSpec with MustMatchers {
+                                                 bind: Bind[M]) extends WordSpec with MustMatchers {
 
   def store: MGraphStore[Rdf,M]
 
