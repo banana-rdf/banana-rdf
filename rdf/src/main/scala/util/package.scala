@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.{Functor, Applicative, Monad, Success}
+import scalaz.{Monad, Bind, Success}
 import akka.dispatch.{Promise, Future}
 
 package object util extends FutureImplicits with BananaExceptionImplicits {
@@ -13,10 +13,8 @@ package object util extends FutureImplicits with BananaExceptionImplicits {
     def bind[A, B](x: BananaFuture[A])(f: A => BananaFuture[B]): BananaFuture[B] = x flatMap f
   }
 
-  import FutureImplicits._
-  implicit def FutureMonad: Monad[Future] = new Monad[Future] {
+  implicit def FutureBind: Bind[Future] = new Bind[Future] {
     def bind[A, B](fa: Future[A])(f: (A) => Future[B]): Future[B] = fa flatMap f
-    def point[A](a: => A): Future[A] = Future(a)
     override def map[A,B](fa: Future[A])(f: A => B): Future[B] = fa map f
   }
 }

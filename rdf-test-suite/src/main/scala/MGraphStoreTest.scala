@@ -9,7 +9,7 @@ import akka.dispatch.Future
 
 abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
                                                  reader: BlockingReader[Rdf#Graph, RDFXML],
-                                                 cmonad: Monad[M]) extends WordSpec with MustMatchers {
+                                                 cmonad: Bind[M]) extends WordSpec with MustMatchers {
 
   def store: MGraphStore[Rdf,M]
 
