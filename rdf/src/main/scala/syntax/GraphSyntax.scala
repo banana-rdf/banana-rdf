@@ -11,7 +11,7 @@ trait GraphSyntax[Rdf <: RDF] {
 
     def toIterable: Iterable[Rdf#Triple] = ops.graphToIterable(graph)
 
-    def union(otherGraph: Rdf#Graph): Rdf#Graph = ops.union(graph :: otherGraph:: Nil)
+    def union(otherGraph: Rdf#Graph): Rdf#Graph = ops.union(graph :: otherGraph :: Nil)
 
     def isIsomorphicWith(otherGraph: Rdf#Graph): Boolean = ops.isomorphism(graph, otherGraph)
 

@@ -12,5 +12,4 @@ package object util extends FutureImplicits with BananaExceptionImplicits {
     def bind[A, B](x: BananaFuture[A])(f: A => BananaFuture[B]): BananaFuture[B] = x flatMap f
   }
 
-
 }

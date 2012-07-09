@@ -168,7 +168,7 @@ object JenaOperations extends RDFOperations[Jena] {
 
   def union(graphs: Traversable[Jena#Graph]): Jena#Graph = {
     graphs match {
-      case x::Nil => x
+      case x :: Nil => x
       case _ =>
         val graph = Factory.createDefaultGraph
         graphs.foreach(g => graphToIterable(g).foreach {

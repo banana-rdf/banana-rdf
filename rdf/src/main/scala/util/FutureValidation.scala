@@ -1,12 +1,11 @@
 package org.w3.banana.util
 
-import akka.dispatch.{Future, Promise}
+import akka.dispatch.{ Future, Promise }
 import scalaz.Validation
 import scalaz.syntax.validation._
 
 case class FutureValidation[F, S](val inner: Future[Validation[F, S]])
-     extends FutureImplicits with AkkaDefaults
-{
+    extends FutureImplicits with AkkaDefaults {
 
   def map[T](fn: (S) => T): FutureValidation[F, T] =
     FutureValidation(inner map { validation => validation map fn })
@@ -38,10 +37,11 @@ case class FutureValidation[F, S](val inner: Future[Validation[F, S]])
 
   def orElse[G](f: F => FutureValidation[G, S]) =
     inner flatMap {
-      (v: Validation[F, S]) => v.fold(
-        success = s => Promise.successful(s.success[G]),
-        failure = f(_).inner
-      )
+      (v: Validation[F, S]) =>
+        v.fold(
+          success = s => Promise.successful(s.success[G]),
+          failure = f(_).inner
+        )
     } fv
 
   /** And the success shall be failures and the failures shall be successes. This is how you do logical negation */
@@ -59,8 +59,6 @@ case class FutureValidation[F, S](val inner: Future[Validation[F, S]])
     this
 }
 
-
 object FutureValidation {
-
 
 }
