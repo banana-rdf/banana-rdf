@@ -140,11 +140,14 @@ object SesameOperations extends RDFOperations[Sesame] {
 
   // graph union
 
-  def union(left: Sesame#Graph, right: Sesame#Graph): Sesame#Graph = {
-    val graph = new GraphImpl
-    graphToIterable(left) foreach { t => graph add t }
-    graphToIterable(right) foreach { t => graph add t }
-    graph
+  def union(graphs: Traversable[Sesame#Graph]): Sesame#Graph = {
+    graphs match {
+      case x :: Nil => x
+      case _ =>
+        val graph = new GraphImpl
+        graphs.foreach(g => graphToIterable(g) foreach { t => graph add t })
+        graph
+    }
   }
 
   // graph isomorphism

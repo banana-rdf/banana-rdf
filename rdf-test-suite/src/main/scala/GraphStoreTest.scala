@@ -47,7 +47,7 @@ abstract class GraphStoreTest[Rdf <: RDF](
     store.addNamedGraph(uri("http://example.com/graph"), graph)
     store.appendToNamedGraph(uri("http://example.com/graph"), graph2)
     val retrievedGraph = store.getNamedGraph(uri("http://example.com/graph"))
-    val unionGraph = union(graph, graph2)
+    val unionGraph = union(graph :: graph2 :: Nil)
     assert(unionGraph isIsomorphicWith retrievedGraph)
   }
 

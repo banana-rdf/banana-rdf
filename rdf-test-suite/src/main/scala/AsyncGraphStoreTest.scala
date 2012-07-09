@@ -54,7 +54,7 @@ abstract class AsyncGraphStoreTest[Rdf <: RDF](
       _ <- store.appendToNamedGraph(uri("http://example.com/graph"), graph2)
       retrievedGraph <- store.getNamedGraph(uri("http://example.com/graph"))
     } {
-      val unionGraph = union(graph, graph2)
+      val unionGraph = union(graph :: graph2 :: Nil)
       assert(unionGraph isIsomorphicWith retrievedGraph)
     }
   }
