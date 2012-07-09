@@ -1,7 +1,5 @@
 package org.w3.banana
 
-import scalaz.Monad
-
 /**
  * to execute SPARQL queries
  */
