@@ -13,7 +13,7 @@ object BuildSettings {
     organization := "org.w3",
     version      := "0.3-SNAPSHOT",
 //    version      := "x04-SNAPSHOT",
-    scalaVersion := "2.9.2",
+    scalaVersion := "2.9.1",
     crossScalaVersions := Seq("2.9.1", "2.9.2"),
 
     parallelExecution in Test := false,
@@ -84,7 +84,6 @@ object BananaRdfBuild extends Build {
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
-  val shapeless = "com.chuusai" %% "shapeless" % "1.2.2"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -188,7 +187,6 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += scalaz,
-      libraryDependencies += shapeless,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
       publishMavenStyle := true
