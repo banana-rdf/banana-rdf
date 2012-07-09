@@ -2,7 +2,7 @@ package org.w3.banana
 
 import scalaz.{ Monad, Success }
 
-package object util {
+package object util extends FutureImplicits with BananaExceptionImplicits {
 
   type BananaFuture[T] = FutureValidation[BananaException, T]
 

@@ -35,3 +35,5 @@ object WrappedThrowable {
 case class LocalNameException(message: String) extends Exception(message) with BananaException
 
 case class VarNotFound(message: String) extends Exception(message) with BananaException
+
+case class StoreProblem(t: Throwable) extends Exception(t) with BananaException
