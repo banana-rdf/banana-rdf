@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.util.Timeout
 import akka.dispatch._
 import akka.util.duration._
+import org.w3.banana.util._
 
 abstract class AsyncSparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf])(
@@ -50,7 +51,7 @@ SELECT DISTINCT ?name WHERE {
 }
 """)
 
-    val names: Iterable[String] = Await.result(asyncEngine.executeSelect(query), 1.second).toIterable map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
+    val names: Iterable[String] = asyncEngine.executeSelect(query).awaitSuccess().toIterable map { row => row("name").flatMap(_.as[String]) getOrElse sys.error("") }
 
     names must contain("Alexandre Bertails")
 
@@ -68,7 +69,7 @@ CONSTRUCT {
 }
 """)
 
-    val clonedGraph = Await.result(asyncEngine.executeConstruct(query), 1.second)
+    val clonedGraph = asyncEngine.executeConstruct(query).awaitSuccess()
 
     assert(clonedGraph isIsomorphicWith graph)
 
@@ -89,7 +90,7 @@ ASK {
 }
 """)
 
-    val alexIsThere = Await.result(asyncEngine.executeAsk(query), 1.second)
+    val alexIsThere = asyncEngine.executeAsk(query).awaitSuccess()
 
     alexIsThere must be(true)
 

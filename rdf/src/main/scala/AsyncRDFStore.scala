@@ -5,8 +5,9 @@ import akka.actor._
 import akka.pattern.ask
 import akka.routing._
 import akka.util.Timeout
+import org.w3.banana.util.BananaFuture
 
-trait AsyncRDFStore[Rdf <: RDF] extends MRDFStore[Rdf, Future]
+trait AsyncRDFStore[Rdf <: RDF] extends MRDFStore[Rdf, BananaFuture]
 
 object AsyncRDFStore {
 
