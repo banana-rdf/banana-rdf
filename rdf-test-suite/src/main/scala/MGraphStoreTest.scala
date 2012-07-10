@@ -5,37 +5,36 @@ import org.scalatest.matchers._
 import scalaz._
 import Scalaz._
 
-
 abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
-                                                 reader: BlockingReader[Rdf#Graph, RDFXML],
-                                                 bind: Bind[M]) extends WordSpec with MustMatchers {
+    reader: BlockingReader[Rdf#Graph, RDFXML],
+    bind: Bind[M]) extends WordSpec with MustMatchers {
 
-  def store: MGraphStore[Rdf,M]
+  def store: MGraphStore[Rdf, M]
 
   import diesel._
   import ops._
 
   val graph: Rdf#Graph = (
     bnode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -- foaf.title ->- "Mr"
-    ).graph
+    -- foaf.name ->- "Alexandre".lang("fr")
+    -- foaf.title ->- "Mr"
+  ).graph
 
   val graph2: Rdf#Graph = (
     bnode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -- foaf.knows ->- (
+    -- foaf.name ->- "Alexandre".lang("fr")
+    -- foaf.knows ->- (
       uri("http://bblfish.net/#hjs")
-        -- foaf.name ->- "Henry Story"
-        -- foaf.currentProject ->- uri("http://webid.info/")
-      )
-    ).graph
+      -- foaf.name ->- "Henry Story"
+      -- foaf.currentProject ->- uri("http://webid.info/")
+    )
+  ).graph
 
   val foo: Rdf#Graph = (
     uri("http://example.com/foo")
-      -- rdf("foo") ->- "foo"
-      -- rdf("bar") ->- "bar"
-    ).graph
+    -- rdf("foo") ->- "foo"
+    -- rdf("bar") ->- "bar"
+  ).graph
 
   "getNamedGraph should retrieve the graph added with addNamedGraph" in {
     store.addNamedGraph(uri("http://example.com/graph"), graph)
@@ -66,6 +65,5 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
 
     retrievedGraph.map(r => r isIsomorphicWith graph)
   }
-
 
 }

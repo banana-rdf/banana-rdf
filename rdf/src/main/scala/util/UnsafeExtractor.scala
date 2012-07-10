@@ -4,6 +4,6 @@ import scalaz.Validation
 
 trait UnsafeExtractor[M[_]] {
 
-  def unsafeExtract[T](m: => M[T]): Validation[Throwable, T]
+  def unsafeExtract[T](m: => M[T]): Validation[Exception, T]
 
 }

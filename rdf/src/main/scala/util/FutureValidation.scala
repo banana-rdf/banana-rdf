@@ -59,6 +59,22 @@ case class FutureValidation[F, S](val inner: Future[Validation[F, S]])
     this
 }
 
+import scalaz._
+
 object FutureValidation {
+
+  implicit def FutureValidationBind[E]: Bind[({ type l[x] = FutureValidation[E, x] })#l] = new Bind[({ type l[x] = FutureValidation[E, x] })#l] {
+    override def map[A, B](x: FutureValidation[E, A])(f: A => B): FutureValidation[E, B] = x map f
+    def bind[A, B](x: FutureValidation[E, A])(f: A => FutureValidation[E, B]): FutureValidation[E, B] = x flatMap f
+  }
+
+  implicit def BananaFutureUnsafeExtractor[E]: UnsafeExtractor[({ type l[x] = FutureValidation[E, x] })#l] = new UnsafeExtractor[({ type l[x] = FutureValidation[E, x] })#l] {
+    def unsafeExtract[T](bf: => FutureValidation[E, T]): Validation[Exception, T] =
+      try {
+        bf.await().fold(e => Failure(new Exception(e.toString)), Success(_))
+      } catch {
+        case e: Exception => Failure(e)
+      }
+  }
 
 }
