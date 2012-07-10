@@ -6,6 +6,7 @@ import akka.pattern.ask
 import akka.routing._
 import akka.util.Timeout
 import org.w3.banana.util._
+import org.w3.banana.BananaException._
 import scalaz.Validation
 
 class AsyncRDFStoreBase[Rdf <: RDF](
