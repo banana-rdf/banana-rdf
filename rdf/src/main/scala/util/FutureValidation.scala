@@ -1,11 +1,13 @@
 package org.w3.banana.util
 
-import akka.dispatch.{ Future, Promise }
+import akka.dispatch._
+import akka.util.Duration
 import scalaz.Validation
 import scalaz.syntax.validation._
 
-case class FutureValidation[F, S](val inner: Future[Validation[F, S]])
-    extends FutureImplicits with AkkaDefaults {
+case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaDefaults {
+
+  implicit val defaultDuration = Duration("3s")
 
   def map[T](fn: (S) => T): FutureValidation[F, T] =
     FutureValidation(inner map { validation => validation map fn })
@@ -52,11 +54,15 @@ case class FutureValidation[F, S](val inner: Future[Validation[F, S]])
         failure = f => f.success))
     )
 
-  // def lift: FutureValidation[F, S] =
-  // this
-
   def fv: FutureValidation[F, S] =
     this
+
+  def await(duration: Duration = defaultDuration): Validation[F, S] =
+    Await.result(inner, duration)
+
+  def awaitSuccess(duration: Duration = defaultDuration): S =
+    await(duration).toOption.get
+
 }
 
 import scalaz._

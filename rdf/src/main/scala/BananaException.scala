@@ -10,6 +10,12 @@ object BananaException {
 
   implicit val bananaExceptionSemiGroup = firstSemigroup[BananaException]
 
+  def bananaCatch[T](a: => T): Validation[BananaException, T] = try {
+    Success(a)
+  } catch {
+    case e => Failure(StoreProblem(e))
+  }
+
 }
 
 sealed trait BananaException extends Exception

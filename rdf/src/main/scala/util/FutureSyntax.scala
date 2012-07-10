@@ -7,7 +7,7 @@ import akka.util.Duration
 import scalaz.Validation
 import scalaz.syntax.validation._
 
-trait FutureImplicits extends AkkaDefaults {
+trait FutureSyntax extends AkkaDefaults {
 
   class FutureW[A](inner: Future[A]) {
     implicit val defaultDuration = Duration("3s")
@@ -25,26 +25,23 @@ trait FutureImplicits extends AkkaDefaults {
       } catch {
         case exn: Exception => None
       }
+
   }
 
-  class FutureValidationW[E, S](val fv: FutureValidation[E, S]) extends FutureW(fv.inner) {
-    def awaitSuccess: S = awaitSuccess()
+  implicit def futureToFutureW[A](f: Future[A]) =
+    new FutureW(f)
 
-    def awaitSuccess(duration: Duration = defaultDuration): S =
-      await(duration).toOption.get
-  }
-
-  def delayFailure[F, S](in: Validation[F, Future[S]]): Future[Validation[F, S]] =
-    in fold (
-      failure = f => Promise.successful(f.fail[S]),
-      success = s => s map (_.success[F])
-    )
-
-  def flattenValidations[F, S](in: Validation[F, Validation[F, S]]): Validation[F, S] =
-    in fold (
-      failure = f => f.fail[S],
-      success = s => s
-    )
+  //  def delayFailure[F, S](in: Validation[F, Future[S]]): Future[Validation[F, S]] =
+  //    in fold (
+  //      failure = f => Promise.successful(f.fail[S]),
+  //      success = s => s map (_.success[F])
+  //    )
+  //
+  //  def flattenValidations[F, S](in: Validation[F, Validation[F, S]]): Validation[F, S] =
+  //    in fold (
+  //      failure = f => f.fail[S],
+  //      success = s => s
+  //    )
 
   implicit def futureOfValidationToFutureValidation[F, S](in: Future[Validation[F, S]]): FutureValidation[F, S] =
     FutureValidation(in)
@@ -52,11 +49,6 @@ trait FutureImplicits extends AkkaDefaults {
   implicit def validationToFutureValidation[F, S](in: Validation[F, S]): FutureValidation[F, S] =
     FutureValidation(Promise.successful(in))
 
-  implicit def futureValidationToFutureValidationW[E, S](fv: FutureValidation[E, S]) =
-    new FutureValidationW(fv)
-
-  implicit def futureToFutureW[A](f: Future[A]) =
-    new FutureW(f)
 }
 
-object FutureImplicits extends FutureImplicits
+object FutureSyntax extends FutureSyntax

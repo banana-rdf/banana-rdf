@@ -1,9 +1,11 @@
 package org.w3.banana
 
 import scalaz._
-import akka.dispatch.{ Promise, Future }
 
-package object util extends FutureImplicits with BananaExceptionImplicits {
+package object util
+    extends FutureSyntax
+    with ValidationSyntax
+    with AnySyntax {
 
   type BananaFuture[T] = FutureValidation[BananaException, T]
 
