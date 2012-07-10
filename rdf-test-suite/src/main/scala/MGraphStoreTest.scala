@@ -4,15 +4,18 @@ import org.scalatest._
 import org.scalatest.matchers._
 import scalaz._
 import Scalaz._
+import util.UnsafeExtractor
 
 abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     reader: BlockingReader[Rdf#Graph, RDFXML],
-    bind: Bind[M]) extends WordSpec with MustMatchers {
+    bind: Bind[M],
+    extractor: UnsafeExtractor[M]) extends WordSpec with MustMatchers {
 
   def store: MGraphStore[Rdf, M]
 
   import diesel._
   import ops._
+  import extractor._
 
   val graph: Rdf#Graph = (
     bnode("betehess")
@@ -36,34 +39,46 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     -- rdf("bar") ->- "bar"
   ).graph
 
-  "getNamedGraph should retrieve the graph added with addNamedGraph" in {
-    store.addNamedGraph(uri("http://example.com/graph"), graph)
-    store.addNamedGraph(uri("http://example.com/graph2"), graph2)
-    val retrievedGraph = store.getNamedGraph(uri("http://example.com/graph"))
-    val retrievedGraph2 = store.getNamedGraph(uri("http://example.com/graph2"))
 
-    retrievedGraph.map(r => assert(graph isIsomorphicWith r))
-    retrievedGraph2.map(r => assert(graph2 isIsomorphicWith r))
+  "getNamedGraph should retrieve the graph added with addNamedGraph" in {
+    unsafeExtract(store.addNamedGraph(uri("http://example.com/graph"), graph).flatMap(
+      _ => store.addNamedGraph(uri("http://example.com/graph2"), graph2).flatMap(
+        _ => store.getNamedGraph(uri("http://example.com/graph")).flatMap (
+           rGraph => store.getNamedGraph(uri("http://example.com/graph2")).map(
+             rGraph2 => {
+               assert(rGraph isIsomorphicWith graph)
+               assert(rGraph2 isIsomorphicWith graph2)
+             }
+           )
+        )
+      )
+    )) must be('success)
   }
 
   "appendToNamedGraph should be equivalent to graph union" in {
-    store.addNamedGraph(uri("http://example.com/graph"), graph)
-    store.appendToNamedGraph(uri("http://example.com/graph"), graph2)
-    val retrievedGraph = store.getNamedGraph(uri("http://example.com/graph"))
-    val unionGraph = union(graph :: graph2 :: Nil)
-    retrievedGraph.map(r => assert(unionGraph isIsomorphicWith r))
+    unsafeExtract(store.addNamedGraph(uri("http://example.com/graph"), graph).flatMap(
+      _ => store.appendToNamedGraph(uri("http://example.com/graph"), graph2).flatMap(
+        _ => store.getNamedGraph(uri("http://example.com/graph")).map(
+          rGraph => assert(rGraph isIsomorphicWith union(graph :: graph2 :: Nil))
+        )
+      )
+    )) must be('success)
   }
 
   "addNamedGraph should drop the existing graph" in {
     val u = uri("http://example.com/graph")
 
-    store.addNamedGraph(u, foo)
-    store.addNamedGraph(u, graph)
-    val retrievedGraph = store.getNamedGraph(u)
-
+    //If graph and foo are isomorphic, the test means nothing
     assert(!(graph isIsomorphicWith foo))
 
-    retrievedGraph.map(r => r isIsomorphicWith graph)
+    unsafeExtract(store.addNamedGraph(u, foo).flatMap(
+      _ => store.addNamedGraph(u, graph).flatMap(
+        _ => store.getNamedGraph(u).map(
+          rGraph => assert(rGraph isIsomorphicWith graph)
+        )
+      )
+    )) must be('success)
+
   }
 
 }

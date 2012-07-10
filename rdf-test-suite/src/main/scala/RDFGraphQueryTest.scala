@@ -146,7 +146,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
       val serialisedAnswer = BooleanWriter.WriterSelector(MediaRange(sparqlWriter.syntax.mime)).map {
         l =>
           l.write(answers, out, "")
-      }.getOrElse(fail("could not find sparql boolean writer for "+sparqlWriter.syntax.mime))
+      }.getOrElse(fail("could not find sparql boolean writer for " + sparqlWriter.syntax.mime))
 
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
