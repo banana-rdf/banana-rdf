@@ -11,7 +11,7 @@ import org.w3.banana.util._
 abstract class AsyncGraphStoreTest[Rdf <: RDF](rdfStore: RDFStore[Rdf])(
   implicit diesel: Diesel[Rdf],
   reader: BlockingReader[Rdf#Graph, RDFXML])
-  extends MGraphStoreTest[Rdf, Future] with BeforeAndAfterAll {
+  extends MGraphStoreTest[Rdf, BananaFuture] with BeforeAndAfterAll {
 
   import diesel._
   import ops._
