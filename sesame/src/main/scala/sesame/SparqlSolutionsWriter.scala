@@ -10,7 +10,7 @@ import java.io.{ Writer, OutputStream }
 object SparqlSolutionsWriter {
 
   def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType],
-    syntax: Syntax[SyntaxType]) =
+    syntaxTp: Syntax[SyntaxType]) =
     new SparqlSolutionsWriter[Sesame, SyntaxType] {
 
       def write(answers: Sesame#Solutions, os: OutputStream, base: String = "") = {
@@ -27,7 +27,7 @@ object SparqlSolutionsWriter {
 
       def write(input: Sesame#Solutions, writer: Writer, base: String) = null
 
-      def syntax[S >: SyntaxType] = syntax
+      def syntax[S >: SyntaxType] = syntaxTp
     }
 
   implicit val Json = SparqlSolutionsWriter[SparqlAnswerJson]

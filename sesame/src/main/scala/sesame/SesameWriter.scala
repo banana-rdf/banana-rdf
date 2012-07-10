@@ -14,7 +14,7 @@ object SesameWriter {
   import SesameOperations._
 
   def apply[SyntaxType](implicit sesameSyntax: SesameSyntax[SyntaxType],
-    syntax: Syntax[SyntaxType]): RDFBlockingWriter[Sesame, SyntaxType] =
+    syntaxTp: Syntax[SyntaxType]): RDFBlockingWriter[Sesame, SyntaxType] =
     new RDFBlockingWriter[Sesame, SyntaxType] {
 
       private def write(graph: Sesame#Graph, rdfWriter: RDFWriter, base: String): Validation[BananaException, Unit] =
@@ -24,7 +24,7 @@ object SesameWriter {
           rdfWriter.endRDF()
         }
 
-      def syntax[S >: SyntaxType] = syntax
+      def syntax[S >: SyntaxType] = syntaxTp
 
       def write(graph: Sesame#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] =
         for {
