@@ -71,11 +71,12 @@ CONSTRUCT {
 prefix : <http://www.w3.org/2001/02pd/rec54#>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 
 ASK {
   graph <http://example.com/graph> {
     ?thing :editor ?ed .
-    ?ed contact:fullName "Alexandre Bertails"
+    ?ed contact:fullName "Alexandre Bertails"^^xsd:string
   }
 }
                           """)
