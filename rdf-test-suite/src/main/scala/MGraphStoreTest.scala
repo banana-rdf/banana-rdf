@@ -4,10 +4,12 @@ import org.scalatest._
 import org.scalatest.matchers._
 import scalaz._
 import Scalaz._
+import util.UnsafeExtractor
 
 abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     reader: BlockingReader[Rdf#Graph, RDFXML],
-    bind: Bind[M]) extends WordSpec with MustMatchers {
+    bind: Bind[M],
+    extractor: UnsafeExtractor[M]) extends WordSpec with MustMatchers {
 
   def store: MGraphStore[Rdf, M]
 
@@ -36,14 +38,20 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     -- rdf("bar") ->- "bar"
   ).graph
 
+  //Throw exception on failure, as espected by the test framework
+  def checkIsomorphism(mGraph: M[Rdf#Graph], graph: Rdf#Graph) {
+    import extractor._
+
+    val v = unsafeExtract(mGraph.map(mg => assert(graph isIsomorphicWith mg)))
+    v.fold(throw _, x => x)
+  }
+
   "getNamedGraph should retrieve the graph added with addNamedGraph" in {
     store.addNamedGraph(uri("http://example.com/graph"), graph)
     store.addNamedGraph(uri("http://example.com/graph2"), graph2)
-    val retrievedGraph = store.getNamedGraph(uri("http://example.com/graph"))
-    val retrievedGraph2 = store.getNamedGraph(uri("http://example.com/graph2"))
 
-    retrievedGraph.map(r => assert(graph isIsomorphicWith r))
-    retrievedGraph2.map(r => assert(graph2 isIsomorphicWith r))
+    checkIsomorphism(store.getNamedGraph(uri("http://example.com/graph")), graph)
+    checkIsomorphism(store.getNamedGraph(uri("http://example.com/graph2")), graph2)
   }
 
   "appendToNamedGraph should be equivalent to graph union" in {
@@ -51,7 +59,8 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     store.appendToNamedGraph(uri("http://example.com/graph"), graph2)
     val retrievedGraph = store.getNamedGraph(uri("http://example.com/graph"))
     val unionGraph = union(graph :: graph2 :: Nil)
-    retrievedGraph.map(r => assert(unionGraph isIsomorphicWith r))
+
+    checkIsomorphism(retrievedGraph, unionGraph)
   }
 
   "addNamedGraph should drop the existing graph" in {
@@ -61,9 +70,10 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     store.addNamedGraph(u, graph)
     val retrievedGraph = store.getNamedGraph(u)
 
+    //If graph and foo are isomorphic, the test means nothing
     assert(!(graph isIsomorphicWith foo))
 
-    retrievedGraph.map(r => r isIsomorphicWith graph)
+    checkIsomorphism(retrievedGraph, graph)
   }
 
 }
