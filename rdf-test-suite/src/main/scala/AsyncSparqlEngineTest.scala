@@ -26,7 +26,6 @@ abstract class AsyncSparqlEngineTest[Rdf <: RDF](
 
   def store = asyncEngine
 
-
   override def beforeAll(): Unit = {
     super.beforeAll()
 
@@ -36,8 +35,5 @@ abstract class AsyncSparqlEngineTest[Rdf <: RDF](
     super.afterAll()
     system.shutdown()
   }
-
-
-
 
 }
