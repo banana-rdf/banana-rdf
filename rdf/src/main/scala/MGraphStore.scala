@@ -1,7 +1,4 @@
 package org.w3.banana
-
-import scalaz.Monad
-
 /**
  * to manipulate named graphs
  */
