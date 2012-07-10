@@ -2,7 +2,7 @@ package org.w3.banana.sesame
 
 import java.io._
 import org.w3.banana._
-import org.openrdf.query.resultio.{ UnsupportedQueryResultFormatException, QueryResultIO }
+import org.openrdf.query.resultio.{QueryResultParseException, UnsupportedQueryResultFormatException, QueryResultIO}
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import org.openrdf.query.UnsupportedQueryLanguageException
 import scala.Left
@@ -42,12 +42,13 @@ object SparqlQueryResultsReader {
       def parse(bytes: Array[Byte]): Validation[BananaException, Either[Sesame#Solutions, Boolean]] = {
         WrappedThrowable.fromTryCatch {
           try {
-            Left(QueryResultIO.parse(new ByteArrayInputStream(bytes),
-              sesameSparqlSyntax.tupleFormat))
+            val parsed = QueryResultIO.parse(new ByteArrayInputStream(bytes),
+                                             sesameSparqlSyntax.booleanFormat)
+            Right(parsed)
           } catch {
-            case e: UnsupportedQueryResultFormatException => {
-              Right(QueryResultIO.parse(new ByteArrayInputStream(bytes),
-                sesameSparqlSyntax.booleanFormat))
+            case e: QueryResultParseException => {
+              Left(QueryResultIO.parse(new ByteArrayInputStream(bytes),
+                                       sesameSparqlSyntax.tupleFormat))
             }
           }
         }

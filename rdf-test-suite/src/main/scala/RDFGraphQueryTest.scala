@@ -150,7 +150,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
       val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
-      assert(answr2.isFailure, "the serialised sparql answers must be deserialisable ( false == left, which is good for a tuple query")
+      assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable ")
 
       answr2.map { a =>
         assert(a.isRight, "The answer to a ASK is a boolean")
