@@ -124,10 +124,11 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
                            |prefix : <http://www.w3.org/2001/02pd/rec54#>
                            |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                            |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+                           |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
                            |
                            |ASK {
                            |  ?thing :editor ?ed .
-                           |  ?ed contact:fullName "Alexandre Bertails"
+                           |  ?ed contact:fullName "Alexandre Bertails"^^xsd:string .
                            |}""".stripMargin)
 
     "Alexandre Bertails must appear as an editor in new-tr.rdf" in { //was: taggedAs (SesameWIP)
@@ -145,7 +146,7 @@ abstract class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
       val serialisedAnswer = BooleanWriter.WriterSelector(MediaRange(sparqlWriter.syntax.mime)).map {
         l =>
           l.write(answers, out, "")
-      }.getOrElse(fail("could not find sparkql boolean writer for json"))
+      }.getOrElse(fail("could not find sparql boolean writer for "+sparqlWriter.syntax.mime))
 
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
