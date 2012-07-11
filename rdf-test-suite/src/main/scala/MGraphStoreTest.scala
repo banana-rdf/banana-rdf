@@ -39,17 +39,16 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     -- rdf("bar") ->- "bar"
   ).graph
 
-
   "getNamedGraph should retrieve the graph added with addNamedGraph" in {
     unsafeExtract(store.addNamedGraph(uri("http://example.com/graph"), graph).flatMap(
       _ => store.addNamedGraph(uri("http://example.com/graph2"), graph2).flatMap(
-        _ => store.getNamedGraph(uri("http://example.com/graph")).flatMap (
-           rGraph => store.getNamedGraph(uri("http://example.com/graph2")).map(
-             rGraph2 => {
-               assert(rGraph isIsomorphicWith graph)
-               assert(rGraph2 isIsomorphicWith graph2)
-             }
-           )
+        _ => store.getNamedGraph(uri("http://example.com/graph")).flatMap(
+          rGraph => store.getNamedGraph(uri("http://example.com/graph2")).map(
+            rGraph2 => {
+              assert(rGraph isIsomorphicWith graph)
+              assert(rGraph2 isIsomorphicWith graph2)
+            }
+          )
         )
       )
     )) must be('success)
