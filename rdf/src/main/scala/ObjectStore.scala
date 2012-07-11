@@ -1,0 +1,51 @@
+package org.w3.banana
+
+import org.w3.banana.util._
+import scalaz._
+import scalaz.Scalaz._
+
+object ObjectStore {
+
+  def apply[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]): ObjectStore[Rdf] =
+    new ObjectStore[Rdf](store)(diesel)
+
+}
+
+class ObjectStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]) {
+
+  import diesel._
+
+  /**
+   * saves an object if we know how to make a graph from it, and how to give it a URI
+   */
+  def save[T](pointed: PointedGraph[Rdf], atGraph: Rdf#URI): BananaFuture[Unit] = {
+    store.appendToNamedGraph(atGraph, pointed.graph)
+  }
+
+  def save[T](pointed: PointedGraph[Rdf]): BananaFuture[Unit] = {
+    for {
+      uri <- pointed.as[Rdf#URI].bf
+      r <- store.appendToNamedGraph(uri, pointed.graph)
+    } yield {
+      r
+    }
+  }
+
+  def get[T](uri: Rdf#URI)(implicit binder: PointedGraphBinder[Rdf, T]): BananaFuture[T] = {
+    store.getNamedGraph(uri) flatMap { graph =>
+      val pointed = PointedGraph(uri, graph)
+      pointed.as[T]
+    }
+  }
+
+  def getAll[T](in: Rdf#URI)(implicit classUris: ClassUrisFor[Rdf, T], binder: PointedGraphBinder[Rdf, T]): BananaFuture[Iterable[T]] = {
+    store.getNamedGraph(in) flatMap { graph =>
+      val ts: Iterable[Validation[BananaException, T]] =
+        graph.getAllInstancesOf(classUris.classes.head) map { _.as[T] }
+      val result: Validation[BananaException, Iterable[T]] =
+        ts.toList.sequence[({ type l[X] = Validation[BananaException, X] })#l, T]
+      result.bf
+    }
+  }
+
+}

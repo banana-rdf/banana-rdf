@@ -48,6 +48,10 @@ trait RecordBinder[Rdf <: RDF] {
   import RecordBinder._
   import ops._
 
+  def classUrisFor[T](uris: Rdf#URI*): ClassUrisFor[Rdf, T] = new ClassUrisFor[Rdf, T] {
+    def classes = uris.toIterable
+  }
+
   /**
    * binds a type T to one unique URI
    *

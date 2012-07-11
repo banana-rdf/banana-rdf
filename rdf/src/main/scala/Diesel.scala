@@ -18,6 +18,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     with syntax.TypedLiteralSyntax[Rdf]
     with syntax.LangLiteralSyntax[Rdf]
     with syntax.StringSyntax[Rdf]
+    with syntax.AnySyntax[Rdf]
     with CommonBinders[Rdf]
     with ListBinder[Rdf]
     with TupleBinder[Rdf]
