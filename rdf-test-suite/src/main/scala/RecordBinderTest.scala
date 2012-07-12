@@ -15,6 +15,7 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
   object Person {
 
     val clazz = uri("http://example.com/Person#class")
+    implicit val classUris = classUrisFor[Person](clazz)
 
     val uriT = uriTemplate[UUID]("http://example.com/person/{id}") { uuid =>
       try { Success(UUID.fromString(uuid)) } catch { case _: IllegalArgumentException => Failure(WrongExpectation(uuid + " cannot be made a UUID")) }
