@@ -5,7 +5,7 @@ import org.scalatest.matchers.MustMatchers
 import scalaz.{ Validation, Failure, Success }
 import java.util.UUID
 
-abstract class ComplexBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
+abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
 
   import diesel._
   import ops._
