@@ -48,8 +48,8 @@ trait RecordBinder[Rdf <: RDF] {
   import RecordBinder._
   import ops._
 
-  def classUrisFor[T](uris: Rdf#URI*): ClassUrisFor[Rdf, T] = new ClassUrisFor[Rdf, T] {
-    def classes = uris.toIterable
+  def classUrisFor[T](uri: Rdf#URI, uris: Rdf#URI*): ClassUrisFor[Rdf, T] = new ClassUrisFor[Rdf, T] {
+    val classes = uri :: uris.toList
   }
 
   /**
