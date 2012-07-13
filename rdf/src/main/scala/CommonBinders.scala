@@ -10,7 +10,7 @@ trait CommonBinders[Rdf <: RDF] {
 
   import ops._
 
-  implicit val StringBinder: TypedLiteralBinder[Rdf, String] = new TypedLiteralBinder[Rdf, String] {
+  implicit val StringLiteralBinder: TypedLiteralBinder[Rdf, String] = new TypedLiteralBinder[Rdf, String] {
 
     def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, String] = {
       val TypedLiteral(lexicalForm, datatype) = literal
@@ -23,6 +23,16 @@ trait CommonBinders[Rdf <: RDF] {
     def toTypedLiteral(t: String): Rdf#TypedLiteral = TypedLiteral(t, xsd.string)
 
   }
+
+  implicit val StringStringBinder: StringBinder[String] = StringBinder { s => Success(s) }
+
+  implicit val UUIDStringBinder: StringBinder[UUID] = StringBinder { uuid =>
+    try {
+      Success(UUID.fromString(uuid))
+    } catch {
+      case _: IllegalArgumentException => Failure(WrongExpectation(uuid + " cannot be made a UUID"))
+    }
+  }    
 
   // TODO: find a better datatype than xsd:string
   implicit val UUIDBinder: TypedLiteralBinder[Rdf, UUID] = new TypedLiteralBinder[Rdf, UUID] {

@@ -15,13 +15,12 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     val clazz = uri("http://example.com/Person#class")
     implicit val classUris = classUrisFor[Person](clazz)
 
-    val uriT = uriTemplate[UUID]("http://example.com/person/{id}") { uuid =>
-      try { Success(UUID.fromString(uuid)) } catch { case _: IllegalArgumentException => Failure(WrongExpectation(uuid + " cannot be made a UUID")) }
-    }
+    implicit val id = uriTemplate[UUID]("http://example.com/person/{id}")
     val name = property[String](foaf.name)
+    val nickname = property[String](foaf("nickname"))
     val address = property[Address](foaf("address"))
 
-    implicit val binder = pgb[Person](uriT, name, address)(Person.apply, Person.unapply)
+    implicit val binder = pgb[Person](id, name, address)(Person.apply, Person.unapply)
 
   }
 
@@ -62,7 +61,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     val clazz = uri("http://example.com/VerifiedAddress#class")
     implicit val classUris = classUrisFor[VerifiedAddress](clazz, Address.clazz)
 
-    val id = uriTemplate[String]("#{id}")(Success(_))
+    val id = uriTemplate[String]("#{id}")
     val label = property[String](foaf("label"))
     val city = property[City](foaf("city"))
 

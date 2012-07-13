@@ -6,7 +6,7 @@ import scalaz.Scalaz._
 
 object ObjectStore {
 
-  def apply[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]): ObjectStore[Rdf] =
+  implicit def apply[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]): ObjectStore[Rdf] =
     new ObjectStore[Rdf](store)(diesel)
 
 }

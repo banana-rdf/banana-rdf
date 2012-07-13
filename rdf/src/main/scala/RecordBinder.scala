@@ -2,26 +2,24 @@ package org.w3.banana
 
 import scalaz.{ Validation, Success, Failure }
 
+// partial informations for building a PointedGraph
+// it separates the current found subject and the Predicate/Object pairs found at some point
+case class Acc[Rdf <: RDF](subject: Rdf#Node, fields: List[(Rdf#URI, PointedGraph[Rdf])])
+
 object RecordBinder {
 
-  // partial informations for building a PointedGraph
-  // it separates the current found subject and the Predicate/Object pairs found at some point
-  type Acc[Rdf <: RDF] = (Rdf#Node, List[(Rdf#URI, PointedGraph[Rdf])])
-
-  type PGBElem[Rdf <: RDF, T] = Either[URIBinder[Rdf, T], (Rdf#URI, PointedGraphBinder[Rdf, T])]
-
-  private def m[Rdf <: RDF, T](acc: Acc[Rdf], t: T, elem: PGBElem[Rdf, T]): Acc[Rdf] = {
-    val (subject, pos) = acc
-    elem match {
-      case Left(uriBinder) => (uriBinder.toUri(t), pos)
-      case Right((predicate, oBinder)) => (subject, (predicate, oBinder.toPointedGraph(t)) :: pos)
+  private def m[Rdf <: RDF, T](acc: Acc[Rdf], t: T, field: Field[Rdf, T]): Acc[Rdf] = {
+    val Acc(subject, pos) = acc
+    field match {
+      case UriComponent(uriBinder) => Acc(uriBinder.toUri(t), pos)
+      case Property(predicate, oBinder) => Acc(subject, (predicate, oBinder.toPointedGraph(t)) :: pos)
     }
   }
 
-  private def accStart[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): Acc[Rdf] = (ops.makeBNode(), List.empty)
+  private def accStart[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): Acc[Rdf] = Acc(ops.makeBNode(), List.empty)
 
   private def accToGraph[Rdf <: RDF](acc: Acc[Rdf])(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
-    val (subject, pos) = acc
+    val Acc(subject, pos) = acc
     var triples: Set[Rdf#Triple] = Set.empty
     for (po <- pos) {
       val (p, pg) = po
@@ -76,10 +74,9 @@ trait RecordBinder[Rdf <: RDF] {
   /**
    * declares a Property/Object element where T is in the object position
    */
-  def property[T](uri: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): PGBElem[Rdf, T] =
-    Right((uri, objectBinder))
+  def property[T](uri: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): Property[Rdf, T] = Property(uri, objectBinder)
 
-  implicit def URIBinderToPGBElem[T](uriBinder: URIBinder[Rdf, T]): PGBElem[Rdf, T] = Left(uriBinder)
+  implicit def URIBinderToField[T](uriBinder: URIBinder[Rdf, T]): UriComponent[Rdf, T] = UriComponent(uriBinder)
 
   /**
    * declares a uri template where an object T can be extracted from the URI
@@ -91,7 +88,7 @@ trait RecordBinder[Rdf <: RDF] {
    * for now, supports only exactly one group in the regex
    * for now, we assume that T.toString does the right thing. TODO: use Show[T]
    */
-  def uriTemplate[T](template: String)(f: String => Validation[BananaException, T]): URIBinder[Rdf, T] =
+  def uriTemplate[T](template: String)(implicit binder: StringBinder[T]): URIBinder[Rdf, T] =
     new URIBinder[Rdf, T] {
 
       // replace the pattern with (.+?) and make sure that the entire string is read
@@ -101,22 +98,22 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def toUri(t: T): Rdf#URI = {
-        val subject = template.replaceAll("""\{.*?\}""", t.toString())
+        val subject = template.replaceAll("""\{.*?\}""", binder.toString(t))
         makeUri(subject)
       }
 
       def fromUri(subject: Rdf#URI): Validation[BananaException, T] = {
         regex findFirstIn ops.fromUri(subject) match {
-          case Some(regex(id)) => f(id)
+          case Some(regex(t)) => binder.fromString(t)
           case None => Failure(WrongExpectation("could not apply template " + template + " to " + subject.toString))
         }
       }
     }
 
   /** extract some graph information from a pointed graph and an declared element */
-  private def extract[T](pointed: PointedGraph[Rdf], elem: PGBElem[Rdf, T]): Validation[BananaException, T] = elem match {
-    case Left(uriBinder) => pointed.as[Rdf#URI] flatMap uriBinder.fromUri
-    case Right((predicate, oBinder)) => (pointed / predicate).as[T](oBinder)
+  private def extract[T](pointed: PointedGraph[Rdf], field: Field[Rdf, T]): Validation[BananaException, T] = field match {
+    case UriComponent(uriBinder) => pointed.as[Rdf#URI] flatMap uriBinder.fromUri
+    case Property(predicate, oBinder) => (pointed / predicate).as[T](oBinder)
   }
 
   /**
@@ -129,7 +126,7 @@ trait RecordBinder[Rdf <: RDF] {
    */
   def pgb[T] = new Object {
 
-    def apply[T1](el1: PGBElem[Rdf, T1])(apply: (T1) => T, unapply: T => Option[T1]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1](el1: Field[Rdf, T1])(apply: (T1) => T, unapply: T => Option[T1]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some(t1) = unapply(t)
@@ -144,7 +141,7 @@ trait RecordBinder[Rdf <: RDF] {
 
     }
 
-    def apply[T1, T2](el1: PGBElem[Rdf, T1], el2: PGBElem[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2](el1: Field[Rdf, T1], el2: Field[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2)) = unapply(t)
@@ -160,7 +157,7 @@ trait RecordBinder[Rdf <: RDF] {
 
     }
 
-    def apply[T1, T2, T3](el1: PGBElem[Rdf, T1], el2: PGBElem[Rdf, T2], el3: PGBElem[Rdf, T3])(apply: (T1, T2, T3) => T, unapply: T => Option[(T1, T2, T3)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2, T3](el1: Field[Rdf, T1], el2: Field[Rdf, T2], el3: Field[Rdf, T3])(apply: (T1, T2, T3) => T, unapply: T => Option[(T1, T2, T3)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3)) = unapply(t)
@@ -177,7 +174,7 @@ trait RecordBinder[Rdf <: RDF] {
 
     }
 
-    def apply[T1, T2, T3, T4](el1: PGBElem[Rdf, T1], el2: PGBElem[Rdf, T2], el3: PGBElem[Rdf, T3], el4: PGBElem[Rdf, T4])(apply: (T1, T2, T3, T4) => T, unapply: T => Option[(T1, T2, T3, T4)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2, T3, T4](el1: Field[Rdf, T1], el2: Field[Rdf, T2], el3: Field[Rdf, T3], el4: Field[Rdf, T4])(apply: (T1, T2, T3, T4) => T, unapply: T => Option[(T1, T2, T3, T4)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4)) = unapply(t)
@@ -195,7 +192,7 @@ trait RecordBinder[Rdf <: RDF] {
 
     }
 
-    def apply[T1, T2, T3, T4, T5](el1: PGBElem[Rdf, T1], el2: PGBElem[Rdf, T2], el3: PGBElem[Rdf, T3], el4: PGBElem[Rdf, T4], el5: PGBElem[Rdf, T5])(apply: (T1, T2, T3, T4, T5) => T, unapply: T => Option[(T1, T2, T3, T4, T5)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2, T3, T4, T5](el1: Field[Rdf, T1], el2: Field[Rdf, T2], el3: Field[Rdf, T3], el4: Field[Rdf, T4], el5: Field[Rdf, T5])(apply: (T1, T2, T3, T4, T5) => T, unapply: T => Option[(T1, T2, T3, T4, T5)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5)) = unapply(t)
