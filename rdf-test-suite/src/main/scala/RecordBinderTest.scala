@@ -14,7 +14,7 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
 
   val city = City("Cambridge")
   val verifiedAddress = VerifiedAddress("qwerty", "32 Vassar st", city)
-  val person = Person(UUID.randomUUID(), "betehess", verifiedAddress)
+  val person = Person(UUID.randomUUID(), "betehess")
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] must be(Success(city))

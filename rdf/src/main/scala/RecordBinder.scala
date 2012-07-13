@@ -78,6 +78,29 @@ trait RecordBinder[Rdf <: RDF] {
 
   implicit def URIBinderToField[T](uriBinder: URIBinder[Rdf, T]): UriComponent[Rdf, T] = UriComponent(uriBinder)
 
+  /** */
+  class UriTemplate[T](template: String, binder: StringBinder[T]) extends URIBinder[Rdf, T] { self =>
+
+    // replace the pattern with (.+?) and make sure that the entire string is read
+    private val regex = {
+      val t = template.replaceAll("""\{.+?\}""", "(.+?)")
+      ("^.*?" + t + "$").r
+    }
+
+    def toUri(t: T): Rdf#URI = {
+      val subject = template.replaceAll("""\{.*?\}""", binder.toString(t))
+      makeUri(subject)
+    }
+
+    def fromUri(subject: Rdf#URI): Validation[BananaException, T] = {
+      regex findFirstIn ops.fromUri(subject) match {
+        case Some(regex(t)) => binder.fromString(t)
+        case None => Failure(WrongExpectation("could not apply template " + template + " to " + subject.toString))
+      }
+    }
+
+  }
+
   /**
    * declares a uri template where an object T can be extracted from the URI
    * this is particularly usefull when the uri encodes an id for the given entity
@@ -89,26 +112,7 @@ trait RecordBinder[Rdf <: RDF] {
    * for now, we assume that T.toString does the right thing. TODO: use Show[T]
    */
   def uriTemplate[T](template: String)(implicit binder: StringBinder[T]): URIBinder[Rdf, T] =
-    new URIBinder[Rdf, T] {
-
-      // replace the pattern with (.+?) and make sure that the entire string is read
-      val regex = {
-        val t = template.replaceAll("""\{.+?\}""", "(.+?)")
-        ("^.*?" + t + "$").r
-      }
-
-      def toUri(t: T): Rdf#URI = {
-        val subject = template.replaceAll("""\{.*?\}""", binder.toString(t))
-        makeUri(subject)
-      }
-
-      def fromUri(subject: Rdf#URI): Validation[BananaException, T] = {
-        regex findFirstIn ops.fromUri(subject) match {
-          case Some(regex(t)) => binder.fromString(t)
-          case None => Failure(WrongExpectation("could not apply template " + template + " to " + subject.toString))
-        }
-      }
-    }
+    new UriTemplate[T](template, binder)
 
   /** extract some graph information from a pointed graph and an declared element */
   private def extract[T](pointed: PointedGraph[Rdf], field: Field[Rdf, T]): Validation[BananaException, T] = field match {

@@ -8,7 +8,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
   import diesel._
   import ops._
 
-  case class Person(id: UUID, name: String, address: Address)
+  case class Person(id: UUID, name: String)
 
   object Person {
 
@@ -19,8 +19,10 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     val name = property[String](foaf.name)
     val nickname = property[String](foaf("nickname"))
     val address = property[Address](foaf("address"))
+    
+    implicit val uriMaker = id.uriMaker[Person](_.id)
 
-    implicit val binder = pgb[Person](id, name, address)(Person.apply, Person.unapply)
+    implicit val binder = pgb[Person](id, name)(Person.apply, Person.unapply)
 
   }
 
@@ -67,7 +69,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
     implicit val ci = classUrisFor[VerifiedAddress](clazz)
 
-    implicit val binder = pgb[VerifiedAddress](id, label, city)(VerifiedAddress.apply, VerifiedAddress.unapply)
+    implicit val binder = pgb[VerifiedAddress](id, label, city)(VerifiedAddress.apply, VerifiedAddress.unapply) withClasses classUris
 
   }
 
