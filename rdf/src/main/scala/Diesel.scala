@@ -21,6 +21,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     with syntax.AnySyntax[Rdf]
     with CommonBinders[Rdf]
     with ListBinder[Rdf]
+    with OptionBinder[Rdf]
     with TupleBinder[Rdf]
     with MapBinder[Rdf]
     with EitherBinder[Rdf]

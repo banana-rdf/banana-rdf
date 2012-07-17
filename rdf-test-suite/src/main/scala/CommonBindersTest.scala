@@ -4,6 +4,7 @@ import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 import org.joda.time.DateTime
 import scalaz._
+import scalaz.Scalaz._
 
 abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
@@ -50,6 +51,13 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     binder.fromPointedGraph(binder.toPointedGraph(left)) must be === (Success(left))
     binder.fromPointedGraph(binder.toPointedGraph(right)) must be === (Success(right))
     binder.fromPointedGraph(StringPGBinder.toPointedGraph("foo")) must be('failure)
+  }
+
+  "serializing and deserialiazing Option" in {
+    val opts = some("foo")
+    implicit val binder = PointedGraphBinder[Rdf, Option[String]]
+    binder.fromPointedGraph(opts.toPointedGraph) must equal (Success(opts))
+    binder.fromPointedGraph(none.toPointedGraph(binder)) must equal (Success(None))
   }
 
 }
