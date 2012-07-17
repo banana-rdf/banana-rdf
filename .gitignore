@@ -11,6 +11,7 @@ projectboot
 *.class
 *.log
 *\#
+*.swp
 sbt-launch*.jar
 .scala_dependencies
 *.orig
