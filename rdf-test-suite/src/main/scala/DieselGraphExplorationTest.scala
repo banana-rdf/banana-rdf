@@ -46,7 +46,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[
 
   "we must be able to project nodes to Scala types" in {
 
-    (betehess / foaf.age).takeOneAs[Int] must be(Success(29))
+    (betehess / foaf.age).as[Int] must be(Success(29))
 
     (betehess / foaf.knows / foaf.name).as[String] must be(Success("Henry Story"))
 

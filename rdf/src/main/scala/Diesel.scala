@@ -94,8 +94,8 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       }
     }
 
-    def takeOneAs[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
-      takeOnePointedGraph flatMap (_.as[T])
+    def exactlyOneAs[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
+      exactlyOnePointedGraph flatMap (_.as[T])
 
     def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
       val it = nodes.iterator
@@ -111,7 +111,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     }
 
     def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
-      exactlyOnePointedGraph flatMap (_.as[T])
+      takeOnePointedGraph flatMap (_.as[T])
 
     def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Option[T]] = headOption match {
       case None => Success(None)
