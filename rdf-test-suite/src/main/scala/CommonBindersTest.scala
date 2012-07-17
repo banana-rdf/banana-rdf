@@ -56,8 +56,8 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
   "serializing and deserialiazing Option" in {
     val opts = some("foo")
     implicit val binder = PointedGraphBinder[Rdf, Option[String]]
-    binder.fromPointedGraph(opts.toPointedGraph) must equal (Success(opts))
-    binder.fromPointedGraph(none.toPointedGraph(binder)) must equal (Success(None))
+    opts.toPG.as[Option[String]] must equal (Success(opts))
+    none.toPG.as[Option[String]] must equal (Success(None))
+    
   }
-
 }
