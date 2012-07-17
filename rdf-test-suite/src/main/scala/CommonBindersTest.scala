@@ -18,6 +18,11 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     fromTypedLiteral(toTypedLiteral(dateTime)).getOrElse(sys.error("problem")).compareTo(dateTime) must be(0)
   }
 
+  "serializing and deserialiazing a Boolean" in {
+    true.toPG.as[Boolean] must be (Success(true))
+    false.toPG.as[Boolean] must be (Success(false))
+  }
+
   "serializing and deserializing a List of simple nodes" in {
     val binder = PointedGraphBinder[Rdf, List[Int]]
     val list = List(1, 2, 3)

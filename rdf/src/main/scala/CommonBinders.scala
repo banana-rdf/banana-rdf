@@ -34,6 +34,24 @@ trait CommonBinders[Rdf <: RDF] {
     }
   }    
 
+  implicit val BooleanLiteralBinder: TypedLiteralBinder[Rdf, Boolean] = new TypedLiteralBinder[Rdf, Boolean] {
+
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, Boolean] = {
+      val TypedLiteral(lexicalForm, datatype) = literal
+      if (datatype == xsd.boolean)
+        lexicalForm match {
+          case "true" | "1" => Success(true)
+          case "false" | "0" => Success(false)
+          case other => Failure(FailedConversion(other + " is not in the lexical space for xsd:boolean"))
+        }
+      else
+        Failure(FailedConversion(lexicalForm + " has datatype " + datatype))
+    }
+
+    def toTypedLiteral(t: Boolean): Rdf#TypedLiteral = TypedLiteral(if (t) "true" else "false", xsd.boolean)
+
+  }
+
   // TODO: find a better datatype than xsd:string
   implicit val UUIDBinder: TypedLiteralBinder[Rdf, UUID] = new TypedLiteralBinder[Rdf, UUID] {
 
