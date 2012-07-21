@@ -22,21 +22,24 @@ import org.w3.banana._
  */
 
 
-class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("NTriples") {
+class NTriplesSpec[Rdf <: RDF](val diesel: Diesel[Rdf]) extends Properties("NTriples") {
   
-  val serializer = new Serializer[Rdf](ops)
+  import diesel._
+  import diesel.ops._
+
+  val serializer = new Serializer[Rdf](diesel)
   
   import ops._
   import serializer._
   
-  val gen = new SpecTriplesGenerator[Rdf](ops)
+  val gen = new SpecTriplesGenerator[Rdf](diesel)
   import gen._
   
   implicit def U : Listener[Rdf] = new Listener(ops)
 
   val P: NTriplesParser[Rdf, String, TreeMsg, Position, Listener[Rdf]] =
     new NTriplesParser(
-      ops,
+      diesel,
       Parsers(Monotypic.String, Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))
 
   
@@ -68,9 +71,9 @@ class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("
      val res = P.fullLiteral(testStr)
      ("input:" + testStr + "\nresult = '" + res + "'") |: all(
          ( res.isSuccess :| "res was failure" ) &&
-         ({val LangLiteral(litres, x) = res.get;
+         ({val litres = res.get.lexicalForm;  //val LangLiteral(litres, x) = res.get;
            litres == lit} :| "literal string does not match") &&
-         ({val LangLiteral(_,Lang(langRes)) =res.get
+         ({val langRes = res.get.fold(tl => sys.error(tl.toString), ll => fromLang(ll.lang)) //val LangLiteral(_,Lang(langRes)) =res.get
            langRes == lang} :| "literal is not a lang literal") &&
          ( { res.get == tst } :| "the final equality fails")
      )
@@ -83,7 +86,7 @@ class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("
        val parsedUri = P.uriRef(uriref)
        ("result = " + parsedUri) |: all(
          (parsedUri.isSuccess :| "failure to parse") &&
-           (parsedUri.get.isInstanceOf[URI] :| "not an URI") &&
+           (parsedUri.get.isInstanceOf[Rdf#URI] :| "not an URI") &&
            ((parsedUri.get == URI(uri)) :| "iris don't match input")
        )
      }
@@ -140,7 +143,7 @@ class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("
       val res = P.nTriples(doc)
       val set = HashSet(graph:_*)
 
-      val resSet = res.user.queue.map(_.asInstanceOf[Triple]).toSet
+      val resSet = res.user.queue.map(_.asInstanceOf[Rdf#Triple]).toSet
 
       ("input graph="+graph+"\ninput set="+set+"\ninputdoc="+doc+"\nresult ="+res+"\nuser content="+resSet) |: all (
         res.isSuccess &&
@@ -149,7 +152,7 @@ class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("
   }
 
   /** Generate an NTriples document from the statements but with very messy whitespacing */
-  def generateDoc(graph: List[Triple]) = {
+  def generateDoc(graph: List[Rdf#Triple]) = {
     val b = new StringBuilder
     if (graph != Nil) { //the pattern matching below does not work well enough at present
       for (Triple(s, r, o) <- graph) {
@@ -171,8 +174,9 @@ class NTriplesSpec[Rdf <: RDF](val ops: RDFOperations[Rdf]) extends Properties("
 
 }
 
-class SpecTriplesGenerator[Rdf <: RDF](val ops: RDFOperations[Rdf]) {
-  import ops._
+class SpecTriplesGenerator[Rdf <: RDF](diesel: Diesel[Rdf]) {
+  import diesel._
+  import diesel.ops._
   val uris = List[String]("http://bblfish.net/", "http://www.w3.org/community/webid/",
     "http://www.w3.org/2005/Incubator/webid/team#we", "http://www.ietf.org/rfc/rfc3986.txt",
     "ftp://ftp.is.co.za/rfc/rfc1808.txt", "ldap://[2001:db8::7]/c=GB?objectClass?one",

@@ -31,18 +31,21 @@ import scalaz.Validation._
 abstract class TurtleParserTest[Rdf <: RDF, Rdf2 <: RDF](
     val testedParser: RDFReader[Rdf, Turtle],
     val referenceParser: RDFReader[Rdf2, Turtle],
-    val ops: RDFOperations[Rdf],
-    val ops2: RDFOperations[Rdf2])
+    val diesel: Diesel[Rdf],
+    val diesel2: Diesel[Rdf2])
 extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
 
-  val morpheus: GraphIsomorphism[Rdf2]
+//  val morpheus: GraphIsomorphism[Rdf2]
 
+  import diesel.ops
   import ops._
+
+  import diesel2.{ ops => ops2 }
 
   lazy val prime: Stream[Int] = 2 #:: Stream.from(3).filter(i =>
     prime.takeWhile(j => j * j <= i).forall(i % _ > 0))
 
-  object rdfTransformer extends RDFTransformer[Rdf,Rdf2](ops, ops2)
+  object rdfTransformer extends RDFTransformer[Rdf,Rdf2](ops, diesel2.ops)
 
   def randomSz = {
     prime(5+Random.nextInt(248))
@@ -57,12 +60,12 @@ extends PropSpec with PropertyChecks with ShouldMatchers with FailureOf {
   def isomorphicTest(result: Rdf#Graph, referenceResult: Rdf2#Graph) {
     val gAsOther = rdfTransformer.transform(result)
 
-    val isomorphic = morpheus.isomorphism(gAsOther, referenceResult)
+    val isomorphic = ops2.isomorphism(gAsOther, referenceResult)
 
     if (!isomorphic) {
       info("graphs were not isomorphic - trying to narrow down on problematic statement")
 
-      import ops2.graphAsIterable
+      import ops2.{ graphToIterable => graphAsIterable }
       val referenceAsSet = graphAsIterable(referenceResult).toIterable.toSet
       val resultAsSet = graphAsIterable(gAsOther).toIterable.toSet
       info("read ntriples file with " +testedParser+" found "+referenceAsSet.size +" triples")

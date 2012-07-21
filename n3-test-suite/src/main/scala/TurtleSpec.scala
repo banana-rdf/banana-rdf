@@ -20,21 +20,20 @@ import java.io.{BufferedReader, StringReader}
  * @author bblfish
  * @created 20/02/2012
  */
-class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
-                             val isomorphism: GraphIsomorphism[Rdf]) extends Properties("Turtle") {
+class TurtleSpec[Rdf <: RDF](val diesel: Diesel[Rdf]) extends Properties("Turtle") {
+  import diesel._
   import ops._
-  import isomorphism._
   
   import System.out
 
-  val gen = new SpecTurtleGenerator[Rdf](ops)
+  val gen = new SpecTurtleGenerator[Rdf](diesel)
   import gen._
 
-  val serializer = new Serializer(ops)
+  val serializer = new Serializer(diesel)
 
 
   val P = new TurtleParser(
-      ops,
+      diesel,
       Parsers(Monotypic.Seq[Char], Errors.tree[Char], Accumulators.position[Listener[Rdf]](4)))
 
   implicit def U: Listener[Rdf] = new Listener(ops)
@@ -229,10 +228,6 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
     )
   }
 
-  val foaf = FOAFPrefix(ops)
-  val rdf = RDFPrefix(ops)
-  val xsd = XSDPrefix(ops)
-
   val hjs=URI("http://bblfish.net/#hjs")
   val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
   val presbrey = URI("http://presbrey.mit.edu/foaf#presbrey")
@@ -397,32 +392,32 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
 
   property("test numbers") = secure {
-  val nums = Map[TypedLiteral,Boolean](
-     ("2".datatype(xsd.integer)) -> true,
-     ("23423.123".datatype(xsd.decimal)) -> true,
-     ("23423123123456789".datatype(xsd.integer)) -> true,
-     (".232e34".datatype(xsd.double)) -> true,
-     (".123".datatype(xsd.decimal)) -> true,
-     ("23423.123".datatype(xsd.decimal)) -> true,
-     (".123".datatype(xsd.decimal)) -> true,
-     (".e34".datatype(xsd.double)) -> false,
-     ("12.00123123e34".datatype(xsd.double)) -> true,
-     ("12e34".datatype(xsd.double)) -> true,
-     ("".datatype(xsd.double)) -> false,
-     ("-".datatype(xsd.double)) -> false,
-     ("+".datatype(xsd.double)) -> false,
-     ("+e32".datatype(xsd.double)) -> false,
-     ("+2345.123".datatype(xsd.decimal)) -> true,
-     ("-34523.1978123".datatype(xsd.decimal)) -> true,
-     ("-2342312349853123123123123".datatype(xsd.integer)) -> true,
-     ("+2342139023".datatype(xsd.integer)) -> true,
-     ("+.4334e034".datatype(xsd.double)) -> true,
-     (".123".datatype(xsd.decimal)) -> true,
-     ("23423.123".datatype(xsd.decimal)) -> true,
-     (".123".datatype(xsd.decimal)) -> true,
-     (".123".datatype(xsd.decimal)) -> true,
-     ("091.999".datatype(xsd.decimal)) -> true,
-     (".123".datatype(xsd.decimal)) -> true
+  val nums = Map[Rdf#TypedLiteral,Boolean](
+     (TypedLiteral("2", xsd.integer)) -> true,
+     (TypedLiteral("23423.123", xsd.decimal)) -> true,
+     (TypedLiteral("23423123123456789", xsd.integer)) -> true,
+     (TypedLiteral(".232e34", xsd.double)) -> true,
+     (TypedLiteral(".123", xsd.decimal)) -> true,
+     (TypedLiteral("23423.123", xsd.decimal)) -> true,
+     (TypedLiteral(".123", xsd.decimal)) -> true,
+     (TypedLiteral(".e34", xsd.double)) -> false,
+     (TypedLiteral("12.00123123e34", xsd.double)) -> true,
+     (TypedLiteral("12e34", xsd.double)) -> true,
+     (TypedLiteral("", xsd.double)) -> false,
+     (TypedLiteral("-", xsd.double)) -> false,
+     (TypedLiteral("+", xsd.double)) -> false,
+     (TypedLiteral("+e32", xsd.double)) -> false,
+     (TypedLiteral("+2345.123", xsd.decimal)) -> true,
+     (TypedLiteral("-34523.1978123", xsd.decimal)) -> true,
+     (TypedLiteral("-2342312349853123123123123", xsd.integer)) -> true,
+     (TypedLiteral("+2342139023", xsd.integer)) -> true,
+     (TypedLiteral("+.4334e034", xsd.double)) -> true,
+     (TypedLiteral(".123", xsd.decimal)) -> true,
+     (TypedLiteral("23423.123", xsd.decimal)) -> true,
+     (TypedLiteral(".123", xsd.decimal)) -> true,
+     (TypedLiteral(".123", xsd.decimal)) -> true,
+     (TypedLiteral("091.999", xsd.decimal)) -> true,
+     (TypedLiteral(".123", xsd.decimal)) -> true
   )
        val res = for ((lit,valid) <- nums) yield {
          val TypedLiteral(str,tp) = lit
@@ -437,7 +432,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
   property("simple blank nodes") = secure {
     val t1 = Triple(BNode("_:n22"),foaf.name, "Alexandre" lang "fr" )
-    val t2 = Triple(BNode(),foaf.name,"Henry")
+    val t2 = Triple(BNode(),foaf.name,TypedLiteral("Henry", xsd.string))
     val t3 = Triple(BNode("_:n22"),foaf.knows,BNode("_:n22"))
     val g = Graph(t1,t2,t3)
     val doc = """
@@ -460,10 +455,10 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
   property("enclosing blank nodes ") = secure {
     val bn = BNode();
-    val triples = List[Triple](
-      (bn,foaf.name, "Joe"§),
-      (bn,foaf.knows,hjs),
-      (bn,foaf("likes"),rdf.nil)
+    val triples = List[Rdf#Triple](
+      Triple(bn,foaf.name, TypedLiteral("Joe", xsd.string)),
+      Triple(bn,foaf.knows,hjs),
+      Triple(bn,foaf("likes"),rdf.nil)
     )
     val g = Graph(triples)
     val doc = """
@@ -487,17 +482,17 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   }
 
   property("lists") = secure {
-    val shop = Prefix("http://shop.example/product/", ops)
+    val shop = Prefix("shop", "http://shop.example/product/")(ops)
     val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
-    val triples = List[Triple](
-      (lst,rdf.first, shop("paper")),
-      (lst,rdf.rest, lst2),
-      (lst2,rdf.first, shop("cat")),
-      (lst2,rdf.rest, lst3),
-      (lst3,rdf.first, bookNode),
-      (lst3,rdf.rest, rdf.nil),
-      (bookNode,foaf.name,"Zen"§),
-      (bookNode,foaf("author") ,rdf.nil)
+    val triples = List[Rdf#Triple](
+      Triple(lst,rdf.first, shop("paper")),
+      Triple(lst,rdf.rest, lst2),
+      Triple(lst2,rdf.first, shop("cat")),
+      Triple(lst2,rdf.rest, lst3),
+      Triple(lst3,rdf.first, bookNode),
+      Triple(lst3,rdf.rest, rdf.nil),
+      Triple(bookNode,foaf.name,TypedLiteral("Zen", xsd.string)),
+      Triple(bookNode,foaf("author") ,rdf.nil)
     )
     val g = Graph(triples)
     val doc = """
@@ -527,24 +522,24 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
   property("stacked blank nodes and lists") = secure {
     val bn1 = BNode(); val bn2 = BNode(); val bn3 = BNode(); val bn4 = BNode()
     val lst = BNode(); val lst2 = BNode(); val lst3 = BNode(); val bookNode = BNode()
-    val shop = Prefix("http://shop.example/product/", ops)
-    val triples = List[Triple](
-      (bn1,foaf.name, "Alexandre" lang "fr" ) ,
-      (bn1,foaf.knows,bn2),
-      (bn2,foaf.name,"Henry"§),
-      (bn2,foaf.knows,bn4),
-      (bn4,foaf.name,"Tim"§),
-      (bn1,foaf.publication,bn3),
-      (bn3,foaf.name,"Pimp My RDF"§),
-      (bn1,foaf.wants,lst),
-      (lst,rdf.first, shop("paper")),
-      (lst,rdf.rest, lst2),
-      (lst2,rdf.first, shop("cat")),
-      (lst2,rdf.rest, lst3),
-      (lst3,rdf.first, bookNode),
-      (lst3,rdf.rest, rdf.nil),
-      (bookNode,foaf.name,"Zen"§),
-      (bookNode,foaf.author ,rdf.nil)
+    val shop = Prefix("shop", "http://shop.example/product/")(ops)
+    val triples = List[Rdf#Triple](
+      Triple(bn1,foaf.name, "Alexandre" lang "fr" ) ,
+      Triple(bn1,foaf.knows,bn2),
+      Triple(bn2,foaf.name,TypedLiteral("Henry", xsd.string)),
+      Triple(bn2,foaf.knows,bn4),
+      Triple(bn4,foaf.name,TypedLiteral("Tim", xsd.string)),
+      Triple(bn1,foaf.publication,bn3),
+      Triple(bn3,foaf.name,TypedLiteral("Pimp My RDF", xsd.string)),
+      Triple(bn1,foaf.wants,lst),
+      Triple(lst,rdf.first, shop("paper")),
+      Triple(lst,rdf.rest, lst2),
+      Triple(lst2,rdf.first, shop("cat")),
+      Triple(lst2,rdf.rest, lst3),
+      Triple(lst3,rdf.first, bookNode),
+      Triple(lst3,rdf.rest, rdf.nil),
+      Triple(bookNode,foaf.name,TypedLiteral("Zen", xsd.string)),
+      Triple(bookNode,foaf.author ,rdf.nil)
     )
     val g = Graph(triples)
     val doc = """
@@ -577,7 +572,7 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 
    property("debugging space") = secure {
      val tr = Triple(URI("http://example.org/resource15"),URI("http://example.org/property"),BNode("anon"))
-     val tr2 = Triple(URI("http://example.org/resource16"),URI("http://example.org/property"),"\u00E9"§)
+     val tr2 = Triple(URI("http://example.org/resource16"),URI("http://example.org/property"),TypedLiteral("\u00E9", xsd.string))
      val doc = """<http://example.org/resource15> <http://example.org/property> _:anon.
      # \\u and \\U escapes
      # latin small letter e with acute symbol \u00E9 - 3 UTF-8 bytes #xC3 #A9
@@ -591,8 +586,8 @@ class TurtleSpec[Rdf <: RDF](val ops: RDFOperations[Rdf],
 }
 
 
-class SpecTurtleGenerator[Rdf <: RDF](override val ops: RDFOperations[Rdf])
-extends SpecTriplesGenerator[Rdf](ops){
+class SpecTurtleGenerator[Rdf <: RDF](val diesel: Diesel[Rdf])
+extends SpecTriplesGenerator[Rdf](diesel){
 
   val gdPfxOrig= List[String](":","cert:","foaf:","foaf.new:","a\u2764:","䷀:","Í\u2318-\u262f:",
     "\u002e:","e\u0eff\u0045:")
