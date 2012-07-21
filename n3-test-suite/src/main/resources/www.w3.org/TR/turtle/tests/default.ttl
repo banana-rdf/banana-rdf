@@ -1,7 +1,0 @@
-# default1 - 	Substitution of a prefix which is the empty string.
-# 
-# $Id: default.ttl,v 1.1 2011/08/08 15:58:52 eric Exp $
-
-@prefix : <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
-<http://www.w3.org/2010/01/Turtle/tests/prefix1.ttl> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> :PositiveSyntaxTest .
-

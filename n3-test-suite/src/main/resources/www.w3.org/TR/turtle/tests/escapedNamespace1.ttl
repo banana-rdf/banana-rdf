@@ -1,8 +1,0 @@
-# prefix1 - Substitution of namespace containing some escaped characters for a prefix.
-# 
-# $Id: escapedNamespace1.ttl,v 1.1 2011/08/08 15:58:52 eric Exp $
-
-@prefix foaf: <http://xmlns.com/fo\u0061f/0.1/> .
-@prefix ericFoaf: <http://www.w3.org/People/Eric/ericP-foaf.rdf#> .
-
-ericFoaf:ericP foaf:givenName "Eric" .

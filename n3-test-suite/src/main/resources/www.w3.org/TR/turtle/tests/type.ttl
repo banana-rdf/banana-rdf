@@ -1,6 +1,0 @@
-# type - Substitution of rdf:type for the keyword a.
-# 
-# $Id: type.ttl,v 1.1 2011/08/08 15:58:58 eric Exp $
-
-<http://www.w3.org/2010/01/Turtle/tests/prefix1.ttl> a <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#PositiveSyntaxTest> .
-

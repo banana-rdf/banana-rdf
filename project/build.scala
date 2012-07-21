@@ -124,9 +124,6 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.6",
       libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % "2.6.6")
 
-  val n3Deps =
-    Seq( libraryDependencies += "org.apache.abdera" % "abdera-i18n" % "1.1.2" )
-
   val pub = TaskKey[Unit]("pub")
 
   lazy val full = {
@@ -137,14 +134,14 @@ object BananaRdfBuild extends Build {
       Seq(xplugin, sxrBaseDir)
     }
 
-    val projects = Seq(rdf, jena, sesame, n3)
+    val projects = Seq(rdf, jena, sesame)
     val allSources           = TaskKey[Seq[Seq[File]]]("all-sources")
     val allSourceDirectories = SettingKey[Seq[Seq[File]]]("all-source-directories")
 
     Project(
       id = "full",
       base = file("full"),
-      dependencies = Seq(rdf, jena, sesame, n3),
+      dependencies = Seq(rdf, jena, sesame),
       settings     = buildSettings ++ Seq(
         allSources           <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
         allSourceDirectories <<= projects.map(sourceDirectories in Compile in _).join,
@@ -174,8 +171,6 @@ object BananaRdfBuild extends Build {
     aggregate = Seq(
       rdf,
       rdfTestSuite,
-      n3,
-//      n3TestSuite,
       jena,
       sesame,
       full,
@@ -217,26 +212,6 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps
   ) dependsOn (rdf, rdfTestSuite % "test")
   
-  lazy val n3 = Project(
-    id = "banana-n3",
-    base = file("n3"),
-    settings = buildSettings ++ jenaDeps ++ n3Deps
-  ) dependsOn (rdf)
-
-  lazy val jenaN3 = Project(
-    id = "banana-jena-n3",
-    base = file("jena-n3"),
-    settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
-      libraryDependencies += akka
-    )
-  ) dependsOn (rdf, jena, n3, rdfTestSuite % "test")
-  
-  lazy val n3TestSuite = Project(
-    id = "banana-n3-test-suite",
-    base = file("n3-test-suite"),
-    settings = buildSettings ++ testsuiteDeps
-  ) dependsOn (n3, jena % "test", sesame % "test")
-
   lazy val linkedData = Project(
     id = "banana-linked-data",
     base = file("linked-data"),
