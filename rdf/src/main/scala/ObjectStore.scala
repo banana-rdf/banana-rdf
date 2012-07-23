@@ -43,7 +43,6 @@ class ObjectStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Dies
     }
   }
 
-
   // classUris.classes should respect the invariant that there is always at least one uri, and this uri is assumed to be the most precise type
   def getAll[T](in: Rdf#URI)(implicit classUris: ClassUrisFor[Rdf, T], binder: PointedGraphBinder[Rdf, T]): BananaFuture[Iterable[T]] = {
     val classUri = classUris.classes.head

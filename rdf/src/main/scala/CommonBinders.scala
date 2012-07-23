@@ -32,7 +32,7 @@ trait CommonBinders[Rdf <: RDF] {
     } catch {
       case _: IllegalArgumentException => Failure(WrongExpectation(uuid + " cannot be made a UUID"))
     }
-  }    
+  }
 
   implicit val BooleanLiteralBinder: TypedLiteralBinder[Rdf, Boolean] = new TypedLiteralBinder[Rdf, Boolean] {
 

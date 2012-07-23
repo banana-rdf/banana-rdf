@@ -10,8 +10,8 @@ import akka.util.Timeout
 
 abstract class ObjectStoreTest[Rdf <: RDF](
   syncStore: RDFStore[Rdf])(
-  implicit diesel: Diesel[Rdf])
-extends WordSpec with MustMatchers {
+    implicit diesel: Diesel[Rdf])
+    extends WordSpec with MustMatchers {
 
   import diesel._
 

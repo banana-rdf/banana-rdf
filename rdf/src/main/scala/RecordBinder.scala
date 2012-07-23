@@ -23,7 +23,7 @@ object RecordBinder {
     var triples: Set[Rdf#Triple] = Set.empty
     for (po <- pos) {
       val (p, pg) = po
-      triples += ops.makeTriple(subject, p, pg.node)
+      triples += ops.makeTriple(subject, p, pg.pointer)
       triples ++= ops.graphToIterable(pg.graph)
     }
     PointedGraph(subject, ops.makeGraph(triples))

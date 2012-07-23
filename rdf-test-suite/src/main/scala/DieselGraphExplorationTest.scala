@@ -32,7 +32,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[
 
     val name = betehess / foaf.name
 
-    name.head.node must be(LangLiteral("Alexandre", Lang("fr")))
+    name.head.pointer must be(LangLiteral("Alexandre", Lang("fr")))
 
   }
 
@@ -40,7 +40,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[
 
     val name = betehess / foaf.knows / foaf.name
 
-    name.head.node must be(TypedLiteral("Henry Story"))
+    name.head.pointer must be(TypedLiteral("Henry Story"))
 
   }
 

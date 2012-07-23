@@ -44,8 +44,8 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       binder.fromPointedGraph(pointed)
 
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
-      val newGraph = graph union Graph(Triple(node, rdf("type"), clazz))
-      PointedGraph(node, newGraph)
+      val newGraph = graph union Graph(Triple(pointer, rdf("type"), clazz))
+      PointedGraph(pointer, newGraph)
     }
 
     def --(p: Rdf#URI): PointedGraphPredicate = new PointedGraphPredicate(pointed, p)
@@ -53,20 +53,20 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     def -<-(p: Rdf#URI): PredicatePointedGraph = new PredicatePointedGraph(p, pointed)
 
     def /(p: Rdf#URI): PointedGraphs = {
-      val nodes = getObjects(graph, node, p)
+      val nodes = getObjects(graph, pointer, p)
       new PointedGraphs(nodes, graph)
     }
 
-    def node: Rdf#Node = pointed.node
+    def pointer: Rdf#Node = pointed.pointer
 
-    def predicates = getPredicates(graph, node)
+    def predicates = getPredicates(graph, pointer)
 
     def isA(clazz: Rdf#URI): Boolean = {
       def isAIfNodeOrBNode = {
-        val classes = getObjects(graph, node, rdf("type"))
+        val classes = getObjects(graph, pointer, rdf("type"))
         classes exists { _ == clazz }
       }
-      node.fold(
+      pointer.fold(
         uri => isAIfNodeOrBNode,
         bnode => isAIfNodeOrBNode,
         literal => false

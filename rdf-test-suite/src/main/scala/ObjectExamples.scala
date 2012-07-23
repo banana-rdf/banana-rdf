@@ -19,7 +19,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     val name = property[String](foaf.name)
     val nickname = property[String](foaf("nickname"))
     val address = property[Address](foaf("address"))
-    
+
     implicit val uriMaker = id.uriMaker[Person](_.id)
 
     implicit val binder = pgb[Person](id, name)(Person.apply, Person.unapply)

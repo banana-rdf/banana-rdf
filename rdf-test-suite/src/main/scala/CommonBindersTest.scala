@@ -19,8 +19,8 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
   }
 
   "serializing and deserialiazing a Boolean" in {
-    true.toPG.as[Boolean] must be (Success(true))
-    false.toPG.as[Boolean] must be (Success(false))
+    true.toPG.as[Boolean] must be(Success(true))
+    false.toPG.as[Boolean] must be(Success(false))
   }
 
   "serializing and deserializing a List of simple nodes" in {
@@ -61,8 +61,8 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
   "serializing and deserialiazing Option" in {
     val opts = some("foo")
     implicit val binder = PointedGraphBinder[Rdf, Option[String]]
-    opts.toPG.as[Option[String]] must equal (Success(opts))
-    none.toPG.as[Option[String]] must equal (Success(None))
-    
+    opts.toPG.as[Option[String]] must equal(Success(opts))
+    none.toPG.as[Option[String]] must equal(Success(None))
+
   }
 }

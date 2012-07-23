@@ -13,7 +13,7 @@ object NodeBinder {
     new PointedGraphBinder[Rdf, T] {
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] =
-        binder.fromNode(pointed.node)
+        binder.fromNode(pointed.pointer)
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = PointedGraph(binder.toNode(t))
     }

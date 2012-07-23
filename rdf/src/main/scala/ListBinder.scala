@@ -11,9 +11,9 @@ trait ListBinder[Rdf <: RDF] {
   implicit def ListBinder[T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
     def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, List[T]] = {
-      import pointed.{ node, graph }
+      import pointed.{ pointer, graph }
       var elems = List[T]()
-      var current = node
+      var current = pointer
       try {
         while (current != rdf.nil) {
           (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
@@ -37,7 +37,7 @@ trait ListBinder[Rdf <: RDF] {
       t.reverse foreach { a =>
         val newBNode = bnode()
         val pointed = binder.toPointedGraph(a)
-        triples += Triple(newBNode, rdf.first, pointed.node)
+        triples += Triple(newBNode, rdf.first, pointed.pointer)
         triples ++= pointed.graph.toIterable
         triples += Triple(newBNode, rdf.rest, current)
         current = newBNode

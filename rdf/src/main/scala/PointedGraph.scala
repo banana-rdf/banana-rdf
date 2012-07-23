@@ -1,6 +1,6 @@
 package org.w3.banana
 
-case class PointedGraph[Rdf <: RDF](node: Rdf#Node, graph: Rdf#Graph)
+case class PointedGraph[Rdf <: RDF](pointer: Rdf#Node, graph: Rdf#Graph)
 
 object PointedGraph {
 
