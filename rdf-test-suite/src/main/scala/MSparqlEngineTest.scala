@@ -42,9 +42,9 @@ abstract class MSparqlEngineTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
 
   override def beforeAll(): Unit = {
 
-    store.addNamedGraph(uri("http://example.com/graph1"), graph1)
-    store.addNamedGraph(uri("http://example.com/graph2"), graph2)
-    store.addNamedGraph(uri("http://example.com/graph"), graph)
+    store.appendToGraph(uri("http://example.com/graph1"), graph1)
+    store.appendToGraph(uri("http://example.com/graph2"), graph2)
+    store.appendToGraph(uri("http://example.com/graph"), graph)
 
   }
 

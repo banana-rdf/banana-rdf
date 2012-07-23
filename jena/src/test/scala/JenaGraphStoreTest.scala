@@ -16,14 +16,14 @@ abstract class AbstractJenaGraphStoreTest(val jenaStore: JenaStore) extends Grap
   }
 
   "adding a named graph should not pollute the default graph" in {
-    store.addNamedGraph(makeUri("http://example.com/foo"), graph)
+    store.appendToGraph(makeUri("http://example.com/foo"), graph)
     defaultGraph must have size(0)
   }
 
 }
 
-class MemJenaGraphStore extends AbstractJenaGraphStoreTest(JenaStore(DatasetGraphFactory.createMem()))
+class JenaMemGraphStore extends AbstractJenaGraphStoreTest(JenaStore(DatasetGraphFactory.createMem()))
 
-class TDBJenaGraphStore extends AbstractJenaGraphStoreTest(JenaStore(TDBFactory.createDataset("test.tdb"))) {
+class JenaTDBGraphStore extends AbstractJenaGraphStoreTest(JenaStore(TDBFactory.createDataset("test.tdb"), defensiveCopy = true)) {
   TDB.getContext().set(TDB.symUnionDefaultGraph, false)
 }

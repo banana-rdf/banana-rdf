@@ -28,23 +28,14 @@ object SesameStore {
 
 class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
 
-  def addNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
-    withConnection(store) { conn =>
-      conn.removeStatements(null: Resource, null, null, uri)
-      for (s: Statement <- graph.`match`(null, null, null)) {
-        conn.addStatement(s.getSubject, s.getPredicate, s.getObject, uri)
-      }
-    }
-  }
-
-  def appendToNamedGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
+  def appendToGraph(uri: Sesame#URI, graph: Sesame#Graph): Unit = {
     withConnection(store) { conn =>
       for (s: Statement <- graph.`match`(null, null, null))
         conn.addStatement(s.getSubject, s.getPredicate, s.getObject, uri)
     }
   }
 
-  def getNamedGraph(uri: Sesame#URI): Sesame#Graph = {
+  def getGraph(uri: Sesame#URI): Sesame#Graph = {
     val graph = new GraphImpl
     withConnection(store) { conn =>
       for (s: Statement <- SesameStore.iter(conn.getStatements(null, null, null, false, uri)))

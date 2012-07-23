@@ -19,24 +19,24 @@ class ObjectStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Dies
    * saves an object if we know how to make a graph from it, and how to give it a URI
    */
   def save[T](pointed: PointedGraph[Rdf], atGraph: Rdf#URI): BananaFuture[Unit] = {
-    store.appendToNamedGraph(atGraph, pointed.graph)
+    store.appendToGraph(atGraph, pointed.graph)
   }
 
   def save[T](pointed: PointedGraph[Rdf]): BananaFuture[Unit] = {
     pointed.as[Rdf#URI].bf flatMap { uri =>
-      store.appendToNamedGraph(uri, pointed.graph)
+      store.appendToGraph(uri, pointed.graph)
     }
   }
 
   def get[T](uri: Rdf#URI)(implicit binder: PointedGraphBinder[Rdf, T]): BananaFuture[T] = {
-    store.getNamedGraph(uri) flatMap { graph =>
+    store.getGraph(uri) flatMap { graph =>
       val pointed = PointedGraph(uri, graph)
       pointed.as[T]
     }
   }
 
   def getAll[T](in: Rdf#URI, classUri: Rdf#URI)(implicit binder: PointedGraphBinder[Rdf, T]): BananaFuture[Iterable[T]] = {
-    store.getNamedGraph(in) flatMap { graph =>
+    store.getGraph(in) flatMap { graph =>
       val ts: Iterable[BananaValidation[T]] = graph.getAllInstancesOf(classUri) map { _.as[T] }
       val result: BananaValidation[Iterable[T]] = ts.toList.sequence[BananaValidation, T]
       result.bf

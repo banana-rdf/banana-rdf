@@ -15,27 +15,35 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
 
   import diesel._
 
-  def put(atUri: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[LinkedDataResource[Rdf]] = {
-    store.appendToNamedGraph(atUri, pointed.graph) map { _ =>
-      LinkedDataResource(atUri, pointed)
+  /**
+   * returns a LinkedDataResource
+   * - the fragment-less uri is the support document uri
+   * - the document content represents the graph itself
+   * - the given is the pointer in the graph
+   */
+  def get(uri: Rdf#URI): BananaFuture[LinkedDataResource[Rdf]] = {
+    val noFragUri = uri.fragmentLess
+    store.getGraph(noFragUri) map { graph =>
+      val pointed = PointedGraph(uri, graph)
+      LinkedDataResource(noFragUri, pointed)
     }
   }
 
-  def put(pointed: PointedGraph[Rdf]): BananaFuture[LinkedDataResource[Rdf]] = {
+  /**
+   * saves the pointed graph using the (fragment-less) pointer as the document uri
+   *
+   * - the graph at the underlying document is not overriden, we only append triples
+   * - if the graph did not previously exist, it is created
+   */
+  def append(pointed: PointedGraph[Rdf]): BananaFuture[LinkedDataResource[Rdf]] = {
     pointed.as[Rdf#URI].bf flatMap { uri =>
-      store.appendToNamedGraph(uri, pointed.graph) map { _ =>
+      store.appendToGraph(uri, pointed.graph) map { _ =>
         LinkedDataResource(uri, pointed)
       }
     }
   }
 
-  def get(uri: Rdf#URI): BananaFuture[LinkedDataResource[Rdf]] = {
-    val noFragUri = uri.fragmentLess
-    store.getNamedGraph(noFragUri) map { graph =>
-      val pointed = PointedGraph(uri, graph)
-      LinkedDataResource(noFragUri, pointed)
-    }
-  }
+
 
 //  def getAll[T](in: Rdf#URI, classUri: Rdf#URI)(implicit binder: PointedGraphBinder[Rdf, T]): BananaFuture[Iterable[T]] = {
 //    store.getNamedGraph(in) flatMap { graph =>

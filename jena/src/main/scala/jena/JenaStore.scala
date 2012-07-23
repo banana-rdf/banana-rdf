@@ -14,16 +14,17 @@ import com.hp.hpl.jena.rdf.model.ModelFactory.createModelForGraph
 
 object JenaStore {
 
-  def apply(dataset: Dataset): JenaStore = new JenaStore(dataset)
+  def apply(dataset: Dataset, defensiveCopy: Boolean): JenaStore =
+    new JenaStore(dataset, defensiveCopy)
 
-  def apply(dg: DatasetGraph): JenaStore = {
+  def apply(dg: DatasetGraph, defensiveCopy: Boolean = false): JenaStore = {
     val dataset = new GraphStoreBasic(dg).toDataset
-    JenaStore(dataset)
+    JenaStore(dataset, defensiveCopy)
   }
 
 }
 
-class JenaStore(dataset: Dataset) extends RDFStore[Jena] {
+class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena] {
 
   val supportsTransactions: Boolean = dataset.supportsTransactions()
 
@@ -57,20 +58,18 @@ class JenaStore(dataset: Dataset) extends RDFStore[Jena] {
     }
   }
 
-  def addNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
-    dg.removeGraph(uri)
-    dg.addGraph(uri, graph)
-  }
-
-  def appendToNamedGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
-    graph.toIterable foreach {
-      case Triple(s, p, o) =>
-        dg.add(uri, s, p, o)
+  def appendToGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
+    graphToIterable(graph) foreach { case Triple(s, p, o) =>
+      dg.add(uri, s, p, o)
     }
   }
 
-  def getNamedGraph(uri: Jena#URI): Jena#Graph = readTransaction {
-    dg.getGraph(uri)
+  def getGraph(uri: Jena#URI): Jena#Graph = readTransaction {
+    val graph = dg.getGraph(uri)
+    if (defensiveCopy)
+      JenaUtil.copy(graph)
+    else
+      graph
   }
 
   def removeGraph(uri: Jena#URI): Unit = writeTransaction {

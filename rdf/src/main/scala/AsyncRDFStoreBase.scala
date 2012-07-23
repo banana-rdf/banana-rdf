@@ -15,9 +15,8 @@ class AsyncRDFStoreBase[Rdf <: RDF](
     implicit timeout: Timeout)
     extends AsyncRDFStore[Rdf] {
 
-  case class AddNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)
-  case class AppendToNamedGraph(uri: Rdf#URI, graph: Rdf#Graph)
-  case class GetNamedGraph(uri: Rdf#URI)
+  case class AppendToGraph(uri: Rdf#URI, graph: Rdf#Graph)
+  case class GetGraph(uri: Rdf#URI)
   case class RemoveGraph(uri: Rdf#URI)
   case class Select(query: Rdf#SelectQuery)
   case class Construct(query: Rdf#ConstructQuery)
@@ -26,16 +25,12 @@ class AsyncRDFStoreBase[Rdf <: RDF](
   class RDFStoreActor(store: RDFStore[Rdf]) extends Actor {
 
     def receive = {
-      case AddNamedGraph(uri, graph) => {
-        val r = bananaCatch { store.addNamedGraph(uri, graph) }
+      case AppendToGraph(uri, graph) => {
+        val r = bananaCatch { store.appendToGraph(uri, graph) }
         sender ! r
       }
-      case AppendToNamedGraph(uri, graph) => {
-        val r = bananaCatch { store.appendToNamedGraph(uri, graph) }
-        sender ! r
-      }
-      case GetNamedGraph(uri) => {
-        val graph = bananaCatch { store.getNamedGraph(uri) }
+      case GetGraph(uri) => {
+        val graph = bananaCatch { store.getGraph(uri) }
         sender ! graph
       }
       case RemoveGraph(uri) => {
@@ -65,17 +60,14 @@ class AsyncRDFStoreBase[Rdf <: RDF](
         .withDispatcher("rdfstore-dispatcher"),
       "rdfstore")
 
-  def addNamedGraph(uri: Rdf#URI, graph: Rdf#Graph): BananaFuture[Unit] =
-    storeActor.?(AddNamedGraph(uri, graph)).asInstanceOf[Future[Validation[BananaException, Unit]]].fv
+  def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): BananaFuture[Unit] =
+    storeActor.?(AppendToGraph(uri, graph)).asInstanceOf[Future[Validation[BananaException, Unit]]].fv
 
-  def appendToNamedGraph(uri: Rdf#URI, graph: Rdf#Graph): BananaFuture[Unit] =
-    storeActor.?(AppendToNamedGraph(uri, graph)).asInstanceOf[Future[Validation[BananaException, Unit]]].fv
-
-  def getNamedGraph(uri: Rdf#URI): BananaFuture[Rdf#Graph] =
-    storeActor.?(GetNamedGraph(uri)).asInstanceOf[Future[Validation[BananaException, Rdf#Graph]]].fv
+  def getGraph(uri: Rdf#URI): BananaFuture[Rdf#Graph] =
+    storeActor.?(GetGraph(uri)).asInstanceOf[Future[Validation[BananaException, Rdf#Graph]]].fv
 
   def removeGraph(uri: Rdf#URI): BananaFuture[Unit] =
-    storeActor.?(RemoveGraph(uri)).asInstanceOf[FutureValidation[BananaException, Unit]].fv
+    storeActor.?(RemoveGraph(uri)).asInstanceOf[Future[Validation[BananaException, Unit]]].fv
 
   def executeSelect(query: Rdf#SelectQuery): BananaFuture[Rdf#Solutions] =
     storeActor.?(Select(query)).asInstanceOf[Future[Validation[BananaException, Rdf#Solutions]]].fv

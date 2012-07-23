@@ -4,6 +4,7 @@ import org.w3.banana._
 import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
 import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
+import com.hp.hpl.jena.graph.{ Factory, Node => JenaNode }
 import JenaOperations._
 
 object JenaUtil {
@@ -22,6 +23,16 @@ object JenaUtil {
     val mToJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
     val jenaGraph = mToJena.transform(graph)
     println(JenaRDFBlockingWriter.TurtleWriter.asString(jenaGraph, ""))
+  }
+
+  def copy(graph: Jena#Graph): Jena#Graph = {
+    val g = Factory.createDefaultGraph
+    val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
+    while (it.hasNext()) {
+      val t = it.next()
+      g add t
+    }
+    g
   }
 
 }
