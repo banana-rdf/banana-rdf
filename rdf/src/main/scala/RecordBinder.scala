@@ -139,7 +139,7 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        val v1 = extract(pointed, el1)
+        def v1 = extract(pointed, el1)
         for (t1 <- v1) yield apply(t1)
       }
 
@@ -154,8 +154,8 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        val v1 = extract(pointed, el1)
-        val v2 = extract(pointed, el2)
+        def v1 = extract(pointed, el1)
+        def v2 = extract(pointed, el2)
         for (t1 <- v1; t2 <- v2) yield apply(t1, t2)
       }
 
@@ -170,9 +170,9 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        val v1 = extract(pointed, el1)
-        val v2 = extract(pointed, el2)
-        val v3 = extract(pointed, el3)
+        def v1 = extract(pointed, el1)
+        def v2 = extract(pointed, el2)
+        def v3 = extract(pointed, el3)
         for (t1 <- v1; t2 <- v2; t3 <- v3) yield apply(t1, t2, t3)
       }
 
