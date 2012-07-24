@@ -8,21 +8,20 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
   import diesel._
   import ops._
 
-  case class Person(id: UUID, name: String)
+  case class Person(name: String)
 
   object Person {
 
     val clazz = uri("http://example.com/Person#class")
     implicit val classUris = classUrisFor[Person](clazz)
 
-    implicit val id = uriTemplate[UUID]("http://example.com/person/{id}")
     val name = property[String](foaf.name)
     val nickname = property[String](foaf("nickname"))
     val address = property[Address](foaf("address"))
 
-    implicit val uriMaker = id.uriMaker[Person](_.id)
+    def makeUri() = newUri("http://example.com/person/")
 
-    implicit val binder = pgb[Person](id, name)(Person.apply, Person.unapply)
+    implicit val binder = pgb[Person](name)(Person.apply, Person.unapply)
 
   }
 
@@ -56,20 +55,19 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
   }
 
-  case class VerifiedAddress(id: String, label: String, city: City) extends Address
+  case class VerifiedAddress(label: String, city: City) extends Address
 
   object VerifiedAddress {
 
     val clazz = uri("http://example.com/VerifiedAddress#class")
     implicit val classUris = classUrisFor[VerifiedAddress](clazz, Address.clazz)
 
-    val id = uriTemplate[String]("#{id}")
     val label = property[String](foaf("label"))
     val city = property[City](foaf("city"))
 
     implicit val ci = classUrisFor[VerifiedAddress](clazz)
 
-    implicit val binder = pgb[VerifiedAddress](id, label, city)(VerifiedAddress.apply, VerifiedAddress.unapply) withClasses classUris
+    implicit val binder = pgb[VerifiedAddress](label, city)(VerifiedAddress.apply, VerifiedAddress.unapply) withClasses classUris
 
   }
 

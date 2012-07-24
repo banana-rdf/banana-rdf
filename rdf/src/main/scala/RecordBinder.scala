@@ -2,26 +2,17 @@ package org.w3.banana
 
 import scalaz.{ Validation, Success, Failure }
 
-// partial informations for building a PointedGraph
-// it separates the current found subject and the Predicate/Object pairs found at some point
-case class Acc[Rdf <: RDF](subject: Rdf#Node, fields: List[(Rdf#URI, PointedGraph[Rdf])])
-
 object RecordBinder {
 
-  private def m[Rdf <: RDF, T](acc: Acc[Rdf], t: T, field: Field[Rdf, T]): Acc[Rdf] = {
-    val Acc(subject, pos) = acc
-    field match {
-      case UriComponent(uriBinder) => Acc(uriBinder.toUri(t), pos)
-      case Property(predicate, oBinder) => Acc(subject, (predicate, oBinder.toPointedGraph(t)) :: pos)
-    }
+  private def po[Rdf <: RDF, T](t: T, property: Property[Rdf, T]): (Rdf#URI, PointedGraph[Rdf]) = {
+    val Property(uri, binder) = property
+    (uri, binder.toPointedGraph(t))
   }
 
-  private def accStart[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): Acc[Rdf] = Acc(ops.makeBNode(), List.empty)
-
-  private def accToGraph[Rdf <: RDF](acc: Acc[Rdf])(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
-    val Acc(subject, pos) = acc
+  private def make[Rdf <: RDF](pos: (Rdf#URI, PointedGraph[Rdf])*)(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
+    val subject = ops.makeUri("#" + java.util.UUID.randomUUID().toString)
     var triples: Set[Rdf#Triple] = Set.empty
-    for (po <- pos) {
+    for (po <- pos.toIterable) {
       val (p, pg) = po
       triples += ops.makeTriple(subject, p, pg.pointer)
       triples ++= ops.graphToIterable(pg.graph)
@@ -76,49 +67,12 @@ trait RecordBinder[Rdf <: RDF] {
    */
   def property[T](uri: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): Property[Rdf, T] = Property(uri, objectBinder)
 
-  implicit def URIBinderToField[T](uriBinder: URIBinder[Rdf, T]): UriComponent[Rdf, T] = UriComponent(uriBinder)
-
-  /** */
-  class UriTemplate[T](template: String, binder: StringBinder[T]) extends URIBinder[Rdf, T] { self =>
-
-    // replace the pattern with (.+?) and make sure that the entire string is read
-    private val regex = {
-      val t = template.replaceAll("""\{.+?\}""", "(.+?)")
-      ("^.*?" + t + "$").r
-    }
-
-    def toUri(t: T): Rdf#URI = {
-      val subject = template.replaceAll("""\{.*?\}""", binder.toString(t))
-      makeUri(subject)
-    }
-
-    def fromUri(subject: Rdf#URI): Validation[BananaException, T] = {
-      regex findFirstIn ops.fromUri(subject) match {
-        case Some(regex(t)) => binder.fromString(t)
-        case None => Failure(WrongExpectation("could not apply template " + template + " to " + subject.toString))
-      }
-    }
-
+  private def extract[T](pointed: PointedGraph[Rdf], property: Property[Rdf, T]): Validation[BananaException, T] = {
+    val Property(predicate, oBinder) = property
+    (pointed / predicate).as[T](oBinder)
   }
 
-  /**
-   * declares a uri template where an object T can be extracted from the URI
-   * this is particularly usefull when the uri encodes an id for the given entity
-   *
-   * f is used to map the extracted string to a T
-   *
-   * example: http://example.com/foo/{id}   or    #{id}
-   * for now, supports only exactly one group in the regex
-   * for now, we assume that T.toString does the right thing. TODO: use Show[T]
-   */
-  def uriTemplate[T](template: String)(implicit binder: StringBinder[T]): URIBinder[Rdf, T] =
-    new UriTemplate[T](template, binder)
-
-  /** extract some graph information from a pointed graph and an declared element */
-  private def extract[T](pointed: PointedGraph[Rdf], field: Field[Rdf, T]): Validation[BananaException, T] = field match {
-    case UriComponent(uriBinder) => pointed.as[Rdf#URI] flatMap uriBinder.fromUri
-    case Property(predicate, oBinder) => (pointed / predicate).as[T](oBinder)
-  }
+  def newUri(prefix: String): Rdf#URI = uri(prefix + java.util.UUID.randomUUID().toString)
 
   /**
    * combine PointedGraphBinder elements and apply/unapply functions to build binders
@@ -128,88 +82,86 @@ trait RecordBinder[Rdf <: RDF] {
    * - provide other apply methods with different arity
    * - use shapeless to generalize
    */
-  def pgb[T] = new Object {
 
-    def apply[T1](el1: Field[Rdf, T1])(apply: (T1) => T, unapply: T => Option[T1]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+  def pgb[T] = new PGB[T]
+
+  class PGB[T] {
+
+    def apply[T1](p1: Property[Rdf, T1])(apply: (T1) => T, unapply: T => Option[T1]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some(t1) = unapply(t)
-        val acc = m(accStart, t1, el1)
-        accToGraph(acc)
+        make(po(t1, p1))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, el1)
+        def v1 = extract(pointed, p1)
         for (t1 <- v1) yield apply(t1)
       }
 
     }
 
-    def apply[T1, T2](el1: Field[Rdf, T1], el2: Field[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2](p1: Property[Rdf, T1], p2: Property[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2)) = unapply(t)
-        val acc = m(m(accStart, t1, el1), t2, el2)
-        accToGraph(acc)
+        make(po(t1, p1), po(t2, p2))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, el1)
-        def v2 = extract(pointed, el2)
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
         for (t1 <- v1; t2 <- v2) yield apply(t1, t2)
       }
 
     }
 
-    def apply[T1, T2, T3](el1: Field[Rdf, T1], el2: Field[Rdf, T2], el3: Field[Rdf, T3])(apply: (T1, T2, T3) => T, unapply: T => Option[(T1, T2, T3)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2, T3](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3])(apply: (T1, T2, T3) => T, unapply: T => Option[(T1, T2, T3)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3)) = unapply(t)
-        val acc = m(m(m(accStart, t1, el1), t2, el2), t3, el3)
-        accToGraph(acc)
+        make(po(t1, p1), po(t2, p2), po(t3, p3))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, el1)
-        def v2 = extract(pointed, el2)
-        def v3 = extract(pointed, el3)
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
         for (t1 <- v1; t2 <- v2; t3 <- v3) yield apply(t1, t2, t3)
       }
 
     }
 
-    def apply[T1, T2, T3, T4](el1: Field[Rdf, T1], el2: Field[Rdf, T2], el3: Field[Rdf, T3], el4: Field[Rdf, T4])(apply: (T1, T2, T3, T4) => T, unapply: T => Option[(T1, T2, T3, T4)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2, T3, T4](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4])(apply: (T1, T2, T3, T4) => T, unapply: T => Option[(T1, T2, T3, T4)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4)) = unapply(t)
-        val acc = m(m(m(m(accStart, t1, el1), t2, el2), t3, el3), t4, el4)
-        accToGraph(acc)
+        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        val v1 = extract(pointed, el1)
-        val v2 = extract(pointed, el2)
-        val v3 = extract(pointed, el3)
-        val v4 = extract(pointed, el4)
+        val v1 = extract(pointed, p1)
+        val v2 = extract(pointed, p2)
+        val v3 = extract(pointed, p3)
+        val v4 = extract(pointed, p4)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4) yield apply(t1, t2, t3, t4)
       }
 
     }
 
-    def apply[T1, T2, T3, T4, T5](el1: Field[Rdf, T1], el2: Field[Rdf, T2], el3: Field[Rdf, T3], el4: Field[Rdf, T4], el5: Field[Rdf, T5])(apply: (T1, T2, T3, T4, T5) => T, unapply: T => Option[(T1, T2, T3, T4, T5)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+    def apply[T1, T2, T3, T4, T5](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5])(apply: (T1, T2, T3, T4, T5) => T, unapply: T => Option[(T1, T2, T3, T4, T5)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5)) = unapply(t)
-        val acc = m(m(m(m(m(accStart, t1, el1), t2, el2), t3, el3), t4, el4), t5, el5)
-        accToGraph(acc)
+        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        val v1 = extract(pointed, el1)
-        val v2 = extract(pointed, el2)
-        val v3 = extract(pointed, el3)
-        val v4 = extract(pointed, el4)
-        val v5 = extract(pointed, el5)
+        val v1 = extract(pointed, p1)
+        val v2 = extract(pointed, p2)
+        val v3 = extract(pointed, p3)
+        val v4 = extract(pointed, p4)
+        val v5 = extract(pointed, p5)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5) yield apply(t1, t2, t3, t4, t5)
       }
 
