@@ -78,7 +78,6 @@ trait RecordBinder[Rdf <: RDF] {
    * combine PointedGraphBinder elements and apply/unapply functions to build binders
    *
    * TODO
-   * - provide a trait to avoid reflection
    * - provide other apply methods with different arity
    * - use shapeless to generalize
    */
@@ -140,10 +139,10 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        val v1 = extract(pointed, p1)
-        val v2 = extract(pointed, p2)
-        val v3 = extract(pointed, p3)
-        val v4 = extract(pointed, p4)
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
+        def v4 = extract(pointed, p4)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4) yield apply(t1, t2, t3, t4)
       }
 
@@ -157,11 +156,11 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        val v1 = extract(pointed, p1)
-        val v2 = extract(pointed, p2)
-        val v3 = extract(pointed, p3)
-        val v4 = extract(pointed, p4)
-        val v5 = extract(pointed, p5)
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
+        def v4 = extract(pointed, p4)
+        def v5 = extract(pointed, p5)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5) yield apply(t1, t2, t3, t4, t5)
       }
 

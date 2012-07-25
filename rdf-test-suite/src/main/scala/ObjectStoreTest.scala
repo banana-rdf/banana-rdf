@@ -31,17 +31,25 @@ abstract class ObjectStoreTest[Rdf <: RDF](
 
     val u1 = Person.makeUri()
     val u2 = Person.makeUri()
+    val coll = uri("http://example.com/persons")
 
     val pointed = person.toPG -- Person.address ->- address1.toPG
     println(pointed)
 
     for {
       _ <- store.removeGraph(u1)
-      ldr <- store.append(pointed)
+      _ <- store.append(u1, pointed)
       rPointed <- store.get(u1)
 
     } {
-      println(ldr)
+      println(rPointed)
+    }
+
+    for {
+      docUri <- store.post(coll, pointed)
+      rPointed <- store.get(docUri)
+
+    } {
       println(rPointed)
     }
 
