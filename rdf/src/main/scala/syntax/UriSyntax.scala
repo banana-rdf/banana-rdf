@@ -34,10 +34,19 @@ trait URISyntax[Rdf <: RDF] {
       Option(juri.getFragment)
     }
 
+    def newChildUri(): Rdf#URI = {
+      val newId = java.util.UUID.randomUUID().toString
+      val juri = new jURI(ops.fromUri(uri) + "/").resolve(newId)
+      ops.makeUri(juri.toString)
+    }
+
+    def resolve(str: String): Rdf#URI = org.w3.banana.URI.resolve(uri, str)(ops)
+
+    def resolveAgainst(other: Rdf#URI): Rdf#URI = org.w3.banana.URI.resolve(other, uri.toString)(ops)
+
+    def relativize(other: Rdf#URI): Rdf#URI = org.w3.banana.URI.relativize(uri, other)(ops)
+
   }
 
 }
 
-object URISyntax {
-
-}
