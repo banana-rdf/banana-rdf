@@ -4,12 +4,11 @@ import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 import scalaz.{ Validation, Failure, Success }
 import java.util.UUID
-import org.w3.banana.ObjectStore._
 import org.w3.banana.LinkedDataStore._
 import akka.actor.ActorSystem
 import akka.util.Timeout
 
-abstract class ObjectStoreTest[Rdf <: RDF](
+abstract class LinkedDataStoreTest[Rdf <: RDF](
   syncStore: RDFStore[Rdf])(
     implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
@@ -37,10 +36,8 @@ abstract class ObjectStoreTest[Rdf <: RDF](
     println(pointed)
 
     for {
-      _ <- store.removeGraph(u1)
       _ <- store.append(u1, pointed)
       rPointed <- store.get(u1)
-
     } {
       println(rPointed)
     }
