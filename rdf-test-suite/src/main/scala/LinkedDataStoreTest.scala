@@ -7,6 +7,7 @@ import java.util.UUID
 import org.w3.banana.LinkedDataStore._
 import akka.actor.ActorSystem
 import akka.util.Timeout
+import org.w3.banana.util._
 
 abstract class LinkedDataStoreTest[Rdf <: RDF](
   syncStore: RDFStore[Rdf])(
@@ -28,26 +29,20 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
 
   "foo" in {
 
-    val u1 = Person.makeUri()
-    val u2 = Person.makeUri()
-    val coll = uri("http://example.com/persons")
-
-    val pointed = person.toPG -- Person.address ->- address1.toPG
-    println(pointed)
-
     for {
-      _ <- store.append(u1, pointed)
-      rPointed <- store.get(u1)
+      personNode <- store.post(Person.container, person.toPG)
+      personUri <- personNode.as[Rdf#URI].bf
+      address1Uri <- store.post(personUri, address1.toPG)
+      address2Uri <- store.post(personUri, address2.toPG)
+      someData = (
+        personUri
+        -- foaf("address") ->- address1Uri
+        -- foaf("address") ->- address2Uri
+      )
+      _ <- store.append(personUri, someData)
+      ldr <- store.get(personUri)
     } {
-      println(rPointed)
-    }
-
-    for {
-      docUri <- store.post(coll, pointed)
-      rPointed <- store.get(docUri)
-
-    } {
-      println(rPointed)
+      println("!!!!!!!!!! "+ldr)
     }
 
   }

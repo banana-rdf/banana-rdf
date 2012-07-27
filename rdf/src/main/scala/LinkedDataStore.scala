@@ -43,9 +43,16 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
   /**
    * 
    */
-  def post(collection: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Rdf#URI] = {
+  def post(collection: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Rdf#Node] = {
     val docUri = collection.newChildUri
-    append(docUri, pointed.relativize(docUri)) map { _ => docUri }
+    println("\n>>>>>>")
+    println("=== "+collection)
+    println("### "+docUri)
+    println("@@@ " + pointed)
+    val anchored = pointed.relativize(docUri)
+    println("&&& " + anchored)
+    println("<<<<<<<\n")
+    append(docUri, anchored) map { _ => anchored.pointer }
   }
 
 }

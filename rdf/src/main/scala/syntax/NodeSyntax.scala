@@ -12,6 +12,16 @@ trait NodeSyntax[Rdf <: RDF] {
     def fold[T](funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T =
       ops.foldNode(node)(funURI, funBNode, funLiteral)
 
+    def resolveAgainst(baseUri: Rdf#URI)(implicit diesel: Diesel[Rdf]): Rdf#Node = {
+      import diesel._
+      node.fold(_.resolveAgainst(baseUri), bn => bn, lit => lit)
+    }
+
+    def relativize(baseUri: Rdf#URI)(implicit diesel: Diesel[Rdf]): Rdf#Node = {
+      import diesel._
+      node.fold(_.relativize(baseUri), bn => bn, lit => lit)
+    }
+
   }
 
 }
