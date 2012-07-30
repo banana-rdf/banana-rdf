@@ -34,6 +34,12 @@ trait URISyntax[Rdf <: RDF] {
       Option(juri.getFragment)
     }
 
+    def isPureFragment: Boolean = {
+      val uriString = ops.fromUri(uri)
+      val juri = new jURI(uriString)
+      (juri.getScheme == null || juri.getScheme.isEmpty) && (juri.getSchemeSpecificPart == null || juri.getSchemeSpecificPart.isEmpty)
+    }
+
     def /(str: String): Rdf#URI = {
       val juri = new jURI(ops.fromUri(uri) + "/").resolve(str)
       ops.makeUri(juri.toString)

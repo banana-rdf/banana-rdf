@@ -2,8 +2,8 @@ package org.w3.banana.util
 
 import akka.dispatch._
 import akka.util.Duration
-import scalaz.Validation
-import scalaz.syntax.validation._
+import scalaz._
+import scalaz.Scalaz._
 
 case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaDefaults {
 
@@ -65,9 +65,18 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaD
 
 }
 
-import scalaz._
-
 object FutureValidation {
+
+  def sequence[A](in: Iterable[BananaFuture[A]])(implicit executor: ExecutionContext): BananaFuture[List[A]] = {
+    val fvs: Iterable[Future[BananaValidation[A]]] = in.view.map(_.inner)
+    val futureValidations: Future[Iterable[BananaValidation[A]]] = Future.sequence(fvs)
+    FutureValidation {
+      futureValidations.map { validations =>
+        val v: BananaValidation[List[A]] = validations.toList.sequence[BananaValidation, A]
+        v
+      }
+    }
+  }
 
   implicit def FutureValidationBind[E]: Bind[({ type l[x] = FutureValidation[E, x] })#l] = new Bind[({ type l[x] = FutureValidation[E, x] })#l] {
     override def map[A, B](x: FutureValidation[E, A])(f: A => B): FutureValidation[E, B] = x map f

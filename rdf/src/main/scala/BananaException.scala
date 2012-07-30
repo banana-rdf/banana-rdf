@@ -43,3 +43,5 @@ case class LocalNameException(message: String) extends Exception(message) with B
 case class VarNotFound(message: String) extends Exception(message) with BananaException
 
 case class StoreProblem(t: Throwable) extends Exception(t) with BananaException
+
+case object NotPureFragment extends Exception("not a pure fragment URI") with BananaException

@@ -30,29 +30,35 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
     }
   }
 
+  def get(hyperlinks: Iterable[Rdf#URI]): BananaFuture[List[LinkedDataResource[Rdf]]] =
+    FutureValidation.sequence(hyperlinks.map(get))
+
   /**
    * saves the pointed graph using the (fragment-less) pointer as the document uri
    *
    * - the graph at the underlying document is not overriden, we only append triples
    * - if the graph did not previously exist, it is created
    */
-  def append(docUri: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Unit] = {
-    store.appendToGraph(docUri, pointed.graph.relativize(docUri))
+  def append(uri: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Unit] = {
+    val docUri = uri.fragmentLess
+    store.appendToGraph(docUri, pointed.graph/*.relativize(docUri)*/)
   }
 
   /**
    * 
    */
-  def post(collection: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Rdf#Node] = {
-    val docUri = collection.newChildUri
-    println("\n>>>>>>")
-    println("=== "+collection)
-    println("### "+docUri)
-    println("@@@ " + pointed)
-    val anchored = pointed.relativize(docUri)
-    println("&&& " + anchored)
-    println("<<<<<<<\n")
-    append(docUri, anchored) map { _ => anchored.pointer }
+  def post(collection: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Rdf#URI] = {
+    for {
+      fragment <- {
+        pointed.pointer.as[Rdf#URI] flatMap { uri =>
+          if (uri.isPureFragment) Success(uri) else Failure(NotPureFragment)
+        }
+      }.bf
+      docUri = collection.newChildUri
+      _ <- append(docUri, pointed)
+    } yield {
+      docUri.resolve(fragment.toString)
+    }
   }
 
 }

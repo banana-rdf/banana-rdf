@@ -4,6 +4,7 @@ import scalaz._
 import scalaz.Scalaz._
 import scalaz.Validation._
 import NodeBinder._
+import org.w3.banana.util._
 
 object Diesel {
   def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): Diesel[Rdf] = new Diesel()(ops)
@@ -113,10 +114,26 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
       takeOnePointedGraph flatMap (_.as[T])
 
+    /**
+     * returns optionally a T (though the implicit binder) if it is available.
+     * that's a good way to know if a particular rdf object was there
+     * 
+     * note: this is very different from as[Option[T]], which is an encoding of an Option in RDF
+     */
     def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Option[T]] = headOption match {
       case None => Success(None)
       case Some(pointed) => pointed.as[T] map (Some(_))
     }
+
+    /**
+     * sees the nodes for this PointedGraphs as an iterator, after they were bound successfully to
+     * a T thought an implicit PointedGraphBinder.
+     * it is a success only if all the bindings were successful themselves
+     * 
+     * note: this is very different from as[List[T]], which is an encoding of a List in RDF
+     */
+    def asIterable[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, List[T]] =
+      this.iterator.toList.map(_.as[T]).sequence[BananaValidation, T]
 
   }
 
