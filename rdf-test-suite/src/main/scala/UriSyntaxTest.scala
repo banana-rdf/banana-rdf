@@ -39,7 +39,7 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends
     uri("bar").resolveAgainst(uri("http://example.com/foo")) must be(URI("http://example.com/bar"))
     uri("#bar").resolveAgainst(uri("http://example.com/foo")) must be(URI("http://example.com/foo#bar"))
     uri("#bar").resolveAgainst(uri("http://example.com/foo/")) must be(URI("http://example.com/foo/#bar"))
-    uri("bar").resolveAgainst(uri("http://example.com/foo")) must be(URI("http://example.com/foo#bar"))
+    uri("bar").resolveAgainst(uri("http://example.com/foo")) must be(URI("http://example.com/bar"))
   }
 
 }
