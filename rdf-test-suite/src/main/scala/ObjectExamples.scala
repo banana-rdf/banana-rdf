@@ -19,8 +19,6 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     val nickname = property[String](foaf("nickname"))
     val address = property[Address](foaf("address"))
 
-    def makeUri() = newUri("http://example.com/person/")
-
     implicit val container = uri("http://example.com/persons/")
     implicit val binder = pgb[Person](name)(Person.apply, Person.unapply)
 

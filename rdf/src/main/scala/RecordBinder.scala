@@ -2,6 +2,37 @@ package org.w3.banana
 
 import scalaz.{ Validation, Success, Failure }
 
+//object Foo {
+//
+//  def main(args: Array[String]) {
+//    (2 to 12) foreach { i =>
+//      val 
+//      val template = """
+//    def apply[T1, T2](p1: Property[Rdf, T1], p2: Property[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+//
+//      def toPointedGraph(t: T): PointedGraph[Rdf] = {
+//        val Some((t1, t2)) = unapply(t)
+//        make(po(t1, p1), po(t2, p2))
+//      }
+//    
+//      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
+//        def v1 = extract(pointed, p1)
+//        def v2 = extract(pointed, p2)
+//        for (t1 <- v1; t2 <- v2) yield apply(t1, t2)
+//      }
+//    
+//    }
+//""" format ()
+//
+//      val template = """|sdf
+//                        |szDf
+//                        |""".stripMargin
+//      println(template)
+//    }
+//  }
+//
+//}
+
 object RecordBinder {
 
   private def po[Rdf <: RDF, T](t: T, property: Property[Rdf, T]): (Rdf#URI, PointedGraph[Rdf]) = {
@@ -162,6 +193,111 @@ trait RecordBinder[Rdf <: RDF] {
         def v4 = extract(pointed, p4)
         def v5 = extract(pointed, p5)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5) yield apply(t1, t2, t3, t4, t5)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6])(apply: (T1, T2, T3, T4, T5, T6) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6)) = unapply(t)
+        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6))
+      }
+
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
+        def v4 = extract(pointed, p4)
+        def v5 = extract(pointed, p5)
+        def v6 = extract(pointed, p6)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6) yield apply(t1, t2, t3, t4, t5, t6)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7])(apply: (T1, T2, T3, T4, T5, T6, T7) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7)) = unapply(t)
+        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7))
+      }
+
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
+        def v4 = extract(pointed, p4)
+        def v5 = extract(pointed, p5)
+        def v6 = extract(pointed, p6)
+        def v7 = extract(pointed, p7)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7) yield apply(t1, t2, t3, t4, t5, t6, t7)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8])(apply: (T1, T2, T3, T4, T5, T6, T7, T8) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8)) = unapply(t)
+        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7), po(t8, p8))
+      }
+
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
+        def v4 = extract(pointed, p4)
+        def v5 = extract(pointed, p5)
+        def v6 = extract(pointed, p6)
+        def v7 = extract(pointed, p7)
+        def v8 = extract(pointed, p8)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8) yield apply(t1, t2, t3, t4, t5, t6, t7, t8)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9)) = unapply(t)
+        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7), po(t8, p8), po(t9, p9))
+      }
+
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
+        def v4 = extract(pointed, p4)
+        def v5 = extract(pointed, p5)
+        def v6 = extract(pointed, p6)
+        def v7 = extract(pointed, p7)
+        def v8 = extract(pointed, p8)
+        def v9 = extract(pointed, p9)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
+
+      def toPointedGraph(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)) = unapply(t)
+        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7), po(t8, p8), po(t9, p9), po(t10, p10))
+      }
+
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
+        def v1 = extract(pointed, p1)
+        def v2 = extract(pointed, p2)
+        def v3 = extract(pointed, p3)
+        def v4 = extract(pointed, p4)
+        def v5 = extract(pointed, p5)
+        def v6 = extract(pointed, p6)
+        def v7 = extract(pointed, p7)
+        def v8 = extract(pointed, p8)
+        def v9 = extract(pointed, p9)
+        def v10 = extract(pointed, p10)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)
       }
 
     }
