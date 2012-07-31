@@ -46,7 +46,28 @@ object SesameOperations extends RDFOperations[Sesame] {
 
   // URI
 
-  def makeUri(iriStr: String): Sesame#URI = ValueFactoryImpl.getInstance.createURI(iriStr).asInstanceOf[Sesame#URI]
+  /**
+   * we provide our own builder for Sesame#URI to relax the constraint "the URI must be absolute"
+   * this constraint becomes relevant only when you add the URI to a Sesame store
+   */
+  def makeUri(iriStr: String): Sesame#URI =
+    try {
+      ValueFactoryImpl.getInstance.createURI(iriStr).asInstanceOf[Sesame#URI]
+    } catch {
+      case e =>
+        if (iriStr.nonEmpty && iriStr.charAt(0) == '#')
+          new URI {
+            override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == this.toString
+            def getLocalName: String = iriStr
+            def getNamespace: String = ""
+            override def hashCode: Int = iriStr.hashCode
+            override def toString: String = iriStr
+            def stringValue: String = iriStr
+          }
+        else {
+          throw e
+        }
+    }
 
   def fromUri(node: Sesame#URI): String = node.toString
 

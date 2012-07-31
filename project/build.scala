@@ -59,10 +59,6 @@ object BuildSettings {
     )
   )
 
-
-
-
-
   val jenaTestWIPFilter = Seq (
     testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
   )
