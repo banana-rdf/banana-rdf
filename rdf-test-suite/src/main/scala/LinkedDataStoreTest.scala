@@ -28,29 +28,46 @@ extends WordSpec with MustMatchers {
   val address2 = VerifiedAddress("rue des poissons", City("Paris"))
   val person = Person("betehess")
 
-  def getAddresses(pointed: PointedGraph[Rdf]): BananaFuture[Iterable[Address]] = {
-    for {
-      uris <- (pointed / Person.address).asIterable[Rdf#URI].bf
-      resources <- store.get(uris)
-      addresses <- resources.map(_.resource.as[Address]).sequence[BananaValidation, Address].bf
-    } yield {
-      addresses
+  class LinkedPerson(uri: Rdf#URI, store: LinkedDataStore[Rdf])(implicit diesel: Diesel[Rdf]) {
+    
+    lazy val bananaResource: BananaFuture[LinkedDataResource[Rdf]] = store.get(uri)
+
+    def getAddresses(): BananaFuture[Iterable[Address]] = {
+      for {
+        ldr <- bananaResource
+        uris <- (ldr.resource / Person.address).asIterable[Rdf#URI].bf
+        resources <- store.get(uris)
+        addresses <- resources.map(_.resource.as[Address]).sequence[BananaValidation, Address].bf
+      } yield {
+        addresses
+      }
     }
+
+    def linkAddress(addressURI: Rdf#URI): BananaFuture[Unit] =
+      store.append(uri, uri -- foaf("address") ->- addressURI)
+    
   }
+
+  def linkedPerson(ldr: LinkedDataResource[Rdf]): LinkedPerson =
+    new LinkedPerson(ldr.uri, store) {
+      import org.w3.banana.util._
+      // just a little optimization in the case we already have the resource at hand
+      override lazy val bananaResource = ldr.bf
+    }
+
+  def linkedPerson(uri: Rdf#URI): LinkedPerson = new LinkedPerson(uri, store)
 
   "saving a person, 2 addresses and then retrieve them" in {
 
     val r = for {
       personUri <- store.post(Person.container, person.toPG)
+      lp = linkedPerson(personUri)
       address1Uri <- store.post(personUri, address1.toPG)
       address2Uri <- store.post(personUri, address2.toPG)
-      _ <- store.append(personUri, (
-        personUri
-        -- foaf("address") ->- address1Uri
-        -- foaf("address") ->- address2Uri
-      ))
+      _ <- lp.linkAddress(address1Uri)
+      _ <- lp.linkAddress(address2Uri)
       personResource <- store.get(personUri)
-      addresses <- getAddresses(personResource.resource)
+      addresses <- linkedPerson(personResource).getAddresses()
     } yield {
       addresses
     }
