@@ -6,7 +6,7 @@ trait Property[Rdf <: RDF, T] {
 
   val uri: Rdf#URI
 
-  val binder: PointedGraphBinder[Rdf, T]
+  def pos(t: T): Iterable[(Rdf#URI, PointedGraph[Rdf])]
 
   def extract(pointed: PointedGraph[Rdf]): BananaValidation[T]
 

@@ -5,15 +5,10 @@ import scalaz.{ Validation, Success, Failure }
 
 object RecordBinder {
 
-  private def po[Rdf <: RDF, T](t: T, property: Property[Rdf, T]): (Rdf#URI, PointedGraph[Rdf]) = {
-    import property.{ uri, binder }
-    (uri, binder.toPointedGraph(t))
-  }
-
-  private def make[Rdf <: RDF](pos: (Rdf#URI, PointedGraph[Rdf])*)(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
+  private def make[Rdf <: RDF](pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
     val subject = ops.makeUri("#" + java.util.UUID.randomUUID().toString)
     var triples: Set[Rdf#Triple] = Set.empty
-    for (po <- pos.toIterable) {
+    for (po <- pos.toIterable.flatten) {
       val (p, pg) = po
       triples += ops.makeTriple(subject, p, pg.pointer)
       triples ++= ops.graphToIterable(pg.graph)
@@ -68,9 +63,19 @@ trait RecordBinder[Rdf <: RDF] {
    */
   def property[T](predicate: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): Property[Rdf, T] = new Property[Rdf, T] {
     val uri = predicate
-    val binder = objectBinder
+    def pos(t: T): Iterable[(Rdf#URI, PointedGraph[Rdf])] = Set((predicate, t.toPG))
     def extract(pointed: PointedGraph[Rdf]): BananaValidation[T] =
-      (pointed / predicate).as[T](binder)
+      (pointed / predicate).as[T]
+  }
+
+  def optional[T](predicate: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): Property[Rdf, Option[T]] = new Property[Rdf, Option[T]] {
+    val uri = predicate
+    def pos(tOpt: Option[T]): Iterable[(Rdf#URI, PointedGraph[Rdf])] = tOpt match {
+      case None => Set()
+      case Some(t) => Set((predicate, t.toPG))
+    }
+    def extract(pointed: PointedGraph[Rdf]): BananaValidation[Option[T]] =
+      (pointed / predicate).asOption[T]
   }
 
   def newUri(prefix: String): Rdf#URI = uri(prefix + java.util.UUID.randomUUID().toString)
@@ -91,7 +96,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some(t1) = unapply(t)
-        make(po(t1, p1))
+        make(p1.pos(t1))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -105,7 +110,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2)) = unapply(t)
-        make(po(t1, p1), po(t2, p2))
+        make(p1.pos(t1), p2.pos(t2))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -120,7 +125,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -136,7 +141,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -153,7 +158,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -171,7 +176,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -190,7 +195,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -210,7 +215,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7, t8)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7), po(t8, p8))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -231,7 +236,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7), po(t8, p8), po(t9, p9))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
@@ -253,7 +258,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)) = unapply(t)
-        make(po(t1, p1), po(t2, p2), po(t3, p3), po(t4, p4), po(t5, p5), po(t6, p6), po(t7, p7), po(t8, p8), po(t9, p9), po(t10, p10))
+        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
