@@ -1,6 +1,6 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
+import org.w3.banana.{ URI => _, _ }
 import JenaOperations._
 import JenaDiesel._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
@@ -8,6 +8,7 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
+import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype }
 import scalaz.{ Validation, Success, Failure }
 import scala.collection.JavaConverters._
 import com.hp.hpl.jena.rdf.model.ModelFactory.createModelForGraph
@@ -29,6 +30,10 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
   val supportsTransactions: Boolean = dataset.supportsTransactions()
 
   val dg: DatasetGraph = dataset.asDatasetGraph
+
+  val modelForBindings = ModelFactory.createDefaultModel()
+
+  val typeMapper = TypeMapper.getInstance()
 
   def readTransaction[T](body: => T): T = {
     if (supportsTransactions) {
@@ -76,20 +81,52 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     dg.removeGraph(uri)
   }
 
+  // oh my, what have I done to deserve this?
+  def toRDFNode(node: Jena#Node): RDFNode = foldNode(node)(
+    { case URI(str) => modelForBindings.createResource(str) },
+    { case BNode(label) => modelForBindings.createResource(AnonId.create(label)) },
+    {
+      _.fold(
+        { case TypedLiteral(lexicalForm, URI(datatype)) => modelForBindings.createTypedLiteral(lexicalForm, typeMapper.getSafeTypeByName(datatype)) },
+        { case LangLiteral(lexicalForm, Lang(lang)) => modelForBindings.createLiteral(lexicalForm, lang) }
+      )
+    }
+  )
+
+  def querySolutionMap(bindings: Map[String, Jena#Node]): QuerySolutionMap = {
+    val map = new QuerySolutionMap() 
+    bindings foreach { case (name, node) =>
+      map.add(name, toRDFNode(node))
+    }
+    map
+  }
+
   def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Jena#Solutions = readTransaction {
-    val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
+    val qexec: QueryExecution =
+      if (bindings.isEmpty)
+        QueryExecutionFactory.create(query, dataset)
+      else
+        QueryExecutionFactory.create(query, dataset, querySolutionMap(bindings))
     val solutions = qexec.execSelect()
     solutions
   }
 
   def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): JenaGraph = readTransaction {
-    val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
+    val qexec: QueryExecution =
+      if (bindings.isEmpty)
+        QueryExecutionFactory.create(query, dataset)
+      else
+        QueryExecutionFactory.create(query, dataset, querySolutionMap(bindings))
     val result = qexec.execConstruct()
     result.getGraph()
   }
 
   def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = readTransaction {
-    val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
+    val qexec: QueryExecution =
+      if (bindings.isEmpty)
+        QueryExecutionFactory.create(query, dataset)
+      else
+        QueryExecutionFactory.create(query, dataset, querySolutionMap(bindings))
     val result = qexec.execAsk()
     result
   }
