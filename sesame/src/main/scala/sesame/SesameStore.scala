@@ -60,7 +60,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
    * @param query
    * @return
    */
-  def executeSelect(query: Sesame#SelectQuery): Sesame#Solutions = {
+  def executeSelect(query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Sesame#Solutions = {
     withConnection(store) { conn =>
       val res = conn.evaluate(query.getTupleExpr, null, empty, false)
       new TupleQueryResult {
@@ -73,7 +73,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
     }
   }
 
-  def executeConstruct(query: Sesame#ConstructQuery): Sesame#Graph =
+  def executeConstruct(query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Sesame#Graph =
     withConnection(store) { conn =>
       val it = conn.evaluate(query.getTupleExpr, null, empty, false)
       val sit = SesameUtil.toStatementIterable(it)
@@ -82,7 +82,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
       res
     }
 
-  def executeAsk(query: Sesame#AskQuery): Boolean =
+  def executeAsk(query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Boolean =
     withConnection(store) { conn =>
       val it = conn.evaluate(query.getTupleExpr, null, empty, false)
       val res = it.hasNext

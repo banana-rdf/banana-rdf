@@ -76,19 +76,19 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     dg.removeGraph(uri)
   }
 
-  def executeSelect(query: Jena#SelectQuery): Jena#Solutions = readTransaction {
+  def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Jena#Solutions = readTransaction {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val solutions = qexec.execSelect()
     solutions
   }
 
-  def executeConstruct(query: Jena#ConstructQuery): JenaGraph = readTransaction {
+  def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): JenaGraph = readTransaction {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val result = qexec.execConstruct()
     result.getGraph()
   }
 
-  def executeAsk(query: Jena#AskQuery): Boolean = readTransaction {
+  def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = readTransaction {
     val qexec: QueryExecution = QueryExecutionFactory.create(query, dataset)
     val result = qexec.execAsk()
     result
