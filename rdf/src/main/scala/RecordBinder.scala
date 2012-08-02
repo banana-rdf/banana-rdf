@@ -1,42 +1,12 @@
 package org.w3.banana
 
+import org.w3.banana.util.BananaValidation
 import scalaz.{ Validation, Success, Failure }
-
-//object Foo {
-//
-//  def main(args: Array[String]) {
-//    (2 to 12) foreach { i =>
-//      val 
-//      val template = """
-//    def apply[T1, T2](p1: Property[Rdf, T1], p2: Property[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
-//
-//      def toPointedGraph(t: T): PointedGraph[Rdf] = {
-//        val Some((t1, t2)) = unapply(t)
-//        make(po(t1, p1), po(t2, p2))
-//      }
-//    
-//      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-//        def v1 = extract(pointed, p1)
-//        def v2 = extract(pointed, p2)
-//        for (t1 <- v1; t2 <- v2) yield apply(t1, t2)
-//      }
-//    
-//    }
-//""" format ()
-//
-//      val template = """|sdf
-//                        |szDf
-//                        |""".stripMargin
-//      println(template)
-//    }
-//  }
-//
-//}
 
 object RecordBinder {
 
   private def po[Rdf <: RDF, T](t: T, property: Property[Rdf, T]): (Rdf#URI, PointedGraph[Rdf]) = {
-    val Property(uri, binder) = property
+    import property.{ uri, binder }
     (uri, binder.toPointedGraph(t))
   }
 
@@ -96,11 +66,11 @@ trait RecordBinder[Rdf <: RDF] {
   /**
    * declares a Property/Object element where T is in the object position
    */
-  def property[T](uri: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): Property[Rdf, T] = Property(uri, objectBinder)
-
-  private def extract[T](pointed: PointedGraph[Rdf], property: Property[Rdf, T]): Validation[BananaException, T] = {
-    val Property(predicate, oBinder) = property
-    (pointed / predicate).as[T](oBinder)
+  def property[T](predicate: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): Property[Rdf, T] = new Property[Rdf, T] {
+    val uri = predicate
+    val binder = objectBinder
+    def extract(pointed: PointedGraph[Rdf]): BananaValidation[T] =
+      (pointed / predicate).as[T](binder)
   }
 
   def newUri(prefix: String): Rdf#URI = uri(prefix + java.util.UUID.randomUUID().toString)
@@ -125,7 +95,7 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
+        def v1 = p1.extract(pointed)
         for (t1 <- v1) yield apply(t1)
       }
 
@@ -139,8 +109,8 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
         for (t1 <- v1; t2 <- v2) yield apply(t1, t2)
       }
 
@@ -154,9 +124,9 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3) yield apply(t1, t2, t3)
       }
 
@@ -170,10 +140,10 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
-        def v4 = extract(pointed, p4)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4) yield apply(t1, t2, t3, t4)
       }
 
@@ -187,11 +157,11 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
-        def v4 = extract(pointed, p4)
-        def v5 = extract(pointed, p5)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5) yield apply(t1, t2, t3, t4, t5)
       }
 
@@ -205,12 +175,12 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
-        def v4 = extract(pointed, p4)
-        def v5 = extract(pointed, p5)
-        def v6 = extract(pointed, p6)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6) yield apply(t1, t2, t3, t4, t5, t6)
       }
 
@@ -224,13 +194,13 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
-        def v4 = extract(pointed, p4)
-        def v5 = extract(pointed, p5)
-        def v6 = extract(pointed, p6)
-        def v7 = extract(pointed, p7)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7) yield apply(t1, t2, t3, t4, t5, t6, t7)
       }
 
@@ -244,14 +214,14 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
-        def v4 = extract(pointed, p4)
-        def v5 = extract(pointed, p5)
-        def v6 = extract(pointed, p6)
-        def v7 = extract(pointed, p7)
-        def v8 = extract(pointed, p8)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8) yield apply(t1, t2, t3, t4, t5, t6, t7, t8)
       }
 
@@ -265,15 +235,15 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
-        def v4 = extract(pointed, p4)
-        def v5 = extract(pointed, p5)
-        def v6 = extract(pointed, p6)
-        def v7 = extract(pointed, p7)
-        def v8 = extract(pointed, p8)
-        def v9 = extract(pointed, p9)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9)
       }
 
@@ -287,16 +257,16 @@ trait RecordBinder[Rdf <: RDF] {
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T] = {
-        def v1 = extract(pointed, p1)
-        def v2 = extract(pointed, p2)
-        def v3 = extract(pointed, p3)
-        def v4 = extract(pointed, p4)
-        def v5 = extract(pointed, p5)
-        def v6 = extract(pointed, p6)
-        def v7 = extract(pointed, p7)
-        def v8 = extract(pointed, p8)
-        def v9 = extract(pointed, p9)
-        def v10 = extract(pointed, p10)
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
         for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)
       }
 

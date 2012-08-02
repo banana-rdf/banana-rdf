@@ -28,7 +28,7 @@ extends WordSpec with MustMatchers {
   val address2 = VerifiedAddress("rue des poissons", City("Paris"))
   val person = Person("betehess")
 
-  class LinkedPerson(uri: Rdf#URI, store: LinkedDataStore[Rdf])(implicit diesel: Diesel[Rdf]) {
+  class LinkedPerson(uri: Rdf#URI, store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]) {
     
     lazy val bananaResource: BananaFuture[LinkedDataResource[Rdf]] = store.get(uri)
 

@@ -1,6 +1,16 @@
 package org.w3.banana
 
-case class Property[Rdf <: RDF, T](uri: Rdf#URI, binder: PointedGraphBinder[Rdf, T])
+import org.w3.banana.util.BananaValidation
+
+trait Property[Rdf <: RDF, T] {
+
+  val uri: Rdf#URI
+
+  val binder: PointedGraphBinder[Rdf, T]
+
+  def extract(pointed: PointedGraph[Rdf]): BananaValidation[T]
+
+}
 
 object Property {
 
