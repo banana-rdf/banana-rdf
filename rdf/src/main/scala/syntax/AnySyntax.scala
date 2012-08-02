@@ -10,6 +10,8 @@ class AnyW[Rdf <: RDF, T](t: T) {
 
   def toPG(implicit binder: PointedGraphBinder[Rdf, T]): PointedGraph[Rdf] = this.toPointedGraph(binder)
 
+  def toNode(implicit nodeBinder: NodeBinder[Rdf, T]): Rdf#Node = nodeBinder.toNode(t)
+
 }
 
 trait AnySyntax[Rdf <: RDF] {

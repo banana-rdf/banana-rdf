@@ -70,6 +70,31 @@ abstract class MSparqlEngineTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
 
   }
 
+
+  "new-tr.rdf must have Alexandre Bertails as an editor (with-bindings version)" taggedAs (SesameWIP) in {
+
+    val query = SelectQuery("""
+                           |prefix : <http://www.w3.org/2001/02pd/rec54#>
+                           |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                           |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+                           |
+                           |SELECT DISTINCT ?name WHERE {
+                           |  graph ?g {
+                           |    ?thing :editor ?ed .
+                           |    ?ed ?prop ?name
+                           |  }
+                           |}""".stripMargin)
+
+    val bindings = Map("g" -> uri("http://example.com/graph"), "prop" -> uri("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
+    val names: M[Iterable[String]] = store.executeSelect(query, bindings).map(_.toIterable.map {
+      row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
+    })
+
+    unsafeExtract(names).map(_ must contain("Alexandre Bertails")) must be('success)
+
+  }
+
+
   "the identity SPARQL Construct must work as expected" in {
 
     val query = ConstructQuery("""
@@ -106,6 +131,32 @@ abstract class MSparqlEngineTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
     alexIsThere.map(_ must be(true)) must be('success)
 
   }
+
+  "Alexandre Bertails must appear as an editor in new-tr.rdf (with-bindings version)" taggedAs (SesameWIP) in {
+
+    val query = AskQuery("""
+                        |prefix : <http://www.w3.org/2001/02pd/rec54#>
+                        |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+                        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+                        |
+                        |ASK {
+                        |  graph ?g {
+                        |    ?thing :editor ?ed .
+                        |    ?ed ?prop ?name
+                        |  }
+                        |}""".stripMargin)
+    val bindings = Map(
+      "g" -> uri("http://example.com/graph"),
+      "prop" -> uri("http://www.w3.org/2000/10/swap/pim/contact#fullName"),
+      "name" -> "Alexandre Bertails".toNode)
+
+    val alexIsThere = unsafeExtract(store.executeAsk(query, bindings))
+
+    alexIsThere.map(_ must be(true)) must be('success)
+
+  }
+
 
   "betehess must know henry" in {
 
