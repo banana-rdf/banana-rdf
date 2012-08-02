@@ -8,7 +8,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
   import diesel._
   import ops._
 
-  case class Person(name: String)
+  case class Person(name: String, nickname: Option[String] = None)
 
   object Person {
 
@@ -16,11 +16,11 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     implicit val classUris = classUrisFor[Person](clazz)
 
     val name = property[String](foaf.name)
-    val nickname = property[String](foaf("nickname"))
+    val nickname = optional[String](foaf("nickname"))
     val address = property[Address](foaf("address"))
 
     implicit val container = uri("http://example.com/persons/")
-    implicit val binder = pgb[Person](name)(Person.apply, Person.unapply)
+    implicit val binder = pgb[Person](name, nickname)(Person.apply, Person.unapply)
 
   }
 
@@ -70,7 +70,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
   }
 
-  case class City(cityName: String)
+  case class City(cityName: String, otherNames: Set[String] = Set.empty)
 
   object City {
 
@@ -78,9 +78,10 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     implicit val classUris = classUrisFor[City](clazz)
 
     val cityName = property[String](foaf("cityName"))
+    val otherNames = set[String](foaf("otherNames"))
 
     implicit val binder: PointedGraphBinder[Rdf, City] =
-      pgb[City](cityName)(City.apply, City.unapply) withClasses classUris
+      pgb[City](cityName, otherNames)(City.apply, City.unapply) withClasses classUris
 
   }
 

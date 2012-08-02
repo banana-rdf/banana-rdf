@@ -12,9 +12,10 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
   val objects = new ObjectExamples
   import objects._
 
-  val city = City("Cambridge")
+  val city = City("Paris", Set("Panam", "Lutetia"))
   val verifiedAddress = VerifiedAddress("32 Vassar st", city)
-  val person = Person("betehess")
+  val person = Person("Alexandre Bertails")
+  val personWithNickname = person.copy(nickname = Some("betehess"))
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] must be(Success(city))
@@ -38,6 +39,10 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
 
   "serializing and deserializing a Person" in {
     person.toPointedGraph.as[Person] must be(Success(person))
+  }
+
+  "serializing and deserializing a Person with a nickname" in {
+    personWithNickname.toPointedGraph.as[Person] must be(Success(personWithNickname))
   }
 
 }
