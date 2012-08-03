@@ -61,4 +61,12 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
     }
   }
 
+  def delete(uri: Rdf#URI): BananaFuture[Unit] = store.removeGraph(uri)
+
+  def put(ldr: LinkedDataResource[Rdf]): BananaFuture[Unit] =
+    this.delete(ldr.uri) flatMap { _ =>
+      this.append(ldr.uri, ldr.resource) map { _ => () }
+    }
+
+
 }

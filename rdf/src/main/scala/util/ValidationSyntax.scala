@@ -11,6 +11,7 @@ class ValidationW[F, S](v: Validation[F, S]) {
 
 class BananaValidationW[S](v: Validation[BananaException, S]) extends ValidationW[BananaException, S](v) {
   def bf: BananaFuture[S] = fv
+  def getOrFail: S = v.fold(be => throw be, s => s)
 }
 
 trait ValidationSyntax {
