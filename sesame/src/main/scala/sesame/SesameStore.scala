@@ -6,12 +6,10 @@ import org.openrdf.model.impl._
 import SesameUtil.withConnection
 import org.openrdf.repository.sail.SailRepository
 import scala.collection.JavaConversions._
-import SesameUtil._
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.sail.SailException
-import org.openrdf.query.impl.EmptyBindingSet
-import org.openrdf.query.parser.ParsedTupleQuery
-import org.openrdf.query.TupleQueryResult
+import org.openrdf.query.impl.{MapBindingSet, EmptyBindingSet}
+import org.openrdf.query.{BindingSet, TupleQueryResult}
 
 object SesameStore {
 
@@ -62,20 +60,37 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
    */
   def executeSelect(query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Sesame#Solutions = {
     withConnection(store) { conn =>
-      val res = conn.evaluate(query.getTupleExpr, null, empty, false)
+      val res = conn.evaluate(query.getTupleExpr, null, toSesame(bindings), false)
+
       new TupleQueryResult {
         def hasNext = res.hasNext
         def next() = res.next
         def remove() { res.remove() }
-        def getBindingNames = List[String]() //how do I get the bindings?
+        lazy val getBindingNames = {
+          val names = query.getTupleExpr.getBindingNames
+          names.removeAll(bindings.keys)
+          new java.util.ArrayList(names) //we don't get the order right here...
+        }
         def close() { res.close() }
       }
     }
   }
 
+
+  private def toSesame(bindings: Map[String, Sesame#Node]): BindingSet = {
+    if (bindings.size == 0) empty
+    else {
+      val bndg = new MapBindingSet(bindings.size)
+      for ((name, value) <- bindings) {
+        bndg.addBinding(name, value)
+      }
+      bndg
+    }
+  }
+
   def executeConstruct(query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Sesame#Graph =
     withConnection(store) { conn =>
-      val it = conn.evaluate(query.getTupleExpr, null, empty, false)
+      val it = conn.evaluate(query.getTupleExpr, null, toSesame(bindings), false)
       val sit = SesameUtil.toStatementIterable(it)
       val res = SesameOperations.makeGraph(sit)
       it.close()
@@ -84,7 +99,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
 
   def executeAsk(query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Boolean =
     withConnection(store) { conn =>
-      val it = conn.evaluate(query.getTupleExpr, null, empty, false)
+      val it = conn.evaluate(query.getTupleExpr, null, toSesame(bindings), false)
       val res = it.hasNext
       it.close()
       res

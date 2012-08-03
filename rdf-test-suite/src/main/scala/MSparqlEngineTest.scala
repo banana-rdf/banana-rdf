@@ -71,7 +71,7 @@ abstract class MSparqlEngineTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
   }
 
 
-  "new-tr.rdf must have Alexandre Bertails as an editor (with-bindings version)" taggedAs (SesameWIP) in {
+  "new-tr.rdf must have Alexandre Bertails as an editor (with-bindings version)"  in {
 
     val query = SelectQuery("""
                            |prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -85,11 +85,13 @@ abstract class MSparqlEngineTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
                            |  }
                            |}""".stripMargin)
 
-    val bindings = Map("g" -> uri("http://example.com/graph"), "prop" -> uri("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
+    val bindings = Map("g" -> uri("http://example.com/graph"),
+      "thing" -> uri("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
+      "prop" -> uri("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
     val names: M[Iterable[String]] = store.executeSelect(query, bindings).map(_.toIterable.map {
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
-
+    unsafeExtract(names).map( _.size must equal(4) ) must be('success)
     unsafeExtract(names).map(_ must contain("Alexandre Bertails")) must be('success)
 
   }
@@ -132,7 +134,7 @@ abstract class MSparqlEngineTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
 
   }
 
-  "Alexandre Bertails must appear as an editor in new-tr.rdf (with-bindings version)" taggedAs (SesameWIP) in {
+  "Alexandre Bertails must appear as an editor in new-tr.rdf (with-bindings version)"  in {
 
     val query = AskQuery("""
                         |prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -148,6 +150,7 @@ abstract class MSparqlEngineTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
                         |}""".stripMargin)
     val bindings = Map(
       "g" -> uri("http://example.com/graph"),
+      "thing" -> uri("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
       "prop" -> uri("http://www.w3.org/2000/10/swap/pim/contact#fullName"),
       "name" -> "Alexandre Bertails".toNode)
 
