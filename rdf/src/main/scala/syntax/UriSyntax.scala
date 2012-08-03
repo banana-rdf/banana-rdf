@@ -47,11 +47,11 @@ trait URISyntax[Rdf <: RDF] {
 
     def newChildUri(): Rdf#URI = this / java.util.UUID.randomUUID().toString.replaceAll("-", "")
 
-    def resolve(str: String): Rdf#URI = org.w3.banana.URI.resolve(uri, str)(ops)
+    def resolve(str: String): Rdf#URI = URIHelper.resolve(uri, str)(ops)
 
-    def resolveAgainst(other: Rdf#URI): Rdf#URI = org.w3.banana.URI.resolve(other, uri.toString)(ops)
+    def resolveAgainst(other: Rdf#URI): Rdf#URI = URIHelper.resolve(other, uri.toString)(ops)
 
-    def relativize(other: Rdf#URI): Rdf#URI = org.w3.banana.URI.relativize(uri, other)(ops)
+    def relativize(other: Rdf#URI): Rdf#URI = URIHelper.relativize(uri, other)(ops)
 
   }
 

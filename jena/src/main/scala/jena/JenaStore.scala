@@ -1,6 +1,6 @@
 package org.w3.banana.jena
 
-import org.w3.banana.{ URI => _, _ }
+import org.w3.banana._
 import JenaOperations._
 import JenaDiesel._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
