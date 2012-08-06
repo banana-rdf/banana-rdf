@@ -52,17 +52,15 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
         rGraph <- store.getGraph(u1)
         rGraph2 <- store.getGraph(u2)
       } yield {
-        // TODO an exception thrown from here stays in the monad
-        // there is a stacktrace in the logs but it's still a 'success
-        // there should be a point operation for M as well!
         assert(rGraph isIsomorphicWith graph)
         assert(rGraph2 isIsomorphicWith graph2)
+        true
       }
-    } must be('success)
+    } must be(Success(true))
   }
 
   "appendToGraph should be equivalent to graph union" in {
-    val r = unsafeExtract {
+    unsafeExtract {
       val u = uri("http://example.com/graph")
       for {
         _ <- store.removeGraph(u)
@@ -70,10 +68,32 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
         _ <- store.appendToGraph(u, graph2)
         rGraph <- store.getGraph(u)
       } yield {
-        // TODO
         assert(rGraph isIsomorphicWith union(List(graph, graph2)))
+        true
       }
-    } must be('success)
+    } must be(Success(true))
+  }
+
+  "patchGraph should delete and insert triples as expected" in {
+    unsafeExtract {
+      val u = uri("http://example.com/graph")
+      for {
+        _ <- store.removeGraph(u)
+        _ <- store.appendToGraph(u, foo)
+        _ <- store.patchGraph(u,
+                              (uri("http://example.com/foo") -- rdf("foo") ->- "foo").graph,
+                              (uri("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+        rGraph <- store.getGraph(u)
+      } yield {
+        val expected = (
+          uri("http://example.com/foo")
+          -- rdf("bar") ->- "bar"
+          -- rdf("baz") ->- "baz"
+        ).graph
+        assert(rGraph isIsomorphicWith expected)
+        true
+      }
+    } must be(Success(true))
   }
 
 }

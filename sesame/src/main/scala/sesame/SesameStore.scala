@@ -33,6 +33,15 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
     }
   }
 
+  def patchGraph(uri: Sesame#URI, delete: Sesame#Graph, insert: Sesame#Graph): Unit = {
+    withConnection(store) { conn =>
+      for (s: Statement <- delete.`match`(null, null, null))
+        conn.removeStatements(s.getSubject, s.getPredicate, s.getObject, uri)
+      for (s: Statement <- insert.`match`(null, null, null))
+        conn.addStatement(s.getSubject, s.getPredicate, s.getObject, uri)
+    }
+  }
+
   def getGraph(uri: Sesame#URI): Sesame#Graph = {
     val graph = new GraphImpl
     withConnection(store) { conn =>
