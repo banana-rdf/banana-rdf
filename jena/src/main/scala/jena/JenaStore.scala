@@ -1,6 +1,6 @@
 package org.w3.banana.jena
 
-import org.w3.banana.{ URI => _, _ }
+import org.w3.banana._
 import JenaOperations._
 import JenaDiesel._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
@@ -72,6 +72,15 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
 
   def appendToGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
     graphToIterable(graph) foreach { case Triple(s, p, o) =>
+      dg.add(uri, s, p, o)
+    }
+  }
+
+  def patchGraph(uri: Jena#URI, delete: Jena#Graph, insert: Jena#Graph): Unit = writeTransaction {
+    graphToIterable(delete) foreach { case Triple(s, p, o) =>
+      dg.delete(uri, s, p, o)
+    }
+    graphToIterable(insert) foreach { case Triple(s, p, o) =>
       dg.add(uri, s, p, o)
     }
   }

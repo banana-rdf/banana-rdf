@@ -114,6 +114,9 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
       takeOnePointedGraph flatMap (_.as[T])
 
+    def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, (T1, T2)] =
+      takeOnePointedGraph flatMap { pg => (pg.as[T1] |@| pg.as[T2])(Tuple2.apply) }
+
     /**
      * returns optionally a T (though the implicit binder) if it is available.
      * that's a good way to know if a particular rdf object was there
@@ -125,6 +128,11 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       case Some(pointed) => pointed.as[T] map (Some(_))
     }
 
+    def asOption2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, Option[(T1, T2)]] = headOption match {
+      case None => Success(None)
+      case Some(pointed) => (pointed.as[T1] |@| pointed.as[T2])(Tuple2.apply) map { Some(_) }
+    }
+
     /**
      * sees the nodes for this PointedGraphs as an iterator, after they were bound successfully to
      * a T thought an implicit PointedGraphBinder.
@@ -134,6 +142,9 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
      */
     def asIterable[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, List[T]] =
       this.iterator.toList.map(_.as[T]).sequence[BananaValidation, T]
+
+    def asIterable2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, List[(T1, T2)]] =
+      this.iterator.toList.map{ pg => (pg.as[T1] |@| pg.as[T2])(Tuple2.apply) }.sequence[BananaValidation, (T1, T2)]
 
   }
 
@@ -211,6 +222,12 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
   implicit def NodeToPointedGraphBinder[T](implicit binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] = NodeBinder.toPointedGraphBinder[Rdf, T](ops, binder)
 
   // the natural Binders
+
+  implicit val PGBPointedGraphBinder: PointedGraphBinder[Rdf, PointedGraph[Rdf]] =
+    new PointedGraphBinder[Rdf, PointedGraph[Rdf]] {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, PointedGraph[Rdf]] = Success(pointed)
+      def toPointedGraph(t: PointedGraph[Rdf]): PointedGraph[Rdf] = t
+    }
 
   implicit val PGBNode: PointedGraphBinder[Rdf, Rdf#Node] = NodeToPointedGraphBinder(NodeBinder.naturalBinder[Rdf])
 

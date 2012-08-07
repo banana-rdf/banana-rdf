@@ -41,7 +41,12 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
    */
   def append(uri: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Unit] = {
     val docUri = uri.fragmentLess
-    store.appendToGraph(docUri, pointed.graph/*.relativize(docUri)*/)
+    store.appendToGraph(docUri, pointed.graph.resolveAgainst(docUri))
+  }
+
+  def patch(uri: Rdf#URI, delete: PointedGraph[Rdf]): BananaFuture[Unit] = {
+    val docUri = uri.fragmentLess
+    store.patchGraph(docUri, delete.graph.resolveAgainst(docUri), emptyGraph)
   }
 
   /**
@@ -60,5 +65,13 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
       docUri.resolve(fragment.toString)
     }
   }
+
+  def delete(uri: Rdf#URI): BananaFuture[Unit] = store.removeGraph(uri)
+
+  def put(ldr: LinkedDataResource[Rdf]): BananaFuture[Unit] =
+    this.delete(ldr.uri) flatMap { _ =>
+      this.append(ldr.uri, ldr.resource) map { _ => () }
+    }
+
 
 }

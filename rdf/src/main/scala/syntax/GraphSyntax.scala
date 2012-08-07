@@ -33,10 +33,10 @@ trait GraphSyntax[Rdf <: RDF] {
     def copy: Rdf#Graph = copy { uri => uri }
 
     def resolveAgainst(baseUri: Rdf#URI): Rdf#Graph =
-      copy { uri => org.w3.banana.URI.resolve(baseUri, uri.toString)(ops) }
+      copy { uri => URIHelper.resolve(baseUri, uri.toString)(ops) }
 
     def relativize(baseUri: Rdf#URI): Rdf#Graph =
-      copy { uri => org.w3.banana.URI.relativize(baseUri, uri)(ops) }
+      copy { uri => URIHelper.relativize(baseUri, uri)(ops) }
 
   }
 

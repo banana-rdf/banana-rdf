@@ -16,6 +16,16 @@ case class PointedGraph[Rdf <: RDF](pointer: Rdf#Node, graph: Rdf#Graph) {
       graph.relativize(baseUri))
   }
 
+  // carefull: this is potentially unsafe!!!
+  def toLDR()(implicit diesel: Diesel[Rdf]): LinkedDataResource[Rdf] = {
+    import diesel._
+    ops.foldNode(pointer)(
+      uri => LinkedDataResource(uri.fragmentLess, this),
+      bn => sys.error("expected a uri, got BNode: " + bn),
+      lit => sys.error("expected a uri, got Literal: " + lit)
+    )
+  }
+
 }
 
 object PointedGraph {

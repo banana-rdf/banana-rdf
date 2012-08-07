@@ -2,7 +2,7 @@ package org.w3.banana
 
 import java.net.{ URI => jURI }
 
-object URI {
+object URIHelper {
 
     def resolve[Rdf <: RDF](uri: Rdf#URI, str: String)(implicit ops: RDFOperations[Rdf]): Rdf#URI = {
       val juri = new jURI(uri.toString).resolve(str)

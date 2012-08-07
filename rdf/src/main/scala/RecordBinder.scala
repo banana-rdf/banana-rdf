@@ -3,21 +3,6 @@ package org.w3.banana
 import org.w3.banana.util.BananaValidation
 import scalaz.{ Validation, Success, Failure }
 
-object RecordBinder {
-
-  private def make[Rdf <: RDF](pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
-    val subject = ops.makeUri("#" + java.util.UUID.randomUUID().toString)
-    var triples: Set[Rdf#Triple] = Set.empty
-    for (po <- pos.toIterable.flatten) {
-      val (p, pg) = po
-      triples += ops.makeTriple(subject, p, pg.pointer)
-      triples ++= ops.graphToIterable(pg.graph)
-    }
-    PointedGraph(subject, ops.makeGraph(triples))
-  }
-
-}
-
 /**
  * helper functions for binding Scala records (typically case classes)
  *
@@ -30,7 +15,6 @@ object RecordBinder {
 trait RecordBinder[Rdf <: RDF] {
   self: Diesel[Rdf] =>
 
-  import RecordBinder._
   import ops._
 
   def classUrisFor[T](uri: Rdf#URI, uris: Rdf#URI*): ClassUrisFor[Rdf, T] = new ClassUrisFor[Rdf, T] {
@@ -96,9 +80,30 @@ trait RecordBinder[Rdf <: RDF] {
    * - use shapeless to generalize
    */
 
-  def pgb[T] = new PGB[T]
+  def pgb[T] = new PGB[T] {
+    def makeSubject(): Rdf#URI = ops.makeUri("#" + java.util.UUID.randomUUID().toString)
+  }
 
-  class PGB[T] {
+  // let's you define the main pointer for the created graph
+  // typically: #, #thing, #me, or even empty string
+  def pgbWithId[T](constantPointer: String) = new PGB[T] {
+    def makeSubject(): Rdf#URI = ops.makeUri(constantPointer)
+  }
+
+  abstract class PGB[T] {
+
+    def makeSubject(): Rdf#URI
+
+    def make(pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
+      val subject = makeSubject()
+      var triples: Set[Rdf#Triple] = Set.empty
+      for (po <- pos.toIterable.flatten) {
+        val (p, pg) = po
+        triples += ops.makeTriple(subject, p, pg.pointer)
+        triples ++= ops.graphToIterable(pg.graph)
+      }
+      PointedGraph(subject, ops.makeGraph(triples))
+    }
 
     def apply[T1](p1: Property[Rdf, T1])(apply: (T1) => T, unapply: T => Option[T1]): PointedGraphBinder[Rdf, T] = new PointedGraphBinder[Rdf, T] {
 
