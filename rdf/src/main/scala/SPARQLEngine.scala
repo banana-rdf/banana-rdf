@@ -16,11 +16,11 @@ trait AsyncSPARQLEngine[Rdf <: RDF] extends MSPARQLEngine[Rdf, BananaFuture]
  */
 trait MSPARQLEngine[Rdf <: RDF, M[_]] {
 
-  def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Solutions]
+  def executeSelect[N<:Rdf#Node](query: Rdf#SelectQuery, bindings: Map[String, N]): M[Rdf#Solutions]
 
-  def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Graph]
+  def executeConstruct[N<:Rdf#Node](query: Rdf#ConstructQuery, bindings: Map[String, N]): M[Rdf#Graph]
 
-  def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): M[Boolean]
+  def executeAsk[N<:Rdf#Node](query: Rdf#AskQuery, bindings: Map[String, N]): M[Boolean]
 
   def executeSelect(query: Rdf#SelectQuery): M[Rdf#Solutions] = executeSelect(query, Map.empty)
 

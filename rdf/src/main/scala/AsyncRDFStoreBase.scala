@@ -77,13 +77,13 @@ class AsyncRDFStoreBase[Rdf <: RDF](
   def removeGraph(uri: Rdf#URI): BananaFuture[Unit] =
     storeActor.?(RemoveGraph(uri)).asInstanceOf[Future[Validation[BananaException, Unit]]].fv
 
-  def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): BananaFuture[Rdf#Solutions] =
+  def executeSelect[N<:Rdf#Node](query: Rdf#SelectQuery, bindings: Map[String, N]): BananaFuture[Rdf#Solutions] =
     storeActor.?(Select(query, bindings)).asInstanceOf[Future[Validation[BananaException, Rdf#Solutions]]].fv
 
-  def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): BananaFuture[Rdf#Graph] =
+  def executeConstruct[N<:Rdf#Node](query: Rdf#ConstructQuery, bindings: Map[String, N]): BananaFuture[Rdf#Graph] =
     storeActor.?(Construct(query, bindings)).asInstanceOf[Future[Validation[BananaException, Rdf#Graph]]].fv
 
-  def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): BananaFuture[Boolean] =
+  def executeAsk[N<:Rdf#Node](query: Rdf#AskQuery, bindings: Map[String, N]): BananaFuture[Boolean] =
     storeActor.?(Ask(query, bindings)).asInstanceOf[Future[Validation[BananaException, Boolean]]].fv
 
 }
