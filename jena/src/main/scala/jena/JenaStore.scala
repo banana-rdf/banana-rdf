@@ -23,6 +23,13 @@ object JenaStore {
     JenaStore(dataset, defensiveCopy)
   }
 
+  implicit def toStore(graph: Jena#Graph): JenaStore = {
+    val datasource = graph match {
+      case dsg: DatasetGraph => DatasetFactory.create(dsg)
+      case _ => DatasetFactory.create(ModelFactory.createModelForGraph(graph))
+    }
+    new JenaStore(datasource,false)
+  }
 }
 
 class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena] {

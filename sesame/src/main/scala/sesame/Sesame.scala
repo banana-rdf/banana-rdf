@@ -36,6 +36,4 @@ object Sesame {
 
   implicit val sparqlOps: SPARQLOperations[Sesame] = SesameSPARQLOperations
 
-  implicit val graphQuery: RDFGraphQuery[Sesame] = SesameGraphQuery
-
 }
