@@ -67,6 +67,7 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaD
 
 object FutureValidation {
 
+  // TODO: add a Traverse[Traversable] to scalaz-seven
   def sequence[A](in: Iterable[BananaFuture[A]])(implicit executor: ExecutionContext): BananaFuture[List[A]] = {
     val fvs: Iterable[Future[BananaValidation[A]]] = in.view.map(_.inner)
     val futureValidations: Future[Iterable[BananaValidation[A]]] = Future.sequence(fvs)

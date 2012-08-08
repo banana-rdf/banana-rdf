@@ -32,10 +32,10 @@ extends WordSpec with MustMatchers {
     
     lazy val bananaResource: BananaFuture[LinkedDataResource[Rdf]] = store.get(uri)
 
-    def getAddresses(): BananaFuture[Iterable[Address]] = {
+    def getAddresses(): BananaFuture[Set[Address]] = {
       for {
         ldr <- bananaResource
-        uris <- (ldr.resource / Person.address).asIterable[Rdf#URI].bf
+        uris <- (ldr.resource / Person.address).asSet[Rdf#URI].bf
         resources <- store.get(uris)
         addresses <- resources.map(_.resource.as[Address]).sequence[BananaValidation, Address].bf
       } yield {

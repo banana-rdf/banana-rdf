@@ -67,7 +67,7 @@ trait RecordBinder[Rdf <: RDF] {
     def pos(ts: Set[T]): Iterable[(Rdf#URI, PointedGraph[Rdf])] =
       ts map { t => (predicate, t.toPG) }
     def extract(pointed: PointedGraph[Rdf]): BananaValidation[Set[T]] =
-      (pointed / predicate).asIterable[T] map { _.toSet }
+      (pointed / predicate).asSet[T]
   }
 
   def newUri(prefix: String): Rdf#URI = uri(prefix + java.util.UUID.randomUUID().toString)
