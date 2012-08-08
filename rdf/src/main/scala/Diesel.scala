@@ -44,6 +44,9 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
       binder.fromPointedGraph(pointed)
 
+    def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, (T1, T2)] =
+      (b1.fromPointedGraph(pointed) |@| b2.fromPointedGraph(pointed))(Tuple2.apply)
+
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
       val newGraph = graph union Graph(Triple(pointer, rdf("type"), clazz))
       PointedGraph(pointer, newGraph)
@@ -115,7 +118,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       takeOnePointedGraph flatMap (_.as[T])
 
     def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, (T1, T2)] =
-      takeOnePointedGraph flatMap { pg => (pg.as[T1] |@| pg.as[T2])(Tuple2.apply) }
+      takeOnePointedGraph flatMap { _.as2[T1, T2] }
 
     /**
      * returns optionally a T (though the implicit binder) if it is available.
