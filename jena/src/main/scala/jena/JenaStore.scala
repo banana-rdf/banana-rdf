@@ -117,7 +117,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     map
   }
 
-  def executeSelect[N<:Jena#Node](query: Jena#SelectQuery, bindings: Map[String, N]): Jena#Solutions = readTransaction {
+  def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Jena#Solutions = readTransaction {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
@@ -127,7 +127,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     solutions
   }
 
-  def executeConstruct[N<:Jena#Node](query: Jena#ConstructQuery, bindings: Map[String, N]): JenaGraph = readTransaction {
+  def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): JenaGraph = readTransaction {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
@@ -137,7 +137,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     result.getGraph()
   }
 
-  def executeAsk[N<:Jena#Node](query: Jena#AskQuery, bindings: Map[String, N]): Boolean = readTransaction {
+  def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = readTransaction {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
