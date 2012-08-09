@@ -18,7 +18,7 @@ object BananaException {
 
 }
 
-sealed trait BananaException extends Exception
+trait BananaException extends Exception
 
 case class FailedConversion(message: String) extends Exception(message) with BananaException
 
