@@ -30,8 +30,8 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
     }
   }
 
-  def get(hyperlinks: Iterable[Rdf#URI]): BananaFuture[List[LinkedDataResource[Rdf]]] =
-    FutureValidation.sequence(hyperlinks.map(get))
+  def get(hyperlinks: Iterable[Rdf#URI]): BananaFuture[Set[LinkedDataResource[Rdf]]] =
+    FutureValidation.sequence(hyperlinks.map(get)).map(_.toSet)
 
   /**
    * saves the pointed graph using the (fragment-less) pointer as the document uri
