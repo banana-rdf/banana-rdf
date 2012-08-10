@@ -27,7 +27,10 @@ object JenaStore {
 
 class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena] {
 
-  val supportsTransactions: Boolean = dataset.supportsTransactions()
+  // there is a huge performance impact when using transaction (READs are 3x slower)
+  // it's fine to deactivate that if there is only one active thread with akka
+  // we should find something clever here...
+  val supportsTransactions: Boolean = false // dataset.supportsTransactions()
 
   val dg: DatasetGraph = dataset.asDatasetGraph
 

@@ -25,7 +25,7 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
   def get(hyperlink: Rdf#URI): BananaFuture[LinkedDataResource[Rdf]] = {
     val docUri = hyperlink.fragmentLess
     store.getGraph(docUri) map { graph =>
-      val pointed = PointedGraph(hyperlink, graph).resolveAgainst(docUri)
+      val pointed = PointedGraph(hyperlink, graph)
       LinkedDataResource(docUri, pointed)
     }
   }
