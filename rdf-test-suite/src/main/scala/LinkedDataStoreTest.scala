@@ -12,8 +12,8 @@ import org.w3.banana.util._
 
 abstract class LinkedDataStoreTest[Rdf <: RDF](
   syncStore: RDFStore[Rdf])(
-  implicit diesel: Diesel[Rdf])
-extends WordSpec with MustMatchers {
+    implicit diesel: Diesel[Rdf])
+    extends WordSpec with MustMatchers {
 
   import diesel._
 
@@ -29,7 +29,7 @@ extends WordSpec with MustMatchers {
   val person = Person("betehess")
 
   class LinkedPerson(uri: Rdf#URI, store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]) {
-    
+
     lazy val bananaResource: BananaFuture[LinkedDataResource[Rdf]] = store.get(uri)
 
     def getAddresses(): BananaFuture[Set[Address]] = {
@@ -45,7 +45,7 @@ extends WordSpec with MustMatchers {
 
     def linkAddress(addressURI: Rdf#URI): BananaFuture[Unit] =
       store.append(uri, uri -- foaf("address") ->- addressURI)
-    
+
   }
 
   def linkedPerson(ldr: LinkedDataResource[Rdf]): LinkedPerson =

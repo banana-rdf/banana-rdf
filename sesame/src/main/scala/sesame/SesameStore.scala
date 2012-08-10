@@ -8,8 +8,8 @@ import org.openrdf.repository.sail.SailRepository
 import scala.collection.JavaConversions._
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.sail.SailException
-import org.openrdf.query.impl.{MapBindingSet, EmptyBindingSet}
-import org.openrdf.query.{BindingSet, TupleQueryResult}
+import org.openrdf.query.impl.{ MapBindingSet, EmptyBindingSet }
+import org.openrdf.query.{ BindingSet, TupleQueryResult }
 
 object SesameStore {
 
@@ -84,7 +84,6 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
       }
     }
   }
-
 
   private def toSesame(bindings: Map[String, Sesame#Node]): BindingSet = {
     if (bindings.size == 0) empty

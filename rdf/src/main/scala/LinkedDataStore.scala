@@ -50,7 +50,7 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
   }
 
   /**
-   * 
+   *
    */
   def post(collection: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Rdf#URI] = {
     for {
@@ -72,6 +72,5 @@ class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: 
     this.delete(ldr.uri) flatMap { _ =>
       this.append(ldr.uri, ldr.resource) map { _ => () }
     }
-
 
 }

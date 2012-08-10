@@ -14,17 +14,11 @@ object JenaOperations extends RDFOperations[Jena] {
 
   // graph
 
-  def emptyGraph: Jena#Graph = Factory.createDefaultGraph
+  val emptyGraph: Jena#Graph = EmptyGraph
 
-  def makeGraph(it: Iterable[Jena#Triple]): Jena#Graph = {
-    val graph = emptyGraph
-    it foreach { t => graph add t }
-    graph
-  }
+  def makeGraph(triples: Iterable[Jena#Triple]): Jena#Graph = GraphAsIterable(triples)
 
-  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] = new Iterable[Jena#Triple] {
-    val iterator = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala
-  }
+  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] = graph.toIterable
 
   // triple
 
@@ -134,7 +128,8 @@ object JenaOperations extends RDFOperations[Jena] {
   // graph traversal
 
   def getObjects(graph: Jena#Graph, subject: Jena#Node, predicate: Jena#URI): Iterable[Jena#Node] = {
-    val model = ModelFactory.createModelForGraph(graph)
+    val jenaGraph = graph.jenaGraph
+    val model = ModelFactory.createModelForGraph(jenaGraph)
     val subjectResource = foldNode(subject)(
       uri => model.createResource(fromUri(uri)),
       bnode => {
@@ -144,43 +139,37 @@ object JenaOperations extends RDFOperations[Jena] {
       lit => throw new RuntimeException("shouldn't use a literal here")
     )
     val p = fromUri(predicate)
-    val it: Iterator[Jena#Node] = model.listObjectsOfProperty(subjectResource, createProperty(p)).asScala map toNode
-    new Iterable[Jena#Node] {
-      def iterator = it
-    }
+    model.listObjectsOfProperty(subjectResource, createProperty(p)).asScala.map(toNode).toIterable
   }
 
   def getPredicates(graph: Jena#Graph, subject: Jena#Node): Iterable[Jena#URI] = {
-    val predicates: Iterator[Jena#URI] = graph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala map { triple => triple.getPredicate().asInstanceOf[Node_URI] }
-    new Iterable[Jena#URI] {
-      def iterator = predicates
-    }
+    graph.jenaGraph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala.map(_.getPredicate().asInstanceOf[Node_URI]).toIterable
   }
 
   def getSubjects(graph: Jena#Graph, predicate: Jena#URI, obj: Jena#Node): Iterable[Jena#Node] = {
-    val subjects: Iterator[Jena#Node] = graph.find(JenaNode.ANY, JenaNode.ANY, obj).asScala map { triple => fromTriple(triple)._1 }
-    new Iterable[Jena#Node] {
-      def iterator = subjects
-    }
+    graph.jenaGraph.find(JenaNode.ANY, JenaNode.ANY, obj).asScala.map { triple => fromTriple(triple)._1 }.toIterable
   }
 
   // graph union
 
-  def union(graphs: Traversable[Jena#Graph]): Jena#Graph = {
-    graphs match {
-      case x :: Nil => x
-      case _ =>
-        val graph = Factory.createDefaultGraph
-        graphs.foreach(g => graphToIterable(g).foreach {
-          t => graph add t
-        })
-        graph
+  def union(graphs: List[Jena#Graph]): Jena#Graph = {
+    var list: List[Jena#Graph] = List.empty
+    graphs foreach {
+      case EmptyGraph => ()
+      case bjg @ BareJenaGraph(_) => list = bjg :: list
+      case gai @ GraphAsIterable(_) => list = gai :: list
+      case UnionGraphs(ugraphs) =>
+        if (list.size < ugraphs.size)
+          list = list ++ ugraphs
+        else
+          list = ugraphs ++ list
     }
+    UnionGraphs(list)
   }
 
   // graph isomorphism
 
   def isomorphism(left: Jena#Graph, right: Jena#Graph): Boolean =
-    left isIsomorphicWith right
+    left.jenaGraph isIsomorphicWith right.jenaGraph
 
 }

@@ -22,7 +22,6 @@ class AnyWithNodeBinderW[Rdf <: RDF, T](t: T, nodeBinder: NodeBinder[Rdf, T]) {
 
 }
 
-
 trait AnySyntax[Rdf <: RDF] {
 
   implicit def anyToAnyWithToURIW[T](t: T)(implicit uriMaker: ToURI[Rdf, T]): AnyWithToURIW[Rdf, T] = new AnyWithToURIW[Rdf, T](t, uriMaker)

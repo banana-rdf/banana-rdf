@@ -6,7 +6,7 @@ import com.hp.hpl.jena.query.{ Query => JenaQuery, QuerySolution, ResultSet }
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 
 trait Jena extends RDF {
-  type Graph = JenaGraph
+  type Graph = ImmutableJenaGraph
   type Triple = JenaTriple
   type Node = JenaNode
   type URI = Node_URI

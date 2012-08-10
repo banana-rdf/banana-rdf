@@ -20,12 +20,12 @@ object JenaRDFBlockingWriter {
       val serialization = jenaSyntax.value
 
       def write(graph: Jena#Graph, os: OutputStream, base: String) = WrappedThrowable.fromTryCatch {
-        val model = ModelFactory.createModelForGraph(graph)
+        val model = ModelFactory.createModelForGraph(graph.jenaGraph)
         model.getWriter(serialization).write(model, os, base)
       }
 
       def write(graph: Jena#Graph, writer: Writer, base: String) = WrappedThrowable.fromTryCatch {
-        val model = ModelFactory.createModelForGraph(graph)
+        val model = ModelFactory.createModelForGraph(graph.jenaGraph)
         model.getWriter(serialization).write(model, writer, base)
       }
 

@@ -26,13 +26,15 @@ object JenaUtil {
   }
 
   def copy(graph: Jena#Graph): Jena#Graph = {
-    val g = Factory.createDefaultGraph
-    val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
-    while (it.hasNext()) {
-      val t = it.next()
-      g add t
+    graph match {
+      case bjg @ BareJenaGraph(_) => {
+        val g = Factory.createDefaultGraph
+        val it = graph.jenaGraph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
+        while (it.hasNext) { g.add(it.next()) }
+        BareJenaGraph(g)
+      }
+      case other => other
     }
-    g
   }
 
 }

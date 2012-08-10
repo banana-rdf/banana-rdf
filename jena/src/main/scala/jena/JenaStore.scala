@@ -64,22 +64,25 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
   }
 
   def appendToGraph(uri: Jena#URI, graph: Jena#Graph): Unit = writeTransaction {
-    graphToIterable(graph) foreach { case Triple(s, p, o) =>
-      dg.add(uri, s, p, o)
+    graphToIterable(graph) foreach {
+      case Triple(s, p, o) =>
+        dg.add(uri, s, p, o)
     }
   }
 
   def patchGraph(uri: Jena#URI, delete: Jena#Graph, insert: Jena#Graph): Unit = writeTransaction {
-    graphToIterable(delete) foreach { case Triple(s, p, o) =>
-      dg.delete(uri, s, p, o)
+    graphToIterable(delete) foreach {
+      case Triple(s, p, o) =>
+        dg.delete(uri, s, p, o)
     }
-    graphToIterable(insert) foreach { case Triple(s, p, o) =>
-      dg.add(uri, s, p, o)
+    graphToIterable(insert) foreach {
+      case Triple(s, p, o) =>
+        dg.add(uri, s, p, o)
     }
   }
 
   def getGraph(uri: Jena#URI): Jena#Graph = readTransaction {
-    val graph = dg.getGraph(uri)
+    val graph = BareJenaGraph(dg.getGraph(uri))
     if (defensiveCopy)
       JenaUtil.copy(graph)
     else
@@ -103,9 +106,10 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
   )
 
   def querySolutionMap(bindings: Map[String, Jena#Node]): QuerySolutionMap = {
-    val map = new QuerySolutionMap() 
-    bindings foreach { case (name, node) =>
-      map.add(name, toRDFNode(node))
+    val map = new QuerySolutionMap()
+    bindings foreach {
+      case (name, node) =>
+        map.add(name, toRDFNode(node))
     }
     map
   }
@@ -120,14 +124,14 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     solutions
   }
 
-  def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): JenaGraph = readTransaction {
+  def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Jena#Graph = readTransaction {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
       else
         QueryExecutionFactory.create(query, dataset, querySolutionMap(bindings))
     val result = qexec.execConstruct()
-    result.getGraph()
+    BareJenaGraph(result.getGraph())
   }
 
   def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = readTransaction {

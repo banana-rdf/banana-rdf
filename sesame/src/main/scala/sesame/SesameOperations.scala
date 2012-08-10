@@ -161,7 +161,7 @@ object SesameOperations extends RDFOperations[Sesame] {
 
   // graph union
 
-  def union(graphs: Traversable[Sesame#Graph]): Sesame#Graph = {
+  def union(graphs: List[Sesame#Graph]): Sesame#Graph = {
     graphs match {
       case x :: Nil => x
       case _ =>

@@ -22,7 +22,7 @@ trait GraphSyntax[Rdf <: RDF] {
       def nodefunc(node: Rdf#Node) = ops.foldNode(node)(urifunc, bn => bn, lit => lit)
       var triples = Set[Rdf#Triple]()
       val it = this.toIterable.iterator
-      while(it.hasNext) {
+      while (it.hasNext) {
         val Triple(s, p, o) = it.next()
         // question: what about predicates?
         triples += Triple(nodefunc(s), urifunc(p), nodefunc(o))
