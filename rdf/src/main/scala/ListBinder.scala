@@ -22,7 +22,7 @@ trait ListBinder[Rdf <: RDF] {
               elems ::= binder.fromPointedGraph(firstPointed).fold(be => throw be, e => e)
               current = rest
             }
-            case _ => throw new FailedConversion("asList: couldn't decode a list")
+            case other => throw new FailedConversion("asList: couldn't decode a list")
           }
         }
         Success(elems.reverse)
