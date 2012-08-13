@@ -5,7 +5,7 @@ import Sesame._
 import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.repository.sail.SailRepository
 
-class SesameSparqlEngineTest extends SparqlEngineTest(
+class SesameAsyncGraphStoreTest() extends AsyncGraphStoreTest[Sesame](
   SesameStore {
     val repo = new SailRepository(new MemoryStore)
     repo.initialize()

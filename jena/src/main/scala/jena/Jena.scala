@@ -28,10 +28,23 @@ object Jena {
 
   implicit val ops: RDFOperations[Jena] = JenaOperations
 
-  implicit val diesel: Diesel[Jena] = Diesel[Jena]
+  implicit val diesel: Diesel[Jena] = JenaDiesel
 
   implicit val sparqlOps: SPARQLOperations[Jena] = JenaSPARQLOperations
 
   implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphQuery
+
+  implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader[RDFXML]
+
+  implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]
+
+  implicit val readerSelector: ReaderSelector[Jena#Graph] =
+    ReaderSelector2[Jena#Graph, RDFXML] combineWith ReaderSelector2[Jena#Graph, Turtle]
+
+  implicit val rdfxmlWriter: RDFBlockingWriter[Jena, RDFXML] = JenaRDFBlockingWriter.rdfxmlWriter
+
+  implicit val turtleWriter: RDFBlockingWriter[Jena, Turtle] = JenaRDFBlockingWriter.turtleWriter
+
+  implicit val writerSelector: RDFWriterSelector[Jena#Graph] = JenaRDFBlockingWriter.writerSelector
 
 }

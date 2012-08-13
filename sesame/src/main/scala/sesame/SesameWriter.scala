@@ -44,9 +44,9 @@ object SesameWriter {
 
     }
 
-  implicit val RDFXMLWriter: RDFBlockingWriter[Sesame, RDFXML] = SesameWriter[RDFXML]
+  val rdfxmlWriter: RDFBlockingWriter[Sesame, RDFXML] = SesameWriter[RDFXML]
 
-  implicit val TurtleWriter: RDFBlockingWriter[Sesame, Turtle] = SesameWriter[Turtle]
+  val turtleWriter: RDFBlockingWriter[Sesame, Turtle] = SesameWriter[Turtle]
 
   //  implicit val ReaderSelector: RDFBlockingWriter[Sesame] = ReaderSelector[Sesame, RDFXML] combineWith ReaderSelector[Sesame, Turtle]
 

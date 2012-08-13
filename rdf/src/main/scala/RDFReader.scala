@@ -13,6 +13,12 @@ import scalaz.Validation._
  */
 trait RDFReader[Rdf <: RDF, +SyntaxType] extends BlockingReader[Rdf#Graph, SyntaxType]
 
+object RDFReader {
+
+  def apply[Rdf <: RDF, SyntaxType](implicit rdfReader: RDFReader[Rdf, SyntaxType]): RDFReader[Rdf, SyntaxType] = rdfReader
+
+}
+
 trait BlockingReader[Result, +SyntaxType] {
   def read(is: InputStream, base: String): Validation[BananaException, Result]
 

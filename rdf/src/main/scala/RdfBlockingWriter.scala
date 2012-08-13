@@ -27,3 +27,8 @@ trait RDFBlockingWriter[Rdf <: RDF, +SyntaxType] extends BlockingWriter[Rdf#Grap
   }
 }
 
+object RDFBlockingWriter {
+
+  def apply[Rdf <: RDF, SyntaxType](implicit rdfWriter: RDFBlockingWriter[Rdf, SyntaxType]): RDFBlockingWriter[Rdf, SyntaxType] = rdfWriter
+
+}
