@@ -114,6 +114,7 @@ object BananaRdfBuild extends Build {
     Seq(
       resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
       libraryDependencies += "org.openrdf.sesame" % "sesame-sail-memory" % "2.6.8",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-nativerdf" % "2.6.8",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.8",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.8",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.8",
