@@ -1,11 +1,9 @@
 package org.w3.banana.sesame
 
-import org.w3.banana
-import banana.Turtle
+import org.w3.banana._
 import Sesame._
-import SesameWriter._
 
-class SesameTurtleTest extends banana.TurtleTestSuite[Sesame] {
-  val reader = SesameTurtleReader
-  val writer = SesameWriter[Turtle]
+class SesameTurtleTest extends TurtleTestSuite[Sesame] {
+  val reader = RDFReader[Sesame, Turtle]
+  val writer = RDFBlockingWriter[Sesame, Turtle]
 }

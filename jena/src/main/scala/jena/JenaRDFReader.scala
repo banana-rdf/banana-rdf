@@ -24,22 +24,15 @@ object JenaRDFReader {
       def read(is: InputStream, base: String): Validation[BananaException, Jena#Graph] = WrappedThrowable.fromTryCatch {
         val model = ModelFactory.createDefaultModel()
         model.getReader(serialization).read(model, is, base)
-        model.getGraph
+        BareJenaGraph(model.getGraph)
       }
 
       def read(reader: Reader, base: String): Validation[BananaException, Jena#Graph] = WrappedThrowable.fromTryCatch {
         val model = ModelFactory.createDefaultModel()
         model.getReader(serialization).read(model, reader, base)
-        model.getGraph
+        BareJenaGraph(model.getGraph)
       }
 
     }
-
-  implicit val RDFXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader[RDFXML]
-
-  implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]
-
-  implicit val ReaderSelector: ReaderSelector[Jena#Graph] =
-    ReaderSelector2[Jena#Graph, RDFXML] combineWith ReaderSelector2[Jena#Graph, Turtle]
 
 }

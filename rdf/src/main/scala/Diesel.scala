@@ -123,7 +123,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     /**
      * returns optionally a T (though the implicit binder) if it is available.
      * that's a good way to know if a particular rdf object was there
-     * 
+     *
      * note: this is very different from as[Option[T]], which is an encoding of an Option in RDF
      */
     def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Option[T]] = headOption match {
@@ -140,14 +140,14 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
      * sees the nodes for this PointedGraphs as an iterator, after they were bound successfully to
      * a T thought an implicit PointedGraphBinder.
      * it is a success only if all the bindings were successful themselves
-     * 
+     *
      * note: this is very different from as[List[T]], which is an encoding of a List in RDF
      */
     def asSet[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Set[T]] =
       this.iterator.toList.map(_.as[T]).sequence[BananaValidation, T].map(_.toSet)
 
     def asSet2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, Set[(T1, T2)]] =
-      this.iterator.toList.map{ pg => (pg.as[T1] |@| pg.as[T2])(Tuple2.apply) }.sequence[BananaValidation, (T1, T2)].map(_.toSet)
+      this.iterator.toList.map { pg => (pg.as[T1] |@| pg.as[T2])(Tuple2.apply) }.sequence[BananaValidation, (T1, T2)].map(_.toSet)
 
   }
 

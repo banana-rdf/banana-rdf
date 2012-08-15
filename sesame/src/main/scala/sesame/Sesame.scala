@@ -32,8 +32,15 @@ object Sesame {
 
   implicit val diesel: Diesel[Sesame] = Diesel[Sesame]
 
+  implicit val sparqlOps: SPARQLOperations[Sesame] = SesameSPARQLOperations
+
   implicit val rdfxmlReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
 
-  implicit val sparqlOps: SPARQLOperations[Sesame] = SesameSPARQLOperations
+  implicit val turtleReader: RDFReader[Sesame, Turtle] = SesameTurtleReader
+
+  implicit val rdfxmlWriter: RDFBlockingWriter[Sesame, RDFXML] = SesameWriter.rdfxmlWriter
+
+  implicit val turtleWriter: RDFBlockingWriter[Sesame, Turtle] = SesameWriter.turtleWriter
+
 
 }

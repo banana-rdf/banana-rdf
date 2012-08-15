@@ -81,8 +81,8 @@ abstract class MGraphStoreTest[Rdf <: RDF, M[_]](implicit diesel: Diesel[Rdf],
         _ <- store.removeGraph(u)
         _ <- store.appendToGraph(u, foo)
         _ <- store.patchGraph(u,
-                              (uri("http://example.com/foo") -- rdf("foo") ->- "foo").graph,
-                              (uri("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+          (uri("http://example.com/foo") -- rdf("foo") ->- "foo").graph,
+          (uri("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
         rGraph <- store.getGraph(u)
       } yield {
         val expected = (

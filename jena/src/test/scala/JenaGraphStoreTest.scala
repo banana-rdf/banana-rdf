@@ -12,12 +12,12 @@ abstract class AbstractJenaGraphStoreTest(val jenaStore: JenaStore) extends Grap
   import JenaOperations._
 
   def defaultGraph: Jena#Graph = jenaStore.readTransaction {
-    jenaStore.dg.getDefaultGraph
+    BareJenaGraph(jenaStore.dg.getDefaultGraph)
   }
 
   "adding a named graph should not pollute the default graph" in {
     store.appendToGraph(makeUri("http://example.com/foo"), graph)
-    defaultGraph must have size(0)
+    defaultGraph.jenaGraph must have size(0)
   }
 
 }

@@ -10,6 +10,8 @@ import SesamePrefix._
 
 object SesameOperations extends RDFOperations[Sesame] {
 
+  val valueFactory: ValueFactory = ValueFactoryImpl.getInstance()
+
   // graph
 
   def emptyGraph: Sesame#Graph = new GraphImpl
@@ -52,7 +54,7 @@ object SesameOperations extends RDFOperations[Sesame] {
    */
   def makeUri(iriStr: String): Sesame#URI =
     try {
-      ValueFactoryImpl.getInstance.createURI(iriStr).asInstanceOf[Sesame#URI]
+      valueFactory.createURI(iriStr).asInstanceOf[Sesame#URI]
     } catch {
       case e =>
         if (iriStr.nonEmpty && iriStr.charAt(0) == '#')
@@ -73,7 +75,7 @@ object SesameOperations extends RDFOperations[Sesame] {
 
   // bnode
 
-  def makeBNode() = ValueFactoryImpl.getInstance().createBNode()
+  def makeBNode() = valueFactory.createBNode()
 
   def makeBNodeLabel(label: String): Sesame#BNode = new BNodeImpl(label)
 
@@ -161,7 +163,7 @@ object SesameOperations extends RDFOperations[Sesame] {
 
   // graph union
 
-  def union(graphs: Traversable[Sesame#Graph]): Sesame#Graph = {
+  def union(graphs: List[Sesame#Graph]): Sesame#Graph = {
     graphs match {
       case x :: Nil => x
       case _ =>

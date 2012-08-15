@@ -32,4 +32,6 @@ object Jena {
 
   implicit val sparqlOps: SPARQLOperations[Jena] = JenaSPARQLOperations
 
+  implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphQuery
+
 }

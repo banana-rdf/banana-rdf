@@ -4,10 +4,12 @@ import akka.dispatch._
 import akka.util.Duration
 import scalaz._
 import scalaz.Scalaz._
+import java.util.concurrent.TimeoutException
+import org.w3.banana._
 
 case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaDefaults {
 
-  implicit val defaultDuration = Duration("3s")
+  implicit val defaultDuration = FutureValidation.defaultDuration
 
   def map[T](fn: (S) => T): FutureValidation[F, T] =
     FutureValidation(inner map { validation => validation map fn })
@@ -57,15 +59,27 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaD
   def fv: FutureValidation[F, S] =
     this
 
-  def await(duration: Duration = defaultDuration): Validation[F, S] =
-    Await.result(inner, duration)
+  def failMap[G](func: F => G): FutureValidation[G, S] =
+    FutureValidation(inner map { validation => validation.fold(f => Failure(func(f)), s => Success(s)) })
 
-  def awaitSuccess(duration: Duration = defaultDuration): S =
-    await(duration).toOption.get
+  def await(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException): Validation[BananaException, S] =
+    try {
+      val bf = this.failMap(ev)
+      Await.result(bf.inner, duration)
+    } catch {
+      case te: TimeoutException => Failure(BananaTimeout(te))
+    }
+
+  def getOrFail(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException): S = {
+    val r = await(duration)
+    r.fold(t => throw t, s => s)
+  }
 
 }
 
 object FutureValidation {
+
+  val defaultDuration = Duration("3s")
 
   // TODO: add a Traverse[Traversable] to scalaz-seven
   def sequence[A](in: Iterable[BananaFuture[A]])(implicit executor: ExecutionContext): BananaFuture[List[A]] = {
@@ -85,12 +99,13 @@ object FutureValidation {
   }
 
   implicit def BananaFutureUnsafeExtractor[E]: UnsafeExtractor[({ type l[x] = FutureValidation[E, x] })#l] = new UnsafeExtractor[({ type l[x] = FutureValidation[E, x] })#l] {
-    def unsafeExtract[T](bf: => FutureValidation[E, T]): Validation[Exception, T] =
+    def unsafeExtract[T](fv: => FutureValidation[E, T]): Validation[Exception, T] = {
       try {
-        bf.await().fold(e => Failure(new Exception(e.toString)), Success(_))
+        Await.result(fv.inner, defaultDuration).fold(e => Failure(new Exception(e.toString)), Success.apply)
       } catch {
         case e: Exception => Failure(e)
       }
+    }
   }
 
 }
