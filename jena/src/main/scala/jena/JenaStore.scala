@@ -26,7 +26,7 @@ object JenaStore {
   implicit def toStore(graph: Jena#Graph): JenaStore = {
     val datasource = graph match {
       case dsg: DatasetGraph => DatasetFactory.create(dsg)
-      case _ => DatasetFactory.create(ModelFactory.createModelForGraph(graph))
+      case _ => DatasetFactory.create(ModelFactory.createModelForGraph(graph.jenaGraph))
     }
     new JenaStore(datasource,false)
   }
