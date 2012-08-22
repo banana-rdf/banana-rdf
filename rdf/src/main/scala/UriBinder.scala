@@ -2,11 +2,11 @@ package org.w3.banana
 
 import scalaz._
 
-trait ToURI[Rdf <: RDF, T] {
+trait ToURI[Rdf <: RDF, -T] {
   def toUri(t: T): Rdf#URI
 }
 
-trait FromURI[Rdf <: RDF, T] {
+trait FromURI[Rdf <: RDF, +T] {
   def fromUri(uri: Rdf#URI): Validation[BananaException, T]
 }
 

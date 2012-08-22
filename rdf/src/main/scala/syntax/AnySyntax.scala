@@ -8,9 +8,9 @@ class AnyWithToURIW[Rdf <: RDF, T](t: T, uriMaker: ToURI[Rdf, T]) {
 
 }
 
-class AnyWithPGBW[Rdf <: RDF, T](t: T, binder: PointedGraphBinder[Rdf, T]) {
+class AnyWithToPG[Rdf <: RDF, T](t: T, pgMaker: ToPointedGraph[Rdf, T]) {
 
-  def toPointedGraph: PointedGraph[Rdf] = binder.toPointedGraph(t)
+  def toPointedGraph: PointedGraph[Rdf] = pgMaker.toPointedGraph(t)
 
   def toPG: PointedGraph[Rdf] = toPointedGraph
 
@@ -26,7 +26,7 @@ trait AnySyntax[Rdf <: RDF] {
 
   implicit def anyToAnyWithToURIW[T](t: T)(implicit uriMaker: ToURI[Rdf, T]): AnyWithToURIW[Rdf, T] = new AnyWithToURIW[Rdf, T](t, uriMaker)
 
-  implicit def anyToAnyWithPBGW[T](t: T)(implicit binder: PointedGraphBinder[Rdf, T]): AnyWithPGBW[Rdf, T] = new AnyWithPGBW[Rdf, T](t, binder)
+  implicit def anyToAnyWithToPG[T](t: T)(implicit pgMaker: ToPointedGraph[Rdf, T]): AnyWithToPG[Rdf, T] = new AnyWithToPG[Rdf, T](t, pgMaker)
 
   implicit def anyToAnyWithNodeBinderW[T](t: T)(implicit nodeBinder: NodeBinder[Rdf, T]): AnyWithNodeBinderW[Rdf, T] = new AnyWithNodeBinderW[Rdf, T](t, nodeBinder)
 

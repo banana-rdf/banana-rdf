@@ -44,5 +44,4 @@ object Sesame {
 
   implicit val turtleWriter: RDFBlockingWriter[Sesame, Turtle] = SesameWriter.turtleWriter
 
-
 }

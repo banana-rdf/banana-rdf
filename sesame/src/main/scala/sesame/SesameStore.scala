@@ -41,7 +41,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
     val graph = new GraphImpl
     withConnection(store) { conn =>
       val rr: RepositoryResult[Statement] = conn.getStatements(null, null, null, false, uri)
-      while(rr.hasNext) {
+      while (rr.hasNext) {
         val s = rr.next()
         graph.add(s)
       }
@@ -81,7 +81,7 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
       bindings foreach { case (name, value) => graphQuery.setBinding(name, value) }
       val result: GraphQueryResult = graphQuery.evaluate()
       val graph = new GraphImpl
-      while(result.hasNext) {
+      while (result.hasNext) {
         graph.add(result.next())
       }
       result.close()
