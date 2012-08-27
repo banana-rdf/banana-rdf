@@ -20,7 +20,6 @@ trait Jena extends RDF {
   // types for the graph traversal API
   type NodeMatch = JenaNode
   type NodeAny = Node_ANY
-  type NodeConcrete = Node_Concrete
 
   // types related to SPARQL
   type Query = JenaQuery

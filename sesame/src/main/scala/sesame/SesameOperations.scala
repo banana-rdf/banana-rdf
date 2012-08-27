@@ -132,7 +132,13 @@ object SesameOperations extends RDFOperations[Sesame] {
 
   val ANY: Sesame#NodeAny = null
 
-  implicit def toNodeConcrete(node: Sesame#Node): Sesame#NodeConcrete = node.asInstanceOf[Value]
+  implicit def toConcreteNodeMatch(node: Sesame#Node): Sesame#NodeMatch = node.asInstanceOf[Sesame#Node]
+
+  def foldNodeMatch[T](nodeMatch: Sesame#NodeMatch)(funANY: => T, funConcrete: Sesame#Node => T): T =
+    if (nodeMatch == null)
+      funANY
+    else
+      funConcrete(nodeMatch.asInstanceOf[Sesame#Node])
 
   def find(graph: Sesame#Graph, subject: Sesame#NodeMatch, predicate: Sesame#NodeMatch, objectt: Sesame#NodeMatch): Iterator[Sesame#Triple] = {
     def sOpt: Option[Resource] =

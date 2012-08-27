@@ -15,7 +15,6 @@ trait RDF {
   // types for the graph traversal API
   type NodeMatch
   type NodeAny <: NodeMatch
-  type NodeConcrete <: NodeMatch
 
   // types related to SPARQL
   type Query

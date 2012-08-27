@@ -67,7 +67,9 @@ trait RDFOperations[Rdf <: RDF] {
 
   def ANY: Rdf#NodeAny
 
-  implicit def toNodeConcrete(node: Rdf#Node): Rdf#NodeConcrete
+  implicit def toConcreteNodeMatch(node: Rdf#Node): Rdf#NodeMatch
+
+  def foldNodeMatch[T](nodeMatch: Rdf#NodeMatch)(funANY: => T, funNode: Rdf#Node => T): T
 
   def find(graph: Rdf#Graph, subject: Rdf#NodeMatch, predicate: Rdf#NodeMatch, objectt: Rdf#NodeMatch): Iterator[Rdf#Triple]
 

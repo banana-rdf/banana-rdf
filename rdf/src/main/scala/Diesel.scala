@@ -13,6 +13,7 @@ object Diesel {
 class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
     extends syntax.RDFOperationsSyntax[Rdf]
     with GraphUtil[Rdf]
+    with TripleUtil[Rdf]
     with syntax.GraphSyntax[Rdf]
     with syntax.NodeSyntax[Rdf]
     with syntax.URISyntax[Rdf]

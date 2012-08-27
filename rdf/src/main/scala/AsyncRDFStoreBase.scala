@@ -16,7 +16,7 @@ class AsyncRDFStoreBase[Rdf <: RDF](
     extends AsyncRDFStore[Rdf] {
 
   case class AppendToGraph(uri: Rdf#URI, graph: Rdf#Graph)
-  case class PatchGraph(uri: Rdf#URI, delete: Rdf#Graph, insert: Rdf#Graph)
+  case class PatchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph)
   case class GetGraph(uri: Rdf#URI)
   case class RemoveGraph(uri: Rdf#URI)
   case class Select(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node])
@@ -68,7 +68,7 @@ class AsyncRDFStoreBase[Rdf <: RDF](
   def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): BananaFuture[Unit] =
     storeActor.?(AppendToGraph(uri, graph)).asInstanceOf[Future[Validation[BananaException, Unit]]].fv
 
-  def patchGraph(uri: Rdf#URI, delete: Rdf#Graph, insert: Rdf#Graph): BananaFuture[Unit] =
+  def patchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph): BananaFuture[Unit] =
     storeActor.?(PatchGraph(uri, delete, insert)).asInstanceOf[Future[Validation[BananaException, Unit]]].fv
 
   def getGraph(uri: Rdf#URI): BananaFuture[Rdf#Graph] =

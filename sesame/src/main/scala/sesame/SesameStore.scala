@@ -28,10 +28,14 @@ class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
     }
   }
 
-  def patchGraph(uri: Sesame#URI, delete: Sesame#Graph, insert: Sesame#Graph): Unit = {
+  def patchGraph(uri: Sesame#URI, delete: Iterable[TripleMatch[Sesame]], insert: Sesame#Graph): Unit = {
     withConnection(store) { conn =>
-      for (s: Statement <- delete.`match`(null, null, null))
-        conn.remove(s, uri)
+      delete foreach {
+        case (s, p, o) =>
+          // I don't really know what else to do...
+          // in Sesame, a Triple is not a (Node, Node, Node)
+          conn.remove(s.asInstanceOf[Resource], p.asInstanceOf[URI], o, uri)
+      }
       for (s: Statement <- insert.`match`(null, null, null))
         conn.add(s, uri)
     }

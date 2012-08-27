@@ -73,10 +73,9 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     }
   }
 
-  def patchGraph(uri: Jena#URI, delete: Jena#Graph, insert: Jena#Graph): Unit = writeTransaction {
-    graphToIterable(delete) foreach {
-      case Triple(s, p, o) =>
-        dg.delete(uri, s, p, o)
+  def patchGraph(uri: Jena#URI, delete: Iterable[TripleMatch[Jena]], insert: Jena#Graph): Unit = writeTransaction {
+    delete foreach { case (s, p, o) =>
+      dg.deleteAny(uri, s, p, o)
     }
     graphToIterable(insert) foreach {
       case Triple(s, p, o) =>
