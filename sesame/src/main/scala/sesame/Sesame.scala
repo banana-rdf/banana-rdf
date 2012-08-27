@@ -8,6 +8,7 @@ import org.openrdf.query.parser._
 import info.aduna.iteration.CloseableIteration
 
 trait Sesame extends RDF {
+  // types related to the RDF datamodel
   type Graph = SesameGraph
   type Triple = Statement
   type Node = Value
@@ -18,6 +19,12 @@ trait Sesame extends RDF {
   type LangLiteral = SesameLiteral
   type Lang = String
 
+  // types for the graph traversal API
+  type NodeMatch = Value
+  type NodeAny = Null
+  type NodeConcrete = Value
+
+  // types related to SPARQL
   type Query = ParsedQuery
   type SelectQuery = ParsedTupleQuery
   type ConstructQuery = ParsedGraphQuery

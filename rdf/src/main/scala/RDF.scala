@@ -12,6 +12,11 @@ trait RDF {
   type LangLiteral <: Literal
   type Lang
 
+  // types for the graph traversal API
+  type NodeMatch
+  type NodeAny <: NodeMatch
+  type NodeConcrete <: NodeMatch
+
   // types related to SPARQL
   type Query
   type SelectQuery <: Query

@@ -130,36 +130,29 @@ object SesameOperations extends RDFOperations[Sesame] {
 
   // graph traversal
 
-  def getObjects(graph: Sesame#Graph, subject: Sesame#Node, predicate: Sesame#URI): Iterable[Sesame#Node] = {
+  val ANY: Sesame#NodeAny = null
 
-    def iterable(subject: org.openrdf.model.Resource) = new Iterable[Sesame#Node] {
-      def iterator = GraphUtil.getObjectIterator(graph, subject, predicate).asScala
+  implicit def toNodeConcrete(node: Sesame#Node): Sesame#NodeConcrete = node.asInstanceOf[Value]
+
+  def find(graph: Sesame#Graph, subject: Sesame#NodeMatch, predicate: Sesame#NodeMatch, objectt: Sesame#NodeMatch): Iterator[Sesame#Triple] = {
+    def sOpt: Option[Resource] =
+      if (subject == null)
+        Some(null)
+      else
+        foldNode(subject)(Some.apply, Some.apply, _ => None)
+    def pOpt: Option[Sesame#URI] =
+      if (predicate == null)
+        Some(null)
+      else
+        foldNode(predicate)(Some.apply, _ => None, _ => None)
+    val r = for {
+      s <- sOpt
+      p <- pOpt
+    } yield {
+      graph.`match`(s, p, objectt).asScala
     }
-
-    foldNode(subject)(
-      iri => iterable(iri),
-      bnode => iterable(bnode),
-      lit => Seq.empty
-    )
+    r getOrElse Iterator.empty
   }
-
-  def getPredicates(graph: Sesame#Graph, subject: Sesame#Node): Iterable[Sesame#URI] = {
-
-    def iterable(subject: org.openrdf.model.Resource) = new Iterable[Sesame#URI] {
-      def iterator = graph.`match`(subject, null, null).asScala map { statement => statement.getPredicate() }
-    }
-
-    foldNode(subject)(
-      iri => iterable(iri),
-      bnode => iterable(bnode),
-      lit => Seq.empty
-    )
-  }
-
-  def getSubjects(graph: Sesame#Graph, predicate: Sesame#URI, obj: Sesame#Node): Iterable[Sesame#Node] =
-    new Iterable[Sesame#Node] {
-      def iterator = GraphUtil.getSubjectIterator(graph, predicate, obj).asScala
-    }
 
   // graph union
 

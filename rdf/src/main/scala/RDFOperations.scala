@@ -65,11 +65,20 @@ trait RDFOperations[Rdf <: RDF] {
 
   // graph traversal
 
-  def getObjects(graph: Rdf#Graph, subject: Rdf#Node, predicate: Rdf#URI): Iterable[Rdf#Node]
+  def ANY: Rdf#NodeAny
 
-  def getPredicates(graph: Rdf#Graph, subject: Rdf#Node): Iterable[Rdf#URI]
+  implicit def toNodeConcrete(node: Rdf#Node): Rdf#NodeConcrete
 
-  def getSubjects(graph: Rdf#Graph, predicate: Rdf#URI, obj: Rdf#Node): Iterable[Rdf#Node]
+  def find(graph: Rdf#Graph, subject: Rdf#NodeMatch, predicate: Rdf#NodeMatch, objectt: Rdf#NodeMatch): Iterator[Rdf#Triple]
+
+  def getObjects(graph: Rdf#Graph, subject: Rdf#Node, predicate: Rdf#URI): Iterable[Rdf#Node] =
+    find(graph, toNodeConcrete(subject), toNodeConcrete(predicate), ANY).map(t => fromTriple(t)._3).toIterable
+
+  def getPredicates(graph: Rdf#Graph, subject: Rdf#Node): Iterable[Rdf#URI] =
+    find(graph, toNodeConcrete(subject), ANY, ANY).map(t => fromTriple(t)._2).toIterable
+
+  def getSubjects(graph: Rdf#Graph, predicate: Rdf#URI, obj: Rdf#Node): Iterable[Rdf#Node] =
+    find(graph, ANY, toNodeConcrete(predicate), toNodeConcrete(obj)).map(t => fromTriple(t)._1).toIterable
 
   // graph union
   def union(graphs: List[Rdf#Graph]): Rdf#Graph

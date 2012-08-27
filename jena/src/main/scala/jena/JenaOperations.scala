@@ -127,27 +127,12 @@ object JenaOperations extends RDFOperations[Jena] {
 
   // graph traversal
 
-  def getObjects(graph: Jena#Graph, subject: Jena#Node, predicate: Jena#URI): Iterable[Jena#Node] = {
-    val jenaGraph = graph.jenaGraph
-    val model = ModelFactory.createModelForGraph(jenaGraph)
-    val subjectResource = foldNode(subject)(
-      uri => model.createResource(fromUri(uri)),
-      bnode => {
-        val label = fromBNode(bnode)
-        model.createResource(new AnonId(label))
-      },
-      lit => throw new RuntimeException("shouldn't use a literal here")
-    )
-    val p = fromUri(predicate)
-    model.listObjectsOfProperty(subjectResource, createProperty(p)).asScala.map(toNode).toIterable
-  }
+  val ANY: Jena#NodeAny = JenaNode.ANY.asInstanceOf[Node_ANY]
 
-  def getPredicates(graph: Jena#Graph, subject: Jena#Node): Iterable[Jena#URI] = {
-    graph.jenaGraph.find(subject, JenaNode.ANY, JenaNode.ANY).asScala.map(_.getPredicate().asInstanceOf[Node_URI]).toIterable
-  }
+  implicit def toNodeConcrete(node: Jena#Node): Jena#NodeConcrete = node.asInstanceOf[Node_Concrete]
 
-  def getSubjects(graph: Jena#Graph, predicate: Jena#URI, obj: Jena#Node): Iterable[Jena#Node] = {
-    graph.jenaGraph.find(JenaNode.ANY, JenaNode.ANY, obj).asScala.map { triple => fromTriple(triple)._1 }.toIterable
+  def find(graph: Jena#Graph, subject: Jena#NodeMatch, predicate: Jena#NodeMatch, objectt: Jena#NodeMatch): Iterator[Jena#Triple] = {
+    graph.jenaGraph.find(subject, predicate, objectt).asScala.toIterator
   }
 
   // graph union
