@@ -37,11 +37,9 @@ object Sesame {
 
   implicit val ops: RDFOperations[Sesame] = SesameOperations
 
-  implicit val diesel: Diesel[Sesame] = SesameDiesel
+  implicit val diesel: Diesel[Sesame] = Diesel[Sesame]
 
   implicit val sparqlOps: SPARQLOperations[Sesame] = SesameSPARQLOperations
-
-  implicit val graphQuery: RDFGraphQuery[Sesame] = SesameGraphQuery
 
   implicit val rdfxmlReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
 

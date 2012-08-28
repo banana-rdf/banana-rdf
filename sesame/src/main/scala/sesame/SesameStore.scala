@@ -11,12 +11,21 @@ import info.aduna.iteration.CloseableIteration
 import org.openrdf.sail.SailException
 import org.openrdf.query._
 import org.openrdf.query.impl._
+import org.openrdf.sail.memory.MemoryStore
 
 object SesameStore {
 
   def apply(store: SailRepository): RDFStore[Sesame] =
     new SesameStore(store)
 
+  implicit def toMemoryStore(graph: Sesame#Graph) = {
+    val store = new MemoryStore
+    val sail = new SailRepository(store)
+    sail.initialize()
+    val sailconn = sail.getConnection
+    sailconn.add(graph)
+    SesameStore(sail)
+  }
 }
 
 class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
