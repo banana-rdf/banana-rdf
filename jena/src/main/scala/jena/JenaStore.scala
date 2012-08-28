@@ -34,9 +34,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
 
   val dg: DatasetGraph = dataset.asDatasetGraph
 
-  val modelForBindings = ModelFactory.createDefaultModel()
-
-  val typeMapper = TypeMapper.getInstance()
+  lazy val querySolution = util.QuerySolution()
 
   def readTransaction[T](body: => T): T = {
     if (supportsTransactions) {
@@ -95,33 +93,12 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     dg.removeGraph(uri)
   }
 
-  // oh my, what have I done to deserve this?
-  def toRDFNode(node: Jena#Node): RDFNode = foldNode(node)(
-    { case URI(str) => modelForBindings.createResource(str) },
-    { case BNode(label) => modelForBindings.createResource(AnonId.create(label)) },
-    {
-      _.fold(
-        { case TypedLiteral(lexicalForm, URI(datatype)) => modelForBindings.createTypedLiteral(lexicalForm, typeMapper.getSafeTypeByName(datatype)) },
-        { case LangLiteral(lexicalForm, Lang(lang)) => modelForBindings.createLiteral(lexicalForm, lang) }
-      )
-    }
-  )
-
-  def querySolutionMap(bindings: Map[String, Jena#Node]): QuerySolutionMap = {
-    val map = new QuerySolutionMap()
-    bindings foreach {
-      case (name, node) =>
-        map.add(name, toRDFNode(node))
-    }
-    map
-  }
-
   def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Jena#Solutions = readTransaction {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
       else
-        QueryExecutionFactory.create(query, dataset, querySolutionMap(bindings))
+        QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings))
     val solutions = qexec.execSelect()
     solutions
   }
@@ -131,7 +108,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
       else
-        QueryExecutionFactory.create(query, dataset, querySolutionMap(bindings))
+        QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings))
     val result = qexec.execConstruct()
     BareJenaGraph(result.getGraph())
   }
@@ -141,7 +118,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
       else
-        QueryExecutionFactory.create(query, dataset, querySolutionMap(bindings))
+        QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings))
     val result = qexec.execAsk()
     result
   }
