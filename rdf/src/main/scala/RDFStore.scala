@@ -1,8 +1,10 @@
 package org.w3.banana
 
 import util._
+import scalaz._
+import Id._
 
-trait RDFStore[Rdf <: RDF] extends MRDFStore[Rdf, scalaz.Id]
+trait RDFStore[Rdf <: RDF] extends MRDFStore[Rdf, Id]
   with GraphStore[Rdf] with SPARQLEngine[Rdf]
 
 trait AsyncRDFStore[Rdf <: RDF] extends MRDFStore[Rdf, BananaFuture]

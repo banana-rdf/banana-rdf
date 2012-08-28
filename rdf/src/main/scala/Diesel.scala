@@ -47,7 +47,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       binder.fromPointedGraph(pointed)
 
     def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, (T1, T2)] =
-      (b1.fromPointedGraph(pointed) |@| b2.fromPointedGraph(pointed))(Tuple2.apply)
+      ^[BananaValidation, T1, T2, (T1, T2)](b1.fromPointedGraph(pointed), b2.fromPointedGraph(pointed))(Tuple2.apply)
 
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
       val newGraph = graph union Graph(Triple(pointer, rdf("type"), clazz))
@@ -135,7 +135,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
 
     def asOption2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, Option[(T1, T2)]] = headOption match {
       case None => Success(None)
-      case Some(pointed) => (pointed.as[T1] |@| pointed.as[T2])(Tuple2.apply) map { Some(_) }
+      case Some(pointed) => ^[BananaValidation, T1, T2, (T1, T2)](pointed.as[T1], pointed.as[T2])(Tuple2.apply) map { Some(_) }
     }
 
     /**
@@ -149,7 +149,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       this.iterator.toList.map(_.as[T]).sequence[BananaValidation, T].map(_.toSet)
 
     def asSet2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, Set[(T1, T2)]] =
-      this.iterator.toList.map { pg => (pg.as[T1] |@| pg.as[T2])(Tuple2.apply) }.sequence[BananaValidation, (T1, T2)].map(_.toSet)
+      this.iterator.toList.map { pg => ^[BananaValidation, T1, T2, (T1, T2)](pg.as[T1], pg.as[T2])(Tuple2.apply) }.sequence[BananaValidation, (T1, T2)].map(_.toSet)
 
   }
 

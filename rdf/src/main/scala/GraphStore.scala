@@ -1,6 +1,7 @@
 package org.w3.banana
 
-import scalaz.Id
+import scalaz._
+import Id._
 import util._
 
 trait GraphStore[Rdf <: RDF] extends MGraphStore[Rdf, Id]

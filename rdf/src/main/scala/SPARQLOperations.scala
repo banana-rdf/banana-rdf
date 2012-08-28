@@ -24,7 +24,8 @@ trait SPARQLOperations[Rdf <: RDF] {
    * A fold operation.
    * The types returned will be very disjunctive. Consider having T be a scalaz.Either3
    */
-  def fold[T](query: Rdf#Query)(select: Rdf#SelectQuery => T,
+  def fold[T](query: Rdf#Query)(
+    select: Rdf#SelectQuery => T,
     construct: Rdf#ConstructQuery => T,
     ask: Rdf#AskQuery => T): T
 

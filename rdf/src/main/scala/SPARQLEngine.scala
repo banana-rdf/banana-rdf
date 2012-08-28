@@ -1,7 +1,8 @@
 package org.w3.banana
 
 import util._
-import scalaz.Id
+import scalaz._
+import Id._
 
 trait SPARQLEngine[Rdf <: RDF] extends MSPARQLEngine[Rdf, Id]
 

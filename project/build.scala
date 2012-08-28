@@ -11,10 +11,10 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-    version      := "0.3-SNAPSHOT",
-//    version      := "x04-SNAPSHOT",
-    scalaVersion := "2.9.1",
-    crossScalaVersions := Seq("2.9.1", "2.9.2"),
+//    version      := "0.3-SNAPSHOT",
+    version      := "x07-SNAPSHOT",
+    scalaVersion := "2.9.2",
+    crossScalaVersions := Seq("2.9.2"),
 
     parallelExecution in Test := false,
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types"),
@@ -170,8 +170,7 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
-      full,
-      linkedData))
+      full))
   
   lazy val rdf = Project(
     id = "banana-rdf",
@@ -209,12 +208,5 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps
   ) dependsOn (rdf, rdfTestSuite % "test")
   
-  lazy val linkedData = Project(
-    id = "banana-linked-data",
-    base = file("linked-data"),
-    settings = buildSettings ++ Seq(
-      libraryDependencies += asyncHttpClient)
-  ) dependsOn (rdf, sesame, jena)
-
 }
 

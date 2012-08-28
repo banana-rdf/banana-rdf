@@ -1,6 +1,7 @@
 package org.w3.banana
 
 import scalaz._
+import Id._
 
 package object util
     extends FutureSyntax

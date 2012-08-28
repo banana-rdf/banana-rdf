@@ -18,19 +18,19 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaD
     FutureValidation(
       inner flatMap { validation =>
         validation fold (
-          failure = f => Promise.successful(f.fail[T]),
-          success = s => fn(s).inner
+          f => Promise.successful(f.fail[T]),
+          s => fn(s).inner
         )
       })
 
   def fold[T](failure: (F) => T = identity[F] _, success: (S) => T = identity[S] _): Future[T] =
-    inner map { validation => validation fold (failure = failure, success = success) }
+    inner map { validation => validation fold (failure, success) }
 
   def mapFailure[G](f: F => G): FutureValidation[G, S] =
     FutureValidation(
       this.fold(
-        failure = f(_).fail,
-        success = x => x.success
+        x => Failure(f(x)),
+        Success.apply
       )
     )
 
@@ -43,17 +43,15 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaD
     inner flatMap {
       (v: Validation[F, S]) =>
         v.fold(
-          success = s => Promise.successful(s.success[G]),
-          failure = f(_).inner
+          x => f(x).inner,
+          s => Promise.successful(s.success[G])
         )
     } fv
 
   /** And the success shall be failures and the failures shall be successes. This is how you do logical negation */
   def invert: FutureValidation[S, F] =
     FutureValidation(
-      inner map (v => v fold (
-        success = s => s.fail,
-        failure = f => f.success))
+      inner map (v => v.fold(Success.apply, Failure.apply))
     )
 
   def fv: FutureValidation[F, S] =
