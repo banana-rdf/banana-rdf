@@ -38,8 +38,6 @@ object Jena {
 
   implicit val sparqlOps: SPARQLOperations[Jena] = JenaSPARQLOperations
 
-  implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphQuery
-
   implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader[RDFXML]
 
   implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]

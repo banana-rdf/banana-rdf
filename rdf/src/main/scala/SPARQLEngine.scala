@@ -18,8 +18,6 @@ trait MSPARQLEngine[Rdf <: RDF, M[_]] {
 
   def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): M[Boolean]
 
-  // TODO
-
   def executeSelect(query: Rdf#SelectQuery): M[Rdf#Solutions] = executeSelect(query, Map.empty)
 
   def executeConstruct(query: Rdf#ConstructQuery): M[Rdf#Graph] = executeConstruct(query, Map.empty)
