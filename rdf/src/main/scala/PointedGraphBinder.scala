@@ -2,11 +2,11 @@ package org.w3.banana
 
 import scalaz.Validation
 
-trait ToPointedGraph[Rdf <: RDF, -T] {
+trait ToPointedGraph[Rdf <: RDF, T] {
   def toPointedGraph(t: T): PointedGraph[Rdf]
 }
 
-trait FromPointedGraph[Rdf <: RDF, +T] {
+trait FromPointedGraph[Rdf <: RDF, T] {
   def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, T]
 }
 
