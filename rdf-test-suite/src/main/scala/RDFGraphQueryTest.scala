@@ -3,23 +3,22 @@ package org.w3.banana
 import org.scalatest._
 import org.scalatest.matchers._
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
-import scalaz.Id
 
 class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     implicit diesel: Diesel[Rdf],
     reader: BlockingReader[Rdf#Graph, RDFXML],
     sparqlOperations: SPARQLOperations[Rdf],
-    graphQuery: Rdf#Graph => SPARQLEngine[Rdf],
+    graphQuery: RDFGraphQuery[Rdf],
     sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
   import diesel._
   import sparqlOperations._
-  import graphQuery._
 
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(file, "http://foo.com") getOrElse sys.error("ouch")
+  val sparqlEngine = graphQuery.makeSPARQLEngine(graph)
 
   "SELECT DISTINCT query in new-tr.rdf " should {
     val selectQueryStr = """prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -48,14 +47,14 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
 
     "have Alexandre Bertails as an editor" in {
       val query = SelectQuery(selectQueryStr)
-      val answers: Id[Rdf#Solutions] = graph.executeSelect(query)
+      val answers: Rdf#Solutions = sparqlEngine.executeSelect(query)
       testAnswer(answers)
     }
 
     "the sparql answer should serialise and deserialise " in {
       val query = SelectQuery(selectQueryStr)
       //in any case we must re-execute query, as the results returned can often only be read once
-      val answers = graph.executeSelect(query)
+      val answers = sparqlEngine.executeSelect(query)
 
       val out = new ByteArrayOutputStream()
 
@@ -81,12 +80,13 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
 
     "work as expected " in {
 
-      val clonedGraph = graph.executeConstruct(query)
+      val clonedGraph = sparqlEngine.executeConstruct(query)
 
       assert(clonedGraph isIsomorphicWith graph)
     }
 
   }
+
   "ASK Query on simple graph" should {
 
     val simple: PointedGraph[Rdf] = (
@@ -102,17 +102,17 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
          | ASK { ?thing :editor [ <http://xmlns.com/foaf/0.1/name> ?name ] }""".stripMargin)
 
     "simple graph contains at least one named person" in {
-      val personInFoaf = simple.graph.executeAsk(yesQuery)
+      val personInFoaf = graphQuery.makeSPARQLEngine(simple.graph).executeAsk(yesQuery)
       assert(personInFoaf, " query " + yesQuery + " must return true")
     }
 
     "simple graph contains no foaf:knows relation" in {
-      val knowRelInFoaf = simple.graph.executeAsk(noQuery)
+      val knowRelInFoaf = graphQuery.makeSPARQLEngine(simple.graph).executeAsk(noQuery)
       assert(!knowRelInFoaf, " query " + noQuery + " must return false")
     }
 
     "more advanced query is ok" in {
-      val objectHasNamedEditor = simple.graph.executeAsk(yesQuery2)
+      val objectHasNamedEditor = graphQuery.makeSPARQLEngine(simple.graph).executeAsk(yesQuery2)
       assert(objectHasNamedEditor, " query " + yesQuery2 + " must return true")
     }
 
@@ -132,14 +132,14 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
                            |}""".stripMargin)
 
     "Alexandre Bertails must appear as an editor in new-tr.rdf" in { //was: taggedAs (SesameWIP)
-      val alexIsThere = graph.executeAsk( query)
+      val alexIsThere = sparqlEngine.executeAsk(query)
 
       assert(alexIsThere, " query " + query + " must return true")
     }
 
     "the sparql answer should serialise and deserialise " in {
       //in any case we must re-execute query, as the results returned can often only be read once
-      val answers = graph.executeAsk( query)
+      val answers = sparqlEngine.executeAsk( query)
 
       val out = new ByteArrayOutputStream()
 
@@ -191,8 +191,8 @@ CONSTRUCT {
                                |  ?ed contact:fullName ?name
                                |}""".stripMargin, base, rdf, contact)
 
-    val contructed1 = graph.executeConstruct(query1)
-    val constructed2 = graph.executeConstruct(query2)
+    val contructed1 = sparqlEngine.executeConstruct(query1)
+    val constructed2 = sparqlEngine.executeConstruct(query2)
 
     assert(contructed1 isIsomorphicWith constructed2, "the results of both queries should be isomorphic")
   }

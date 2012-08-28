@@ -18,14 +18,6 @@ object SesameStore {
   def apply(store: SailRepository): RDFStore[Sesame] =
     new SesameStore(store)
 
-  implicit def toMemoryStore(graph: Sesame#Graph) = {
-    val store = new MemoryStore
-    val sail = new SailRepository(store)
-    sail.initialize()
-    val sailconn = sail.getConnection
-    sailconn.add(graph)
-    SesameStore(sail)
-  }
 }
 
 class SesameStore(store: SailRepository) extends RDFStore[Sesame] {
