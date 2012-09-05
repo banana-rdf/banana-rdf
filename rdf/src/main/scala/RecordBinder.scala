@@ -1,6 +1,5 @@
 package org.w3.banana
 
-import org.w3.banana.util.BananaValidation
 import scalaz.{ Validation, Success, Failure }
 
 /**

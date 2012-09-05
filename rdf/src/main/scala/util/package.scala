@@ -8,10 +8,6 @@ package object util
     with ValidationSyntax
     with AnySyntax {
 
-  type BananaValidation[T] = Validation[BananaException, T]
-
-  type BananaFuture[T] = FutureValidation[BananaException, T]
-
   implicit val IdUnsafeExtractor: UnsafeExtractor[Id] = new UnsafeExtractor[Id] {
     def unsafeExtract[T](id: => Id[T]): Validation[Exception, T] =
       try {

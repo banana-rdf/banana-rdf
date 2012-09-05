@@ -1,6 +1,6 @@
 package org.w3.banana.util
 
-import org.w3.banana.BananaException
+import org.w3.banana._
 
 import akka.dispatch.Promise
 import scalaz.{ Validation, Success }

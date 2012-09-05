@@ -4,10 +4,11 @@ import org.w3.banana._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
+import scalaz.Id._
 
 object JenaGraphSPARQLEngine extends RDFGraphQuery[Jena] {
 
-  def makeSPARQLEngine(graph: Jena#Graph): SPARQLEngine[Jena] = new SPARQLEngine[Jena] {
+  def makeSPARQLEngine(graph: Jena#Graph): SPARQLEngine[Jena, Id] = new SPARQLEngine[Jena, Id] {
 
     lazy val querySolution = util.QuerySolution()
 

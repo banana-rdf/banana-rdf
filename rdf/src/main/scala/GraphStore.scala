@@ -1,17 +1,9 @@
 package org.w3.banana
 
-import scalaz._
-import Id._
-import util._
-
-trait GraphStore[Rdf <: RDF] extends MGraphStore[Rdf, Id]
-
-trait AsyncGraphStore[Rdf <: RDF] extends MGraphStore[Rdf, BananaFuture]
-
 /**
  * to manipulate named graphs
  */
-trait MGraphStore[Rdf <: RDF, M[_]] {
+trait GraphStore[Rdf <: RDF, M[_]] {
 
   def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): M[Unit]
 
@@ -23,3 +15,19 @@ trait MGraphStore[Rdf <: RDF, M[_]] {
 
 }
 
+object GraphStore {
+
+  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M])(implicit ops: RDFOperations[Rdf], ldc: LDC[Rdf]): GraphStore[Rdf, M] = new GraphStore[Rdf, M] {
+
+    def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): M[Unit] =
+      store.execute(ldc.append(uri, ops.graphToIterable(graph)))
+    
+    def patchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph): M[Unit] = sys.error("")
+    
+    def getGraph(uri: Rdf#URI): M[Rdf#Graph] = sys.error("")
+    
+    def removeGraph(uri: Rdf#URI): M[Unit] = sys.error("")
+
+  }
+
+}

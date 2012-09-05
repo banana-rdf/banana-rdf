@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import org.w3.banana.util.BananaValidation
+import org.w3.banana.util._
 
 trait Property[Rdf <: RDF, T] {
 
