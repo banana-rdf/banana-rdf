@@ -15,21 +15,18 @@ import scala.collection.JavaConverters._
 
 object JenaStore {
 
-  def apply(dataset: Dataset, defensiveCopy: Boolean): JenaStore =
-    new JenaStore(dataset, defensiveCopy)
+  def apply[M[_]](dataset: Dataset, defensiveCopy: Boolean)(implicit m: Monad[M]): JenaStore[M] =
+    new JenaStore(dataset, defensiveCopy, m)
 
-  def apply(dg: DatasetGraph, defensiveCopy: Boolean = false): JenaStore = {
+  def apply[M[_]](dg: DatasetGraph, defensiveCopy: Boolean = false)(implicit m: Monad[M]): JenaStore[M] = {
     val dataset = new GraphStoreBasic(dg).toDataset
-    JenaStore(dataset, defensiveCopy)
+    JenaStore(dataset, defensiveCopy)(m)
   }
 
 }
 
-class JenaStore[M[_]](dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena] {
+class JenaStore[M[_]](dataset: Dataset, defensiveCopy: Boolean, m: Monad[M]) extends RDFStore[Jena, M] {
 
-  // there is a huge performance impact when using transaction (READs are 3x slower)
-  // it's fine to deactivate that if there is only one active thread with akka
-  // we should find something clever here...
   val supportsTransactions: Boolean = dataset.supportsTransactions()
 
   val dg: DatasetGraph = dataset.asDatasetGraph
@@ -64,66 +61,73 @@ class JenaStore[M[_]](dataset: Dataset, defensiveCopy: Boolean) extends RDFStore
     }
   }
 
-  def run[A](script: Free[LDC[Jena]#Command, A]): A = {
+  def run[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): A = {
     script.resume fold (
       {
-        case JenaLDC.Create(uri, a) => {
-          appendToGraph(uri, emptyGraph)
+        case Create(uri, a) => {
+          appendToGraph(uri, List.empty)
           run(a)
         }
-        case JenaLDC.Delete(uri, a) => {
+        case Delete(uri, a) => {
           removeGraph(uri)
           run(a)
         }
-        case JenaLDC.Get(uri, f) => {
+        case Get(uri, k) => {
           val graph = getGraph(uri)
-          run(f(graph))
+          run(k(graph))
         }
-        case JenaLDC.Append(uri, triples, a) => {
-          appendToGraph(uri, makeGraph(triples))
+        case Append(uri, triples, a) => {
+          appendToGraph(uri, triples)
           run(a)
         }
-        case JenaLDC.Remove(uri, tripleMatches, a) => {
-          patchGraph(uri, tripleMatches, emptyGraph)
+        case Remove(uri, tripleMatches, a) => {
+          removeFromGraph(uri, tripleMatches)
           run(a)
+        }
+        case Select(query, bindings, k) => {
+          val solutions = executeSelect(query, bindings)
+          run(k(solutions))
+        }
+        case Construct(query, bindings, k) => {
+          val graph = executeConstruct(query, bindings)
+          run(k(graph))
+        }
+        case Ask(query, bindings, k) => {
+          val b = executeAsk(query, bindings)
+          run(k(b))
         }
       },
       a => a
     )
   }
 
-  def operationType[A](script: Free[LDC[Jena]#Command, A]): RW = {
+  def operationType[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): RW = {
     script.resume fold (
       {
-        case JenaLDC.Get(_, f) => operationType(f(ops.emptyGraph))
+        case Get(_, f) => operationType(f(ops.emptyGraph))
         case _ => WRITE
       },
       _ => READ
     )
   }
 
-  override def execute[A](script: Free[LDC[Jena]#Command, A]): A = {
+  override def execute[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): M[A] = {
     operationType(script) match {
-      case READ => readTransaction(run(script))
-      case WRITE => writeTransaction(run(script))
+      case READ => readTransaction(m.point(run(script)))
+      case WRITE => writeTransaction(m.point(run(script)))
     }
 
   }
 
-  def appendToGraph(uri: Jena#URI, graph: Jena#Graph): Unit = {
-    graphToIterable(graph) foreach {
-      case Triple(s, p, o) =>
-        dg.add(uri, s, p, o)
+  def appendToGraph(uri: Jena#URI, triples: Iterable[Jena#Triple]): Unit = {
+    triples foreach { case Triple(s, p, o) =>
+      dg.add(uri, s, p, o)
     }
   }
 
-  def patchGraph(uri: Jena#URI, delete: Iterable[TripleMatch[Jena]], insert: Jena#Graph): Unit = {
-    delete foreach { case (s, p, o) =>
+  def removeFromGraph(uri: Jena#URI, tripleMatches: Iterable[TripleMatch[Jena]]): Unit = {
+    tripleMatches foreach { case (s, p, o) =>
       dg.deleteAny(uri, s, p, o)
-    }
-    graphToIterable(insert) foreach {
-      case Triple(s, p, o) =>
-        dg.add(uri, s, p, o)
     }
   }
 

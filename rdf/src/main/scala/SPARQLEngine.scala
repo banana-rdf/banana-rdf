@@ -18,3 +18,20 @@ trait SPARQLEngine[Rdf <: RDF, M[_]] {
   def executeAsk(query: Rdf#AskQuery): M[Boolean] = executeAsk(query, Map.empty)
 
 }
+
+object SPARQLEngine {
+
+  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]): SPARQLEngine[Rdf, M] = new SPARQLEngine[Rdf, M] {
+
+    def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Solutions] =
+      store.execute(Command.select(query, bindings))
+
+    def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Graph] =
+      store.execute(Command.construct(query, bindings))
+
+    def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): M[Boolean] =
+      store.execute(Command.ask(query, bindings))
+
+  }
+
+}

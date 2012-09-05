@@ -6,8 +6,6 @@ import scalaz.Semigroup.firstSemigroup
 
 object BananaException {
 
-  //  implicit val validationBananaExceptionMonad = validationMonad[BananaException]
-
   implicit val bananaExceptionSemiGroup = firstSemigroup[BananaException]
 
   def bananaCatch[T](a: => T): Validation[BananaException, T] = try {

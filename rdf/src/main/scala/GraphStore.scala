@@ -17,16 +17,19 @@ trait GraphStore[Rdf <: RDF, M[_]] {
 
 object GraphStore {
 
-  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M])(implicit ops: RDFOperations[Rdf], ldc: LDC[Rdf]): GraphStore[Rdf, M] = new GraphStore[Rdf, M] {
+  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M])(implicit ops: RDFOperations[Rdf]): GraphStore[Rdf, M] = new GraphStore[Rdf, M] {
 
     def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): M[Unit] =
-      store.execute(ldc.append(uri, ops.graphToIterable(graph)))
+      store.execute(Command.append(uri, ops.graphToIterable(graph)))
     
-    def patchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph): M[Unit] = sys.error("")
+    def patchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph): M[Unit] =
+      store.execute(Command.patch(uri, delete, ops.graphToIterable(insert)))
     
-    def getGraph(uri: Rdf#URI): M[Rdf#Graph] = sys.error("")
+    def getGraph(uri: Rdf#URI): M[Rdf#Graph] =
+      store.execute(Command.get(uri))
     
-    def removeGraph(uri: Rdf#URI): M[Unit] = sys.error("")
+    def removeGraph(uri: Rdf#URI): M[Unit] =
+      store.execute(Command.delete(uri))
 
   }
 

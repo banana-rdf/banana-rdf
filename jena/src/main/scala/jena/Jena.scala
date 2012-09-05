@@ -53,6 +53,4 @@ object Jena {
 
   implicit val writerSelector: RDFWriterSelector[Jena#Graph] = JenaRDFBlockingWriter.writerSelector
 
-  implicit val ldc: LDC[Jena] = JenaLDC
-
 }
