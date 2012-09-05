@@ -4,12 +4,12 @@ import org.w3.banana._
 import com.hp.hpl.jena.sparql.core._
 import Jena._
 import JenaRDFReader._
-import com.hp.hpl.jena.tdb.{TDB, TDBFactory}
+import com.hp.hpl.jena.tdb.{ TDB, TDBFactory }
+import JenaOperations._
 
 
-abstract class AbstractJenaGraphStoreTest(val jenaStore: JenaStore) extends GraphStoreTest[Jena](jenaStore) {
+class JenaGraphStoreTest(val jenaStore: JenaStore) extends GraphStoreTest[Jena](jenaStore) {
 
-  import JenaOperations._
 
   def defaultGraph: Jena#Graph = jenaStore.readTransaction {
     BareJenaGraph(jenaStore.dg.getDefaultGraph)
