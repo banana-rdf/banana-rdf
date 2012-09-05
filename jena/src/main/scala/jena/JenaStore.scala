@@ -3,7 +3,7 @@ package org.w3.banana.jena
 import org.w3.banana._
 import JenaOperations._
 import JenaDiesel._
-//import JenaLDC._
+import org.w3.banana.util._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
@@ -12,26 +12,37 @@ import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype }
 import scalaz._
 import scala.collection.JavaConverters._
+import akka.dispatch.{ ExecutionContext, Future }
+import java.util.concurrent._
 
 object JenaStore {
 
-  def apply[M[_]](dataset: Dataset, defensiveCopy: Boolean)(implicit m: Monad[M]): JenaStore[M] =
-    new JenaStore(dataset, defensiveCopy, m)
+  def apply(dataset: Dataset, defensiveCopy: Boolean): JenaStore =
+    new JenaStore(dataset, defensiveCopy)
 
-  def apply[M[_]](dg: DatasetGraph, defensiveCopy: Boolean = false)(implicit m: Monad[M]): JenaStore[M] = {
+  def apply(dg: DatasetGraph, defensiveCopy: Boolean = false): JenaStore = {
     val dataset = new GraphStoreBasic(dg).toDataset
-    JenaStore(dataset, defensiveCopy)(m)
+    JenaStore(dataset, defensiveCopy)
   }
 
 }
 
-class JenaStore[M[_]](dataset: Dataset, defensiveCopy: Boolean, m: Monad[M]) extends RDFStore[Jena, M] {
+class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena, BananaFuture] {
+
+  val executorService: ExecutorService = Executors.newFixedThreadPool(8)
+
+  implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutorService(executorService)
 
   val supportsTransactions: Boolean = dataset.supportsTransactions()
 
   val dg: DatasetGraph = dataset.asDatasetGraph
 
   lazy val querySolution = util.QuerySolution()
+
+  def shutdown(): Unit = {
+    executorService.shutdown()
+    dataset.close()
+  }
 
   def readTransaction[T](body: => T): T = {
     if (supportsTransactions) {
@@ -111,10 +122,10 @@ class JenaStore[M[_]](dataset: Dataset, defensiveCopy: Boolean, m: Monad[M]) ext
     )
   }
 
-  override def execute[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): M[A] = {
+  override def execute[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): BananaFuture[A] = {
     operationType(script) match {
-      case READ => readTransaction(m.point(run(script)))
-      case WRITE => writeTransaction(m.point(run(script)))
+      case READ => readTransaction(run(script).bf)
+      case WRITE => writeTransaction(run(script).bf)
     }
 
   }
