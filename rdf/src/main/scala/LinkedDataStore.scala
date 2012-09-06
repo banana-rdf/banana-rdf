@@ -3,15 +3,16 @@ package org.w3.banana
 import org.w3.banana.util._
 import scalaz._
 import scalaz.Scalaz._
+import akka.dispatch.ExecutionContext
 
 object LinkedDataStore {
 
-  implicit def apply[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]): LinkedDataStore[Rdf] =
-    new LinkedDataStore[Rdf](store)(diesel)
+  implicit def apply[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf], ec: ExecutionContext): LinkedDataStore[Rdf] =
+    new LinkedDataStore[Rdf](store)(diesel, ec)
 
 }
 
-class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf]) {
+class LinkedDataStore[Rdf <: RDF](store: AsyncGraphStore[Rdf])(implicit diesel: Diesel[Rdf], ec: ExecutionContext) {
 
   import diesel._
   import ops._

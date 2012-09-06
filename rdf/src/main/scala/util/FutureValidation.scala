@@ -7,14 +7,14 @@ import scalaz.Scalaz._
 import java.util.concurrent.TimeoutException
 import org.w3.banana._
 
-case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaDefaults {
+case class FutureValidation[F, S](inner: Future[Validation[F, S]]) /*extends AkkaDefaults */ {
 
   implicit val defaultDuration = FutureValidation.defaultDuration
 
   def map[T](fn: (S) => T): FutureValidation[F, T] =
     FutureValidation(inner map { validation => validation map fn })
 
-  def flatMap[T](fn: (S) => FutureValidation[F, T]): FutureValidation[F, T] =
+  def flatMap[T](fn: (S) => FutureValidation[F, T])(implicit ec: ExecutionContext): FutureValidation[F, T] =
     FutureValidation(
       inner flatMap { validation =>
         validation fold (
@@ -39,7 +39,7 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) extends AkkaD
     ()
   }
 
-  def orElse[G](f: F => FutureValidation[G, S]) =
+  def orElse[G](f: F => FutureValidation[G, S])(implicit ec: ExecutionContext) =
     inner flatMap {
       (v: Validation[F, S]) =>
         v.fold(
@@ -91,10 +91,10 @@ object FutureValidation {
     }
   }
 
-  implicit def FutureValidationBind[E]: Bind[({ type l[x] = FutureValidation[E, x] })#l] = new Bind[({ type l[x] = FutureValidation[E, x] })#l] {
-    override def map[A, B](x: FutureValidation[E, A])(f: A => B): FutureValidation[E, B] = x map f
-    def bind[A, B](x: FutureValidation[E, A])(f: A => FutureValidation[E, B]): FutureValidation[E, B] = x flatMap f
-  }
+  // implicit def FutureValidationBind[E]: Bind[({ type l[x] = FutureValidation[E, x] })#l] = new Bind[({ type l[x] = FutureValidation[E, x] })#l] {
+  //   override def map[A, B](x: FutureValidation[E, A])(f: A => B): FutureValidation[E, B] = x map f
+  //   def bind[A, B](x: FutureValidation[E, A])(f: A => FutureValidation[E, B]): FutureValidation[E, B] = x flatMap f
+  // }
 
   implicit def BananaFutureUnsafeExtractor[E]: UnsafeExtractor[({ type l[x] = FutureValidation[E, x] })#l] = new UnsafeExtractor[({ type l[x] = FutureValidation[E, x] })#l] {
     def unsafeExtract[T](fv: => FutureValidation[E, T]): Validation[Exception, T] = {

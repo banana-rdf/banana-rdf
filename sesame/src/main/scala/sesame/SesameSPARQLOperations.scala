@@ -45,12 +45,6 @@ object SesameSPARQLOperations extends SPARQLOperations[Sesame] {
 
   def varnames(solution: Sesame#Solution): Set[String] = solution.getBindingNames.asScala.toSet
 
-  def solutionIterator(solutions: Sesame#Solutions): Iterable[Sesame#Solution] = {
-    val iterator = new Iterator[Sesame#Solution] {
-      def hasNext: Boolean = solutions.hasNext
-      def next(): Sesame#Solution = solutions.next()
-    }
-    iterator.toIterable
-  }
+  def solutionIterator(solutions: Sesame#Solutions): Iterable[Sesame#Solution] = solutions
 
 }

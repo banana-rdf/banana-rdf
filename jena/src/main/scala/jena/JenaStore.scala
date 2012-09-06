@@ -122,10 +122,10 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
     )
   }
 
-  override def execute[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): BananaFuture[A] = {
+  def execute[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): BananaFuture[A] = {
     operationType(script) match {
-      case READ => readTransaction(run(script).bf)
-      case WRITE => writeTransaction(run(script).bf)
+      case READ => readTransaction(run(script)).bf
+      case WRITE => writeTransaction(run(script)).bf
     }
 
   }

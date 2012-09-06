@@ -5,21 +5,27 @@ import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.repository.Repository
 import org.openrdf.repository.sail.SailRepository
 import Sesame._
+import SesameOperations._
 
-class SesameGraphStoreTest() extends GraphStoreTest[Sesame](
-  SesameStore {
-    val repo = new SailRepository(new MemoryStore)
-    repo.initialize()
-    repo
-  }) {
-
-  import SesameOperations._
-  import store._
+abstract class SesameGraphStoreTest(sesameStore: SesameStore) extends GraphStoreTest[Sesame](sesameStore) {
 
   "adding a named graph should not pollute the default graph" in {
-    appendToGraph(makeUri("http://example.com/foo"), graph)
-    val defaultGraph = getGraph(null.asInstanceOf[Sesame#URI])
+    val s = sesameStore.execute {
+      for {
+        _ <- Command.append[Sesame](makeUri("http://example.com/foo"), graphToIterable(graph))
+        graph <- Command.get[Sesame](null.asInstanceOf[Sesame#URI])
+      } yield graph
+    }
+    val defaultGraph = s.getOrFail()
     defaultGraph must have size (0)
   }
 
 }
+
+class SesameMemoryGraphStoreTest extends SesameGraphStoreTest({
+  SesameStore {
+    val repo = new SailRepository(new MemoryStore)
+    repo.initialize()
+    repo
+  }
+})

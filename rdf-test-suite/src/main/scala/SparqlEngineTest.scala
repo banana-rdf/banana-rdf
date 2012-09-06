@@ -22,6 +22,7 @@ class SparqlEngineTest[Rdf <: RDF](
   val sparqlEngine = SPARQLEngine[Rdf, BananaFuture](store)
 
   override def afterAll(): Unit = {
+    super.afterAll()
     store.shutdown()
   }
 

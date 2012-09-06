@@ -2,15 +2,15 @@ package org.w3.banana.util
 
 import org.w3.banana._
 
-import akka.dispatch.Promise
+import akka.dispatch._
 import scalaz.Validation
 
 class ValidationW[F, S](v: Validation[F, S]) {
-  def fv: FutureValidation[F, S] = FutureValidation(Promise.successful(v))
+  def fv(implicit ec: ExecutionContext): FutureValidation[F, S] = FutureValidation(Promise.successful(v))
 }
 
 class BananaValidationW[S](v: Validation[BananaException, S]) extends ValidationW[BananaException, S](v) {
-  def bf: BananaFuture[S] = fv
+  def bf(implicit ec: ExecutionContext): BananaFuture[S] = fv
   def getOrFail: S = v.fold(be => throw be, s => s)
 }
 

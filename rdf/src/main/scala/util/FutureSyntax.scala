@@ -2,12 +2,12 @@ package org.w3.banana.util
 
 import org.w3.banana.BananaException
 
-import akka.dispatch.{ Await, Future, Promise }
+import akka.dispatch._
 import akka.util.Duration
 import scalaz.Validation
 import scalaz.syntax.validation._
 
-trait FutureSyntax extends AkkaDefaults {
+trait FutureSyntax /*extends AkkaDefaults*/ {
 
   class FutureW[A](inner: Future[A]) {
     implicit val defaultDuration = Duration("3s")
@@ -46,7 +46,7 @@ trait FutureSyntax extends AkkaDefaults {
   implicit def futureOfValidationToFutureValidation[F, S](in: Future[Validation[F, S]]): FutureValidation[F, S] =
     FutureValidation(in)
 
-  implicit def validationToFutureValidation[F, S](in: Validation[F, S]): FutureValidation[F, S] =
+  implicit def validationToFutureValidation[F, S](in: Validation[F, S])(implicit ec: ExecutionContext): FutureValidation[F, S] =
     FutureValidation(Promise.successful(in))
 
 }

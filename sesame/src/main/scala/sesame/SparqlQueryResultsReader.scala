@@ -47,8 +47,13 @@ object SparqlQueryResultsReader {
             Right(parsed)
           } catch {
             case e: QueryResultParseException => {
-              Left(QueryResultIO.parse(new ByteArrayInputStream(bytes),
-                sesameSparqlSyntax.tupleFormat))
+              val enumerator = new BindingsAccumulator()
+              QueryResultIO.parse(
+                new ByteArrayInputStream(bytes),
+                sesameSparqlSyntax.tupleFormat,
+                enumerator,
+                org.openrdf.model.impl.ValueFactoryImpl.getInstance())
+              Left(enumerator.bindings())
             }
           }
         }

@@ -30,7 +30,8 @@ trait Sesame extends RDF {
   type ConstructQuery = ParsedGraphQuery
   type AskQuery = ParsedBooleanQuery
   type Solution = BindingSet
-  type Solutions = TupleQueryResult
+  // instead of TupleQueryResult so that it's eager instead of lazy
+  type Solutions = Vector[BindingSet]
 }
 
 object Sesame {

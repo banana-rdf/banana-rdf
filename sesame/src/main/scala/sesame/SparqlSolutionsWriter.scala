@@ -16,10 +16,9 @@ object SparqlSolutionsWriter {
       def write(answers: Sesame#Solutions, os: OutputStream, base: String = "") = {
         WrappedThrowable.fromTryCatch {
           val w = sesameSparqlSyntax.writer(os)
-          w.startQueryResult(answers.getBindingNames)
-          while (answers.hasNext) {
-            w.handleSolution(answers.next())
-          }
+          // w.startQueryResult(answers.getBindingNames)
+          w.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
+          answers foreach { answer => w.handleSolution(answer) }
           os.flush()
           w.endQueryResult()
         }
