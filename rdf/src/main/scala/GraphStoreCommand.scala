@@ -1,6 +1,7 @@
 package org.w3.banana
 
 import scalaz._
+import scalaz.Scalaz._
 import Id._
 import Free._
 
@@ -9,6 +10,69 @@ case object READ extends RW
 case object WRITE extends RW
 
 object Command {
+
+  def GET[Rdf <: RDF](hyperlink: Rdf#URI)(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, LinkedDataResource[Rdf]] = {
+    import diesel._
+    import ops._    
+    val docUri = hyperlink.fragmentLess
+    Command.get(docUri) map { graph =>
+      val pointed = PointedGraph(hyperlink, graph)
+      LinkedDataResource(docUri, pointed)
+    }
+  }
+
+  def GET[Rdf <: RDF](hyperlinks: Iterable[Rdf#URI])(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Set[LinkedDataResource[Rdf]]] = {
+    import diesel._
+    import ops._
+    implicit val functor: Functor[({type l[+x] = Command[Rdf, x]})#l] = Command.ldcFunctor[Rdf]
+    implicit val applicative: Applicative[({type f[+y] = Free[({type l[+x] = Command[Rdf, x]})#l, y]})#f] =
+      Free.freeMonad[({type l[+x] = Command[Rdf, x]})#l]
+    hyperlinks.map{ hyperlink => GET(hyperlink) }.toList.sequence[({type f[+y] = Free[({type l[+x] = Command[Rdf, x]})#l, y]})#f, LinkedDataResource[Rdf]].map(_.toSet)
+  }
+
+  def POST[Rdf <: RDF](uri: Rdf#URI, pointed: PointedGraph[Rdf])(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+    import diesel.{ uri => _, _ }
+    import ops._
+    val docUri = uri.fragmentLess
+    Command.append(docUri, graphToIterable(pointed.graph.resolveAgainst(docUri)))
+  }
+
+  // TODO move somewhere else
+  def resolveAgainst[Rdf <: RDF](nodeMatch: Rdf#NodeMatch, docUri: Rdf#URI)(implicit diesel: Diesel[Rdf]): Rdf#NodeMatch = {
+    import diesel._
+    import ops._
+    foldNodeMatch[Rdf#NodeMatch](nodeMatch)(ANY, node => node.resolveAgainst(docUri))
+  }
+
+  def PATCH[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]] /*, TODO insertTriples: Iterable[Rdf#Triple]*/)(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+    import diesel.{ uri => _, _ }
+    val docUri = uri.fragmentLess
+    val deletePattern = tripleMatches map { case (s, p, o) => (resolveAgainst(s, docUri), resolveAgainst(p, docUri), resolveAgainst(o, docUri)) }
+    Command.patch(docUri, deletePattern, List.empty)
+  }
+
+  def POSTToCollection[Rdf <: RDF](collection: Rdf#URI, pointed: PointedGraph[Rdf])(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#URI] = {
+    import diesel._
+    import ops._
+    val fragment = pointed.pointer.as[Rdf#URI].fold(t => throw t, s => s)
+    // was:
+    //  pointed.pointer.as[Rdf#URI] flatMap { uri =>
+    //    if (uri.isPureFragment) Success(uri) else Failure(NotPureFragment)
+    val docUri = collection.newChildUri
+    POST(docUri, pointed) map { _ => docUri.resolve(fragment.toString) }
+  }
+
+
+  def DELETE[Rdf <: RDF](uri: Rdf#URI)(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+    Command.delete(uri)
+  }
+
+  def PUT[Rdf <: RDF](ldr: LinkedDataResource[Rdf])(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+    for {
+      _ <- DELETE(ldr.uri)
+      _ <- POST(ldr.uri, ldr.resource)
+    } yield ()
+  }
 
   def create[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Create(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))

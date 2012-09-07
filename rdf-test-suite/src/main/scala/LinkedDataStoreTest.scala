@@ -24,17 +24,15 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
   val address2 = VerifiedAddress("rue des poissons", City("Paris"))
   val person = Person("betehess")
 
-  val graphStore = GraphStore[Rdf, BananaFuture](store)
+  class LinkedPerson(uri: Rdf#URI, store: RDFStore[Rdf, BananaFuture])(implicit diesel: Diesel[Rdf]) {
 
-  class LinkedPerson(uri: Rdf#URI, graphStore: GraphStore[Rdf, BananaFuture])(implicit diesel: Diesel[Rdf]) {
-
-    lazy val bananaResource: BananaFuture[LinkedDataResource[Rdf]] = graphStore.get(uri)
+    lazy val bananaResource: BananaFuture[LinkedDataResource[Rdf]] = store.GET(uri)
 
     def getAddresses(): BananaFuture[Set[Address]] = {
       for {
         ldr <- bananaResource
         uris <- (ldr.resource / Person.address).asSet[Rdf#URI].bf
-        resources <- graphStore.get(uris)
+        resources <- store.GET(uris)
         addresses <- resources.map(_.resource.as[Address]).sequence[BananaValidation, Address].bf
       } yield {
         addresses
@@ -42,29 +40,29 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
     }
 
     def linkAddress(addressURI: Rdf#URI): BananaFuture[Unit] =
-      graphStore.append(uri, uri -- foaf("address") ->- addressURI)
+      store.POST(uri, uri -- foaf("address") ->- addressURI)
 
   }
 
   def linkedPerson(ldr: LinkedDataResource[Rdf]): LinkedPerson =
-    new LinkedPerson(ldr.uri, graphStore) {
+    new LinkedPerson(ldr.uri, store) {
       import org.w3.banana.util._
       // just a little optimization in the case we already have the resource at hand
       override lazy val bananaResource = ldr.bf
     }
 
-  def linkedPerson(uri: Rdf#URI): LinkedPerson = new LinkedPerson(uri, graphStore)
+  def linkedPerson(uri: Rdf#URI): LinkedPerson = new LinkedPerson(uri, store)
 
   "saving a person, 2 addresses and then retrieve them" in {
 
     val r = for {
-      personUri <- graphStore.post(Person.container, person.toPG)
+      personUri <- store.POSTToCollection(Person.container, person.toPG)
       lp = linkedPerson(personUri)
-      address1Uri <- graphStore.post(personUri, address1.toPG)
-      address2Uri <- graphStore.post(personUri, address2.toPG)
+      address1Uri <- store.POSTToCollection(personUri, address1.toPG)
+      address2Uri <- store.POSTToCollection(personUri, address2.toPG)
       _ <- lp.linkAddress(address1Uri)
       _ <- lp.linkAddress(address2Uri)
-      personResource <- graphStore.get(personUri)
+      personResource <- store.GET(personUri)
       addresses <- linkedPerson(personResource).getAddresses()
     } yield {
       addresses
