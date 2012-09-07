@@ -74,7 +74,7 @@ object BananaRdfBuild extends Build {
 
   import BuildSettings._
   
-  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
+//  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
   
   val akka = "com.typesafe.akka" % "akka-actor" % "2.0.1"
 
@@ -163,7 +163,7 @@ object BananaRdfBuild extends Build {
     id = "banana",
     base = file("."),
     settings = buildSettings ++ Seq(
-      EclipseKeys.skipParents in ThisBuild := false,
+//      EclipseKeys.skipParents in ThisBuild := false,
       pub := (),
       pub <<= pub.dependsOn(publish in rdf, publish in jena, publish in sesame)),
     aggregate = Seq(
