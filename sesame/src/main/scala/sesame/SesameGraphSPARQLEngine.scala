@@ -30,7 +30,7 @@ object SesameGraphSPARQLEngine extends RDFGraphQuery[Sesame] {
 
     def executeSelect(query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Sesame#Solutions =
       withConnection(repository) { conn => SesameStore.executeSelect(conn, query, bindings) }
-    
+
     def executeConstruct(query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Sesame#Graph =
       withConnection(repository) { conn => SesameStore.executeConstruct(conn, query, bindings) }
 

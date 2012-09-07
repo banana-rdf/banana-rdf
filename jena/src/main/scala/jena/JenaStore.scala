@@ -72,7 +72,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
     }
   }
 
-  def run[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): A = {
+  def run[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): A = {
     script.resume fold (
       {
         case Create(uri, a) => {
@@ -112,7 +112,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
     )
   }
 
-  def operationType[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): RW = {
+  def operationType[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): RW = {
     script.resume fold (
       {
         case Get(_, f) => operationType(f(ops.emptyGraph))
@@ -122,7 +122,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
     )
   }
 
-  def execute[A](script: Free[({type l[+x] = Command[Jena, x]})#l, A]): BananaFuture[A] = {
+  def execute[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): BananaFuture[A] = {
     operationType(script) match {
       case READ => readTransaction(run(script)).bf
       case WRITE => writeTransaction(run(script)).bf
@@ -131,14 +131,16 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
   }
 
   def appendToGraph(uri: Jena#URI, triples: Iterable[Jena#Triple]): Unit = {
-    triples foreach { case Triple(s, p, o) =>
-      dg.add(uri, s, p, o)
+    triples foreach {
+      case Triple(s, p, o) =>
+        dg.add(uri, s, p, o)
     }
   }
 
   def removeFromGraph(uri: Jena#URI, tripleMatches: Iterable[TripleMatch[Jena]]): Unit = {
-    tripleMatches foreach { case (s, p, o) =>
-      dg.deleteAny(uri, s, p, o)
+    tripleMatches foreach {
+      case (s, p, o) =>
+        dg.deleteAny(uri, s, p, o)
     }
   }
 

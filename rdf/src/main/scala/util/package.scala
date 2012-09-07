@@ -8,7 +8,7 @@ package object util
     with ValidationSyntax
     with AnySyntax {
 
-   implicit val IdUnsafeExtractor: UnsafeExtractor[Id] = new UnsafeExtractor[Id] {
+  implicit val IdUnsafeExtractor: UnsafeExtractor[Id] = new UnsafeExtractor[Id] {
     def unsafeExtract[T](id: => Id[T]): Validation[Exception, T] =
       try {
         Success(id)

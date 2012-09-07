@@ -9,7 +9,7 @@ import akka.util.duration._
 import org.w3.banana.util._
 
 class SparqlEngineTest[Rdf <: RDF](
-    store: RDFStore[Rdf, BananaFuture])(
+  store: RDFStore[Rdf, BananaFuture])(
     implicit reader: BlockingReader[Rdf#Graph, RDFXML],
     diesel: Diesel[Rdf],
     sparqlOps: SPARQLOperations[Rdf])
@@ -52,9 +52,9 @@ class SparqlEngineTest[Rdf <: RDF](
 
     val init = store.execute {
       for {
-      _ <- Command.append(uri("http://example.com/graph1"), graph1.toIterable)
-      _ <- Command.append(uri("http://example.com/graph2"), graph2.toIterable)
-      _ <- Command.append(uri("http://example.com/graph"), graph.toIterable)
+        _ <- Command.append(uri("http://example.com/graph1"), graph1.toIterable)
+        _ <- Command.append(uri("http://example.com/graph2"), graph2.toIterable)
+        _ <- Command.append(uri("http://example.com/graph"), graph.toIterable)
       } yield ()
     }
     init.getOrFail()
@@ -105,7 +105,7 @@ class SparqlEngineTest[Rdf <: RDF](
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
 
-    names.getOrFail() must have size(4)
+    names.getOrFail() must have size (4)
 
     names.getOrFail() must contain("Alexandre Bertails")
 

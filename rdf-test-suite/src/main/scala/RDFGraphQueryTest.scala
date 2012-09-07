@@ -139,7 +139,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
 
     "the sparql answer should serialise and deserialise " in {
       //in any case we must re-execute query, as the results returned can often only be read once
-      val answers = sparqlEngine.executeAsk( query)
+      val answers = sparqlEngine.executeAsk(query)
 
       val out = new ByteArrayOutputStream()
 

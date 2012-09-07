@@ -22,7 +22,7 @@ object JenaGraphSPARQLEngine extends RDFGraphQuery[Jena] {
       val solutions = qexec.execSelect()
       solutions
     }
-    
+
     def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Jena#Graph = {
       val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
       val qexec: QueryExecution =
@@ -33,7 +33,7 @@ object JenaGraphSPARQLEngine extends RDFGraphQuery[Jena] {
       val result = qexec.execConstruct()
       BareJenaGraph(result.getGraph())
     }
-    
+
     def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = {
       val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
       val qexec: QueryExecution =

@@ -11,7 +11,7 @@ import akka.util.Timeout
 import org.w3.banana.util._
 
 abstract class LinkedDataStoreTest[Rdf <: RDF](
-    store: RDFStore[Rdf, BananaFuture])(
+  store: RDFStore[Rdf, BananaFuture])(
     implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers with TestHelper {
 

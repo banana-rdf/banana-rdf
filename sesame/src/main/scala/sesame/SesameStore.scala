@@ -82,7 +82,6 @@ object SesameStore {
     val result: Boolean = booleanQuery.evaluate()
     result
   }
-  
 
 }
 
@@ -98,7 +97,7 @@ class SesameStore(repository: SailRepository) extends RDFStore[Sesame, BananaFut
     repository.shutDown()
   }
 
-  def run[A](conn: SailRepositoryConnection, script: Free[({type l[+x] = Command[Sesame, x]})#l, A]): A = {
+  def run[A](conn: SailRepositoryConnection, script: Free[({ type l[+x] = Command[Sesame, x] })#l, A]): A = {
     script.resume fold (
       {
         case Create(uri, a) => {
@@ -138,7 +137,7 @@ class SesameStore(repository: SailRepository) extends RDFStore[Sesame, BananaFut
     )
   }
 
-  def execute[A](script: Free[({type l[+x] = Command[Sesame, x]})#l, A]): BananaFuture[A] = {
+  def execute[A](script: Free[({ type l[+x] = Command[Sesame, x] })#l, A]): BananaFuture[A] = {
     def result = {
       val conn = repository.getConnection()
       val result: A = run(conn, script)
@@ -148,7 +147,6 @@ class SesameStore(repository: SailRepository) extends RDFStore[Sesame, BananaFut
     }
     result.bf
   }
-
 
 }
 

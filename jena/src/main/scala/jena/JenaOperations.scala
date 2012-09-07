@@ -132,11 +132,10 @@ object JenaOperations extends RDFOperations[Jena] {
   implicit def toConcreteNodeMatch(node: Jena#Node): Jena#NodeMatch = node.asInstanceOf[Jena#Node]
 
   def foldNodeMatch[T](nodeMatch: Jena#NodeMatch)(funANY: => T, funConcrete: Jena#Node => T): T =
-    if(nodeMatch == ANY)
+    if (nodeMatch == ANY)
       funANY
     else
       funConcrete(nodeMatch.asInstanceOf[JenaNode])
-
 
   def find(graph: Jena#Graph, subject: Jena#NodeMatch, predicate: Jena#NodeMatch, objectt: Jena#NodeMatch): Iterator[Jena#Triple] = {
     graph.jenaGraph.find(subject, predicate, objectt).asScala.toIterator

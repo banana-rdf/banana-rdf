@@ -10,49 +10,49 @@ case object WRITE extends RW
 
 object Command {
 
-  def create[Rdf <: RDF](uri: Rdf#URI): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Unit](Create(uri, Return[({type l[+x] = Command[Rdf, x]})#l, Unit](())))
+  def create[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Create(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
-  def append[Rdf <: RDF](uri: Rdf#URI, triples: Iterable[Rdf#Triple]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Unit](Append(uri, triples, Return[({type l[+x] = Command[Rdf, x]})#l, Unit](())))
+  def append[Rdf <: RDF](uri: Rdf#URI, triples: Iterable[Rdf#Triple]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Append(uri, triples, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
-  def remove[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Unit](Remove(uri, tripleMatches, Return[({type l[+x] = Command[Rdf, x]})#l, Unit](())))  
+  def remove[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Remove(uri, tripleMatches, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
-  def delete[Rdf <: RDF](uri: Rdf#URI): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Unit](Delete(uri, Return[({type l[+x] = Command[Rdf, x]})#l, Unit](())))  
+  def delete[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Delete(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
-  def patch[Rdf <: RDF](uri: Rdf#URI, deleteTripleMatches: Iterable[TripleMatch[Rdf]], insertTriples: Iterable[Rdf#Triple]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] =
+  def patch[Rdf <: RDF](uri: Rdf#URI, deleteTripleMatches: Iterable[TripleMatch[Rdf]], insertTriples: Iterable[Rdf#Triple]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     for {
       _ <- remove(uri, deleteTripleMatches)
       _ <- append(uri, insertTriples)
     } yield ()
 
-  def get[Rdf <: RDF](uri: Rdf#URI): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#Graph] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Rdf#Graph](
+  def get[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Graph] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Graph](
       Get(uri,
-          g => Return[({type l[+x] = Command[Rdf, x]})#l, Rdf#Graph](g)))
+        g => Return[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Graph](g)))
 
-  def select[Rdf <: RDF](query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#Solutions] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Rdf#Solutions](
+  def select[Rdf <: RDF](query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Free[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Solutions] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Solutions](
       Select(query,
-             bindings,
-             s => Return[({type l[+x] = Command[Rdf, x]})#l, Rdf#Solutions](s)))
+        bindings,
+        s => Return[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Solutions](s)))
 
-  def construct[Rdf <: RDF](query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#Graph] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Rdf#Graph](
+  def construct[Rdf <: RDF](query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): Free[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Graph] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Graph](
       Construct(query,
-                bindings,
-                g => Return[({type l[+x] = Command[Rdf, x]})#l, Rdf#Graph](g)))
+        bindings,
+        g => Return[({ type l[+x] = Command[Rdf, x] })#l, Rdf#Graph](g)))
 
-  def ask[Rdf <: RDF](query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Free[({type l[+x] = Command[Rdf, x]})#l, Boolean] =
-    Suspend[({type l[+x] = Command[Rdf, x]})#l, Boolean](
+  def ask[Rdf <: RDF](query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Free[({ type l[+x] = Command[Rdf, x] })#l, Boolean] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Boolean](
       Ask(query,
-          bindings,
-          b => Return[({type l[+x] = Command[Rdf, x]})#l, Boolean](b)))
+        bindings,
+        b => Return[({ type l[+x] = Command[Rdf, x] })#l, Boolean](b)))
 
-  implicit def ldcFunctor[Rdf <: RDF]: Functor[({type l[+x] = Command[Rdf, x]})#l] =
-    new Functor[({type l[+x] = Command[Rdf, x]})#l] {
+  implicit def ldcFunctor[Rdf <: RDF]: Functor[({ type l[+x] = Command[Rdf, x] })#l] =
+    new Functor[({ type l[+ x] = Command[Rdf, x] })#l] {
 
       def map[A, B](command: Command[Rdf, A])(f: A => B): Command[Rdf, B] =
         command match {
