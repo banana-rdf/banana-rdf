@@ -12,7 +12,7 @@ trait MapBinder[Rdf <: RDF] {
 
     val binder = implicitly[PointedGraphBinder[Rdf, List[(K, V)]]]
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, Map[K, V]] = binder.fromPointedGraph(pointed) map { l => Map() ++ l }
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[Map[K, V]] = binder.fromPointedGraph(pointed) map { l => Map() ++ l }
 
     def toPointedGraph(t: Map[K, V]): PointedGraph[Rdf] =
       binder.toPointedGraph(t.toList)

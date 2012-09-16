@@ -35,7 +35,7 @@ object SesameSPARQLOperations extends SPARQLOperations[Sesame] {
       case qa: Sesame#AskQuery => ask(qa)
     }
 
-  def getNode(solution: Sesame#Solution, v: String): Validation[BananaException, Sesame#Node] = {
+  def getNode(solution: Sesame#Solution, v: String): BananaValidation[Sesame#Node] = {
     val node = solution.getValue(v)
     if (node == null)
       Failure(VarNotFound("var " + v + " not found in BindingSet " + solution.toString))

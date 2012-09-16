@@ -7,7 +7,7 @@ trait ToURI[Rdf <: RDF, T] {
 }
 
 trait FromURI[Rdf <: RDF, T] {
-  def fromUri(uri: Rdf#URI): Validation[BananaException, T]
+  def fromUri(uri: Rdf#URI): BananaValidation[T]
 }
 
 trait URIBinder[Rdf <: RDF, T] extends FromURI[Rdf, T] with ToURI[Rdf, T]
@@ -25,7 +25,7 @@ object URIBinder {
   def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: URIBinder[Rdf, T]): NodeBinder[Rdf, T] =
     new NodeBinder[Rdf, T] {
 
-      def fromNode(node: Rdf#Node): Validation[BananaException, T] =
+      def fromNode(node: Rdf#Node): BananaValidation[T] =
         ops.foldNode(node)(
           uri => binder.fromUri(uri),
           bnode => Failure(FailedConversion(node + " is a BNode, not a URI")),
@@ -38,7 +38,7 @@ object URIBinder {
   def naturalBinder[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): URIBinder[Rdf, Rdf#URI] =
     new URIBinder[Rdf, Rdf#URI] {
 
-      def fromUri(uri: Rdf#URI): Validation[BananaException, Rdf#URI] = Success(uri)
+      def fromUri(uri: Rdf#URI): BananaValidation[Rdf#URI] = Success(uri)
 
       def toUri(t: Rdf#URI): Rdf#URI = t
 

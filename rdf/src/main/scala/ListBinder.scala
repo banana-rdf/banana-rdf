@@ -10,7 +10,7 @@ trait ListBinder[Rdf <: RDF] {
 
   implicit def ListBinder[T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, List[T]] = {
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[List[T]] = {
       import pointed.{ pointer, graph }
       var elems = List[T]()
       var current = pointer

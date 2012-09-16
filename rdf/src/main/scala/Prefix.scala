@@ -30,7 +30,7 @@ class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(i
       None
   }
 
-  def getLocalName(iri: Rdf#URI): Validation[BananaException, String] =
+  def getLocalName(iri: Rdf#URI): BananaValidation[String] =
     unapply(iri) match {
       case None => Failure(LocalNameException(this.toString + " couldn't extract localname for " + iri.toString))
       case Some(localname) => Success(localname)

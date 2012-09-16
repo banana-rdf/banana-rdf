@@ -10,7 +10,7 @@ trait TupleBinder[Rdf <: RDF] {
 
   implicit def Tuple2Binder[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): PointedGraphBinder[Rdf, (T1, T2)] = new PointedGraphBinder[Rdf, (T1, T2)] {
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, (T1, T2)] =
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[(T1, T2)] =
       for {
         t1 <- (pointed / rdf("_1")).as[T1]
         t2 <- (pointed / rdf("_2")).as[T2]
@@ -29,7 +29,7 @@ trait TupleBinder[Rdf <: RDF] {
     b2: PointedGraphBinder[Rdf, T2],
     b3: PointedGraphBinder[Rdf, T3]): PointedGraphBinder[Rdf, (T1, T2, T3)] = new PointedGraphBinder[Rdf, (T1, T2, T3)] {
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, (T1, T2, T3)] =
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[(T1, T2, T3)] =
       for {
         t1 <- (pointed / rdf("_1")).as[T1]
         t2 <- (pointed / rdf("_2")).as[T2]

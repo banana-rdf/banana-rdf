@@ -21,13 +21,13 @@ object JenaRDFReader {
 
       val serialization = jenaSyntax.value
 
-      def read(is: InputStream, base: String): Validation[BananaException, Jena#Graph] = WrappedThrowable.fromTryCatch {
+      def read(is: InputStream, base: String): BananaValidation[Jena#Graph] = WrappedThrowable.fromTryCatch {
         val model = ModelFactory.createDefaultModel()
         model.getReader(serialization).read(model, is, base)
         BareJenaGraph(model.getGraph)
       }
 
-      def read(reader: Reader, base: String): Validation[BananaException, Jena#Graph] = WrappedThrowable.fromTryCatch {
+      def read(reader: Reader, base: String): BananaValidation[Jena#Graph] = WrappedThrowable.fromTryCatch {
         val model = ModelFactory.createDefaultModel()
         model.getReader(serialization).read(model, reader, base)
         BareJenaGraph(model.getGraph)

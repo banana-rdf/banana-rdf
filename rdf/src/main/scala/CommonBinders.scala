@@ -12,7 +12,7 @@ trait CommonBinders[Rdf <: RDF] {
 
   implicit val StringLiteralBinder: TypedLiteralBinder[Rdf, String] = new TypedLiteralBinder[Rdf, String] {
 
-    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, String] = {
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): BananaValidation[String] = {
       val TypedLiteral(lexicalForm, datatype) = literal
       if (datatype == xsd.string)
         Success(lexicalForm)
@@ -36,7 +36,7 @@ trait CommonBinders[Rdf <: RDF] {
 
   implicit val BooleanLiteralBinder: TypedLiteralBinder[Rdf, Boolean] = new TypedLiteralBinder[Rdf, Boolean] {
 
-    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, Boolean] = {
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): BananaValidation[Boolean] = {
       val TypedLiteral(lexicalForm, datatype) = literal
       if (datatype == xsd.boolean)
         lexicalForm match {
@@ -55,7 +55,7 @@ trait CommonBinders[Rdf <: RDF] {
   // TODO: find a better datatype than xsd:string
   implicit val UUIDBinder: TypedLiteralBinder[Rdf, UUID] = new TypedLiteralBinder[Rdf, UUID] {
 
-    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, UUID] = {
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): BananaValidation[UUID] = {
       val TypedLiteral(lexicalForm, datatype) = literal
       if (datatype == xsd.string)
         try { Success(UUID.fromString(lexicalForm)) } catch { case _: IllegalArgumentException => Failure(FailedConversion(lexicalForm + " cannot be made a java.util.UUID")) }
@@ -69,7 +69,7 @@ trait CommonBinders[Rdf <: RDF] {
 
   implicit val IntBinder: TypedLiteralBinder[Rdf, Int] = new TypedLiteralBinder[Rdf, Int] {
 
-    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, Int] = {
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): BananaValidation[Int] = {
       val TypedLiteral(lexicalForm, datatype) = literal
       if (datatype == xsd.integer)
         Success(lexicalForm.toInt)
@@ -83,7 +83,7 @@ trait CommonBinders[Rdf <: RDF] {
 
   implicit val DoubleBinder: TypedLiteralBinder[Rdf, Double] = new TypedLiteralBinder[Rdf, Double] {
 
-    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, Double] = {
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): BananaValidation[Double] = {
       val TypedLiteral(lexicalForm, datatype) = literal
       if (datatype == xsd.double)
         Success(lexicalForm.toDouble)
@@ -97,7 +97,7 @@ trait CommonBinders[Rdf <: RDF] {
 
   implicit val DateTimeBinder: TypedLiteralBinder[Rdf, DateTime] = new TypedLiteralBinder[Rdf, DateTime] {
 
-    def fromTypedLiteral(literal: Rdf#TypedLiteral): Validation[BananaException, DateTime] = {
+    def fromTypedLiteral(literal: Rdf#TypedLiteral): BananaValidation[DateTime] = {
       val TypedLiteral(lexicalForm, datatype) = literal
       if (datatype == xsd.dateTime)
         try {

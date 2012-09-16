@@ -20,10 +20,10 @@ class JenaBasedWriter[Rdf <: RDF, SyntaxType](val ops: RDFOperations[Rdf])(impli
 
   private val MtoJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
 
-  def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] =
+  def write(graph: Rdf#Graph, os: OutputStream, base: String): BananaValidation[Unit] =
     graphWriter.write(MtoJena.transform(graph), os, base)
 
-  def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit] =
+  def write(graph: Rdf#Graph, writer: Writer, base: String): BananaValidation[Unit] =
     graphWriter.write(MtoJena.transform(graph), writer, base)
 
   def syntax[S >: SyntaxType] = syntaxTp

@@ -10,7 +10,7 @@ object SPARQLSolutionSyntax {
 
 class SPARQLSolutionSyntax[Rdf <: RDF](solution: Rdf#Solution)(implicit sparqlOps: SPARQLOperations[Rdf]) {
 
-  def apply(v: String): Validation[BananaException, Rdf#Node] =
+  def apply(v: String): BananaValidation[Rdf#Node] =
     sparqlOps.getNode(solution, v)
 
   def vars: Set[String] = sparqlOps.varnames(solution)

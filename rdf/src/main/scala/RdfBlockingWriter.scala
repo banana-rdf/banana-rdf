@@ -13,15 +13,15 @@ import scalaz.Validation
  */
 trait RDFBlockingWriter[Rdf <: RDF, +SyntaxType] extends BlockingWriter[Rdf#Graph, SyntaxType] {
 
-  def write(graph: Rdf#Graph, os: OutputStream, base: String): Validation[BananaException, Unit]
-  def write(graph: Rdf#Graph, writer: Writer, base: String): Validation[BananaException, Unit]
-  def write(graph: Rdf#Graph, file: File, base: String): Validation[BananaException, Unit] =
+  def write(graph: Rdf#Graph, os: OutputStream, base: String): BananaValidation[Unit]
+  def write(graph: Rdf#Graph, writer: Writer, base: String): BananaValidation[Unit]
+  def write(graph: Rdf#Graph, file: File, base: String): BananaValidation[Unit] =
     for {
       fos <- WrappedThrowable.fromTryCatch { new BufferedOutputStream(new FileOutputStream(file)) }
       result <- write(graph, fos, base)
     } yield result
 
-  def asString(graph: Rdf#Graph, base: String): Validation[BananaException, String] = {
+  def asString(graph: Rdf#Graph, base: String): BananaValidation[String] = {
     val stringWriter = new StringWriter
     write(graph, stringWriter, base).map(_ => stringWriter.toString)
   }

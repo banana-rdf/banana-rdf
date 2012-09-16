@@ -12,7 +12,7 @@ trait OptionBinder[Rdf <: RDF] {
 
     val listBinder = implicitly[PointedGraphBinder[Rdf, List[T]]]
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, Option[T]] = {
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[Option[T]] = {
       listBinder.fromPointedGraph(pointed) map { _.headOption }
     }
 

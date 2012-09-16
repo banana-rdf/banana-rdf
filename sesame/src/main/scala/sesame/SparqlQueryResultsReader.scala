@@ -39,7 +39,7 @@ object SparqlQueryResultsReader {
         parse(bytes)
       }
 
-      def parse(bytes: Array[Byte]): Validation[BananaException, Either[Sesame#Solutions, Boolean]] = {
+      def parse(bytes: Array[Byte]): BananaValidation[Either[Sesame#Solutions, Boolean]] = {
         WrappedThrowable.fromTryCatch {
           try {
             val parsed = QueryResultIO.parse(new ByteArrayInputStream(bytes),

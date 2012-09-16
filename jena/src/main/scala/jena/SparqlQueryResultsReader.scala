@@ -17,7 +17,7 @@ object SparqlQueryResultsReader {
   def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[Jena, Syntax] =
     new SparqlQueryResultsReader[Jena, Syntax] {
 
-      def read(in: InputStream, base: String = ""): Validation[BananaException, Answer] =
+      def read(in: InputStream, base: String = ""): BananaValidation[Answer] =
         WrappedThrowable.fromTryCatch {
           val resultSet = jenaSparqlSyntax.parse(in)
           if (resultSet.isBoolean) {

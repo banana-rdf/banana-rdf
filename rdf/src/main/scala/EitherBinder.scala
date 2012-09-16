@@ -10,7 +10,7 @@ trait EitherBinder[Rdf <: RDF] {
 
   implicit def EitherBinder[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): PointedGraphBinder[Rdf, Either[T1, T2]] = new PointedGraphBinder[Rdf, Either[T1, T2]] {
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, Either[T1, T2]] = {
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[Either[T1, T2]] = {
       if (pointed isA rdf("Left"))
         (pointed / rdf("left")).as[T1] flatMap (v => Success(Left(v)))
       else if (pointed isA rdf("Right"))

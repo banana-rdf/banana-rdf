@@ -33,7 +33,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
     // not sure if this could be made more general, nor if we actually want to do that
     implicit val binder: PointedGraphBinder[Rdf, Address] = new PointedGraphBinder[Rdf, Address] {
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, Address] =
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[Address] =
         Unknown.binder.fromPointedGraph(pointed) orElse VerifiedAddress.binder.fromPointedGraph(pointed)
 
       def toPointedGraph(address: Address): PointedGraph[Rdf] = address match {

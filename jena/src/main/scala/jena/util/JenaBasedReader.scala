@@ -21,10 +21,10 @@ class JenaBasedReader[Rdf <: RDF, SyntaxType](val ops: RDFOperations[Rdf])(impli
 
   private val jenaToM = new RDFTransformer[Jena, Rdf](JenaOperations, ops)
 
-  def read(is: InputStream, base: String): Validation[BananaException, Rdf#Graph] =
+  def read(is: InputStream, base: String): BananaValidation[Rdf#Graph] =
     graphReader.read(is, base) map jenaToM.transform
 
-  def read(reader: Reader, base: String): Validation[BananaException, Rdf#Graph] =
+  def read(reader: Reader, base: String): BananaValidation[Rdf#Graph] =
     graphReader.read(reader, base) map jenaToM.transform
 
 }

@@ -20,23 +20,23 @@ object RDFReader {
 }
 
 trait BlockingReader[Result, +SyntaxType] {
-  def read(is: InputStream, base: String): Validation[BananaException, Result]
+  def read(is: InputStream, base: String): BananaValidation[Result]
 
-  def read(reader: java.io.Reader, base: String): Validation[BananaException, Result]
+  def read(reader: java.io.Reader, base: String): BananaValidation[Result]
 
-  def read(file: File, base: String): Validation[BananaException, Result] =
+  def read(file: File, base: String): BananaValidation[Result] =
     for {
       fis <- WrappedThrowable.fromTryCatch { new BufferedInputStream(new FileInputStream(file)) }
       graph <- read(fis, base)
     } yield graph
 
-  def read(file: File, base: String, encoding: String): Validation[BananaException, Result] =
+  def read(file: File, base: String, encoding: String): BananaValidation[Result] =
     for {
       fis <- WrappedThrowable.fromTryCatch { new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), encoding) }
       graph <- read(fis, base)
     } yield graph
 
-  def read(s: String, base: String): Validation[BananaException, Result] = {
+  def read(s: String, base: String): BananaValidation[Result] = {
     val reader = new StringReader(s)
     read(reader, base)
   }

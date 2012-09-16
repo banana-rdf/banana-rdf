@@ -8,7 +8,7 @@ object BananaException {
 
   implicit val bananaExceptionSemiGroup = firstSemigroup[BananaException]
 
-  def bananaCatch[T](a: => T): Validation[BananaException, T] = try {
+  def bananaCatch[T](a: => T): BananaValidation[T] = try {
     Success(a)
   } catch {
     case e => Failure(StoreProblem(e))

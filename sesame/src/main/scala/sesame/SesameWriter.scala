@@ -17,7 +17,7 @@ object SesameWriter {
     syntaxTp: Syntax[SyntaxType]): RDFBlockingWriter[Sesame, SyntaxType] =
     new RDFBlockingWriter[Sesame, SyntaxType] {
 
-      private def write(graph: Sesame#Graph, rdfWriter: RDFWriter, base: String): Validation[BananaException, Unit] =
+      private def write(graph: Sesame#Graph, rdfWriter: RDFWriter, base: String): BananaValidation[Unit] =
         WrappedThrowable.fromTryCatch {
           rdfWriter.startRDF()
           graph.toIterable foreach rdfWriter.handleStatement
@@ -26,7 +26,7 @@ object SesameWriter {
 
       def syntax[S >: SyntaxType] = syntaxTp
 
-      def write(graph: Sesame#Graph, os: OutputStream, base: String): Validation[BananaException, Unit] =
+      def write(graph: Sesame#Graph, os: OutputStream, base: String): BananaValidation[Unit] =
         for {
           rdfWriter <- WrappedThrowable.fromTryCatch {
             sesameSyntax.rdfWriter(os, base)
@@ -34,7 +34,7 @@ object SesameWriter {
           result <- write(graph, rdfWriter, base)
         } yield result
 
-      def write(graph: Sesame#Graph, writer: Writer, base: String): Validation[BananaException, Unit] =
+      def write(graph: Sesame#Graph, writer: Writer, base: String): BananaValidation[Unit] =
         for {
           rdfWriter <- WrappedThrowable.fromTryCatch {
             sesameSyntax.rdfWriter(writer, base)

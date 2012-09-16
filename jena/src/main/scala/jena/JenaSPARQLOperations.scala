@@ -31,7 +31,7 @@ object JenaSPARQLOperations extends SPARQLOperations[Jena] {
       case JenaQuery.QueryTypeAsk => ask(query)
     }
 
-  def getNode(solution: Jena#Solution, v: String): Validation[BananaException, Jena#Node] = {
+  def getNode(solution: Jena#Solution, v: String): BananaValidation[Jena#Node] = {
     val node: RDFNode = solution.get(v)
     if (node == null)
       Failure(VarNotFound("var " + v + " not found in QuerySolution " + solution.toString))

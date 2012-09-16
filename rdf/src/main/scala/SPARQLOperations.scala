@@ -29,7 +29,7 @@ trait SPARQLOperations[Rdf <: RDF] {
     construct: Rdf#ConstructQuery => T,
     ask: Rdf#AskQuery => T): T
 
-  def getNode(solution: Rdf#Solution, v: String): Validation[BananaException, Rdf#Node]
+  def getNode(solution: Rdf#Solution, v: String): BananaValidation[Rdf#Node]
 
   def varnames(solution: Rdf#Solution): Set[String]
 

@@ -43,10 +43,10 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
 
     import pointed.graph
 
-    def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
+    def as[T](implicit binder: PointedGraphBinder[Rdf, T]): BananaValidation[T] =
       binder.fromPointedGraph(pointed)
 
-    def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, (T1, T2)] =
+    def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): BananaValidation[(T1, T2)] =
       ^[BananaValidation, T1, T2, (T1, T2)](b1.fromPointedGraph(pointed), b2.fromPointedGraph(pointed))(Tuple2.apply)
 
     def a(clazz: Rdf#URI): PointedGraph[Rdf] = {
@@ -90,7 +90,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       new PointedGraphs(ns, graph)
     }
 
-    def takeOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
+    def takeOnePointedGraph: BananaValidation[PointedGraph[Rdf]] = {
       val it = nodes.iterator
       if (!it.hasNext) {
         Failure(WrongExpectation("expected exactly one node but got 0"))
@@ -100,10 +100,10 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       }
     }
 
-    def exactlyOneAs[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
+    def exactlyOneAs[T](implicit binder: PointedGraphBinder[Rdf, T]): BananaValidation[T] =
       exactlyOnePointedGraph flatMap (_.as[T])
 
-    def exactlyOnePointedGraph: Validation[BananaException, PointedGraph[Rdf]] = {
+    def exactlyOnePointedGraph: BananaValidation[PointedGraph[Rdf]] = {
       val it = nodes.iterator
       if (!it.hasNext) {
         Failure(WrongExpectation("expected exactly one node but got 0"))
@@ -116,10 +116,10 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
       }
     }
 
-    def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, T] =
+    def as[T](implicit binder: PointedGraphBinder[Rdf, T]): BananaValidation[T] =
       takeOnePointedGraph flatMap (_.as[T])
 
-    def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, (T1, T2)] =
+    def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): BananaValidation[(T1, T2)] =
       takeOnePointedGraph flatMap { _.as2[T1, T2] }
 
     /**
@@ -128,12 +128,12 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
      *
      * note: this is very different from as[Option[T]], which is an encoding of an Option in RDF
      */
-    def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Option[T]] = headOption match {
+    def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): BananaValidation[Option[T]] = headOption match {
       case None => Success(None)
       case Some(pointed) => pointed.as[T] map (Some(_))
     }
 
-    def asOption2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, Option[(T1, T2)]] = headOption match {
+    def asOption2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): BananaValidation[Option[(T1, T2)]] = headOption match {
       case None => Success(None)
       case Some(pointed) => ^[BananaValidation, T1, T2, (T1, T2)](pointed.as[T1], pointed.as[T2])(Tuple2.apply) map { Some(_) }
     }
@@ -145,10 +145,10 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
      *
      * note: this is very different from as[List[T]], which is an encoding of a List in RDF
      */
-    def asSet[T](implicit binder: PointedGraphBinder[Rdf, T]): Validation[BananaException, Set[T]] =
+    def asSet[T](implicit binder: PointedGraphBinder[Rdf, T]): BananaValidation[Set[T]] =
       this.iterator.toList.map(_.as[T]).sequence[BananaValidation, T].map(_.toSet)
 
-    def asSet2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Validation[BananaException, Set[(T1, T2)]] =
+    def asSet2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): BananaValidation[Set[(T1, T2)]] =
       this.iterator.toList.map { pg => ^[BananaValidation, T1, T2, (T1, T2)](pg.as[T1], pg.as[T2])(Tuple2.apply) }.sequence[BananaValidation, (T1, T2)].map(_.toSet)
 
   }
@@ -230,7 +230,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
 
   implicit val PGBPointedGraphBinder: PointedGraphBinder[Rdf, PointedGraph[Rdf]] =
     new PointedGraphBinder[Rdf, PointedGraph[Rdf]] {
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): Validation[BananaException, PointedGraph[Rdf]] = Success(pointed)
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[PointedGraph[Rdf]] = Success(pointed)
       def toPointedGraph(t: PointedGraph[Rdf]): PointedGraph[Rdf] = t
     }
 

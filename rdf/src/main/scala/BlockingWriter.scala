@@ -11,9 +11,9 @@ import scalaz.Validation
  * @tparam SyntaxType The syntax type that it is serialised to.
  */
 trait BlockingWriter[ObjectType, +SyntaxType] {
-  def write(input: ObjectType, os: OutputStream, base: String): Validation[BananaException, Unit]
+  def write(input: ObjectType, os: OutputStream, base: String): BananaValidation[Unit]
 
-  def write(input: ObjectType, writer: Writer, base: String): Validation[BananaException, Unit]
+  def write(input: ObjectType, writer: Writer, base: String): BananaValidation[Unit]
 
   def syntax[S >: SyntaxType]: Syntax[S]
 }

@@ -60,7 +60,7 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) /*extends Akk
   def failMap[G](func: F => G): FutureValidation[G, S] =
     FutureValidation(inner map { validation => validation.fold(f => Failure(func(f)), s => Success(s)) })
 
-  def await(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException): Validation[BananaException, S] =
+  def await(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException): BananaValidation[S] =
     try {
       val bf = this.failMap(ev)
       Await.result(bf.inner, duration)
