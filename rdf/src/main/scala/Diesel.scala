@@ -11,17 +11,7 @@ object Diesel {
 }
 
 class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
-    extends syntax.RDFOpsSyntax[Rdf]
-    with GraphUtil[Rdf]
-    with TripleUtil[Rdf]
-    with syntax.GraphSyntax[Rdf]
-    with syntax.NodeSyntax[Rdf]
-    with syntax.URISyntax[Rdf]
-    with syntax.LiteralSyntax[Rdf]
-    with syntax.TypedLiteralSyntax[Rdf]
-    with syntax.LangLiteralSyntax[Rdf]
-    with syntax.StringSyntax[Rdf]
-    with syntax.AnySyntax[Rdf]
+    extends syntax.RDFSyntax[Rdf]
     with CommonBinders[Rdf]
     with ListBinder[Rdf]
     with OptionBinder[Rdf]

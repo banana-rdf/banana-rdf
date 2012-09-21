@@ -7,7 +7,7 @@ package org.w3.banana
  * But with the  notable exceptions:
  *   - we allow literals in subject position
  */
-trait RDFOps[Rdf <: RDF] {
+trait RDFOps[Rdf <: RDF] extends RDFDSL[Rdf] {
 
   // graph
 

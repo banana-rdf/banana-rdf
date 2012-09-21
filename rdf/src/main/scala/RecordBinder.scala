@@ -69,7 +69,7 @@ trait RecordBinder[Rdf <: RDF] {
       (pointed / predicate).asSet[T]
   }
 
-  def newUri(prefix: String): Rdf#URI = uri(prefix + java.util.UUID.randomUUID().toString)
+  def newUri(prefix: String): Rdf#URI = URI(prefix + java.util.UUID.randomUUID().toString)
 
   /**
    * combine PointedGraphBinder elements and apply/unapply functions to build binders

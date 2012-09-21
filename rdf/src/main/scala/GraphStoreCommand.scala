@@ -31,7 +31,7 @@ object Command {
   }
 
   def POST[Rdf <: RDF](uri: Rdf#URI, pointed: PointedGraph[Rdf])(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
-    import diesel.{ uri => _, _ }
+    import diesel._
     import ops._
     val docUri = uri.fragmentLess
     Command.append(docUri, graphToIterable(pointed.graph.resolveAgainst(docUri)))
@@ -45,7 +45,7 @@ object Command {
   }
 
   def PATCH[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]] /*, TODO insertTriples: Iterable[Rdf#Triple]*/)(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
-    import diesel.{ uri => _, _ }
+    import diesel._
     val docUri = uri.fragmentLess
     val deletePattern = tripleMatches map { case (s, p, o) => (resolveAgainst(s, docUri), resolveAgainst(p, docUri), resolveAgainst(o, docUri)) }
     Command.patch(docUri, deletePattern, List.empty)

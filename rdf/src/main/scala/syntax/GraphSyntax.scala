@@ -3,7 +3,8 @@ package org.w3.banana.syntax
 import org.w3.banana._
 
 trait GraphSyntax[Rdf <: RDF] {
-  this: RDFOpsSyntax[Rdf] =>
+
+  def ops: RDFOps[Rdf]
 
   implicit def graphWrapper(graph: Rdf#Graph): GraphW = new GraphW(graph)
 
@@ -23,9 +24,9 @@ trait GraphSyntax[Rdf <: RDF] {
       var triples = Set[Rdf#Triple]()
       val it = this.toIterable.iterator
       while (it.hasNext) {
-        val Triple(s, p, o) = it.next()
+        val ops.Triple(s, p, o) = it.next()
         // question: what about predicates?
-        triples += Triple(nodefunc(s), urifunc(p), nodefunc(o))
+        triples += ops.Triple(nodefunc(s), urifunc(p), nodefunc(o))
       }
       ops.makeGraph(triples)
     }
