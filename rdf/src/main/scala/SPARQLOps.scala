@@ -2,7 +2,7 @@ package org.w3.banana
 
 import scalaz.Validation
 
-trait SPARQLOperations[Rdf <: RDF] {
+trait SPARQLOps[Rdf <: RDF] {
 
   def SelectQuery(query: String): Rdf#SelectQuery
 

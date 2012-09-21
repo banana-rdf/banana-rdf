@@ -7,11 +7,11 @@ import NodeBinder._
 import org.w3.banana.util._
 
 object Diesel {
-  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): Diesel[Rdf] = new Diesel()(ops)
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]): Diesel[Rdf] = new Diesel()(ops)
 }
 
-class Diesel[Rdf <: RDF]()(implicit val ops: RDFOperations[Rdf])
-    extends syntax.RDFOperationsSyntax[Rdf]
+class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
+    extends syntax.RDFOpsSyntax[Rdf]
     with GraphUtil[Rdf]
     with TripleUtil[Rdf]
     with syntax.GraphSyntax[Rdf]

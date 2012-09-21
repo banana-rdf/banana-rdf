@@ -9,7 +9,7 @@ trait LiteralBinder[Rdf <: RDF, T] {
 
 object LiteralBinder {
 
-  implicit def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: LiteralBinder[Rdf, T]): NodeBinder[Rdf, T] =
+  implicit def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], binder: LiteralBinder[Rdf, T]): NodeBinder[Rdf, T] =
     new NodeBinder[Rdf, T] {
 
       def fromNode(node: Rdf#Node): BananaValidation[T] =
@@ -22,7 +22,7 @@ object LiteralBinder {
       def toNode(t: T): Rdf#Node = binder.toLiteral(t)
     }
 
-  def naturalBinder[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): LiteralBinder[Rdf, Rdf#Literal] =
+  def naturalBinder[Rdf <: RDF](implicit ops: RDFOps[Rdf]): LiteralBinder[Rdf, Rdf#Literal] =
     new LiteralBinder[Rdf, Rdf#Literal] {
 
       def fromLiteral(literal: Rdf#Literal): BananaValidation[Rdf#Literal] =

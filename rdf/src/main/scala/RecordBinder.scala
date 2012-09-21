@@ -93,7 +93,7 @@ trait RecordBinder[Rdf <: RDF] {
 
     def makeSubject(): Rdf#URI
 
-    def make(pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOperations[Rdf]): PointedGraph[Rdf] = {
+    def make(pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
       val subject = makeSubject()
       var triples: Set[Rdf#Triple] = Set.empty
       for (po <- pos.toIterable.flatten) {

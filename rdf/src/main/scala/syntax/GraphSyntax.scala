@@ -3,7 +3,7 @@ package org.w3.banana.syntax
 import org.w3.banana._
 
 trait GraphSyntax[Rdf <: RDF] {
-  this: RDFOperationsSyntax[Rdf] =>
+  this: RDFOpsSyntax[Rdf] =>
 
   implicit def graphWrapper(graph: Rdf#Graph): GraphW = new GraphW(graph)
 

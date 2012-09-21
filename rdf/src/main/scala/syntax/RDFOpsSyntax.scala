@@ -2,9 +2,9 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait RDFOperationsSyntax[Rdf <: RDF] {
+trait RDFOpsSyntax[Rdf <: RDF] {
 
-  def ops: RDFOperations[Rdf]
+  def ops: RDFOps[Rdf]
 
   // graph
 

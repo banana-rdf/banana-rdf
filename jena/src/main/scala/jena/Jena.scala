@@ -32,11 +32,11 @@ trait Jena extends RDF {
 
 object Jena {
 
-  implicit val ops: RDFOperations[Jena] = JenaOperations
+  implicit val ops: RDFOps[Jena] = JenaOperations
 
   implicit val diesel: Diesel[Jena] = JenaDiesel
 
-  implicit val sparqlOps: SPARQLOperations[Jena] = JenaSPARQLOperations
+  implicit val sparqlOps: SPARQLOps[Jena] = JenaSPARQLOps
 
   implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphSPARQLEngine
 

@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 
 import SesamePrefix._
 
-object SesameOperations extends RDFOperations[Sesame] {
+object SesameOperations extends RDFOps[Sesame] {
 
   val valueFactory: ValueFactory = ValueFactoryImpl.getInstance()
 

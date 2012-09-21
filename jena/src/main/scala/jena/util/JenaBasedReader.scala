@@ -16,7 +16,7 @@ import scalaz.Validation
  * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
  *                     for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-class JenaBasedReader[Rdf <: RDF, SyntaxType](val ops: RDFOperations[Rdf])(implicit graphReader: RDFReader[Jena, SyntaxType])
+class JenaBasedReader[Rdf <: RDF, SyntaxType](val ops: RDFOps[Rdf])(implicit graphReader: RDFReader[Jena, SyntaxType])
     extends RDFReader[Rdf, Turtle] {
 
   private val jenaToM = new RDFTransformer[Jena, Rdf](JenaOperations, ops)

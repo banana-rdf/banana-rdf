@@ -7,7 +7,7 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter
 class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     implicit diesel: Diesel[Rdf],
     reader: BlockingReader[Rdf#Graph, RDFXML],
-    sparqlOperations: SPARQLOperations[Rdf],
+    sparqlOperations: SPARQLOps[Rdf],
     graphQuery: RDFGraphQuery[Rdf],
     sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {

@@ -10,11 +10,11 @@ trait Prefix[Rdf <: RDF] {
 }
 
 object Prefix {
-  def apply[Rdf <: RDF](prefixName: String, prefixIri: String)(implicit ops: RDFOperations[Rdf]) =
+  def apply[Rdf <: RDF](prefixName: String, prefixIri: String)(implicit ops: RDFOps[Rdf]) =
     new PrefixBuilder(prefixName, prefixIri)(ops)
 }
 
-class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(implicit ops: RDFOperations[Rdf]) extends Prefix[Rdf] {
+class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(implicit ops: RDFOps[Rdf]) extends Prefix[Rdf] {
 
   import ops._
 
@@ -39,10 +39,10 @@ class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(i
 }
 
 object RDFPrefix {
-  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf]) = new RDFPrefix(ops)
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new RDFPrefix(ops)
 }
 
-class RDFPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")(ops) {
+class RDFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")(ops) {
   val langString = apply("langString")
   val typ = apply("type")
   val first = apply("first")
@@ -51,10 +51,10 @@ class RDFPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("rdf"
 }
 
 object XSDPrefix {
-  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf]) = new XSDPrefix[Rdf](ops)
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new XSDPrefix[Rdf](ops)
 }
 
-class XSDPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("xsd", "http://www.w3.org/2001/XMLSchema#")(ops) {
+class XSDPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("xsd", "http://www.w3.org/2001/XMLSchema#")(ops) {
   import ops._
 
   val string = apply("string")
@@ -69,18 +69,18 @@ class XSDPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("xsd"
 }
 
 object DCPrefix {
-  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf]) = new DCPrefix(ops)
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new DCPrefix(ops)
 }
 
-class DCPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/elements/1.1/")(ops) {
+class DCPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/elements/1.1/")(ops) {
 
 }
 
 object FOAFPrefix {
-  def apply[Rdf <: RDF](implicit ops: RDFOperations[Rdf]) = new FOAFPrefix(ops)
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FOAFPrefix(ops)
 }
 
-class FOAFPrefix[Rdf <: RDF](ops: RDFOperations[Rdf]) extends PrefixBuilder("foaf", "http://xmlns.com/foaf/0.1/")(ops) {
+class FOAFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("foaf", "http://xmlns.com/foaf/0.1/")(ops) {
   val name = apply("name")
   val title = apply("title")
   val knows = apply("knows")

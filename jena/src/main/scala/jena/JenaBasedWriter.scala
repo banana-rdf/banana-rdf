@@ -14,7 +14,7 @@ import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, XMLOutput }
  * @param graphWriter picks  up a graphWriter for the syntaxType desired
  * @tparam Rdf the rdf implementation of the given graph
  */
-class JenaBasedWriter[Rdf <: RDF, SyntaxType](val ops: RDFOperations[Rdf])(implicit graphWriter: RDFBlockingWriter[Jena, SyntaxType],
+class JenaBasedWriter[Rdf <: RDF, SyntaxType](val ops: RDFOps[Rdf])(implicit graphWriter: RDFBlockingWriter[Jena, SyntaxType],
   syntaxTp: Syntax[SyntaxType])
     extends RDFBlockingWriter[Rdf, SyntaxType] {
 

@@ -12,7 +12,7 @@ class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf, BananaFuture])(
     implicit reader: BlockingReader[Rdf#Graph, RDFXML],
     diesel: Diesel[Rdf],
-    sparqlOps: SPARQLOperations[Rdf])
+    sparqlOps: SPARQLOps[Rdf])
     extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._

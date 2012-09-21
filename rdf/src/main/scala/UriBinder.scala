@@ -22,7 +22,7 @@ object URIBinder {
 
   implicit def toURIBinderW[Rdf <: RDF, T](binder: URIBinder[Rdf, T]) = new URIBinderW[Rdf, T](binder)
 
-  def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: URIBinder[Rdf, T]): NodeBinder[Rdf, T] =
+  def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], binder: URIBinder[Rdf, T]): NodeBinder[Rdf, T] =
     new NodeBinder[Rdf, T] {
 
       def fromNode(node: Rdf#Node): BananaValidation[T] =
@@ -35,7 +35,7 @@ object URIBinder {
       def toNode(t: T): Rdf#Node = binder.toUri(t)
     }
 
-  def naturalBinder[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): URIBinder[Rdf, Rdf#URI] =
+  def naturalBinder[Rdf <: RDF](implicit ops: RDFOps[Rdf]): URIBinder[Rdf, Rdf#URI] =
     new URIBinder[Rdf, Rdf#URI] {
 
       def fromUri(uri: Rdf#URI): BananaValidation[Rdf#URI] = Success(uri)

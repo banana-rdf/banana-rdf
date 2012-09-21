@@ -17,7 +17,7 @@ trait GraphStore[Rdf <: RDF, M[_]] {
 
 object GraphStore {
 
-  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M])(implicit ops: RDFOperations[Rdf]): GraphStore[Rdf, M] = new GraphStore[Rdf, M] {
+  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M])(implicit ops: RDFOps[Rdf]): GraphStore[Rdf, M] = new GraphStore[Rdf, M] {
 
     def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): M[Unit] =
       store.execute(Command.append(uri, ops.graphToIterable(graph)))

@@ -10,7 +10,7 @@ import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
 import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
 
-object JenaOperations extends RDFOperations[Jena] {
+object JenaOperations extends RDFOps[Jena] {
 
   // graph
 

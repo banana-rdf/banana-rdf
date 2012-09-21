@@ -4,7 +4,7 @@ import org.w3.banana._
 import java.net.{ URI => jURI }
 
 trait URISyntax[Rdf <: RDF] {
-  this: RDFOperationsSyntax[Rdf] =>
+  this: RDFOpsSyntax[Rdf] =>
 
   implicit def uriWrapper(uri: Rdf#URI): URIW = new URIW(uri)
 

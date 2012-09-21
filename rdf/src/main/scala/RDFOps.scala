@@ -5,9 +5,9 @@ package org.w3.banana
  * Closely based on
  *   http://dvcs.w3.org/hg/rdf/raw-file/default/rdf-concepts/index.html
  * But with the  notable exceptions:
- *   - we allow literals in subject position - for help later in reasoning.
+ *   - we allow literals in subject position
  */
-trait RDFOperations[Rdf <: RDF] {
+trait RDFOps[Rdf <: RDF] {
 
   // graph
 

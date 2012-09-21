@@ -9,7 +9,7 @@ trait LangLiteralBinder[Rdf <: RDF, T] {
 
 object LangLiteralBinder {
 
-  def toLiteralBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: LangLiteralBinder[Rdf, T]): LiteralBinder[Rdf, T] =
+  def toLiteralBinder[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], binder: LangLiteralBinder[Rdf, T]): LiteralBinder[Rdf, T] =
     new LiteralBinder[Rdf, T] {
 
       def fromLiteral(literal: Rdf#Literal): BananaValidation[T] =

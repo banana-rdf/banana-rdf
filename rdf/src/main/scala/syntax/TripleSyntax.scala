@@ -4,7 +4,7 @@ import org.w3.banana._
 
 trait TripleSyntax[Rdf <: RDF] {
 
-  def ops: RDFOperations[Rdf]
+  def ops: RDFOps[Rdf]
 
   implicit def tripleWrapper(triple: Rdf#Triple): TripleW = new TripleW(triple)
 

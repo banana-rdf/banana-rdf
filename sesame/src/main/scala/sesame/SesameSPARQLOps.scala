@@ -7,7 +7,7 @@ import scalaz.{ Failure, Success, Validation }
 import org.openrdf.query.MalformedQueryException
 import scala.collection.JavaConverters._
 
-object SesameSPARQLOperations extends SPARQLOperations[Sesame] {
+object SesameSPARQLOps extends SPARQLOps[Sesame] {
 
   private val p = new SPARQLParserFactory().getParser()
 

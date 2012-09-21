@@ -9,7 +9,7 @@ trait NodeBinder[Rdf <: RDF, T] {
 
 object NodeBinder {
 
-  def toPointedGraphBinder[Rdf <: RDF, T](implicit ops: RDFOperations[Rdf], binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
+  def toPointedGraphBinder[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
     new PointedGraphBinder[Rdf, T] {
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] =
@@ -18,7 +18,7 @@ object NodeBinder {
       def toPointedGraph(t: T): PointedGraph[Rdf] = PointedGraph(binder.toNode(t))
     }
 
-  def naturalBinder[Rdf <: RDF](implicit ops: RDFOperations[Rdf]): NodeBinder[Rdf, Rdf#Node] =
+  def naturalBinder[Rdf <: RDF](implicit ops: RDFOps[Rdf]): NodeBinder[Rdf, Rdf#Node] =
     new NodeBinder[Rdf, Rdf#Node] {
 
       def fromNode(node: Rdf#Node): BananaValidation[Rdf#Node] =
