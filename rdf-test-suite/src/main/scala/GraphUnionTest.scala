@@ -10,31 +10,31 @@ abstract class GraphUnionTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
   import ops._
 
   val foo = (
-    uri("http://example.com/foo")
+    URI("http://example.com/foo")
     -- rdf("foo") ->- "foo"
     -- rdf("bar") ->- "bar"
   ).graph
 
   val fooReference = (
-    uri("http://example.com/foo")
+    URI("http://example.com/foo")
     -- rdf("foo") ->- "foo"
     -- rdf("bar") ->- "bar"
   ).graph
 
   val bar = (
-    uri("http://example.com/foo")
+    URI("http://example.com/foo")
     -- rdf("bar") ->- "bar"
     -- rdf("baz") ->- "baz"
   ).graph
 
   val barReference = (
-    uri("http://example.com/foo")
+    URI("http://example.com/foo")
     -- rdf("bar") ->- "bar"
     -- rdf("baz") ->- "baz"
   ).graph
 
   val foobar = (
-    uri("http://example.com/foo")
+    URI("http://example.com/foo")
     -- rdf("foo") ->- "foo"
     -- rdf("bar") ->- "bar"
     -- rdf("baz") ->- "baz"

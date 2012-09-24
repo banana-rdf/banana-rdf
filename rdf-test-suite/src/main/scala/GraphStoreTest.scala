@@ -31,21 +31,21 @@ class GraphStoreTest[Rdf <: RDF](
     bnode("betehess")
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.knows ->- (
-      uri("http://bblfish.net/#hjs")
+      URI("http://bblfish.net/#hjs")
       -- foaf.name ->- "Henry Story"
-      -- foaf.currentProject ->- uri("http://webid.info/")
+      -- foaf.currentProject ->- URI("http://webid.info/")
     )
   ).graph
 
   val foo: Rdf#Graph = (
-    uri("http://example.com/foo")
+    URI("http://example.com/foo")
     -- rdf("foo") ->- "foo"
     -- rdf("bar") ->- "bar"
   ).graph
 
   "getNamedGraph should retrieve the graph added with appendToGraph" in {
-    val u1 = uri("http://example.com/graph")
-    val u2 = uri("http://example.com/graph2")
+    val u1 = URI("http://example.com/graph")
+    val u2 = URI("http://example.com/graph2")
     val r = for {
       _ <- graphStore.removeGraph(u1)
       _ <- graphStore.removeGraph(u2)
@@ -61,7 +61,7 @@ class GraphStoreTest[Rdf <: RDF](
   }
 
   "appendToGraph should be equivalent to graph union" in {
-    val u = uri("http://example.com/graph")
+    val u = URI("http://example.com/graph")
     val r = for {
       _ <- graphStore.removeGraph(u)
       _ <- graphStore.appendToGraph(u, graph)
@@ -74,17 +74,17 @@ class GraphStoreTest[Rdf <: RDF](
   }
 
   "patchGraph should delete and insert triples as expected" in {
-    val u = uri("http://example.com/graph")
+    val u = URI("http://example.com/graph")
     val r = for {
       _ <- graphStore.removeGraph(u)
       _ <- graphStore.appendToGraph(u, foo)
       _ <- graphStore.patchGraph(u,
-        (uri("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable,
-        (uri("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+        (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable,
+        (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
       rGraph <- graphStore.getGraph(u)
     } yield {
       val expected = (
-        uri("http://example.com/foo")
+        URI("http://example.com/foo")
         -- rdf("bar") ->- "bar"
         -- rdf("baz") ->- "baz"
       ).graph

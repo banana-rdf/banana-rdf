@@ -6,6 +6,7 @@ import org.scalatest.matchers.MustMatchers
 abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
 
   import diesel._
+  import ops._
 
   ".fragmentLess should remove the fragment part of a URI" in {
     val uri = URI("http://example.com/foo#bar")
@@ -25,21 +26,21 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends
   }
 
   "/ should create a sub-resource uri" in {
-    (uri("http://example.com/foo") / "bar") must be(uri("http://example.com/foo/bar"))
-    (uri("http://example.com/foo/") / "bar") must be(uri("http://example.com/foo/bar"))
+    (URI("http://example.com/foo") / "bar") must be(URI("http://example.com/foo/bar"))
+    (URI("http://example.com/foo/") / "bar") must be(URI("http://example.com/foo/bar"))
   }
 
   "resolve should resolve the uri against the passed string" in {
-    uri("http://example.com/foo").resolve("bar") must be(uri("http://example.com/bar"))
-    uri("http://example.com/foo/").resolve("bar") must be(uri("http://example.com/foo/bar"))
+    URI("http://example.com/foo").resolve("bar") must be(URI("http://example.com/bar"))
+    URI("http://example.com/foo/").resolve("bar") must be(URI("http://example.com/foo/bar"))
   }
 
   "resolveAgainst should work like resolve, just the other way around" in {
-    uri("http://example.com/foo").resolveAgainst(uri("#bar")) must be(URI("http://example.com/foo"))
-    /* uri("bar").resolveAgainst(uri("http://example.com/foo")) must be(URI("http://example.com/bar")) */
-    uri("#bar").resolveAgainst(uri("http://example.com/foo")) must be(URI("http://example.com/foo#bar"))
-    uri("#bar").resolveAgainst(uri("http://example.com/foo/")) must be(URI("http://example.com/foo/#bar"))
-    /* uri("bar").resolveAgainst(uri("http://example.com/foo")) must be(URI("http://example.com/bar")) */
+    URI("http://example.com/foo").resolveAgainst(URI("#bar")) must be(URI("http://example.com/foo"))
+    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/bar")) */
+    URI("#bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/foo#bar"))
+    URI("#bar").resolveAgainst(URI("http://example.com/foo/")) must be(URI("http://example.com/foo/#bar"))
+    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/bar")) */
   }
 
 }

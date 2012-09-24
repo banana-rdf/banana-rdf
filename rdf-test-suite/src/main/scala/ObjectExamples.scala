@@ -12,14 +12,14 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
   object Person {
 
-    val clazz = uri("http://example.com/Person#class")
+    val clazz = URI("http://example.com/Person#class")
     implicit val classUris = classUrisFor[Person](clazz)
 
     val name = property[String](foaf.name)
     val nickname = optional[String](foaf("nickname"))
     val address = property[Address](foaf("address"))
 
-    implicit val container = uri("http://example.com/persons/")
+    implicit val container = URI("http://example.com/persons/")
     implicit val binder = pgb[Person](name, nickname)(Person.apply, Person.unapply)
 
   }
@@ -28,7 +28,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
   object Address {
 
-    val clazz = uri("http://example.com/Address#class")
+    val clazz = URI("http://example.com/Address#class")
     implicit val classUris = classUrisFor[Address](clazz)
 
     // not sure if this could be made more general, nor if we actually want to do that
@@ -46,11 +46,11 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
   case object Unknown extends Address {
 
-    val clazz = uri("http://example.com/Unknown#class")
+    val clazz = URI("http://example.com/Unknown#class")
     implicit val classUris = classUrisFor[Unknown.type](clazz, Address.clazz)
 
     // there is a question about constants and the classes they live in
-    implicit val binder: PointedGraphBinder[Rdf, Unknown.type] = constant(this, uri("http://example.com/Unknown#thing")) withClasses classUris
+    implicit val binder: PointedGraphBinder[Rdf, Unknown.type] = constant(this, URI("http://example.com/Unknown#thing")) withClasses classUris
 
   }
 
@@ -58,7 +58,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
   object VerifiedAddress {
 
-    val clazz = uri("http://example.com/VerifiedAddress#class")
+    val clazz = URI("http://example.com/VerifiedAddress#class")
     implicit val classUris = classUrisFor[VerifiedAddress](clazz, Address.clazz)
 
     val label = property[String](foaf("label"))
@@ -74,7 +74,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
   object City {
 
-    val clazz = uri("http://example.com/City#class")
+    val clazz = URI("http://example.com/City#class")
     implicit val classUris = classUrisFor[City](clazz)
 
     val cityName = property[String](foaf("cityName"))

@@ -13,6 +13,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
   import diesel._
+  import ops._
   import sparqlOperations._
 
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")

@@ -1,7 +1,7 @@
 package org.w3.banana
 
 import org.scalatest._
-import org.scalatest.matchers.MustMatchers
+import org.scalatest.matchers._
 import java.io._
 import org.scalatest.EitherValues._
 
@@ -11,20 +11,19 @@ import scalaz.Validation._
 abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
 
-  import org.scalatest.matchers.{ BeMatcher, MatchResult }
   import diesel._
   import ops._
 
   val betehess: PointedGraph[Rdf] = (
-    uri("http://bertails.org/#betehess").a(foaf.Person)
+    URI("http://bertails.org/#betehess").a(foaf.Person)
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.name ->- "Alexander".lang("en")
     -- foaf.age ->- 29
     -- foaf("foo") ->- List(1, 2, 3)
     -- foaf.knows ->- (
-      uri("http://bblfish.net/#hjs").a(foaf.Person)
+      URI("http://bblfish.net/#hjs").a(foaf.Person)
       -- foaf.name ->- "Henry Story"
-      -- foaf.currentProject ->- uri("http://webid.info/")
+      -- foaf.currentProject ->- URI("http://webid.info/")
     )
   )
 
@@ -113,7 +112,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[
 
     val persons = betehess.graph.getAllInstancesOf(foaf.Person).nodes
 
-    persons.toSet must be === (Set(uri("http://bertails.org/#betehess"), uri("http://bblfish.net/#hjs")))
+    persons.toSet must be === (Set(URI("http://bertails.org/#betehess"), URI("http://bblfish.net/#hjs")))
 
   }
 

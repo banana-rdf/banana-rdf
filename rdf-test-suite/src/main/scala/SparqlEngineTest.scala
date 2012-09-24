@@ -42,9 +42,9 @@ class SparqlEngineTest[Rdf <: RDF](
     bnode("betehess")
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.knows ->- (
-      uri("http://bblfish.net/#hjs")
+      URI("http://bblfish.net/#hjs")
       -- foaf.name ->- "Henry Story"
-      -- foaf.currentProject ->- uri("http://webid.info/")
+      -- foaf.currentProject ->- URI("http://webid.info/")
     )
   ).graph
 
@@ -52,9 +52,9 @@ class SparqlEngineTest[Rdf <: RDF](
 
     val init = store.execute {
       for {
-        _ <- Command.append(uri("http://example.com/graph1"), graph1.toIterable)
-        _ <- Command.append(uri("http://example.com/graph2"), graph2.toIterable)
-        _ <- Command.append(uri("http://example.com/graph"), graph.toIterable)
+        _ <- Command.append(URI("http://example.com/graph1"), graph1.toIterable)
+        _ <- Command.append(URI("http://example.com/graph2"), graph2.toIterable)
+        _ <- Command.append(URI("http://example.com/graph"), graph.toIterable)
       } yield ()
     }
     init.getOrFail()
@@ -97,9 +97,9 @@ class SparqlEngineTest[Rdf <: RDF](
                            |  }
                            |}""".stripMargin)
 
-    val bindings = Map("g" -> uri("http://example.com/graph"),
-      "thing" -> uri("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
-      "prop" -> uri("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
+    val bindings = Map("g" -> URI("http://example.com/graph"),
+      "thing" -> URI("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
+      "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
 
     val names: BananaFuture[Iterable[String]] = sparqlEngine.executeSelect(query, bindings).map(_.toIterable.map {
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
@@ -163,9 +163,9 @@ class SparqlEngineTest[Rdf <: RDF](
                         |  }
                         |}""".stripMargin)
     val bindings = Map(
-      "g" -> uri("http://example.com/graph"),
-      "thing" -> uri("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
-      "prop" -> uri("http://www.w3.org/2000/10/swap/pim/contact#fullName"),
+      "g" -> URI("http://example.com/graph"),
+      "thing" -> URI("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
+      "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"),
       "name" -> "Alexandre Bertails".toNode)
 
     val alexIsThere = sparqlEngine.executeAsk(query, bindings).getOrFail()

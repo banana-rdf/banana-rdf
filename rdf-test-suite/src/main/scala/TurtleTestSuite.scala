@@ -8,9 +8,6 @@ import org.scalatest.EitherValues._
 import scalaz.Validation
 import scalaz.Validation._
 
-object JenaWIP extends Tag("org.w3.banana.jenaWIP")
-object SesameWIP extends Tag("org.w3.banana.sesameWIP")
-
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
 
@@ -23,11 +20,11 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
 
   def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriples = prefix("ntriples/")
-    val creator = uri("http://purl.org/dc/elements/1.1/creator")
-    val publisher = uri("http://purl.org/dc/elements/1.1/publisher")
+    val creator = URI("http://purl.org/dc/elements/1.1/creator")
+    val publisher = URI("http://purl.org/dc/elements/1.1/publisher")
     val dave = TypedLiteral("Dave Beckett")
     val art = TypedLiteral("Art Barstow")
-    val w3org = uri("http://www.w3.org/")
+    val w3org = URI("http://www.w3.org/")
     Graph(
       Triple(ntriples, creator, dave),
       Triple(ntriples, creator, art),

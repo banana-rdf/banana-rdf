@@ -1,7 +1,7 @@
 package org.w3.banana
 
 import org.scalatest._
-import org.scalatest.matchers.MustMatchers
+import org.scalatest.matchers._
 import java.io._
 import org.scalatest.EitherValues._
 
@@ -12,8 +12,8 @@ import scalaz.Validation._
 abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
 
-  import org.scalatest.matchers.{ BeMatcher, MatchResult }
   import diesel._
+  import ops._
 
   "Diesel must accept a GraphNode in the object position" in {
 
@@ -38,18 +38,18 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rd
       bnode("betehess")
       -- foaf.name ->- "Alexandre".lang("fr")
       -- foaf.knows ->- (
-        uri("http://bblfish.net/#hjs")
+        URI("http://bblfish.net/#hjs")
         -- foaf.name ->- "Henry Story"
-        -- foaf.currentProject ->- uri("http://webid.info/")
+        -- foaf.currentProject ->- URI("http://webid.info/")
       )
     )
 
     val expectedGraph =
       Graph(
         Triple(bnode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))),
-        Triple(bnode("betehess"), foaf.knows, uri("http://bblfish.net/#hjs")),
-        Triple(uri("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")),
-        Triple(uri("http://bblfish.net/#hjs"), foaf.currentProject, uri("http://webid.info/")))
+        Triple(bnode("betehess"), foaf.knows, URI("http://bblfish.net/#hjs")),
+        Triple(URI("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")),
+        Triple(URI("http://bblfish.net/#hjs"), foaf.currentProject, URI("http://webid.info/")))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -60,15 +60,15 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rd
       bnode("betehess")
       -- foaf.name ->- "Alexandre".lang("fr")
       -<- foaf.knows -- (
-        uri("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story"
+        URI("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story"
       )
     )
 
     val expectedGraph =
       Graph(
         Triple(bnode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))),
-        Triple(uri("http://bblfish.net/#hjs"), foaf.knows, bnode("betehess")),
-        Triple(uri("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")))
+        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, bnode("betehess")),
+        Triple(URI("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")))
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
