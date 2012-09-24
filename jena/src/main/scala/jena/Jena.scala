@@ -44,8 +44,8 @@ object Jena {
 
   implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]
 
-  implicit val readerSelector: ReaderSelector[Jena#Graph] =
-    ReaderSelector2[Jena#Graph, RDFXML] combineWith ReaderSelector2[Jena#Graph, Turtle]
+  implicit val readerSelector: ReaderSelector[Jena] =
+    ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
 
   implicit val rdfxmlWriter: RDFBlockingWriter[Jena, RDFXML] = JenaRDFBlockingWriter.rdfxmlWriter
 

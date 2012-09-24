@@ -10,7 +10,7 @@ import BananaException.bananaCatch
 class GraphStoreTest[Rdf <: RDF](
     store: RDFStore[Rdf, BananaFuture])(
         implicit diesel: Diesel[Rdf],
-        reader: BlockingReader[Rdf#Graph, RDFXML]) extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
+        reader: RDFReader[Rdf, RDFXML]) extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
 
   import diesel._
   import ops._

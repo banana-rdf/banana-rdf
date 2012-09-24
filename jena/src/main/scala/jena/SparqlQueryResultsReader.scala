@@ -14,8 +14,8 @@ object SparqlQueryResultsReader {
 
   type Answer = Either[Jena#Solutions, Boolean]
 
-  def apply[Syntax](implicit jenaSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[Jena, Syntax] =
-    new SparqlQueryResultsReader[Jena, Syntax] {
+  def apply[S](implicit jenaSparqlSyntax: SparqlAnswerIn[S]): SparqlQueryResultsReader[Jena, S] =
+    new SparqlQueryResultsReader[Jena, S] {
 
       def read(in: InputStream, base: String = ""): BananaValidation[Answer] =
         WrappedThrowable.fromTryCatch {
@@ -38,7 +38,7 @@ object SparqlQueryResultsReader {
   implicit val XMLSparqlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerXML] =
     SparqlQueryResultsReader[SparqlAnswerXML]
 
-  implicit val ReaderSelector: ReaderSelector[Answer] =
-    ReaderSelector2[Answer, SparqlAnswerJson] combineWith ReaderSelector2[Answer, SparqlAnswerXML]
+  // implicit val ReaderSelector: ReaderSelector[Jena, Any] =
+  //   ReaderSelector[Jena, SparqlAnswerJson] combineWith ReaderSelector[Jena, SparqlAnswerXML]
 
 }

@@ -4,39 +4,33 @@ import java.io._
 import scalaz.Validation
 import scalaz.Validation._
 
-/**
- * typeclass for an RDF BlockingReader that returns Graphs
- *
- * @tparam Rdf
- * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
- *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
- */
-trait RDFReader[Rdf <: RDF, +SyntaxType] extends BlockingReader[Rdf#Graph, SyntaxType]
-
 object RDFReader {
 
-  def apply[Rdf <: RDF, SyntaxType](implicit rdfReader: RDFReader[Rdf, SyntaxType]): RDFReader[Rdf, SyntaxType] = rdfReader
+  def apply[Rdf <: RDF, S](implicit rdfReader: RDFReader[Rdf, S]): RDFReader[Rdf, S] = rdfReader
 
 }
 
-trait BlockingReader[Result, +SyntaxType] {
-  def read(is: InputStream, base: String): BananaValidation[Result]
+trait RDFReader[Rdf <: RDF, +S] {
 
-  def read(reader: java.io.Reader, base: String): BananaValidation[Result]
+  def syntax: Syntax[S]
 
-  def read(file: File, base: String): BananaValidation[Result] =
+  def read(is: InputStream, base: String): BananaValidation[Rdf#Graph]
+
+  def read(reader: java.io.Reader, base: String): BananaValidation[Rdf#Graph]
+
+  def read(file: File, base: String): BananaValidation[Rdf#Graph] =
     for {
       fis <- WrappedThrowable.fromTryCatch { new BufferedInputStream(new FileInputStream(file)) }
       graph <- read(fis, base)
     } yield graph
 
-  def read(file: File, base: String, encoding: String): BananaValidation[Result] =
+  def read(file: File, base: String, encoding: String): BananaValidation[Rdf#Graph] =
     for {
       fis <- WrappedThrowable.fromTryCatch { new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), encoding) }
       graph <- read(fis, base)
     } yield graph
 
-  def read(s: String, base: String): BananaValidation[Result] = {
+  def read(s: String, base: String): BananaValidation[Rdf#Graph] = {
     val reader = new StringReader(s)
     read(reader, base)
   }

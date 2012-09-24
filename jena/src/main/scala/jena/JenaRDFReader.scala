@@ -16,8 +16,10 @@ object JenaRDFReader {
    *                    for aligning writers implemented with different frameworks (eg: Jena or Sesame)
    * @return  an RDFREader
    */
-  def apply[SyntaxType](implicit jenaSyntax: JenaGraphSyntax[SyntaxType]): RDFReader[Jena, SyntaxType] =
-    new RDFReader[Jena, SyntaxType] {
+  def apply[S](implicit _syntax: Syntax[S], jenaSyntax: JenaGraphSyntax[S]): RDFReader[Jena, S] =
+    new RDFReader[Jena, S] {
+
+      val syntax = _syntax
 
       val serialization = jenaSyntax.value
 

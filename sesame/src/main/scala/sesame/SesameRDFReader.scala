@@ -28,6 +28,8 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
 
   import SesameOperations._
 
+  val syntax = Syntax[Turtle]
+
   def read(is: InputStream, base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
     val triples = new java.util.LinkedList[Statement]
@@ -51,6 +53,8 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
 object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
 
   import SesameOperations._
+
+  val syntax = Syntax[RDFXML]
 
   def read(is: InputStream, base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
     val parser = new org.openrdf.rio.rdfxml.RDFXMLParser

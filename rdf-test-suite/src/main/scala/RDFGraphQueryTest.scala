@@ -6,7 +6,7 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter
 
 class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     implicit diesel: Diesel[Rdf],
-    reader: BlockingReader[Rdf#Graph, RDFXML],
+    reader: RDFReader[Rdf, RDFXML],
     sparqlOperations: SPARQLOps[Rdf],
     graphQuery: RDFGraphQuery[Rdf],
     sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],

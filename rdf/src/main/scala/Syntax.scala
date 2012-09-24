@@ -36,6 +36,8 @@ trait Syntax[+T] {
  */
 object Syntax {
 
+  def apply[T](implicit syntax: Syntax[T]): Syntax[T] = syntax
+
   implicit val RDFQueryLang: Syntax[SparqlQuery] = new Syntax[SparqlQuery] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application/sparql-query"))
   }

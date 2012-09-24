@@ -10,7 +10,7 @@ import org.w3.banana.util._
 
 class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf, BananaFuture])(
-    implicit reader: BlockingReader[Rdf#Graph, RDFXML],
+    implicit reader: RDFReader[Rdf, RDFXML],
     diesel: Diesel[Rdf],
     sparqlOps: SPARQLOps[Rdf])
     extends WordSpec with MustMatchers with BeforeAndAfterAll {

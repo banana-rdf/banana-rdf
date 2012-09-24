@@ -1,24 +1,36 @@
 package org.w3.banana
 
-import java.io.InputStream
 import scalaz.Validation
-import scala.Either
+import java.io._
 
 /**
- * typeclass for a blocking BlockingReader of Sparql Query Results
- * such as those defined
  * <ul>
  *   <li><a href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL Query Results XML Format</a></li>
  *   <li><a href="http://www.w3.org/TR/rdf-sparql-json-res/">SPARQL Query Results in JSON</a></li>
  * </ul>
- *
- * The BlockingReader's answers are of type Either[Rdf#Solutions, Boolean], where the
- * left is reserved for multiple tuple solutions for SELECT queries, and the right is
- * reserved for boolean queries ("yes, sir, yes, sir, three bags full sir")
- *
- * @tparam Rdf RDF implementation of SPARQL
- * @tparam SyntaxType  type of serialisation to write to. Usually a phantom type, useful for type class behavior and
- *                     for aligning writers implemented with different frameworks (eg: Jena or Sesame)
  */
-trait SparqlQueryResultsReader[Rdf <: RDF, +SyntaxType]
-  extends BlockingReader[Either[Rdf#Solutions, Boolean], SyntaxType]
+trait SparqlQueryResultsReader[Rdf <: RDF, +S] {
+
+  def read(is: InputStream, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]]
+
+  def read(reader: java.io.Reader, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]]
+
+  def read(file: File, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]] =
+    for {
+      fis <- WrappedThrowable.fromTryCatch { new BufferedInputStream(new FileInputStream(file)) }
+      graph <- read(fis, base)
+    } yield graph
+
+  def read(file: File, base: String, encoding: String): BananaValidation[Either[Rdf#Solutions, Boolean]] =
+    for {
+      fis <- WrappedThrowable.fromTryCatch { new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), encoding) }
+      graph <- read(fis, base)
+    } yield graph
+
+  def read(s: String, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]] = {
+    val reader = new StringReader(s)
+    read(reader, base)
+  }
+
+}
+

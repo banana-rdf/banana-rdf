@@ -8,7 +8,7 @@ import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, XMLOutput, OutputFormatter
  * typeclass  used to construct a BlockingReader
  */
 trait JenaGraphSyntax[T] {
-  val value: String
+  def value: String
 }
 
 object JenaGraphSyntax {
