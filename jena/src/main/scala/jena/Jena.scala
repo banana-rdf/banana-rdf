@@ -47,10 +47,10 @@ object Jena {
   implicit val readerSelector: ReaderSelector[Jena] =
     ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
 
-  implicit val rdfxmlWriter: RDFBlockingWriter[Jena, RDFXML] = JenaRDFBlockingWriter.rdfxmlWriter
+  implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
 
-  implicit val turtleWriter: RDFBlockingWriter[Jena, Turtle] = JenaRDFBlockingWriter.turtleWriter
+  implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
 
-  implicit val writerSelector: RDFWriterSelector[Jena#Graph] = JenaRDFBlockingWriter.writerSelector
+  implicit val writerSelector: RDFWriterSelector[Jena] = JenaRDFWriter.writerSelector
 
 }

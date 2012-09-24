@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import scalaz.NonEmptyList
+
 /* some well-known mime-types so that we can refer to them in banana-rdf */
 
 trait SparqlQuery
@@ -9,7 +11,6 @@ trait RDFXML
 trait RDFaXHTML
 trait SparqlAnswerJson
 trait SparqlAnswerXML
-import scalaz.NonEmptyList
 
 /**
  * typeclass for a Syntax
@@ -59,11 +60,11 @@ object Syntax {
   }
 
   implicit val SparqlAnswerJson = new Syntax[SparqlAnswerJson] {
-    def mimeTypes = NonEmptyList(MimeType("application/sparql-results+json"))
+    val mimeTypes = NonEmptyList(MimeType("application/sparql-results+json"))
   }
 
   implicit val SparqlAnswerXML = new Syntax[SparqlAnswerXML] {
-    def mimeTypes = NonEmptyList(MimeType("application/sparql-results+xml"))
+    val mimeTypes = NonEmptyList(MimeType("application/sparql-results+xml"))
   }
 
 }

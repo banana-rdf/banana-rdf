@@ -12,7 +12,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
 
   val reader: RDFReader[Rdf, Turtle]
-  val writer: RDFBlockingWriter[Rdf, Turtle]
+  val writer: RDFWriter[Rdf, Turtle]
   import diesel._
   import ops._
 

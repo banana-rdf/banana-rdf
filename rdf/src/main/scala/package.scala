@@ -3,7 +3,9 @@ package org.w3
 import scalaz._
 import scalaz.Id._
 
-package object banana {
+package object banana
+extends BananaRDFWriterSelector
+with BananaSPARQLSolutionWriterSelector {
 
   type TripleMatch[Rdf <: RDF] = (Rdf#NodeMatch, Rdf#NodeMatch, Rdf#NodeMatch)
 
@@ -22,5 +24,13 @@ package object banana {
   type SyncSPARQLEngine[Rdf <: RDF] = SPARQLEngine[Rdf, Id]
 
   type AsyncSPARQLEngine[Rdf <: RDF] = SPARQLEngine[Rdf, BananaFuture]
+
+
+  type SPARQLSolutionsWriter[Rdf <: RDF, +T] = Writer[Rdf#Solutions, T]
+
+
+  type RDFWriterSelector[Rdf <: RDF] = WriterSelector[Rdf#Graph]
+
+  type SPARQLSolutionsWriterSelector[Rdf <: RDF] = WriterSelector[Rdf#Solutions]
 
 }

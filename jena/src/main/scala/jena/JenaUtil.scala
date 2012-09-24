@@ -22,7 +22,7 @@ object JenaUtil {
   def dump[Rdf <: RDF](graph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Unit = {
     val mToJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
     val jenaGraph = mToJena.transform(graph)
-    println(JenaRDFBlockingWriter.turtleWriter.asString(jenaGraph, ""))
+    println(JenaRDFWriter.turtleWriter.asString(jenaGraph, ""))
   }
 
   def copy(graph: Jena#Graph): Jena#Graph = {

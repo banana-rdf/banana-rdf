@@ -9,7 +9,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     reader: RDFReader[Rdf, RDFXML],
     sparqlOperations: SPARQLOps[Rdf],
     graphQuery: RDFGraphQuery[Rdf],
-    sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
+    sparqlWriter: SPARQLSolutionsWriter[Rdf, SyntaxType],
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
   import diesel._
@@ -144,7 +144,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = BooleanWriter.WriterSelector(MediaRange(sparqlWriter.syntax.mime)).map {
+      val serialisedAnswer = BooleanWriter.selector(MediaRange(sparqlWriter.syntax.mime)).map {
         l =>
           l.write(answers, out, "")
       }.getOrElse(fail("could not find sparql boolean writer for " + sparqlWriter.syntax.mime))
