@@ -5,5 +5,5 @@ import Sesame._
 
 class SesameTurtleTest extends TurtleTestSuite[Sesame] {
   val reader = RDFReader[Sesame, Turtle]
-  val writer = RDFBlockingWriter[Sesame, Turtle]
+  val writer = RDFWriter[Sesame, Turtle]
 }

@@ -51,6 +51,6 @@ object Jena {
 
   implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
 
-  implicit val writerSelector: RDFWriterSelector[Jena] = JenaRDFWriter.writerSelector
+  implicit val writerSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector
 
 }

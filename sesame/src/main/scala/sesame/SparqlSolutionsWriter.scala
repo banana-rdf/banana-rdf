@@ -1,7 +1,6 @@
 package org.w3.banana.sesame
 
 import org.w3.banana._
-import jena.RDFWriterSelector
 import java.io.{ Writer, OutputStream }
 
 /**
@@ -9,9 +8,10 @@ import java.io.{ Writer, OutputStream }
  */
 object SparqlSolutionsWriter {
 
-  def apply[SyntaxType](implicit sesameSparqlSyntax: SparqlAnswerOut[SyntaxType],
-    syntaxTp: Syntax[SyntaxType]) =
-    new SparqlSolutionsWriter[Sesame, SyntaxType] {
+  def apply[T](implicit sesameSparqlSyntax: SparqlAnswerOut[T], _syntax: Syntax[T]) =
+    new SPARQLSolutionsWriter[Sesame, T] {
+
+      val syntax = _syntax
 
       def write(answers: Sesame#Solutions, os: OutputStream, base: String = "") = {
         WrappedThrowable.fromTryCatch {
@@ -26,15 +26,14 @@ object SparqlSolutionsWriter {
 
       def write(input: Sesame#Solutions, writer: Writer, base: String) = null
 
-      def syntax[S >: SyntaxType] = syntaxTp
     }
 
   implicit val Json = SparqlSolutionsWriter[SparqlAnswerJson]
 
   implicit val XML = SparqlSolutionsWriter[SparqlAnswerXML]
 
-  implicit val WriterSelector: RDFWriterSelector[Sesame#Solutions] =
-    RDFWriterSelector[Sesame#Solutions, SparqlAnswerXML] combineWith
-      RDFWriterSelector[Sesame#Solutions, SparqlAnswerXML]
+  implicit val writerSelector: SPARQLSolutionsWriterSelector[Sesame] =
+    SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXML] combineWith
+      SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXML]
 
 }
