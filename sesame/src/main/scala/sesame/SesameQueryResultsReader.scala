@@ -31,7 +31,7 @@ import scalaz.Validation
  */
 object SesameQueryResultsReader {
 
-  def apply[T](implicit sesameSparqlSyntax: SparqlAnswerIn[T]): SparqlQueryResultsReader[Sesame, T] =
+  def apply[T](implicit sesameSparqlSyntax: SesameAnswerInput[T]): SparqlQueryResultsReader[Sesame, T] =
     new SparqlQueryResultsReader[Sesame, T] {
 
       def read(in: InputStream, base: String) = {

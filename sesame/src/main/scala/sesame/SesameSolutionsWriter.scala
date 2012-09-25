@@ -8,7 +8,7 @@ import java.io.{ Writer, OutputStream }
  */
 object SesameSolutionsWriter {
 
-  def apply[T](implicit sesameSparqlSyntax: SparqlAnswerOut[T], _syntax: Syntax[T]) =
+  def apply[T](implicit sesameSparqlSyntax: SesameAnswerOutput[T], _syntax: Syntax[T]) =
     new SparqlSolutionsWriter[Sesame, T] {
 
       val syntax = _syntax

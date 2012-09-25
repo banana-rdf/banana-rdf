@@ -10,19 +10,19 @@ import org.w3.banana._
  * Sparql Output Syntaxes for Sesame, dependent on a SyntaxType for type classes
  * @tparam SyntaxType  They type of Syntax the
  */
-trait SparqlAnswerOut[SyntaxType] {
+trait SesameAnswerOutput[SyntaxType] {
   def writer(outputStream: OutputStream): TupleQueryResultWriter
 }
 
-object SparqlAnswerOut {
+object SesameAnswerOutput {
 
-  implicit val Json: SparqlAnswerOut[SparqlAnswerJson] =
-    new SparqlAnswerOut[SparqlAnswerJson] {
+  implicit val Json: SesameAnswerOutput[SparqlAnswerJson] =
+    new SesameAnswerOutput[SparqlAnswerJson] {
       def writer(outputStream: OutputStream) = new SPARQLResultsJSONWriter(outputStream)
     }
 
-  implicit val XML: SparqlAnswerOut[SparqlAnswerXml] =
-    new SparqlAnswerOut[SparqlAnswerXml] {
+  implicit val XML: SesameAnswerOutput[SparqlAnswerXml] =
+    new SesameAnswerOutput[SparqlAnswerXml] {
       def writer(outputStream: OutputStream) = new SPARQLResultsXMLWriter(outputStream)
     }
 

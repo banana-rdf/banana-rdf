@@ -12,7 +12,7 @@ object JenaQueryResultsReader {
 
   type Answer = Either[Jena#Solutions, Boolean]
 
-  def apply[S](implicit jenaSparqlSyntax: SparqlAnswerIn[S]): SparqlQueryResultsReader[Jena, S] =
+  def apply[S](implicit jenaSparqlSyntax: JenaAnswerInput[S]): SparqlQueryResultsReader[Jena, S] =
     new SparqlQueryResultsReader[Jena, S] {
 
       def read(in: InputStream, base: String = ""): BananaValidation[Answer] =

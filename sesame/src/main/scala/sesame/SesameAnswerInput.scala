@@ -1,7 +1,7 @@
 package org.w3.banana.sesame
 
-import java.io.InputStream
 import org.w3.banana._
+import java.io.InputStream
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLParserFactory
 import org.openrdf.query.resultio.{ BooleanQueryResultFormat, TupleQueryResultFormat }
 
@@ -9,21 +9,21 @@ import org.openrdf.query.resultio.{ BooleanQueryResultFormat, TupleQueryResultFo
  * typeclass for serialising special
  * @tparam T
  */
-trait SparqlAnswerIn[T] {
+trait SesameAnswerInput[T] {
   def tupleFormat: TupleQueryResultFormat
   def booleanFormat: BooleanQueryResultFormat
 }
 
-object SparqlAnswerIn {
+object SesameAnswerInput {
 
-  implicit val Json: SparqlAnswerIn[SparqlAnswerJson] =
-    new SparqlAnswerIn[SparqlAnswerJson] {
+  implicit val Json: SesameAnswerInput[SparqlAnswerJson] =
+    new SesameAnswerInput[SparqlAnswerJson] {
       val tupleFormat = TupleQueryResultFormat.JSON
       val booleanFormat = BooleanQueryResultFormat.forMIMEType("application/sparql-results+json")
     }
 
-  implicit val XML: SparqlAnswerIn[SparqlAnswerXml] =
-    new SparqlAnswerIn[SparqlAnswerXml] {
+  implicit val XML: SesameAnswerInput[SparqlAnswerXml] =
+    new SesameAnswerInput[SparqlAnswerXml] {
       val tupleFormat = TupleQueryResultFormat.SPARQL
       val booleanFormat = BooleanQueryResultFormat.forMIMEType("application/sparql-results+xml")
     }

@@ -9,19 +9,19 @@ import com.hp.hpl.jena.sparql.resultset.{ XMLInput, JSONInput, SPARQLResult }
  * typeclass for serialising special
  * @tparam T
  */
-trait SparqlAnswerIn[T] {
+trait JenaAnswerInput[T] {
   def parse(in: InputStream): SPARQLResult
 }
 
-object SparqlAnswerIn {
+object JenaAnswerInput {
 
-  implicit val Json: SparqlAnswerIn[SparqlAnswerJson] =
-    new SparqlAnswerIn[SparqlAnswerJson] {
+  implicit val Json: JenaAnswerInput[SparqlAnswerJson] =
+    new JenaAnswerInput[SparqlAnswerJson] {
       def parse(in: InputStream) = JSONInput.make(in)
     }
 
-  implicit val XML: SparqlAnswerIn[SparqlAnswerXml] =
-    new SparqlAnswerIn[SparqlAnswerXml] {
+  implicit val XML: JenaAnswerInput[SparqlAnswerXml] =
+    new JenaAnswerInput[SparqlAnswerXml] {
       def parse(in: InputStream) = XMLInput.make(in)
     }
 

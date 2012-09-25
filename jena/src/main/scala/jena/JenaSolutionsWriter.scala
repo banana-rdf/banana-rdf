@@ -9,7 +9,7 @@ import scalaz.Validation
  */
 object JenaSolutionsWriter {
 
-  def apply[T](implicit jenaSparqlSyntax: SparqlAnswerOut[T], _syntax: Syntax[T]): SparqlSolutionsWriter[Jena, T] =
+  def apply[T](implicit jenaSparqlSyntax: JenaAnswerOutput[T], _syntax: Syntax[T]): SparqlSolutionsWriter[Jena, T] =
     new SparqlSolutionsWriter[Jena, T] {
 
       val syntax = _syntax
