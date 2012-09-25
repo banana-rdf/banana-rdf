@@ -5,8 +5,8 @@ import java.io._
 
 /**
  * <ul>
- *   <li><a href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL Query Results XML Format</a></li>
- *   <li><a href="http://www.w3.org/TR/rdf-sparql-json-res/">SPARQL Query Results in JSON</a></li>
+ *   <li><a href="http://www.w3.org/TR/rdf-sparql-XMLres/">Sparql Query Results XML Format</a></li>
+ *   <li><a href="http://www.w3.org/TR/rdf-sparql-json-res/">Sparql Query Results in JSON</a></li>
  * </ul>
  */
 trait SparqlQueryResultsReader[Rdf <: RDF, +S] {

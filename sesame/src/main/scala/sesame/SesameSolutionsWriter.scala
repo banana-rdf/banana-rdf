@@ -4,7 +4,7 @@ import org.w3.banana._
 import java.io.{ Writer, OutputStream }
 
 /**
- * Creates a blocking SPARQL writer for the given syntax
+ * Creates a blocking Sparql writer for the given syntax
  */
 object SesameSolutionsWriter {
 
@@ -33,7 +33,7 @@ object SesameSolutionsWriter {
   implicit val solutionsWriterXml = SesameSolutionsWriter[SparqlAnswerXml]
 
   implicit val writerSelector: SparqlSolutionsWriterSelector[Sesame] =
-    SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXml] combineWith
-      SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXml]
+    SparqlSolutionWriterSelector[Sesame, SparqlAnswerXml] combineWith
+      SparqlSolutionWriterSelector[Sesame, SparqlAnswerXml]
 
 }

@@ -12,14 +12,14 @@ class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf, BananaFuture])(
     implicit reader: RDFReader[Rdf, RDFXML],
     diesel: Diesel[Rdf],
-    sparqlOps: SPARQLOps[Rdf])
+    sparqlOps: SparqlOps[Rdf])
     extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
   import ops._
   import sparqlOps._
 
-  val sparqlEngine = SPARQLEngine[Rdf, BananaFuture](store)
+  val sparqlEngine = SparqlEngine[Rdf, BananaFuture](store)
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -111,7 +111,7 @@ class SparqlEngineTest[Rdf <: RDF](
 
   }
 
-  "the identity SPARQL Construct must work as expected" in {
+  "the identity Sparql Construct must work as expected" in {
 
     val query = ConstructQuery("""
                               |CONSTRUCT {

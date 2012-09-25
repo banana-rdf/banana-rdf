@@ -6,9 +6,9 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import scalaz.Id._
 
-object JenaGraphSPARQLEngine extends RDFGraphQuery[Jena] {
+object JenaGraphSparqlEngine extends RDFGraphQuery[Jena] {
 
-  def makeSPARQLEngine(graph: Jena#Graph): SPARQLEngine[Jena, Id] = new SPARQLEngine[Jena, Id] {
+  def makeSparqlEngine(graph: Jena#Graph): SparqlEngine[Jena, Id] = new SparqlEngine[Jena, Id] {
 
     lazy val querySolution = util.QuerySolution()
 

@@ -2,7 +2,7 @@ package org.w3.banana
 
 import scalaz.Validation
 
-trait SPARQLOps[Rdf <: RDF] {
+trait SparqlOps[Rdf <: RDF] {
 
   def SelectQuery(query: String): Rdf#SelectQuery
 
@@ -15,7 +15,7 @@ trait SPARQLOps[Rdf <: RDF] {
    * because the query type is not known in advance, ( as when a query is received
    * over the internet). As a result the response is a validation, as the query
    * may not have been tested for validity.
-   * @param query a SPARQL query
+   * @param query a Sparql query
    * @return A validation containing the Query
    */
   def Query(query: String): Validation[Exception, Rdf#Query]
@@ -37,9 +37,9 @@ trait SPARQLOps[Rdf <: RDF] {
 
   /* provides syntax for the Solution and Solutions */
 
-  implicit def solutionSyntax(solution: Rdf#Solution): SPARQLSolutionSyntax[Rdf] = SPARQLSolutionSyntax(solution)(this)
+  implicit def solutionSyntax(solution: Rdf#Solution): SparqlSolutionSyntax[Rdf] = SparqlSolutionSyntax(solution)(this)
 
-  implicit def solutionsSyntax(solutions: Rdf#Solutions): SPARQLSolutionsSyntax[Rdf] = SPARQLSolutionsSyntax(solutions)(this)
+  implicit def solutionsSyntax(solutions: Rdf#Solutions): SparqlSolutionsSyntax[Rdf] = SparqlSolutionsSyntax(solutions)(this)
 
   /**************/
 

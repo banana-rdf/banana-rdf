@@ -4,6 +4,6 @@ import scalaz.Id._
 
 trait RDFGraphQuery[Rdf <: RDF] {
 
-  def makeSPARQLEngine(graph: Rdf#Graph): SPARQLEngine[Rdf, Id]
+  def makeSparqlEngine(graph: Rdf#Graph): SparqlEngine[Rdf, Id]
 
 }

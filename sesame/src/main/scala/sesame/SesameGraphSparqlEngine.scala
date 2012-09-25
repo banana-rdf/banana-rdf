@@ -14,9 +14,9 @@ import org.openrdf.query.impl._
 import org.openrdf.sail.memory.MemoryStore
 import scalaz.Id._
 
-object SesameGraphSPARQLEngine extends RDFGraphQuery[Sesame] {
+object SesameGraphSparqlEngine extends RDFGraphQuery[Sesame] {
 
-  def makeSPARQLEngine(graph: Sesame#Graph): SPARQLEngine[Sesame, Id] = new SPARQLEngine[Sesame, Id] {
+  def makeSparqlEngine(graph: Sesame#Graph): SparqlEngine[Sesame, Id] = new SparqlEngine[Sesame, Id] {
 
     val repository = {
       val store = new MemoryStore

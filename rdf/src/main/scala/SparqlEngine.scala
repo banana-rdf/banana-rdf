@@ -1,9 +1,9 @@
 package org.w3.banana
 
 /**
- * to execute SPARQL queries
+ * to execute Sparql queries
  */
-trait SPARQLEngine[Rdf <: RDF, M[_]] {
+trait SparqlEngine[Rdf <: RDF, M[_]] {
 
   def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Solutions]
 
@@ -19,9 +19,9 @@ trait SPARQLEngine[Rdf <: RDF, M[_]] {
 
 }
 
-object SPARQLEngine {
+object SparqlEngine {
 
-  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]): SPARQLEngine[Rdf, M] = new SPARQLEngine[Rdf, M] {
+  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]): SparqlEngine[Rdf, M] = new SparqlEngine[Rdf, M] {
 
     def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Solutions] =
       store.execute(Command.select(query, bindings))

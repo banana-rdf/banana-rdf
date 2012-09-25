@@ -24,7 +24,7 @@ trait Sesame extends RDF {
   type NodeAny = Null
   type NodeConcrete = Value
 
-  // types related to SPARQL
+  // types related to Sparql
   type Query = ParsedQuery
   type SelectQuery = ParsedTupleQuery
   type ConstructQuery = ParsedGraphQuery
@@ -40,9 +40,9 @@ object Sesame {
 
   implicit val diesel: Diesel[Sesame] = SesameDiesel
 
-  implicit val sparqlOps: SPARQLOps[Sesame] = SesameSPARQLOps
+  implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 
-  implicit val graphQuery: RDFGraphQuery[Sesame] = SesameGraphSPARQLEngine
+  implicit val graphQuery: RDFGraphQuery[Sesame] = SesameGraphSparqlEngine
 
   implicit val rdfxmlReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
 

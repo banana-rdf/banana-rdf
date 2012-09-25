@@ -1,8 +1,8 @@
 package org.w3.banana
 
-trait BananaSPARQLSolutionWriterSelector {
+trait BananaSparqlSolutionWriterSelector {
 
-  object SPARQLSolutionWriterSelector {
+  object SparqlSolutionWriterSelector {
 
     def apply[Rdf <: RDF, T](implicit syntax: Syntax[T], writer: SparqlSolutionsWriter[Rdf, T]): SparqlSolutionsWriterSelector[Rdf] =
       new SparqlSolutionsWriterSelector[Rdf] {

@@ -21,7 +21,7 @@ trait Jena extends RDF {
   type NodeMatch = JenaNode
   type NodeAny = Node_ANY
 
-  // types related to SPARQL
+  // types related to Sparql
   type Query = JenaQuery
   type SelectQuery = JenaQuery
   type ConstructQuery = JenaQuery
@@ -36,9 +36,9 @@ object Jena {
 
   implicit val diesel: Diesel[Jena] = JenaDiesel
 
-  implicit val sparqlOps: SPARQLOps[Jena] = JenaSPARQLOps
+  implicit val sparqlOps: SparqlOps[Jena] = JenaSparqlOps
 
-  implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphSPARQLEngine
+  implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphSparqlEngine
 
   implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader
 

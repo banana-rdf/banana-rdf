@@ -5,7 +5,7 @@ import org.w3.banana._
 import scalaz.Validation
 
 /**
- * Creates a blocking SPARQL writer for the given syntax
+ * Creates a blocking Sparql writer for the given syntax
  */
 object JenaSolutionsWriter {
 
@@ -30,7 +30,7 @@ object JenaSolutionsWriter {
     JenaSolutionsWriter[SparqlAnswerXml]
 
   implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Jena] =
-    SPARQLSolutionWriterSelector[Jena, SparqlAnswerXml] combineWith
-      SPARQLSolutionWriterSelector[Jena, SparqlAnswerXml]
+    SparqlSolutionWriterSelector[Jena, SparqlAnswerXml] combineWith
+      SparqlSolutionWriterSelector[Jena, SparqlAnswerXml]
 
 }

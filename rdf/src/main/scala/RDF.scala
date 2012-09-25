@@ -16,7 +16,7 @@ trait RDF {
   type NodeMatch
   type NodeAny <: NodeMatch
 
-  // types related to SPARQL
+  // types related to Sparql
   type Query
   type SelectQuery <: Query
   type ConstructQuery <: Query

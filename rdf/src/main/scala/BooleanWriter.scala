@@ -19,7 +19,7 @@ trait BooleanWriter[T] extends Writer[Boolean, T] {
 object BooleanWriter {
 
   /**
-   * <a href="http://www.w3.org/TR/sparql11-results-json/">SPARQL 1.1 Query Results JSON Format</a>
+   * <a href="http://www.w3.org/TR/sparql11-results-json/">Sparql 1.1 Query Results JSON Format</a>
    */
   implicit val Json = new BooleanWriter[SparqlAnswerJson] {
 
@@ -35,7 +35,7 @@ object BooleanWriter {
   }
 
   /**
-   * <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL Query Results XML Format</a>
+   * <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">Sparql Query Results XML Format</a>
    */
   implicit val booleanWriterXml = new BooleanWriter[SparqlAnswerXml] {
 

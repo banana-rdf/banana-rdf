@@ -12,7 +12,7 @@ object RDFStore {
   implicit def RDFStore2GraphStore[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M])(implicit ops: RDFOps[Rdf]): GraphStore[Rdf, M] =
     GraphStore[Rdf, M](store)
 
-  implicit def RDFStore2SPARQLEngine[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]): SPARQLEngine[Rdf, M] =
-    SPARQLEngine[Rdf, M](store)
+  implicit def RDFStore2SparqlEngine[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]): SparqlEngine[Rdf, M] =
+    SparqlEngine[Rdf, M](store)
 
 }

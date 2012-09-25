@@ -7,7 +7,7 @@ import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter
 class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     implicit diesel: Diesel[Rdf],
     reader: RDFReader[Rdf, RDFXML],
-    sparqlOperations: SPARQLOps[Rdf],
+    sparqlOperations: SparqlOps[Rdf],
     graphQuery: RDFGraphQuery[Rdf],
     sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
@@ -19,7 +19,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
   val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(file, "http://foo.com") getOrElse sys.error("ouch")
-  val sparqlEngine = graphQuery.makeSPARQLEngine(graph)
+  val sparqlEngine = graphQuery.makeSparqlEngine(graph)
 
   "SELECT DISTINCT query in new-tr.rdf " should {
     val selectQueryStr = """prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -69,7 +69,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     }
   }
 
-  "the identity SPARQL Construct " should {
+  "the identity Sparql Construct " should {
 
     val query = ConstructQuery("""
                    |CONSTRUCT {
@@ -103,17 +103,17 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
          | ASK { ?thing :editor [ <http://xmlns.com/foaf/0.1/name> ?name ] }""".stripMargin)
 
     "simple graph contains at least one named person" in {
-      val personInFoaf = graphQuery.makeSPARQLEngine(simple.graph).executeAsk(yesQuery)
+      val personInFoaf = graphQuery.makeSparqlEngine(simple.graph).executeAsk(yesQuery)
       assert(personInFoaf, " query " + yesQuery + " must return true")
     }
 
     "simple graph contains no foaf:knows relation" in {
-      val knowRelInFoaf = graphQuery.makeSPARQLEngine(simple.graph).executeAsk(noQuery)
+      val knowRelInFoaf = graphQuery.makeSparqlEngine(simple.graph).executeAsk(noQuery)
       assert(!knowRelInFoaf, " query " + noQuery + " must return false")
     }
 
     "more advanced query is ok" in {
-      val objectHasNamedEditor = graphQuery.makeSPARQLEngine(simple.graph).executeAsk(yesQuery2)
+      val objectHasNamedEditor = graphQuery.makeSparqlEngine(simple.graph).executeAsk(yesQuery2)
       assert(objectHasNamedEditor, " query " + yesQuery2 + " must return true")
     }
 
@@ -163,7 +163,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
   }
 
   //taggedAs (SesameWIP)
-  "a SPARQL query constructor must accept Prefix objects" in {
+  "a Sparql query constructor must accept Prefix objects" in {
 
     val query1 = ConstructQuery("""
 prefix : <http://www.w3.org/2001/02pd/rec54#>

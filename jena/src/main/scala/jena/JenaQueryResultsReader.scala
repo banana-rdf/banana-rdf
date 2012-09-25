@@ -6,7 +6,7 @@ import java.io.{ Reader, InputStream, OutputStream }
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 /**
- * Creates a blocking SPARQL BlockingReader for the given syntax
+ * Creates a blocking Sparql BlockingReader for the given syntax
  */
 object JenaQueryResultsReader {
 

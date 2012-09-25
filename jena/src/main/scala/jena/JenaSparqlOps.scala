@@ -8,7 +8,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode
 import scalaz.{ Failure, Success, Validation }
 import scala.collection.JavaConverters._
 
-object JenaSPARQLOps extends SPARQLOps[Jena] {
+object JenaSparqlOps extends SparqlOps[Jena] {
 
   def SelectQuery(query: String): Jena#SelectQuery = QueryFactory.create(query)
 
