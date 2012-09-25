@@ -22,8 +22,8 @@ object SparqlAnswerIn {
       val booleanFormat = BooleanQueryResultFormat.forMIMEType("application/sparql-results+json")
     }
 
-  implicit val XML: SparqlAnswerIn[SparqlAnswerXML] =
-    new SparqlAnswerIn[SparqlAnswerXML] {
+  implicit val XML: SparqlAnswerIn[SparqlAnswerXml] =
+    new SparqlAnswerIn[SparqlAnswerXml] {
       val tupleFormat = TupleQueryResultFormat.SPARQL
       val booleanFormat = BooleanQueryResultFormat.forMIMEType("application/sparql-results+xml")
     }

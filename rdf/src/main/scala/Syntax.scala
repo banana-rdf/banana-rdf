@@ -10,7 +10,7 @@ trait Turtle
 trait RDFXML
 trait RDFaXHTML
 trait SparqlAnswerJson
-trait SparqlAnswerXML
+trait SparqlAnswerXml
 
 /**
  * typeclass for a Syntax
@@ -63,7 +63,7 @@ object Syntax {
     val mimeTypes = NonEmptyList(MimeType("application/sparql-results+json"))
   }
 
-  implicit val SparqlAnswerXML = new Syntax[SparqlAnswerXML] {
+  implicit val SparqlAnswerXml = new Syntax[SparqlAnswerXml] {
     val mimeTypes = NonEmptyList(MimeType("application/sparql-results+xml"))
   }
 

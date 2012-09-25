@@ -20,8 +20,8 @@ object SparqlAnswerIn {
       def parse(in: InputStream) = JSONInput.make(in)
     }
 
-  implicit val XML: SparqlAnswerIn[SparqlAnswerXML] =
-    new SparqlAnswerIn[SparqlAnswerXML] {
+  implicit val XML: SparqlAnswerIn[SparqlAnswerXml] =
+    new SparqlAnswerIn[SparqlAnswerXml] {
       def parse(in: InputStream) = XMLInput.make(in)
     }
 

@@ -37,4 +37,11 @@ object JenaRDFReader {
 
     }
 
+  implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader[RDFXML]
+
+  implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]
+
+  implicit val selector: ReaderSelector[Jena] = 
+    ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
+
 }

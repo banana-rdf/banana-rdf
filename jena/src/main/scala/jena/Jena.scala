@@ -40,17 +40,32 @@ object Jena {
 
   implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphSPARQLEngine
 
-  implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader[RDFXML]
+  implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader
 
-  implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader[Turtle]
+  implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader
 
-  implicit val readerSelector: ReaderSelector[Jena] =
-    ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
+  implicit val readerSelector: ReaderSelector[Jena] = JenaRDFReader.selector //
 
   implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
 
   implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
 
-  implicit val writerSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector
+  implicit val rdfWriterSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector //
+
+  implicit val sparqlSolutionsWriterJson: SPARQLSolutionsWriter[Jena, SparqlAnswerJson] =
+    JenaSolutionsWriter.sparqlSolutionsWriterJson
+
+  implicit val sparqlSolutionsWriterXml: SPARQLSolutionsWriter[Jena, SparqlAnswerXml] =
+    JenaSolutionsWriter.sparqlSolutionsWriterXml
+
+  implicit val solutionsWriterSelector: SPARQLSolutionsWriterSelector[Jena] = JenaSolutionsWriter.solutionsWriterSelector
+
+  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
+    JenaQueryResultsReader.queryResultsReaderJson
+
+  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Jena, SparqlAnswerXml] =
+    JenaQueryResultsReader.queryResultsReaderXml
+
+
 
 }

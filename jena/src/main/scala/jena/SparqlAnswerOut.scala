@@ -18,8 +18,8 @@ object SparqlAnswerOut {
       def formatter = new JSONOutput()
     }
 
-  implicit val XML: SparqlAnswerOut[SparqlAnswerXML] =
-    new SparqlAnswerOut[SparqlAnswerXML] {
+  implicit val XML: SparqlAnswerOut[SparqlAnswerXml] =
+    new SparqlAnswerOut[SparqlAnswerXml] {
       def formatter = new XMLOutput()
     }
 

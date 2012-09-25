@@ -6,7 +6,7 @@ import java.io.{ Writer, OutputStream }
 /**
  * Creates a blocking SPARQL writer for the given syntax
  */
-object SparqlSolutionsWriter {
+object SesameSolutionsWriter {
 
   def apply[T](implicit sesameSparqlSyntax: SparqlAnswerOut[T], _syntax: Syntax[T]) =
     new SPARQLSolutionsWriter[Sesame, T] {
@@ -28,12 +28,12 @@ object SparqlSolutionsWriter {
 
     }
 
-  implicit val Json = SparqlSolutionsWriter[SparqlAnswerJson]
+  implicit val solutionsWriterJson = SesameSolutionsWriter[SparqlAnswerJson]
 
-  implicit val XML = SparqlSolutionsWriter[SparqlAnswerXML]
+  implicit val solutionsWriterXml = SesameSolutionsWriter[SparqlAnswerXml]
 
   implicit val writerSelector: SPARQLSolutionsWriterSelector[Sesame] =
-    SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXML] combineWith
-      SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXML]
+    SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXml] combineWith
+      SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXml]
 
 }

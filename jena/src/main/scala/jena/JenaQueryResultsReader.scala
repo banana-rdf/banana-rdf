@@ -1,16 +1,14 @@
 package org.w3.banana.jena
 
+import org.w3.banana._
 import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, XMLOutput }
 import java.io.{ Reader, InputStream, OutputStream }
-import org.w3.banana._
-import jena._
-import scalaz.{ Validation, Either3 }
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 /**
  * Creates a blocking SPARQL BlockingReader for the given syntax
  */
-object SparqlQueryResultsReader {
+object JenaQueryResultsReader {
 
   type Answer = Either[Jena#Solutions, Boolean]
 
@@ -32,13 +30,13 @@ object SparqlQueryResultsReader {
       def read(reader: Reader, base: String) = throw new NotImplementedException
     }
 
-  implicit val JsonSparqlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
-    SparqlQueryResultsReader[SparqlAnswerJson]
+  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
+    JenaQueryResultsReader[SparqlAnswerJson]
 
-  implicit val XMLSparqlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerXML] =
-    SparqlQueryResultsReader[SparqlAnswerXML]
+  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Jena, SparqlAnswerXml] =
+    JenaQueryResultsReader[SparqlAnswerXml]
 
-  // implicit val ReaderSelector: ReaderSelector[Jena, Any] =
-  //   ReaderSelector[Jena, SparqlAnswerJson] combineWith ReaderSelector[Jena, SparqlAnswerXML]
+  //implicit val queryResultsReaderSelector: ReaderSelector[Jena, Any] =
+  //   ReaderSelector[Jena, SparqlAnswerJson] combineWith ReaderSelector[Jena, SparqlAnswerXml]
 
 }

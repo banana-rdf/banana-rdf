@@ -37,9 +37,9 @@ object BooleanWriter {
   /**
    * <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">SPARQL Query Results XML Format</a>
    */
-  implicit val XML = new BooleanWriter[SparqlAnswerXML] {
+  implicit val booleanWriterXml = new BooleanWriter[SparqlAnswerXml] {
 
-    val syntax = Syntax[SparqlAnswerXML]
+    val syntax = Syntax[SparqlAnswerXml]
 
     def format(result: Boolean) =
       """<?xml version="1.0"?>
@@ -51,6 +51,6 @@ object BooleanWriter {
   }
 
   implicit val selector: WriterSelector[Boolean] =
-    WriterSelector[Boolean, SparqlAnswerXML] combineWith WriterSelector[Boolean, SparqlAnswerJson]
+    WriterSelector[Boolean, SparqlAnswerXml] combineWith WriterSelector[Boolean, SparqlAnswerJson]
 
 }

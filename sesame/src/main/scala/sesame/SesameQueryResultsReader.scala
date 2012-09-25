@@ -29,10 +29,10 @@ import scalaz.Validation
  * that difficult.
  *
  */
-object SparqlQueryResultsReader {
+object SesameQueryResultsReader {
 
-  def apply[Syntax](implicit sesameSparqlSyntax: SparqlAnswerIn[Syntax]): SparqlQueryResultsReader[Sesame, Syntax] =
-    new SparqlQueryResultsReader[Sesame, Syntax] {
+  def apply[T](implicit sesameSparqlSyntax: SparqlAnswerIn[T]): SparqlQueryResultsReader[Sesame, T] =
+    new SparqlQueryResultsReader[Sesame, T] {
 
       def read(in: InputStream, base: String) = {
         val bytes: Array[Byte] = Iterator.continually(in.read).takeWhile(-1 !=).map(_.toByte).toArray
@@ -67,10 +67,10 @@ object SparqlQueryResultsReader {
 
     }
 
-  implicit val Json: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
-    SparqlQueryResultsReader[SparqlAnswerJson]
+  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
+    SesameQueryResultsReader[SparqlAnswerJson]
 
-  implicit val forXML: SparqlQueryResultsReader[Sesame, SparqlAnswerXML] =
-    SparqlQueryResultsReader[SparqlAnswerXML]
+  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Sesame, SparqlAnswerXml] =
+    SesameQueryResultsReader[SparqlAnswerXml]
 
 }

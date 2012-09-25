@@ -21,8 +21,8 @@ object SparqlAnswerOut {
       def writer(outputStream: OutputStream) = new SPARQLResultsJSONWriter(outputStream)
     }
 
-  implicit val XML: SparqlAnswerOut[SparqlAnswerXML] =
-    new SparqlAnswerOut[SparqlAnswerXML] {
+  implicit val XML: SparqlAnswerOut[SparqlAnswerXml] =
+    new SparqlAnswerOut[SparqlAnswerXml] {
       def writer(outputStream: OutputStream) = new SPARQLResultsXMLWriter(outputStream)
     }
 
