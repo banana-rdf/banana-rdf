@@ -9,8 +9,8 @@ import scalaz.Validation
  */
 object JenaSolutionsWriter {
 
-  def apply[T](implicit jenaSparqlSyntax: SparqlAnswerOut[T], _syntax: Syntax[T]): SPARQLSolutionsWriter[Jena, T] =
-    new SPARQLSolutionsWriter[Jena, T] {
+  def apply[T](implicit jenaSparqlSyntax: SparqlAnswerOut[T], _syntax: Syntax[T]): SparqlSolutionsWriter[Jena, T] =
+    new SparqlSolutionsWriter[Jena, T] {
 
       val syntax = _syntax
 
@@ -23,13 +23,13 @@ object JenaSolutionsWriter {
 
     }
 
-  implicit val sparqlSolutionsWriterJson: SPARQLSolutionsWriter[Jena, SparqlAnswerJson] =
+  implicit val solutionsWriterJson: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter[SparqlAnswerJson]
 
-  implicit val sparqlSolutionsWriterXml: SPARQLSolutionsWriter[Jena, SparqlAnswerXml] =
+  implicit val solutionsWriterXml: SparqlSolutionsWriter[Jena, SparqlAnswerXml] =
     JenaSolutionsWriter[SparqlAnswerXml]
 
-  implicit val solutionsWriterSelector: SPARQLSolutionsWriterSelector[Jena] =
+  implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Jena] =
     SPARQLSolutionWriterSelector[Jena, SparqlAnswerXml] combineWith
       SPARQLSolutionWriterSelector[Jena, SparqlAnswerXml]
 

@@ -26,11 +26,11 @@ with BananaSPARQLSolutionWriterSelector {
   type AsyncSPARQLEngine[Rdf <: RDF] = SPARQLEngine[Rdf, BananaFuture]
 
 
-  type SPARQLSolutionsWriter[Rdf <: RDF, +T] = Writer[Rdf#Solutions, T]
+  type SparqlSolutionsWriter[Rdf <: RDF, +T] = Writer[Rdf#Solutions, T]
 
 
   type RDFWriterSelector[Rdf <: RDF] = WriterSelector[Rdf#Graph]
 
-  type SPARQLSolutionsWriterSelector[Rdf <: RDF] = WriterSelector[Rdf#Solutions]
+  type SparqlSolutionsWriterSelector[Rdf <: RDF] = WriterSelector[Rdf#Solutions]
 
 }

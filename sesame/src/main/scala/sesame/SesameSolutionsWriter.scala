@@ -9,7 +9,7 @@ import java.io.{ Writer, OutputStream }
 object SesameSolutionsWriter {
 
   def apply[T](implicit sesameSparqlSyntax: SparqlAnswerOut[T], _syntax: Syntax[T]) =
-    new SPARQLSolutionsWriter[Sesame, T] {
+    new SparqlSolutionsWriter[Sesame, T] {
 
       val syntax = _syntax
 
@@ -32,7 +32,7 @@ object SesameSolutionsWriter {
 
   implicit val solutionsWriterXml = SesameSolutionsWriter[SparqlAnswerXml]
 
-  implicit val writerSelector: SPARQLSolutionsWriterSelector[Sesame] =
+  implicit val writerSelector: SparqlSolutionsWriterSelector[Sesame] =
     SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXml] combineWith
       SPARQLSolutionWriterSelector[Sesame, SparqlAnswerXml]
 

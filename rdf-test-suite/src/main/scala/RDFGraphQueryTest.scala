@@ -9,7 +9,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     reader: RDFReader[Rdf, RDFXML],
     sparqlOperations: SPARQLOps[Rdf],
     graphQuery: RDFGraphQuery[Rdf],
-    sparqlWriter: SPARQLSolutionsWriter[Rdf, SyntaxType],
+    sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
   import diesel._

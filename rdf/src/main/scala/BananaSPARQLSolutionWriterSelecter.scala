@@ -4,9 +4,9 @@ trait BananaSPARQLSolutionWriterSelector {
 
   object SPARQLSolutionWriterSelector {
 
-    def apply[Rdf <: RDF, T](implicit syntax: Syntax[T], writer: SPARQLSolutionsWriter[Rdf, T]): SPARQLSolutionsWriterSelector[Rdf] =
-      new SPARQLSolutionsWriterSelector[Rdf] {
-        def apply(range: MediaRange): Option[SPARQLSolutionsWriter[Rdf, Any]] =
+    def apply[Rdf <: RDF, T](implicit syntax: Syntax[T], writer: SparqlSolutionsWriter[Rdf, T]): SparqlSolutionsWriterSelector[Rdf] =
+      new SparqlSolutionsWriterSelector[Rdf] {
+        def apply(range: MediaRange): Option[SparqlSolutionsWriter[Rdf, Any]] =
           syntax.mimeTypes.list.find(m => range.matches(m)).map(_ => writer)
       }
   }

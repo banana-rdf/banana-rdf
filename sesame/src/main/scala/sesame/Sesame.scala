@@ -52,10 +52,10 @@ object Sesame {
 
   implicit val turtleWriter: RDFWriter[Sesame, Turtle] = SesameRDFWriter.turtleWriter
 
-  implicit val sparqlSolutionsWriterJson: SPARQLSolutionsWriter[Sesame, SparqlAnswerJson] =
+  implicit val solutionsWriterJson: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
     SesameSolutionsWriter.solutionsWriterJson
 
-  implicit val sparqlSolutionsWriterXml: SPARQLSolutionsWriter[Sesame, SparqlAnswerXml] =
+  implicit val solutionsWriterXml: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] =
     SesameSolutionsWriter.solutionsWriterXml
 
   implicit val queryResultsReaderJson: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =

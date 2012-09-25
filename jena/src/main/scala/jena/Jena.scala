@@ -52,13 +52,13 @@ object Jena {
 
   implicit val rdfWriterSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector //
 
-  implicit val sparqlSolutionsWriterJson: SPARQLSolutionsWriter[Jena, SparqlAnswerJson] =
-    JenaSolutionsWriter.sparqlSolutionsWriterJson
+  implicit val solutionsWriterJson: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
+    JenaSolutionsWriter.solutionsWriterJson
 
-  implicit val sparqlSolutionsWriterXml: SPARQLSolutionsWriter[Jena, SparqlAnswerXml] =
-    JenaSolutionsWriter.sparqlSolutionsWriterXml
+  implicit val solutionsWriterXml: SparqlSolutionsWriter[Jena, SparqlAnswerXml] =
+    JenaSolutionsWriter.solutionsWriterXml
 
-  implicit val solutionsWriterSelector: SPARQLSolutionsWriterSelector[Jena] = JenaSolutionsWriter.solutionsWriterSelector
+  implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Jena] = JenaSolutionsWriter.solutionsWriterSelector
 
   implicit val queryResultsReaderJson: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
     JenaQueryResultsReader.queryResultsReaderJson
