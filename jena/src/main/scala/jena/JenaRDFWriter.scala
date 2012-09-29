@@ -1,7 +1,8 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import java.io.{ OutputStream, Writer => jWriter }
+import java.io.{ Writer => jWriter }
+import scalax.io._
 import com.hp.hpl.jena.rdf.model.ModelFactory
 
 /**
@@ -18,15 +19,13 @@ object JenaRDFWriter {
 
       val serialization = jenaSyntax.value
 
-      def write(graph: Jena#Graph, os: OutputStream, base: String) = WrappedThrowable.fromTryCatch {
-        val model = ModelFactory.createModelForGraph(graph.jenaGraph)
-        model.getWriter(serialization).write(model, os, base)
-      }
-
-      def write(graph: Jena#Graph, writer: jWriter, base: String) = WrappedThrowable.fromTryCatch {
-        val model = ModelFactory.createModelForGraph(graph.jenaGraph)
-        model.getWriter(serialization).write(model, writer, base)
-      }
+      def write[R <: jWriter](graph: Jena#Graph, wcr: WriteCharsResource[R], base: String): BananaValidation[Unit] =
+        WrappedThrowable.fromTryCatch {
+          wcr.acquireAndGet { writer =>
+            val model = ModelFactory.createModelForGraph(graph.jenaGraph)
+            model.getWriter(serialization).write(model, writer, base)
+          }
+        }
 
     }
 

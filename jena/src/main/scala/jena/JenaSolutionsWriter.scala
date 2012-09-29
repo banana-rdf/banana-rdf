@@ -1,11 +1,12 @@
 package org.w3.banana.jena
 
-import java.io.{ Writer, OutputStream }
+import java.io.{ ByteArrayOutputStream, Writer => jWriter }
+import scalax.io._
 import org.w3.banana._
 import scalaz.Validation
 
 /**
- * Creates a blocking Sparql writer for the given syntax
+ * Creates a Sparql writer for the given syntax
  */
 object JenaSolutionsWriter {
 
@@ -14,12 +15,14 @@ object JenaSolutionsWriter {
 
       val syntax = _syntax
 
-      def write(answers: Jena#Solutions, os: OutputStream, base: String) =
+      def write[R <: jWriter](answers: Jena#Solutions, wcr: WriteCharsResource[R], base: String) =
         WrappedThrowable.fromTryCatch {
-          jenaSparqlSyntax.formatter.format(os, answers)
+          // Jena's OutputFormater has no method operating over a Writer
+          // so we need to a temporary String
+          val baos = new ByteArrayOutputStream()
+          jenaSparqlSyntax.formatter.format(baos, answers)
+          wcr.write(baos.toString("UTF-8"))
         }
-
-      def write(input: Jena#Solutions, writer: Writer, base: String) = null
 
     }
 

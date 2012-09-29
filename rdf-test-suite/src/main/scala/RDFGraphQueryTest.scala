@@ -60,7 +60,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = sparqlWriter.write(answers, out, "")
+      val serialisedAnswer = sparqlWriter.write(answers, Resource.fromOutputStream(out), "")
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
       val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
@@ -147,7 +147,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
 
       val serialisedAnswer = BooleanWriter.selector(MediaRange(sparqlWriter.syntax.mime)).map {
         l =>
-          l.write(answers, out, "")
+          l.write(answers, Resource.fromOutputStream(out), "")
       }.getOrElse(fail("could not find sparql boolean writer for " + sparqlWriter.syntax.mime))
 
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")

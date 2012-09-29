@@ -1,7 +1,8 @@
 package org.w3.banana.sesame
 
 import org.w3.banana._
-import java.io.{ Writer, OutputStream }
+import java.io.{ ByteArrayOutputStream, Writer => jWriter }
+import scalax.io._
 
 /**
  * Creates a blocking Sparql writer for the given syntax
@@ -13,18 +14,16 @@ object SesameSolutionsWriter {
 
       val syntax = _syntax
 
-      def write(answers: Sesame#Solutions, os: OutputStream, base: String = "") = {
+      def write[R <: jWriter](answers: Sesame#Solutions, wcr: WriteCharsResource[R], base: String) =
         WrappedThrowable.fromTryCatch {
-          val w = sesameSparqlSyntax.writer(os)
-          // w.startQueryResult(answers.getBindingNames)
-          w.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
-          answers foreach { answer => w.handleSolution(answer) }
-          os.flush()
-          w.endQueryResult()
+          val baos = new ByteArrayOutputStream()
+          val sWriter = sesameSparqlSyntax.writer(baos)
+          // sWriter.startQueryResult(answers.getBindingNames)
+          sWriter.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
+          answers foreach { answer => sWriter.handleSolution(answer) }
+          sWriter.endQueryResult()
+          wcr.write(baos.toString("UTF-8"))
         }
-      }
-
-      def write(input: Sesame#Solutions, writer: Writer, base: String) = null
 
     }
 

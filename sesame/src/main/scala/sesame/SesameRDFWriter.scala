@@ -5,6 +5,7 @@ import SesameDiesel._
 import SesameOperations._
 import scalaz.Validation
 import java.io.{ Writer => jWriter, _ }
+import scalax.io._
 import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
 import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 import org.openrdf.rio.{ RDFWriter => sRDFWriter }
@@ -16,28 +17,15 @@ object SesameRDFWriter {
 
       val syntax = _syntax
 
-      private def write(graph: Sesame#Graph, rdfWriter: sRDFWriter, base: String): BananaValidation[Unit] =
+      def write[R <: jWriter](graph: Sesame#Graph, wcr: WriteCharsResource[R], base: String): BananaValidation[Unit] =
         WrappedThrowable.fromTryCatch {
-          rdfWriter.startRDF()
-          graph.toIterable foreach rdfWriter.handleStatement
-          rdfWriter.endRDF()
+          wcr.acquireAndGet { writer =>
+            val sWriter = sesameSyntax.rdfWriter(writer, base)
+            sWriter.startRDF()
+            graph.toIterable foreach sWriter.handleStatement
+            sWriter.endRDF()
+          }
         }
-
-      def write(graph: Sesame#Graph, os: OutputStream, base: String): BananaValidation[Unit] =
-        for {
-          rdfWriter <- WrappedThrowable.fromTryCatch {
-            sesameSyntax.rdfWriter(os, base)
-          }
-          result <- write(graph, rdfWriter, base)
-        } yield result
-
-      def write(graph: Sesame#Graph, writer: jWriter, base: String): BananaValidation[Unit] =
-        for {
-          rdfWriter <- WrappedThrowable.fromTryCatch {
-            sesameSyntax.rdfWriter(writer, base)
-          }
-          result <- write(graph, rdfWriter, base)
-        } yield result
 
     }
 
