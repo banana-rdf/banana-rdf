@@ -3,6 +3,7 @@ package org.w3.banana
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 import java.io._
+import scalax.io._
 import org.scalatest.EitherValues._
 
 import scalaz.Validation
@@ -43,7 +44,8 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
 
   "read TURTLE version of timbl's card" in {
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
-    val graph = reader.read(file, file.toURI.toString).fold(t => throw t, g => g)
+    val resource = Resource.fromFile(file)
+    val graph = reader.read(resource, file.toURI.toString).fold(t => throw t, g => g)
     //    graph.fold( _.printStackTrace, r => println(r.size))
     graph.toIterable.size must equal(77)
   }
@@ -53,6 +55,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
+    import scalax.io.JavaConverters._
     val graph = reader.read(turtleString, rdfCore).fold(t => throw t, g => g)
     assert(referenceGraph isIsomorphicWith graph)
 

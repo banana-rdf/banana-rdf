@@ -5,7 +5,6 @@ trait WriterSelector[O] extends (MediaRange => Option[Writer[O, Any]]) { self =>
   def combineWith(otherSelector: WriterSelector[O]): WriterSelector[O] =
     new WriterSelector[O] {
       def apply(range: MediaRange): Option[Writer[O, Any]] = {
-        println(range)
         self(range) orElse otherSelector(range)
       }
     }

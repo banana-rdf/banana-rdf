@@ -76,6 +76,9 @@ object BananaRdfBuild extends Build {
   
 //  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
   
+  val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.1-seq"
+  val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.1-seq"
+
   val akka = "com.typesafe.akka" % "akka-actor" % "2.0.1"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
@@ -177,6 +180,8 @@ object BananaRdfBuild extends Build {
     id = "banana-rdf",
     base = file("rdf"),
     settings = buildSettings ++ testDeps ++ Seq(
+      libraryDependencies += scalaIoCore,
+      libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,

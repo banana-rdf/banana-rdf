@@ -7,6 +7,7 @@ import akka.util.Timeout
 import akka.dispatch._
 import akka.util.duration._
 import org.w3.banana.util._
+import scalax.io._
 
 class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf, BananaFuture])(
@@ -28,9 +29,9 @@ class SparqlEngineTest[Rdf <: RDF](
 
   val foaf = FOAFPrefix(ops)
 
-  val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
+  val resource = Resource.fromFile("rdf-test-suite/src/main/resources/new-tr.rdf")
 
-  val graph = reader.read(file, "http://example.com") getOrElse sys.error("ouch")
+  val graph = reader.read(resource, "http://example.com") getOrElse sys.error("ouch")
 
   val graph1: Rdf#Graph = (
     bnode("betehess")

@@ -4,6 +4,7 @@ import org.w3.banana._
 import java.io._
 import com.hp.hpl.jena.rdf.model.{ RDFReader => _, _ }
 import scalaz.Validation
+import scalax.io._
 
 object JenaRDFReader {
 
@@ -23,16 +24,12 @@ object JenaRDFReader {
 
       val serialization = jenaSyntax.value
 
-      def read(is: InputStream, base: String): BananaValidation[Jena#Graph] = WrappedThrowable.fromTryCatch {
-        val model = ModelFactory.createDefaultModel()
-        model.getReader(serialization).read(model, is, base)
-        BareJenaGraph(model.getGraph)
-      }
-
-      def read(reader: Reader, base: String): BananaValidation[Jena#Graph] = WrappedThrowable.fromTryCatch {
-        val model = ModelFactory.createDefaultModel()
-        model.getReader(serialization).read(model, reader, base)
-        BareJenaGraph(model.getGraph)
+      def read[R <: Reader](resource: ReadCharsResource[R], base: String): BananaValidation[Jena#Graph] = WrappedThrowable.fromTryCatch {
+        resource acquireAndGet { reader => 
+          val model = ModelFactory.createDefaultModel()
+          model.getReader(serialization).read(model, reader, base)
+          BareJenaGraph(model.getGraph)
+        }
       }
 
     }

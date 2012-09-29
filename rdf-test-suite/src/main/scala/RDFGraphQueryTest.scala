@@ -3,6 +3,7 @@ package org.w3.banana
 import org.scalatest._
 import org.scalatest.matchers._
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
+import scalax.io._
 
 class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
     implicit diesel: Diesel[Rdf],
@@ -16,9 +17,9 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
   import ops._
   import sparqlOperations._
 
-  val file = new java.io.File("rdf-test-suite/src/main/resources/new-tr.rdf")
+  val resource = Resource.fromFile("rdf-test-suite/src/main/resources/new-tr.rdf")
 
-  val graph = reader.read(file, "http://foo.com") getOrElse sys.error("ouch")
+  val graph = reader.read(resource, "http://foo.com") getOrElse sys.error("ouch")
   val sparqlEngine = graphQuery.makeSparqlEngine(graph)
 
   "SELECT DISTINCT query in new-tr.rdf " should {

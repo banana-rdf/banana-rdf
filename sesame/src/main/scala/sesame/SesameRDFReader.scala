@@ -10,6 +10,7 @@ import SesamePrefix._
 
 import scalaz.Validation
 import scalaz.Validation._
+import scalax.io._
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
   override def handleStatement(st: Statement): Unit = st.getObject match {
@@ -30,22 +31,15 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
 
   val syntax = Syntax[Turtle]
 
-  def read(is: InputStream, base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
-    val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
-    val triples = new java.util.LinkedList[Statement]
-    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-    turtleParser.setRDFHandler(collector)
-    turtleParser.parse(is, base)
-    new GraphImpl(triples)
-  }
-
-  def read(reader: Reader, base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
-    val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
-    val triples = new java.util.LinkedList[Statement]
-    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-    turtleParser.setRDFHandler(collector)
-    turtleParser.parse(reader, base)
-    new GraphImpl(triples)
+  def read[R <: Reader](resource: ReadCharsResource[R], base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
+    resource acquireAndGet { reader => 
+      val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
+      val triples = new java.util.LinkedList[Statement]
+      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
+      turtleParser.setRDFHandler(collector)
+      turtleParser.parse(reader, base)
+      new GraphImpl(triples)
+    }
   }
 
 }
@@ -56,22 +50,15 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
 
   val syntax = Syntax[RDFXML]
 
-  def read(is: InputStream, base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
-    val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
-    val triples = new java.util.LinkedList[Statement]
-    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-    parser.setRDFHandler(collector)
-    parser.parse(is, base)
-    new GraphImpl(triples)
-  }
-
-  def read(reader: Reader, base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
-    val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
-    val triples = new java.util.LinkedList[Statement]
-    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-    parser.setRDFHandler(collector)
-    parser.parse(reader, base)
-    new GraphImpl(triples)
+  def read[R <: Reader](resource: ReadCharsResource[R], base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
+    resource acquireAndGet { reader =>
+      val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
+      val triples = new java.util.LinkedList[Statement]
+      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
+      parser.setRDFHandler(collector)
+      parser.parse(reader, base)
+      new GraphImpl(triples)
+    }
   }
 
 }
