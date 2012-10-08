@@ -103,7 +103,7 @@ trait CommonBinders[Rdf <: RDF] {
         try {
           Success(DateTime.parse(lexicalForm))
         } catch {
-          case t => Failure(FailedConversion(literal.toString + " is of type xsd:dateTime but its lexicalForm could not be parsed: " + lexicalForm))
+          case t: Throwable => Failure(FailedConversion(literal.toString + " is of type xsd:dateTime but its lexicalForm could not be parsed: " + lexicalForm))
         }
       else
         Failure(FailedConversion(lexicalForm + " has datatype " + datatype))

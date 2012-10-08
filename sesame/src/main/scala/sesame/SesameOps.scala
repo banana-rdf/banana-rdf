@@ -56,7 +56,7 @@ object SesameOperations extends RDFOps[Sesame] {
     try {
       valueFactory.createURI(iriStr).asInstanceOf[Sesame#URI]
     } catch {
-      case e =>
+      case e: Exception =>
         if (iriStr.nonEmpty && iriStr.charAt(0) == '#')
           new URI {
             override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == this.toString

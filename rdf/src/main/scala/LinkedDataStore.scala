@@ -3,7 +3,7 @@ package org.w3.banana
 import org.w3.banana.util._
 import scalaz._
 import scalaz.Scalaz._
-import akka.dispatch.ExecutionContext
+import scala.concurrent._
 
 object LinkedDataStore {
 

@@ -1,7 +1,8 @@
 package org.w3.banana.util
 
 import akka.dispatch._
-import akka.util.Duration
+import scala.concurrent._
+import scala.concurrent.util._
 import scalaz._
 import scalaz.Scalaz._
 import java.util.concurrent.TimeoutException
@@ -11,22 +12,22 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) /*extends Akk
 
   implicit val defaultDuration = FutureValidation.defaultDuration
 
-  def map[T](fn: (S) => T): FutureValidation[F, T] =
+  def map[T](fn: (S) => T)(implicit ec: ExecutionContext): FutureValidation[F, T] =
     FutureValidation(inner map { validation => validation map fn })
 
   def flatMap[T](fn: (S) => FutureValidation[F, T])(implicit ec: ExecutionContext): FutureValidation[F, T] =
     FutureValidation(
       inner flatMap { validation =>
         validation fold (
-          f => Promise.successful(f.fail[T]),
+          f => Future.successful(Failure[F, T](f)),
           s => fn(s).inner
         )
       })
 
-  def fold[T](failure: (F) => T = identity[F] _, success: (S) => T = identity[S] _): Future[T] =
+  def fold[T](failure: (F) => T = identity[F] _, success: (S) => T = identity[S] _)(implicit ec: ExecutionContext): Future[T] =
     inner map { validation => validation fold (failure, success) }
 
-  def mapFailure[G](f: F => G): FutureValidation[G, S] =
+  def mapFailure[G](f: F => G)(implicit ec: ExecutionContext): FutureValidation[G, S] =
     FutureValidation(
       this.fold(
         x => Failure(f(x)),
@@ -34,22 +35,22 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) /*extends Akk
       )
     )
 
-  def foreach[T](f: (S) => T): Unit = {
+  def foreach[T](f: (S) => T)(implicit ec: ExecutionContext): Unit = {
     this.map(f)
     ()
   }
 
   def orElse[G](f: F => FutureValidation[G, S])(implicit ec: ExecutionContext) =
-    inner flatMap {
+    inner.flatMap {
       (v: Validation[F, S]) =>
         v.fold(
           x => f(x).inner,
-          s => Promise.successful(s.success[G])
+          s => Future.successful(s.success[G])
         )
-    } fv
+    }.fv
 
   /** And the success shall be failures and the failures shall be successes. This is how you do logical negation */
-  def invert: FutureValidation[S, F] =
+  def invert(implicit ec: ExecutionContext): FutureValidation[S, F] =
     FutureValidation(
       inner map (v => v.fold(Success.apply, Failure.apply))
     )
@@ -57,10 +58,10 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) /*extends Akk
   def fv: FutureValidation[F, S] =
     this
 
-  def failMap[G](func: F => G): FutureValidation[G, S] =
+  def failMap[G](func: F => G)(implicit ec: ExecutionContext): FutureValidation[G, S] =
     FutureValidation(inner map { validation => validation.fold(f => Failure(func(f)), s => Success(s)) })
 
-  def await(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException): BananaValidation[S] =
+  def await(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException, ec: ExecutionContext): BananaValidation[S] =
     try {
       val bf = this.failMap(ev)
       Await.result(bf.inner, duration)
@@ -68,7 +69,7 @@ case class FutureValidation[F, S](inner: Future[Validation[F, S]]) /*extends Akk
       case te: TimeoutException => Failure(BananaTimeout(te))
     }
 
-  def getOrFail(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException): S = {
+  def getOrFail(duration: Duration = defaultDuration)(implicit ev: F <:< BananaException, ec: ExecutionContext): S = {
     val r = await(duration)
     r.fold(t => throw t, s => s)
   }

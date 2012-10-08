@@ -5,9 +5,10 @@ import org.scalatest.matchers._
 import akka.actor.ActorSystem
 import akka.util.Timeout
 import akka.dispatch._
-import akka.util.duration._
+import scala.concurrent.util._
 import org.w3.banana.util._
 import scalax.io._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf, BananaFuture])(

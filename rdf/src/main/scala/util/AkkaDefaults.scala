@@ -2,7 +2,7 @@ package org.w3.banana.util
 
 import akka.actor.ActorSystem
 import akka.dispatch.MessageDispatcher
-import akka.util.duration._
+import scala.concurrent.util._
 
 trait AkkaDefaults {
   def defaultActorSystem = AkkaDefaults.actorSystem

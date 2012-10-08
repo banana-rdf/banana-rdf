@@ -35,7 +35,7 @@ object SesameQueryResultsReader {
     new SparqlQueryResultsReader[Sesame, T] {
 
       def read(in: InputStream, base: String) = {
-        val bytes: Array[Byte] = Iterator.continually(in.read).takeWhile(-1 !=).map(_.toByte).toArray
+        val bytes: Array[Byte] = Iterator.continually(in.read).takeWhile((-1).!=).map(_.toByte).toArray
         parse(bytes)
       }
 
@@ -60,7 +60,7 @@ object SesameQueryResultsReader {
       }
 
       def read(reader: Reader, base: String) = {
-        val queri = Iterator.continually(reader.read).takeWhile(-1 !=).map(_.toChar).toArray
+        val queri = Iterator.continually(reader.read).takeWhile((-1).!=).map(_.toChar).toArray
         //it is really horrible to have to turn a nice char array into bytes for parsing!
         parse(new String(queri).getBytes("UTF-8"))
       }

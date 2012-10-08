@@ -13,8 +13,8 @@ import org.openrdf.sail.SailException
 import org.openrdf.query._
 import org.openrdf.query.impl._
 import org.openrdf.sail.memory.MemoryStore
-import scalaz._
-import akka.dispatch.{ ExecutionContext, Future }
+import scalaz.{ Resource => _, _ }
+import scala.concurrent._
 import java.util.concurrent._
 
 object SesameStore {

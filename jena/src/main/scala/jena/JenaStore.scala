@@ -12,7 +12,7 @@ import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype }
 import scalaz._
 import scala.collection.JavaConverters._
-import akka.dispatch.{ ExecutionContext, Future }
+import scala.concurrent.{ ops => _, _ }
 import java.util.concurrent._
 
 object JenaStore {

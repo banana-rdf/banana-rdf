@@ -1,7 +1,7 @@
 package org.w3.banana
 
 import org.scalatest._
-import akka.dispatch.{ ExecutionContext, Future }
+import scala.concurrent._
 import java.util.concurrent._
 
 object TestHelper {

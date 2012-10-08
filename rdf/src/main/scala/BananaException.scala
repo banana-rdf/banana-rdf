@@ -11,7 +11,7 @@ object BananaException {
   def bananaCatch[T](a: => T): BananaValidation[T] = try {
     Success(a)
   } catch {
-    case e => Failure(StoreProblem(e))
+    case e: Throwable => Failure(StoreProblem(e))
   }
 
 }

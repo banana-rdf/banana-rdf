@@ -2,11 +2,11 @@ package org.w3.banana.util
 
 import org.w3.banana._
 
-import akka.dispatch._
+import scala.concurrent._
 import scalaz.{ Validation, Success }
 
 class AnyW[T](t: T) {
-  def bf(implicit ec: ExecutionContext): BananaFuture[T] = FutureValidation(Promise.successful(Success(t)))
+  def bf(implicit ec: ExecutionContext): BananaFuture[T] = FutureValidation(Future.successful(Success(t)))
 }
 
 trait AnySyntax {

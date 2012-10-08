@@ -13,13 +13,13 @@ object BuildSettings {
     organization := "org.w3",
 //    version      := "0.3-SNAPSHOT",
     version      := "x07-SNAPSHOT",
-    scalaVersion := "2.9.2",
-    crossScalaVersions := Seq("2.9.2"),
+    scalaVersion := "2.10.0-M7",
 
     parallelExecution in Test := false,
-    testOptions in Test += Tests.Argument("-oDF"),
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-Ydependent-method-types"),
+    testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions", "-language:higherKinds"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+    resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
     ensimeConfig := sexp(
@@ -61,11 +61,11 @@ object BuildSettings {
   )
 
   val jenaTestWIPFilter = Seq (
-    testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
+    testOptions in Test += Tests.Argument("exclude(org.w3.banana.jenaWIP)")
   )
 
   val sesameTestWIPFilter = Seq (
-    testOptions in Test += Tests.Argument("-l", "org.w3.banana.sesameWIP")
+    testOptions in Test += Tests.Argument("exclude(org.w3.banana.sesameWIP)")
   )
 
 }
@@ -75,15 +75,19 @@ object BananaRdfBuild extends Build {
   import BuildSettings._
   
 //  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
-  
-  val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.1-seq"
-  val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.1-seq"
 
-  val akka = "com.typesafe.akka" % "akka-actor" % "2.0.1"
+  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0-M7"
+
+  val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.1"
+  val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.1"
+
+  val akka = "com.typesafe.akka" % "akka-actor_2.10.0-M7" % "2.1-M2"
+
+  val scalaStm = "org.scala-tools" % "scala-stm_2.10.0-M7" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
+  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -92,18 +96,19 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val junitInterface = "com.novocode" % "junit-interface" % "0.8"
-  val scalacheck = "org.scala-tools.testing" % "scalacheck_2.9.1" % "1.9"
-  val scalatest = "org.scalatest" %% "scalatest" % "1.8"
+  val scalatest = "org.scalatest" % "scalatest_2.10.0-M7" % "2.0.M4-2.10.0-M7-B1"
   
   val testsuiteDeps =
-    Seq(libraryDependencies += junitInterface,
-        libraryDependencies += scalatest,
-        libraryDependencies += scalacheck)
+    Seq(
+      libraryDependencies += scalaActors,
+      libraryDependencies += scalatest
+    )
   
   val testDeps =
-    Seq(libraryDependencies += junitInterface % "test",
-        libraryDependencies += scalatest % "test")
+    Seq(
+      libraryDependencies += scalaActors % "test",
+      libraryDependencies += scalatest % "test"
+    )
   
   val jenaDeps =
     Seq(
@@ -127,39 +132,39 @@ object BananaRdfBuild extends Build {
 
   val pub = TaskKey[Unit]("pub")
 
-  lazy val full = {
-    def sxrOptions(baseDir: File, sourceDirs: Seq[Seq[File]]): Seq[String] = {
-      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.9.0-0.2.7.jar").asFile.getAbsolutePath
-      val baseDirs = sourceDirs.flatten
-      val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
-      Seq(xplugin, sxrBaseDir)
-    }
-
-    val projects = Seq(rdf, jena, sesame)
-    val allSources           = TaskKey[Seq[Seq[File]]]("all-sources")
-    val allSourceDirectories = SettingKey[Seq[Seq[File]]]("all-source-directories")
-
-    Project(
-      id = "full",
-      base = file("full"),
-      dependencies = Seq(rdf, jena, sesame),
-      settings     = buildSettings ++ Seq(
-        allSources           <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
-        allSourceDirectories <<= projects.map(sourceDirectories in Compile in _).join,
-
-        // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
-        (sources in Compile) <<= (allSources).map(_.flatten),
-
-        // Avoid compiling the sources here; we just are after scaladoc.
-        (compile in Compile) := inc.Analysis.Empty,
-
-        // Include SXR in the Scaladoc Build to generated HTML annotated sources.
-        scalacOptions in (Compile, doc) <++= (baseDirectory, allSourceDirectories).map {
-          (bd, asd) => sxrOptions(bd, asd)
-        }
-      )
-    )
-  }
+//  lazy val full = {
+//    def sxrOptions(baseDir: File, sourceDirs: Seq[Seq[File]]): Seq[String] = {
+//      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.9.0-0.2.7.jar").asFile.getAbsolutePath
+//      val baseDirs = sourceDirs.flatten
+//      val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
+//      Seq(xplugin, sxrBaseDir)
+//    }
+//
+//    val projects = Seq(rdf, jena, sesame)
+//    val allSources           = TaskKey[Seq[Seq[File]]]("all-sources")
+//    val allSourceDirectories = SettingKey[Seq[Seq[File]]]("all-source-directories")
+//
+//    Project(
+//      id = "full",
+//      base = file("full"),
+//      dependencies = Seq(rdf, jena, sesame),
+//      settings     = buildSettings ++ Seq(
+//        allSources           <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
+//        allSourceDirectories <<= projects.map(sourceDirectories in Compile in _).join,
+//
+//        // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
+//        (sources in Compile) <<= (allSources).map(_.flatten),
+//
+//        // Avoid compiling the sources here; we just are after scaladoc.
+//        (compile in Compile) := inc.Analysis.Empty,
+//
+//        // Include SXR in the Scaladoc Build to generated HTML annotated sources.
+//        scalacOptions in (Compile, doc) <++= (baseDirectory, allSourceDirectories).map {
+//          (bd, asd) => sxrOptions(bd, asd)
+//        }
+//      )
+//    )
+//  }
 
   
   lazy val banana = Project(
@@ -173,8 +178,9 @@ object BananaRdfBuild extends Build {
       rdf,
       rdfTestSuite,
       jena,
-      sesame,
-      full))
+      sesame//,
+//      ldp,
+      /*full*/))
   
   lazy val rdf = Project(
     id = "banana-rdf",
@@ -194,6 +200,8 @@ object BananaRdfBuild extends Build {
     id = "banana-rdf-test-suite",
     base = file("rdf-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ Seq(
+      libraryDependencies += scalaIoCore,
+      libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert
@@ -204,6 +212,8 @@ object BananaRdfBuild extends Build {
     id = "banana-jena",
     base = file("jena"),
     settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
+      libraryDependencies += scalaIoCore,
+      libraryDependencies += scalaIoFile,
       libraryDependencies += akka
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
@@ -211,8 +221,22 @@ object BananaRdfBuild extends Build {
   lazy val sesame = Project(
     id = "banana-sesame",
     base = file("sesame"),
-    settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps
+    settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps ++ Seq(
+      libraryDependencies += scalaIoCore,
+      libraryDependencies += scalaIoFile,
+      libraryDependencies += akka
+
+    )
   ) dependsOn (rdf, rdfTestSuite % "test")
+
+  lazy val ldp = Project(
+    id = "ldp",
+    base = file("ldp"),
+    settings = buildSettings ++ testDeps ++ Seq(
+      libraryDependencies += scalaStm
+    )
+  ) dependsOn (rdf, jena % "test", sesame % "test")
+
   
 }
 
