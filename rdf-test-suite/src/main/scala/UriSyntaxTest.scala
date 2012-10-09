@@ -43,4 +43,12 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends
     /* URI("bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/bar")) */
   }
 
+  "should be able to create and work with relative URIs" taggedAs(SesameWIP) in {
+    val me = URI("/people/card/henry#me")
+    me.fragment must be(Some("me"))
+    me.fragmentLess must be(URI("/people/card/henry"))
+    val host = URI("http://bblfish.net")
+    me.resolveAgainst(host) must be(URI("http://bblfish.net/people/card/henry#me"))
+  }
+
 }
