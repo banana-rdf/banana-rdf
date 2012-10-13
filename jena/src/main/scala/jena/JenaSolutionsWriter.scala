@@ -3,7 +3,7 @@ package org.w3.banana.jena
 import java.io.{ ByteArrayOutputStream, Writer => jWriter }
 import scalax.io._
 import org.w3.banana._
-import scalaz.Validation
+import scala.util._
 
 /**
  * Creates a Sparql writer for the given syntax
@@ -16,7 +16,7 @@ object JenaSolutionsWriter {
       val syntax = _syntax
 
       def write[R <: jWriter](answers: Jena#Solutions, wcr: WriteCharsResource[R], base: String) =
-        WrappedThrowable.fromTryCatch {
+        Try {
           // Jena's OutputFormater has no method operating over a Writer
           // so we need to a temporary String
           val baos = new ByteArrayOutputStream()

@@ -40,7 +40,9 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
   }
 
   def linkedPerson(ldr: LinkedDataResource[Rdf]): LinkedPerson =
-    new LinkedPerson(ldr.uri, store)
+    new LinkedPerson(ldr.uri, store) {
+      override lazy val bananaResource = ldr.asFuture
+    }
 
   def linkedPerson(uri: Rdf#URI): LinkedPerson = new LinkedPerson(uri, store)
 

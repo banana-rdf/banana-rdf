@@ -4,6 +4,7 @@ import org.w3.banana._
 import java.io.{ Writer => jWriter }
 import scalax.io._
 import com.hp.hpl.jena.rdf.model.ModelFactory
+import scala.util._
 
 /**
  * Create an RDF Writer using Jena's serialisers
@@ -19,8 +20,8 @@ object JenaRDFWriter {
 
       val serialization = jenaSyntax.value
 
-      def write[R <: jWriter](graph: Jena#Graph, wcr: WriteCharsResource[R], base: String): BananaValidation[Unit] =
-        WrappedThrowable.fromTryCatch {
+      def write[R <: jWriter](graph: Jena#Graph, wcr: WriteCharsResource[R], base: String): Try[Unit] =
+        Try {
           wcr.acquireAndGet { writer =>
             val model = ModelFactory.createModelForGraph(graph.jenaGraph)
             model.getWriter(serialization).write(model, writer, base)

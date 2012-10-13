@@ -4,6 +4,7 @@ import org.w3.banana._
 import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, XMLOutput }
 import java.io.{ Reader, InputStream, OutputStream }
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import scala.util._
 
 /**
  * Creates a blocking Sparql BlockingReader for the given syntax
@@ -15,8 +16,8 @@ object JenaQueryResultsReader {
   def apply[S](implicit jenaSparqlSyntax: JenaAnswerInput[S]): SparqlQueryResultsReader[Jena, S] =
     new SparqlQueryResultsReader[Jena, S] {
 
-      def read(in: InputStream, base: String = ""): BananaValidation[Answer] =
-        WrappedThrowable.fromTryCatch {
+      def read(in: InputStream, base: String = ""): Try[Answer] =
+        Try {
           val resultSet = jenaSparqlSyntax.parse(in)
           if (resultSet.isBoolean) {
             Right(resultSet.getBooleanResult)

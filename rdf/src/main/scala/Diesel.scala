@@ -26,7 +26,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
 
   implicit def toPointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(PointedGraph(node))
 
-  class PointedGraphW(pointed: PointedGraph[Rdf]) {
+  implicit class PointedGraphW(pointed: PointedGraph[Rdf]) {
 
     import pointed.graph
 
@@ -72,6 +72,10 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
   }
 
   class PointedGraphs(val nodes: Iterable[Rdf#Node], val graph: Rdf#Graph) extends Iterable[PointedGraph[Rdf]] {
+
+    override def toString: String = {
+      nodes.mkString("[", " ; ", "]")
+    }
 
     def iterator = nodes.iterator map { PointedGraph(_, graph) }
 
@@ -139,13 +143,9 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
      *
      * note: this is very different from as[List[T]], which is an encoding of a List in RDF
      */
-    def asSet[T](implicit binder: PointedGraphBinder[Rdf, T]): Try[Set[T]] =
-      this.iterator.foldLeft[Try[Set[T]]](Success(Set.empty[T])){ case (accT, g) =>
-        for {
-          acc <- accT
-          t <- g.as[T]
-        } yield acc + t
-      }
+    def asSet[T](implicit binder: PointedGraphBinder[Rdf, T]): Try[Set[T]] = Try {
+      this.iterator.foldLeft[Set[T]](Set.empty[T]){ case (acc, pg) => acc + binder.fromPointedGraph(pg).get }
+    }
 
     def asSet2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Try[Set[(T1, T2)]] =
       this.iterator.foldLeft[Try[Set[(T1, T2)]]](Success(Set.empty)){ case (accT, g) =>
@@ -243,8 +243,6 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
   implicit val PGBUri: PointedGraphBinder[Rdf, Rdf#URI] = NodeToPointedGraphBinder(UriToNodeBinder(URIBinder.naturalBinder[Rdf]))
 
   implicit val PGBLiteral: PointedGraphBinder[Rdf, Rdf#Literal] = NodeToPointedGraphBinder(LiteralToNodeBinder(LiteralBinder.naturalBinder[Rdf]))
-
-  implicit def pointedGraph2PointedGraphW(pointed: PointedGraph[Rdf]): PointedGraphW = new PointedGraphW(pointed)
 
   implicit def graph2GraphW(graph: Rdf#Graph): GraphW = new GraphW(graph)
 

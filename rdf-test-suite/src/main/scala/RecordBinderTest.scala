@@ -2,8 +2,7 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
-import scalaz.{ Validation, Failure, Success }
-import java.util.UUID
+import scala.util._
 
 abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
 

@@ -4,7 +4,7 @@ import scala.util._
 
 trait Property[Rdf <: RDF, T] {
 
-  val uri: Rdf#URI
+  def uri: Rdf#URI
 
   def pos(t: T): Iterable[(Rdf#URI, PointedGraph[Rdf])]
 

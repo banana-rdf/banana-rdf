@@ -5,8 +5,8 @@ import org.w3.banana._
 import com.hp.hpl.jena.query.{ Query => JenaQuery, QueryException, QueryFactory }
 import com.hp.hpl.jena.graph.{ Node => JenaNode }
 import com.hp.hpl.jena.rdf.model.RDFNode
-import scalaz.{ Failure, Success, Validation }
 import scala.collection.JavaConverters._
+import scala.util._
 
 object JenaSparqlOps extends SparqlOps[Jena] {
 
@@ -16,10 +16,8 @@ object JenaSparqlOps extends SparqlOps[Jena] {
 
   def AskQuery(query: String): Jena#AskQuery = QueryFactory.create(query)
 
-  def Query(query: String): Validation[Exception, Jena#Query] = try {
-    Success(QueryFactory.create(query))
-  } catch {
-    case e: QueryException => Failure(e)
+  def Query(query: String): Try[Jena#Query] = Try {
+    QueryFactory.create(query)
   }
 
   def fold[T](query: Jena#Query)(select: Jena#SelectQuery => T,
@@ -31,7 +29,7 @@ object JenaSparqlOps extends SparqlOps[Jena] {
       case JenaQuery.QueryTypeAsk => ask(query)
     }
 
-  def getNode(solution: Jena#Solution, v: String): BananaValidation[Jena#Node] = {
+  def getNode(solution: Jena#Solution, v: String): Try[Jena#Node] = {
     val node: RDFNode = solution.get(v)
     if (node == null)
       Failure(VarNotFound("var " + v + " not found in QuerySolution " + solution.toString))

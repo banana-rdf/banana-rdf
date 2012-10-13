@@ -4,9 +4,7 @@ import org.scalatest._
 import org.scalatest.matchers._
 import java.io._
 import org.scalatest.EitherValues._
-
-import scalaz._
-import scalaz.Validation._
+import scala.util._
 
 abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {

@@ -3,8 +3,7 @@ package org.w3.banana
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 import org.joda.time.DateTime
-import scalaz._
-import scalaz.Scalaz._
+import scala.util._
 
 abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
@@ -59,10 +58,10 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
   }
 
   "serializing and deserialiazing Option" in {
-    val opts = some("foo")
+    val opts: Option[String] = Some("foo")
     implicit val binder = PointedGraphBinder[Rdf, Option[String]]
     opts.toPG.as[Option[String]] must equal(Success(opts))
-    none.toPG.as[Option[String]] must equal(Success(None))
+    (None: Option[String]).toPG.as[Option[String]] must equal(Success(None))
 
   }
 }

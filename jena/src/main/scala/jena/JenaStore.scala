@@ -3,17 +3,16 @@ package org.w3.banana.jena
 import org.w3.banana._
 import JenaOperations._
 import JenaDiesel._
-import org.w3.banana.util._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype }
-import scalaz._
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ops => _, _ }
-import java.util.concurrent._
+import java.util.concurrent.{ Executors, ExecutorService }
+import scalaz.Free
 
 object JenaStore {
 
@@ -27,7 +26,7 @@ object JenaStore {
 
 }
 
-class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena, BananaFuture] {
+class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena, Future] {
 
   val executorService: ExecutorService = Executors.newFixedThreadPool(8)
 
@@ -122,10 +121,10 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
     )
   }
 
-  def execute[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): BananaFuture[A] = {
+  def execute[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): Future[A] = {
     operationType(script) match {
-      case READ => readTransaction(run(script)).bf
-      case WRITE => writeTransaction(run(script)).bf
+      case READ => readTransaction(run(script)).asFuture
+      case WRITE => writeTransaction(run(script)).asFuture
     }
 
   }
