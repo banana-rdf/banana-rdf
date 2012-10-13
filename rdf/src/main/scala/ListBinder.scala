@@ -13,7 +13,7 @@ trait ListBinder[Rdf <: RDF] {
       import pointed.{ pointer, graph }
       var elems = List[T]()
       var current = pointer
-      try {
+      Try {
         while (current != rdf.nil) {
           (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
             case (List(first), List(rest)) => {
@@ -24,9 +24,7 @@ trait ListBinder[Rdf <: RDF] {
             case other => throw new FailedConversion("asList: couldn't decode a list")
           }
         }
-        Success(elems.reverse)
-      } catch {
-        case be: BananaException => Failure(be)
+        elems.reverse
       }
     }
 

@@ -23,11 +23,19 @@ with BananaSparqlSolutionWriterSelector {
   }
 
   implicit class TryW[T](t: Try[T]) {
-    def asFuture: Future[T] = Future.successful(t.get)
+    def asFuture: Future[T] = t match {
+      case Success(s) => Future.successful(s)
+      case Failure(f) => Future.failed(f)
+    }
   }
 
-  implicit class AnyW[T](t: T) {
-    def asFuture: Future[T] = Future.successful(t)
+  implicit class AnyW[T](t: => T) {
+    def asFuture: Future[T] =
+      try {
+        Future.successful(t)
+      } catch { case e: Exception =>
+        Future.failed(e)
+      }
   }
 
 }

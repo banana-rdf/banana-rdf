@@ -209,7 +209,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
 
   }
 
-  class GraphW(graph: Rdf#Graph) {
+  implicit class GraphW(graph: Rdf#Graph) {
 
     def getAllInstancesOf(clazz: Rdf#URI): PointedGraphs = {
       val instances = getSubjects(graph, rdf("type"), clazz): Iterable[Rdf#Node]
@@ -243,7 +243,5 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
   implicit val PGBUri: PointedGraphBinder[Rdf, Rdf#URI] = NodeToPointedGraphBinder(UriToNodeBinder(URIBinder.naturalBinder[Rdf]))
 
   implicit val PGBLiteral: PointedGraphBinder[Rdf, Rdf#Literal] = NodeToPointedGraphBinder(LiteralToNodeBinder(LiteralBinder.naturalBinder[Rdf]))
-
-  implicit def graph2GraphW(graph: Rdf#Graph): GraphW = new GraphW(graph)
 
 }
