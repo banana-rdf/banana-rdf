@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.Validation
+import scala.util._
 
 trait SparqlOps[Rdf <: RDF] {
 
@@ -18,7 +18,7 @@ trait SparqlOps[Rdf <: RDF] {
    * @param query a Sparql query
    * @return A validation containing the Query
    */
-  def Query(query: String): Validation[Exception, Rdf#Query]
+  def Query(query: String): Try[Rdf#Query]
 
   /**
    * A fold operation.
@@ -29,7 +29,7 @@ trait SparqlOps[Rdf <: RDF] {
     construct: Rdf#ConstructQuery => T,
     ask: Rdf#AskQuery => T): T
 
-  def getNode(solution: Rdf#Solution, v: String): BananaValidation[Rdf#Node]
+  def getNode(solution: Rdf#Solution, v: String): Try[Rdf#Node]
 
   def varnames(solution: Rdf#Solution): Set[String]
 

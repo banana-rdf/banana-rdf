@@ -1,18 +1,17 @@
 package org.w3.banana
 
-import org.w3.banana.util._
 import scalaz._
 import scalaz.Scalaz._
 import scala.concurrent._
 
 object LinkedDataStore {
 
-  implicit def apply[Rdf <: RDF](store: RDFStore[Rdf, BananaFuture])(implicit diesel: Diesel[Rdf], ec: ExecutionContext): LinkedDataStore[Rdf] =
+  implicit def apply[Rdf <: RDF](store: RDFStore[Rdf, Future])(implicit diesel: Diesel[Rdf], ec: ExecutionContext): LinkedDataStore[Rdf] =
     new LinkedDataStore[Rdf](store)(diesel, ec)
 
 }
 
-class LinkedDataStore[Rdf <: RDF](store: RDFStore[Rdf, BananaFuture])(implicit diesel: Diesel[Rdf], ec: ExecutionContext) {
+class LinkedDataStore[Rdf <: RDF](store: RDFStore[Rdf, Future])(implicit diesel: Diesel[Rdf], ec: ExecutionContext) {
 
   import diesel._
   import ops._
@@ -23,11 +22,11 @@ class LinkedDataStore[Rdf <: RDF](store: RDFStore[Rdf, BananaFuture])(implicit d
    * - the document content represents the graph itself
    * - the given is the pointer in the graph
    */
-  def GET(hyperlink: Rdf#URI): BananaFuture[LinkedDataResource[Rdf]] = {
+  def GET(hyperlink: Rdf#URI): Future[LinkedDataResource[Rdf]] = {
     store.execute(Command.GET[Rdf](hyperlink))
   }
 
-  def GET(hyperlinks: Iterable[Rdf#URI]): BananaFuture[Set[LinkedDataResource[Rdf]]] = {
+  def GET(hyperlinks: Iterable[Rdf#URI]): Future[Set[LinkedDataResource[Rdf]]] = {
     store.execute(Command.GET[Rdf](hyperlinks))
   }
 
@@ -37,26 +36,26 @@ class LinkedDataStore[Rdf <: RDF](store: RDFStore[Rdf, BananaFuture])(implicit d
    * - the graph at the underlying document is not overriden, we only append triples
    * - if the graph did not previously exist, it is created
    */
-  def POST(uri: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Unit] = {
+  def POST(uri: Rdf#URI, pointed: PointedGraph[Rdf]): Future[Unit] = {
     store.execute(Command.POST[Rdf](uri, pointed))
   }
 
-  def PATCH(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]]): BananaFuture[Unit] = {
+  def PATCH(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]]): Future[Unit] = {
     store.execute(Command.PATCH[Rdf](uri, delete))
   }
 
   /**
    *
    */
-  def POSTToCollection(collection: Rdf#URI, pointed: PointedGraph[Rdf]): BananaFuture[Rdf#URI] = {
+  def POSTToCollection(collection: Rdf#URI, pointed: PointedGraph[Rdf]): Future[Rdf#URI] = {
     store.execute(Command.POSTToCollection[Rdf](collection, pointed))
   }
 
-  def DELETE(uri: Rdf#URI): BananaFuture[Unit] = {
+  def DELETE(uri: Rdf#URI): Future[Unit] = {
     store.execute(Command.DELETE[Rdf](uri))
   }
 
-  def PUT(ldr: LinkedDataResource[Rdf]): BananaFuture[Unit] = {
+  def PUT(ldr: LinkedDataResource[Rdf]): Future[Unit] = {
     store.execute(Command.PUT[Rdf](ldr))
   }
 

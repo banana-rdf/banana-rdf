@@ -1,7 +1,5 @@
 package org.w3.banana
 
-import scalaz.Validation
-
 object SparqlSolutionsSyntax {
 
   def apply[Rdf <: RDF](solutions: Rdf#Solutions)(implicit sparqlOps: SparqlOps[Rdf]) =

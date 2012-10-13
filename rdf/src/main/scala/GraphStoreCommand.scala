@@ -54,7 +54,7 @@ object Command {
   def POSTToCollection[Rdf <: RDF](collection: Rdf#URI, pointed: PointedGraph[Rdf])(implicit diesel: Diesel[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#URI] = {
     import diesel._
     import ops._
-    val fragment = pointed.pointer.as[Rdf#URI].fold(t => throw t, s => s)
+    val fragment = pointed.pointer.as[Rdf#URI].get
     // was:
     //  pointed.pointer.as[Rdf#URI] flatMap { uri =>
     //    if (uri.isPureFragment) Success(uri) else Failure(NotPureFragment)

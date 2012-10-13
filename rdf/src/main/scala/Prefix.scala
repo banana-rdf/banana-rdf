@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz._
+import scala.util._
 
 trait Prefix[Rdf <: RDF] {
   def prefixName: String
@@ -30,7 +30,7 @@ class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(i
       None
   }
 
-  def getLocalName(iri: Rdf#URI): BananaValidation[String] =
+  def getLocalName(iri: Rdf#URI): Try[String] =
     unapply(iri) match {
       case None => Failure(LocalNameException(this.toString + " couldn't extract localname for " + iri.toString))
       case Some(localname) => Success(localname)

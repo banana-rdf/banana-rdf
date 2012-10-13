@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.Validation
+import scala.util._
 
 object SparqlSolutionSyntax {
 
@@ -10,7 +10,7 @@ object SparqlSolutionSyntax {
 
 class SparqlSolutionSyntax[Rdf <: RDF](solution: Rdf#Solution)(implicit sparqlOps: SparqlOps[Rdf]) {
 
-  def apply(v: String): BananaValidation[Rdf#Node] =
+  def apply(v: String): Try[Rdf#Node] =
     sparqlOps.getNode(solution, v)
 
   def vars: Set[String] = sparqlOps.varnames(solution)

@@ -1,7 +1,6 @@
 package org.w3.banana
 
-import scalaz._
-import scalaz.Validation._
+import scala.util._
 
 trait ListBinder[Rdf <: RDF] {
   this: Diesel[Rdf] =>
@@ -10,7 +9,7 @@ trait ListBinder[Rdf <: RDF] {
 
   implicit def ListBinder[T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, List[T]] = new PointedGraphBinder[Rdf, List[T]] {
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[List[T]] = {
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[List[T]] = {
       import pointed.{ pointer, graph }
       var elems = List[T]()
       var current = pointer
@@ -19,7 +18,7 @@ trait ListBinder[Rdf <: RDF] {
           (getObjects(graph, current, rdf.first).toList, getObjects(graph, current, rdf.rest).toList) match {
             case (List(first), List(rest)) => {
               val firstPointed = PointedGraph(first, pointed.graph)
-              elems ::= binder.fromPointedGraph(firstPointed).fold(be => throw be, e => e)
+              elems ::= binder.fromPointedGraph(firstPointed).get
               current = rest
             }
             case other => throw new FailedConversion("asList: couldn't decode a list")

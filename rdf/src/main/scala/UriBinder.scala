@@ -1,13 +1,13 @@
 package org.w3.banana
 
-import scalaz._
+import scala.util._
 
 trait ToURI[Rdf <: RDF, T] {
   def toUri(t: T): Rdf#URI
 }
 
 trait FromURI[Rdf <: RDF, T] {
-  def fromUri(uri: Rdf#URI): BananaValidation[T]
+  def fromUri(uri: Rdf#URI): Try[T]
 }
 
 trait URIBinder[Rdf <: RDF, T] extends FromURI[Rdf, T] with ToURI[Rdf, T]
@@ -25,7 +25,7 @@ object URIBinder {
   def toNodeBinder[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], binder: URIBinder[Rdf, T]): NodeBinder[Rdf, T] =
     new NodeBinder[Rdf, T] {
 
-      def fromNode(node: Rdf#Node): BananaValidation[T] =
+      def fromNode(node: Rdf#Node): Try[T] =
         ops.foldNode(node)(
           uri => binder.fromUri(uri),
           bnode => Failure(FailedConversion(node + " is a BNode, not a URI")),
@@ -38,7 +38,7 @@ object URIBinder {
   def naturalBinder[Rdf <: RDF](implicit ops: RDFOps[Rdf]): URIBinder[Rdf, Rdf#URI] =
     new URIBinder[Rdf, Rdf#URI] {
 
-      def fromUri(uri: Rdf#URI): BananaValidation[Rdf#URI] = Success(uri)
+      def fromUri(uri: Rdf#URI): Try[Rdf#URI] = Success(uri)
 
       def toUri(t: Rdf#URI): Rdf#URI = t
 

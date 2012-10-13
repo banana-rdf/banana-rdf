@@ -22,3 +22,6 @@ sbt-launch*.jar
 bin
 .ensime
 *.egp
+
+# just for convenience
+ldp

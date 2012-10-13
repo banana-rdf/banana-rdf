@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.{ Validation, Success, Failure }
+import scala.util._
 
 /**
  * helper functions for binding Scala records (typically case classes)
@@ -28,7 +28,7 @@ trait RecordBinder[Rdf <: RDF] {
   def constant[T](constT: T, constUri: Rdf#URI): PointedGraphBinder[Rdf, T] = {
 
     val uriBinder = new URIBinder[Rdf, T] {
-      def fromUri(uri: Rdf#URI): BananaValidation[T] =
+      def fromUri(uri: Rdf#URI): Try[T] =
         if (constUri == uri)
           Success(constT)
         else
@@ -47,7 +47,7 @@ trait RecordBinder[Rdf <: RDF] {
   def property[T](predicate: Rdf#URI)(implicit objectBinder: PointedGraphBinder[Rdf, T]): Property[Rdf, T] = new Property[Rdf, T] {
     val uri = predicate
     def pos(t: T): Iterable[(Rdf#URI, PointedGraph[Rdf])] = Set((predicate, t.toPG))
-    def extract(pointed: PointedGraph[Rdf]): BananaValidation[T] =
+    def extract(pointed: PointedGraph[Rdf]): Try[T] =
       (pointed / predicate).as[T]
   }
 
@@ -57,7 +57,7 @@ trait RecordBinder[Rdf <: RDF] {
       case None => Set()
       case Some(t) => Set((predicate, t.toPG))
     }
-    def extract(pointed: PointedGraph[Rdf]): BananaValidation[Option[T]] =
+    def extract(pointed: PointedGraph[Rdf]): Try[Option[T]] =
       (pointed / predicate).asOption[T]
   }
 
@@ -65,7 +65,7 @@ trait RecordBinder[Rdf <: RDF] {
     val uri = predicate
     def pos(ts: Set[T]): Iterable[(Rdf#URI, PointedGraph[Rdf])] =
       ts map { t => (predicate, t.toPG) }
-    def extract(pointed: PointedGraph[Rdf]): BananaValidation[Set[T]] =
+    def extract(pointed: PointedGraph[Rdf]): Try[Set[T]] =
       (pointed / predicate).asSet[T]
   }
 
@@ -111,7 +111,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         for (t1 <- v1) yield apply(t1)
       }
@@ -125,7 +125,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         for (t1 <- v1; t2 <- v2) yield apply(t1, t2)
@@ -140,7 +140,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)
@@ -156,7 +156,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)
@@ -173,7 +173,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)
@@ -191,7 +191,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)
@@ -210,7 +210,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)
@@ -230,7 +230,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)
@@ -251,7 +251,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)
@@ -273,7 +273,7 @@ trait RecordBinder[Rdf <: RDF] {
         make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10))
       }
 
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] = {
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
         def v1 = p1.extract(pointed)
         def v2 = p2.extract(pointed)
         def v3 = p3.extract(pointed)

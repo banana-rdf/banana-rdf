@@ -1,7 +1,6 @@
 package org.w3.banana
 
-import scalaz._
-import scalaz.Validation._
+import scala.util._
 
 trait OptionBinder[Rdf <: RDF] {
   this: Diesel[Rdf] =>
@@ -12,7 +11,7 @@ trait OptionBinder[Rdf <: RDF] {
 
     val listBinder = implicitly[PointedGraphBinder[Rdf, List[T]]]
 
-    def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[Option[T]] = {
+    def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[Option[T]] = {
       listBinder.fromPointedGraph(pointed) map { _.headOption }
     }
 

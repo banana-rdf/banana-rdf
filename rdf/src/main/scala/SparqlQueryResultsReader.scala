@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.Validation
+import scala.util._
 import java.io._
 
 /**
@@ -11,23 +11,23 @@ import java.io._
  */
 trait SparqlQueryResultsReader[Rdf <: RDF, +S] {
 
-  def read(is: InputStream, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]]
+  def read(is: InputStream, base: String): Try[Either[Rdf#Solutions, Boolean]]
 
-  def read(reader: java.io.Reader, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]]
+  def read(reader: java.io.Reader, base: String): Try[Either[Rdf#Solutions, Boolean]]
 
-  def read(file: File, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]] =
+  def read(file: File, base: String): Try[Either[Rdf#Solutions, Boolean]] =
     for {
-      fis <- WrappedThrowable.fromTryCatch { new BufferedInputStream(new FileInputStream(file)) }
+      fis <- Try { new BufferedInputStream(new FileInputStream(file)) }
       graph <- read(fis, base)
     } yield graph
 
-  def read(file: File, base: String, encoding: String): BananaValidation[Either[Rdf#Solutions, Boolean]] =
+  def read(file: File, base: String, encoding: String): Try[Either[Rdf#Solutions, Boolean]] =
     for {
-      fis <- WrappedThrowable.fromTryCatch { new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), encoding) }
+      fis <- Try { new InputStreamReader(new BufferedInputStream(new FileInputStream(file)), encoding) }
       graph <- read(fis, base)
     } yield graph
 
-  def read(s: String, base: String): BananaValidation[Either[Rdf#Solutions, Boolean]] = {
+  def read(s: String, base: String): Try[Either[Rdf#Solutions, Boolean]] = {
     val reader = new StringReader(s)
     read(reader, base)
   }

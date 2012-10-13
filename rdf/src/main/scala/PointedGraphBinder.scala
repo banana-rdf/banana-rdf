@@ -1,13 +1,13 @@
 package org.w3.banana
 
-import scalaz.Validation
+import scala.util._
 
 trait ToPointedGraph[Rdf <: RDF, T] {
   def toPointedGraph(t: T): PointedGraph[Rdf]
 }
 
 trait FromPointedGraph[Rdf <: RDF, T] {
-  def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T]
+  def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T]
 }
 
 trait PointedGraphBinder[Rdf <: RDF, T] extends FromPointedGraph[Rdf, T] with ToPointedGraph[Rdf, T]
@@ -33,7 +33,7 @@ class PointedGraphBinderCombinator[Rdf <: RDF, T](binder: PointedGraphBinder[Rdf
   def withClasses(classUris: ClassUrisFor[Rdf, T]): PointedGraphBinder[Rdf, T] =
     new PointedGraphBinder[Rdf, T] {
       // Q: do we want to check the classes here?
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): BananaValidation[T] =
+      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] =
         binder.fromPointedGraph(pointed)
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
