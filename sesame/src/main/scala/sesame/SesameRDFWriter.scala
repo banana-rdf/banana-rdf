@@ -22,7 +22,7 @@ object SesameRDFWriter {
           wcr.acquireAndGet { writer =>
             val sWriter = sesameSyntax.rdfWriter(writer, base)
             sWriter.startRDF()
-            graph.toIterable foreach sWriter.handleStatement
+            graphToIterable(graph) foreach sWriter.handleStatement
             sWriter.endRDF()
           }
         }

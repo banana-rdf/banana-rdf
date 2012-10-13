@@ -2,16 +2,8 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait StringSyntax[Rdf <: RDF] {
+class StringSyntax(s: String) {
 
-  def ops: RDFOps[Rdf]
-
-  implicit def stringWrapper(s: String): StringW = new StringW(s)
-
-  class StringW(s: String) {
-
-    def lang(langString: String): Rdf#LangLiteral = ops.makeLangLiteral(s, ops.makeLang(langString))
-
-  }
+  def lang[Rdf <: RDF](langString: String)(implicit ops: RDFOps[Rdf]): Rdf#LangLiteral = ops.makeLangLiteral(s, ops.makeLang(langString))
 
 }

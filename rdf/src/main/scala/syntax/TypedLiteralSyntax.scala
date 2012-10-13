@@ -2,16 +2,8 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait TypedLiteralSyntax[Rdf <: RDF] {
+class TypedLiteralSyntax[Rdf <: RDF](tl: Rdf#TypedLiteral)(implicit ops: RDFOps[Rdf]) {
 
-  def ops: RDFOps[Rdf]
-
-  implicit def typedLiteralWrapper(tl: Rdf#TypedLiteral): TypedLiteralW = new TypedLiteralW(tl)
-
-  class TypedLiteralW(tl: Rdf#TypedLiteral) {
-
-    def datatype: Rdf#URI = ops.fromTypedLiteral(tl)._2
-
-  }
+  def datatype: Rdf#URI = ops.fromTypedLiteral(tl)._2
 
 }

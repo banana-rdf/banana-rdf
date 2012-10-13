@@ -4,12 +4,11 @@ import NodeBinder._
 import scala.util._
 
 object Diesel {
-  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]): Diesel[Rdf] = new Diesel()(ops)
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]): Diesel[Rdf] = new Diesel
 }
 
-class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
-    extends syntax.RDFSyntax[Rdf]
-    with CommonBinders[Rdf]
+class Diesel[Rdf <: RDF](implicit val ops: RDFOps[Rdf])
+    extends CommonBinders[Rdf]
     with ListBinder[Rdf]
     with OptionBinder[Rdf]
     with TupleBinder[Rdf]
@@ -164,7 +163,7 @@ class Diesel[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
       val graph: Rdf#Graph =
         if (os.isEmpty) {
           val g = Graph(Triple(s, p, o))
-          graphWrapper(acc).union(g)
+          acc union g
         } else {
           val triples: Iterable[Rdf#Triple] = (o :: os.toList) map { o => Triple(s, p, o) }
           Graph(triples) union acc
