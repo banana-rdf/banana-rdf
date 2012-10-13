@@ -2,16 +2,13 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers._
-import akka.actor.ActorSystem
-import akka.util.Timeout
-import akka.dispatch._
+import scala.concurrent._
 import scala.concurrent.util._
-import org.w3.banana.util._
 import scalax.io._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SparqlEngineTest[Rdf <: RDF](
-  store: RDFStore[Rdf, BananaFuture])(
+  store: RDFStore[Rdf, Future])(
     implicit reader: RDFReader[Rdf, RDFXML],
     diesel: Diesel[Rdf],
     sparqlOps: SparqlOps[Rdf])
@@ -21,7 +18,7 @@ class SparqlEngineTest[Rdf <: RDF](
   import ops._
   import sparqlOps._
 
-  val sparqlEngine = SparqlEngine[Rdf, BananaFuture](store)
+  val sparqlEngine = SparqlEngine[Rdf, Future](store)
 
   override def afterAll(): Unit = {
     super.afterAll()
@@ -77,7 +74,7 @@ class SparqlEngineTest[Rdf <: RDF](
                            |  }
                            |}""".stripMargin)
 
-    val names: BananaFuture[Iterable[String]] = sparqlEngine.executeSelect(query).map(_.toIterable.map {
+    val names: Future[Iterable[String]] = sparqlEngine.executeSelect(query).map(_.toIterable.map {
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
 
@@ -103,7 +100,7 @@ class SparqlEngineTest[Rdf <: RDF](
       "thing" -> URI("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
       "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
 
-    val names: BananaFuture[Iterable[String]] = sparqlEngine.executeSelect(query, bindings).map(_.toIterable.map {
+    val names: Future[Iterable[String]] = sparqlEngine.executeSelect(query, bindings).map(_.toIterable.map {
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
 

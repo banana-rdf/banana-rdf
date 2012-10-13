@@ -2,16 +2,11 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
-import scalaz._
-import scalaz.Scalaz._
-import java.util.UUID
+import scala.concurrent._
 import org.w3.banana.LinkedDataStore._
-import akka.actor.ActorSystem
-import akka.util.Timeout
-import org.w3.banana.util._
 
 abstract class LinkedDataStoreTest[Rdf <: RDF](
-  store: RDFStore[Rdf, BananaFuture])(
+  store: RDFStore[Rdf, Future])(
     implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers with TestHelper {
 
@@ -24,32 +19,28 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
   val address2 = VerifiedAddress("rue des poissons", City("Paris"))
   val person = Person("betehess")
 
-  class LinkedPerson(uri: Rdf#URI, store: RDFStore[Rdf, BananaFuture])(implicit diesel: Diesel[Rdf]) {
+  class LinkedPerson(uri: Rdf#URI, store: RDFStore[Rdf, Future])(implicit diesel: Diesel[Rdf]) {
 
-    lazy val bananaResource: BananaFuture[LinkedDataResource[Rdf]] = store.GET(uri)
+    lazy val bananaResource: Future[LinkedDataResource[Rdf]] = store.GET(uri)
 
-    def getAddresses(): BananaFuture[Set[Address]] = {
+    def getAddresses(): Future[Set[Address]] = {
       for {
         ldr <- bananaResource
-        uris <- (ldr.resource / Person.address).asSet[Rdf#URI].bf
+        uris <- (ldr.resource / Person.address).asSet[Rdf#URI].asFuture
         resources <- store.GET(uris)
-        addresses <- resources.map(_.resource.as[Address]).sequence[BananaValidation, Address].bf
+        addresses <- resources.map(_.resource.as[Address].get).asFuture
       } yield {
         addresses
       }
     }
 
-    def linkAddress(addressURI: Rdf#URI): BananaFuture[Unit] =
+    def linkAddress(addressURI: Rdf#URI): Future[Unit] =
       store.POST(uri, uri -- foaf("address") ->- addressURI)
 
   }
 
   def linkedPerson(ldr: LinkedDataResource[Rdf]): LinkedPerson =
-    new LinkedPerson(ldr.uri, store) {
-      import org.w3.banana.util._
-      // just a little optimization in the case we already have the resource at hand
-      override lazy val bananaResource = ldr.bf
-    }
+    new LinkedPerson(ldr.uri, store)
 
   def linkedPerson(uri: Rdf#URI): LinkedPerson = new LinkedPerson(uri, store)
 
@@ -68,8 +59,8 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
       addresses
     }
 
-    val addresses = r.await().map(_.toSet)
-    addresses must be(Success(Set(address1, address2)))
+    val addresses = r.getOrFail().toSet
+    addresses must be(Set(address1, address2))
 
   }
 

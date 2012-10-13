@@ -6,9 +6,6 @@ import java.io._
 import scalax.io._
 import org.scalatest.EitherValues._
 
-import scalaz.Validation
-import scalaz.Validation._
-
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
 
@@ -45,7 +42,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
   "read TURTLE version of timbl's card" in {
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
     val resource = Resource.fromFile(file)
-    val graph = reader.read(resource, file.toURI.toString).fold(t => throw t, g => g)
+    val graph = reader.read(resource, file.toURI.toString).get
     //    graph.fold( _.printStackTrace, r => println(r.size))
     graph.toIterable.size must equal(77)
   }
@@ -56,13 +53,13 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
     import scalax.io.JavaConverters._
-    val graph = reader.read(turtleString, rdfCore).fold(t => throw t, g => g)
+    val graph = reader.read(turtleString, rdfCore).get
     assert(referenceGraph isIsomorphicWith graph)
 
   }
 
   "write simple graph as TURTLE string" in {
-    val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").fold(t => throw t, s => s)
+    val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString must not be ('empty)
   }
 
@@ -71,7 +68,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
       turtleString <- writer.asString(referenceGraph, rdfCore)
       computedFooGraph <- reader.read(turtleString, foo)
     } yield computedFooGraph
-    val g: Rdf#Graph = bar.fold(t => throw t, g => g)
+    val g: Rdf#Graph = bar.get
     assert(fooGraph isIsomorphicWith g)
   }
 

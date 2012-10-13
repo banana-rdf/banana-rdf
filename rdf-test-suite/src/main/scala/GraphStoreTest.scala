@@ -2,20 +2,20 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers._
+import scala.concurrent._
+import scala.concurrent.util._
 import scalaz._
 import Scalaz._
-import util._
-import BananaException.bananaCatch
 
 class GraphStoreTest[Rdf <: RDF](
-    store: RDFStore[Rdf, BananaFuture])(
+    store: RDFStore[Rdf, Future])(
         implicit diesel: Diesel[Rdf],
         reader: RDFReader[Rdf, RDFXML]) extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
 
   import diesel._
   import ops._
 
-  val graphStore = GraphStore[Rdf, BananaFuture](store)
+  val graphStore = GraphStore[Rdf, Future](store)
 
   override def afterAll(): Unit = {
     store.shutdown()
