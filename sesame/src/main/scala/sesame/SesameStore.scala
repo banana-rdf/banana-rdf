@@ -2,7 +2,6 @@ package org.w3.banana.sesame
 
 import org.w3.banana._
 import SesameUtil.withConnection
-import org.w3.banana.util._
 import org.openrdf.model._
 import org.openrdf.model.impl._
 import org.openrdf.repository.sail._
@@ -13,9 +12,9 @@ import org.openrdf.sail.SailException
 import org.openrdf.query._
 import org.openrdf.query.impl._
 import org.openrdf.sail.memory.MemoryStore
-import scalaz.{ Resource => _, _ }
+import scalaz.Free
 import scala.concurrent._
-import java.util.concurrent._
+import java.util.concurrent.{ ExecutorService, Executors }
 
 object SesameStore {
 
@@ -87,7 +86,7 @@ object SesameStore {
 
 import SesameStore._
 
-class SesameStore(repository: SailRepository) extends RDFStore[Sesame, BananaFuture] {
+class SesameStore(repository: SailRepository) extends RDFStore[Sesame, Future] {
 
   val executorService: ExecutorService = Executors.newFixedThreadPool(8)
 
@@ -137,7 +136,7 @@ class SesameStore(repository: SailRepository) extends RDFStore[Sesame, BananaFut
     )
   }
 
-  def execute[A](script: Free[({ type l[+x] = Command[Sesame, x] })#l, A]): BananaFuture[A] = {
+  def execute[A](script: Free[({ type l[+x] = Command[Sesame, x] })#l, A]): Future[A] = {
     def result = {
       val conn = repository.getConnection()
       val result: A = run(conn, script)
@@ -145,7 +144,7 @@ class SesameStore(repository: SailRepository) extends RDFStore[Sesame, BananaFut
       conn.close()
       result
     }
-    result.bf
+    result.asFuture
   }
 
 }

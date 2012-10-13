@@ -5,10 +5,7 @@ import org.w3.banana._
 import org.openrdf.query.resultio.{ QueryResultParseException, UnsupportedQueryResultFormatException, QueryResultIO }
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import org.openrdf.query.UnsupportedQueryLanguageException
-import scala.Left
-import scala.Right
-import collection.mutable.ArrayBuffer
-import scalaz.Validation
+import scala.util._
 
 /**
  *
@@ -39,23 +36,20 @@ object SesameQueryResultsReader {
         parse(bytes)
       }
 
-      def parse(bytes: Array[Byte]): BananaValidation[Either[Sesame#Solutions, Boolean]] = {
-        WrappedThrowable.fromTryCatch {
-          try {
-            val parsed = QueryResultIO.parse(new ByteArrayInputStream(bytes),
-              sesameSparqlSyntax.booleanFormat)
-            Right(parsed)
-          } catch {
-            case e: QueryResultParseException => {
-              val enumerator = new BindingsAccumulator()
-              QueryResultIO.parse(
-                new ByteArrayInputStream(bytes),
-                sesameSparqlSyntax.tupleFormat,
-                enumerator,
-                org.openrdf.model.impl.ValueFactoryImpl.getInstance())
-              Left(enumerator.bindings())
-            }
-          }
+      def parse(bytes: Array[Byte]): Try[Either[Sesame#Solutions, Boolean]] = Try {
+        try {
+          val parsed = QueryResultIO.parse(new ByteArrayInputStream(bytes),
+                                           sesameSparqlSyntax.booleanFormat)
+          Right(parsed)
+        } catch {
+          case e: QueryResultParseException =>
+            val enumerator = new BindingsAccumulator()
+            QueryResultIO.parse(
+              new ByteArrayInputStream(bytes),
+              sesameSparqlSyntax.tupleFormat,
+              enumerator,
+              org.openrdf.model.impl.ValueFactoryImpl.getInstance())
+            Left(enumerator.bindings())
         }
       }
 

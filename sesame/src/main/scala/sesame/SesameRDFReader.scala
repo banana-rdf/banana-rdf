@@ -1,16 +1,13 @@
 package org.w3.banana.sesame
 
 import org.w3.banana._
+import SesamePrefix._
 import org.openrdf.model._
 import org.openrdf.model.impl.{ GraphImpl, StatementImpl, LiteralImpl }
 import java.io._
 import java.util.LinkedList
-
-import SesamePrefix._
-
-import scalaz.Validation
-import scalaz.Validation._
 import scalax.io._
+import scala.util._
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
   override def handleStatement(st: Statement): Unit = st.getObject match {
@@ -31,10 +28,10 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
 
   val syntax = Syntax[Turtle]
 
-  def read[R <: Reader](resource: ReadCharsResource[R], base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
+  def read[R <: Reader](resource: ReadCharsResource[R], base: String): Try[Sesame#Graph] = Try {
     resource acquireAndGet { reader => 
       val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
-      val triples = new java.util.LinkedList[Statement]
+      val triples = new LinkedList[Statement]
       val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
       turtleParser.setRDFHandler(collector)
       turtleParser.parse(reader, base)
@@ -50,10 +47,10 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
 
   val syntax = Syntax[RDFXML]
 
-  def read[R <: Reader](resource: ReadCharsResource[R], base: String): BananaValidation[Sesame#Graph] = WrappedThrowable.fromTryCatch {
+  def read[R <: Reader](resource: ReadCharsResource[R], base: String): Try[Sesame#Graph] = Try {
     resource acquireAndGet { reader =>
       val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
-      val triples = new java.util.LinkedList[Statement]
+      val triples = new LinkedList[Statement]
       val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
       parser.setRDFHandler(collector)
       parser.parse(reader, base)

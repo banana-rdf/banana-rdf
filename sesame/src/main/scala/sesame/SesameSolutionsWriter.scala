@@ -3,6 +3,7 @@ package org.w3.banana.sesame
 import org.w3.banana._
 import java.io.{ ByteArrayOutputStream, Writer => jWriter }
 import scalax.io._
+import scala.util._
 
 /**
  * Creates a blocking Sparql writer for the given syntax
@@ -15,7 +16,7 @@ object SesameSolutionsWriter {
       val syntax = _syntax
 
       def write[R <: jWriter](answers: Sesame#Solutions, wcr: WriteCharsResource[R], base: String) =
-        WrappedThrowable.fromTryCatch {
+        Try {
           val baos = new ByteArrayOutputStream()
           val sWriter = sesameSparqlSyntax.writer(baos)
           // sWriter.startQueryResult(answers.getBindingNames)

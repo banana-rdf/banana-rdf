@@ -3,9 +3,9 @@ package org.w3.banana.sesame
 import org.w3.banana._
 import org.openrdf.query.parser.sparql.SPARQLParserFactory
 import org.openrdf.query.parser.{ ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery }
-import scalaz.{ Failure, Success, Validation }
 import org.openrdf.query.MalformedQueryException
 import scala.collection.JavaConverters._
+import scala.util._
 
 object SesameSparqlOps extends SparqlOps[Sesame] {
 
@@ -20,10 +20,8 @@ object SesameSparqlOps extends SparqlOps[Sesame] {
   def AskQuery(query: String): Sesame#AskQuery =
     p.parseQuery(query, "http://todo.example/").asInstanceOf[ParsedBooleanQuery]
 
-  def Query(query: String): Validation[Exception, Sesame#Query] = try {
-    Success(p.parseQuery(query, "http://todo.example/"))
-  } catch {
-    case e: MalformedQueryException => Failure(e)
+  def Query(query: String): Try[Sesame#Query] = Try {
+    p.parseQuery(query, "http://todo.example/")
   }
 
   def fold[T](query: Sesame#Query)(select: (Sesame#SelectQuery) => T,
@@ -35,7 +33,7 @@ object SesameSparqlOps extends SparqlOps[Sesame] {
       case qa: Sesame#AskQuery => ask(qa)
     }
 
-  def getNode(solution: Sesame#Solution, v: String): BananaValidation[Sesame#Node] = {
+  def getNode(solution: Sesame#Solution, v: String): Try[Sesame#Node] = {
     val node = solution.getValue(v)
     if (node == null)
       Failure(VarNotFound("var " + v + " not found in BindingSet " + solution.toString))
