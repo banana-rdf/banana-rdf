@@ -9,6 +9,10 @@ trait NodeBinder[Rdf <: RDF, T] {
 
 object NodeBinder {
 
+  implicit class NodeBinderW[Rdf <: RDF, T](val nodeBinder: NodeBinder[Rdf, T]) extends AnyVal {
+    def toPGB(implicit ops: RDFOps[Rdf]): PointedGraphBinder[Rdf, T] = toPointedGraphBinder(ops, nodeBinder)
+  }
+
   def toPointedGraphBinder[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], binder: NodeBinder[Rdf, T]): PointedGraphBinder[Rdf, T] =
     new PointedGraphBinder[Rdf, T] {
 

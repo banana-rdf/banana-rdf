@@ -6,14 +6,13 @@ import scala.concurrent._
 
 object LinkedDataStore {
 
-  implicit def apply[Rdf <: RDF](store: RDFStore[Rdf, Future])(implicit diesel: Diesel[Rdf], ec: ExecutionContext): LinkedDataStore[Rdf] =
-    new LinkedDataStore[Rdf](store)(diesel, ec)
+  implicit def apply[Rdf <: RDF](store: RDFStore[Rdf, Future])(implicit ops: RDFOps[Rdf], ec: ExecutionContext): LinkedDataStore[Rdf] =
+    new LinkedDataStore[Rdf](store)(ops, ec)
 
 }
 
-class LinkedDataStore[Rdf <: RDF](store: RDFStore[Rdf, Future])(implicit diesel: Diesel[Rdf], ec: ExecutionContext) {
+class LinkedDataStore[Rdf <: RDF](store: RDFStore[Rdf, Future])(implicit ops: RDFOps[Rdf], ec: ExecutionContext) {
 
-  import diesel._
   import ops._
 
   /**

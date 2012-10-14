@@ -14,6 +14,12 @@ trait PointedGraphBinder[Rdf <: RDF, T] extends FromPointedGraph[Rdf, T] with To
 
 object PointedGraphBinder {
 
+//  implicit def PGBNode[Rdf <: RDF](implicit ops: ): PointedGraphBinder[Rdf, Rdf#Node] = NodeToPointedGraphBinder(NodeBinder.naturalBinder[Rdf])
+
+  implicit def PGBUri[Rdf <: RDF](implicit ops: RDFOps[Rdf]): PointedGraphBinder[Rdf, Rdf#URI] = URIBinder.naturalBinder[Rdf].toNodeBinder.toPGB
+
+//  implicit val PGBLiteral: PointedGraphBinder[Rdf, Rdf#Literal] = NodeToPointedGraphBinder(LiteralToNodeBinder(LiteralBinder.naturalBinder[Rdf]))
+
   def apply[Rdf <: RDF, T](implicit binder: PointedGraphBinder[Rdf, T]): PointedGraphBinder[Rdf, T] = binder
 
   implicit def toPointedGraphBinderCombinator[Rdf <: RDF, T](binder: PointedGraphBinder[Rdf, T])(implicit diesel: Diesel[Rdf]): PointedGraphBinderCombinator[Rdf, T] = new PointedGraphBinderCombinator[Rdf, T](binder)(diesel)

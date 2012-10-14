@@ -39,8 +39,6 @@ class Diesel[Rdf <: RDF](implicit val ops: RDFOps[Rdf])
 
   implicit val PGBNode: PointedGraphBinder[Rdf, Rdf#Node] = NodeToPointedGraphBinder(NodeBinder.naturalBinder[Rdf])
 
-  implicit val PGBUri: PointedGraphBinder[Rdf, Rdf#URI] = NodeToPointedGraphBinder(UriToNodeBinder(URIBinder.naturalBinder[Rdf]))
-
   implicit val PGBLiteral: PointedGraphBinder[Rdf, Rdf#Literal] = NodeToPointedGraphBinder(LiteralToNodeBinder(LiteralBinder.naturalBinder[Rdf]))
 
 }
