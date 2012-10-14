@@ -23,6 +23,9 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
 
   class LinkedPerson(uri: Rdf#URI, store: RDFStore[Rdf, Future])(implicit diesel: Diesel[Rdf]) {
 
+    import diesel._
+    import ops._
+
     lazy val bananaResource: Future[LinkedDataResource[Rdf]] = store.GET(uri)
 
     def getAddresses(): Future[Set[Address]] = {

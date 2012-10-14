@@ -33,4 +33,9 @@ class GraphSyntax[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
   def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph =
     copy { uri => URIHelper.relativize(baseUri, uri)(ops) }
 
+  def getAllInstancesOf(clazz: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraphs[Rdf] = {
+    val instances = ops.getSubjects(graph, ops.rdf("type"), clazz): Iterable[Rdf#Node]
+    new PointedGraphs(instances, graph)
+  }
+
 }

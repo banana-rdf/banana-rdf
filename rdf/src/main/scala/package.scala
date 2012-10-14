@@ -58,5 +58,6 @@ with BananaSparqlSolutionWriterSelector {
 
   implicit def sparqlSolutionsSyntax[Rdf <: RDF](solutions: Rdf#Solutions): syntax.SparqlSolutionsSyntax[Rdf] = new syntax.SparqlSolutionsSyntax[Rdf](solutions)
 
+  implicit def toPointedGraphW[Rdf <: RDF](node: Rdf#Node)(implicit ops: RDFOps[Rdf]): PointedGraphW[Rdf] = new PointedGraphW[Rdf](PointedGraph(node)(ops))
 
 }
