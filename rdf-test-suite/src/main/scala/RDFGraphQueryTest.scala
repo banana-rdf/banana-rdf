@@ -17,6 +17,8 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
   import ops._
   import sparqlOperations._
 
+  val foaf = FOAFPrefix[Rdf]
+
   val resource = Resource.fromFile("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(resource, "http://foo.com") getOrElse sys.error("ouch")

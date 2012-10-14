@@ -15,6 +15,8 @@ class GraphStoreTest[Rdf <: RDF](
   import diesel._
   import ops._
 
+  val foaf = FOAFPrefix[Rdf]
+
   val graphStore = GraphStore[Rdf, Future](store)
 
   override def afterAll(): Unit = {

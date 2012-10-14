@@ -15,6 +15,8 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rd
   import diesel._
   import ops._
 
+  val foaf = FOAFPrefix[Rdf]
+
   "Diesel must accept a GraphNode in the object position" in {
 
     val g: PointedGraph[Rdf] = (

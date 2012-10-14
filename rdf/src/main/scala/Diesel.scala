@@ -18,11 +18,6 @@ class Diesel[Rdf <: RDF](implicit val ops: RDFOps[Rdf])
 
   import ops._
 
-  val xsd = XSDPrefix(ops)
-  val rdf = RDFPrefix(ops)
-  val dc = DCPrefix(ops)
-  val foaf = FOAFPrefix(ops)
-
   implicit def toPointedGraphW(node: Rdf#Node): PointedGraphW = new PointedGraphW(PointedGraph(node))
 
   implicit class PointedGraphW(pointed: PointedGraph[Rdf]) {

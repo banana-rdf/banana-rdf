@@ -7,6 +7,8 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
   import diesel._
   import ops._
 
+  val foaf = FOAFPrefix[Rdf]
+
   case class Person(name: String, nickname: Option[String] = None)
 
   object Person {

@@ -12,6 +12,8 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit diesel: Diesel[
   import diesel._
   import ops._
 
+  val foaf = FOAFPrefix[Rdf]
+
   val betehess: PointedGraph[Rdf] = (
     URI("http://bertails.org/#betehess").a(foaf.Person)
     -- foaf.name ->- "Alexandre".lang("fr")

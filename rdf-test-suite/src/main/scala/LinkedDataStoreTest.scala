@@ -12,6 +12,8 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
 
   import diesel._
 
+  val foaf = FOAFPrefix[Rdf]
+
   val objects = new ObjectExamples
   import objects._
 
