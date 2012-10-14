@@ -2,18 +2,18 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-class GraphSyntax[Rdf <: RDF](graph: Rdf#Graph)(implicit ops: RDFOps[Rdf]) {
+class GraphSyntax[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
 
-  def toIterable: Iterable[Rdf#Triple] = ops.graphToIterable(graph)
+  def toIterable(implicit ops: RDFOps[Rdf]): Iterable[Rdf#Triple] = ops.graphToIterable(graph)
 
-  def union(otherGraph: Rdf#Graph): Rdf#Graph = ops.union(graph :: otherGraph :: Nil)
+  def union(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Rdf#Graph = ops.union(graph :: otherGraph :: Nil)
 
-  def isIsomorphicWith(otherGraph: Rdf#Graph): Boolean = ops.isomorphism(graph, otherGraph)
+  def isIsomorphicWith(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Boolean = ops.isomorphism(graph, otherGraph)
 
   /**
    * returns a copy of the graph where uri are transformed through urifunc
    */
-  def copy(urifunc: Rdf#URI => Rdf#URI): Rdf#Graph = {
+  def copy(urifunc: Rdf#URI => Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph = {
     def nodefunc(node: Rdf#Node) = ops.foldNode(node)(urifunc, bn => bn, lit => lit)
     var triples = Set[Rdf#Triple]()
     val it = this.toIterable.iterator
@@ -25,12 +25,12 @@ class GraphSyntax[Rdf <: RDF](graph: Rdf#Graph)(implicit ops: RDFOps[Rdf]) {
     ops.makeGraph(triples)
   }
 
-  def copy: Rdf#Graph = copy { uri => uri }
+  def copy(implicit ops: RDFOps[Rdf]): Rdf#Graph = copy { uri => uri }
 
-  def resolveAgainst(baseUri: Rdf#URI): Rdf#Graph =
+  def resolveAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph =
     copy { uri => URIHelper.resolve(baseUri, uri.toString)(ops) }
 
-  def relativize(baseUri: Rdf#URI): Rdf#Graph =
+  def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph =
     copy { uri => URIHelper.relativize(baseUri, uri)(ops) }
 
 }

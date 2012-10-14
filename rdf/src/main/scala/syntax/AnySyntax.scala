@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-class AnySyntax[T](t: T) {
+class AnySyntax[T](val t: T) extends AnyVal {
 
   def toUri[Rdf <: RDF](implicit uriMaker: ToURI[Rdf, T]): Rdf#URI = uriMaker.toUri(t)
 

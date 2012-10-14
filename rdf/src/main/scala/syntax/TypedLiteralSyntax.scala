@@ -2,8 +2,8 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-class TypedLiteralSyntax[Rdf <: RDF](tl: Rdf#TypedLiteral)(implicit ops: RDFOps[Rdf]) {
+class TypedLiteralSyntax[Rdf <: RDF](val tl: Rdf#TypedLiteral) extends AnyVal {
 
-  def datatype: Rdf#URI = ops.fromTypedLiteral(tl)._2
+  def datatype(implicit ops: RDFOps[Rdf]): Rdf#URI = ops.fromTypedLiteral(tl)._2
 
 }

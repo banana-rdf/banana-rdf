@@ -2,8 +2,8 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-class LangLiteralSyntax[Rdf <: RDF](ll: Rdf#LangLiteral)(implicit ops: RDFOps[Rdf]) {
+class LangLiteralSyntax[Rdf <: RDF](val ll: Rdf#LangLiteral) extends AnyVal {
 
-  def lang: Rdf#Lang = ops.fromLangLiteral(ll)._2
+  def lang(implicit ops: RDFOps[Rdf]): Rdf#Lang = ops.fromLangLiteral(ll)._2
 
 }
