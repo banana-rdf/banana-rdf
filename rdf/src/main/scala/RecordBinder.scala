@@ -37,7 +37,7 @@ trait RecordBinder[Rdf <: RDF] {
       def toUri(t: T): Rdf#URI = constUri
     }
 
-    NodeToPointedGraphBinder(UriToNodeBinder(uriBinder))
+    uriBinder.toNodeBinder.toPGB
 
   }
 

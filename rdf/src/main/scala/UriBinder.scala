@@ -39,12 +39,13 @@ object URIBinder {
       def toNode(t: T): Rdf#Node = binder.toUri(t)
     }
 
-  class NaturalURIBinder[Rdf <: RDF](val ops: RDFOps[Rdf]) extends AnyVal with URIBinder[Rdf, Rdf#URI] {
+  class URIBinderForURI[Rdf <: RDF](val ops: RDFOps[Rdf]) extends AnyVal with URIBinder[Rdf, Rdf#URI] {
       def fromUri(uri: Rdf#URI): Try[Rdf#URI] = Success(uri)
 
       def toUri(t: Rdf#URI): Rdf#URI = t
   }
 
-  def naturalBinder[Rdf <: RDF](implicit ops: RDFOps[Rdf]): URIBinder[Rdf, Rdf#URI] = new NaturalURIBinder(ops)
+  implicit def uriBinderForURI[Rdf <: RDF](implicit ops: RDFOps[Rdf]): URIBinder[Rdf, Rdf#URI] =
+    new URIBinderForURI(ops)
 
 }
