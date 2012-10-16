@@ -114,8 +114,8 @@ object BananaRdfBuild extends Build {
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1",
-      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1",
+      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
+      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
   
