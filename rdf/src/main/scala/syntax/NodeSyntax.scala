@@ -8,11 +8,13 @@ class NodeSyntax[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
     ops.foldNode(node)(funURI, funBNode, funLiteral)
 
   def resolveAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
-    ops.foldNode(node)(_.resolveAgainst(baseUri), bn => bn, lit => lit)
+    import ops._
+    foldNode(node)(_.resolveAgainst(baseUri), bn => bn, lit => lit)
   }
 
   def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
-    ops.foldNode(node)(_.relativize(baseUri), bn => bn, lit => lit)
+    import ops._
+    foldNode(node)(_.relativize(baseUri), bn => bn, lit => lit)
   }
 
 }

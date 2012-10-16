@@ -9,6 +9,10 @@ trait RDFStore[Rdf <: RDF, M[_]] {
 
 object RDFStore {
 
+  implicit class RDFStoreW[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]) {
+    def asGraphStore(implicit ops: RDFOps[Rdf]): GraphStore[Rdf, M] = GraphStore[Rdf, M](store)
+  }
+
   implicit def RDFStore2GraphStore[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M])(implicit ops: RDFOps[Rdf]): GraphStore[Rdf, M] =
     GraphStore[Rdf, M](store)
 

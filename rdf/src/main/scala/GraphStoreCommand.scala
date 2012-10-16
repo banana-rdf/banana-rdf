@@ -41,6 +41,7 @@ object Command {
   }
 
   def PATCH[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]] /*, TODO insertTriples: Iterable[Rdf#Triple]*/)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+    import ops._
     val docUri = uri.fragmentLess
     val deletePattern = tripleMatches map { case (s, p, o) => (resolveAgainst(s, docUri), resolveAgainst(p, docUri), resolveAgainst(o, docUri)) }
     Command.patch(docUri, deletePattern, List.empty)

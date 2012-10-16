@@ -11,6 +11,7 @@ abstract class LinkedDataStoreTest[Rdf <: RDF](
     extends WordSpec with MustMatchers with TestHelper {
 
   import diesel._
+  import ops._
 
   val foaf = FOAFPrefix[Rdf]
 

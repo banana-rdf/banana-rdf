@@ -7,6 +7,7 @@ import scala.util._
 abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
 
   import diesel._
+  import ops._
 
   val objects = new ObjectExamples
   import objects._

@@ -7,9 +7,7 @@ trait ToPointedGraph[Rdf <: RDF, T] {
 }
 
 object ToPointedGraph {
-
   implicit def ToPointedGraphForPGB[Rdf <: RDF, T](implicit binder: PointedGraphBinder[Rdf, T]): ToPointedGraph[Rdf, T] = binder
-
 }
 
 trait FromPointedGraph[Rdf <: RDF, T] {
@@ -17,9 +15,7 @@ trait FromPointedGraph[Rdf <: RDF, T] {
 }
 
 object FromPointedGraph {
-
   implicit def FromPointedGraphForPGB[Rdf <: RDF, T](implicit binder: PointedGraphBinder[Rdf, T]): FromPointedGraph[Rdf, T] = binder
-
 }
 
 trait PointedGraphBinder[Rdf <: RDF, T] extends FromPointedGraph[Rdf, T] with ToPointedGraph[Rdf, T]

@@ -62,6 +62,14 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     implicit val binder = PointedGraphBinder[Rdf, Option[String]]
     opts.toPG.as[Option[String]] must equal(Success(opts))
     (None: Option[String]).toPG.as[Option[String]] must equal(Success(None))
-
   }
+
+  "the implicit chains must be complete" in {
+    implicitly[PointedGraphBinder[Rdf, Rdf#URI]]
+    implicitly[NodeBinder[Rdf, Rdf#URI]]
+    implicitly[PointedGraphBinder[Rdf, Rdf#Node]]
+    implicitly[ToURI[Rdf, Rdf#URI]]
+    implicitly[FromURI[Rdf, Rdf#URI]]
+  }
+
 }

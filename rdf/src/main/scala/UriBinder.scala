@@ -6,8 +6,16 @@ trait ToURI[Rdf <: RDF, T] extends Any {
   def toUri(t: T): Rdf#URI
 }
 
+object ToURI {
+  implicit def ToURIForURIBinder[Rdf <: RDF, T](implicit binder: URIBinder[Rdf, T]): ToURI[Rdf, T] = binder
+}
+
 trait FromURI[Rdf <: RDF, T] extends Any {
   def fromUri(uri: Rdf#URI): Try[T]
+}
+
+object FromURI {
+  implicit def FromURIForURIBinder[Rdf <: RDF, T](implicit binder: URIBinder[Rdf, T]): FromURI[Rdf, T] = binder
 }
 
 trait URIBinder[Rdf <: RDF, T] extends Any with FromURI[Rdf, T] with ToURI[Rdf, T]

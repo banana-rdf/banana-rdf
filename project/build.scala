@@ -12,7 +12,7 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
 //    version      := "0.3-SNAPSHOT",
-    version      := "x07-SNAPSHOT",
+    version      := "x12-SNAPSHOT",
     scalaVersion := "2.10.0-M7",
 
     parallelExecution in Test := false,
@@ -87,7 +87,8 @@ object BananaRdfBuild extends Build {
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
-  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3"
+//  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://jay.w3.org/~bertails/jar/scalaz-core_2.10.0-M7-7.0.0-M3.jar"
+  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"

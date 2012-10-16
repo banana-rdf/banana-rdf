@@ -6,6 +6,11 @@ import scala.concurrent._
 
 object LinkedDataStore {
 
+  implicit class LinkedDataStoreW[Rdf <: RDF](store: RDFStore[Rdf, Future]) {
+    def asLDStore(implicit ops: RDFOps[Rdf], ec: ExecutionContext): LinkedDataStore[Rdf] =
+      new LinkedDataStore[Rdf](store)(ops, ec)
+  }
+
   implicit def apply[Rdf <: RDF](store: RDFStore[Rdf, Future])(implicit ops: RDFOps[Rdf], ec: ExecutionContext): LinkedDataStore[Rdf] =
     new LinkedDataStore[Rdf](store)(ops, ec)
 
