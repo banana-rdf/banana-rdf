@@ -17,7 +17,7 @@ object BuildSettings {
 
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions", "-language:higherKinds"),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
@@ -88,7 +88,7 @@ object BananaRdfBuild extends Build {
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
 //  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://jay.w3.org/~bertails/jar/scalaz-core_2.10.0-M7-7.0.0-M3.jar"
-  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
+  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" // from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -114,8 +114,8 @@ object BananaRdfBuild extends Build {
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
-      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
+      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1" /* excludeAll(ExclusionRule(organization = "org.slf4j")) */,
+      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1" /* excludeAll(ExclusionRule(organization = "org.slf4j")) */,
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
   
