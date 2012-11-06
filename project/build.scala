@@ -12,8 +12,8 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
 //    version      := "0.3-SNAPSHOT",
-    version      := "x12-SNAPSHOT",
-    scalaVersion := "2.10.0-M7",
+    version      := "x14-SNAPSHOT",
+    scalaVersion := "2.10.0-RC1",
 
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
@@ -76,14 +76,14 @@ object BananaRdfBuild extends Build {
   
 //  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 
-  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0-M7"
+  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0-RC1"
 
   val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.1"
   val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.1"
 
-  val akka = "com.typesafe.akka" % "akka-actor_2.10.0-M7" % "2.1-M2"
+  val akka = "com.typesafe.akka" % "akka-actor_2.10.0-RC1" % "2.1.0-RC1"
 
-  val scalaStm = "org.scala-tools" % "scala-stm_2.10.0-M7" % "0.6"
+  val scalaStm = "org.scala-tools" % "scala-stm_2.10.0-RC1" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
@@ -97,7 +97,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" % "scalatest_2.10.0-M7" % "2.0.M4-2.10.0-M7-B1"
+  val scalatest = "org.scalatest" % "scalatest_2.10.0-RC1" % "2.0.M4-2.10.0-RC1-B1"
   
   val testsuiteDeps =
     Seq(
