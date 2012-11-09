@@ -78,8 +78,8 @@ object BananaRdfBuild extends Build {
 
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0-RC1"
 
-  val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.1"
-  val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.1"
+  val scalaIoCore = "com.github.scala-incubator.io" % "scala-io-core_2.10.0-RC1" % "0.4.1"
+  val scalaIoFile = "com.github.scala-incubator.io" % "scala-io-file_2.10.0-RC1" % "0.4.1"
 
   val akka = "com.typesafe.akka" % "akka-actor_2.10.0-RC1" % "2.1.0-RC1"
 
@@ -114,8 +114,10 @@ object BananaRdfBuild extends Build {
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1" /* excludeAll(ExclusionRule(organization = "org.slf4j")) */,
-      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1" /* excludeAll(ExclusionRule(organization = "org.slf4j")) */,
+      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
+      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
+      libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
+      libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided",
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
   
