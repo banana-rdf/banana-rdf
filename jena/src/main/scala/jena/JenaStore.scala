@@ -114,7 +114,10 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
   def operationType[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): RW = {
     script.resume fold (
       {
-        case Get(_, f) => operationType(f(ops.emptyGraph))
+        case Get(_, k) => operationType(k(null))
+        case Select(_, _, k) => operationType(k(null))
+        case Construct(_, _, k) => operationType(k(null))
+        case Ask(_, _, k) => operationType(k(false))
         case _ => WRITE
       },
       _ => READ
