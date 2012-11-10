@@ -10,6 +10,6 @@ object SesamePrefix {
 
   val dc = DCPrefix(SesameOperations)
 
-  val foaf = RDFPrefix(SesameOperations)
+  val foaf = FOAFPrefix(SesameOperations)
 
 }

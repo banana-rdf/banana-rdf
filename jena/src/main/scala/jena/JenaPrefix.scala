@@ -10,6 +10,6 @@ object JenaPrefix {
 
   val dc = DCPrefix(JenaOperations)
 
-  val foaf = RDFPrefix(JenaOperations)
+  val foaf = FOAFPrefix(JenaOperations)
 
 }
