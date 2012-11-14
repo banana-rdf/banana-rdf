@@ -13,6 +13,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ ops => _, _ }
 import java.util.concurrent.{ Executors, ExecutorService }
 import scalaz.Free
+import org.slf4j.{ Logger, LoggerFactory }
 
 object JenaStore {
 
@@ -24,11 +25,28 @@ object JenaStore {
     JenaStore(dataset, defensiveCopy)
   }
 
+  val logger = LoggerFactory.getLogger(classOf[JenaStore])
+
+  implicit class FutureF[+T](val future: Future[T]) extends AnyVal {
+
+    def timer(name: String)(implicit ec: ExecutionContext): Future[T] = {
+      val start = System.currentTimeMillis
+      future onComplete { case _ =>
+        val end = System.currentTimeMillis
+        logger.debug(s"""$name: ${end - start}ms""")
+      }
+      future
+    }
+
+  }
+
 }
 
 class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena, Future] {
 
-  val executorService: ExecutorService = Executors.newFixedThreadPool(8)
+  import JenaStore.FutureF
+
+  val executorService: ExecutorService = Executors.newSingleThreadExecutor()
 
   implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutorService(executorService)
 
@@ -126,8 +144,8 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
 
   def execute[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): Future[A] = {
     operationType(script) match {
-      case READ => readTransaction(run(script)).asFuture
-      case WRITE => writeTransaction(run(script)).asFuture
+      case READ => Future { readTransaction(run(script)) }.timer("READ")
+      case WRITE => Future { writeTransaction(run(script)) }.timer("WRITE")
     }
 
   }
