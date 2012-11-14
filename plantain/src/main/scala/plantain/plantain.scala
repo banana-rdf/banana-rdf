@@ -138,7 +138,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Jena
   def getTransactionHandler(): TransactionHandler = throw new UnsupportedOperationException
   def isClosed(): Boolean = true
   def queryHandler(): QueryHandler = new SimpleQueryHandler(this)
-  def add(x$1: JenaTriple): Unit = throw new UnsupportedOperationException
+  def add(triple: JenaTriple): Unit = throw new UnsupportedOperationException
   def isEmpty(): Boolean = size == 0
   def contains(triple: JenaTriple): Boolean =
     this.contains(triple.getSubject, triple.getPredicate, triple.getObject)
@@ -146,7 +146,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Jena
     val s = NodeMatch.fromJena(subject)
     val p = NodeMatch.fromJena(predicate)
     val o = NodeMatch.fromJena(objectt)
-    !find(s, p, o).isEmpty // yes we can do better :-)
+    find(s, p, o).nonEmpty // yes we can do better :-)
   }
    def delete(triple: JenaTriple): Unit = throw new UnsupportedOperationException
    def find(subject: JenaNode, predicate: JenaNode, objectt: JenaNode): ExtendedIterator[JenaTriple] = {
