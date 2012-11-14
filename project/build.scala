@@ -181,7 +181,8 @@ object BananaRdfBuild extends Build {
       rdf,
       rdfTestSuite,
       jena,
-      sesame//,
+      sesame,
+      plantain
 //      ldp,
       /*full*/))
   
@@ -228,9 +229,20 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoCore,
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka
-
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
+
+  lazy val plantain = Project(
+    id = "plantain",
+    base = file("plantain"),
+    settings = buildSettings ++ testDeps ++ Seq(
+      libraryDependencies += scalaIoCore,
+      libraryDependencies += scalaIoFile,
+      libraryDependencies += akka,
+      libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
+      libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
+    )
+  ) dependsOn (rdf, jena, rdfTestSuite % "test")
 
   lazy val ldp = Project(
     id = "ldp",
