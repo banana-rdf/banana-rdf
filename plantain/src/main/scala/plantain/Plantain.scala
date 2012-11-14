@@ -35,35 +35,35 @@ object Plantain {
 
   implicit val diesel: Diesel[Plantain] = PlantainDiesel
 
-//  implicit val sparqlOps: SparqlOps[Jena] = JenaSparqlOps
+  implicit val sparqlOps: SparqlOps[Plantain] = PlantainSparqlOps
+
+//  implicit val graphQuery: RDFGraphQuery[Plantain] = PlantainGraphSparqlEngine
+
+  implicit val rdfxmlReader: RDFReader[Plantain, RDFXML] = PlantainRDFXMLReader
+
+  implicit val turtleReader: RDFReader[Plantain, Turtle] = PlantainTurtleReader
+
+//  implicit val readerSelector: ReaderSelector[Plantain] = PlantainRDFReader.selector
+
+  implicit val rdfxmlWriter: RDFWriter[Plantain, RDFXML] = PlantainRDFWriter.rdfxmlWriter
+
+  implicit val turtleWriter: RDFWriter[Plantain, Turtle] = PlantainRDFWriter.turtleWriter
+
+  implicit val rdfWriterSelector: RDFWriterSelector[Plantain] = PlantainRDFWriter.selector //
+
+//  implicit val solutionsWriterJson: SparqlSolutionsWriter[Plantain, SparqlAnswerJson] =
+//    PlantainSolutionsWriter.solutionsWriterJson
 //
-//  implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphSparqlEngine
+//  implicit val solutionsWriterXml: SparqlSolutionsWriter[Plantain, SparqlAnswerXml] =
+//    PlantainSolutionsWriter.solutionsWriterXml
 //
-//  implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader
+//  implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Plantain] = PlantainSolutionsWriter.solutionsWriterSelector
 //
-//  implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader
+//  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Plantain, SparqlAnswerJson] =
+//    PlantainQueryResultsReader.queryResultsReaderJson
 //
-//  implicit val readerSelector: ReaderSelector[Jena] = JenaRDFReader.selector //
-//
-//  implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
-//
-//  implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
-//
-//  implicit val rdfWriterSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector //
-//
-//  implicit val solutionsWriterJson: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
-//    JenaSolutionsWriter.solutionsWriterJson
-//
-//  implicit val solutionsWriterXml: SparqlSolutionsWriter[Jena, SparqlAnswerXml] =
-//    JenaSolutionsWriter.solutionsWriterXml
-//
-//  implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Jena] = JenaSolutionsWriter.solutionsWriterSelector
-//
-//  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
-//    JenaQueryResultsReader.queryResultsReaderJson
-//
-//  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Jena, SparqlAnswerXml] =
-//    JenaQueryResultsReader.queryResultsReaderXml
+//  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Plantain, SparqlAnswerXml] =
+//    PlantainQueryResultsReader.queryResultsReaderXml
 
 
 

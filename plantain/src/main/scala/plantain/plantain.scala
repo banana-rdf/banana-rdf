@@ -12,6 +12,8 @@ import com.hp.hpl.jena.graph.query.{ QueryHandler, SimpleQueryHandler }
 import com.hp.hpl.jena.util.iterator.{ ExtendedIterator, Filter, Map1 }
 import java.util.{ Set => jSet, List => jList}
 import scala.collection.JavaConverters._
+import org.openrdf.model.{ Graph => SesameGraph, Literal => SesameLiteral, BNode => SesameBNode, URI => SesameURI, _ }
+import org.openrdf.model.impl.{ URIImpl, BNodeImpl, LiteralImpl, StatementImpl }
 
 object Graph {
 
@@ -170,11 +172,27 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Jena
 
 }
 
+object Triple {
+
+  def fromSesame(statement: Statement): Triple =
+    Triple(
+      Node.fromSesame(statement.getSubject),
+      URI.fromString(statement.getPredicate.toString),
+      Node.fromSesame(statement.getObject))
+
+}
+
 case class Triple(subject: Node, predicate: URI, objectt: Node) {
 
   override def toString: String = asJena.toString
 
   def asJena: JenaTriple = JenaTriple.create(subject.asJena, predicate.asJena, objectt.asJena)
+
+  def asSesame: Statement =
+    new StatementImpl(
+      subject.asSesame.asInstanceOf[Resource],
+      predicate.asSesame.asInstanceOf[SesameURI],
+      objectt.asSesame)
 
 }
 
@@ -198,6 +216,29 @@ object Node {
     }
   }
 
+  def fromSesame(value: Value): Node = value match {
+    case resource: Resource => fromSesame(resource)
+    case literal: SesameLiteral => fromSesame(literal)
+  }
+
+  def fromSesame(uri: SesameURI): URI = URI.fromString(uri.toString)
+
+  def fromSesame(resource: Resource): Node = resource match {
+    case uri: SesameURI => fromSesame(uri)
+    case bnode: SesameBNode => BNode(bnode.getID)
+  }
+
+  def fromSesame(literal: SesameLiteral): Literal = {
+    val lexicalForm = literal.getLabel
+    val lang = literal.getLanguage
+    if (lang == null || lang.isEmpty) {
+      val typ = URI.fromString(Option(literal.getDatatype).map(_.toString) getOrElse "http://www.w3.org/2001/XMLSchema#string")
+      TypedLiteral(lexicalForm, typ)
+    } else {
+      LangLiteral(lexicalForm, lang)
+    }
+  }
+
 }
 
 sealed trait Node {
@@ -209,6 +250,13 @@ sealed trait Node {
     case BNode(label) => JenaNode.createAnon(AnonId.create(label))
     case TypedLiteral(lexicalForm, uri) => JenaNode.createLiteral(lexicalForm, null, Node.mapper.getTypeByName(uri.toString))
     case LangLiteral(lexicalForm, lang) => JenaNode.createLiteral(lexicalForm, lang, null)
+  }
+
+  def asSesame: Value = this match {
+    case URI(underlying) => new URIImpl(underlying.toString)
+    case BNode(label) => new BNodeImpl(label)
+    case TypedLiteral(lexicalForm, uri) => new LiteralImpl(lexicalForm, new URIImpl(uri.underlying.toString))
+    case LangLiteral(lexicalForm, lang) => new LiteralImpl(lexicalForm, lang)
   }
 
 }
