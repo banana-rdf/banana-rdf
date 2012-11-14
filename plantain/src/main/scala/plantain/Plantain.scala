@@ -1,6 +1,8 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
+import com.hp.hpl.jena.query.{ Query => JenaQuery, QueryException, QueryFactory }
+import com.hp.hpl.jena.query.{ Query => JenaQuery, QuerySolution, ResultSet }
 
 trait Plantain extends RDF {
   // types related to the RDF datamodel
@@ -18,13 +20,13 @@ trait Plantain extends RDF {
   type NodeMatch = plantain.NodeMatch
   type NodeAny = plantain.ANY.type
 
-//  // types related to Sparql
-//  type Query = JenaQuery
-//  type SelectQuery = JenaQuery
-//  type ConstructQuery = JenaQuery
-//  type AskQuery = JenaQuery
-//  type Solution = QuerySolution
-//  type Solutions = ResultSet
+  // types related to Sparql
+  type Query = JenaQuery
+  type SelectQuery = JenaQuery
+  type ConstructQuery = JenaQuery
+  type AskQuery = JenaQuery
+  type Solution = QuerySolution
+  type Solutions = ResultSet
 }
 
 object Plantain {

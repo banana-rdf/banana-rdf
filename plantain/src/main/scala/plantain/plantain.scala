@@ -6,7 +6,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
 import com.hp.hpl.jena.rdf.model.AnonId
 import com.hp.hpl.jena.datatypes.TypeMapper
-import com.hp.hpl.jena.graph.impl.{ GraphMatcher, GraphBase }
+import com.hp.hpl.jena.graph.impl.GraphMatcher
 import com.hp.hpl.jena.shared.PrefixMapping
 import com.hp.hpl.jena.graph.query.{ QueryHandler, SimpleQueryHandler }
 import com.hp.hpl.jena.util.iterator.{ ExtendedIterator, Filter, Map1 }
@@ -59,7 +59,6 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Jena
       o <- os
     } yield Triple(s, p, o)
 
-
   def +(triple: Triple): Graph = {
     import triple.{ subject, predicate, objectt }
     spo.get(subject) match {
@@ -92,6 +91,15 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Jena
 
   def find(subject: NodeMatch, predicate: NodeMatch, objectt: NodeMatch): Iterable[Triple] =
     (subject, predicate, objectt) match {
+      case (ANY, ANY, ANY) => triples
+      case (PlainNode(s), PlainNode(Predicate(p)), PlainNode(o)) => {
+        val opt = for {
+          pos <- spo.get(s)
+          os <- pos.get(p)
+          if os contains o
+        } yield Iterable(Triple(s, p, o))
+        opt getOrElse Iterable.empty
+      }
       case (PlainNode(s), ANY, ANY) =>
         for {
           (p, os) <- spo.get(s) getOrElse Iterable.empty
@@ -148,17 +156,17 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Jena
     val o = NodeMatch.fromJena(objectt)
     find(s, p, o).nonEmpty // yes we can do better :-)
   }
-   def delete(triple: JenaTriple): Unit = throw new UnsupportedOperationException
-   def find(subject: JenaNode, predicate: JenaNode, objectt: JenaNode): ExtendedIterator[JenaTriple] = {
-     val s = NodeMatch.fromJena(subject)
-     val p = NodeMatch.fromJena(predicate)
-     val o = NodeMatch.fromJena(objectt)
-     val iterable = find(s, p, o) map (_.asJena)
-     new Graph.AsExtendedIterator(iterable.iterator)
-   }
-   def find(triple: TripleMatch): ExtendedIterator[JenaTriple] =
-     this.find(triple.getMatchSubject, triple.getMatchPredicate, triple.getMatchObject)
-   def isIsomorphicWith(other: JenaGraph): Boolean = GraphMatcher.equals(this, other)
+  def delete(triple: JenaTriple): Unit = throw new UnsupportedOperationException
+  def find(subject: JenaNode, predicate: JenaNode, objectt: JenaNode): ExtendedIterator[JenaTriple] = {
+    val s = NodeMatch.fromJena(subject)
+    val p = NodeMatch.fromJena(predicate)
+    val o = NodeMatch.fromJena(objectt)
+    val iterable = find(s, p, o) map (_.asJena)
+    new Graph.AsExtendedIterator(iterable.iterator)
+  }
+  def find(triple: TripleMatch): ExtendedIterator[JenaTriple] =
+    this.find(triple.getMatchSubject, triple.getMatchPredicate, triple.getMatchObject)
+  def isIsomorphicWith(other: JenaGraph): Boolean = GraphMatcher.equals(this, other)
 
 }
 
