@@ -1,6 +1,7 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
+import org.openrdf.model.util.ModelUtil
 
 object PlantainOps extends RDFOps[Plantain] {
 
@@ -95,6 +96,6 @@ object PlantainOps extends RDFOps[Plantain] {
   // graph isomorphism
 
   def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean =
-    left isIsomorphicWith right
+    ModelUtil.equals(left, right)
 
 }

@@ -239,12 +239,15 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoCore,
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.9",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.9",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.9",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.9",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.9",
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (rdf, jena, sesame, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test")
 
   lazy val ldp = Project(
     id = "ldp",

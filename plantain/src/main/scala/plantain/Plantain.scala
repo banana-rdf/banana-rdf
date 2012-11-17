@@ -1,8 +1,10 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import com.hp.hpl.jena.query.{ Query => JenaQuery, QueryException, QueryFactory }
-import com.hp.hpl.jena.query.{ Query => JenaQuery, QuerySolution, ResultSet }
+import org.openrdf.model.{ Graph => SesameGraph, Literal => SesameLiteral, BNode => SesameBNode, URI => SesameURI, _ }
+import org.openrdf.query._
+import org.openrdf.query.parser._
+import info.aduna.iteration.CloseableIteration
 
 trait Plantain extends RDF {
   // types related to the RDF datamodel
@@ -21,12 +23,14 @@ trait Plantain extends RDF {
   type NodeAny = plantain.ANY.type
 
   // types related to Sparql
-  type Query = JenaQuery
-  type SelectQuery = JenaQuery
-  type ConstructQuery = JenaQuery
-  type AskQuery = JenaQuery
-  type Solution = QuerySolution
-  type Solutions = ResultSet
+  type Query = ParsedQuery
+  type SelectQuery = ParsedTupleQuery
+  type ConstructQuery = ParsedGraphQuery
+  type AskQuery = ParsedBooleanQuery
+  type Solution = BindingSet
+  // instead of TupleQueryResult so that it's eager instead of lazy
+  type Solutions = Iterable[BindingSet]
+
 }
 
 object Plantain {

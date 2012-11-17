@@ -3,17 +3,13 @@ package org.w3.banana.plantain
 import java.net.{ URI => jURI }
 import java.util.UUID
 import org.slf4j.{ Logger, LoggerFactory }
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
-import com.hp.hpl.jena.rdf.model.AnonId
-import com.hp.hpl.jena.datatypes.TypeMapper
-import com.hp.hpl.jena.graph.impl.GraphMatcher
-import com.hp.hpl.jena.shared.PrefixMapping
-import com.hp.hpl.jena.graph.query.{ QueryHandler, SimpleQueryHandler }
-import com.hp.hpl.jena.util.iterator.{ ExtendedIterator, Filter, Map1 }
-import java.util.{ Set => jSet, List => jList}
+import java.util.{ Set => jSet, List => jList, Collection => jCollection, Iterator => jIterator }
 import scala.collection.JavaConverters._
 import org.openrdf.model.{ Graph => SesameGraph, Literal => SesameLiteral, BNode => SesameBNode, URI => SesameURI, _ }
 import org.openrdf.model.impl.{ URIImpl, BNodeImpl, LiteralImpl, StatementImpl }
+import org.openrdf.query.algebra.evaluation.TripleSource
+import info.aduna.iteration.CloseableIteration
+import org.openrdf.query.QueryEvaluationException
 
 object Graph {
 
@@ -21,36 +17,9 @@ object Graph {
 
   val empty = Graph(Map.empty, 0)
 
-  class AsExtendedIterator[T](iterator: Iterator[T]) extends ExtendedIterator[T] {
-    def close(): Unit = ()
-    def andThen[X <: T](other: java.util.Iterator[X]): ExtendedIterator[T] =
-      new AsExtendedIterator(iterator ++ other.asScala)
-    def filterDrop(f: Filter[T]): ExtendedIterator[T] = new AsExtendedIterator(iterator filterNot f.accept)
-    def filterKeep(f: Filter[T]): ExtendedIterator[T] = new AsExtendedIterator(iterator filter f.accept)
-    def mapWith[U](map1: Map1[T,U]): ExtendedIterator[U] = new AsExtendedIterator(iterator map map1.map1)
-    def removeNext(): T = throw new UnsupportedOperationException
-    def toList(): jList[T] = iterator.toList.asJava
-    def toSet(): jSet[T] = iterator.toSet.asJava
-    def hasNext(): Boolean = iterator.hasNext
-    def next(): T = iterator.next
-    def remove(): Unit = throw new UnsupportedOperationException
-  }
-
-  val Capabilities = new Capabilities {
-    def addAllowed(b: Boolean): Boolean = false
-    def addAllowed(): Boolean = false
-    def canBeEmpty(): Boolean = true
-    def deleteAllowed(b: Boolean): Boolean = false
-    def deleteAllowed(): Boolean = false
-    def findContractSafe(): Boolean = true
-    def handlesLiteralTyping(): Boolean = true
-    def iteratorRemoveAllowed(): Boolean = false
-    def sizeAccurate(): Boolean = true
-  }
-
 }
 
-case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends JenaGraph {
+case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends SesameGraph with TripleSource {
 
   import Graph.{ logger }
 
@@ -135,40 +104,53 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Jena
       }
     }
 
-  /* methods for Jena's Graph */
+  /* methods for Sesame's Graph */
 
-  def close(): Unit = throw new UnsupportedOperationException
-  def dependsOn(other: JenaGraph): Boolean = throw new UnsupportedOperationException
-  def getBulkUpdateHandler(): BulkUpdateHandler = throw new UnsupportedOperationException
-  def getCapabilities(): Capabilities = Graph.Capabilities
-  def getEventManager(): GraphEventManager = throw new UnsupportedOperationException
-  def getPrefixMapping(): PrefixMapping = throw new UnsupportedOperationException
-  def getReifier(): Reifier = throw new UnsupportedOperationException
-  def getStatisticsHandler(): GraphStatisticsHandler = throw new UnsupportedOperationException
-  def getTransactionHandler(): TransactionHandler = throw new UnsupportedOperationException
-  def isClosed(): Boolean = true
-  def queryHandler(): QueryHandler = new SimpleQueryHandler(this)
-  def add(triple: JenaTriple): Unit = throw new UnsupportedOperationException
+  def add(statement: Statement): Boolean = throw new UnsupportedOperationException
+  def addAll(statements: jCollection[_ <: Statement]): Boolean = throw new UnsupportedOperationException
+  def clear(): Unit = throw new UnsupportedOperationException
+  def contains(o: Any): Boolean = ???
+  def containsAll(coll: java.util.Collection[_]): Boolean = ???
   def isEmpty(): Boolean = size == 0
-  def contains(triple: JenaTriple): Boolean =
-    this.contains(triple.getSubject, triple.getPredicate, triple.getObject)
-  def contains(subject: JenaNode, predicate: JenaNode, objectt: JenaNode): Boolean = {
-    val s = NodeMatch.fromJena(subject)
-    val p = NodeMatch.fromJena(predicate)
-    val o = NodeMatch.fromJena(objectt)
-    find(s, p, o).nonEmpty // yes we can do better :-)
+  def iterator(): jIterator[Statement] = triples.iterator.map(_.asSesame).asJava
+  def remove(o: Any): Boolean = throw new UnsupportedOperationException
+  def removeAll(coll: jCollection[_]): Boolean = throw new UnsupportedOperationException
+  def retainAll(x$1: java.util.Collection[_]): Boolean = throw new UnsupportedOperationException
+  def toArray[T](a: Array[T with Object]): Array[T with Object] = ???
+  def toArray(): Array[Object] = ???
+  
+  def add(subject: Resource, predicate: SesameURI, objectt: Value, contexts: Resource*): Boolean =
+    throw new UnsupportedOperationException
+  def getValueFactory(): ValueFactory = ???
+  def `match`(subject: Resource, predicate: SesameURI, objectt: Value, contexts: Resource*): jIterator[Statement] = {
+    if (contexts.nonEmpty)
+      throw new UnsupportedOperationException
+    else {
+      val s = if (subject == null) ANY else PlainNode(Node.fromSesame(subject))
+      val p = if (predicate == null) ANY else PlainNode(Node.fromSesame(predicate))
+      val o = if (objectt == null) ANY else PlainNode(Node.fromSesame(objectt))
+      find(s, p, o).iterator.map(_.asSesame).asJava
+    }
   }
-  def delete(triple: JenaTriple): Unit = throw new UnsupportedOperationException
-  def find(subject: JenaNode, predicate: JenaNode, objectt: JenaNode): ExtendedIterator[JenaTriple] = {
-    val s = NodeMatch.fromJena(subject)
-    val p = NodeMatch.fromJena(predicate)
-    val o = NodeMatch.fromJena(objectt)
-    val iterable = find(s, p, o) map (_.asJena)
-    new Graph.AsExtendedIterator(iterable.iterator)
+
+  /* TripleSource */
+
+  def getStatements(subject: Resource, predicate: SesameURI, objectt: Value, contexts: Resource*): CloseableIteration[_ <: Statement, QueryEvaluationException] = {
+    if (contexts.nonEmpty)
+      throw new UnsupportedOperationException
+    else {
+      val s = if (subject == null) ANY else PlainNode(Node.fromSesame(subject))
+      val p = if (predicate == null) ANY else PlainNode(Node.fromSesame(predicate))
+      val o = if (objectt == null) ANY else PlainNode(Node.fromSesame(objectt))
+      val it = find(s, p, o).iterator
+      new CloseableIteration[Statement, QueryEvaluationException] {
+        def close(): Unit = ()
+        def hasNext(): Boolean = it.hasNext
+        def next(): Statement = it.next().asSesame
+        def remove(): Unit = throw new UnsupportedOperationException
+      }
+    }
   }
-  def find(triple: TripleMatch): ExtendedIterator[JenaTriple] =
-    this.find(triple.getMatchSubject, triple.getMatchPredicate, triple.getMatchObject)
-  def isIsomorphicWith(other: JenaGraph): Boolean = GraphMatcher.equals(this, other)
 
 }
 
@@ -184,9 +166,7 @@ object Triple {
 
 case class Triple(subject: Node, predicate: URI, objectt: Node) {
 
-  override def toString: String = asJena.toString
-
-  def asJena: JenaTriple = JenaTriple.create(subject.asJena, predicate.asJena, objectt.asJena)
+  override def toString: String = asSesame.toString
 
   def asSesame: Statement =
     new StatementImpl(
@@ -197,24 +177,6 @@ case class Triple(subject: Node, predicate: URI, objectt: Node) {
 }
 
 object Node {
-
-  lazy val mapper = TypeMapper.getInstance
-
-  def fromJena(node: JenaNode): Node = node match {
-    case iri: Node_URI => URI(new jURI(iri.getURI))
-    case bnode: Node_Blank => BNode(bnode.getBlankNodeId.getLabelString)
-    case tl: Node_Literal if tl.getLiteralLanguage == null || tl.getLiteralLanguage.isEmpty => {
-      val lexicalForm = tl.getLiteralLexicalForm.toString
-      val uri =
-        Option(tl.getLiteralDatatype).map(typ => URI.fromString(typ.getURI)) getOrElse URI.fromString(("http://www.w3.org/2001/XMLSchema#string"))
-      TypedLiteral(lexicalForm, uri)
-    }
-    case ll: Node_Literal => {
-      val lexicalForm = ll.getLiteralLexicalForm.toString
-      val lang = ll.getLiteralLanguage
-      LangLiteral(lexicalForm, lang)
-    }
-  }
 
   def fromSesame(value: Value): Node = value match {
     case resource: Resource => fromSesame(resource)
@@ -243,17 +205,25 @@ object Node {
 
 sealed trait Node {
 
-  override def toString: String = asJena.toString
-
-  def asJena: JenaNode = this match {
-    case URI(underlying) => JenaNode.createURI(underlying.toString)
-    case BNode(label) => JenaNode.createAnon(AnonId.create(label))
-    case TypedLiteral(lexicalForm, uri) => JenaNode.createLiteral(lexicalForm, null, Node.mapper.getTypeByName(uri.toString))
-    case LangLiteral(lexicalForm, lang) => JenaNode.createLiteral(lexicalForm, lang, null)
-  }
+  override def toString: String = asSesame.toString
 
   def asSesame: Value = this match {
-    case URI(underlying) => new URIImpl(underlying.toString)
+    case URI(underlying) => {
+      val uriS = underlying.toString
+      try {
+        new URIImpl(uriS)
+      } catch {
+        case iae: IllegalArgumentException =>
+          new SesameURI {
+            override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == uriS
+            def getLocalName: String = uriS
+            def getNamespace: String = ""
+            override def hashCode: Int = uriS.hashCode
+            override def toString: String = uriS
+            def stringValue: String = uriS
+          }
+      }
+    }
     case BNode(label) => new BNodeImpl(label)
     case TypedLiteral(lexicalForm, uri) => new LiteralImpl(lexicalForm, new URIImpl(uri.underlying.toString))
     case LangLiteral(lexicalForm, lang) => new LiteralImpl(lexicalForm, lang)
@@ -294,10 +264,6 @@ object Predicate {
 
 object NodeMatch {
 
-  def fromJena(node: JenaNode): NodeMatch = node match {
-    case null | JenaNode.ANY => ANY
-    case concrete: Node_Concrete => PlainNode(Node.fromJena(concrete))
-  }
 
 }
 
