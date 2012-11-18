@@ -2390,7 +2390,7 @@
             <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
         </org:deliveredBy>
         <mat:hasErrata rdf:resource="http://dev.w3.org/2006/waf/widgets-access/errata.html"/>
-        <mat:hasTranslations rdf:resource="%20http://www.w3.org/2003/03/Translations/byTechnology?technology=widgets-access"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=widgets-access"/>
     </REC>
 
     <LastCall rdf:about="http://www.w3.org/TR/2012/WD-WebIDL-20120207/">

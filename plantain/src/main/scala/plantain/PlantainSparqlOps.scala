@@ -43,6 +43,6 @@ object PlantainSparqlOps extends SparqlOps[Plantain] {
 
   def varnames(solution: Plantain#Solution): Set[String] = solution.getBindingNames.asScala.toSet
 
-  def solutionIterator(solutions: Plantain#Solutions): Iterable[Plantain#Solution] = solutions
+  def solutionIterator(solutions: Plantain#Solutions): Iterable[Plantain#Solution] = solutions.toIterable
 
 }

@@ -29,7 +29,7 @@ trait Plantain extends RDF {
   type AskQuery = ParsedBooleanQuery
   type Solution = BindingSet
   // instead of TupleQueryResult so that it's eager instead of lazy
-  type Solutions = Iterable[BindingSet]
+  type Solutions = Iterator[BindingSet]
 
 }
 
@@ -41,7 +41,7 @@ object Plantain {
 
   implicit val sparqlOps: SparqlOps[Plantain] = PlantainSparqlOps
 
-//  implicit val graphQuery: RDFGraphQuery[Plantain] = PlantainGraphSparqlEngine
+  implicit val graphQuery: RDFGraphQuery[Plantain] = PlantainGraphSparqlEngine
 
   implicit val rdfxmlReader: RDFReader[Plantain, RDFXML] = PlantainRDFXMLReader
 
@@ -55,20 +55,18 @@ object Plantain {
 
   implicit val rdfWriterSelector: RDFWriterSelector[Plantain] = PlantainRDFWriter.selector //
 
-//  implicit val solutionsWriterJson: SparqlSolutionsWriter[Plantain, SparqlAnswerJson] =
-//    PlantainSolutionsWriter.solutionsWriterJson
-//
-//  implicit val solutionsWriterXml: SparqlSolutionsWriter[Plantain, SparqlAnswerXml] =
-//    PlantainSolutionsWriter.solutionsWriterXml
-//
-//  implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Plantain] = PlantainSolutionsWriter.solutionsWriterSelector
-//
-//  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Plantain, SparqlAnswerJson] =
-//    PlantainQueryResultsReader.queryResultsReaderJson
-//
-//  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Plantain, SparqlAnswerXml] =
-//    PlantainQueryResultsReader.queryResultsReaderXml
+  implicit val solutionsWriterJson: SparqlSolutionsWriter[Plantain, SparqlAnswerJson] =
+    PlantainSolutionsWriter.solutionsWriterJson
 
+  implicit val solutionsWriterXml: SparqlSolutionsWriter[Plantain, SparqlAnswerXml] =
+    PlantainSolutionsWriter.solutionsWriterXml
 
+  implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Plantain] = PlantainSolutionsWriter.writerSelector
+
+  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Plantain, SparqlAnswerJson] =
+    PlantainQueryResultsReader.queryResultsReaderJson
+
+  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Plantain, SparqlAnswerXml] =
+    PlantainQueryResultsReader.queryResultsReaderXml
 
 }

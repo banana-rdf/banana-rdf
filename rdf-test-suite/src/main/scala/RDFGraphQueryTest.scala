@@ -21,7 +21,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
 
   val resource = Resource.fromFile("rdf-test-suite/src/main/resources/new-tr.rdf")
 
-  val graph = reader.read(resource, "http://foo.com") getOrElse sys.error("ouch")
+  val graph = reader.read(resource, "http://foo.com").get
   val sparqlEngine = graphQuery.makeSparqlEngine(graph)
 
   "SELECT DISTINCT query in new-tr.rdf " should {
