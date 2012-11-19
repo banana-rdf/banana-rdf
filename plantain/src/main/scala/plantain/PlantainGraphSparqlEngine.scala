@@ -18,36 +18,14 @@ object PlantainGraphSparqlEngine extends RDFGraphQuery[Plantain] {
 
   class PlantainSparqlEngine(graph: Plantain#Graph) extends SparqlEngine[Plantain, Id] {
 
-    def executeSelect(query: Plantain#SelectQuery, bindings: Map[String, Plantain#Node]): Plantain#Solutions = {
-      val tupleExpr = query.getTupleExpr
-      val evaluationStrategy = new EvaluationStrategyImpl(graph)
-      val results = evaluationStrategy.evaluate(tupleExpr, bindings.asSesame)
-      results.toIterator
-    }
+    def executeSelect(query: Plantain#SelectQuery, bindings: Map[String, Plantain#Node]): Plantain#Solutions =
+      PlantainUtil.executeSelect(graph, query, bindings)
 
-    def executeConstruct(query: Plantain#ConstructQuery, bindings: Map[String, Plantain#Node]): Plantain#Graph = {
-      val tupleExpr = query.getTupleExpr
-      val evaluationStrategy = new EvaluationStrategyImpl(graph)
-      val results = evaluationStrategy.evaluate(tupleExpr, bindings.asSesame)
-      val it = results.toIterator
-      var resultGraph = Graph.empty
-      it foreach { bindingSet =>
-        try {
-          val s = bindingSet.getValue("subject").asInstanceOf[Resource]
-          val p = bindingSet.getValue("predicate").asInstanceOf[SesameURI]
-          val o = bindingSet.getValue("object").asInstanceOf[Value]
-          resultGraph += Triple(Node.fromSesame(s), Node.fromSesame(p), Node.fromSesame(o))
-        } catch { case e: Exception => () }
-      }
-      resultGraph
-    }
+    def executeConstruct(query: Plantain#ConstructQuery, bindings: Map[String, Plantain#Node]): Plantain#Graph =
+      PlantainUtil.executeConstruct(graph, query, bindings)
 
-    def executeAsk(query: Plantain#AskQuery, bindings: Map[String, Plantain#Node]): Boolean = {
-      val tupleExpr = query.getTupleExpr
-      val evaluationStrategy = new EvaluationStrategyImpl(graph)
-      val results = evaluationStrategy.evaluate(tupleExpr, bindings.asSesame)
-      results.hasNext
-    }
+    def executeAsk(query: Plantain#AskQuery, bindings: Map[String, Plantain#Node]): Boolean =
+      PlantainUtil.executeAsk(graph, query, bindings)
 
   }
 

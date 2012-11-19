@@ -85,11 +85,12 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
 
   // TripleMatch
 
-  implicit def tripleAsTripleMatch(triple: Rdf#Triple): TripleMatch[Rdf] =
-    fromTriple(triple).asInstanceOf[TripleMatch[Rdf]]
+  implicit def tripleAsTripleMatch(triple: Rdf#Triple): TripleMatch[Rdf] = {
+    val (s, p, o) = fromTriple(triple)
+    (toConcreteNodeMatch(s), toConcreteNodeMatch(p), toConcreteNodeMatch(o))
+  }
 
   implicit def triplesAsTripleMatches(triples: Iterable[Rdf#Triple]): Iterable[TripleMatch[Rdf]] =
     triples map { triple => tripleAsTripleMatch(triple) }
-
 
 }

@@ -1,5 +1,6 @@
 package org.w3.banana.plantain
 
+import org.w3.banana.TripleMatch
 import java.net.{ URI => jURI }
 import java.util.UUID
 import org.slf4j.{ Logger, LoggerFactory }
@@ -49,6 +50,29 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Sesa
         }
       }
     }
+  }
+
+  def removeExistingTriple(triple: Triple): Graph = {
+    import triple.{ subject, predicate, objectt }
+    val pos = spo(subject)
+    val os = pos(predicate)
+    if (os.size == 1) { // then it must contains only $objectt
+      val newPos = pos - predicate
+      if (newPos.isEmpty) // then it was actually the only spo!
+        Graph(spo - subject, size - 1)
+      else
+        Graph(spo + (subject -> newPos), size -1)
+    } else {
+      val newPos = pos + (predicate -> (os filterNot { _ == objectt }))
+      Graph(spo + (subject -> newPos), size - 1)
+    }
+  }
+
+  def -(tripleMatch: TripleMatch[Plantain]): Graph = {
+    import tripleMatch.{ _1 => sMatch, _2 => pMatch, _3 => oMatch }
+    val matchedTriples: Iterable[Triple] = find(sMatch, pMatch, oMatch)
+    val newGraph = matchedTriples.foldLeft(this){ _.removeExistingTriple(_) }
+    newGraph
   }
 
   def union(other: Graph): Graph = {

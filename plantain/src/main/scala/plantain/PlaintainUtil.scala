@@ -5,8 +5,41 @@ import org.openrdf.query.impl.MapBindingSet
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.model.{ URI => SesameURI, _ }
 import org.openrdf.model.impl.ContextStatementImpl
+import org.openrdf.query.algebra.evaluation.TripleSource
+import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl
 
 object PlantainUtil {
+
+  def executeSelect(tripleSource: TripleSource, query: Plantain#SelectQuery, bindings: Map[String, Plantain#Node]): Plantain#Solutions = {
+    val tupleExpr = query.getTupleExpr
+    val evaluationStrategy = new EvaluationStrategyImpl(tripleSource)
+    val results = evaluationStrategy.evaluate(tupleExpr, bindings.asSesame)
+    results.toIterator
+  }
+
+  def executeConstruct(tripleSource: TripleSource, query: Plantain#ConstructQuery, bindings: Map[String, Plantain#Node]): Plantain#Graph = {
+    val tupleExpr = query.getTupleExpr
+    val evaluationStrategy = new EvaluationStrategyImpl(tripleSource)
+    val results = evaluationStrategy.evaluate(tupleExpr, bindings.asSesame)
+    val it = results.toIterator
+    var resultGraph = Graph.empty
+    it foreach { bindingSet =>
+      try {
+        val s = bindingSet.getValue("subject").asInstanceOf[Resource]
+        val p = bindingSet.getValue("predicate").asInstanceOf[SesameURI]
+        val o = bindingSet.getValue("object").asInstanceOf[Value]
+        resultGraph += Triple(Node.fromSesame(s), Node.fromSesame(p), Node.fromSesame(o))
+      } catch { case e: Exception => () }
+    }
+    resultGraph
+  }
+
+  def executeAsk(tripleSource: TripleSource, query: Plantain#AskQuery, bindings: Map[String, Plantain#Node]): Boolean = {
+    val tupleExpr = query.getTupleExpr
+    val evaluationStrategy = new EvaluationStrategyImpl(tripleSource)
+    val results = evaluationStrategy.evaluate(tupleExpr, bindings.asSesame)
+    results.hasNext
+  }
 
   private class CloseableIterationAsIterator[+T](iteration: CloseableIteration[T, _]) extends Iterator[T] {
     def hasNext: Boolean = iteration.hasNext
