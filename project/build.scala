@@ -83,6 +83,8 @@ object BananaRdfBuild extends Build {
 
   val akka = "com.typesafe.akka" % "akka-actor_2.10.0-RC1" % "2.1.0-RC1"
 
+  val akkaTransactor = "com.typesafe.akka" % "akka-transactor_2.10.0-RC1" % "2.1.0-RC1"
+
   val scalaStm = "org.scala-tools" % "scala-stm_2.10.0-RC1" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
@@ -239,6 +241,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoCore,
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
+      libraryDependencies += akkaTransactor,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.9",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.9",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.9",

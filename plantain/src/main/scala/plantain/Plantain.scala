@@ -1,10 +1,8 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import org.openrdf.model.{ Graph => SesameGraph, Literal => SesameLiteral, BNode => SesameBNode, URI => SesameURI, _ }
-import org.openrdf.query._
-import org.openrdf.query.parser._
-import info.aduna.iteration.CloseableIteration
+import org.openrdf.query.BindingSet
+import org.openrdf.query.parser.{ ParsedQuery, ParsedTupleQuery, ParsedGraphQuery, ParsedBooleanQuery }
 
 trait Plantain extends RDF {
   // types related to the RDF datamodel
