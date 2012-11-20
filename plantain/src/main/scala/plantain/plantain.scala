@@ -61,7 +61,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Sesa
       if (newPos.isEmpty) // then it was actually the only spo!
         Graph(spo - subject, size - 1)
       else
-        Graph(spo + (subject -> newPos), size -1)
+        Graph(spo + (subject -> newPos), size - 1)
     } else {
       val newPos = pos + (predicate -> (os filterNot { _ == objectt }))
       Graph(spo + (subject -> newPos), size - 1)
