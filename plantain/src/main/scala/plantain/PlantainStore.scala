@@ -37,18 +37,12 @@ trait LDPC[Rdf <: RDF] {
 trait LDPS[Rdf <: RDF] {
   def baseUri: Rdf#URI
   def shutdown(): Unit
-  def createLDPC(uri: URI): Future[LDPC[Rdf]]
-  def getLDPC(uri: URI): Future[LDPC[Rdf]]
-  def deleteLDPC(uri: URI): Future[Unit]
+  def createLDPC(uri: Rdf#URI): Future[LDPC[Rdf]]
+  def getLDPC(uri: Rdf#URI): Future[LDPC[Rdf]]
+  def deleteLDPC(uri: Rdf#URI): Future[Unit]
 }
 
 
-
-object PlantainLDPR {
-
-
-
-}
 
 /**
  * it's important for the uris in the graph to be absolute
@@ -58,12 +52,14 @@ case class PlantainLDPR(uri: URI, graph: Graph) extends LDPR[Plantain] {
 
   /* the graph such that all URIs are relative to $uri */
   def relativeGraph: Graph = {
-    graph.triples.foldLeft(Graph.empty){ (current, triple) => current + triple.relativize(uri) }
+    graph.triples.foldLeft(Graph.empty){ (current, triple) => current + triple.relativizeAgainst(uri) }
   }
 
 }
 
 class PlantainLDPC(val uri: URI, actorRef: ActorRef)(implicit timeout: Timeout) extends LDPC[Plantain] {
+
+  override def toString: String = uri.toString
 
   def execute[A](script: Plantain#Script[A]): Future[A] = {
     (actorRef ? Coordinated(Script(script))).asInstanceOf[Future[A]]
@@ -97,7 +93,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
         }
         case GetLDPR(uri, k) => {
           val ldpr = LDPRs(uri.lastPathSegment)
-          run(coordinated, k(ldpr.graph))
+          run(coordinated, k(ldpr.relativeGraph))
         }
         case DeleteLDPR(uri, a) => {
           LDPRs.remove(uri.lastPathSegment)
@@ -188,7 +184,7 @@ class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit 
       val ldpc = new PlantainLDPC(uri, ldpcActorRef)
       sender ! ldpc
     }
-    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
+    case coordinated @ Coordinated(DeleteLDPC(uri)) => coordinated atomic { implicit t =>
       val ldpcActorRefOpt = LDPCs.remove(uri)
       ldpcActorRefOpt foreach { ldpcActorRef => system.stop(ldpcActorRef) }
       sender ! ()

@@ -25,6 +25,8 @@ trait URISyntax[Rdf <: RDF] extends Any {
 
   def relativize(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
 
+  def relativizeAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
+
   def lastPathSegment: String
 
 }
@@ -73,6 +75,8 @@ class URISyntaxDefault[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal with URISynt
   def resolveAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.resolve(other, uri.toString)(ops)
 
   def relativize(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.relativize(uri, other)(ops)
+
+  def relativizeAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.relativize(other, uri)(ops)
 
   def lastPathSegment: String = uri.toString.replaceFirst(".*/([^/?]+).*", "$1")
 

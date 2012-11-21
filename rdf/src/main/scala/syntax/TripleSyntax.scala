@@ -16,4 +16,10 @@ class TripleSyntax[Rdf <: RDF](val triple: Rdf#Triple) extends AnyVal {
     ops.makeTriple(s.relativize(baseUri), p, o.relativize(baseUri))
   }
 
+  def relativizeAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Triple = {
+    import ops.nodeSyntax
+    val (s, p, o) = ops.fromTriple(triple)
+    ops.makeTriple(s.relativizeAgainst(baseUri), p, o.relativizeAgainst(baseUri))
+  }
+
 }

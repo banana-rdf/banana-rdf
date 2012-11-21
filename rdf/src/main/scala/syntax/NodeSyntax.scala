@@ -17,4 +17,9 @@ class NodeSyntax[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
     foldNode(node)(_.relativize(baseUri), bn => bn, lit => lit)
   }
 
+  def relativizeAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
+    import ops.uriSyntax
+    ops.foldNode(node)(_.relativizeAgainst(baseUri), bn => bn, lit => lit)
+  }
+
 }

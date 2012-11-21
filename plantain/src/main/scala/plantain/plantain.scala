@@ -239,7 +239,7 @@ sealed trait Node {
       } catch {
         case iae: IllegalArgumentException =>
           new SesameURI {
-            override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == uriS
+            override def equals(o: Any): Boolean = o.isInstanceOf[SesameURI] && o.asInstanceOf[SesameURI].toString == uriS
             def getLocalName: String = uriS
             def getNamespace: String = ""
             override def hashCode: Int = uriS.hashCode
