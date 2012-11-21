@@ -77,7 +77,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
   def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
     script.resume fold (
       {
-        case CreateLDPR(uriOpt, graph, a) => {
+        case CreateLDPR(uriOpt, graph, k) => {
           import PlantainOps._
           val (uri, pathSegment) = uriOpt match {
             case None => {
@@ -89,7 +89,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
           }
           val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
           LDPRs.put(pathSegment, ldpr)
-          run(coordinated, a)
+          run(coordinated, k(uri))
         }
         case GetLDPR(uri, k) => {
           val ldpr = LDPRs(uri.lastPathSegment)

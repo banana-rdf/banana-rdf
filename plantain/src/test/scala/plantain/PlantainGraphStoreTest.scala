@@ -52,10 +52,11 @@ class LDPSTest[Rdf <: RDF](
     val ldprUri = URI("http://example.com/foo/betehess")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
-      _ <- ldpc.execute(createLDPR(Some(ldprUri), graph))
+      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
       rGraph <- ldpc.execute(getLDPR(ldprUri))
       _ <- ldps.deleteLDPC(ldpcUri)
     } yield {
+      rUri must be(ldprUri)
       assert(rGraph isIsomorphicWith graph)
     }
     script.getOrFail(scala.concurrent.duration.Duration.create("10s"))
