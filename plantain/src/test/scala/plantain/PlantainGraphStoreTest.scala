@@ -59,7 +59,21 @@ class LDPSTest[Rdf <: RDF](
       rUri must be(ldprUri)
       assert(rGraph isIsomorphicWith graph)
     }
-    script.getOrFail(scala.concurrent.duration.Duration.create("10s"))
+    script.getOrFail()
+  }
+
+  "CreateLDPR should create an LDPR with the given graph -- no given uri" in {
+    val ldpcUri = URI("http://example.com/foo")
+    val script = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      rUri <- ldpc.execute(createLDPR(None, graph))
+      rGraph <- ldpc.execute(getLDPR(rUri))
+      _ <- ldps.deleteLDPC(ldpcUri)
+    } yield {
+      rUri.relativizeAgainst(ldpcUri).toString must not include ("/")
+      assert(rGraph isIsomorphicWith graph)
+    }
+    script.getOrFail()
   }
 
 //  "getNamedGraph should retrieve the graph added with appendToGraph" in {
