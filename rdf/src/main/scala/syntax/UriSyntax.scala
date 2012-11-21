@@ -3,7 +3,33 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import java.net.{ URI => jURI }
 
-class URISyntax[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal {
+trait URISyntax[Rdf <: RDF] extends Any {
+
+  def getString(implicit ops: RDFOps[Rdf]): String
+
+  def fragmentLess(implicit ops: RDFOps[Rdf]): Rdf#URI
+
+  def fragment(frag: String)(implicit ops: RDFOps[Rdf]): Rdf#URI
+
+  def fragment(implicit ops: RDFOps[Rdf]): Option[String]
+
+  def isPureFragment(implicit ops: RDFOps[Rdf]): Boolean
+
+  def /(str: String)(implicit ops: RDFOps[Rdf]): Rdf#URI
+
+  def newChildUri()(implicit ops: RDFOps[Rdf]): Rdf#URI
+
+  def resolve(str: String)(implicit ops: RDFOps[Rdf]): Rdf#URI
+
+  def resolveAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
+
+  def relativize(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
+
+  def lastPathSegment: String
+
+}
+
+class URISyntaxDefault[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal with URISyntax[Rdf] {
 
   def getString(implicit ops: RDFOps[Rdf]): String = ops.fromUri(uri)
 

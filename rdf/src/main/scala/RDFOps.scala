@@ -93,7 +93,7 @@ trait RDFOps[Rdf <: RDF]
 
   implicit def nodeSyntax(node: Rdf#Node): syntax.NodeSyntax[Rdf] = new syntax.NodeSyntax[Rdf](node)
 
-  implicit def uriSyntax(uri: Rdf#URI): syntax.URISyntax[Rdf] = new syntax.URISyntax[Rdf](uri)
+  implicit def uriSyntax(uri: Rdf#URI): syntax.URISyntax[Rdf] = new syntax.URISyntaxDefault[Rdf](uri)
 
   implicit def literalSyntax(literal: Rdf#Literal): syntax.LiteralSyntax[Rdf] = new syntax.LiteralSyntax[Rdf](literal)
 

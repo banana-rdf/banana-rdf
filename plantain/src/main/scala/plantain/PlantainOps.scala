@@ -98,4 +98,8 @@ object PlantainOps extends RDFOps[Plantain] {
   def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean =
     ModelUtil.equals(left, right)
 
+  // override the default uriSyntax implementations
+
+  override implicit def uriSyntax(uri: Plantain#URI): syntax.URISyntax[Plantain] = new PlantainURISyntax(uri)
+
 }
