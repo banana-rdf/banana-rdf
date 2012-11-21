@@ -29,7 +29,7 @@ trait Plantain extends RDF {
   // instead of TupleQueryResult so that it's eager instead of lazy
   type Solutions = Iterator[BindingSet]
 
-  type Script[+A] = scalaz.Free[({ type l[+x] = Command[Plantain, x] })#l, A]
+  type Script[+A] = scalaz.Free[({ type l[+x] = LDPCommand[Plantain, x] })#l, A]
 
 
 }

@@ -48,5 +48,7 @@ class URISyntax[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal {
 
   def relativize(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.relativize(uri, other)(ops)
 
+  def lastPathSegment: String = uri.toString.replaceFirst(".*/([^/?]+).*", "$1")
+
 }
 

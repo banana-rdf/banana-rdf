@@ -15,9 +15,10 @@ import org.openrdf.query.algebra.evaluation.TripleSource
 import org.openrdf.query.QueryEvaluationException
 import info.aduna.iteration.CloseableIteration
 import PlantainUtil._
+import PlantainOps.uriSyntax
 import org.slf4j.{ Logger, LoggerFactory }
 
-class TMapTripleSource(graphs: TMap[URI, Graph]) extends TripleSource {
+class TMapTripleSource(tmap: TMap[String, PlantainLDPR]) extends TripleSource {
 
   def getValueFactory(): org.openrdf.model.ValueFactory = ???
 
@@ -25,18 +26,18 @@ class TMapTripleSource(graphs: TMap[URI, Graph]) extends TripleSource {
     val iterator: Iterator[Statement] = if (contexts.isEmpty) {
       PlantainLDPS.logger.warn(s"""_very_ inefficient pattern ($subject, $predicate, $objectt, ANY)""")
       for {
-        (uri, graph) <- graphs.single.iterator
-        statement <- graph.getStatements(subject, predicate, objectt).toIterator
+        ldpr <- tmap.single.values.iterator
+        statement <- ldpr.graph.getStatements(subject, predicate, objectt).toIterator
       } yield {
-        statement.withContext(uri.asSesame.asInstanceOf[Resource])
+        statement.withContext(ldpr.uri.asSesame.asInstanceOf[Resource])
       }
     } else {
       for {
         context <- contexts.iterator
         if context.isInstanceOf[SesameURI]
         uri = context.asInstanceOf[SesameURI]
-        graph <- graphs.single.lift(Node.fromSesame(uri)).toIterator
-        statement <- graph.getStatements(subject, predicate, objectt).toIterator
+        ldpr <- tmap.single.lift(Node.fromSesame(uri).lastPathSegment).toIterator
+        statement <- ldpr.graph.getStatements(subject, predicate, objectt).toIterator
       } yield {
         statement.withContext(uri)
       }

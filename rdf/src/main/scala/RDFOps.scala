@@ -85,6 +85,12 @@ trait RDFOps[Rdf <: RDF]
 
   implicit def graphSyntax(graph: Rdf#Graph): syntax.GraphSyntax[Rdf] = new syntax.GraphSyntax[Rdf](graph)
 
+  implicit def tripleMatchSyntax(tripleMatch: TripleMatch[Rdf]): syntax.TripleMatchSyntax[Rdf] = new syntax.TripleMatchSyntax[Rdf](tripleMatch)
+
+  implicit def tripleSyntax(triple: Rdf#Triple): syntax.TripleSyntax[Rdf] = new syntax.TripleSyntax[Rdf](triple)
+
+  implicit def nodeMatchSyntax(nodeMatch: Rdf#NodeMatch): syntax.NodeMatchSyntax[Rdf] = new syntax.NodeMatchSyntax[Rdf](nodeMatch)
+
   implicit def nodeSyntax(node: Rdf#Node): syntax.NodeSyntax[Rdf] = new syntax.NodeSyntax[Rdf](node)
 
   implicit def uriSyntax(uri: Rdf#URI): syntax.URISyntax[Rdf] = new syntax.URISyntax[Rdf](uri)

@@ -16,6 +16,8 @@ import org.openrdf.query.QueryEvaluationException
 import info.aduna.iteration.CloseableIteration
 import PlantainUtil._
 import org.slf4j.{ Logger, LoggerFactory }
+import PlantainLDPS._
+import PlantainOps.{ uriSyntax, nodeSyntax, tripleSyntax, tripleMatchSyntax }
 
 /*
  * TODO
@@ -24,27 +26,44 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 trait LDPR[Rdf <: RDF] {
   def uri: Rdf#URI // *no* trailing slash
-  def graph: Rdf#Graph
+  def graph: Rdf#Graph // all uris are relative to uri
 }
 
-case class PlantainLDPR(uri: URI, graph: Graph) extends LDPR[Plantain]
-
-trait LDPC[Rdf <: RDF] extends RDFStore[Rdf, Future] {
+trait LDPC[Rdf <: RDF] {
   def uri: Rdf#URI // *with* a trailing slash
+  def execute[A](script: LDPCommand.Script[Rdf, A]): Future[A]
 }
 
-object StoreActor {
-  case class CreateLDPC(uri: URI)
-  case class GetLDPC(uri: URI)
-  case class DeleteLDPC(uri: URI)
-  case class Script[A](script: Plantain#Script[A])
+trait LDPS[Rdf <: RDF] {
+  def baseUri: Rdf#URI
+  def shutdown(): Unit
+  def createLDPC(uri: URI): Future[LDPC[Rdf]]
+  def getLDPC(uri: URI): Future[LDPC[Rdf]]
+  def deleteLDPC(uri: URI): Future[Unit]
 }
 
-import StoreActor._
+
+
+object PlantainLDPR {
+
+
+
+}
+
+/**
+ * it's important for the uris in the graph to be absolute
+ * this invariant is assumed by the sparql engine (TripleSource)
+ */
+case class PlantainLDPR(uri: URI, graph: Graph) extends LDPR[Plantain] {
+
+  /* the graph such that all URIs are relative to $uri */
+  def relativeGraph: Graph = {
+    graph.triples.foldLeft(Graph.empty){ (current, triple) => current + triple.relativize(uri) }
+  }
+
+}
 
 class PlantainLDPC(val uri: URI, actorRef: ActorRef)(implicit timeout: Timeout) extends LDPC[Plantain] {
-
-  def shutdown(): Unit = ()
 
   def execute[A](script: Plantain#Script[A]): Future[A] = {
     (actorRef ? Coordinated(Script(script))).asInstanceOf[Future[A]]
@@ -54,46 +73,69 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef)(implicit timeout: Timeout) 
 
 class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
 
-  val graphs = TMap.empty[URI, Graph]
+  // invariant to be preserved: the Graph are always relative to 
+  val LDPRs = TMap.empty[String, PlantainLDPR]
 
-  val tripleSource: TripleSource = new TMapTripleSource(graphs)
+  val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
 
   def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
     script.resume fold (
       {
-        case Create(uri, a) => {
-          graphs.put(uri, Graph.empty)
+        case CreateLDPR(uriOpt, graph, a) => {
+          import PlantainOps._
+          val (uri, pathSegment) = uriOpt match {
+            case None => {
+              val pathSegment = randomPathSegment
+              val uri = baseUri / pathSegment
+              (uri, pathSegment)
+            }
+            case Some(uri) => (uri, uri.lastPathSegment)
+          }
+          val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
+          LDPRs.put(pathSegment, ldpr)
           run(coordinated, a)
         }
-        case Delete(uri, a) => {
-          graphs.remove(uri)
+        case GetLDPR(uri, k) => {
+          val ldpr = LDPRs(uri.lastPathSegment)
+          run(coordinated, k(ldpr.graph))
+        }
+        case DeleteLDPR(uri, a) => {
+          LDPRs.remove(uri.lastPathSegment)
           run(coordinated, a)
         }
-        case Get(uri, k) => {
-          val graph = graphs(uri)
+        case UpdateLDPR(uri, remove, add, a) => {
+          val pathSegment = uri.lastPathSegment
+          val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse Graph.empty
+          val temp = remove.foldLeft(graph){ (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri) }
+          val resultGraph = add.foldLeft(temp){ (graph, triple) => graph + triple.resolveAgainst(uri) }
+          val ldpr = PlantainLDPR(uri, resultGraph)
+          LDPRs.put(pathSegment, ldpr)
+          run(coordinated, a)
+        }
+        case SelectLDPR(uri, query, bindings, k) => {
+          val graph = LDPRs(uri.lastPathSegment).graph
+          val solutions = PlantainUtil.executeSelect(graph, query, bindings)
+          run(coordinated, k(solutions))
+        }
+        case ConstructLDPR(uri, query, bindings, k) => {
+          val graph = LDPRs(uri.lastPathSegment).graph
+          val resultGraph = PlantainUtil.executeConstruct(graph, query, bindings)
           run(coordinated, k(graph))
         }
-        case Append(uri, triples, a) => {
-          val current = graphs.get(uri) getOrElse Graph.empty
-          val graph = triples.foldLeft(current){ _ + _ }
-          graphs.put(uri, graph)
-          run(coordinated, a)
+        case AskLDPR(uri, query, bindings, k) => {
+          val graph = LDPRs(uri.lastPathSegment).graph
+          val b = PlantainUtil.executeAsk(graph, query, bindings)
+          run(coordinated, k(b))
         }
-        case Remove(uri, tripleMatches, a) => {
-          val current = graphs.get(uri) getOrElse Graph.empty
-          val graph = tripleMatches.foldLeft(current){ _ - _ }
-          graphs.put(uri, graph)
-          run(coordinated, a)
-        }
-        case Select(query, bindings, k) => {
+        case SelectLDPC(query, bindings, k) => {
           val solutions = PlantainUtil.executeSelect(tripleSource, query, bindings)
           run(coordinated, k(solutions))
         }
-        case Construct(query, bindings, k) => {
+        case ConstructLDPC(query, bindings, k) => {
           val graph = PlantainUtil.executeConstruct(tripleSource, query, bindings)
           run(coordinated, k(graph))
         }
-        case Ask(query, bindings, k) => {
+        case AskLDPC(query, bindings, k) => {
           val b = PlantainUtil.executeAsk(tripleSource, query, bindings)
           run(coordinated, k(b))
         }
@@ -111,20 +153,47 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
 
 }
 
-trait LDPS[Rdf <: RDF] {
-  def baseUri: Rdf#URI
-  def shutdown(): Unit
-  def createLDPC(uri: URI): Future[LDPC[Rdf]]
-  def getLDPC(uri: URI): Future[LDPC[Rdf]]
-  def deleteLDPC(uri: URI): Future[Unit]
-}
 
 object PlantainLDPS {
+
+  case class CreateLDPC(uri: URI)
+  case class GetLDPC(uri: URI)
+  case class DeleteLDPC(uri: URI)
+  case class Script[A](script: Plantain#Script[A])
 
   val logger = LoggerFactory.getLogger(classOf[PlantainLDPS])
 
   def apply(baseUri: URI, root: Path)(implicit timeout: Timeout = Timeout(5000)): PlantainLDPS =
     new PlantainLDPS(baseUri, root)
+
+  def randomPathSegment(): String = java.util.UUID.randomUUID().toString.replaceAll("-", "")
+
+}
+
+
+
+class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends Actor {
+
+  val LDPCs = TMap.empty[URI, ActorRef] // PlantainLDPCActor
+
+  def receive = {
+    case coordinated @ Coordinated(CreateLDPC(uri)) => coordinated atomic { implicit t =>
+      val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(uri, root)))
+      LDPCs.put(uri, ldpcActorRef)
+      val ldpc = new PlantainLDPC(uri, ldpcActorRef)
+      sender ! ldpc
+    }
+    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
+      val ldpcActorRef = LDPCs(uri)
+      val ldpc = new PlantainLDPC(uri, ldpcActorRef)
+      sender ! ldpc
+    }
+    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
+      val ldpcActorRefOpt = LDPCs.remove(uri)
+      ldpcActorRefOpt foreach { ldpcActorRef => system.stop(ldpcActorRef) }
+      sender ! ()
+    }
+  }
 
 }
 
@@ -148,31 +217,6 @@ class PlantainLDPS(val baseUri: URI, root: Path)(implicit timeout: Timeout) exte
 
   def deleteLDPC(uri: URI): Future[Unit] = {
     (ldpsActorRef ? Coordinated(DeleteLDPC(uri))).asInstanceOf[Future[Unit]]
-  }
-
-}
-
-class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends Actor {
-
-  val LDPCs = TMap.empty[URI, ActorRef] // PlantainLDPCActor
-
-  def receive = {
-    case coordinated @ Coordinated(CreateLDPC(uri)) => coordinated atomic { implicit t =>
-      val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(uri, root)))
-      LDPCs.put(uri, ldpcActorRef)
-      val ldpc = new PlantainLDPC(uri, ldpcActorRef)
-      sender ! ldpc
-    }
-    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
-      val ldpcActorRef = LDPCs(uri)
-      val ldpc = new PlantainLDPC(uri, ldpcActorRef)
-      sender ! ldpc
-    }
-    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
-      val ldpcActorRefOpt = LDPCs.remove(uri)
-      ldpcActorRefOpt foreach { ldpcActorRef => system.stop(ldpcActorRef) }
-      sender ! ()
-    }
   }
 
 }
