@@ -5,6 +5,7 @@ import com.hp.hpl.jena.sparql.core._
 import Jena._
 import com.hp.hpl.jena.tdb.{ TDB, TDBFactory }
 import JenaOperations._
+import concurrent.Future
 
 abstract class JenaGraphStoreTest(jenaStore: JenaStore) extends GraphStoreTest[Jena](jenaStore) {
 
@@ -13,11 +14,11 @@ abstract class JenaGraphStoreTest(jenaStore: JenaStore) extends GraphStoreTest[J
   }
 
   "adding a named graph should not pollute the default graph" in {
-    val s = jenaStore.execute {
-      Command.append[Jena](makeUri("http://example.com/foo"), graphToIterable(graph))
+    val s: Future[Unit] = jenaStore.execute {
+      Command.append[Jena]( makeUri("http://example.com/foo"), graphToIterable(graph))
     }
     s.getOrFail()
-    defaultGraph.jenaGraph must have size(0)
+    assert( defaultGraph.jenaGraph.size == 0)
   }
 
 }

@@ -13,6 +13,8 @@ object JenaUtil {
     def visitBlank(r: Resource, id: AnonId) = makeBNodeLabel(id.getLabelString)
     // go from the model's Node to the Graph one, then cast it (always safe here)
     def visitLiteral(l: JenaLiteral) = foldLiteral(l.asNode.asInstanceOf[Jena#Literal])(x => x, x => x)
+
+    override
     def visitURI(r: Resource, uri: String) = makeUri(uri)
   }
 

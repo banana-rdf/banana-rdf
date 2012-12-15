@@ -5,4 +5,4 @@ before_install:
   - sudo dpkg -i /tmp/sbt.deb
 language: scala
 scala:
-   - 2.10.0-RC1
+   - 2.10.0-RC5

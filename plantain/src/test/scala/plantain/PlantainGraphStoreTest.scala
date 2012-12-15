@@ -11,7 +11,7 @@ class PlantainLDPSTest extends LDPSTest[Plantain]({
   PlantainLDPS(null, null)
 })
 
-class LDPSTest[Rdf <: RDF](
+abstract class LDPSTest[Rdf <: RDF](
   ldps: LDPS[Rdf])(
   implicit diesel: Diesel[Rdf],
   reader: RDFReader[Rdf, RDFXML]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
