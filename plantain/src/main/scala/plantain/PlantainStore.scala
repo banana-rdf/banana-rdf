@@ -8,7 +8,7 @@ import akka.actor._
 import akka.util._
 import akka.pattern.{ ask, pipe }
 import akka.transactor._
-import scalaz.Free
+import scalaz.{ -\/, \/- , Free }
 import org.openrdf.model.{ URI => SesameURI, _ }
 import org.openrdf.model.impl._
 import org.openrdf.query.algebra.evaluation.TripleSource
@@ -18,6 +18,7 @@ import PlantainUtil._
 import org.slf4j.{ Logger, LoggerFactory }
 import PlantainLDPS._
 import PlantainOps.{ uriSyntax, nodeSyntax, tripleSyntax, tripleMatchSyntax }
+import annotation.tailrec
 
 /*
  * TODO
@@ -51,9 +52,9 @@ trait LDPS[Rdf <: RDF] {
 case class PlantainLDPR(uri: URI, graph: Graph) extends LDPR[Plantain] {
 
   /* the graph such that all URIs are relative to $uri */
-  def relativeGraph: Graph = {
+  def relativeGraph: Graph =
     graph.triples.foldLeft(Graph.empty){ (current, triple) => current + triple.relativizeAgainst(uri) }
-  }
+
 
 }
 
@@ -74,70 +75,74 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
 
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
 
-  def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
-    script.resume fold (
-      {
-        case CreateLDPR(uriOpt, graph, k) => {
-          import PlantainOps._
-          val (uri, pathSegment) = uriOpt match {
-            case None => {
-              val pathSegment = randomPathSegment
-              val uri = baseUri / pathSegment
-              (uri, pathSegment)
-            }
-            case Some(uri) => (uri, uri.lastPathSegment)
+  @tailrec
+  final def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
+    script.resume match {
+      case -\/(CreateLDPR(uriOpt, graph, k)) => {
+        import PlantainOps._
+        val (uri, pathSegment) = uriOpt match {
+          case None => {
+            val pathSegment = randomPathSegment
+            val uri = baseUri / pathSegment
+            (uri, pathSegment)
           }
-          val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
-          LDPRs.put(pathSegment, ldpr)
-          run(coordinated, k(uri))
+          case Some(uri) => (uri, uri.lastPathSegment)
         }
-        case GetLDPR(uri, k) => {
-          val ldpr = LDPRs(uri.lastPathSegment)
-          run(coordinated, k(ldpr.relativeGraph))
+        val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
+        LDPRs.put(pathSegment, ldpr)
+        run(coordinated, k(uri))
+      }
+      case -\/(GetLDPR(uri, k)) => {
+        val ldpr = LDPRs(uri.lastPathSegment)
+        run(coordinated, k(ldpr.relativeGraph))
+      }
+      case -\/(DeleteLDPR(uri, a)) => {
+        LDPRs.remove(uri.lastPathSegment)
+        run(coordinated, a)
+      }
+      case -\/(UpdateLDPR(uri, remove, add, a)) => {
+        val pathSegment = uri.lastPathSegment
+        val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse Graph.empty
+        val temp = remove.foldLeft(graph) {
+          (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri)
         }
-        case DeleteLDPR(uri, a) => {
-          LDPRs.remove(uri.lastPathSegment)
-          run(coordinated, a)
+        val resultGraph = add.foldLeft(temp) {
+          (graph, triple) => graph + triple.resolveAgainst(uri)
         }
-        case UpdateLDPR(uri, remove, add, a) => {
-          val pathSegment = uri.lastPathSegment
-          val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse Graph.empty
-          val temp = remove.foldLeft(graph){ (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri) }
-          val resultGraph = add.foldLeft(temp){ (graph, triple) => graph + triple.resolveAgainst(uri) }
-          val ldpr = PlantainLDPR(uri, resultGraph)
-          LDPRs.put(pathSegment, ldpr)
-          run(coordinated, a)
-        }
-        case SelectLDPR(uri, query, bindings, k) => {
-          val graph = LDPRs(uri.lastPathSegment).graph
-          val solutions = PlantainUtil.executeSelect(graph, query, bindings)
-          run(coordinated, k(solutions))
-        }
-        case ConstructLDPR(uri, query, bindings, k) => {
-          val graph = LDPRs(uri.lastPathSegment).graph
-          val resultGraph = PlantainUtil.executeConstruct(graph, query, bindings)
-          run(coordinated, k(graph))
-        }
-        case AskLDPR(uri, query, bindings, k) => {
-          val graph = LDPRs(uri.lastPathSegment).graph
-          val b = PlantainUtil.executeAsk(graph, query, bindings)
-          run(coordinated, k(b))
-        }
-        case SelectLDPC(query, bindings, k) => {
-          val solutions = PlantainUtil.executeSelect(tripleSource, query, bindings)
-          run(coordinated, k(solutions))
-        }
-        case ConstructLDPC(query, bindings, k) => {
-          val graph = PlantainUtil.executeConstruct(tripleSource, query, bindings)
-          run(coordinated, k(graph))
-        }
-        case AskLDPC(query, bindings, k) => {
-          val b = PlantainUtil.executeAsk(tripleSource, query, bindings)
-          run(coordinated, k(b))
-        }
-      },
-      a => a
-    )
+        val ldpr = PlantainLDPR(uri, resultGraph)
+        LDPRs.put(pathSegment, ldpr)
+        run(coordinated, a)
+      }
+      case -\/(SelectLDPR(uri, query, bindings, k)) => {
+        val graph = LDPRs(uri.lastPathSegment).graph
+        val solutions = PlantainUtil.executeSelect(graph, query, bindings)
+        run(coordinated, k(solutions))
+      }
+      case -\/(ConstructLDPR(uri, query, bindings, k)) => {
+        val graph = LDPRs(uri.lastPathSegment).graph
+        val resultGraph = PlantainUtil.executeConstruct(graph, query, bindings)
+        run(coordinated, k(graph))
+      }
+      case -\/(AskLDPR(uri, query, bindings, k)) => {
+        val graph = LDPRs(uri.lastPathSegment).graph
+        val b = PlantainUtil.executeAsk(graph, query, bindings)
+        run(coordinated, k(b))
+      }
+      case -\/(SelectLDPC(query, bindings, k)) => {
+        val solutions = PlantainUtil.executeSelect(tripleSource, query, bindings)
+        run(coordinated, k(solutions))
+      }
+      case -\/(ConstructLDPC(query, bindings, k)) => {
+        val graph = PlantainUtil.executeConstruct(tripleSource, query, bindings)
+        run(coordinated, k(graph))
+      }
+      case -\/(AskLDPC(query, bindings, k)) => {
+        val b = PlantainUtil.executeAsk(tripleSource, query, bindings)
+        run(coordinated, k(b))
+      }
+      case \/-(a) => a
+
+    }
   }
 
   def receive = {
