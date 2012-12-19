@@ -19,21 +19,63 @@ import org.slf4j.{ Logger, LoggerFactory }
 import PlantainLDPS._
 import PlantainOps.{ uriSyntax, nodeSyntax, tripleSyntax, tripleMatchSyntax }
 import annotation.tailrec
+import java.util.Date
+
+// A resource on the server ( Resource is already taken. )
+// note:
+// There can be named and unamed resources, as when a POST creates a
+// resource that is not given a name...
+trait Res[Rdf<:RDF] {
+   def uri: Rdf#URI
+}
+
+///**
+// * Metadata about a resource
+// *   This may be thought to be so generic that a graph representation would do,
+// *   but it is very likely to be very limited set of properties and so to be
+// *   better done in form methods for efficiency reasons.
+// */
+//trait Meta[Rdf <: RDF]  {
+//
+//  def uri: Rdf#URI
+//
+//  def updated: Date
+//
+//// def tpe:
+//
+//  /**
+//   * location of initial ACL for this resource
+//   **/
+//  def acl: Option[Rdf#URI]
+//
+//  //other metadata candidates:
+//  // - owner
+//  // - etag
+//  //
+//
+//}
+//
+
+trait BinaryResource[Rdf<:RDF,Iteratee] extends Res[Rdf] {
+  //one needs a way to put and get something to it
+}
 
 /*
  * TODO
  * - an LDPS must subscribe to the death of its LDPC
  */
 
-trait LDPR[Rdf <: RDF] {
+trait LDPR[Rdf <: RDF] extends Res[Rdf] {
   def uri: Rdf#URI // *no* trailing slash
+
   def graph: Rdf#Graph // all uris are relative to uri
 }
 
-trait LDPC[Rdf <: RDF] {
+trait LDPC[Rdf <: RDF] extends Res[Rdf] {
   def uri: Rdf#URI // *with* a trailing slash
   def execute[A](script: LDPCommand.Script[Rdf, A]): Future[A]
 }
+
 
 trait LDPS[Rdf <: RDF] {
   def baseUri: Rdf#URI
@@ -69,6 +111,8 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef)(implicit timeout: Timeout) 
 }
 
 class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
+  import org.w3.banana.plantain.Plantain.diesel._
+  import org.w3.banana.plantain.Plantain.ops.emptyGraph
 
   // invariant to be preserved: the Graph are always relative to 
   val LDPRs = TMap.empty[String, PlantainLDPR]
@@ -96,13 +140,18 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
         val ldpr = LDPRs(uri.lastPathSegment)
         run(coordinated, k(ldpr.relativeGraph))
       }
+      case -\/(GetMeta(uri,k)) => {
+        val metaURI = if (uri.toString.endsWith(";meta")) uri else URI.fromString(uri.toString+";meta")
+        val ldpr = LDPRs.get(metaURI.lastPathSegment) getOrElse PlantainLDPR(metaURI,emptyGraph)
+        run(coordinated, k(ldpr))
+      }
       case -\/(DeleteLDPR(uri, a)) => {
         LDPRs.remove(uri.lastPathSegment)
         run(coordinated, a)
       }
       case -\/(UpdateLDPR(uri, remove, add, a)) => {
         val pathSegment = uri.lastPathSegment
-        val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse Graph.empty
+        val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse emptyGraph
         val temp = remove.foldLeft(graph) {
           (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri)
         }

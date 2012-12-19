@@ -20,6 +20,7 @@ abstract class LDPSTest[Rdf <: RDF](
   import ops._
 
   val foaf = FOAFPrefix[Rdf]
+  val wac = WebACL[Rdf]
 
   override def afterAll(): Unit = {
     ldps.shutdown()
@@ -30,6 +31,13 @@ abstract class LDPSTest[Rdf <: RDF](
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.title ->- "Mr"
   ).graph
+
+  val graphMeta: Rdf#Graph = (
+    bnode()
+      -- wac.accessTo ->- URI("http://example.com/foo/betehess")
+      -- wac.agent    ->- URI("http://example.com/foo/betehess#me")
+      -- wac.mode     ->- wac.Read
+    ).graph
 
   val graph2: Rdf#Graph = (
     URI("#me")
@@ -76,7 +84,30 @@ abstract class LDPSTest[Rdf <: RDF](
     script.getOrFail()
   }
 
-//  "getNamedGraph should retrieve the graph added with appendToGraph" in {
+  "CreateLDPR with Meta - should create an LDPR with the given graph -- with given uri" in {
+    val ldpcUri = URI("http://example.com/foo")
+    val ldprUri = URI("http://example.com/foo/betehess")
+    val ldprMeta = URI("http://example.com/foo/betehess;meta")
+    val script = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
+      rMeta <- ldpc.execute(getMeta(ldprUri).flatMap{ metaG=>
+        updateLDPR(metaG.uri,Iterable.empty,graphMeta.toIterable).flatMap(_=>
+        getMeta(metaG.uri))
+      })
+      rGraph <- ldpc.execute(getLDPR(ldprUri))
+      _ <- ldps.deleteLDPC(ldpcUri)
+    } yield {
+      rUri must be(ldprUri)
+      rMeta.uri must be(ldprMeta)
+      assert( rMeta.graph isIsomorphicWith graphMeta)
+      assert(rGraph isIsomorphicWith graph)
+    }
+    script.getOrFail()
+  }
+
+
+  //  "getNamedGraph should retrieve the graph added with appendToGraph" in {
 //    val u1 = URI("http://example.com/foo/betehess")
 //    val u2 = URI("http://example.com/foo/alexandre")
 //    val r = for {

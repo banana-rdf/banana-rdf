@@ -22,6 +22,8 @@ sealed trait LDPCommand[Rdf <: RDF, +A]
 
 case class CreateLDPR[Rdf <: RDF, A](uri: Option[Rdf#URI], graph: Rdf#Graph, k: Rdf#URI => A) extends LDPCommand[Rdf, A]
 
+case class GetMeta[Rdf<: RDF, A](uri: Rdf#URI, k: LDPR[Rdf] => A ) extends LDPCommand[Rdf, A]
+
 case class GetLDPR[Rdf <: RDF, A](uri: Rdf#URI, k: Rdf#Graph => A) extends LDPCommand[Rdf, A]
 
 case class DeleteLDPR[Rdf <: RDF, A](uri: Rdf#URI, a: A) extends LDPCommand[Rdf, A]
@@ -58,6 +60,9 @@ object LDPCommand {
   def getLDPR[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, Rdf#Graph] =
     suspend(GetLDPR(uri, graph => `return`(graph)))
 
+  def getMeta[Rdf <: RDF,A](uri: Rdf#URI): Script[Rdf, LDPR[Rdf]] =
+    suspend[Rdf,LDPR[Rdf]](GetMeta(uri, ldpr => `return`(ldpr)))
+
   def deleteLDPR[Rdf <: RDF](uri: Rdf#URI): Script[Rdf, Unit] =
     suspend(DeleteLDPR(uri, nop))
 
@@ -89,6 +94,7 @@ object LDPCommand {
         ldpCommand match {
           case CreateLDPR(uri, graph, k) => CreateLDPR(uri, graph, x => f(k(x)))
           case GetLDPR(uri, k) => GetLDPR(uri, x => f(k(x)))
+          case GetMeta(uri, k) => GetMeta(uri, x => f(k(x)))
           case DeleteLDPR(uri, a) =>  DeleteLDPR(uri, f(a))
           case UpdateLDPR(uri, remove, add, a) => UpdateLDPR(uri, remove, add, f(a))
           case SelectLDPR(uri, query, bindings, k) => SelectLDPR(uri, query, bindings, x => f(k(x)))
