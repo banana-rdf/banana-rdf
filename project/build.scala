@@ -107,7 +107,9 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaActors,
       libraryDependencies += scalatest
     )
-  
+
+  val iterateeDeps = "play" % "play-iteratees_2.10" % "2.1-SNAPSHOT"
+
   val testDeps =
     Seq(
       libraryDependencies += scalaActors % "test",
@@ -243,6 +245,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
+      libraryDependencies += iterateeDeps,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.9",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.9",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.9",

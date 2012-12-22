@@ -20,12 +20,17 @@ import PlantainLDPS._
 import PlantainOps.{ uriSyntax, nodeSyntax, tripleSyntax, tripleMatchSyntax }
 import annotation.tailrec
 import java.util.Date
+import play.api.libs.iteratee.{Error, Enumerator, Iteratee}
+import java.io.{File, IOException, OutputStream}
+import play.api.libs.iteratee.Input.El
+import scala.util.Try
+import scala.language.reflectiveCalls
 
 // A resource on the server ( Resource is already taken. )
 // note:
 // There can be named and unamed resources, as when a POST creates a
 // resource that is not given a name...
-trait Res[Rdf<:RDF] {
+trait LocalResource[Rdf<:RDF] {
    def uri: Rdf#URI
 }
 
@@ -56,8 +61,28 @@ trait Res[Rdf<:RDF] {
 //}
 //
 
-trait BinaryResource[Rdf<:RDF,Iteratee] extends Res[Rdf] {
-  //one needs a way to put and get something to it
+/**
+ * A binary resource does not get direct semantic interpretation.
+ * It has a mime type. One can write bytes to it, to replace its content, or one
+ * can read its content.
+ * @tparam Rdf
+ */
+trait BinaryResource[Rdf<:RDF] extends LocalResource[Rdf] {
+  /*
+   * A resource should ideally be versioned, so any change would get a version URI
+   * ( but this is probably something that should be on a MetaData trait
+   **/
+  def version: Rdf#URI
+
+  def size: Try[Long]
+
+  // also should be on a metadata trait, since all resources have update times
+  def updated: Try[Date]
+  def mime: MimeType
+
+  // creates a new BinaryResource, with new time stamp, etc...
+  def write:  Iteratee[Array[Byte], BinaryResource[Rdf]]
+  def reader(chunkSize: Int): Enumerator[Array[Byte]]
 }
 
 /*
@@ -65,13 +90,16 @@ trait BinaryResource[Rdf<:RDF,Iteratee] extends Res[Rdf] {
  * - an LDPS must subscribe to the death of its LDPC
  */
 
-trait LDPR[Rdf <: RDF] extends Res[Rdf] {
+trait LDPR[Rdf <: RDF] extends LocalResource[Rdf] {
   def uri: Rdf#URI // *no* trailing slash
 
   def graph: Rdf#Graph // all uris are relative to uri
+
+  /* the graph such that all URIs are relative to $uri */
+  def relativeGraph: Rdf#Graph
 }
 
-trait LDPC[Rdf <: RDF] extends Res[Rdf] {
+trait LDPC[Rdf <: RDF] extends LocalResource[Rdf] {
   def uri: Rdf#URI // *with* a trailing slash
   def execute[A](script: LDPCommand.Script[Rdf, A]): Future[A]
 }
@@ -85,7 +113,48 @@ trait LDPS[Rdf <: RDF] {
   def deleteLDPC(uri: Rdf#URI): Future[Unit]
 }
 
+case class OperationNotSupported(msg: String) extends Exception(msg)
 
+case class PlantainBinary(root: Path, uri: Plantain#URI) extends BinaryResource[Plantain] {
+
+  lazy val path = root.resolve(uri.lastPathSegment)
+
+  /*
+   * A resource should ideally be versioned, so any change would get a version URI
+   * ( but this is probably something that should be on a MetaData trait
+   **/
+  def version = ???
+
+  // also should be on a metadata trait, since all resources have update times
+  def updated = Try { new Date(Files.getLastModifiedTime(path).toMillis) }
+
+  val size = Try { Files.size(path) }
+
+  def mime = ???
+
+  // creates a new BinaryResource, with new time stamp, etc...
+  //here I can just write to the file, as that should be a very quick operation, which even if it blocks,
+  //should be extreemly fast server side.  Iteratee
+  def write: Iteratee[Array[Byte], PlantainBinary ] = {
+    val tmpfile = Files.createTempFile(path.getParent,path.getFileName.toString,"tmp")
+    val out = Files.newOutputStream(tmpfile, StandardOpenOption.WRITE)
+    val i = Iteratee.fold[Array[Byte],OutputStream](out){ (out, bytes ) =>
+      try {
+        out.write(bytes)
+      } catch {
+        case outerr: IOException => Error("Problem writing bytes: "+outerr, El(bytes))
+      }
+      out
+    }
+    i.mapDone{ _ =>
+       Files.move(tmpfile,path,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING)
+       this // we can return this
+    }
+  }
+
+  //this will probably require an agent to push things along.
+  def reader(chunkSize: Int=1024*8) = Enumerator.fromFile(path.toFile,chunkSize)
+}
 
 /**
  * it's important for the uris in the graph to be absolute
@@ -93,7 +162,6 @@ trait LDPS[Rdf <: RDF] {
  */
 case class PlantainLDPR(uri: URI, graph: Graph) extends LDPR[Plantain] {
 
-  /* the graph such that all URIs are relative to $uri */
   def relativeGraph: Graph =
     graph.triples.foldLeft(Graph.empty){ (current, triple) => current + triple.relativizeAgainst(uri) }
 
@@ -112,41 +180,45 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef)(implicit timeout: Timeout) 
 
 class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
   import org.w3.banana.plantain.Plantain.diesel._
-  import org.w3.banana.plantain.Plantain.ops.emptyGraph
-
+  val NonLDPRs = TMap.empty[String, LocalResource[Plantain]]
   // invariant to be preserved: the Graph are always relative to 
+
   val LDPRs = TMap.empty[String, PlantainLDPR]
+
 
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
 
   @tailrec
   final def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
+    import PlantainOps._
     script.resume match {
       case -\/(CreateLDPR(uriOpt, graph, k)) => {
-        import PlantainOps._
-        val (uri, pathSegment) = uriOpt match {
-          case None => {
-            val pathSegment = randomPathSegment
-            val uri = baseUri / pathSegment
-            (uri, pathSegment)
-          }
-          case Some(uri) => (uri, uri.lastPathSegment)
-        }
+        val (uri, pathSegment) = deconstruct(uriOpt)
         val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
         LDPRs.put(pathSegment, ldpr)
         run(coordinated, k(uri))
       }
-      case -\/(GetLDPR(uri, k)) => {
-        val ldpr = LDPRs(uri.lastPathSegment)
-        run(coordinated, k(ldpr.relativeGraph))
+      case -\/(CreateBinary(uriOpt, k)) => {
+        val (uri, pathSegment) = deconstruct(uriOpt)
+        //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
+        val bin = PlantainBinary(root,uri)
+        NonLDPRs.put(pathSegment, bin)
+        run(coordinated, k(bin))
+      }
+      case -\/(GetResource(uri,k)) => {
+        val path = uri.lastPathSegment
+        val res = LDPRs.get(path).getOrElse(NonLDPRs(path))
+        run(coordinated, k(res))
       }
       case -\/(GetMeta(uri,k)) => {
-        val metaURI = if (uri.toString.endsWith(";meta")) uri else URI.fromString(uri.toString+";meta")
-        val ldpr = LDPRs.get(metaURI.lastPathSegment) getOrElse PlantainLDPR(metaURI,emptyGraph)
-        run(coordinated, k(ldpr))
+        val metaURI = if (uri.toString.endsWith(";meta")) uri else URI(uri.toString+";meta")
+        val meta = LDPRs.get(metaURI.lastPathSegment) getOrElse PlantainLDPR(metaURI,emptyGraph)
+        run(coordinated,k(meta))
       }
-      case -\/(DeleteLDPR(uri, a)) => {
-        LDPRs.remove(uri.lastPathSegment)
+      case -\/(DeleteResource(uri, a)) => {
+         LDPRs.remove(uri.lastPathSegment).orElse{
+           NonLDPRs.remove(uri.lastPathSegment)
+         }
         run(coordinated, a)
       }
       case -\/(UpdateLDPR(uri, remove, add, a)) => {
@@ -194,10 +266,26 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
     }
   }
 
+
+  protected def deconstruct[A](uriOpt: Option[Plantain#URI]): (Plantain#URI, String) = {
+    uriOpt match {
+      case None => {
+        val pathSegment = randomPathSegment
+        val uri = baseUri / pathSegment
+        (uri, pathSegment)
+      }
+      case Some(uri) => (uri, uri.lastPathSegment)
+    }
+  }
+
   def receive = {
     case coordinated @ Coordinated(Script(script)) => coordinated atomic { implicit t =>
+      try {
       val r = run(coordinated, script)
       sender ! r
+      } catch {
+        case e: Exception => sender ! akka.actor.Status.Failure(e)
+      }
     }
   }
 

@@ -22,11 +22,13 @@ sealed trait LDPCommand[Rdf <: RDF, +A]
 
 case class CreateLDPR[Rdf <: RDF, A](uri: Option[Rdf#URI], graph: Rdf#Graph, k: Rdf#URI => A) extends LDPCommand[Rdf, A]
 
+case class CreateBinary[Rdf <: RDF, A](uri: Option[Rdf#URI], k: BinaryResource[Rdf] => A ) extends LDPCommand[Rdf, A]
+
 case class GetMeta[Rdf<: RDF, A](uri: Rdf#URI, k: LDPR[Rdf] => A ) extends LDPCommand[Rdf, A]
 
-case class GetLDPR[Rdf <: RDF, A](uri: Rdf#URI, k: Rdf#Graph => A) extends LDPCommand[Rdf, A]
+case class GetResource[Rdf <: RDF, A](uri: Rdf#URI, k: LocalResource[Rdf] => A) extends LDPCommand[Rdf, A]
 
-case class DeleteLDPR[Rdf <: RDF, A](uri: Rdf#URI, a: A) extends LDPCommand[Rdf, A]
+case class DeleteResource[Rdf <: RDF, A](uri: Rdf#URI, a: A) extends LDPCommand[Rdf, A]
 
 case class UpdateLDPR[Rdf <: RDF, A](uri: Rdf#URI, remove: Iterable[TripleMatch[Rdf]], add: Iterable[Rdf#Triple], a: A) extends LDPCommand[Rdf, A]
 
@@ -57,14 +59,26 @@ object LDPCommand {
   def createLDPR[Rdf <: RDF](uri: Option[Rdf#URI], graph: Rdf#Graph): Script[Rdf, Rdf#URI] =
     suspend(CreateLDPR(uri, graph, uri => `return`(uri)))
 
+  def createBinary[Rdf <: RDF](uri: Option[Rdf#URI]): Script[Rdf, BinaryResource[Rdf]] =
+    suspend(CreateBinary(uri, bin => `return`(bin)))
+
+
   def getLDPR[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, Rdf#Graph] =
-    suspend(GetLDPR(uri, graph => `return`(graph)))
+    getResource(uri).map{res =>
+      res match {
+        case ldpr: LDPR[Rdf] =>  ldpr.relativeGraph
+        case obj => throw OperationNotSupported("cannot do this operation on a "+obj.getClass)
+      }
+    }
 
   def getMeta[Rdf <: RDF,A](uri: Rdf#URI): Script[Rdf, LDPR[Rdf]] =
     suspend[Rdf,LDPR[Rdf]](GetMeta(uri, ldpr => `return`(ldpr)))
 
-  def deleteLDPR[Rdf <: RDF](uri: Rdf#URI): Script[Rdf, Unit] =
-    suspend(DeleteLDPR(uri, nop))
+  def getResource[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, LocalResource[Rdf]] =
+    suspend[Rdf,LocalResource[Rdf]](GetResource(uri, resource => `return`(resource)))
+
+  def deleteResource[Rdf <: RDF](uri: Rdf#URI): Script[Rdf, Unit] =
+    suspend(DeleteResource(uri, nop))
 
   def updateLDPR[Rdf <: RDF](uri: Rdf#URI, remove: Iterable[TripleMatch[Rdf]], add: Iterable[Rdf#Triple]): Script[Rdf, Unit] =
     suspend(UpdateLDPR(uri, remove, add, nop))
@@ -92,10 +106,11 @@ object LDPCommand {
 
       def map[A, B](ldpCommand: LDPCommand[Rdf, A])(f: A => B): LDPCommand[Rdf, B] =
         ldpCommand match {
+          case CreateBinary(uri, k) => CreateBinary(uri, x=> f(k(x)))
           case CreateLDPR(uri, graph, k) => CreateLDPR(uri, graph, x => f(k(x)))
-          case GetLDPR(uri, k) => GetLDPR(uri, x => f(k(x)))
+          case GetResource(uri, k) => GetResource(uri, x=> f(k(x)))
           case GetMeta(uri, k) => GetMeta(uri, x => f(k(x)))
-          case DeleteLDPR(uri, a) =>  DeleteLDPR(uri, f(a))
+          case DeleteResource(uri, a) =>  DeleteResource(uri, f(a))
           case UpdateLDPR(uri, remove, add, a) => UpdateLDPR(uri, remove, add, f(a))
           case SelectLDPR(uri, query, bindings, k) => SelectLDPR(uri, query, bindings, x => f(k(x)))
           case ConstructLDPR(uri, query, bindings, k) => ConstructLDPR(uri, query, bindings, x => f(k(x)))

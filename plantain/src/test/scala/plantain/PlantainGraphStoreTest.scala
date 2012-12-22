@@ -6,9 +6,17 @@ import org.scalatest.matchers._
 import Plantain._
 import LDPCommand._
 import scala.concurrent.ExecutionContext.Implicits.global
+import java.nio.charset.Charset
+import java.nio.file.{Files, Paths, Path}
+import java.io.File
+import play.api.libs.iteratee.Enumerator
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+import java.util.concurrent.TimeUnit
 
 class PlantainLDPSTest extends LDPSTest[Plantain]({
-  PlantainLDPS(null, null)
+  val dir = Files.createTempDirectory("plantain")
+  PlantainLDPS(URI.fromString("http://example.com/foo"), dir)
 })
 
 abstract class LDPSTest[Rdf <: RDF](
@@ -55,6 +63,8 @@ abstract class LDPSTest[Rdf <: RDF](
     -- rdf("bar") ->- "bar"
   ).graph
 
+  val helloWorldBinary = "☯ Hello, World! ☮".getBytes("UTF-8")
+
   "CreateLDPR should create an LDPR with the given graph -- with given uri" in {
     val ldpcUri = URI("http://example.com/foo")
     val ldprUri = URI("http://example.com/foo/betehess")
@@ -100,10 +110,51 @@ abstract class LDPSTest[Rdf <: RDF](
     } yield {
       rUri must be(ldprUri)
       rMeta.uri must be(ldprMeta)
-      assert( rMeta.graph isIsomorphicWith graphMeta)
-      assert(rGraph isIsomorphicWith graph)
+      assert( rMeta.graph isIsomorphicWith graphMeta )
+      assert( rGraph isIsomorphicWith graph )
     }
     script.getOrFail()
+  }
+
+  "Create Binary" in {
+    val ldpcUri = URI("http://example.com/foo")
+    val binUri = URI("http://example.com/foo/img.jpg")
+    val ldprMeta = URI("http://example.com/foo/img.jpg;meta")
+
+    val createBin = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      bin <- ldpc.execute(createBinary(Some(binUri)))
+      val it = bin.write
+      newbin <- Enumerator(helloWorldBinary).apply(it)
+      newres <- newbin.run
+    } yield {
+      bin.uri must be(binUri)
+      newres.uri must be(binUri)
+    }
+    createBin.getOrFail()
+
+    val getBin = for {
+       ldpc <- ldps.getLDPC(ldpcUri)
+       bin  <- ldpc.execute(getResource(binUri).map(r=>r.asInstanceOf[BinaryResource[Rdf]]))
+    } yield {
+      bin.reader(400).map{ bytes =>
+        helloWorldBinary must be(bytes)
+      }
+    }
+
+    getBin.getOrFail()
+
+    val deleteBin = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      _ <- ldpc.execute(deleteResource(binUri))
+      _ <- ldpc.execute(getResource(binUri))
+    } yield {
+      "hello"
+    }
+
+    val res = Await.result(deleteBin.failed,Duration(1,TimeUnit.SECONDS))
+    assert(res.isInstanceOf[NoSuchElementException])
+
   }
 
 
