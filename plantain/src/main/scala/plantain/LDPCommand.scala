@@ -24,9 +24,9 @@ case class CreateLDPR[Rdf <: RDF, A](uri: Option[Rdf#URI], graph: Rdf#Graph, k: 
 
 case class CreateBinary[Rdf <: RDF, A](uri: Option[Rdf#URI], k: BinaryResource[Rdf] => A ) extends LDPCommand[Rdf, A]
 
-case class GetMeta[Rdf<: RDF, A](uri: Rdf#URI, k: LDPR[Rdf] => A ) extends LDPCommand[Rdf, A]
+case class GetMeta[Rdf<: RDF, A](uri: Rdf#URI, k: Meta[Rdf] => A ) extends LDPCommand[Rdf, A]
 
-case class GetResource[Rdf <: RDF, A](uri: Rdf#URI, k: LocalResource[Rdf] => A) extends LDPCommand[Rdf, A]
+case class GetResource[Rdf <: RDF, A](uri: Rdf#URI, k: NamedResource[Rdf] => A) extends LDPCommand[Rdf, A]
 
 case class DeleteResource[Rdf <: RDF, A](uri: Rdf#URI, a: A) extends LDPCommand[Rdf, A]
 
@@ -71,11 +71,11 @@ object LDPCommand {
       }
     }
 
-  def getMeta[Rdf <: RDF,A](uri: Rdf#URI): Script[Rdf, LDPR[Rdf]] =
-    suspend[Rdf,LDPR[Rdf]](GetMeta(uri, ldpr => `return`(ldpr)))
+  def getMeta[Rdf <: RDF,A](uri: Rdf#URI): Script[Rdf, Meta[Rdf]] =
+    suspend[Rdf,Meta[Rdf]](GetMeta(uri, ldpr => `return`(ldpr)))
 
-  def getResource[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, LocalResource[Rdf]] =
-    suspend[Rdf,LocalResource[Rdf]](GetResource(uri, resource => `return`(resource)))
+  def getResource[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, NamedResource[Rdf]] =
+    suspend[Rdf,NamedResource[Rdf]](GetResource(uri, resource => `return`(resource)))
 
   def deleteResource[Rdf <: RDF](uri: Rdf#URI): Script[Rdf, Unit] =
     suspend(DeleteResource(uri, nop))

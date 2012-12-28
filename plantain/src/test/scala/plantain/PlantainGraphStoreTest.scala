@@ -66,8 +66,8 @@ abstract class LDPSTest[Rdf <: RDF](
   val helloWorldBinary = "☯ Hello, World! ☮".getBytes("UTF-8")
 
   "CreateLDPR should create an LDPR with the given graph -- with given uri" in {
-    val ldpcUri = URI("http://example.com/foo")
-    val ldprUri = URI("http://example.com/foo/betehess")
+    val ldpcUri = URI("http://example.com/foo1")
+    val ldprUri = URI("http://example.com/foo1/betehess")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
@@ -81,7 +81,7 @@ abstract class LDPSTest[Rdf <: RDF](
   }
 
   "CreateLDPR should create an LDPR with the given graph -- no given uri" in {
-    val ldpcUri = URI("http://example.com/foo")
+    val ldpcUri = URI("http://example.com/foo2")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(None, graph))
@@ -95,31 +95,41 @@ abstract class LDPSTest[Rdf <: RDF](
   }
 
   "CreateLDPR with Meta - should create an LDPR with the given graph -- with given uri" in {
-    val ldpcUri = URI("http://example.com/foo")
-    val ldprUri = URI("http://example.com/foo/betehess")
-    val ldprMeta = URI("http://example.com/foo/betehess;meta")
+    val ldpcUri = URI("http://example.com/foo2")
+    val ldprUri = URI("http://example.com/foo2/betehess")
+    val ldprMeta = URI("http://example.com/foo2/betehess;meta")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
-      rMeta <- ldpc.execute(getMeta(ldprUri).flatMap{ metaG=>
-        updateLDPR(metaG.uri,Iterable.empty,graphMeta.toIterable).flatMap(_=>
-        getMeta(metaG.uri))
-      })
-      rGraph <- ldpc.execute(getLDPR(ldprUri))
-      _ <- ldps.deleteLDPC(ldpcUri)
+      rAcl <- ldpc.execute{
+        for {
+           meta <- getMeta(ldprUri)
+           acl = meta.acl.get
+           _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
+        } yield acl
+      }
     } yield {
       rUri must be(ldprUri)
-      rMeta.uri must be(ldprMeta)
-      assert( rMeta.graph isIsomorphicWith graphMeta )
-      assert( rGraph isIsomorphicWith graph )
+      rAcl must be(ldprMeta)
     }
     script.getOrFail()
+
+    val script2 = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      res <- ldpc.execute(getResource(ldprUri))
+      acl <- ldpc.execute(getLDPR(res.acl.get))
+      _ <- ldps.deleteLDPC( ldpcUri)
+    } yield {
+      assert( acl.graph isIsomorphicWith graphMeta )
+      assert( res.asInstanceOf[LDPR[Plantain]].graph.asInstanceOf[Rdf#Graph] isIsomorphicWith graph )
+    }
+
   }
 
   "Create Binary" in {
-    val ldpcUri = URI("http://example.com/foo")
-    val binUri = URI("http://example.com/foo/img.jpg")
-    val ldprMeta = URI("http://example.com/foo/img.jpg;meta")
+    val ldpcUri = URI("http://example.com/foocb")
+    val binUri = URI("http://example.com/foocb/img.jpg")
+    val ldprMeta = URI("http://example.com/foocb/img.jpg;meta")
 
     val createBin = for {
       ldpc <- ldps.createLDPC(ldpcUri)
