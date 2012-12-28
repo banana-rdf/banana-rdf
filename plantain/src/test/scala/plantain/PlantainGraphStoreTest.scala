@@ -121,8 +121,9 @@ abstract class LDPSTest[Rdf <: RDF](
       _ <- ldps.deleteLDPC( ldpcUri)
     } yield {
       assert( acl.graph isIsomorphicWith graphMeta )
-      assert( res.asInstanceOf[LDPR[Plantain]].graph.asInstanceOf[Rdf#Graph] isIsomorphicWith graph )
+      assert( res.asInstanceOf[LDPR[Rdf]].relativeGraph isIsomorphicWith graph )
     }
+    script2.getOrFail()
 
   }
 
@@ -134,7 +135,7 @@ abstract class LDPSTest[Rdf <: RDF](
     val createBin = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       bin <- ldpc.execute(createBinary(Some(binUri)))
-      val it = bin.write
+      it = bin.write
       newbin <- Enumerator(helloWorldBinary).apply(it)
       newres <- newbin.run
     } yield {
