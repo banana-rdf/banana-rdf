@@ -14,11 +14,10 @@ object BuildSettings {
 //    version      := "0.3-SNAPSHOT",
     version      := "x14-SNAPSHOT",
     scalaVersion := "2.10.0-RC5",
-    javacOptions ++= Seq("-source","1.7", "-target","1.7"),
 
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds"),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
