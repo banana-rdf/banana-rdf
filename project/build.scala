@@ -18,7 +18,7 @@ object BuildSettings {
 
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds"),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
@@ -126,17 +126,16 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
   
-  /* http://repo.aduna-software.org/maven2/releases/org/openrdf/sesame/ */
   val sesameDeps =
     Seq(
       resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-memory" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-nativerdf" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % "2.6.9")
+      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-memory" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-nativerdf" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % "2.6.10")
 
   val pub = TaskKey[Unit]("pub")
 
@@ -245,12 +244,12 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
-      libraryDependencies += iterateeDeps,
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.9",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.9",
+      resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.10",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.10",
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
