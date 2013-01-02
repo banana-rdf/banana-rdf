@@ -65,6 +65,8 @@ abstract class LDPSTest[Rdf <: RDF](
 
   val helloWorldBinary = "☯ Hello, World! ☮".getBytes("UTF-8")
 
+  val helloWorldBinary2 = "Hello, World!".getBytes("UTF-8")
+
   "CreateLDPR should create an LDPR with the given graph -- with given uri" in {
     val ldpcUri = URI("http://example.com/foo1")
     val ldprUri = URI("http://example.com/foo1/betehess")
@@ -144,16 +146,37 @@ abstract class LDPSTest[Rdf <: RDF](
     }
     createBin.getOrFail()
 
-    val getBin = for {
+    def getBin(hw: Array[Byte]) = for {
        ldpc <- ldps.getLDPC(ldpcUri)
-       bin  <- ldpc.execute(getResource(binUri).map(r=>r.asInstanceOf[BinaryResource[Rdf]]))
+       res  <- ldpc.execute(getResource(binUri))
     } yield {
-      bin.reader(400).map{ bytes =>
-        helloWorldBinary must be(bytes)
+      res match {
+        case bin: BinaryResource[Rdf] => bin.reader(400).map{ bytes =>
+          hw must be(bytes)
+        }
+        case _ => throw new Exception("Object MUST be a binary - given that this test is not running in an open world")
       }
+
     }
 
-    getBin.getOrFail()
+    getBin(helloWorldBinary).getOrFail()
+
+    val editBin = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      newRes <- ldpc.execute(getResource(binUri)) // we get the resource, but we don't use that thread to upload the data
+      bin <- newRes match { //rather here we should use the client thread to upload the data ( as it could be very large )
+        case br: BinaryResource[Rdf] => for {
+          it <- Enumerator(helloWorldBinary2) |>> br.write
+          newres <- it.run
+        } yield newres
+        case _ => throw new Exception("Object MUST be binary - given that this test is not running in an open world")
+      }
+    } yield {
+      bin.uri must be(binUri)
+    }
+    editBin.getOrFail()
+
+    getBin(helloWorldBinary2).getOrFail()
 
     val deleteBin = for {
       ldpc <- ldps.getLDPC(ldpcUri)
@@ -169,38 +192,34 @@ abstract class LDPSTest[Rdf <: RDF](
   }
 
 
-  //  "getNamedGraph should retrieve the graph added with appendToGraph" in {
-//    val u1 = URI("http://example.com/foo/betehess")
-//    val u2 = URI("http://example.com/foo/alexandre")
-//    val r = for {
-//      ldpc <- ldps.createLDPC(URI("http://example.com/foo"))
-//      _ <- ldpc.execute()
-//      _ <- graphStore.appendToGraph(u1, graph)
-//      _ <- graphStore.appendToGraph(u2, graph2)
-//      rGraph <- graphStore.getGraph(u1)
-//      rGraph2 <- graphStore.getGraph(u2)
-//    } yield {
-//      assert(rGraph isIsomorphicWith graph)
-//      assert(rGraph2 isIsomorphicWith graph2)
-//    }
-//    r.getOrFail()
-//  }
+  "appendToGraph should be equivalent to graph union" in {
+    val ldpcUri = URI("http://example.com/foo3")
+    val ldprUri = URI("http://example.com/foo3/betehess")
+    val script = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
+    } yield {
+      rUri must be(ldprUri)
+    }
+    script.getOrFail()
 
-//  "appendToGraph should be equivalent to graph union" in {
-//    val u = URI("http://example.com/graph")
-//    val r = for {
-//      _ <- graphStore.removeGraph(u)
-//      _ <- graphStore.appendToGraph(u, graph)
-//      _ <- graphStore.appendToGraph(u, graph2)
-//      rGraph <- graphStore.getGraph(u)
-//    } yield {
-//      assert(rGraph isIsomorphicWith union(List(graph, graph2)))
-//    }
-//    r.getOrFail()
-//  }
-//
+    val script2 = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      unionG <- ldpc.execute(updateLDPR(ldprUri, Iterable.empty, graph2.toIterable).flatMap { _ =>
+        getLDPR(ldprUri)
+      })
+    } yield {
+      assert( unionG isIsomorphicWith( graph union graph2) )
+    }
+
+    script2.getOrFail()
+
+  }
+
 //  "patchGraph should delete and insert triples as expected" in {
-//    val u = URI("http://example.com/graph")
+//    val ldpcUri = URI("http://example.com/foo4")
+//    val ldprUri = URI("http://example.com/foo4/betehess")
+//todo: need to add PATCH mechanism
 //    val r = for {
 //      _ <- graphStore.removeGraph(u)
 //      _ <- graphStore.appendToGraph(u, foo)
