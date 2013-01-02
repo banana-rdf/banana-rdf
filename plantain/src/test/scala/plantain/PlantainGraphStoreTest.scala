@@ -40,12 +40,18 @@ abstract class LDPSTest[Rdf <: RDF](
     -- foaf.title ->- "Mr"
   ).graph
 
-  val graphMeta: Rdf#Graph = (
+  val graphMeta: PointedGraph[Rdf] = (
     bnode()
       -- wac.accessTo ->- URI("http://example.com/foo/betehess")
       -- wac.agent    ->- URI("http://example.com/foo/betehess#me")
       -- wac.mode     ->- wac.Read
-    ).graph
+    ) Union (
+      URI("http://example.com/foo/betehess;meta") -- wac.include ->- URI("http://example.com/foo/meta")
+    )
+
+  val graphMetaBase = (
+    //todo: link graphMeta
+  )
 
   val graph2: Rdf#Graph = (
     URI("#me")
@@ -107,7 +113,7 @@ abstract class LDPSTest[Rdf <: RDF](
         for {
            meta <- getMeta(ldprUri)
            acl = meta.acl.get
-           _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
+           _   <- updateLDPR(acl,Iterable.empty,graphMeta.graph.toIterable)
         } yield acl
       }
     } yield {
@@ -122,7 +128,7 @@ abstract class LDPSTest[Rdf <: RDF](
       acl <- ldpc.execute(getLDPR(res.acl.get))
       _ <- ldps.deleteLDPC( ldpcUri)
     } yield {
-      assert( acl.graph isIsomorphicWith graphMeta )
+      assert( acl.graph isIsomorphicWith graphMeta.graph )
       assert( res.asInstanceOf[LDPR[Rdf]].relativeGraph isIsomorphicWith graph )
     }
     script2.getOrFail()
@@ -213,6 +219,11 @@ abstract class LDPSTest[Rdf <: RDF](
     }
 
     script2.getOrFail()
+
+  }
+
+  "access control test" in {
+
 
   }
 

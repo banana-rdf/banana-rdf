@@ -47,4 +47,7 @@ class PointedGraphW[Rdf <: RDF](val pointed: PointedGraph[Rdf]) extends AnyVal {
     )
   }
 
+  def Union(graph: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] =
+    PointedGraph(pointed.pointer, ops.union(List(pointed.graph, graph.graph)))
+
 }

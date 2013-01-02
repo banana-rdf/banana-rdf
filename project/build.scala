@@ -27,7 +27,7 @@ object BuildSettings {
       key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
       key(":formatting-prefs"), sexp(
         key(":rewriteArrowSymbols"), true,
-	key(":doubleIndentClassDeclaration"), true
+        key(":doubleIndentClassDeclaration"), true
       )
     ),
     licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
