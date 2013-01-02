@@ -2,12 +2,8 @@ package org.w3.banana
 
 import org.scalatest._
 import org.scalatest.matchers._
-import java.io._
-import org.scalatest.EitherValues._
 
-import scalaz._
 import scalaz.Scalaz._
-import scalaz.Validation._
 
 abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf])
     extends WordSpec with MustMatchers {
@@ -186,12 +182,35 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rd
     ).graph
 
     val expectedGraph = (
-      bnode("betehess")
+      bnode("b")
       -- foaf.name ->- "Alexandre"
       -- foaf.age ->- 42
     ).graph
 
     assert(g isIsomorphicWith expectedGraph)
+
+  }
+
+  "disconnected graph construction" in {
+
+    val g = (
+        bnode("a") -- foaf.name ->- "Alexandre"
+                -- foaf.age ->- 29
+      ).graph union (
+        bnode("h") -- foaf.name ->- "Henry"
+            -- foaf.height ->- 1.92
+      ).graph
+
+
+    val expectedGraph =
+      Graph(
+        Triple(bnode("a"), foaf.name, TypedLiteral("Alexandre", xsd.string)),
+        Triple(bnode("a"), foaf.age, TypedLiteral("29", xsd.integer)),
+        Triple(bnode("h"), foaf.name, TypedLiteral("Henry", xsd.string)),
+        Triple(bnode("h"), foaf.height, TypedLiteral("1.92", xsd.double))
+          )
+
+    assert(g.graph isIsomorphicWith expectedGraph)
 
   }
 
