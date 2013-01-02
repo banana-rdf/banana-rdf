@@ -6,9 +6,17 @@ import org.scalatest.matchers._
 import Plantain._
 import LDPCommand._
 import scala.concurrent.ExecutionContext.Implicits.global
+import java.nio.charset.Charset
+import java.nio.file.{Files, Paths, Path}
+import java.io.File
+import play.api.libs.iteratee.Enumerator
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+import java.util.concurrent.TimeUnit
 
 class PlantainLDPSTest extends LDPSTest[Plantain]({
-  PlantainLDPS(null, null)
+  val dir = Files.createTempDirectory("plantain")
+  PlantainLDPS(URI.fromString("http://example.com/foo"), dir)
 })
 
 abstract class LDPSTest[Rdf <: RDF](
@@ -20,6 +28,7 @@ abstract class LDPSTest[Rdf <: RDF](
   import ops._
 
   val foaf = FOAFPrefix[Rdf]
+  val wac = WebACL[Rdf]
 
   override def afterAll(): Unit = {
     ldps.shutdown()
@@ -30,6 +39,13 @@ abstract class LDPSTest[Rdf <: RDF](
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.title ->- "Mr"
   ).graph
+
+  val graphMeta: Rdf#Graph = (
+    bnode()
+      -- wac.accessTo ->- URI("http://example.com/foo/betehess")
+      -- wac.agent    ->- URI("http://example.com/foo/betehess#me")
+      -- wac.mode     ->- wac.Read
+    ).graph
 
   val graph2: Rdf#Graph = (
     URI("#me")
@@ -47,9 +63,13 @@ abstract class LDPSTest[Rdf <: RDF](
     -- rdf("bar") ->- "bar"
   ).graph
 
+  val helloWorldBinary = "☯ Hello, World! ☮".getBytes("UTF-8")
+
+  val helloWorldBinary2 = "Hello, World!".getBytes("UTF-8")
+
   "CreateLDPR should create an LDPR with the given graph -- with given uri" in {
-    val ldpcUri = URI("http://example.com/foo")
-    val ldprUri = URI("http://example.com/foo/betehess")
+    val ldpcUri = URI("http://example.com/foo1")
+    val ldprUri = URI("http://example.com/foo1/betehess")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
@@ -63,7 +83,7 @@ abstract class LDPSTest[Rdf <: RDF](
   }
 
   "CreateLDPR should create an LDPR with the given graph -- no given uri" in {
-    val ldpcUri = URI("http://example.com/foo")
+    val ldpcUri = URI("http://example.com/foo2")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(None, graph))
@@ -76,38 +96,130 @@ abstract class LDPSTest[Rdf <: RDF](
     script.getOrFail()
   }
 
-//  "getNamedGraph should retrieve the graph added with appendToGraph" in {
-//    val u1 = URI("http://example.com/foo/betehess")
-//    val u2 = URI("http://example.com/foo/alexandre")
-//    val r = for {
-//      ldpc <- ldps.createLDPC(URI("http://example.com/foo"))
-//      _ <- ldpc.execute()
-//      _ <- graphStore.appendToGraph(u1, graph)
-//      _ <- graphStore.appendToGraph(u2, graph2)
-//      rGraph <- graphStore.getGraph(u1)
-//      rGraph2 <- graphStore.getGraph(u2)
-//    } yield {
-//      assert(rGraph isIsomorphicWith graph)
-//      assert(rGraph2 isIsomorphicWith graph2)
-//    }
-//    r.getOrFail()
-//  }
+  "CreateLDPR with Meta - should create an LDPR with the given graph -- with given uri" in {
+    val ldpcUri = URI("http://example.com/foo2")
+    val ldprUri = URI("http://example.com/foo2/betehess")
+    val ldprMeta = URI("http://example.com/foo2/betehess;meta")
+    val script = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
+      rAcl <- ldpc.execute{
+        for {
+           meta <- getMeta(ldprUri)
+           acl = meta.acl.get
+           _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
+        } yield acl
+      }
+    } yield {
+      rUri must be(ldprUri)
+      rAcl must be(ldprMeta)
+    }
+    script.getOrFail()
 
-//  "appendToGraph should be equivalent to graph union" in {
-//    val u = URI("http://example.com/graph")
-//    val r = for {
-//      _ <- graphStore.removeGraph(u)
-//      _ <- graphStore.appendToGraph(u, graph)
-//      _ <- graphStore.appendToGraph(u, graph2)
-//      rGraph <- graphStore.getGraph(u)
-//    } yield {
-//      assert(rGraph isIsomorphicWith union(List(graph, graph2)))
-//    }
-//    r.getOrFail()
-//  }
-//
+    val script2 = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      res <- ldpc.execute(getResource(ldprUri))
+      acl <- ldpc.execute(getLDPR(res.acl.get))
+      _ <- ldps.deleteLDPC( ldpcUri)
+    } yield {
+      assert( acl.graph isIsomorphicWith graphMeta )
+      assert( res.asInstanceOf[LDPR[Rdf]].relativeGraph isIsomorphicWith graph )
+    }
+    script2.getOrFail()
+
+  }
+
+  "Create Binary" in {
+    val ldpcUri = URI("http://example.com/foocb")
+    val binUri = URI("http://example.com/foocb/img.jpg")
+    val ldprMeta = URI("http://example.com/foocb/img.jpg;meta")
+
+    val createBin = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      bin <- ldpc.execute(createBinary(Some(binUri)))
+      it = bin.write
+      newbin <- Enumerator(helloWorldBinary).apply(it)
+      newres <- newbin.run
+    } yield {
+      bin.uri must be(binUri)
+      newres.uri must be(binUri)
+    }
+    createBin.getOrFail()
+
+    def getBin(hw: Array[Byte]) = for {
+       ldpc <- ldps.getLDPC(ldpcUri)
+       res  <- ldpc.execute(getResource(binUri))
+    } yield {
+      res match {
+        case bin: BinaryResource[Rdf] => bin.reader(400).map{ bytes =>
+          hw must be(bytes)
+        }
+        case _ => throw new Exception("Object MUST be a binary - given that this test is not running in an open world")
+      }
+
+    }
+
+    getBin(helloWorldBinary).getOrFail()
+
+    val editBin = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      newRes <- ldpc.execute(getResource(binUri)) // we get the resource, but we don't use that thread to upload the data
+      bin <- newRes match { //rather here we should use the client thread to upload the data ( as it could be very large )
+        case br: BinaryResource[Rdf] => for {
+          it <- Enumerator(helloWorldBinary2) |>> br.write
+          newres <- it.run
+        } yield newres
+        case _ => throw new Exception("Object MUST be binary - given that this test is not running in an open world")
+      }
+    } yield {
+      bin.uri must be(binUri)
+    }
+    editBin.getOrFail()
+
+    getBin(helloWorldBinary2).getOrFail()
+
+    val deleteBin = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      _ <- ldpc.execute(deleteResource(binUri))
+      _ <- ldpc.execute(getResource(binUri))
+    } yield {
+      "hello"
+    }
+
+    val res = Await.result(deleteBin.failed,Duration(1,TimeUnit.SECONDS))
+    assert(res.isInstanceOf[NoSuchElementException])
+
+  }
+
+
+  "appendToGraph should be equivalent to graph union" in {
+    val ldpcUri = URI("http://example.com/foo3")
+    val ldprUri = URI("http://example.com/foo3/betehess")
+    val script = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
+    } yield {
+      rUri must be(ldprUri)
+    }
+    script.getOrFail()
+
+    val script2 = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      unionG <- ldpc.execute(updateLDPR(ldprUri, Iterable.empty, graph2.toIterable).flatMap { _ =>
+        getLDPR(ldprUri)
+      })
+    } yield {
+      assert( unionG isIsomorphicWith( graph union graph2) )
+    }
+
+    script2.getOrFail()
+
+  }
+
 //  "patchGraph should delete and insert triples as expected" in {
-//    val u = URI("http://example.com/graph")
+//    val ldpcUri = URI("http://example.com/foo4")
+//    val ldprUri = URI("http://example.com/foo4/betehess")
+//todo: need to add PATCH mechanism
 //    val r = for {
 //      _ <- graphStore.removeGraph(u)
 //      _ <- graphStore.appendToGraph(u, foo)

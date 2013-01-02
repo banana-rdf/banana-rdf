@@ -100,3 +100,27 @@ trait CommonPrefixes[Rdf <: RDF] { this: RDFOps[Rdf] =>
   lazy val rdf = RDFPrefix(this)
 
 }
+
+
+object WebACL {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new WebACL(ops)
+}
+
+class WebACL[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("acl", "http://www.w3.org/ns/auth/acl#")(ops) {
+  val Authorization = apply("Authorization")
+  val agent = apply("agent")
+  val agentClass = apply("agentClass")
+  val accessTo = apply("accessTo")
+  val accessToClass = apply("accessToClass")
+  val defaultForNew = apply("defaultForNew")
+  val mode = apply("mode")
+  val Access = apply("Access")
+  val Read = apply("Read")
+  val Write = apply("Write")
+  val Append = apply("Append")
+  val accessControl = apply("accessControl")
+  val Control = apply("Control")
+  val owner = apply("owner")
+  val regex = apply("regex")
+  val WebIDAgent = apply("WebIDAgent")
+}

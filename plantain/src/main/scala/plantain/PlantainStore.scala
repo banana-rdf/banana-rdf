@@ -1,39 +1,108 @@
 package org.w3.banana.plantain
 
+import scala.language.reflectiveCalls
+
 import org.w3.banana._
 import java.nio.file._
 import scala.concurrent._
 import scala.concurrent.stm._
 import akka.actor._
 import akka.util._
-import akka.pattern.{ ask, pipe }
+import akka.pattern.ask
 import akka.transactor._
-import scalaz.{ -\/, \/- , Free }
-import org.openrdf.model.{ URI => SesameURI, _ }
-import org.openrdf.model.impl._
 import org.openrdf.query.algebra.evaluation.TripleSource
-import org.openrdf.query.QueryEvaluationException
-import info.aduna.iteration.CloseableIteration
-import PlantainUtil._
-import org.slf4j.{ Logger, LoggerFactory }
-import PlantainLDPS._
-import PlantainOps.{ uriSyntax, nodeSyntax, tripleSyntax, tripleMatchSyntax }
+import org.slf4j.LoggerFactory
+import org.w3.banana.plantain.PlantainOps._
 import annotation.tailrec
+import java.util.Date
+import play.api.libs.iteratee.{Error, Enumerator, Iteratee}
+import java.io.{IOException, OutputStream}
+import scala.util.Try
+import scala.Some
+import scalaz.{\/-,-\/}
+import play.api.libs.iteratee.Input.El
+import org.w3.banana.plantain.PlantainLDPS.DeleteLDPC
+import org.w3.banana.plantain.PlantainLDPS.GetLDPC
+import org.w3.banana.plantain.PlantainLDPS.CreateLDPC
+import org.w3.banana.plantain.PlantainLDPS.Script
+
+// A resource on the server ( Resource is already taken. )
+// note:
+// There can be named and unamed resources, as when a POST creates a
+// resource that is not given a name... so this should probably extend a more abstract resource
+trait NamedResource[Rdf<:RDF] extends Meta[Rdf] {
+   def uri: Rdf#URI
+}
+
+/**
+ * Metadata about a resource
+ *   This may be thought to be so generic that a graph representation would do,
+ *   but it is very likely to be very limited set of properties and so to be
+ *   better done in form methods for efficiency reasons.
+ */
+trait Meta[Rdf <: RDF] { this: NamedResource[Rdf] =>
+  def ops: RDFOps[Rdf]
+
+  def updated: Option[Date]
+  /*
+ * A resource should ideally be versioned, so any change would get a version URI
+ * ( but this is probably something that should be on a MetaData trait
+ **/
+  def version: Option[Rdf#URI] = None
+
+  /**
+   * location of initial ACL for this resource
+   * This initial implementation is too hard wired. IT should be something that is settable at configuration time
+   **/
+  lazy val acl: Option[Rdf#URI] = Some{
+    if (uri.toString.endsWith(";meta")) uri
+    else ops.URI(uri.toString+";meta")
+  }
+
+  //other metadata candidates:
+  // - owner
+  // - etag
+  //
+
+}
+
+
+/**
+ * A binary resource does not get direct semantic interpretation.
+ * It has a mime type. One can write bytes to it, to replace its content, or one
+ * can read its content.
+ * @tparam Rdf
+ */
+trait BinaryResource[Rdf<:RDF] extends NamedResource[Rdf]  {
+
+  def size: Option[Long]
+
+  def mime: MimeType
+
+  // creates a new BinaryResource, with new time stamp, etc...
+  def write:  Iteratee[Array[Byte], BinaryResource[Rdf]]
+  def reader(chunkSize: Int): Enumerator[Array[Byte]]
+}
 
 /*
  * TODO
  * - an LDPS must subscribe to the death of its LDPC
  */
 
-trait LDPR[Rdf <: RDF] {
+trait LDPR[Rdf <: RDF] extends NamedResource[Rdf]  {
   def uri: Rdf#URI // *no* trailing slash
+
   def graph: Rdf#Graph // all uris are relative to uri
+
+  /* the graph such that all URIs are relative to $uri */
+  def relativeGraph: Rdf#Graph
 }
 
-trait LDPC[Rdf <: RDF] {
+trait LDPC[Rdf <: RDF] extends NamedResource[Rdf] {
   def uri: Rdf#URI // *with* a trailing slash
   def execute[A](script: LDPCommand.Script[Rdf, A]): Future[A]
 }
+
 
 trait LDPS[Rdf <: RDF] {
   def baseUri: Rdf#URI
@@ -43,22 +112,59 @@ trait LDPS[Rdf <: RDF] {
   def deleteLDPC(uri: Rdf#URI): Future[Unit]
 }
 
+case class OperationNotSupported(msg: String) extends Exception(msg)
 
+case class PlantainBinary(root: Path, uri: Plantain#URI) extends BinaryResource[Plantain] {
+
+  lazy val path = root.resolve(uri.lastPathSegment)
+
+
+  // also should be on a metadata trait, since all resources have update times
+  def updated = Try { new Date(Files.getLastModifiedTime(path).toMillis) }.toOption
+
+  val size = Try { Files.size(path) }.toOption
+
+  def mime = ???
+
+  // creates a new BinaryResource, with new time stamp, etc...
+  //here I can just write to the file, as that should be a very quick operation, which even if it blocks,
+  //should be extreemly fast server side.  Iteratee
+  def write: Iteratee[Array[Byte], PlantainBinary ] = {
+    val tmpfile = Files.createTempFile(path.getParent,path.getFileName.toString,"tmp")
+    val out = Files.newOutputStream(tmpfile, StandardOpenOption.WRITE)
+    val i = Iteratee.fold[Array[Byte],OutputStream](out){ (out, bytes ) =>
+      try {
+        out.write(bytes)
+      } catch {
+        case outerr: IOException => Error("Problem writing bytes: "+outerr, El(bytes))
+      }
+      out
+    }
+    i.mapDone{ _ =>
+       Files.move(tmpfile,path,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING)
+       this // we can return this
+    }
+  }
+
+  //this will probably require an agent to push things along.
+  def reader(chunkSize: Int=1024*8) = Enumerator.fromFile(path.toFile,chunkSize)
+
+  val ops = Plantain.ops
+}
 
 /**
  * it's important for the uris in the graph to be absolute
  * this invariant is assumed by the sparql engine (TripleSource)
  */
-case class PlantainLDPR(uri: URI, graph: Graph) extends LDPR[Plantain] {
+case class PlantainLDPR(uri: URI, graph: Graph, updated: Option[Date] = Some(new Date)) extends LDPR[Plantain] {
 
-  /* the graph such that all URIs are relative to $uri */
   def relativeGraph: Graph =
     graph.triples.foldLeft(Graph.empty){ (current, triple) => current + triple.relativizeAgainst(uri) }
 
-
+  val ops = Plantain.ops
 }
 
-class PlantainLDPC(val uri: URI, actorRef: ActorRef)(implicit timeout: Timeout) extends LDPC[Plantain] {
+class PlantainLDPC(val uri: URI, actorRef: ActorRef, val updated: Option[Date] = Some(new Date))(implicit timeout: Timeout) extends LDPC[Plantain] {
 
   override def toString: String = uri.toString
 
@@ -66,43 +172,58 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef)(implicit timeout: Timeout) 
     (actorRef ? Coordinated(Script(script))).asInstanceOf[Future[A]]
   }
 
+  def ops = Plantain.ops
+
 }
 
 class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
-
+  val NonLDPRs = TMap.empty[String, NamedResource[Plantain]]
   // invariant to be preserved: the Graph are always relative to 
+
   val LDPRs = TMap.empty[String, PlantainLDPR]
+
 
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
 
   @tailrec
   final def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
+    import PlantainOps._
     script.resume match {
       case -\/(CreateLDPR(uriOpt, graph, k)) => {
-        import PlantainOps._
-        val (uri, pathSegment) = uriOpt match {
-          case None => {
-            val pathSegment = randomPathSegment
-            val uri = baseUri / pathSegment
-            (uri, pathSegment)
-          }
-          case Some(uri) => (uri, uri.lastPathSegment)
-        }
+        val (uri, pathSegment) = deconstruct(uriOpt)
         val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
         LDPRs.put(pathSegment, ldpr)
         run(coordinated, k(uri))
       }
-      case -\/(GetLDPR(uri, k)) => {
-        val ldpr = LDPRs(uri.lastPathSegment)
-        run(coordinated, k(ldpr.relativeGraph))
+      case -\/(CreateBinary(uriOpt, k)) => {
+        val (uri, pathSegment) = deconstruct(uriOpt)
+        //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
+        val bin = PlantainBinary(root,uri)
+        NonLDPRs.put(pathSegment, bin)
+        run(coordinated, k(bin))
       }
-      case -\/(DeleteLDPR(uri, a)) => {
-        LDPRs.remove(uri.lastPathSegment)
+      case -\/(GetResource(uri,k)) => {
+        val path = uri.lastPathSegment
+        val res = LDPRs.get(path).getOrElse(NonLDPRs(path))
+        run(coordinated, k(res))
+      }
+      case -\/(GetMeta(uri,k)) => {
+        //todo: GetMeta here is very close to GetResource, as currently there is no big work difference between the two
+        //The point of GetMeta is mostly to remove work if there were work that was very time
+        //consuming ( such as serialising a graph )
+        val path = uri.lastPathSegment
+        val res = LDPRs.get(path).getOrElse(NonLDPRs(path))
+        run(coordinated, k(res.asInstanceOf[Meta[Plantain]]))
+      }
+      case -\/(DeleteResource(uri, a)) => {
+         LDPRs.remove(uri.lastPathSegment).orElse{
+           NonLDPRs.remove(uri.lastPathSegment)
+         }
         run(coordinated, a)
       }
       case -\/(UpdateLDPR(uri, remove, add, a)) => {
         val pathSegment = uri.lastPathSegment
-        val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse Graph.empty
+        val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse emptyGraph
         val temp = remove.foldLeft(graph) {
           (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri)
         }
@@ -145,10 +266,27 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
     }
   }
 
+
+  protected def deconstruct[A](uriOpt: Option[Plantain#URI]): (Plantain#URI, String) = {
+    import PlantainLDPS.randomPathSegment
+    uriOpt match {
+      case None => {
+        val pathSegment = randomPathSegment
+        val uri = baseUri / pathSegment
+        (uri, pathSegment)
+      }
+      case Some(uri) => (uri, uri.lastPathSegment)
+    }
+  }
+
   def receive = {
     case coordinated @ Coordinated(Script(script)) => coordinated atomic { implicit t =>
+      try {
       val r = run(coordinated, script)
       sender ! r
+      } catch {
+        case e: Exception => sender ! akka.actor.Status.Failure(e)
+      }
     }
   }
 

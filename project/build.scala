@@ -14,6 +14,7 @@ object BuildSettings {
 //    version      := "0.3-SNAPSHOT",
     version      := "x14-SNAPSHOT",
     scalaVersion := "2.10.0-RC5",
+    javacOptions ++= Seq("-source","1.7", "-target","1.7"),
 
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
@@ -106,7 +107,9 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaActors,
       libraryDependencies += scalatest
     )
-  
+
+  val iterateeDeps = "play" % "play-iteratees_2.10" % "2.1-12142012"
+
   val testDeps =
     Seq(
       libraryDependencies += scalaActors % "test",
@@ -241,6 +244,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
+      libraryDependencies += iterateeDeps,
       resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.10",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.10",
