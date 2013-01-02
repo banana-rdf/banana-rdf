@@ -196,14 +196,11 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit diesel: Diesel[Rd
     val g = (
         bnode("a") -- foaf.name ->- "Alexandre"
                 -- foaf.age ->- 29
-      ) Union (
+      ).graph union (
         bnode("h") -- foaf.name ->- "Henry"
             -- foaf.height ->- 1.92
-      )
+      ).graph
 
-    //todo: should one have a union where one can reference bnodes between the parts -
-    // ie: the union here would not rename the bnodes.
-    // perhaps that would require A larger Graph( ) wrapper so that this type of union cannot escape from the context
 
     val expectedGraph =
       Graph(
