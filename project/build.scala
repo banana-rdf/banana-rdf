@@ -13,7 +13,7 @@ object BuildSettings {
     organization := "org.w3",
 //    version      := "0.3-SNAPSHOT",
     version      := "x14-SNAPSHOT",
-    scalaVersion := "2.10.0-RC5",
+    scalaVersion := "2.10.0",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
 
     parallelExecution in Test := false,
@@ -27,7 +27,7 @@ object BuildSettings {
       key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
       key(":formatting-prefs"), sexp(
         key(":rewriteArrowSymbols"), true,
-	key(":doubleIndentClassDeclaration"), true
+        key(":doubleIndentClassDeclaration"), true
       )
     ),
     licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
@@ -77,21 +77,21 @@ object BananaRdfBuild extends Build {
   
 //  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
 
-  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0-RC5"
+  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0"
 
   val scalaIoCore = "com.github.scala-incubator.io" % "scala-io-core_2.10.0-RC1" % "0.4.1"
   val scalaIoFile = "com.github.scala-incubator.io" % "scala-io-file_2.10.0-RC1" % "0.4.1"
 
-  val akka = "com.typesafe.akka" % "akka-actor_2.10.0-RC5" % "2.1.0-RC6"
+  val akka = "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0"
 
-  val akkaTransactor = "com.typesafe.akka" % "akka-transactor_2.10.0-RC5" % "2.1.0-RC6"
+  val akkaTransactor = "com.typesafe.akka" % "akka-transactor_2.10" % "2.1.0"
 
-  val scalaStm = "org.scala-tools" % "scala-stm_2.10.0-RC5" % "0.6"
+  val scalaStm = "org.scala-tools" % "scala-stm_2.10.0" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
 //  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://jay.w3.org/~bertails/jar/scalaz-core_2.10.0-M7-7.0.0-M3.jar"
-  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-RC5" % "7.0-SNAPSHOT" // from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
+  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0-SNAPSHOT" // from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"

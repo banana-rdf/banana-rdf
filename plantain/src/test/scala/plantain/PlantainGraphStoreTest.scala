@@ -45,7 +45,13 @@ abstract class LDPSTest[Rdf <: RDF](
       -- wac.accessTo ->- URI("http://example.com/foo/betehess")
       -- wac.agent    ->- URI("http://example.com/foo/betehess#me")
       -- wac.mode     ->- wac.Read
+    ).graph union (
+      URI("http://example.com/foo/betehess;meta") -- wac.include ->- URI("http://example.com/foo/meta")
     ).graph
+
+  val graphMetaBase = (
+    //todo: link graphMeta
+  )
 
   val graph2: Rdf#Graph = (
     URI("#me")
@@ -213,6 +219,11 @@ abstract class LDPSTest[Rdf <: RDF](
     }
 
     script2.getOrFail()
+
+  }
+
+  "access control test" in {
+
 
   }
 

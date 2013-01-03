@@ -123,4 +123,5 @@ class WebACL[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("acl", "http://
   val owner = apply("owner")
   val regex = apply("regex")
   val WebIDAgent = apply("WebIDAgent")
+  val include = apply("include")
 }
