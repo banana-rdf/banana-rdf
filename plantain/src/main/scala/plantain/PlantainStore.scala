@@ -40,7 +40,9 @@ trait NamedResource[Rdf<:RDF] extends Meta[Rdf] {
  *   but it is very likely to be very limited set of properties and so to be
  *   better done in form methods for efficiency reasons.
  */
-trait Meta[Rdf <: RDF] { this: NamedResource[Rdf] =>
+trait Meta[Rdf <: RDF] {
+  def uri: Rdf#URI
+
   def ops: RDFOps[Rdf]
 
   def updated: Option[Date]

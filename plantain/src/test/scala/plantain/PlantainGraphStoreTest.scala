@@ -40,18 +40,23 @@ abstract class LDPSTest[Rdf <: RDF](
     -- foaf.title ->- "Mr"
   ).graph
 
-  val graphMeta: Rdf#Graph = (
+  // make the card readable by the whole world ( and link to the main file that make it read/write to Alex )
+  val graphCardACL: Rdf#Graph = (
     bnode()
-      -- wac.accessTo ->- URI("http://example.com/foo/betehess")
-      -- wac.agent    ->- URI("http://example.com/foo/betehess#me")
+      -- wac.accessTo ->- URI("http://example.com/betehess/card")
+      -- wac.agentClass ->- foaf.Agent
       -- wac.mode     ->- wac.Read
     ).graph union (
-      URI("http://example.com/foo/betehess;meta") -- wac.include ->- URI("http://example.com/foo/meta")
+      URI("") -- wac.include ->- URI("http://example.com/betehess/;meta")
     ).graph
 
-  val graphMetaBase = (
-    //todo: link graphMeta
-  )
+  // this makes all of the files under the betehess collection read/write to an Alex
+  val graphCollectionACL = (
+    bnode()
+       -- wac.accessToClass ->- ( bnode() -- wac.regex ->- "http://example.com/betehess/.*" )
+       -- wac.agent ->-  URI("http://example.com/betehess/betehess#me")
+       -- wac.mode  ->- (wac.Read, wac.Write)
+  ).graph
 
   val graph2: Rdf#Graph = (
     URI("#me")
@@ -102,36 +107,60 @@ abstract class LDPSTest[Rdf <: RDF](
     script.getOrFail()
   }
 
-  "CreateLDPR with Meta - should create an LDPR with the given graph -- with given uri" in {
-    val ldpcUri = URI("http://example.com/foo2")
-    val ldprUri = URI("http://example.com/foo2/betehess")
-    val ldprMeta = URI("http://example.com/foo2/betehess;meta")
-    val script = for {
-      ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
-      rAcl <- ldpc.execute{
-        for {
-           meta <- getMeta(ldprUri)
-           acl = meta.acl.get
-           _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
-        } yield acl
-      }
-    } yield {
-      rUri must be(ldprUri)
-      rAcl must be(ldprMeta)
-    }
-    script.getOrFail()
+  "CreateLDPC & LDPR with ACLs" in {
+    import System.out
+    val ldpcUri = URI("http://example.com/betehess/")
+    val ldpcMetaFull = URI("http://example.com/betehess/;meta")
+    val ldprUri = URI("card")
+    val ldprUriFull = URI("http://example.com/betehess/card")
+    val ldprMeta = URI("http://example.com/betehess/card;meta")
 
-    val script2 = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      res <- ldpc.execute(getResource(ldprUri))
-      acl <- ldpc.execute(getLDPR(res.acl.get))
-      _ <- ldps.deleteLDPC( ldpcUri)
+    //create container with ACLs
+    val createContainerScript = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      rUri <- ldpc.execute(createLDPR(ldpc.acl, graphCollectionACL))
+      acl <- ldpc.execute(getLDPR(rUri))
     } yield {
-      assert( acl.graph isIsomorphicWith graphMeta )
-      assert( res.asInstanceOf[LDPR[Rdf]].relativeGraph isIsomorphicWith graph )
+      rUri must be(ldpcMetaFull)
+      assert(acl isIsomorphicWith graphCollectionACL)
     }
-    script2.getOrFail()
+    createContainerScript.getOrFail()
+
+    //create Profile with ACLs
+    val createProfile = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      cardRes <- ldpc.execute(
+        for {
+//        rUri <- createLDPR(Some(ldprUri), graph) <- should something like this work?
+          rUri <- createLDPR(Some(ldprUriFull), graph)
+          res <- getResource(rUri)
+          _ <- createLDPR(res.acl,graphCardACL)
+        } yield res  )
+      acl <- ldpc.execute(getLDPR(cardRes.acl.get))
+    } yield {
+      cardRes.uri must be(ldprUriFull)
+      cardRes.acl.get must be(ldprMeta)
+      out.println("graphCardACL="+graphCardACL)
+      out.println("acl="+acl)
+      assert(acl isIsomorphicWith graphCardACL.resolveAgainst(ldpcMetaFull))
+      cardRes match {
+        case card: LDPR[Rdf] => assert( card.graph isIsomorphicWith graph.resolveAgainst(ldprUriFull))
+        case _ => throw new Exception("recived the wrong type of resource")
+      }
+    }
+    createProfile.getOrFail()
+
+
+//    rAcl <- ldpc.execute{
+//      for {
+//        meta <- getMeta(ldprUri)
+//        acl = meta.acl.get
+//        _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
+//      } yield acl
+//    }
+
+   //add access control tests here on the graph created above
+
 
   }
 

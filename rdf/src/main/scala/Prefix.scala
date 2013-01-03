@@ -85,6 +85,7 @@ class FOAFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("foaf", "ht
   val title = apply("title")
   val knows = apply("knows")
   val currentProject = apply("currentProject")
+  val Agent = apply("Agent")
   val Person = apply("Person")
   val age = apply("age")
   val height = apply("height")
@@ -121,7 +122,9 @@ class WebACL[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("acl", "http://
   val accessControl = apply("accessControl")
   val Control = apply("Control")
   val owner = apply("owner")
-  val regex = apply("regex")
   val WebIDAgent = apply("WebIDAgent")
+
+  //not officially supported:
   val include = apply("include")
+  val regex = apply("regex")
 }
