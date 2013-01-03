@@ -21,6 +21,10 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
     city.toPG.as[City] must be(Success(city))
   }
 
+  "check graph poitner generetaed by custom rule " in {
+    city.toPG.pointer must be(URI("http://example.com/Paris"))
+  }
+
   "serializing and deserializing a VerifiedAddress" in {
     verifiedAddress.toPG.as[VerifiedAddress] must be(Success(verifiedAddress))
   }

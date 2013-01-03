@@ -82,7 +82,9 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     val otherNames = set[String](foaf("otherNames"))
 
     implicit val binder: PointedGraphBinder[Rdf, City] =
-      pgb[City](cityName, otherNames)(City.apply, City.unapply) withClasses classUris
+      (new PGB[City]{
+        def makeSubject(t: City) = URI("http://example.com/" + t.cityName)
+      }).apply(cityName, otherNames)(City.apply, City.unapply) withClasses classUris
 
   }
 
