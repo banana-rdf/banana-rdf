@@ -79,15 +79,24 @@ trait RecordBinder[Rdf <: RDF] {
    * - use shapeless to generalize
    */
 
-  def pgb[T] = new PGB[T] {
-    def makeSubject(t: T): Rdf#URI = ops.makeUri("#" + java.util.UUID.randomUUID().toString)
+  /**
+   * Create PGB with pointer based on record fields.
+   */
+  def pgbWithId[T](id: T => Rdf#URI) = new PGB[T] {
+    def makeSubject(t: T): Rdf#URI = id(t)
   }
 
-  // let's you define the main pointer for the created graph
-  // typically: #, #thing, #me, or even empty string
-  def pgbWithId[T](constantPointer: String) = new PGB[T] {
-    def makeSubject(t: T): Rdf#URI = ops.makeUri(constantPointer)
-  }
+  /**
+   * Create PGB with constant pointer.
+   * Typically: #, #thing, #me, or even empty string.
+   */
+  def pgbWithConstId[T](constantPointer: String) =
+    pgbWithId[T](_ => ops.makeUri(constantPointer))
+
+  /**
+   * Create PGB with random UUID pointer.
+   */
+  def pgb[T] = pgbWithId[T](_ => newUri("#"))
 
   abstract class PGB[T] {
 
