@@ -93,6 +93,7 @@ class FOAFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("foaf", "ht
   val publication = apply("publication")
   val wants = apply("wants")
   val author = apply("author")
+  val member = apply("member")
 }
 
 trait CommonPrefixes[Rdf <: RDF] { this: RDFOps[Rdf] =>

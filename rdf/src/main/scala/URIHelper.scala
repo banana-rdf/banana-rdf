@@ -1,11 +1,13 @@
 package org.w3.banana
 
-import java.net.{ URI => jURI }
+import java.net.{URI => jURI}
 
 object URIHelper {
+  val regex = "#".r
 
   def resolve[Rdf <: RDF](uri: Rdf#URI, str: String)(implicit ops: RDFOps[Rdf]): Rdf#URI = {
-    val juri = new jURI(uri.toString).resolve(str)
+    val juri = if (""==str) new jURI(regex.split(uri.toString)(0))
+               else new jURI(uri.toString).resolve(str)
     ops.makeUri(juri.toString)
   }
 
