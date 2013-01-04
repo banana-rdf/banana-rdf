@@ -16,12 +16,17 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
   val verifiedAddress = VerifiedAddress("32 Vassar st", city)
   val person = Person("Alexandre Bertails")
   val personWithNickname = person.copy(nickname = Some("betehess"))
+  val me = Me("Name")
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] must be(Success(city))
   }
 
-  "check graph poitner generetaed by custom rule " in {
+  "graph constant poitner" in {
+    me.toPG.pointer must be(URI("http://example.com#me"))
+  }
+
+  "graph poitner baised on record fields" in {
     city.toPG.pointer must be(URI("http://example.com/Paris"))
   }
 
