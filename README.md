@@ -43,6 +43,10 @@ bridge the Scala and RDF worlds. Most of the common datastructures are
 already available, and you can even map your own classes. Unlike usual
 ORM techniques, this does not rely on annotation or reflection.
 
+Until we write thorough documentation, the best place to understand
+what you can do is to go through the [test
+suite](https://github.com/w3c/banana-rdf/tree/master/rdf-test-suite/src/main/scala).
+
 How to start geeking
 --------------------
 
@@ -68,7 +72,15 @@ or
 $ open full/target/scala-2.9.1/api.sxr/index.html
 ```
 
+Contribution
+------------
+
+All contributions are welcome. By contributing, you accept to give the
+ownership of your contribution to the [World Wide Web
+Consortium](http://www/w3/org). They are a _nonprofit organization_
+and just want to simplify the gouvernance of this opensource project.
+
 Licence
 -------
 
-This source code is made available under the [W3C Licence](http://opensource.org/licenses/W3C).
+This source code is made available under the [W3C Licence](http://opensource.org/licenses/W3C). This is a business friendly license.
