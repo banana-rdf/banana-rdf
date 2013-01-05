@@ -65,7 +65,7 @@ Contributions
 
 All contributions are welcome. By contributing, you accept to give the
 ownership of your contribution to the [World Wide Web
-Consortium](http://www/w3/org). They are a _nonprofit organization_
+Consortium](http://www.w3.org). They are a _nonprofit organization_
 and just want to simplify the gouvernance of this opensource project.
 
 Licence
