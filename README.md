@@ -1,4 +1,4 @@
-Banana RDF
+banana-rdf
 ==========
 
 [![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png?branch=master)](http://travis-ci.org/w3c/banana-rdf)
@@ -72,8 +72,8 @@ or
 $ open full/target/scala-2.9.1/api.sxr/index.html
 ```
 
-Contribution
-------------
+Contributions
+-------------
 
 All contributions are welcome. By contributing, you accept to give the
 ownership of your contribution to the [World Wide Web
