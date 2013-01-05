@@ -37,8 +37,8 @@ With `banana-rdf`, you get `Diesel`, a nice DSL to build and navigate
 within **pointed graphs** (graphs with a pointer to an inner
 node). You also get an abstraction for **graph stores**
 (`GraphStore`), which do not have to be **SPARQL engines**
-(`SparqlEngine`). Of course, you can serialize and deserialize most of
-the RDF syntaxes (RDFa will come soon).
+(`SparqlEngine`). Of course, you can **serialize** and **deserialize**
+most of the RDF syntaxes (RDFa and JSON-LD will come soon).
 
 `banana-rdf` introduces the concept of **binders**, which let you
 bridge the Scala and RDF worlds. Most of the common datastructures are
