@@ -6,11 +6,13 @@ banana-rdf
 An RDF library in Scala
 -----------------------
 
-`banana-rdf` is a set of libraries for RDF and RDF-related
-technologies in Scala, which can be used with existing libraries
-without any added cost. There is no wrapping involved: you manipulate
-directly the real objects. We currently support Jena, Sesame and
-Plantain, a pure Scala implementation.
+`banana-rdf` is a library for RDF, SPARQL and Linked Data technologies
+in Scala.
+
+It can be used with existing libraries without any added cost. There
+is no wrapping involved: you manipulate directly the real objects. We
+currently support Jena, Sesame and Plantain, a pure Scala
+implementation.
 
 Features
 --------
@@ -34,7 +36,7 @@ does the same for SPARQL.
 With `banana-rdf`, you get `Diesel`, a nice DSL to build and navigate
 within **pointed graphs** (graphs with a pointer to an inner
 node). You also get an abstraction for **graph stores**
-(`GraphStore`), which does not have to be **SPARQL engines**
+(`GraphStore`), which do not have to be **SPARQL engines**
 (`SparqlEngine`). Of course, you can serialize and deserialize most of
 the RDF syntaxes (RDFa will come soon).
 
@@ -56,20 +58,6 @@ You only need a recent version of Java, that's all:
 $ git clone git@github.com:w3c/banana-rdf.git
 $ cd banana-rdf
 $ ./sbt
-```
-
-Generate documentation
--------------------------
-
-``` bash
-$ ./sbt doc
-$ open full/target/scala-2.9.1/api/index.html
-```
-
-or
-
-``` bash
-$ open full/target/scala-2.9.1/api.sxr/index.html
 ```
 
 Contributions
