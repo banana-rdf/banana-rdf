@@ -1,4 +1,4 @@
-package org.w3.banana.plantain
+package org.w3.banana.plantain.model
 
 import org.w3.banana.TripleMatch
 import java.net.{ URI => jURI }
@@ -68,7 +68,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Sesa
     }
   }
 
-  def -(tripleMatch: TripleMatch[Plantain]): Graph = {
+  def -(tripleMatch: TripleMatch[org.w3.banana.plantain.Plantain]): Graph = {
     import tripleMatch.{ _1 => sMatch, _2 => pMatch, _3 => oMatch }
     val matchedTriples: Iterable[Triple] = find(sMatch, pMatch, oMatch)
     val newGraph = matchedTriples.foldLeft(this){ _.removeExistingTriple(_) }

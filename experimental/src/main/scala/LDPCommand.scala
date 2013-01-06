@@ -1,8 +1,9 @@
-package org.w3.banana.plantain
+package org.w3.banana.experimental
 
 import org.w3.banana._
 import scalaz.{ Free, Functor }
 import scalaz.Free._
+import org.w3.banana.plantain._
 
 sealed trait LDPCommand[Rdf <: RDF, +A]
 

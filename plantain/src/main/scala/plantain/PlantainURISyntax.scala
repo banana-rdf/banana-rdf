@@ -1,6 +1,7 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
+import org.w3.banana.plantain.model._
 import java.net.{ URI => jURI }
 
 class PlantainURISyntax(val uri: URI) extends AnyVal with syntax.URISyntax[Plantain] {

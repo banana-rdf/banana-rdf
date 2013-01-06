@@ -1,4 +1,4 @@
-package org.w3.banana.plantain
+package org.w3.banana.experimental
 
 import org.w3.banana._
 import java.nio.file._
@@ -14,8 +14,9 @@ import org.openrdf.model.impl._
 import org.openrdf.query.algebra.evaluation.TripleSource
 import org.openrdf.query.QueryEvaluationException
 import info.aduna.iteration.CloseableIteration
-import PlantainUtil._
-import PlantainOps.uriSyntax
+import org.w3.banana.plantain.model.Node
+import org.w3.banana.plantain.PlantainUtil._
+import org.w3.banana.plantain.PlantainOps.uriSyntax
 import org.slf4j.{ Logger, LoggerFactory }
 
 class TMapTripleSource(tmap: TMap[String, PlantainLDPR]) extends TripleSource {

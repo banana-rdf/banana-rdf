@@ -1,7 +1,8 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import org.openrdf.model._
+import org.w3.banana.plantain.model._
+import org.openrdf.model.{ Graph => _, _ }
 import java.io._
 import scalax.io._
 import scala.util._

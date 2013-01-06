@@ -1,6 +1,7 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
+import org.w3.banana.plantain.model._
 import org.openrdf.query.parser.sparql.SPARQLParserFactory
 import org.openrdf.query.parser.{ ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery }
 import scala.collection.JavaConverters._

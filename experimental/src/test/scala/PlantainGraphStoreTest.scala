@@ -1,6 +1,8 @@
-package org.w3.banana.plantain
+package org.w3.banana.experimental
 
 import org.w3.banana._
+import org.w3.banana.plantain._
+import org.w3.banana.plantain.model._
 import org.scalatest._
 import org.scalatest.matchers._
 import Plantain._

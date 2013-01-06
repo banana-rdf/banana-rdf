@@ -1,4 +1,4 @@
-package org.w3.banana.plantain
+package org.w3.banana.experimental
 
 import scala.language.reflectiveCalls
 
@@ -12,19 +12,16 @@ import akka.pattern.ask
 import akka.transactor._
 import org.openrdf.query.algebra.evaluation.TripleSource
 import org.slf4j.LoggerFactory
-import org.w3.banana.plantain.PlantainOps._
 import annotation.tailrec
 import java.util.Date
-import play.api.libs.iteratee.{Error, Enumerator, Iteratee}
-import java.io.{IOException, OutputStream}
+import play.api.libs.iteratee.{ Error, Enumerator, Iteratee }
+import java.io.{ IOException, OutputStream }
 import scala.util.Try
-import scala.Some
-import scalaz.{\/-,-\/}
+import scalaz.{ \/-, -\/ }
 import play.api.libs.iteratee.Input.El
-import org.w3.banana.plantain.PlantainLDPS.DeleteLDPC
-import org.w3.banana.plantain.PlantainLDPS.GetLDPC
-import org.w3.banana.plantain.PlantainLDPS.CreateLDPC
-import org.w3.banana.plantain.PlantainLDPS.Script
+import org.w3.banana.plantain._
+import org.w3.banana.plantain.PlantainOps._
+import org.w3.banana.experimental.PlantainLDPS.{ DeleteLDPC, GetLDPC, CreateLDPC, Script }
 
 // A resource on the server ( Resource is already taken. )
 // note:
@@ -156,19 +153,19 @@ case class PlantainBinary(root: Path, uri: Plantain#URI) extends BinaryResource[
  * it's important for the uris in the graph to be absolute
  * this invariant is assumed by the sparql engine (TripleSource)
  */
-case class PlantainLDPR(uri: URI, graph: Graph, updated: Option[Date] = Some(new Date)) extends LDPR[Plantain] {
+case class PlantainLDPR(uri: Plantain#URI, graph: Plantain#Graph, updated: Option[Date] = Some(new Date)) extends LDPR[Plantain] {
 
-  def relativeGraph: Graph =
+  def relativeGraph: Plantain#Graph =
     graph.triples.foldLeft(Graph.empty){ (current, triple) => current + triple.relativizeAgainst(uri) }
 
   val ops = Plantain.ops
 }
 
-class PlantainLDPC(val uri: URI, actorRef: ActorRef, val updated: Option[Date] = Some(new Date))(implicit timeout: Timeout) extends LDPC[Plantain] {
+class PlantainLDPC(val uri: Plantain#URI, actorRef: ActorRef, val updated: Option[Date] = Some(new Date))(implicit timeout: Timeout) extends LDPC[Plantain] {
 
   override def toString: String = uri.toString
 
-  def execute[A](script: Plantain#Script[A]): Future[A] = {
+  def execute[A](script: PlantainScript[A]): Future[A] = {
     (actorRef ? Coordinated(Script(script))).asInstanceOf[Future[A]]
   }
 
@@ -176,7 +173,7 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef, val updated: Option[Date] =
 
 }
 
-class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
+class PlantainLDPCActor(baseUri: Plantain#URI, root: Path) extends Actor {
   val NonLDPRs = TMap.empty[String, NamedResource[Plantain]]
   // invariant to be preserved: the Graph are always relative to 
 
@@ -186,7 +183,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
 
   @tailrec
-  final def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
+  final def run[A](coordinated: Coordinated, script: PlantainScript[A])(implicit t: InTxn): A = {
     import PlantainOps._
     script.resume match {
       case -\/(CreateLDPR(uriOpt, graph, k)) => {
@@ -295,14 +292,14 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
 
 object PlantainLDPS {
 
-  case class CreateLDPC(uri: URI)
-  case class GetLDPC(uri: URI)
-  case class DeleteLDPC(uri: URI)
-  case class Script[A](script: Plantain#Script[A])
+  case class CreateLDPC(uri: Plantain#URI)
+  case class GetLDPC(uri: Plantain#URI)
+  case class DeleteLDPC(uri: Plantain#URI)
+  case class Script[A](script: PlantainScript[A])
 
   val logger = LoggerFactory.getLogger(classOf[PlantainLDPS])
 
-  def apply(baseUri: URI, root: Path)(implicit timeout: Timeout = Timeout(5000)): PlantainLDPS =
+  def apply(baseUri: Plantain#URI, root: Path)(implicit timeout: Timeout = Timeout(5000)): PlantainLDPS =
     new PlantainLDPS(baseUri, root)
 
   def randomPathSegment(): String = java.util.UUID.randomUUID().toString.replaceAll("-", "")
@@ -311,9 +308,9 @@ object PlantainLDPS {
 
 
 
-class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends Actor {
+class PlantainLDPSActor(baseUri: Plantain#URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends Actor {
 
-  val LDPCs = TMap.empty[URI, ActorRef] // PlantainLDPCActor
+  val LDPCs = TMap.empty[Plantain#URI, ActorRef] // PlantainLDPCActor
 
   def receive = {
     case coordinated @ Coordinated(CreateLDPC(uri)) => coordinated atomic { implicit t =>
@@ -336,7 +333,7 @@ class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit 
 
 }
 
-class PlantainLDPS(val baseUri: URI, root: Path)(implicit timeout: Timeout) extends LDPS[Plantain] {
+class PlantainLDPS(val baseUri: Plantain#URI, root: Path)(implicit timeout: Timeout) extends LDPS[Plantain] {
 
   val system = ActorSystem("plantain")
 
@@ -346,15 +343,15 @@ class PlantainLDPS(val baseUri: URI, root: Path)(implicit timeout: Timeout) exte
     system.shutdown()
   }
 
-  def createLDPC(uri: URI): Future[PlantainLDPC] = {
+  def createLDPC(uri: Plantain#URI): Future[PlantainLDPC] = {
     (ldpsActorRef ? Coordinated(CreateLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
   }
 
-  def getLDPC(uri: URI): Future[PlantainLDPC] = {
+  def getLDPC(uri: Plantain#URI): Future[PlantainLDPC] = {
     (ldpsActorRef ? Coordinated(GetLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
   }
 
-  def deleteLDPC(uri: URI): Future[Unit] = {
+  def deleteLDPC(uri: Plantain#URI): Future[Unit] = {
     (ldpsActorRef ? Coordinated(DeleteLDPC(uri))).asInstanceOf[Future[Unit]]
   }
 

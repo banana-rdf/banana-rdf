@@ -6,19 +6,19 @@ import org.openrdf.query.parser.{ ParsedQuery, ParsedTupleQuery, ParsedGraphQuer
 
 trait Plantain extends RDF {
   // types related to the RDF datamodel
-  type Graph = plantain.Graph
-  type Triple = plantain.Triple
-  type Node = plantain.Node
-  type URI = plantain.URI
-  type BNode = plantain.BNode
-  type Literal = plantain.Literal
-  type TypedLiteral = plantain.TypedLiteral
-  type LangLiteral = plantain.LangLiteral
+  type Graph = model.Graph
+  type Triple = model.Triple
+  type Node = model.Node
+  type URI = model.URI
+  type BNode = model.BNode
+  type Literal = model.Literal
+  type TypedLiteral = model.TypedLiteral
+  type LangLiteral = model.LangLiteral
   type Lang = String
 
   // types for the graph traversal API
-  type NodeMatch = plantain.NodeMatch
-  type NodeAny = plantain.ANY.type
+  type NodeMatch = model.NodeMatch
+  type NodeAny = model.ANY.type
 
   // types related to Sparql
   type Query = ParsedQuery
@@ -28,9 +28,6 @@ trait Plantain extends RDF {
   type Solution = BindingSet
   // instead of TupleQueryResult so that it's eager instead of lazy
   type Solutions = Iterator[BindingSet]
-
-  type Script[+A] = scalaz.Free[({ type l[+x] = LDPCommand[Plantain, x] })#l, A]
-
 
 }
 
