@@ -3,6 +3,21 @@ package org.w3.banana.plantain
 import org.w3.banana._
 import scalaz.{ Free, Functor }
 import scalaz.Free._
+import org.w3.banana.plantain.OperationNotSupported
+import org.w3.banana.plantain.DeleteResource
+import org.w3.banana.plantain.UpdateLDPR
+import scalaz.Free.Suspend
+import org.w3.banana.plantain.GetMeta
+import org.w3.banana.plantain.GetResource
+import org.w3.banana.plantain.CreateBinary
+import org.w3.banana.plantain.AskLDPC
+import org.w3.banana.plantain.SelectLDPC
+import org.w3.banana.plantain.ConstructLDPC
+import org.w3.banana.plantain.AskLDPR
+import org.w3.banana.plantain.SelectLDPR
+import org.w3.banana.plantain.ConstructLDPR
+import scalaz.Free.Return
+import org.w3.banana.plantain.CreateLDPR
 
 sealed trait LDPCommand[Rdf <: RDF, +A]
 
@@ -34,10 +49,10 @@ object LDPCommand {
 
   type Script[Rdf <: RDF, A] = Free[({ type l[+x] = LDPCommand[Rdf, x] })#l, A]
 
-  private def `return`[Rdf <: RDF, A](a: => A): Script[Rdf, A] =
+  def `return`[Rdf <: RDF, A](a: => A): Script[Rdf, A] =
     Return[({ type l[+x] = LDPCommand[Rdf, x] })#l, A](a)
 
-  private def suspend[Rdf <: RDF, A](a: LDPCommand[Rdf, Script[Rdf, A]]): Script[Rdf, A] =
+  def suspend[Rdf <: RDF, A](a: LDPCommand[Rdf, Script[Rdf, A]]): Script[Rdf, A] =
     Suspend[({ type l[+x] = LDPCommand[Rdf, x] })#l, A](a)
 
   private def nop[Rdf <: RDF]: Script[Rdf, Unit] = `return`(())

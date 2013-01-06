@@ -6,17 +6,11 @@ import org.scalatest.matchers._
 import Plantain._
 import LDPCommand._
 import scala.concurrent.ExecutionContext.Implicits.global
-import java.nio.charset.Charset
-import java.nio.file.{Files, Paths, Path}
-import java.io.File
+import java.nio.file.Files
 import play.api.libs.iteratee.Enumerator
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
-import scalaz.Validation
-import collection.immutable
-import scalaz.Free.{Gosub, Suspend, Return}
-import annotation.tailrec
 
 class PlantainLDPSTest extends LDPSTest[Plantain]({
   val dir = Files.createTempDirectory("plantain")
@@ -26,11 +20,12 @@ class PlantainLDPSTest extends LDPSTest[Plantain]({
 abstract class LDPSTest[Rdf <: RDF](
   ldps: LDPS[Rdf])(
   implicit diesel: Diesel[Rdf],
-  reader: RDFReader[Rdf, RDFXML]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
-  import System.out
+  reader: RDFReader[Rdf, RDFXML],
+  authz: AuthZ[Rdf]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
   import ops._
+  import authz._
 
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACL[Rdf]
@@ -116,61 +111,6 @@ abstract class LDPSTest[Rdf <: RDF](
     script.getOrFail()
   }
 
-  trait Agent {
-    def contains(id: Rdf#URI): Boolean
-  }
-
-  object Agent extends Agent {
-    //ok really the id should represent an Agent, and not say a stone
-    def contains(id: Rdf#URI) = true
-  }
-
-  case class Group(members: List[Rdf#URI]) extends Agent {
-    override
-    def contains(id: Rdf#URI): Boolean = members.contains(id)
-  }
-
-  case class Person(id: Rdf#URI) extends Agent {
-    override
-    def contains(webid: Rdf#URI) = id == webid
-  }
-
-
-  /**
-   * return the list of agents that are allowed access to the given resource
-   * stop looking if everybody is authorized
-   * @return A list of Agents with access ( should be perhaps just an Agent.
-   **/
-  def authz(acl: Rdf#Graph, resource: Rdf#URI, method: Rdf#URI): List[Agent]  = {
-    def agent(a: PointedGraph[Rdf]): Agent = if (a.pointer == foaf.Agent) Agent
-     else {
-       val people = (a/foaf.member).collect{ case PointedGraph(p,_) if isURI(p)  => p.asInstanceOf[Rdf#URI]}.toList
-       Group(people)
-   }
-
-    def authorized(auths: Iterator[PointedGraph[Rdf]]): List[Agent] =
-      if (!auths.hasNext) {
-         List()
-      } else {
-        val az = auths.next
-        val ac = (az / wac.agentClass).map { agent _ }.toList
-        if (ac.contains(foaf.Agent))  List(Agent)
-        else {
-          (az/wac.agent).collect { case PointedGraph(p,_) if isURI(p) => p.asInstanceOf[Rdf#URI]}.toList match {
-            case Nil => ac
-            case list: List[Rdf#URI] => Group(list)::ac:::authorized(auths)
-          }
-        }
-      }
-
-    val it = (PointedGraph(method,acl)/-wac.mode)
-    val result = authorized(it.iterator)
-    //compress result
-    if (result.contains(Agent)) List(Agent)
-    else result
-  }
-
-
 
   "CreateLDPC & LDPR with ACLs" in {
     val ldpcUri = URI("http://example.com/betehess/")
@@ -211,24 +151,6 @@ abstract class LDPSTest[Rdf <: RDF](
       }
     }
     createProfile.getOrFail()
-
-    /* recursive function, gets included auths in a collection (only) - but is not tail rec because of flatMap */
-    def getAuth(meta: Rdf#URI, method: Rdf#URI): Script[Rdf, List[Agent]] =  {
-      getLDPR(meta).flatMap { g: Rdf#Graph =>
-        val az = authz(g, ldprUriFull, method)
-        az match {
-          case List(Agent) => Return[({ type l[+x] = LDPCommand[Rdf, x] })#l, List[Agent]](az)
-          case agents => {
-            val inc= (PointedGraph(URI(""), g) / wac.include).collectFirst { //todo: check that its' in the collection. What to do if it's not?
-              case PointedGraph(node,g) if isURI(node) =>
-                getAuth(node.asInstanceOf[Rdf#URI],method)
-            }
-            val res = inc.getOrElse(Return[({ type l[+x] = LDPCommand[Rdf, x] })#l, List[Agent]](az))
-            res
-          }
-        }
-      }
-    }
 
 
     val authZ1 = for {
