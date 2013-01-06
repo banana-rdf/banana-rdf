@@ -64,8 +64,8 @@ object Command {
 
   def PUT[Rdf <: RDF](ldr: LinkedDataResource[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
     for {
-      _ <- DELETE(ldr.uri)
-      _ <- POST(ldr.uri, ldr.resource)
+      _ <- DELETE(ldr.location)
+      _ <- POST(ldr.location, ldr.resource)
     } yield ()
   }
 
