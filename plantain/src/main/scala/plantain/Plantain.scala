@@ -70,4 +70,7 @@ object Plantain {
   implicit val queryResultsReaderXml: SparqlQueryResultsReader[Plantain, SparqlAnswerXml] =
     PlantainQueryResultsReader.queryResultsReaderXml
 
+  implicit val plantainAuthz: AuthZ[Plantain] = new AuthZ[Plantain]
+
+
 }

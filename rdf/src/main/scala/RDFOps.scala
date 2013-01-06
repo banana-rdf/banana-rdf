@@ -29,6 +29,8 @@ trait RDFOps[Rdf <: RDF]
 
   def foldNode[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
 
+  def isURI[T](node: Rdf#Node) = foldNode[Boolean](node)(uri=>true, bn=>false,lit=>false)
+
   // URI
 
   def makeUri(s: String): Rdf#URI

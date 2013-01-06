@@ -6,9 +6,7 @@ import org.scalatest.matchers._
 import Plantain._
 import LDPCommand._
 import scala.concurrent.ExecutionContext.Implicits.global
-import java.nio.charset.Charset
-import java.nio.file.{Files, Paths, Path}
-import java.io.File
+import java.nio.file.Files
 import play.api.libs.iteratee.Enumerator
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -22,13 +20,18 @@ class PlantainLDPSTest extends LDPSTest[Plantain]({
 abstract class LDPSTest[Rdf <: RDF](
   ldps: LDPS[Rdf])(
   implicit diesel: Diesel[Rdf],
-  reader: RDFReader[Rdf, RDFXML]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
+  reader: RDFReader[Rdf, RDFXML],
+  authz: AuthZ[Rdf]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
   import ops._
+  import authz._
 
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACL[Rdf]
+
+  val betehess = URI("http://example.com/betehess/card#me")
+  val betehessCard = URI("http://example.com/betehess/card")
 
   override def afterAll(): Unit = {
     ldps.shutdown()
@@ -40,18 +43,24 @@ abstract class LDPSTest[Rdf <: RDF](
     -- foaf.title ->- "Mr"
   ).graph
 
-  val graphMeta: Rdf#Graph = (
+  // make the card readable by the whole world ( and link to the main file that make it read/write to Alex )
+  val graphCardACL: Rdf#Graph = (
     bnode()
-      -- wac.accessTo ->- URI("http://example.com/foo/betehess")
-      -- wac.agent    ->- URI("http://example.com/foo/betehess#me")
+      -- wac.accessTo ->- betehessCard
+      -- wac.agentClass ->- foaf.Agent
       -- wac.mode     ->- wac.Read
     ).graph union (
-      URI("http://example.com/foo/betehess;meta") -- wac.include ->- URI("http://example.com/foo/meta")
+      URI(betehessCard.toString+";meta") -- wac.include ->- URI("http://example.com/betehess/;meta")
     ).graph
 
-  val graphMetaBase = (
-    //todo: link graphMeta
-  )
+  // this makes all of the files under the betehess collection read/write to an Alex
+  val graphCollectionACL = (
+    bnode()
+       -- wac.accessToClass ->- ( bnode() -- wac.regex ->- "http://example.com/betehess/.*" )
+       -- wac.accessTo ->- betehessCard
+       -- wac.agent ->-  betehess
+       -- wac.mode  ->- (wac.Read, wac.Write)
+  ).graph
 
   val graph2: Rdf#Graph = (
     URI("#me")
@@ -102,36 +111,87 @@ abstract class LDPSTest[Rdf <: RDF](
     script.getOrFail()
   }
 
-  "CreateLDPR with Meta - should create an LDPR with the given graph -- with given uri" in {
-    val ldpcUri = URI("http://example.com/foo2")
-    val ldprUri = URI("http://example.com/foo2/betehess")
-    val ldprMeta = URI("http://example.com/foo2/betehess;meta")
-    val script = for {
-      ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
-      rAcl <- ldpc.execute{
-        for {
-           meta <- getMeta(ldprUri)
-           acl = meta.acl.get
-           _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
-        } yield acl
-      }
-    } yield {
-      rUri must be(ldprUri)
-      rAcl must be(ldprMeta)
-    }
-    script.getOrFail()
 
-    val script2 = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      res <- ldpc.execute(getResource(ldprUri))
-      acl <- ldpc.execute(getLDPR(res.acl.get))
-      _ <- ldps.deleteLDPC( ldpcUri)
+  "CreateLDPC & LDPR with ACLs" in {
+    val ldpcUri = URI("http://example.com/betehess/")
+    val ldpcMetaFull = URI("http://example.com/betehess/;meta")
+    val ldprUri = URI("card")
+    val ldprUriFull = betehessCard
+    val ldprMeta = URI("http://example.com/betehess/card;meta")
+
+    //create container with ACLs
+    val createContainerScript = for {
+      ldpc <- ldps.createLDPC(ldpcUri)
+      rUri <- ldpc.execute(createLDPR(ldpc.acl, graphCollectionACL))
+      acl <- ldpc.execute(getLDPR(rUri))
     } yield {
-      assert( acl.graph isIsomorphicWith graphMeta )
-      assert( res.asInstanceOf[LDPR[Rdf]].relativeGraph isIsomorphicWith graph )
+      rUri must be(ldpcMetaFull)
+      assert(acl isIsomorphicWith graphCollectionACL)
     }
-    script2.getOrFail()
+    createContainerScript.getOrFail()
+
+    //create Profile with ACLs
+    val createProfile = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      cardRes <- ldpc.execute(
+        for {
+//        rUri <- createLDPR(Some(ldprUri), graph) <- should something like this work?
+          rUri <- createLDPR(Some(ldprUriFull), graph)
+          res  <- getResource(rUri)
+          _    <- createLDPR( res.acl, graphCardACL )
+        } yield res  )
+      acl <- ldpc.execute(getLDPR(cardRes.acl.get))
+    } yield {
+      cardRes.uri must be(ldprUriFull)
+      cardRes.acl.get must be(ldprMeta)
+      assert(acl.resolveAgainst(ldprMeta) isIsomorphicWith graphCardACL)
+      cardRes match {
+        case card: LDPR[Rdf] => assert( card.graph isIsomorphicWith graph.resolveAgainst(ldprUriFull))
+        case _ => throw new Exception("recived the wrong type of resource")
+      }
+    }
+    createProfile.getOrFail()
+
+
+    val authZ1 = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      l <- ldpc.execute (
+       for {
+         meta <- getMeta(ldprUriFull)
+         athzd <- getAuth(meta.acl.get,wac.Read)
+       } yield athzd
+      )
+    } yield {
+       assert( l.contains(Agent) )
+    }
+
+    authZ1.getOrFail()
+
+    val authZ2 = for {
+      ldpc <- ldps.getLDPC(ldpcUri)
+      l <- ldpc.execute (
+        for {
+          meta <- getMeta(ldprUriFull)
+          athzd <- getAuth(meta.acl.get,wac.Write)
+        } yield athzd
+      )
+    } yield {
+      assert( l.exists(a => a.contains(betehess) ))
+    }
+
+    authZ2.getOrFail()
+
+
+    //    rAcl <- ldpc.execute{
+//      for {
+//        meta <- getMeta(ldprUri)
+//        acl = meta.acl.get
+//        _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
+//      } yield acl
+//    }
+
+   //add access control tests here on the graph created above
+
 
   }
 
