@@ -75,8 +75,6 @@ object BananaRdfBuild extends Build {
 
   import BuildSettings._
   
-//  import com.typesafe.sbteclipse.plugin.EclipsePlugin._
-
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0"
 
   val scalaIoCore = "com.github.scala-incubator.io" % "scala-io-core_2.10.0-RC1" % "0.4.1"
@@ -90,8 +88,7 @@ object BananaRdfBuild extends Build {
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
-//  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://jay.w3.org/~bertails/jar/scalaz-core_2.10.0-M7-7.0.0-M3.jar"
-  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0-SNAPSHOT" // from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
+  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0-SNAPSHOT"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -125,60 +122,30 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided",
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
+
+  val sesameVersion = "2.6.10"
   
-  val sesameDeps =
+  val sesameCoreDeps =
     Seq(
       resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-memory" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-nativerdf" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % "2.6.10")
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % sesameVersion,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % sesameVersion)
+
+  val sesameDeps = sesameCoreDeps ++
+    Seq(
+      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-memory" % sesameVersion,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-sail-nativerdf" % sesameVersion,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion)
 
   val pub = TaskKey[Unit]("pub")
 
-//  lazy val full = {
-//    def sxrOptions(baseDir: File, sourceDirs: Seq[Seq[File]]): Seq[String] = {
-//      val xplugin = "-Xplugin:" + (baseDir / "lib" / "sxr_2.9.0-0.2.7.jar").asFile.getAbsolutePath
-//      val baseDirs = sourceDirs.flatten
-//      val sxrBaseDir = "-P:sxr:base-directory:" + baseDirs.mkString(":")
-//      Seq(xplugin, sxrBaseDir)
-//    }
-//
-//    val projects = Seq(rdf, jena, sesame)
-//    val allSources           = TaskKey[Seq[Seq[File]]]("all-sources")
-//    val allSourceDirectories = SettingKey[Seq[Seq[File]]]("all-source-directories")
-//
-//    Project(
-//      id = "full",
-//      base = file("full"),
-//      dependencies = Seq(rdf, jena, sesame),
-//      settings     = buildSettings ++ Seq(
-//        allSources           <<= projects.map(sources in Compile in _).join, // join: Seq[Task[A]] => Task[Seq[A]]
-//        allSourceDirectories <<= projects.map(sourceDirectories in Compile in _).join,
-//
-//        // Combine the sources of other modules to generate Scaladoc and SXR annotated sources
-//        (sources in Compile) <<= (allSources).map(_.flatten),
-//
-//        // Avoid compiling the sources here; we just are after scaladoc.
-//        (compile in Compile) := inc.Analysis.Empty,
-//
-//        // Include SXR in the Scaladoc Build to generated HTML annotated sources.
-//        scalacOptions in (Compile, doc) <++= (baseDirectory, allSourceDirectories).map {
-//          (bd, asd) => sxrOptions(bd, asd)
-//        }
-//      )
-//    )
-//  }
-
-  
   lazy val banana = Project(
     id = "banana",
     base = file("."),
-    settings = buildSettings ++ Seq(
-//      EclipseKeys.skipParents in ThisBuild := false,
+    settings = buildSettings ++ Unidoc.settings ++ Seq(
       pub := (),
       pub <<= pub.dependsOn(publish in rdf, publish in jena, publish in sesame)),
     aggregate = Seq(
@@ -186,9 +153,7 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
-      plantain
-//      ldp,
-      /*full*/))
+      plantain))
   
   lazy val rdf = Project(
     id = "banana-rdf",
@@ -239,22 +204,32 @@ object BananaRdfBuild extends Build {
   lazy val plantain = Project(
     id = "plantain",
     base = file("plantain"),
-    settings = buildSettings ++ testDeps ++ Seq(
+    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
       libraryDependencies += scalaIoCore,
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
       libraryDependencies += iterateeDeps,
-      resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.10",
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
+
+  // this is _experimental_
+  // please do not add this projet to the main one
+  lazy val experimental = Project(
+    id = "experimental",
+    base = file("experimental"),
+    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
+      libraryDependencies += scalaIoCore,
+      libraryDependencies += scalaIoFile,
+      libraryDependencies += akka,
+      libraryDependencies += akkaTransactor,
+      libraryDependencies += iterateeDeps,
+      libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
+      libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
+    )
+  ) dependsOn (plantain, rdfTestSuite % "test")
 
   lazy val ldp = Project(
     id = "ldp",
