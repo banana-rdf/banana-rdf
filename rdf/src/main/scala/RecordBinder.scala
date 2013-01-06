@@ -79,22 +79,31 @@ trait RecordBinder[Rdf <: RDF] {
    * - use shapeless to generalize
    */
 
-  def pgb[T] = new PGB[T] {
-    def makeSubject(): Rdf#URI = ops.makeUri("#" + java.util.UUID.randomUUID().toString)
+  /**
+   * Create PGB with pointer based on record fields.
+   */
+  def pgbWithId[T](id: T => Rdf#URI) = new PGB[T] {
+    def makeSubject(t: T): Rdf#URI = id(t)
   }
 
-  // let's you define the main pointer for the created graph
-  // typically: #, #thing, #me, or even empty string
-  def pgbWithId[T](constantPointer: String) = new PGB[T] {
-    def makeSubject(): Rdf#URI = ops.makeUri(constantPointer)
-  }
+  /**
+   * Create PGB with constant pointer.
+   * Typically: #, #thing, #me, or even empty string.
+   */
+  def pgbWithConstId[T](constantPointer: String) =
+    pgbWithId[T](_ => ops.makeUri(constantPointer))
+
+  /**
+   * Create PGB with random UUID pointer.
+   */
+  def pgb[T] = pgbWithId[T](_ => newUri("#"))
 
   abstract class PGB[T] {
 
-    def makeSubject(): Rdf#URI
+    def makeSubject(t: T): Rdf#URI
 
-    def make(pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
-      val subject = makeSubject()
+    def make(t: T, pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
+      val subject = makeSubject(t)
       var triples: Set[Rdf#Triple] = Set.empty
       for (po <- pos.toIterable.flatten) {
         val (p, pg) = po
@@ -108,7 +117,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some(t1) = unapply(t)
-        make(p1.pos(t1))
+        make(t, p1.pos(t1))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -122,7 +131,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2))
+        make(t, p1.pos(t1), p2.pos(t2))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -137,7 +146,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -153,7 +162,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -170,7 +179,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -188,7 +197,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -207,7 +216,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -227,7 +236,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7, t8)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -248,7 +257,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
@@ -270,7 +279,7 @@ trait RecordBinder[Rdf <: RDF] {
 
       def toPointedGraph(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10)) = unapply(t)
-        make(p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10))
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10))
       }
 
       def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[T] = {
