@@ -11,8 +11,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-//    version      := "0.3-SNAPSHOT",
-    version      := "x14-SNAPSHOT",
+    version      := "2013_01_07-SNAPSHOT",
     scalaVersion := "2.10.0",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
 
@@ -56,6 +55,11 @@ object BuildSettings {
           <id>betehess</id>
           <name>Alexandre Bertails</name>
           <url>http://bertails.org</url>
+        </developer>
+        <developer>
+          <id>bblfish</id>
+          <name>Henry Story</name>
+          <url>http://bblfish.net/</url>
         </developer>
       </developers>
     )
