@@ -2,22 +2,8 @@ package org.w3.banana.plantain
 
 import org.w3.banana._
 import scalaz.{ Free, Functor }
-import scalaz.Free._
-import org.w3.banana.plantain.OperationNotSupported
-import org.w3.banana.plantain.DeleteResource
-import org.w3.banana.plantain.UpdateLDPR
 import scalaz.Free.Suspend
-import org.w3.banana.plantain.GetMeta
-import org.w3.banana.plantain.GetResource
-import org.w3.banana.plantain.CreateBinary
-import org.w3.banana.plantain.AskLDPC
-import org.w3.banana.plantain.SelectLDPC
-import org.w3.banana.plantain.ConstructLDPC
-import org.w3.banana.plantain.AskLDPR
-import org.w3.banana.plantain.SelectLDPR
-import org.w3.banana.plantain.ConstructLDPR
 import scalaz.Free.Return
-import org.w3.banana.plantain.CreateLDPR
 
 sealed trait LDPCommand[Rdf <: RDF, +A]
 
@@ -81,7 +67,9 @@ object LDPCommand {
   def deleteResource[Rdf <: RDF](uri: Rdf#URI): Script[Rdf, Unit] =
     suspend(DeleteResource(uri, nop))
 
-  def updateLDPR[Rdf <: RDF](uri: Rdf#URI, remove: Iterable[TripleMatch[Rdf]], add: Iterable[Rdf#Triple]): Script[Rdf, Unit] =
+  def updateLDPR[Rdf <: RDF](uri: Rdf#URI,
+                             remove: Iterable[TripleMatch[Rdf]]=Iterable.empty,
+                             add: Iterable[Rdf#Triple]=Iterable.empty): Script[Rdf, Unit] =
     suspend(UpdateLDPR(uri, remove, add, nop))
 
   def selectLDPR[Rdf <: RDF](uri: Rdf#URI, query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Script[Rdf, Rdf#Solutions] =

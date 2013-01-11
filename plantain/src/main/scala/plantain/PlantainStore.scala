@@ -26,6 +26,17 @@ import org.w3.banana.plantain.PlantainLDPS.GetLDPC
 import org.w3.banana.plantain.PlantainLDPS.CreateLDPC
 import org.w3.banana.plantain.PlantainLDPS.Script
 
+trait RActor extends Actor {
+  def returnErrors[A,B](pf: Receive): Receive = new PartialFunction[Any,Unit] {
+    //interestingly it seems we can't catch an error here! If we do, we have to return a true or a false
+    // and whatever we choose it could have bad sideffects. What happens if the isDefinedAt throws an exception?
+      def isDefinedAt(x: Any): Boolean = pf.isDefinedAt(x)
+      def apply(a: Any): Unit = try { pf.apply(a) } catch {
+        case e: Exception => sender ! akka.actor.Status.Failure(e)
+      }
+    }
+}
+
 // A resource on the server ( Resource is already taken. )
 // note:
 // There can be named and unamed resources, as when a POST creates a
@@ -178,7 +189,7 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef, val updated: Option[Date] =
 
 }
 
-class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
+class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
   val NonLDPRs = TMap.empty[String, NamedResource[Plantain]]
   // invariant to be preserved: the Graph are always relative to 
 
@@ -282,12 +293,10 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends Actor {
   }
 
   def receive = {
+    returnErrors {
     case coordinated @ Coordinated(Script(script)) => coordinated atomic { implicit t =>
-      try {
-      val r = run(coordinated, script)
-      sender ! r
-      } catch {
-        case e: Exception => sender ! akka.actor.Status.Failure(e)
+        val r = run(coordinated, script)
+        sender ! r
       }
     }
   }
@@ -312,11 +321,11 @@ object PlantainLDPS {
 
 
 
-class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends Actor {
+class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends RActor {
 
   val LDPCs = TMap.empty[URI, ActorRef] // PlantainLDPCActor
 
-  def receive = {
+  def receive = returnErrors {
     case coordinated @ Coordinated(CreateLDPC(uri)) => coordinated atomic { implicit t =>
       val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(uri, root)))
       LDPCs.put(uri, ldpcActorRef)
@@ -348,15 +357,15 @@ class PlantainLDPS(val baseUri: URI, root: Path)(implicit timeout: Timeout) exte
   }
 
   def createLDPC(uri: URI): Future[PlantainLDPC] = {
-    (ldpsActorRef ? Coordinated(CreateLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
+    (ldpsActorRef ? Coordinated(CreateLDPC(uri.resolveAgainst(baseUri)))).asInstanceOf[Future[PlantainLDPC]]
   }
 
   def getLDPC(uri: URI): Future[PlantainLDPC] = {
-    (ldpsActorRef ? Coordinated(GetLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
+    (ldpsActorRef ? Coordinated(GetLDPC(uri.resolveAgainst(baseUri)))).asInstanceOf[Future[PlantainLDPC]]
   }
 
   def deleteLDPC(uri: URI): Future[Unit] = {
-    (ldpsActorRef ? Coordinated(DeleteLDPC(uri))).asInstanceOf[Future[Unit]]
+    (ldpsActorRef ? Coordinated(DeleteLDPC(uri.resolveAgainst(baseUri)))).asInstanceOf[Future[Unit]]
   }
 
 }
