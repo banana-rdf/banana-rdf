@@ -6,30 +6,6 @@ trait PointedGraph[Rdf <: RDF] {
 
   def graph: Rdf#Graph
 
-  def resolveAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
-    import ops._
-    PointedGraph[Rdf](
-      pointer.resolveAgainst(baseUri),
-      graph.resolveAgainst(baseUri))
-  }
-
-  def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
-    import ops._
-    PointedGraph[Rdf](
-      pointer.relativize(baseUri),
-      graph.relativize(baseUri))
-  }
-
-  // carefull: this is potentially unsafe!!!
-  def toLDR()(implicit ops: RDFOps[Rdf]): LinkedDataResource[Rdf] = {
-    import ops._
-    ops.foldNode(pointer)(
-      uri => LinkedDataResource(uri.fragmentLess, this),
-      bn => sys.error("expected a uri, got BNode: " + bn),
-      lit => sys.error("expected a uri, got Literal: " + lit)
-    )
-  }
-
 }
 
 object PointedGraph {
