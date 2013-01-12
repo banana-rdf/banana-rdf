@@ -2,7 +2,24 @@ package org.w3.banana
 
 /** An RDF Resource that can be located on the Web.
   * 
-  * @param location the location on the Web where `resource` can be found
-  * @param resource the [[PointedResource]] whose `graph` was found at `location`, and `pointer` exists in it
+  * @param location 
+  * @param resource 
   */
-case class LinkedDataResource[Rdf <: RDF](location: Rdf#URI, resource: PointedGraph[Rdf])
+trait LinkedDataResource[Rdf <: RDF] {
+
+  /** the location on the Web where `resource` can be found */
+  def location: Rdf#URI
+
+  /** the [[PointedResource]] whose `graph` was found at `location`, and `pointer` exists in it */
+  def resource: PointedGraph[Rdf]
+}
+
+object LinkedDataResource {
+
+  def apply[Rdf <: RDF](_location: Rdf#URI, _resource: PointedGraph[Rdf]): LinkedDataResource[Rdf] =
+    new LinkedDataResource[Rdf] {
+      val location = _location
+      val resource = _resource
+    }
+
+}

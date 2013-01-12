@@ -6,7 +6,7 @@ class PointedGraphPredicate[Rdf <: RDF](pointed: PointedGraph[Rdf], p: Rdf#URI) 
 
   def ->-(o: Rdf#Node, os: Rdf#Node*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
     import ops._
-    val PointedGraph(s, acc) = pointed
+    import pointed.{ pointer => s, graph => acc }
     val graph: Rdf#Graph =
       if (os.isEmpty) {
         val g = Graph(Triple(s, p, o))
@@ -20,14 +20,14 @@ class PointedGraphPredicate[Rdf <: RDF](pointed: PointedGraph[Rdf], p: Rdf#URI) 
 
   def ->-(pointedObject: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
     import ops._
-    val PointedGraph(s, acc) = pointed
-    val PointedGraph(o, graphObject) = pointedObject
+    import pointed.{ pointer => s, graph => acc }
+    import pointedObject.{ pointer => o, graph => graphObject }
     val graph = Graph(Triple(s, p, o)) union acc union graphObject
     PointedGraph(s, graph)
   }
 
   def ->-[T](o: T)(implicit ops: RDFOps[Rdf], binder: PointedGraphBinder[Rdf, T]): PointedGraph[Rdf] = {
-    val PointedGraph(s, acc) = pointed
+    import pointed.{ pointer => s, graph => acc }
     val pg = binder.toPointedGraph(o)
     this.->-(pg)
   }

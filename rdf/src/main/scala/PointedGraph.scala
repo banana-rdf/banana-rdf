@@ -1,6 +1,10 @@
 package org.w3.banana
 
-case class PointedGraph[Rdf <: RDF](pointer: Rdf#Node, graph: Rdf#Graph) {
+trait PointedGraph[Rdf <: RDF] {
+
+  def pointer: Rdf#Node
+
+  def graph: Rdf#Graph
 
   def resolveAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
     import ops._
@@ -30,8 +34,14 @@ case class PointedGraph[Rdf <: RDF](pointer: Rdf#Node, graph: Rdf#Graph) {
 
 object PointedGraph {
 
+  def apply[Rdf <: RDF](_pointer: Rdf#Node, _graph: Rdf#Graph): PointedGraph[Rdf] =
+    new PointedGraph[Rdf] {
+      val pointer = _pointer
+      val graph = _graph
+    }
+
   def apply[Rdf <: RDF](node: Rdf#Node)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] =
-    new PointedGraph[Rdf](node, ops.emptyGraph)
+    PointedGraph[Rdf](node, ops.emptyGraph)
 
   implicit def toPointedGraphW[Rdf <: RDF](pointed: PointedGraph[Rdf]): PointedGraphW[Rdf] = new PointedGraphW[Rdf](pointed)
 
