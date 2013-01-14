@@ -198,6 +198,15 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
 
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
 
+  /**
+   *
+   * @param coordinated
+   * @param script
+   * @param t
+   * @tparam A
+   * @throws NoSuchElementException if the resource does not exist
+   * @return
+   */
   @tailrec
   final def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
     import PlantainOps._
@@ -231,12 +240,14 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
       case -\/(DeleteResource(uri, a)) => {
          LDPRs.remove(uri.lastPathSegment).orElse{
            NonLDPRs.remove(uri.lastPathSegment)
-         }
+         } orElse( throw new NoSuchElementException("Could not find resource "+uri))
         run(coordinated, a)
       }
       case -\/(UpdateLDPR(uri, remove, add, a)) => {
         val pathSegment = uri.lastPathSegment
-        val graph = LDPRs.get(pathSegment).map(_.graph) getOrElse emptyGraph
+        val graph = LDPRs.get(pathSegment).map(_.graph).getOrElse {
+          throw new NoSuchElementException("Resource does not exist at "+uri)
+        }
         val temp = remove.foldLeft(graph) {
           (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri)
         }
