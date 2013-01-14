@@ -5,8 +5,8 @@ import SesameUtil.withConnection
 import org.openrdf.model._
 import org.openrdf.model.impl._
 import org.openrdf.repository.sail._
-import org.openrdf.repository.RepositoryResult
-import scala.collection.JavaConversions._
+import org.openrdf.repository.{RepositoryConnection, RepositoryResult}
+import scala.collection.JavaConverters._
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.sail.SailException
 import org.openrdf.query._
@@ -21,22 +21,20 @@ object SesameStore {
   def apply(repository: SailRepository): SesameStore =
     new SesameStore(repository)
 
-  def appendToGraph(conn: SailRepositoryConnection, uri: Sesame#URI, triples: Iterable[Sesame#Triple]): Unit = {
-    triples foreach { triple =>
-      conn.add(triple, uri)
-    }
+  def appendToGraph(conn: RepositoryConnection, uri: Sesame#URI, triples: Iterable[Sesame#Triple]): Unit = {
+    conn.add(triples.asJava, uri)
   }
 
-  def removeFromGraph(conn: SailRepositoryConnection, uri: Sesame#URI, tripleMatches: Iterable[TripleMatch[Sesame]]): Unit = {
-    tripleMatches foreach {
-      case (s, p, o) =>
-        // I don't really know what else to do...
-        // in Sesame, a Triple is not a (Node, Node, Node)
-        conn.remove(s.asInstanceOf[Resource], p.asInstanceOf[URI], o, uri)
+  def removeFromGraph(conn: RepositoryConnection, uri: Sesame#URI, tripleMatches: Iterable[TripleMatch[Sesame]]): Unit = {
+    val ts = tripleMatches map { case (s, p, o) =>
+      // I don't really know what else to do...
+      // in Sesame, a Triple is not a (Node, Node, Node)
+      new StatementImpl(s.asInstanceOf[Resource], p.asInstanceOf[URI], o)
     }
+    conn.remove(ts.asJava, uri)
   }
 
-  def getGraph(conn: SailRepositoryConnection, uri: Sesame#URI): Sesame#Graph = {
+  def getGraph(conn: RepositoryConnection, uri: Sesame#URI): Sesame#Graph = {
     val graph = new GraphImpl
     val rr: RepositoryResult[Statement] = conn.getStatements(null, null, null, false, uri)
     while (rr.hasNext) {
@@ -47,7 +45,7 @@ object SesameStore {
     graph
   }
 
-  def removeGraph(conn: SailRepositoryConnection, uri: Sesame#URI): Unit = {
+  def removeGraph(conn: RepositoryConnection, uri: Sesame#URI): Unit = {
     conn.remove(null: Resource, null, null, uri)
   }
 
@@ -55,7 +53,7 @@ object SesameStore {
    * Watch out connection is not closed here and neither is iterator.
    * (what does that mean? please help out)
    */
-  def executeSelect(conn: SailRepositoryConnection, query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Sesame#Solutions = {
+  def executeSelect(conn: RepositoryConnection, query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Sesame#Solutions = {
     val accumulator = new BindingsAccumulator()
     val tupleQuery: TupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.getSourceString)
     bindings foreach { case (name, value) => tupleQuery.setBinding(name, value) }
@@ -63,7 +61,7 @@ object SesameStore {
     accumulator.bindings()
   }
 
-  def executeConstruct(conn: SailRepositoryConnection, query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Sesame#Graph = {
+  def executeConstruct(conn: RepositoryConnection, query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Sesame#Graph = {
     val graphQuery: GraphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, query.getSourceString)
     bindings foreach { case (name, value) => graphQuery.setBinding(name, value) }
     val result: GraphQueryResult = graphQuery.evaluate()
@@ -75,7 +73,7 @@ object SesameStore {
     graph
   }
 
-  def executeAsk(conn: SailRepositoryConnection, query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Boolean = {
+  def executeAsk(conn: RepositoryConnection, query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Boolean = {
     val booleanQuery: BooleanQuery = conn.prepareBooleanQuery(QueryLanguage.SPARQL, query.getSourceString)
     bindings foreach { case (name, value) => booleanQuery.setBinding(name, value) }
     val result: Boolean = booleanQuery.evaluate()
