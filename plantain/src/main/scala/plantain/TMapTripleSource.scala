@@ -24,7 +24,6 @@ class TMapTripleSource(tmap: TMap[String, PlantainLDPR]) extends TripleSource {
 
   def getStatements(subject: Resource, predicate: SesameURI, objectt: Value, contexts: Resource*): CloseableIteration[Statement, QueryEvaluationException] = {
     val iterator: Iterator[Statement] = if (contexts.isEmpty) {
-      PlantainLDPS.logger.warn(s"""_very_ inefficient pattern ($subject, $predicate, $objectt, ANY)""")
       for {
         ldpr <- tmap.single.values.iterator
         statement <- ldpr.graph.getStatements(subject, predicate, objectt).toIterator

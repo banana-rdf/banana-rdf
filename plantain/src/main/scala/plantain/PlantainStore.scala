@@ -193,7 +193,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
   val NonLDPRs = TMap.empty[String, NamedResource[Plantain]]
   // invariant to be preserved: the Graph are always relative to 
 
-  val LDPRs = TMap.empty[String, PlantainLDPR]
+  val LDPRs = TMap("" -> PlantainLDPR(baseUri,plantain.Graph.empty))
 
 
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
@@ -246,7 +246,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
       case -\/(UpdateLDPR(uri, remove, add, a)) => {
         val pathSegment = uri.lastPathSegment
         val graph = LDPRs.get(pathSegment).map(_.graph).getOrElse {
-          throw new NoSuchElementException("Resource does not exist at "+uri)
+          throw new NoSuchElementException(s"Resource does not exist at $uri with path segment '$pathSegment'")
         }
         val temp = remove.foldLeft(graph) {
           (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri)
