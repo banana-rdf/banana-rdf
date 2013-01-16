@@ -27,12 +27,14 @@ trait Plantain extends RDF {
   type AskQuery = ParsedBooleanQuery
   type Solution = BindingSet
   // instead of TupleQueryResult so that it's eager instead of lazy
-  type Solutions = Iterator[BindingSet]
+  type Solutions = BoundSolutions
 
   type Script[+A] = scalaz.Free[({ type l[+x] = LDPCommand[Plantain, x] })#l, A]
 
 
 }
+
+case class BoundSolutions(iterator: Iterator[BindingSet], bindings: List[String])
 
 object Plantain {
 

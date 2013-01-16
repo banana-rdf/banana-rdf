@@ -266,12 +266,12 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
       case -\/(ConstructLDPR(uri, query, bindings, k)) => {
         val graph = LDPRs(uri.lastPathSegment).graph
         val resultGraph = PlantainUtil.executeConstruct(graph, query, bindings)
-        run(coordinated, k(graph))
+        run(coordinated, k(resultGraph))
       }
       case -\/(AskLDPR(uri, query, bindings, k)) => {
         val graph = LDPRs(uri.lastPathSegment).graph
-        val b = PlantainUtil.executeAsk(graph, query, bindings)
-        run(coordinated, k(b))
+        val resultGraph = PlantainUtil.executeAsk(graph, query, bindings)
+        run(coordinated, k(resultGraph))
       }
       case -\/(SelectLDPC(query, bindings, k)) => {
         val solutions = PlantainUtil.executeSelect(tripleSource, query, bindings)
