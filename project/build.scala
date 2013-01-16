@@ -11,10 +11,10 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-    version      := "2013_01_07-SNAPSHOT",
+    version      := "2013_01_16-SNAPSHOT",
     scalaVersion := "2.10.0",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
-
+    fork := true,
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
