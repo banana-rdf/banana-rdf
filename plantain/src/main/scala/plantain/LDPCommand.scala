@@ -87,7 +87,7 @@ object LDPCommand {
   def constructLDPC[Rdf <: RDF](query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): Script[Rdf, Rdf#Graph] =
     suspend(ConstructLDPC(query, bindings, graph => `return`(graph)))
 
-  def askLDPR[Rdf <: RDF](query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Script[Rdf, Boolean] =
+  def askLDPC[Rdf <: RDF](query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Script[Rdf, Boolean] =
     suspend(AskLDPC(query, bindings, b => `return`(b)))
 
   implicit def ldpCommandFunctor[Rdf <: RDF]: Functor[({ type l[+x] = LDPCommand[Rdf, x] })#l] =
