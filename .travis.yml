@@ -10,4 +10,5 @@ before_install:
   # - wget http://files.travis-ci.org/packages/deb/sbt/sbt-0.12.1.deb -O /tmp/sbt.deb
   - sudo dpkg -i /tmp/sbt.deb
 script:
+  - git checkout ldp
   - ./sbt test
