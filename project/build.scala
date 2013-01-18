@@ -95,7 +95,7 @@ object BananaRdfBuild extends Build {
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
 //  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://jay.w3.org/~bertails/jar/scalaz-core_2.10.0-M7-7.0.0-M3.jar"
-  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0-SNAPSHOT" // from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
+  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0-M7" // from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -104,7 +104,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" % "scalatest_2.10.0-RC5" % "2.0.M5-B1"
+  val scalatest = "org.scalatest" % "scalatest_2.10.0-RC5" % "2.0.M6-SNAP4"
   
   val testsuiteDeps =
     Seq(
@@ -112,7 +112,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "play" % "play-iteratees_2.10" % "2.1-12142012"
+  val iterateeDeps = "play" % "play-iteratees_2.10" % "2.1-RC2"
 
   val testDeps =
     Seq(

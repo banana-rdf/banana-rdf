@@ -5,7 +5,7 @@ cd "$dir"
 
 url="http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.12.2/sbt-launch.jar"
 
-sbt="sbt-launch-0.12.2-RC2.jar"
+sbt="sbt-launch-0.12.2.jar"
 
 # set the right tool to download sbt
 if [ -n "$tool" ]; then

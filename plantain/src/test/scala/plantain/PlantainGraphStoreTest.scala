@@ -87,7 +87,7 @@ abstract class LDPSTest[Rdf <: RDF](
     val ldprUri = URI("http://example.com/foo1/betehess")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
+      rUri <- ldpc.execute(createLDPR(Some(ldprUri.lastPathSegment), graph))
       rGraph <- ldpc.execute(getLDPR(ldprUri))
       _ <- ldps.deleteLDPC(ldpcUri)
     } yield {
@@ -122,7 +122,7 @@ abstract class LDPSTest[Rdf <: RDF](
     //create container with ACLs
     val createContainerScript = for {
       ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(ldpc.acl, graphCollectionACL))
+      rUri <- ldpc.execute(createLDPR(ldpc.acl.map(_.lastPathSegment), graphCollectionACL))
       acl <- ldpc.execute(getLDPR(rUri))
     } yield {
       rUri must be(ldpcMetaFull)
@@ -136,9 +136,9 @@ abstract class LDPSTest[Rdf <: RDF](
       cardRes <- ldpc.execute(
         for {
 //        rUri <- createLDPR(Some(ldprUri), graph) <- should something like this work?
-          rUri <- createLDPR(Some(ldprUriFull), graph)
+          rUri <- createLDPR(Some(ldprUriFull.lastPathSegment), graph)
           res  <- getResource(rUri)
-          _    <- createLDPR( res.acl, graphCardACL )
+          _    <- createLDPR( res.acl.map(_.lastPathSegment), graphCardACL )
         } yield res  )
       acl <- ldpc.execute(getLDPR(cardRes.acl.get))
     } yield {
@@ -202,7 +202,7 @@ abstract class LDPSTest[Rdf <: RDF](
 
     val createBin = for {
       ldpc <- ldps.createLDPC(ldpcUri)
-      bin <- ldpc.execute(createBinary(Some(binUri)))
+      bin <- ldpc.execute(createBinary(Some(binUri.lastPathSegment)))
       it = bin.write
       newbin <- Enumerator(helloWorldBinary).apply(it)
       newres <- newbin.run
@@ -263,7 +263,7 @@ abstract class LDPSTest[Rdf <: RDF](
     val ldprUri = URI("http://example.com/foo3/betehess")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(Some(ldprUri), graph))
+      rUri <- ldpc.execute(createLDPR(Some(ldprUri.lastPathSegment), graph))
     } yield {
       rUri must be(ldprUri)
     }
