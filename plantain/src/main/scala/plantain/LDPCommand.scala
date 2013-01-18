@@ -7,9 +7,9 @@ import scalaz.Free.Return
 
 sealed trait LDPCommand[Rdf <: RDF, +A]
 
-case class CreateLDPR[Rdf <: RDF, A](uri: Option[Rdf#URI], graph: Rdf#Graph, k: Rdf#URI => A) extends LDPCommand[Rdf, A]
+case class CreateLDPR[Rdf <: RDF, A](slug: Option[String], graph: Rdf#Graph, k: Rdf#URI => A) extends LDPCommand[Rdf, A]
 
-case class CreateBinary[Rdf <: RDF, A](uri: Option[Rdf#URI], k: BinaryResource[Rdf] => A ) extends LDPCommand[Rdf, A]
+case class CreateBinary[Rdf <: RDF, A](slug: Option[String], k: BinaryResource[Rdf] => A ) extends LDPCommand[Rdf, A]
 
 case class GetMeta[Rdf<: RDF, A](uri: Rdf#URI, k: Meta[Rdf] => A ) extends LDPCommand[Rdf, A]
 
@@ -43,11 +43,11 @@ object LDPCommand {
 
   private def nop[Rdf <: RDF]: Script[Rdf, Unit] = `return`(())
 
-  def createLDPR[Rdf <: RDF](uri: Option[Rdf#URI], graph: Rdf#Graph): Script[Rdf, Rdf#URI] =
-    suspend(CreateLDPR(uri, graph, uri => `return`(uri)))
+  def createLDPR[Rdf <: RDF](slug: Option[String], graph: Rdf#Graph): Script[Rdf, Rdf#URI] =
+    suspend(CreateLDPR(slug, graph, uri => `return`(uri)))
 
-  def createBinary[Rdf <: RDF](uri: Option[Rdf#URI]): Script[Rdf, BinaryResource[Rdf]] =
-    suspend(CreateBinary(uri, bin => `return`(bin)))
+  def createBinary[Rdf <: RDF](slug: Option[String]): Script[Rdf, BinaryResource[Rdf]] =
+    suspend(CreateBinary(slug, bin => `return`(bin)))
 
 
   def getLDPR[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, Rdf#Graph] =

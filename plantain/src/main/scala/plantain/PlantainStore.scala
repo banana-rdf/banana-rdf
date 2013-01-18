@@ -211,14 +211,14 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
   final def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
     import PlantainOps._
     script.resume match {
-      case -\/(CreateLDPR(uriOpt, graph, k)) => {
-        val (uri, pathSegment) = deconstruct(uriOpt)
+      case -\/(CreateLDPR(slugOpt, graph, k)) => {
+        val (uri, pathSegment) = deconstruct(slugOpt)
         val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
         LDPRs.put(pathSegment, ldpr)
         run(coordinated, k(uri))
       }
-      case -\/(CreateBinary(uriOpt, k)) => {
-        val (uri, pathSegment) = deconstruct(uriOpt)
+      case -\/(CreateBinary(slugOpt, k)) => {
+        val (uri, pathSegment) = deconstruct(slugOpt)
         //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
         val bin = PlantainBinary(root,uri)
         NonLDPRs.put(pathSegment, bin)
@@ -249,10 +249,10 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
           throw new NoSuchElementException(s"Resource does not exist at $uri with path segment '$pathSegment'")
         }
         val temp = remove.foldLeft(graph) {
-          (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri)
+          (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri.resolveAgainst(baseUri))
         }
         val resultGraph = add.foldLeft(temp) {
-          (graph, triple) => graph + triple.resolveAgainst(uri)
+          (graph, triple) => graph + triple.resolveAgainst(uri.resolveAgainst(baseUri))
         }
         val ldpr = PlantainLDPR(uri, resultGraph)
         LDPRs.put(pathSegment, ldpr)
@@ -291,7 +291,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
   }
 
 
-  protected def deconstruct[A](uriOpt: Option[Plantain#URI]): (Plantain#URI, String) = {
+  protected def deconstruct[A](uriOpt: Option[String])(implicit t: InTxn): (Plantain#URI, String) = {
     import PlantainLDPS.randomPathSegment
     uriOpt match {
       case None => {
@@ -299,7 +299,11 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
         val uri = baseUri / pathSegment
         (uri, pathSegment)
       }
-      case Some(uri) => (uri, uri.lastPathSegment)
+      case Some(slug) => {
+         val safeSlug = slug.replace('/','_')
+         if (LDPRs.get(safeSlug) == None) (baseUri/safeSlug,safeSlug)
+         else deconstruct(None)
+      }
     }
   }
 
