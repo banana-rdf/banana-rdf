@@ -9,7 +9,7 @@ sealed trait LDPCommand[Rdf <: RDF, +A]
 
 case class CreateLDPR[Rdf <: RDF, A](slug: Option[String], graph: Rdf#Graph, k: Rdf#URI => A) extends LDPCommand[Rdf, A]
 
-case class CreateBinary[Rdf <: RDF, A](slug: Option[String], k: BinaryResource[Rdf] => A ) extends LDPCommand[Rdf, A]
+case class CreateBinary[Rdf <: RDF, A](slug: Option[String], mime: MimeType, k: BinaryResource[Rdf] => A ) extends LDPCommand[Rdf, A]
 
 case class GetMeta[Rdf<: RDF, A](uri: Rdf#URI, k: Meta[Rdf] => A ) extends LDPCommand[Rdf, A]
 
@@ -46,8 +46,8 @@ object LDPCommand {
   def createLDPR[Rdf <: RDF](slug: Option[String], graph: Rdf#Graph): Script[Rdf, Rdf#URI] =
     suspend(CreateLDPR(slug, graph, uri => `return`(uri)))
 
-  def createBinary[Rdf <: RDF](slug: Option[String]): Script[Rdf, BinaryResource[Rdf]] =
-    suspend(CreateBinary(slug, bin => `return`(bin)))
+  def createBinary[Rdf <: RDF](slug: Option[String], mime: MimeType): Script[Rdf, BinaryResource[Rdf]] =
+    suspend(CreateBinary(slug, mime, bin => `return`(bin)))
 
 
   def getLDPR[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, Rdf#Graph] =
@@ -95,7 +95,7 @@ object LDPCommand {
 
       def map[A, B](ldpCommand: LDPCommand[Rdf, A])(f: A => B): LDPCommand[Rdf, B] =
         ldpCommand match {
-          case CreateBinary(uri, k) => CreateBinary(uri, x=> f(k(x)))
+          case CreateBinary(uri, mime, k) => CreateBinary(uri, mime, x=> f(k(x)))
           case CreateLDPR(uri, graph, k) => CreateLDPR(uri, graph, x => f(k(x)))
           case GetResource(uri, k) => GetResource(uri, x=> f(k(x)))
           case GetMeta(uri, k) => GetMeta(uri, x => f(k(x)))

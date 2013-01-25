@@ -217,7 +217,7 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
         LDPRs.put(pathSegment, ldpr)
         run(coordinated, k(uri))
       }
-      case -\/(CreateBinary(slugOpt, k)) => {
+      case -\/(CreateBinary(slugOpt, mime: MimeType, k)) => {
         val (uri, pathSegment) = deconstruct(slugOpt)
         //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
         val bin = PlantainBinary(root,uri)
@@ -334,31 +334,67 @@ object PlantainLDPS {
 
 }
 
-
+case class ParentDoesNotExist(message: String) extends Exception(message) with BananaException
+case class ResourceExists(message: String) extends Exception(message) with BananaException
+case class AccessDenied(message: String) extends Exception(message) with BananaException
 
 class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends RActor {
 
   val LDPCs = TMap.empty[URI, ActorRef] // PlantainLDPCActor
 
-  def receive = returnErrors {
-    case coordinated @ Coordinated(CreateLDPC(uri)) => coordinated atomic { implicit t =>
-      val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(uri, root)))
-      LDPCs.put(uri, ldpcActorRef)
-      val ldpc = new PlantainLDPC(uri, ldpcActorRef)
-      sender ! ldpc
-    }
-    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
-      val ldpcActorRef = LDPCs(uri)
-      val ldpc = new PlantainLDPC(uri, ldpcActorRef)
-      sender ! ldpc
-    }
-    case coordinated @ Coordinated(DeleteLDPC(uri)) => coordinated atomic { implicit t =>
-      val ldpcActorRefOpt = LDPCs.remove(uri)
-      ldpcActorRefOpt foreach { ldpcActorRef => system.stop(ldpcActorRef) }
-      sender ! ()
+  def valid(uri: URI): Option[java.net.URI] = {
+    val norm = uri.underlying.normalize()
+    if (norm.isAbsolute) {
+      sender ! akka.actor.Status.Failure ( WrongExpectation(s"collection does not fetch remote URIs such as $uri") )
+      None
+    } else if (norm.toString.startsWith("..")) {
+      sender ! akka.actor.Status.Failure ( AccessDenied(s"cannot access beneath root $baseUri as requested by $uri" ) )
+      None
+    } else {
+      Some(norm)
     }
   }
 
+  def receive = returnErrors {
+    case coordinated @ Coordinated(CreateLDPC(uri)) => coordinated atomic { implicit t =>
+      val fullUri = uri.resolveAgainst(baseUri)
+
+      valid(uri).map { normedUri =>
+        val path = root.resolve(normedUri.toString)
+
+        if (!Files.exists(path)) {
+          if (Files.exists(path.getParent)) {
+            Files.createDirectory(path)
+            val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(fullUri, path)))
+            LDPCs.put(plantain.URI(normedUri), ldpcActorRef)
+            val ldpc = new PlantainLDPC(fullUri, ldpcActorRef)
+            sender ! ldpc
+          } else {
+            sender ! akka.actor.Status.Failure(
+              ParentDoesNotExist("parent resource does not exist for " + fullUri + " create it first."))
+          }
+        } else {
+          sender ! akka.actor.Status.Failure(ResourceExists(s"collection at $baseUri with name $path exists"))
+        }
+      }
+    }
+    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
+      val ldpcActorRef = LDPCs(uri)
+      val ldpc = new PlantainLDPC(uri.resolveAgainst(baseUri), ldpcActorRef)
+      sender ! ldpc
+    }
+    case coordinated @ Coordinated(DeleteLDPC(uri)) => coordinated atomic { implicit t =>
+      valid(uri).map { normedUri =>
+        val LDPCsubset = LDPCs.retain{ case (path,_) => path.toString.startsWith(normedUri.toString) }
+        LDPCsubset foreach { case (_, ldpcActorRef) => system.stop(ldpcActorRef) }
+        import scalax.file.Path
+        //todo: do we loose something by not using java7's Path?
+        //for more on scalax.io see http://daily-scala.blogspot.fr/2012/07/introducing-scala-io-this-is-start-of.html
+        Path(root.resolve(normedUri.toString).toFile).deleteRecursively(true)
+        sender ! ()
+      }
+    }
+  }
 }
 
 class PlantainLDPS(val baseUri: URI, root: Path)(implicit timeout: Timeout) extends LDPS[Plantain] {
@@ -372,15 +408,15 @@ class PlantainLDPS(val baseUri: URI, root: Path)(implicit timeout: Timeout) exte
   }
 
   def createLDPC(uri: URI): Future[PlantainLDPC] = {
-    (ldpsActorRef ? Coordinated(CreateLDPC(uri.resolveAgainst(baseUri)))).asInstanceOf[Future[PlantainLDPC]]
+    (ldpsActorRef ? Coordinated(CreateLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
   }
 
   def getLDPC(uri: URI): Future[PlantainLDPC] = {
-    (ldpsActorRef ? Coordinated(GetLDPC(uri.resolveAgainst(baseUri)))).asInstanceOf[Future[PlantainLDPC]]
+    (ldpsActorRef ? Coordinated(GetLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
   }
 
   def deleteLDPC(uri: URI): Future[Unit] = {
-    (ldpsActorRef ? Coordinated(DeleteLDPC(uri.resolveAgainst(baseUri)))).asInstanceOf[Future[Unit]]
+    (ldpsActorRef ? Coordinated(DeleteLDPC(uri))).asInstanceOf[Future[Unit]]
   }
 
 }
