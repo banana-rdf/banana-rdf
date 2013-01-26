@@ -25,6 +25,7 @@ import org.w3.banana.plantain.PlantainLDPS.DeleteLDPC
 import org.w3.banana.plantain.PlantainLDPS.GetLDPC
 import org.w3.banana.plantain.PlantainLDPS.CreateLDPC
 import org.w3.banana.plantain.PlantainLDPS.Script
+import java.net.{URI=>jURI}
 
 trait RActor extends Actor {
   def returnErrors[A,B](pf: Receive): Receive = new PartialFunction[Any,Unit] {
@@ -340,10 +341,13 @@ case class AccessDenied(message: String) extends Exception(message) with BananaE
 
 class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends RActor {
 
-  val LDPCs = TMap.empty[URI, ActorRef] // PlantainLDPCActor
+  val LDPCs = {
+    val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(baseUri, root)))
+    TMap((URI(new jURI(""))->ldpcActorRef))
+  } // PlantainLDPCActor
 
-  def valid(uri: URI): Option[java.net.URI] = {
-    val norm = uri.underlying.normalize()
+  def valid(uri: URI): Option[jURI] = {
+    val norm = baseUri.underlying.relativize(uri.underlying.normalize())
     if (norm.isAbsolute) {
       sender ! akka.actor.Status.Failure ( WrongExpectation(s"collection does not fetch remote URIs such as $uri") )
       None
@@ -361,25 +365,24 @@ class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit 
 
       valid(uri).map { normedUri =>
         val path = root.resolve(normedUri.toString)
-
-        if (!Files.exists(path)) {
+       if (Files.exists(path)) {
+          sender ! akka.actor.Status.Failure(ResourceExists(s"collection at <$baseUri> with name '$normedUri'exists"))
+        } else {
           if (Files.exists(path.getParent)) {
             Files.createDirectory(path)
             val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(fullUri, path)))
-            LDPCs.put(plantain.URI(normedUri), ldpcActorRef)
+            LDPCs.put(URI(normedUri), ldpcActorRef)
             val ldpc = new PlantainLDPC(fullUri, ldpcActorRef)
             sender ! ldpc
           } else {
             sender ! akka.actor.Status.Failure(
-              ParentDoesNotExist("parent resource does not exist for " + fullUri + " create it first."))
+              ParentDoesNotExist(s"parent does not exist for <$fullUri> create it first."))
           }
-        } else {
-          sender ! akka.actor.Status.Failure(ResourceExists(s"collection at $baseUri with name $path exists"))
         }
       }
     }
     case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
-      val ldpcActorRef = LDPCs(uri)
+      val ldpcActorRef = LDPCs(URI(baseUri.underlying.relativize(uri.underlying)))
       val ldpc = new PlantainLDPC(uri.resolveAgainst(baseUri), ldpcActorRef)
       sender ! ldpc
     }

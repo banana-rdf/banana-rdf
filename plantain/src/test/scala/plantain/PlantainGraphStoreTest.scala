@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 
 class PlantainLDPSTest extends LDPSTest[Plantain]({
   val dir = Files.createTempDirectory("plantain")
-  PlantainLDPS(URI.fromString("http://example.com/foo"), dir)
+  PlantainLDPS(URI.fromString("http://example.com/foo/"), dir)
 })
 
 abstract class LDPSTest[Rdf <: RDF](
@@ -30,8 +30,8 @@ abstract class LDPSTest[Rdf <: RDF](
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACL[Rdf]
 
-  val betehess = URI("http://example.com/betehess/card#me")
-  val betehessCard = URI("http://example.com/betehess/card")
+  val betehess = URI("http://example.com/foo/bertails/card#me")
+  val betehessCard = URI("http://example.com/foo/bertails/card")
 
   override def afterAll(): Unit = {
     ldps.shutdown()
@@ -73,7 +73,7 @@ abstract class LDPSTest[Rdf <: RDF](
   ).graph
 
   val foo: Rdf#Graph = (
-    URI("http://example.com/foo")
+    URI("http://example.com/foo/")
     -- rdf("foo") ->- "foo"
     -- rdf("bar") ->- "bar"
   ).graph
@@ -83,13 +83,12 @@ abstract class LDPSTest[Rdf <: RDF](
   val helloWorldBinary2 = "Hello, World!".getBytes("UTF-8")
 
   "CreateLDPR should create an LDPR with the given graph -- with given uri" in {
-    val ldpcUri = URI("http://example.com/foo1")
-    val ldprUri = URI("http://example.com/foo1/betehess")
+    val ldpcUri = URI("http://example.com/foo/")
+    val ldprUri = URI("http://example.com/foo/betehess")
     val script = for {
-      ldpc <- ldps.createLDPC(ldpcUri)
+      ldpc <- ldps.getLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(Some(ldprUri.lastPathSegment), graph))
       rGraph <- ldpc.execute(getLDPR(ldprUri))
-      _ <- ldps.deleteLDPC(ldpcUri)
     } yield {
       rUri must be(ldprUri)
       assert(rGraph isIsomorphicWith graph)
@@ -98,7 +97,7 @@ abstract class LDPSTest[Rdf <: RDF](
   }
 
   "CreateLDPR should create an LDPR with the given graph -- no given uri" in {
-    val ldpcUri = URI("http://example.com/foo2")
+    val ldpcUri = URI("http://example.com/foo/test2/")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(None, graph))
@@ -113,11 +112,11 @@ abstract class LDPSTest[Rdf <: RDF](
 
 
   "CreateLDPC & LDPR with ACLs" in {
-    val ldpcUri = URI("http://example.com/betehess/")
-    val ldpcMetaFull = URI("http://example.com/betehess/;meta")
+    val ldpcUri = URI("http://example.com/foo/bertails/")
+    val ldpcMetaFull = URI("http://example.com/foo/bertails/;meta")
     val ldprUri = URI("card")
     val ldprUriFull = betehessCard
-    val ldprMeta = URI("http://example.com/betehess/card;meta")
+    val ldprMeta = URI("http://example.com/foo/bertails/card;meta")
 
     //create container with ACLs
     val createContainerScript = for {
@@ -196,13 +195,13 @@ abstract class LDPSTest[Rdf <: RDF](
   }
 
   "Create Binary" in {
-    val ldpcUri = URI("http://example.com/foocb")
-    val binUri = URI("http://example.com/foocb/img.jpg")
-    val ldprMeta = URI("http://example.com/foocb/img.jpg;meta")
+    val ldpcUri = URI("http://example.com/foo/cb/")
+    val binUri = URI("http://example.com/foo/cb/img.jpg")
+    val ldprMeta = URI("http://example.com/foo/cb/img.jpg;meta")
 
     val createBin = for {
       ldpc <- ldps.createLDPC(ldpcUri)
-      bin <- ldpc.execute(createBinary(Some(binUri.lastPathSegment)))
+      bin <- ldpc.execute(createBinary(Some(binUri.lastPathSegment),MimeType("text/html")))
       it = bin.write
       newbin <- Enumerator(helloWorldBinary).apply(it)
       newres <- newbin.run
@@ -259,8 +258,8 @@ abstract class LDPSTest[Rdf <: RDF](
 
 
   "appendToGraph should be equivalent to graph union" in {
-    val ldpcUri = URI("http://example.com/foo3")
-    val ldprUri = URI("http://example.com/foo3/betehess")
+    val ldpcUri = URI("http://example.com/foo/3/")
+    val ldprUri = URI("http://example.com/foo/3/betehess")
     val script = for {
       ldpc <- ldps.createLDPC(ldpcUri)
       rUri <- ldpc.execute(createLDPR(Some(ldprUri.lastPathSegment), graph))
