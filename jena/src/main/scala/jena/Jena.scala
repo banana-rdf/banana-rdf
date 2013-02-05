@@ -34,7 +34,7 @@ object Jena {
 
   implicit val ops: RDFOps[Jena] = JenaOperations
 
-  implicit val diesel: Diesel[Jena] = JenaDiesel
+  implicit val recordBinder: binder.RecordBinder[Jena] = binder.RecordBinder[Jena]
 
   implicit val sparqlOps: SparqlOps[Jena] = JenaSparqlOps
 

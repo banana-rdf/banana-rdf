@@ -19,6 +19,4 @@ object PointedGraph {
   def apply[Rdf <: RDF](node: Rdf#Node)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] =
     PointedGraph[Rdf](node, ops.emptyGraph)
 
-  implicit def toPointedGraphW[Rdf <: RDF](pointed: PointedGraph[Rdf]): PointedGraphW[Rdf] = new PointedGraphW[Rdf](pointed)
-
 }

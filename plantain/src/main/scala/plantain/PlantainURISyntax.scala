@@ -4,7 +4,14 @@ import org.w3.banana._
 import org.w3.banana.plantain.model._
 import java.net.{ URI => jURI }
 
-class PlantainURISyntax(val uri: URI) extends AnyVal with syntax.URISyntax[Plantain] {
+/** offers an alternative to the default URISyntax implementation in the case of plantain */
+object PlantainURISyntax {
+
+  implicit def uriSyntax(uri: Plantain#URI): syntax.URIW[Plantain] = new PlantainURISyntax(uri)
+
+}
+
+class PlantainURISyntax(val uri: URI) extends AnyVal with syntax.URIW[Plantain] {
 
   def getString(implicit ops: RDFOps[Plantain]): String = uri.underlying.toString
 

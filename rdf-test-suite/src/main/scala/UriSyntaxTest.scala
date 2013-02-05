@@ -1,11 +1,12 @@
-package org.w3.banana
+package org.w3.banana.syntax
 
+import org.w3.banana._
+import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 
-abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
+abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with MustMatchers {
 
-  import diesel._
   import ops._
 
   ".fragmentLess should remove the fragment part of a URI" in {

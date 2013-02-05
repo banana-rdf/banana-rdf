@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.binder._
+import org.w3.banana.diesel._
 import scala.util._
 
 class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Graph) extends Iterable[PointedGraph[Rdf]] {
@@ -28,7 +30,7 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
     }
   }
 
-  def exactlyOneAs[T](implicit binder: PointedGraphBinder[Rdf, T]): Try[T] =
+  def exactlyOneAs[T](implicit fromPG: FromPG[Rdf, T]): Try[T] =
     exactlyOnePointedGraph flatMap (_.as[T])
 
   def exactlyOnePointedGraph: Try[PointedGraph[Rdf]] = {
@@ -44,10 +46,10 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
     }
   }
 
-  def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Try[T] =
+  def as[T](implicit fromPG: FromPG[Rdf, T]): Try[T] =
     takeOnePointedGraph flatMap (_.as[T])
 
-  def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Try[(T1, T2)] =
+  def as2[T1, T2](implicit fromPG1: FromPG[Rdf, T1], fromPG2: FromPG[Rdf, T2]): Try[(T1, T2)] =
     takeOnePointedGraph flatMap { _.as2[T1, T2] }
 
   /**
@@ -56,12 +58,12 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
    *
    * note: this is very different from as[Option[T]], which is an encoding of an Option in RDF
    */
-  def asOption[T](implicit binder: PointedGraphBinder[Rdf, T]): Try[Option[T]] = headOption match {
+  def asOption[T](implicit fromPG: FromPG[Rdf, T]): Try[Option[T]] = headOption match {
     case None => Success(None)
     case Some(pointed) => pointed.as[T] map (Some(_))
   }
 
-  def asOption2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Try[Option[(T1, T2)]] = headOption match {
+  def asOption2[T1, T2](implicit fromPG1: FromPG[Rdf, T1], fromPG2: FromPG[Rdf, T2]): Try[Option[(T1, T2)]] = headOption match {
     case None => Success(None)
     case Some(pointed) =>
       for {
@@ -72,16 +74,16 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
 
   /**
    * sees the nodes for this PointedGraphs as an iterator, after they were bound successfully to
-   * a T thought an implicit PointedGraphBinder.
+   * a T thought an implicit PGBinder.
    * it is a success only if all the bindings were successful themselves
    *
    * note: this is very different from as[List[T]], which is an encoding of a List in RDF
    */
-  def asSet[T](implicit binder: PointedGraphBinder[Rdf, T]): Try[Set[T]] = Try {
-    this.iterator.foldLeft[Set[T]](Set.empty[T]){ case (acc, pg) => acc + binder.fromPointedGraph(pg).get }
+  def asSet[T](implicit fromPG: FromPG[Rdf, T]): Try[Set[T]] = Try {
+    this.iterator.foldLeft[Set[T]](Set.empty[T]){ case (acc, pg) => acc + fromPG.fromPG(pg).get }
   }
 
-  def asSet2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Try[Set[(T1, T2)]] =
+  def asSet2[T1, T2](implicit fromPG1: FromPG[Rdf, T1], fromPG2: FromPG[Rdf, T2]): Try[Set[(T1, T2)]] =
     this.iterator.foldLeft[Try[Set[(T1, T2)]]](Success(Set.empty)){ case (accT, g) =>
       for {
         acc <- accT

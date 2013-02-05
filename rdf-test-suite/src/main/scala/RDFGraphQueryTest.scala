@@ -1,19 +1,20 @@
 package org.w3.banana
 
+import org.w3.banana.diesel._
+import org.w3.banana.syntax._
 import org.scalatest._
 import org.scalatest.matchers._
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
 import scalax.io._
 
 class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
-    implicit diesel: Diesel[Rdf],
+    implicit ops: RDFOps[Rdf],
     reader: RDFReader[Rdf, RDFXML],
     sparqlOperations: SparqlOps[Rdf],
     graphQuery: RDFGraphQuery[Rdf],
     sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
-  import diesel._
   import ops._
   import sparqlOperations._
 

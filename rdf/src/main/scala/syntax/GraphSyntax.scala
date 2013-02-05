@@ -2,7 +2,15 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-class GraphSyntax[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
+trait GraphSyntax {
+
+  implicit def graphW[Rdf <: RDF](graph: Rdf#Graph) = new GraphW[Rdf](graph)
+
+}
+
+object GraphSyntax extends GraphSyntax
+
+class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
 
   def toIterable(implicit ops: RDFOps[Rdf]): Iterable[Rdf#Triple] = ops.graphToIterable(graph)
 

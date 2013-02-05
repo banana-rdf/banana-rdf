@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.syntax._
+
 import scalaz._
 import scalaz.Scalaz._
 import Id._
@@ -49,7 +51,9 @@ object Command {
 
   def POSTToCollection[Rdf <: RDF](collection: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#URI] = {
     import ops._
-    val fragment = pointed.pointer.as[Rdf#URI].get
+    import org.w3.banana.binder._
+    val AsURI = implicitly[PGBinder[Rdf, Rdf#URI]]
+    val fragment = AsURI.fromPG(pointed).get
     // was:
     //  pointed.pointer.as[Rdf#URI] flatMap { uri =>
     //    if (uri.isPureFragment) Success(uri) else Failure(NotPureFragment)

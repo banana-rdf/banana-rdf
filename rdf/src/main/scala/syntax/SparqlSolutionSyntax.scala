@@ -3,7 +3,13 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import scala.util._
 
-class SparqlSolutionSyntax[Rdf <: RDF](val solution: Rdf#Solution) extends AnyVal {
+trait SparqlSolutionSyntax {
+
+  implicit def sparqlSolutionSyntax[Rdf <: RDF](solution: Rdf#Solution) = new SparqlSolutionSyntaxW[Rdf](solution)
+
+}
+
+class SparqlSolutionSyntaxW[Rdf <: RDF](val solution: Rdf#Solution) extends AnyVal {
 
   def apply(v: String)(implicit sparqlOps: SparqlOps[Rdf]): Try[Rdf#Node] =
     sparqlOps.getNode(solution, v)

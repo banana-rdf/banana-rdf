@@ -3,7 +3,6 @@ package org.w3.banana.jena.util
 import org.w3.banana._
 import org.w3.banana.jena._
 import org.w3.banana.jena.JenaOperations._
-import org.w3.banana.jena.JenaDiesel._
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.datatypes.TypeMapper

@@ -81,34 +81,8 @@ trait RDFOps[Rdf <: RDF]
   // graph isomorphism
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
 
-  // implicits
-
-  implicit def graphSyntax(graph: Rdf#Graph): syntax.GraphSyntax[Rdf] = new syntax.GraphSyntax[Rdf](graph)
-
-  implicit def tripleMatchSyntax(tripleMatch: TripleMatch[Rdf]): syntax.TripleMatchSyntax[Rdf] = new syntax.TripleMatchSyntax[Rdf](tripleMatch)
-
-  implicit def tripleSyntax(triple: Rdf#Triple): syntax.TripleSyntax[Rdf] = new syntax.TripleSyntax[Rdf](triple)
-
-  implicit def nodeMatchSyntax(nodeMatch: Rdf#NodeMatch): syntax.NodeMatchSyntax[Rdf] = new syntax.NodeMatchSyntax[Rdf](nodeMatch)
-
-  implicit def nodeSyntax(node: Rdf#Node): syntax.NodeSyntax[Rdf] = new syntax.NodeSyntax[Rdf](node)
-
-  implicit def uriSyntax(uri: Rdf#URI): syntax.URISyntax[Rdf] = new syntax.URISyntaxDefault[Rdf](uri)
-
-  implicit def literalSyntax(literal: Rdf#Literal): syntax.LiteralSyntax[Rdf] = new syntax.LiteralSyntax[Rdf](literal)
-
-  implicit def typedLiteralSyntax(tl: Rdf#TypedLiteral): syntax.TypedLiteralSyntax[Rdf] = new syntax.TypedLiteralSyntax[Rdf](tl)
-
-  implicit def langLiteralSyntax(ll: Rdf#LangLiteral): syntax.LangLiteralSyntax[Rdf] = new syntax.LangLiteralSyntax[Rdf](ll)
-
-  implicit def stringSyntax(s: String): syntax.StringSyntax = new syntax.StringSyntax(s)
-
-  implicit def anySyntax[T](t: T): syntax.AnySyntax[Rdf, T] = new syntax.AnySyntax[Rdf, T](t)
-
-  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): syntax.SparqlSolutionSyntax[Rdf] = new syntax.SparqlSolutionSyntax[Rdf](solution)
-
-  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions): syntax.SparqlSolutionsSyntax[Rdf] = new syntax.SparqlSolutionsSyntax[Rdf](solutions)
-
-  implicit def toPointedGraphW(node: Rdf#Node)(implicit ops: RDFOps[Rdf]): PointedGraphW[Rdf] = new PointedGraphW[Rdf](PointedGraph(node)(ops))
+//  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): syntax.SparqlSolutionSyntax[Rdf] = new syntax.SparqlSolutionSyntax[Rdf](solution)
+//
+//  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions): syntax.SparqlSolutionsSyntax[Rdf] = new syntax.SparqlSolutionsSyntax[Rdf](solutions)
 
 }

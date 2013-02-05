@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.syntax._
+import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers._
 import scala.concurrent._
@@ -8,11 +10,11 @@ import scalaz._
 import Scalaz._
 
 class GraphStoreTest[Rdf <: RDF](
-    store: RDFStore[Rdf, Future])(
-        implicit diesel: Diesel[Rdf],
-        reader: RDFReader[Rdf, RDFXML]) extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
+  store: RDFStore[Rdf, Future])(
+  implicit ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, RDFXML])
+    extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
 
-  import diesel._
   import ops._
 
   val foaf = FOAFPrefix[Rdf]

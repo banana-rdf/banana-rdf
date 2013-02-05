@@ -1,18 +1,21 @@
-package org.w3.banana
+package org.w3.banana.diesel
 
+import org.w3.banana._
+import org.w3.banana.binder._
+import org.w3.banana.syntax._
 import scala.util._
 
 class PointedGraphW[Rdf <: RDF](val pointed: PointedGraph[Rdf]) extends AnyVal {
 
   import pointed.graph
 
-  def as[T](implicit binder: PointedGraphBinder[Rdf, T]): Try[T] =
-    binder.fromPointedGraph(pointed)
+  def as[T](implicit fromPG: FromPG[Rdf, T]): Try[T] =
+    fromPG.fromPG(pointed)
 
-  def as2[T1, T2](implicit b1: PointedGraphBinder[Rdf, T1], b2: PointedGraphBinder[Rdf, T2]): Try[(T1, T2)] =
+  def as2[T1, T2](implicit fromPG1: FromPG[Rdf, T1], fromPG2: FromPG[Rdf, T2]): Try[(T1, T2)] =
     for {
-      t1 <- b1.fromPointedGraph(pointed)
-      t2 <- b2.fromPointedGraph(pointed)
+      t1 <- fromPG1.fromPG(pointed)
+      t2 <- fromPG2.fromPG(pointed)
     } yield (t1, t2)
 
   def a(clazz: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {

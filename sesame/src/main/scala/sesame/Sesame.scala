@@ -38,7 +38,7 @@ object Sesame {
 
   implicit val ops: RDFOps[Sesame] = SesameOperations
 
-  implicit val diesel: Diesel[Sesame] = SesameDiesel
+  implicit val recordBinder: binder.RecordBinder[Sesame] = binder.RecordBinder[Sesame]
 
   implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 

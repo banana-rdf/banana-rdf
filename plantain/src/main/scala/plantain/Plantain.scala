@@ -35,7 +35,7 @@ object Plantain {
 
   implicit val ops: RDFOps[Plantain] = PlantainOps
 
-  implicit val diesel: Diesel[Plantain] = PlantainDiesel
+  implicit val recordBinder: binder.RecordBinder[Plantain] = binder.RecordBinder[Plantain]
 
   implicit val sparqlOps: SparqlOps[Plantain] = PlantainSparqlOps
 

@@ -1,17 +1,18 @@
 package org.w3.banana
 
+import org.w3.banana.syntax._
+import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 import java.io._
 import scalax.io._
 import org.scalatest.EitherValues._
 
-abstract class TurtleTestSuite[Rdf <: RDF]()(implicit val diesel: Diesel[Rdf])
+abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     extends WordSpec with MustMatchers {
 
   val reader: RDFReader[Rdf, Turtle]
   val writer: RDFWriter[Rdf, Turtle]
-  import diesel._
   import ops._
 
   import org.scalatest.matchers.{ BeMatcher, MatchResult }
