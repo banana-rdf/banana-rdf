@@ -52,24 +52,41 @@ object SesameOperations extends RDFOps[Sesame] {
    * we provide our own builder for Sesame#URI to relax the constraint "the URI must be absolute"
    * this constraint becomes relevant only when you add the URI to a Sesame store
    */
-  def makeUri(iriStr: String): Sesame#URI =
+  def makeUri(iriStr: String): Sesame#URI = {
     try {
-      valueFactory.createURI(iriStr).asInstanceOf[Sesame#URI]
+      new URIImpl(iriStr)
     } catch {
-      case e: Exception =>
-        if (iriStr.nonEmpty && iriStr.charAt(0) == '#')
-          new URI {
-            override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == this.toString
-            def getLocalName: String = iriStr
-            def getNamespace: String = ""
-            override def hashCode: Int = iriStr.hashCode
-            override def toString: String = iriStr
-            def stringValue: String = iriStr
-          }
-        else {
-          throw e
+      case iae: IllegalArgumentException =>
+        new URI {
+          override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == iriStr
+          def getLocalName: String = iriStr
+          def getNamespace: String = ""
+          override def hashCode: Int = iriStr.hashCode
+          override def toString: String = iriStr
+          def stringValue: String = iriStr
         }
     }
+
+  }
+
+
+//    try {
+//      valueFactory.createURI(iriStr).asInstanceOf[Sesame#URI]
+//    } catch {
+//      case e: Exception =>
+//        if (iriStr.nonEmpty && iriStr.charAt(0) == '#')
+//          new URI {
+//            override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == this.toString
+//            def getLocalName: String = iriStr
+//            def getNamespace: String = ""
+//            override def hashCode: Int = iriStr.hashCode
+//            override def toString: String = iriStr
+//            def stringValue: String = iriStr
+//          }
+//        else {
+//          throw e
+//        }
+//    }
 
   def fromUri(node: Sesame#URI): String = node.toString
 

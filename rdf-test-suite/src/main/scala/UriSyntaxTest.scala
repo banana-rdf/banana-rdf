@@ -44,7 +44,7 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
     /* URI("bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/bar")) */
   }
 
-  "should be able to create and work with relative URIs" taggedAs(SesameWIP) in {
+  "should be able to create and work with relative URIs" in {
     val me = URI("/people/card/henry#me")
     me.fragment must be(Some("me"))
     me.fragmentLess must be(URI("/people/card/henry"))
