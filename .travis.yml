@@ -1,7 +1,7 @@
 before_install:
   - sudo dpkg -r sbt
   - sudo rm /usr/bin/sbt
-  - wget http://scalasbt.artifactoryonline.com/scalasbt/sbt-native-packages/org/scala-sbt/sbt/0.12.2/sbt.deb
+  - wget http://scalasbt.artifactoryonline.com/scalasbt/sbt-native-packages/org/scala-sbt/sbt/0.12.2/sbt.deb -O /tmp/sbt.deb
   - sudo dpkg -i /tmp/sbt.deb
 language: scala
 scala:
