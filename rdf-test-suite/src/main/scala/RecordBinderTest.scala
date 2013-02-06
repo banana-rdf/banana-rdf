@@ -22,13 +22,21 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordB
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] must be(Success(city))
+
+    val expectedGraph = (
+      URI("http://example.com/Paris").a(City.clazz)
+        -- foaf("cityName") ->- "Paris"
+        -- foaf("otherNames") ->- "Panam"
+        -- foaf("otherNames") ->- "Lutetia"
+    ).graph
+    city.toPG.graph.isIsomorphicWith(expectedGraph) must be(true)
   }
 
-  "graph constant poitner" in {
+  "graph constant pointer" in {
     me.toPG.pointer must be(URI("http://example.com#me"))
   }
 
-  "graph poitner baised on record fields" in {
+  "graph pointer based on record fields" in {
     city.toPG.pointer must be(URI("http://example.com/Paris"))
   }
 
