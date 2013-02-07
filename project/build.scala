@@ -17,6 +17,7 @@ object BuildSettings {
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
 
     parallelExecution in Test := false,
+    offline := true,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
@@ -153,7 +154,8 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
-      plantain))
+      plantain,
+      examples))
   
   lazy val rdf = Project(
     id = "banana-rdf",
@@ -214,6 +216,12 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
+
+  lazy val examples = Project(
+    id = "examples",
+    base = file("examples"),
+    settings = buildSettings
+  ) dependsOn (sesame, jena)
 
   // this is _experimental_
   // please do not add this projet to the main one
