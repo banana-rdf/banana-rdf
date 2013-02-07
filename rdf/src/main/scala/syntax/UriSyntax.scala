@@ -5,7 +5,7 @@ import java.net.{ URI => jURI }
 
 trait URISyntax {
 
-  implicit def uriW[Rdf <: RDF](uri: Rdf#URI) = new URIWDefault(uri)
+  implicit def uriW[Rdf <: RDF](uri: Rdf#URI): URIW[Rdf] = new URIWDefault(uri)
 
 }
 
