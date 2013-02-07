@@ -1,5 +1,11 @@
 package org.w3.banana
 
+object RDFOps {
+
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]): RDFOps[Rdf] = ops
+
+}
+
 /**
  * A Module that gathers the types needed to define an RDF implementation
  * Closely based on
