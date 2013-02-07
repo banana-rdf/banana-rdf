@@ -30,7 +30,9 @@ trait Jena extends RDF {
   type Solutions = ResultSet
 }
 
-object Jena {
+object Jena extends JenaModule
+
+trait JenaModule {
 
   implicit val ops: RDFOps[Jena] = JenaOperations
 
