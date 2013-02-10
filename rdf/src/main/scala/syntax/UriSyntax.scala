@@ -7,6 +7,8 @@ trait URISyntax {
 
   implicit def uriW[Rdf <: RDF](uri: Rdf#URI): URIW[Rdf] = new URIWDefault(uri)
 
+  def foo() = ()
+
 }
 
 object URISyntax extends URISyntax

@@ -10,7 +10,7 @@ object IOExample {
   import org.w3.banana._
   import scala.util.Properties
   import java.io.File
-  import scalax.io.{ OutputResource, Resource }
+  import scalax.io.Resource
 
   // just because we can :-)
   implicit class FileW(val file: File) extends AnyVal {
@@ -53,6 +53,21 @@ object IOExample {
     val graph10Triples = Graph(graph.toIterable.take(10).toSet)
     val graphAsString = writer.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsString)
+  }
+
+}
+
+object SPARQLExample {
+
+  import org.w3.banana._
+
+  def main(args: Array[String]): Unit = {
+    val ops = RDFOps[Rdf]
+    import ops._
+    val sparqlOps = SparqlOps[Rdf]
+    import sparqlOps._
+
+    ()
   }
 
 }

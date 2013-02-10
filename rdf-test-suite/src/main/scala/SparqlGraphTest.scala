@@ -7,11 +7,11 @@ import org.scalatest.matchers._
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
 import scalax.io._
 
-class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
+class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
     implicit ops: RDFOps[Rdf],
     reader: RDFReader[Rdf, RDFXML],
     sparqlOperations: SparqlOps[Rdf],
-    graphQuery: RDFGraphQuery[Rdf],
+    sparqlGraph: SparqlGraph[Rdf],
     sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
     sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
 
@@ -23,7 +23,7 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
   val resource = Resource.fromFile("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(resource, "http://foo.com").get
-  val sparqlEngine = graphQuery.makeSparqlEngine(graph)
+  val sparqlEngine = sparqlGraph(graph)
 
   "SELECT DISTINCT query in new-tr.rdf " should {
     val selectQueryStr = """prefix : <http://www.w3.org/2001/02pd/rec54#>
@@ -107,17 +107,17 @@ class RDFGraphQueryTest[Rdf <: RDF, SyntaxType]()(
          | ASK { ?thing :editor [ <http://xmlns.com/foaf/0.1/name> ?name ] }""".stripMargin)
 
     "simple graph contains at least one named person" in {
-      val personInFoaf = graphQuery.makeSparqlEngine(simple.graph).executeAsk(yesQuery)
+      val personInFoaf = sparqlGraph(simple.graph).executeAsk(yesQuery)
       assert(personInFoaf, " query " + yesQuery + " must return true")
     }
 
     "simple graph contains no foaf:knows relation" in {
-      val knowRelInFoaf = graphQuery.makeSparqlEngine(simple.graph).executeAsk(noQuery)
+      val knowRelInFoaf = sparqlGraph(simple.graph).executeAsk(noQuery)
       assert(!knowRelInFoaf, " query " + noQuery + " must return false")
     }
 
     "more advanced query is ok" in {
-      val objectHasNamedEditor = graphQuery.makeSparqlEngine(simple.graph).executeAsk(yesQuery2)
+      val objectHasNamedEditor = sparqlGraph(simple.graph).executeAsk(yesQuery2)
       assert(objectHasNamedEditor, " query " + yesQuery2 + " must return true")
     }
 

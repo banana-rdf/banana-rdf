@@ -3,6 +3,7 @@ package org.w3.banana.experimental
 import scala.language.reflectiveCalls
 
 import org.w3.banana._
+import org.w3.banana.syntax._
 import java.nio.file._
 import scala.concurrent._
 import scala.concurrent.stm._
@@ -113,7 +114,7 @@ case class OperationNotSupported(msg: String) extends Exception(msg)
 
 case class PlantainBinary(root: Path, uri: Plantain#URI) extends BinaryResource[Plantain] {
 
-  lazy val path = root.resolve(uri.lastPathSegment)
+  lazy val path = root.resolve(uriW(uri).lastPathSegment)
 
 
   // also should be on a metadata trait, since all resources have update times

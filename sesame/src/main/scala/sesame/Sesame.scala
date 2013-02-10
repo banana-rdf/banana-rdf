@@ -42,7 +42,7 @@ object Sesame {
 
   implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 
-  implicit val graphQuery: RDFGraphQuery[Sesame] = SesameGraphSparqlEngine
+  implicit val sparqlGraph: SparqlGraph[Sesame] = SesameSparqlGraph
 
   implicit val rdfxmlReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
 

@@ -39,7 +39,7 @@ object Plantain {
 
   implicit val sparqlOps: SparqlOps[Plantain] = PlantainSparqlOps
 
-  implicit val graphQuery: RDFGraphQuery[Plantain] = PlantainGraphSparqlEngine
+  implicit val sparqlGraph: SparqlGraph[Plantain] = PlantainSparqlGraph
 
   implicit val rdfxmlReader: RDFReader[Plantain, RDFXML] = PlantainRDFXMLReader
 

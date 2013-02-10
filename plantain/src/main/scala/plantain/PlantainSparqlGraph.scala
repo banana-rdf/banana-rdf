@@ -11,9 +11,11 @@ import scalaz.Id._
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl
 import PlantainUtil._
 
-object PlantainGraphSparqlEngine extends RDFGraphQuery[Plantain] {  
+object PlantainSparqlGraph extends PlantainSparqlGraph
 
-  def makeSparqlEngine(graph: Plantain#Graph): SparqlEngine[Plantain, Id] =
+trait PlantainSparqlGraph extends SparqlGraph[Plantain] {  
+
+  def apply(graph: Plantain#Graph): SparqlEngine[Plantain, Id] =
     new PlantainSparqlEngine(graph)
 
   class PlantainSparqlEngine(graph: Plantain#Graph) extends SparqlEngine[Plantain, Id] {

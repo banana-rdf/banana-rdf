@@ -6,43 +6,31 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import scalaz.Id._
 
-object JenaGraphSparqlEngine extends RDFGraphQuery[Jena] {
+object JenaSparqlGraph extends SparqlGraph[Jena] {
 
-  def makeSparqlEngine(graph: Jena#Graph): SparqlEngine[Jena, Id] = new SparqlEngine[Jena, Id] {
+  def apply(graph: Jena#Graph): SparqlEngine[Jena, Id] = new SparqlEngine[Jena, Id] {
 
-    lazy val querySolution = util.QuerySolution()
+    val querySolution = util.QuerySolution()
+
+    def qexec(query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
+      val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
+      if (bindings.isEmpty)
+        QueryExecutionFactory.create(query, model)
+      else
+        QueryExecutionFactory.create(query, model, querySolution.getMap(bindings))
+    }
 
     def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Jena#Solutions = {
-      val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
-      val qexec: QueryExecution =
-        if (bindings.isEmpty)
-          QueryExecutionFactory.create(query, model)
-        else
-          QueryExecutionFactory.create(query, model, querySolution.getMap(bindings))
-      val solutions = qexec.execSelect()
-      solutions
+      qexec(query, bindings).execSelect()
     }
 
     def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Jena#Graph = {
-      val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
-      val qexec: QueryExecution =
-        if (bindings.isEmpty)
-          QueryExecutionFactory.create(query, model)
-        else
-          QueryExecutionFactory.create(query, model, querySolution.getMap(bindings))
-      val result = qexec.execConstruct()
+      val result = qexec(query, bindings).execConstruct()
       BareJenaGraph(result.getGraph())
     }
 
     def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = {
-      val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
-      val qexec: QueryExecution =
-        if (bindings.isEmpty)
-          QueryExecutionFactory.create(query, model)
-        else
-          QueryExecutionFactory.create(query, model, querySolution.getMap(bindings))
-      val result = qexec.execAsk()
-      result
+      qexec(query, bindings).execAsk()
     }
   }
 
