@@ -1,6 +1,8 @@
 package org.w3.banana.syntax
 
 import org.w3.banana._
+import org.w3.banana.binder._
+import scala.util.Try
 
 trait NodeSyntax {
 
@@ -28,5 +30,8 @@ class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
   def relativizeAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
     ops.foldNode(node)(_.relativizeAgainst(baseUri), bn => bn, lit => lit)
   }
+
+  def as[T](implicit from: FromNode[Rdf, T]): Try[T] =
+    from.fromNode(node)
 
 }
