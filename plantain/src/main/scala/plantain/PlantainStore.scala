@@ -5,37 +5,59 @@ import scala.language.reflectiveCalls
 import org.w3.banana._
 import java.nio.file._
 import scala.concurrent._
-import scala.concurrent.stm._
 import akka.actor._
 import akka.util._
 import akka.pattern.ask
-import akka.transactor._
 import org.openrdf.query.algebra.evaluation.TripleSource
 import org.slf4j.LoggerFactory
 import org.w3.banana.plantain.PlantainOps._
 import annotation.tailrec
 import java.util.Date
-import play.api.libs.iteratee.{Error, Enumerator, Iteratee}
+import play.api.libs.iteratee._
 import java.io.{IOException, OutputStream}
 import scala.util.Try
+import java.net.{URI => jURI}
 import scala.Some
-import scalaz.{\/-,-\/}
+import org.w3.banana.plantain.PlantainLDPS.Cmd
+import scalaz.\/-
+import org.w3.banana.WrongExpectation
+import scalaz.-\/
 import play.api.libs.iteratee.Input.El
 import org.w3.banana.plantain.PlantainLDPS.DeleteLDPC
 import org.w3.banana.plantain.PlantainLDPS.GetLDPC
 import org.w3.banana.plantain.PlantainLDPS.CreateLDPC
 import org.w3.banana.plantain.PlantainLDPS.Script
-import java.net.{URI=>jURI}
 
 trait RActor extends Actor {
+  /**
+   * @param path of the resource
+   * @return the pair consisting of the collection and the name of the resource to make a request on
+   */
+  def split(path: String): Pair[String, String] = {
+    val i = path.lastIndexOf('/')
+    if (i <0) ("",path)
+    else (path.substring(0,i+1),path.substring(i+1,path.length))
+  }
+
   def returnErrors[A,B](pf: Receive): Receive = new PartialFunction[Any,Unit] {
     //interestingly it seems we can't catch an error here! If we do, we have to return a true or a false
     // and whatever we choose it could have bad sideffects. What happens if the isDefinedAt throws an exception?
       def isDefinedAt(x: Any): Boolean = pf.isDefinedAt(x)
-      def apply(a: Any): Unit = try { pf.apply(a) } catch {
+      def apply(a: Any): Unit = try { System.out.println(s"${context.self} received $a"); pf.apply(a) } catch {
         case e: Exception => sender ! akka.actor.Status.Failure(e)
       }
     }
+
+  def local(u: jURI, base: jURI): Option[String] = {
+    if ((!u.isAbsolute ) || (u.getScheme == base.getScheme && u.getHost == base.getHost && u.getPort == base.getPort)) {
+      if (u.getPath.startsWith(base.getPath)) {
+        val res = Some(u.getPath.substring(base.getPath.size))
+        System.out.println("res="+res)
+        res
+      } else None
+    } else None
+  }
+
 }
 
 // A resource on the server ( Resource is already taken. )
@@ -183,7 +205,7 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef, val updated: Option[Date] =
   override def toString: String = uri.toString
 
   def execute[A](script: Plantain#Script[A]): Future[A] = {
-    (actorRef ? Coordinated(Script(script))).asInstanceOf[Future[A]]
+    (actorRef ? Script(script)).asInstanceOf[Future[A]]
   }
 
   def ops = Plantain.ops
@@ -191,17 +213,18 @@ class PlantainLDPC(val uri: URI, actorRef: ActorRef, val updated: Option[Date] =
 }
 
 class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
-  val NonLDPRs = TMap.empty[String, NamedResource[Plantain]]
+  val NonLDPRs = scala.collection.mutable.Map.empty[String, NamedResource[Plantain]]
   // invariant to be preserved: the Graph are always relative to 
 
-  val LDPRs = TMap("" -> PlantainLDPR(baseUri,plantain.Graph.empty))
+  val LDPRs = scala.collection.mutable.Map("" -> PlantainLDPR(baseUri,plantain.Graph.empty),
+    ";meta"-> PlantainLDPR(plantain.URI.fromString(baseUri.underlying.toString+";meta"), Graph.empty))
+
 
 
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
 
   /**
    *
-   * @param coordinated
    * @param script
    * @param t
    * @tparam A
@@ -209,42 +232,77 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
    * @return
    */
   @tailrec
-  final def run[A](coordinated: Coordinated, script: Plantain#Script[A])(implicit t: InTxn): A = {
-    import PlantainOps._
+  final def run[A](sender: ActorRef, script: Plantain#Script[A]) {
     script.resume match {
-      case -\/(CreateLDPR(slugOpt, graph, k)) => {
+      case -\/(cmd) => {
+        if(local(cmd.uri.underlying,baseUri.underlying).exists(!_.contains('/'))) {
+          val script = runLocalCmd(cmd)
+          run(sender, script)
+        }
+        else {
+          val a = context.actorFor("/user/web")
+          System.out.println(s"sending to $a")
+          a forward Cmd(cmd) }
+      }
+      case \/-(a) => {
+        System.out.println(s"returning to $sender $a")
+        sender ! a
+      }
+    }
+  }
+
+  /**
+   * Runs a command that can be evaluated on this container.
+   * @param cmd the command to evaluate
+   * @tparam A The final return type of the script
+   * @return a script for further evaluation
+   */
+  def runLocalCmd[A](cmd: LDPCommand[Plantain, Plantain#Script[A]]): Plantain#Script[A] = {
+    System.out.println(s"in RunLocalCmd - received $cmd")
+    cmd match {
+      case CreateLDPR(_, slugOpt, graph, k) => {
         val (uri, pathSegment) = deconstruct(slugOpt)
         val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
         LDPRs.put(pathSegment, ldpr)
-        run(coordinated, k(uri))
+        if (!pathSegment.endsWith(";meta"))
+          LDPRs.put(pathSegment+";meta",PlantainLDPR(ldpr.acl.get, Graph.empty))
+        k(uri)
       }
-      case -\/(CreateBinary(slugOpt, mime: MimeType, k)) => {
+      case CreateBinary(_, slugOpt, mime: MimeType, k) => {
         val (uri, pathSegment) = deconstruct(slugOpt)
         //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
-        val bin = PlantainBinary(root,uri)
+        val bin = PlantainBinary(root, uri)
         NonLDPRs.put(pathSegment, bin)
-        run(coordinated, k(bin))
+        k(bin)
       }
-      case -\/(GetResource(uri,k)) => {
+      case CreateContainer(_,slugOpt,graph,k) => {
+         val (uri,pathSegment) = deconstruct(slugOpt) //todo: deconstruct should check the file system. This should in fact use a file sytem call
+         val p = root.resolve(pathSegment)
+         Files.createDirectory(p)
+         val dirUri = uri/""
+         context.actorOf(Props(new PlantainLDPCActor(dirUri, p)),pathSegment)
+         k(dirUri)
+      }
+      case GetResource(uri, k) => {
         val path = uri.lastPathSegment
         val res = LDPRs.get(path).getOrElse(NonLDPRs(path))
-        run(coordinated, k(res))
+        k(res)
       }
-      case -\/(GetMeta(uri,k)) => {
+      case GetMeta(uri, k) => {
         //todo: GetMeta here is very close to GetResource, as currently there is no big work difference between the two
         //The point of GetMeta is mostly to remove work if there were work that was very time
         //consuming ( such as serialising a graph )
         val path = uri.lastPathSegment
         val res = LDPRs.get(path).getOrElse(NonLDPRs(path))
-        run(coordinated, k(res.asInstanceOf[Meta[Plantain]]))
+        k(res.asInstanceOf[Meta[Plantain]])
       }
-      case -\/(DeleteResource(uri, a)) => {
-         LDPRs.remove(uri.lastPathSegment).orElse{
-           NonLDPRs.remove(uri.lastPathSegment)
-         } orElse( throw new NoSuchElementException("Could not find resource "+uri))
-        run(coordinated, a)
+      case DeleteResource(uri, a) => {
+        LDPRs.remove(uri.lastPathSegment).orElse {
+          NonLDPRs.remove(uri.lastPathSegment)
+        } orElse (throw new NoSuchElementException("Could not find resource " + uri))
+        a //todo: why no function here?
       }
-      case -\/(UpdateLDPR(uri, remove, add, a)) => {
+      case UpdateLDPR(uri, remove, add, a) => {
         val pathSegment = uri.lastPathSegment
         val graph = LDPRs.get(pathSegment).map(_.graph).getOrElse {
           throw new NoSuchElementException(s"Resource does not exist at $uri with path segment '$pathSegment'")
@@ -257,44 +315,42 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
         }
         val ldpr = PlantainLDPR(uri, resultGraph)
         LDPRs.put(pathSegment, ldpr)
-        run(coordinated, a)
+        a //todo: why no function here?
       }
-      case -\/(SelectLDPR(uri, query, bindings, k)) => {
+      case SelectLDPR(uri, query, bindings, k) => {
         val graph = LDPRs(uri.lastPathSegment).graph
         val solutions = PlantainUtil.executeSelect(graph, query, bindings)
-        run(coordinated, k(solutions))
+        k(solutions)
       }
-      case -\/(ConstructLDPR(uri, query, bindings, k)) => {
+      case ConstructLDPR(uri, query, bindings, k) => {
         val graph = LDPRs(uri.lastPathSegment).graph
         val resultGraph = PlantainUtil.executeConstruct(graph, query, bindings)
-        run(coordinated, k(resultGraph))
+        k(resultGraph)
       }
-      case -\/(AskLDPR(uri, query, bindings, k)) => {
+      case AskLDPR(uri, query, bindings, k) => {
         val graph = LDPRs(uri.lastPathSegment).graph
         val resultGraph = PlantainUtil.executeAsk(graph, query, bindings)
-        run(coordinated, k(resultGraph))
+        k(resultGraph)
       }
-      case -\/(SelectLDPC(query, bindings, k)) => {
+      case SelectLDPC(_,query, bindings, k) => {
         val solutions = PlantainUtil.executeSelect(tripleSource, query, bindings)
-        run(coordinated, k(solutions))
+        k(solutions)
       }
-      case -\/(ConstructLDPC(query, bindings, k)) => {
+      case ConstructLDPC(_,query, bindings, k) => {
         val graph = PlantainUtil.executeConstruct(tripleSource, query, bindings)
-        run(coordinated, k(graph))
+        k(graph)
       }
-      case -\/(AskLDPC(query, bindings, k)) => {
+      case AskLDPC(_,query, bindings, k) => {
         val b = PlantainUtil.executeAsk(tripleSource, query, bindings)
-        run(coordinated, k(b))
+        k(b)
       }
-      case \/-(a) => a
-
     }
   }
 
 
-  protected def deconstruct[A](uriOpt: Option[String])(implicit t: InTxn): (Plantain#URI, String) = {
+  protected def deconstruct[A](slugOpt: Option[String]): (Plantain#URI, String) = {
     import PlantainLDPS.randomPathSegment
-    uriOpt match {
+    slugOpt match {
       case None => {
         val pathSegment = randomPathSegment
         val uri = baseUri / pathSegment
@@ -310,14 +366,19 @@ class PlantainLDPCActor(baseUri: URI, root: Path) extends RActor {
 
   def receive = {
     returnErrors {
-    case coordinated @ Coordinated(Script(script)) => coordinated atomic { implicit t =>
-        val r = run(coordinated, script)
-        sender ! r
+      case Script(script) => {
+          run(sender, script)
+      }
+      case Cmd(command) => {
+        val script =runLocalCmd(command)
+        System.out.println(s"returned $script ")
+        run(sender, script)
       }
     }
   }
 
 }
+
 
 object PlantainLDPS {
 
@@ -325,7 +386,7 @@ object PlantainLDPS {
   case class GetLDPC(uri: URI)
   case class DeleteLDPC(uri: URI)
   case class Script[A](script: Plantain#Script[A])
-
+  case class Cmd[A](command: LDPCommand[Plantain, Plantain#Script[A]])
   val logger = LoggerFactory.getLogger(classOf[PlantainLDPS])
 
   def apply(baseUri: URI, root: Path)(implicit timeout: Timeout = Timeout(5000)): PlantainLDPS =
@@ -341,10 +402,10 @@ case class AccessDenied(message: String) extends Exception(message) with BananaE
 
 class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit timeout: Timeout) extends RActor {
 
-  val LDPCs = {
-    val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(baseUri, root)))
-    TMap((URI(new jURI(""))->ldpcActorRef))
-  } // PlantainLDPCActor
+  val ldpcActorRef = system.actorOf(Props(new PlantainLDPCActor(baseUri, root)),"rootContainer")
+  System.out.println(s"created ldpc=<$ldpcActorRef>")
+
+  val LDPCs = scala.collection.mutable.Map((URI(new jURI(""))->ldpcActorRef))
 
   def valid(uri: URI): Option[jURI] = {
     val norm = baseUri.underlying.relativize(uri.underlying.normalize())
@@ -360,7 +421,7 @@ class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit 
   }
 
   def receive = returnErrors {
-    case coordinated @ Coordinated(CreateLDPC(uri)) => coordinated atomic { implicit t =>
+    case CreateLDPC(uri) => {
       val fullUri = uri.resolveAgainst(baseUri)
 
       valid(uri).map { normedUri =>
@@ -381,12 +442,12 @@ class PlantainLDPSActor(baseUri: URI, root: Path, system: ActorSystem)(implicit 
         }
       }
     }
-    case coordinated @ Coordinated(GetLDPC(uri)) => coordinated atomic { implicit t =>
+    case GetLDPC(uri) => {
       val ldpcActorRef = LDPCs(URI(baseUri.underlying.relativize(uri.underlying)))
       val ldpc = new PlantainLDPC(uri.resolveAgainst(baseUri), ldpcActorRef)
       sender ! ldpc
     }
-    case coordinated @ Coordinated(DeleteLDPC(uri)) => coordinated atomic { implicit t =>
+    case DeleteLDPC(uri) =>  {
       valid(uri).map { normedUri =>
         val LDPCsubset = LDPCs.retain{ case (path,_) => path.toString.startsWith(normedUri.toString) }
         LDPCsubset foreach { case (_, ldpcActorRef) => system.stop(ldpcActorRef) }
@@ -406,20 +467,78 @@ class PlantainLDPS(val baseUri: URI, root: Path)(implicit timeout: Timeout) exte
 
   val ldpsActorRef = system.actorOf(Props(new PlantainLDPSActor(baseUri, root, system)), name = "store")
 
+  System.out.println(s"created ldps=<$ldpsActorRef>")
+
   def shutdown(): Unit = {
     system.shutdown()
   }
 
   def createLDPC(uri: URI): Future[PlantainLDPC] = {
-    (ldpsActorRef ? Coordinated(CreateLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
+    (ldpsActorRef ? CreateLDPC(uri)).asInstanceOf[Future[PlantainLDPC]]
   }
 
   def getLDPC(uri: URI): Future[PlantainLDPC] = {
-    (ldpsActorRef ? Coordinated(GetLDPC(uri))).asInstanceOf[Future[PlantainLDPC]]
+    (ldpsActorRef ? GetLDPC(uri)).asInstanceOf[Future[PlantainLDPC]]
   }
 
   def deleteLDPC(uri: URI): Future[Unit] = {
-    (ldpsActorRef ? Coordinated(DeleteLDPC(uri))).asInstanceOf[Future[Unit]]
+    (ldpsActorRef ? DeleteLDPC(uri)).asInstanceOf[Future[Unit]]
   }
+
+}
+
+trait RWW[Rdf <: RDF] {  //not sure which of exec or execute is going to be needed
+  def execute[A](script: LDPCommand.Script[Rdf,A]): Future[A]
+  def exec[A](cmd: LDPCommand[Plantain, Plantain#Script[A]]): Future[A]
+}
+
+class PlantainRWW(ldps: PlantainLDPS)(implicit timeout: Timeout) extends RWW[Plantain] {
+  val webActorRef = ldps.system.actorOf(Props(new PlantainRWWeb(ldps)),name="web")
+
+  def execute[A](script: LDPCommand.Script[Plantain, A]) = {
+    (webActorRef ? Script[A](script)).asInstanceOf[Future[A]]
+  }
+
+  def exec[A](cmd: LDPCommand[Plantain, Plantain#Script[A]]) = {
+    (webActorRef ? cmd).asInstanceOf[Future[A]]
+  }
+}
+
+
+
+
+//ldps is provisional, one should get rid of it
+class PlantainRWWeb(ldps: PlantainLDPS)(implicit timeout: Timeout) extends RActor {
+
+  def receive = returnErrors {
+    case Script(script) => {
+       script.resume match {
+         case -\/(command) => forwardSwitch(command)
+         case \/-(res) => sender ! res
+       }
+    }
+    case Cmd(cmd) => forwardSwitch(cmd)
+  }
+
+  def forwardSwitch[A](cmd: LDPCommand[Plantain, Plantain#Script[A]]) {
+    local(cmd.uri.underlying,ldps.baseUri.underlying).map { path=>
+      // this is a request for a local actor. Here we can distinguish between LDPCs as those that end in /
+      val (coll,file) = split(path)
+      val rootContainer = ldps.ldpsActorRef.path.parent/"rootContainer"
+      val p = if (""==coll) rootContainer else rootContainer/coll.split('/').toIterable
+      System.out.println(s"sending message to akka('$path')=$p ")
+      context.actorFor(p) forward Cmd(cmd)
+    } orElse {
+      System.out.println("in orElse")
+      null
+      //todo: this relative uri comparison is too simple.
+      //     really one should look to see if it
+      //     is the same host and then send it to the local lpdserver ( because a remote server may
+      //     link to this server ) and if so there is no need to go though the external http layer to
+      //     fetch graphs
+      //send to web cache
+    }
+  }
+
 
 }

@@ -11,10 +11,10 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-    version      := "2013_01_16-SNAPSHOT",
+    version      := "2013_02_09-SNAPSHOT",
     scalaVersion := "2.10.0",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
-    fork := true,
+    fork := false,
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
@@ -83,8 +83,8 @@ object BananaRdfBuild extends Build {
 
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0"
 
-  val scalaIoCore = "com.github.scala-incubator.io" % "scala-io-core_2.10.0-RC1" % "0.4.1"
-  val scalaIoFile = "com.github.scala-incubator.io" % "scala-io-file_2.10.0-RC1" % "0.4.1"
+  val scalaIoCore = "com.github.scala-incubator.io" % "scala-io-core_2.10" % "0.4.2"
+  val scalaIoFile = "com.github.scala-incubator.io" % "scala-io-file_2.10" % "0.4.2"
 
   val akka = "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0"
 
@@ -92,7 +92,7 @@ object BananaRdfBuild extends Build {
 
   val scalaStm = "org.scala-tools" % "scala-stm_2.10.0" % "0.6"
 
-  val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
+//  val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
 //  val scalaz = "org.scalaz" % "scalaz-core_2.10.0-M7" % "7.0.0-M3" from "http://jay.w3.org/~bertails/jar/scalaz-core_2.10.0-M7-7.0.0-M3.jar"
   val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0.0-M7" // from "http://repo.typesafe.com/typesafe/releases/org/scalaz/scalaz-core_2.10.0-M6/7.0.0-M2/scalaz-core_2.10.0-M6-7.0.0-M2.jar"
@@ -104,7 +104,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" % "scalatest_2.10" % "2.0.M6-SNAP4"
+  val scalatest = "org.scalatest" % "scalatest_2.10" % "2.0.M6-SNAP8"
   
   val testsuiteDeps =
     Seq(
@@ -112,7 +112,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "play" % "play-iteratees_2.10" % "2.1-RC2"
+  val iterateeDeps = "play" % "play-iteratees_2.10" % "2.1.0"
 
   val testDeps =
     Seq(

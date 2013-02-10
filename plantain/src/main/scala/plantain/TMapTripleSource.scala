@@ -18,14 +18,14 @@ import PlantainUtil._
 import PlantainOps.uriSyntax
 import org.slf4j.{ Logger, LoggerFactory }
 
-class TMapTripleSource(tmap: TMap[String, PlantainLDPR]) extends TripleSource {
+class TMapTripleSource(tmap: scala.collection.mutable.Map[String, PlantainLDPR]) extends TripleSource {
 
   def getValueFactory(): org.openrdf.model.ValueFactory = ???
 
   def getStatements(subject: Resource, predicate: SesameURI, objectt: Value, contexts: Resource*): CloseableIteration[Statement, QueryEvaluationException] = {
     val iterator: Iterator[Statement] = if (contexts.isEmpty) {
       for {
-        ldpr <- tmap.single.values.iterator
+        ldpr <- tmap.values.iterator
         statement <- ldpr.graph.getStatements(subject, predicate, objectt).toIterator
       } yield {
         statement.withContext(ldpr.uri.asSesame.asInstanceOf[Resource])
@@ -35,7 +35,7 @@ class TMapTripleSource(tmap: TMap[String, PlantainLDPR]) extends TripleSource {
         context <- contexts.iterator
         if context.isInstanceOf[SesameURI]
         uri = context.asInstanceOf[SesameURI]
-        ldpr <- tmap.single.lift(Node.fromSesame(uri).lastPathSegment).toIterator
+        ldpr <- tmap.lift(Node.fromSesame(uri).lastPathSegment).toIterator
         statement <- ldpr.graph.getStatements(subject, predicate, objectt).toIterator
       } yield {
         statement.withContext(uri)

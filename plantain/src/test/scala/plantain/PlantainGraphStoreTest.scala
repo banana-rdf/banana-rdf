@@ -4,21 +4,27 @@ import org.w3.banana._
 import org.scalatest._
 import org.scalatest.matchers._
 import Plantain._
-import LDPCommand._
+import org.w3.banana.plantain.LDPCommand._
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.nio.file.Files
 import play.api.libs.iteratee.Enumerator
-import scala.concurrent.Await
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
+import akka.util.Timeout
+import scala.Some
 
-class PlantainLDPSTest extends LDPSTest[Plantain]({
+object PlantainTest {
+  implicit val timeout = Timeout(10,TimeUnit.MINUTES)
   val dir = Files.createTempDirectory("plantain")
-  PlantainLDPS(URI.fromString("http://example.com/foo/"), dir)
-})
+  lazy val ldps = PlantainLDPS(URI.fromString("http://example.com/foo/"), dir)(timeout)
+  lazy val rww = new PlantainRWW(ldps)(timeout)
+
+}
+class PlantainLDPSTest extends LDPSTest[Plantain](PlantainTest.ldps,PlantainTest.rww)
 
 abstract class LDPSTest[Rdf <: RDF](
-  ldps: LDPS[Rdf])(
+  ldps: LDPS[Rdf], rww: RWW[Rdf])(
   implicit diesel: Diesel[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   authz: AuthZ[Rdf]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
@@ -50,13 +56,13 @@ abstract class LDPSTest[Rdf <: RDF](
       -- wac.agentClass ->- foaf.Agent
       -- wac.mode     ->- wac.Read
     ).graph union (
-      URI(betehessCard.toString+";meta") -- wac.include ->- URI("http://example.com/betehess/;meta")
+      URI(betehessCard.toString+";meta") -- wac.include ->- URI("http://example.com/foo/bertails/;meta")
     ).graph
 
   // this makes all of the files under the betehess collection read/write to an Alex
-  val graphCollectionACL = (
+  val graphCollectionACL: Rdf#Graph = (
     bnode()
-       -- wac.accessToClass ->- ( bnode() -- wac.regex ->- "http://example.com/betehess/.*" )
+       -- wac.accessToClass ->- ( bnode() -- wac.regex ->- "http://example.com/foo/bertails/.*" )
        -- wac.accessTo ->- betehessCard
        -- wac.agent ->-  betehess
        -- wac.mode  ->- (wac.Read, wac.Write)
@@ -82,30 +88,77 @@ abstract class LDPSTest[Rdf <: RDF](
 
   val helloWorldBinary2 = "Hello, World!".getBytes("UTF-8")
 
-  "CreateLDPR should create an LDPR with the given graph -- with given uri" in {
-    val ldpcUri = URI("http://example.com/foo/")
+  val baseLdpc =  URI("http://example.com/foo/")
+
+
+  "CreateLDPR should create an LDPR with the given graph" in {
+    val ldpcUri = baseLdpc
     val ldprUri = URI("http://example.com/foo/betehess")
+    val ldprUri2 = URI("http://example.com/foo/betehess2")
+
     val script = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(Some(ldprUri.lastPathSegment), graph))
-      rGraph <- ldpc.execute(getLDPR(ldprUri))
+      rUri <- rww.execute(createLDPR(ldpcUri,Some(ldprUri.lastPathSegment),graph))
+      rGraph <- rww.execute(getLDPR(ldprUri))
     } yield {
       rUri must be(ldprUri)
       assert(rGraph isIsomorphicWith graph)
     }
     script.getOrFail()
+
+    //this version should be more efficient, in that it should not need to leave the
+    //container collection. If one could calculate the number of message sends this would
+    //be visible
+    val script2 = rww.execute{
+      for {
+        ruri <- createLDPR(ldpcUri,Some(ldprUri2.lastPathSegment),graph)
+        rGraph  <- getLDPR(ruri)
+      } yield {
+        ruri must be(ldprUri2)
+        assert(rGraph isIsomorphicWith graph)
+      }
+    }
+    script2.getOrFail()
+
+    val deleteScript = rww.execute {
+      for {
+        _ <- deleteResource(ldprUri)
+        _ <- deleteResource(ldprUri2)
+        x <- getResource(ldprUri2)
+      } yield x
+    }
+    deleteScript.failed.getOrFail()
+
+
+
   }
 
+    "CreateLDPR should create an LDPR with the given graph -- with given uri" in {
+      val ldpcUri = baseLdpc
+      val ldprUri = URI("http://example.com/foo/betehess2")
+      val script = rww.execute {
+        for {
+          rUri <- createLDPR(ldpcUri, Some(ldprUri.lastPathSegment), graph)
+          rGraph <- getLDPR(ldprUri)
+        } yield {
+          rUri must be(ldprUri)
+          assert(rGraph isIsomorphicWith graph)
+        }
+      }
+      script.getOrFail()
+    }
+
   "CreateLDPR should create an LDPR with the given graph -- no given uri" in {
-    val ldpcUri = URI("http://example.com/foo/test2/")
-    val script = for {
-      ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(None, graph))
-      rGraph <- ldpc.execute(getLDPR(rUri))
-      _ <- ldps.deleteLDPC(ldpcUri)
-    } yield {
-      rUri.relativizeAgainst(ldpcUri).toString must not include ("/")
-      assert(rGraph isIsomorphicWith graph)
+    val ldpcUri = URI("http://example.com/foo/")
+    val innerldpcUri = ldpcUri/"test1/"
+    val script = rww.execute { for {
+        ldpc <- createContainer(ldpcUri,Some("test1"),Graph.empty)
+        rUri <- createLDPR(ldpc,None, graph)
+        rGraph <- getLDPR(rUri)
+        _ <- deleteResource(innerldpcUri)
+      } yield {
+        rUri.relativizeAgainst(innerldpcUri).toString must not include ("/")
+        assert(rGraph isIsomorphicWith graph)
+      }
     }
     script.getOrFail()
   }
@@ -119,69 +172,61 @@ abstract class LDPSTest[Rdf <: RDF](
     val ldprMeta = URI("http://example.com/foo/bertails/card;meta")
 
     //create container with ACLs
-    val createContainerScript = for {
-      ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(ldpc.acl.map(_.lastPathSegment), graphCollectionACL))
-      acl <- ldpc.execute(getLDPR(rUri))
-    } yield {
-      rUri must be(ldpcMetaFull)
-      assert(acl isIsomorphicWith graphCollectionACL)
+    val createContainerScript = rww.execute {
+      for {
+        ldpcUri <- createContainer(baseLdpc,Some("bertails"),Graph.empty)
+        ldpc <- getResource(ldpcUri)
+        _   <- updateLDPR(ldpc.acl.get , None, graphCollectionACL.toIterable)
+        acl <- getLDPR(ldpc.acl.get)
+      } yield {
+        ldpc.acl.get must be(ldpcMetaFull)
+        assert(acl isIsomorphicWith graphCollectionACL)
+      }
     }
     createContainerScript.getOrFail()
 
-    //create Profile with ACLs
-    val createProfile = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      cardRes <- ldpc.execute(
-        for {
-//        rUri <- createLDPR(Some(ldprUri), graph) <- should something like this work?
-          rUri <- createLDPR(Some(ldprUriFull.lastPathSegment), graph)
-          res  <- getResource(rUri)
-          _    <- createLDPR( res.acl.map(_.lastPathSegment), graphCardACL )
-        } yield res  )
-      acl <- ldpc.execute(getLDPR(cardRes.acl.get))
-    } yield {
-      cardRes.uri must be(ldprUriFull)
-      cardRes.acl.get must be(ldprMeta)
-      assert(acl.resolveAgainst(ldprMeta) isIsomorphicWith graphCardACL)
-      cardRes match {
-        case card: LDPR[Rdf] => assert( card.graph isIsomorphicWith graph.resolveAgainst(ldprUriFull))
-        case _ => throw new Exception("recived the wrong type of resource")
+    val createProfile = rww.execute{
+      for {
+        rUri <- createLDPR(ldpcUri,Some(ldprUriFull.lastPathSegment), graph)
+        cardRes  <- getResource(rUri)
+        x    <- updateLDPR(cardRes.acl.get, add = graphCardACL.toIterable )
+        acl  <- getLDPR(cardRes.acl.get)
+      } yield {
+        cardRes.uri must be(ldprUriFull)
+        cardRes.acl.get must be(ldprMeta)
+        assert(acl.resolveAgainst(ldprMeta) isIsomorphicWith graphCardACL)
+        cardRes match {
+          case card: LDPR[Rdf] => assert( card.graph isIsomorphicWith graph.resolveAgainst(ldprUriFull))
+          case _ => throw new Exception("recived the wrong type of resource")
+        }
       }
     }
+
     createProfile.getOrFail()
 
 
-    val authZ1 = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      l <- ldpc.execute (
+    val authZ1 =  rww.execute (
        for {
          meta <- getMeta(ldprUriFull)
          athzd <- getAuth(meta.acl.get,wac.Read)
-       } yield athzd
-      )
-    } yield {
-       assert( l.contains(Agent) )
-    }
+       } yield { athzd.contains(Agent)  }
+    )
 
     authZ1.getOrFail()
 
-    val authZ2 = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      l <- ldpc.execute (
+    val authZ2 = rww.execute (
         for {
           meta <- getMeta(ldprUriFull)
           athzd <- getAuth(meta.acl.get,wac.Write)
-        } yield athzd
+        } yield  {
+          assert( athzd.exists(a => a.contains(betehess) ))
+        }
       )
-    } yield {
-      assert( l.exists(a => a.contains(betehess) ))
-    }
 
     authZ2.getOrFail()
 
 
-    //    rAcl <- ldpc.execute{
+//    val meta =  rww.execute{
 //      for {
 //        meta <- getMeta(ldprUri)
 //        acl = meta.acl.get
@@ -199,36 +244,42 @@ abstract class LDPSTest[Rdf <: RDF](
     val binUri = URI("http://example.com/foo/cb/img.jpg")
     val ldprMeta = URI("http://example.com/foo/cb/img.jpg;meta")
 
-    val createBin = for {
-      ldpc <- ldps.createLDPC(ldpcUri)
-      bin <- ldpc.execute(createBinary(Some(binUri.lastPathSegment),MimeType("text/html")))
-      it = bin.write
-      newbin <- Enumerator(helloWorldBinary).apply(it)
-      newres <- newbin.run
-    } yield {
-      bin.uri must be(binUri)
-      newres.uri must be(binUri)
-    }
-    createBin.getOrFail()
-
-    def getBin(hw: Array[Byte]) = for {
-       ldpc <- ldps.getLDPC(ldpcUri)
-       res  <- ldpc.execute(getResource(binUri))
-    } yield {
-      res match {
-        case bin: BinaryResource[Rdf] => bin.reader(400).map{ bytes =>
-          hw must be(bytes)
+    val createBin =
+      for {
+        bin <- rww.execute {
+          for {
+            ldpc <- createContainer(baseLdpc, Some("cb"), Graph.empty)
+            bin <- createBinary(ldpc, Some(binUri.lastPathSegment), MimeType("text/html"))
+          } yield bin
         }
-        case _ => throw new Exception("Object MUST be a binary - given that this test is not running in an open world")
+        it = bin.write
+        newbin <- Enumerator(helloWorldBinary).apply(it)
+        newres <-  newbin.run
+      } yield {
+        bin.uri must be(binUri)
+        newres.uri must be(binUri)
       }
 
-    }
+    createBin.getOrFail()
+
+    def getBin(hw: Array[Byte]) = rww.execute(
+      for {
+        res <- getResource(binUri)
+      } yield {
+        res match {
+          case bin: BinaryResource[Rdf] => bin.reader(400).map {
+            bytes =>
+              hw must be(bytes)
+          }
+          case _ => throw new Exception("Object MUST be a binary - given that this test is not running in an open world")
+        }
+      })
 
     getBin(helloWorldBinary).getOrFail()
 
-    val editBin = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      newRes <- ldpc.execute(getResource(binUri)) // we get the resource, but we don't use that thread to upload the data
+    val editBin =
+      for {
+      newRes <- rww.execute(getResource(binUri)) // we get the resource, but we don't use that thread to upload the data
       bin <- newRes match { //rather here we should use the client thread to upload the data ( as it could be very large )
         case br: BinaryResource[Rdf] => for {
           it <- Enumerator(helloWorldBinary2) |>> br.write
@@ -243,13 +294,12 @@ abstract class LDPSTest[Rdf <: RDF](
 
     getBin(helloWorldBinary2).getOrFail()
 
-    val deleteBin = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      _ <- ldpc.execute(deleteResource(binUri))
-      _ <- ldpc.execute(getResource(binUri))
+    val deleteBin = rww.execute(for {
+      _ <- deleteResource(binUri)
+      _ <- getResource(binUri)
     } yield {
       "hello"
-    }
+    })
 
     val res = Await.result(deleteBin.failed,Duration(1,TimeUnit.SECONDS))
     assert(res.isInstanceOf[NoSuchElementException])
@@ -260,31 +310,34 @@ abstract class LDPSTest[Rdf <: RDF](
   "appendToGraph should be equivalent to graph union" in {
     val ldpcUri = URI("http://example.com/foo/3/")
     val ldprUri = URI("http://example.com/foo/3/betehess")
-    val script = for {
-      ldpc <- ldps.createLDPC(ldpcUri)
-      rUri <- ldpc.execute(createLDPR(Some(ldprUri.lastPathSegment), graph))
-    } yield {
-      rUri must be(ldprUri)
+    val script = rww.execute{
+      for {
+        ldpc <- createContainer(baseLdpc,Some("3"),Graph.empty)
+        rUri <- createLDPR(ldpc, Some(ldprUri.lastPathSegment), graph)
+      } yield {
+        rUri must be(ldprUri)
+      }
     }
     script.getOrFail()
 
-    val script2 = for {
-      ldpc <- ldps.getLDPC(ldpcUri)
-      unionG <- ldpc.execute(updateLDPR(ldprUri, Iterable.empty, graph2.toIterable).flatMap { _ =>
-        getLDPR(ldprUri)
-      })
-    } yield {
-      assert( unionG isIsomorphicWith( graph union graph2) )
+    val script2 = rww.execute {
+      for {
+        unionG <- updateLDPR(ldprUri, Iterable.empty, graph2.toIterable).flatMap { _ =>
+          getLDPR(ldprUri)
+        }
+      } yield {
+        assert( unionG isIsomorphicWith( graph union graph2) )
+      }
     }
 
     script2.getOrFail()
 
   }
-
-  "access control test" in {
-
-
-  }
+//
+//  "access control test" in {
+//
+//
+//  }
 
 //  "patchGraph should delete and insert triples as expected" in {
 //    val ldpcUri = URI("http://example.com/foo4")
