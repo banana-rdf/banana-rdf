@@ -57,17 +57,57 @@ object IOExample {
 
 }
 
+/** examples for doing SPARQL queries
+  * from sbt:
+  *   project examples
+  *   run-main org.w3.banana.examples.SPARQLExample
+  * 
+  * In this scenario, we search on dbpedia all the languages
+  */
 object SPARQLExample {
 
   import org.w3.banana._
+  import org.w3.banana.syntax._
+  import java.net.URL
+  import scalaz.Id.Id
 
   def main(args: Array[String]): Unit = {
-    val ops = RDFOps[Rdf]
-    import ops._
-    val sparqlOps = SparqlOps[Rdf]
-    import sparqlOps._
+    /* Scala is unable to infer the types correctly when using only type projection
+     * a workaround is to parameterize over RDF
+     */
+    def aux[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], sparqlOps: SparqlOps[Rdf], sparqlHttp: SparqlHttp[Rdf, Id]): Unit = {
+      import ops._
+      import sparqlOps._
 
-    ()
+      /* gets a SparqlEngine out of a Sparql endpoint */
+
+      val client = sparqlHttp(new URL("http://dbpedia.org/sparql/"))
+
+      /* creates a Sparql Select query */
+
+      val query = SelectQuery("""
+PREFIX ont: <http://dbpedia.org/ontology/>
+SELECT DISTINCT ?language WHERE {
+ ?language a ont:ProgrammingLanguage .
+ ?language ont:influencedBy ?other .
+ ?other ont:influencedBy ?language .
+} LIMIT 100
+""")
+
+      /* executes the query */
+
+      val answers: Rdf#Solutions = client.executeSelect(query)
+
+      /* iterate through the solutions */
+
+      val languages: Iterable[Rdf#URI] = answers.toIterable map { row =>
+        /* row is an Rdf#Solution, we can get an Rdf#Node from the variable name */
+        /* both the #Rdf#Node projection and the transformation to Rdf#URI can fail in the Try type, hense the flatMap */
+        row("language").flatMap(_.as[Rdf#URI]) getOrElse sys.error("die")
+      }
+      println(languages.toList)
+    }
+    aux()
   }
 
 }
