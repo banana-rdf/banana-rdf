@@ -68,6 +68,7 @@ object SPARQLExample {
 
   import org.w3.banana._
   import org.w3.banana.syntax._
+  import org.w3.banana.diesel._
   import java.net.URL
   import scalaz.Id.Id
 

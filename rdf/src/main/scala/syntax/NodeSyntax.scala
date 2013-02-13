@@ -31,7 +31,4 @@ class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
     ops.foldNode(node)(_.relativizeAgainst(baseUri), bn => bn, lit => lit)
   }
 
-  def as[T](implicit from: FromNode[Rdf, T]): Try[T] =
-    from.fromNode(node)
-
 }
