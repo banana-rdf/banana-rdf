@@ -78,18 +78,17 @@ object BananaRdfBuild extends Build {
   
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0"
 
-  val scalaIoCore = "com.github.scala-incubator.io" % "scala-io-core_2.10.0-RC1" % "0.4.1"
-  val scalaIoFile = "com.github.scala-incubator.io" % "scala-io-file_2.10.0-RC1" % "0.4.1"
+  val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
+  val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
 
-  val akka = "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0"
+  val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.0"
+  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.0"
 
-  val akkaTransactor = "com.typesafe.akka" % "akka-transactor_2.10" % "2.1.0"
-
-  val scalaStm = "org.scala-tools" % "scala-stm_2.10.0" % "0.6"
+  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
-  val scalaz = "org.scalaz" % "scalaz-core_2.10" % "7.0-SNAPSHOT"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -98,7 +97,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" % "scalatest_2.10.0-RC5" % "2.0.M5-B1"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M5b"
   
   val testsuiteDeps =
     Seq(
@@ -106,7 +105,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "play" % "play-iteratees_2.10" % "2.1-12142012"
+  val iterateeDeps = "play" %% "play-iteratees" % "2.1.0"
 
   val testDeps =
     Seq(
