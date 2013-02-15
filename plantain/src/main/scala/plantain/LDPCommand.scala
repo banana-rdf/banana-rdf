@@ -4,6 +4,7 @@ import org.w3.banana._
 import scalaz.{ Free, Functor }
 import scalaz.Free.Suspend
 import scalaz.Free.Return
+import java.security.Principal
 
 sealed trait LDPCommand[Rdf <: RDF, +A]{
   //the uri on which the action is applied.
@@ -12,8 +13,21 @@ sealed trait LDPCommand[Rdf <: RDF, +A]{
 
 sealed trait LDPContainerCmd[Rdf <: RDF, +A] extends LDPCommand[Rdf,A] {
   def uri: Rdf#URI = container
-  def container: Rdf#URI
+  def container: Rdf#URI //just a synonym for URI when the command can only be run on a container
 }
+
+trait Subject {
+  def id: List[Principal]
+}
+
+case class Subj (id: List[Principal]) extends Subject
+
+case class Admin(onBehalfOf: Subject, id: List[Principal]=List())
+
+case class WebIDPrincipal(webid: java.net.URI) extends Principal {
+  val getName = webid.toString
+}
+
 
 case class CreateLDPR[Rdf <: RDF, A](container: Rdf#URI,
                                      slug: Option[String],
@@ -36,6 +50,7 @@ case class GetMeta[Rdf<: RDF, A](uri: Rdf#URI,
 
 
 case class GetResource[Rdf <: RDF, A](uri: Rdf#URI,
+                                      subject: Option[Subject],
                                       k: NamedResource[Rdf] => A) extends LDPCommand[Rdf, A]
 
 
@@ -112,8 +127,8 @@ object LDPCommand {
   def getMeta[Rdf <: RDF,A](uri: Rdf#URI): Script[Rdf, Meta[Rdf]] =
     suspend[Rdf,Meta[Rdf]](GetMeta(uri, ldpr => `return`(ldpr)))
 
-  def getResource[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, NamedResource[Rdf]] =
-    suspend[Rdf,NamedResource[Rdf]](GetResource(uri, resource => `return`(resource)))
+  def getResource[Rdf <: RDF, A](uri: Rdf#URI, subj: Option[Subject] = None): Script[Rdf, NamedResource[Rdf]] =
+    suspend[Rdf,NamedResource[Rdf]](GetResource(uri, subj, resource => `return`(resource)))
 
   def deleteResource[Rdf <: RDF](uri: Rdf#URI): Script[Rdf, Unit] =
     suspend(DeleteResource(uri, nop))
@@ -152,7 +167,7 @@ object LDPCommand {
           case CreateBinary(uric, slug, mime, k) => CreateBinary(uric, slug, mime, x=> f(k(x)))
           case CreateLDPR(uric, slug, graph, k) => CreateLDPR(uric, slug, graph, x => f(k(x)))
           case CreateContainer(uric, slug, graph, k) => CreateContainer(uric, slug, graph, x => f(k(x)))
-          case GetResource(uri, k) => GetResource(uri, x=> f(k(x)))
+          case GetResource(uri, subj, k) => GetResource(uri, subj, x=> f(k(x)))
           case GetMeta(uri, k) => GetMeta(uri, x => f(k(x)))
           case DeleteResource(uri, a) =>  DeleteResource(uri, f(a))
           case UpdateLDPR(uri, remove, add, a) => UpdateLDPR(uri, remove, add, f(a))

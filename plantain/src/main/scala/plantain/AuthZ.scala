@@ -17,13 +17,15 @@ class AuthZ[Rdf<:RDF]( implicit dsl: Diesel[Rdf]) {
   val wac = WebACL[Rdf]
 
   /**
-   * Returns a Script for authentication that looks in metadata file for agents
-   * that have access to a given resource in a given manner
+   * Returns a Script for authentication that looks in the metadata file for a resource
+   * to see what agents have access to a given resource in a given manner, following
+   * resources.
+   *
    *
    * but is not tail rec because of flatMap
-   * @param meta the meta data graph resource to look in
+   * @param meta metadata
    * @param method the method of access asked for ( in wac ontology )
-   * @return a Free based recursive structure
+   * @return a Free based recursive structure that will return a list of agents ( identified by WebIDs. )
    * */
   def getAuth(meta: Rdf#URI, method: Rdf#URI): Script[Rdf, List[Agent]] =  {
     getLDPR(meta).flatMap { g: Rdf#Graph =>
@@ -31,13 +33,28 @@ class AuthZ[Rdf<:RDF]( implicit dsl: Diesel[Rdf]) {
       az match {
         case List(Agent) => `return`(az)
         case agents => {
-          val inc= (PointedGraph(URI(""), g) / wac.include).collectFirst { //todo: check that its' in the collection. What to do if it's not?
+          val inc= (PointedGraph(URI(""), g) / wac.include).collectFirst { //todo: check that it is in the collection. What to do if it's not?
             case PointedGraph(node,g) if isURI(node) =>
               getAuth(node.asInstanceOf[Rdf#URI],method)
           }
           val res = inc.getOrElse(`return`(az))
           res
         }
+      }
+    }
+  }
+
+  /**
+   * getAuth for a resource ( fetch metadata for it )
+   * @param resource the resource to check authorization for
+   * @param method the type of access requested
+   * @param noMeta what should be assumed if no acl location is found?
+   * @return
+   */
+  def getAuthFor(resource: Rdf#URI,  method: Rdf#URI, noMeta: List[Agent]=List()): Script[Rdf, List[Agent]] = {
+    getMeta(resource).flatMap{nr =>
+      nr.acl.map { acl => getAuth(acl, method)}.getOrElse {
+        `return`(noMeta)
       }
     }
   }

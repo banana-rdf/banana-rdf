@@ -17,14 +17,13 @@ import scala.Some
 object PlantainTest {
   implicit val timeout = Timeout(10,TimeUnit.MINUTES)
   val dir = Files.createTempDirectory("plantain")
-  lazy val ldps = PlantainLDPS(URI.fromString("http://example.com/foo/"), dir)(timeout)
-  lazy val rww = new PlantainRWW(ldps)(timeout)
+  lazy val rww = new PlantainRWW(URI.fromString("http://example.com/foo/"), dir,None)(timeout)
 
 }
-class PlantainLDPSTest extends LDPSTest[Plantain](PlantainTest.ldps,PlantainTest.rww)
+class PlantainLDPSTest extends LDPSTest[Plantain](PlantainTest.rww)
 
 abstract class LDPSTest[Rdf <: RDF](
-  ldps: LDPS[Rdf], rww: RWW[Rdf])(
+  rww: RWW[Rdf])(
   implicit diesel: Diesel[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   authz: AuthZ[Rdf]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
@@ -40,7 +39,7 @@ abstract class LDPSTest[Rdf <: RDF](
   val betehessCard = URI("http://example.com/foo/bertails/card")
 
   override def afterAll(): Unit = {
-    ldps.shutdown()
+    rww.shutdown()
   }
 
   val graph: Rdf#Graph = (
@@ -56,7 +55,7 @@ abstract class LDPSTest[Rdf <: RDF](
       -- wac.agentClass ->- foaf.Agent
       -- wac.mode     ->- wac.Read
     ).graph union (
-      URI(betehessCard.toString+";meta") -- wac.include ->- URI("http://example.com/foo/bertails/;meta")
+      URI(betehessCard.toString+";acl") -- wac.include ->- URI("http://example.com/foo/bertails/;acl")
     ).graph
 
   // this makes all of the files under the betehess collection read/write to an Alex
@@ -166,10 +165,10 @@ abstract class LDPSTest[Rdf <: RDF](
 
   "CreateLDPC & LDPR with ACLs" in {
     val ldpcUri = URI("http://example.com/foo/bertails/")
-    val ldpcMetaFull = URI("http://example.com/foo/bertails/;meta")
+    val ldpcMetaFull = URI("http://example.com/foo/bertails/;acl")
     val ldprUri = URI("card")
     val ldprUriFull = betehessCard
-    val ldprMeta = URI("http://example.com/foo/bertails/card;meta")
+    val ldprMeta = URI("http://example.com/foo/bertails/card;acl")
 
     //create container with ACLs
     val createContainerScript = rww.execute {
@@ -216,8 +215,7 @@ abstract class LDPSTest[Rdf <: RDF](
 
     val authZ2 = rww.execute (
         for {
-          meta <- getMeta(ldprUriFull)
-          athzd <- getAuth(meta.acl.get,wac.Write)
+          athzd <- getAuthFor(ldprUriFull,wac.Write)
         } yield  {
           assert( athzd.exists(a => a.contains(betehess) ))
         }
