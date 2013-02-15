@@ -38,6 +38,8 @@ case class BoundSolutions(iterator: Iterator[BindingSet], bindings: List[String]
 
 object Plantain {
 
+  import Syntax._
+
   implicit val ops: RDFOps[Plantain] = PlantainOps
 
   implicit val diesel: Diesel[Plantain] = PlantainDiesel
@@ -50,7 +52,7 @@ object Plantain {
 
   implicit val turtleReader: RDFReader[Plantain, Turtle] = PlantainTurtleReader
 
-//  implicit val readerSelector: ReaderSelector[Plantain] = PlantainRDFReader.selector
+  implicit val readerSelector: ReaderSelector[Plantain] = ReaderSelector[Plantain,Turtle] combineWith ReaderSelector[Plantain,RDFXML]
 
   implicit val rdfxmlWriter: RDFWriter[Plantain, RDFXML] = PlantainRDFWriter.rdfxmlWriter
 
