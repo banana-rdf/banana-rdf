@@ -62,6 +62,7 @@ class XSDPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("xsd", "http
   val integer = apply("integer")
   val decimal = apply("decimal")
   val double = apply("double")
+  val hexBinary = apply("hexBinary")
   val boolean = apply("boolean")
   val trueLit: Rdf#TypedLiteral = makeTypedLiteral("true", boolean)
   val falseLit: Rdf#TypedLiteral = makeTypedLiteral("false", boolean)
@@ -104,11 +105,11 @@ trait CommonPrefixes[Rdf <: RDF] { this: RDFOps[Rdf] =>
 }
 
 
-object WebACL {
-  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new WebACL(ops)
+object WebACLPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new WebACLPrefix(ops)
 }
 
-class WebACL[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("acl", "http://www.w3.org/ns/auth/acl#")(ops) {
+class WebACLPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("acl", "http://www.w3.org/ns/auth/acl#")(ops) {
   val Authorization = apply("Authorization")
   val agent = apply("agent")
   val agentClass = apply("agentClass")
@@ -128,4 +129,16 @@ class WebACL[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("acl", "http://
   //not officially supported:
   val include = apply("include")
   val regex = apply("regex")
+}
+
+object CertPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new CertPrefix(ops)
+}
+
+class CertPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("cert", "http://www.w3.org/ns/auth/cert#")(ops) {
+   val key = apply("key")
+   val RSAKey = apply("RSAKey")
+   val RSAPublicKey = apply("RSAPublicKey")
+   val exponent = apply("exponent")
+   val modulus = apply("modulus")
 }

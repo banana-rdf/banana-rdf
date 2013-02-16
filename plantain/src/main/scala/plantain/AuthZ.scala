@@ -14,7 +14,7 @@ class AuthZ[Rdf<:RDF]( implicit dsl: Diesel[Rdf]) {
   import ops._
 
   val foaf = FOAFPrefix[Rdf]
-  val wac = WebACL[Rdf]
+  val wac = WebACLPrefix[Rdf]
 
   /**
    * Returns a Script for authentication that looks in the metadata file for a resource

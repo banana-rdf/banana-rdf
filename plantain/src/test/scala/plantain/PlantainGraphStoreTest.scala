@@ -33,7 +33,7 @@ abstract class LDPSTest[Rdf <: RDF](
   import authz._
 
   val foaf = FOAFPrefix[Rdf]
-  val wac = WebACL[Rdf]
+  val wac = WebACLPrefix[Rdf]
 
   val betehess = URI("http://example.com/foo/bertails/card#me")
   val betehessCard = URI("http://example.com/foo/bertails/card")
