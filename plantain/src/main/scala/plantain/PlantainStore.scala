@@ -414,7 +414,7 @@ class PlantainRWW(val baseUri: URI, root: Path, cache: Option[Props])(implicit t
   }
 
   def exec[A](cmd: LDPCommand[Plantain, Plantain#Script[A]]) = {
-    (rwwActorRef ? cmd).asInstanceOf[Future[A]]
+    (rwwActorRef ? Cmd(cmd)).asInstanceOf[Future[A]]
   }
 
   def shutdown(): Unit = {
@@ -448,10 +448,10 @@ class PlantainRWWeb(val baseUri: URI, root: Path)(implicit timeout: Timeout) ext
       // this is a request for a local actor. Here we can distinguish between LDPCs as those that end in /
       val (coll,file) = split(path)
       val p = if (""==coll) rootContainerPath else rootContainerPath/coll.split('/').toIterable
-      log.info(s"sending message to akka('$path')=$p ")
+      log.info(s"sending message $cmd to akka('$path')=$p ")
       context.actorFor(p) forward Cmd(cmd)
     } getOrElse {
-      log.info(s"PlantainRWWeb, sending message to general web agent <$web>")
+      log.info(s"sending message $cmd to general web agent <$web>")
       //todo: this relative uri comparison is too simple.
       //     really one should look to see if it
       //     is the same host and then send it to the local lpdserver ( because a remote server may
