@@ -106,6 +106,7 @@ object BananaRdfBuild extends Build {
     )
 
   val iterateeDeps = "play" %% "play-iteratees" % "2.1.0"
+  val playDeps = "play" %% "play" % "2.1.0"
 
   val testDeps =
     Seq(
@@ -233,6 +234,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
       libraryDependencies += iterateeDeps,
+      libraryDependencies += playDeps,
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
