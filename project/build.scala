@@ -88,7 +88,7 @@ object BananaRdfBuild extends Build {
   val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.0"
   val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.0"
 
-  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
+//  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
@@ -101,7 +101,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M5b"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP8"
   
   val testsuiteDeps =
     Seq(
@@ -252,7 +252,7 @@ object BananaRdfBuild extends Build {
     id = "ldp",
     base = file("ldp"),
     settings = buildSettings ++ testDeps ++ Seq(
-      libraryDependencies += scalaStm
+//      libraryDependencies += scalaStm
     )
   ) dependsOn (rdf, jena % "test", sesame % "test")
 
