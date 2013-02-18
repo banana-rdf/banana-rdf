@@ -38,11 +38,11 @@ object Sesame {
 
   implicit val ops: RDFOps[Sesame] = SesameOperations
 
-  implicit val diesel: Diesel[Sesame] = SesameDiesel
+  implicit val recordBinder: binder.RecordBinder[Sesame] = binder.RecordBinder[Sesame]
 
   implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 
-  implicit val graphQuery: RDFGraphQuery[Sesame] = SesameGraphSparqlEngine
+  implicit val sparqlGraph: SparqlGraph[Sesame] = SesameSparqlGraph
 
   implicit val rdfxmlReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
 

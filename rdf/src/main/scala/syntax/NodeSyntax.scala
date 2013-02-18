@@ -1,8 +1,18 @@
 package org.w3.banana.syntax
 
 import org.w3.banana._
+import org.w3.banana.binder._
+import scala.util.Try
 
-class NodeSyntax[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
+trait NodeSyntax {
+
+  implicit def nodeW[Rdf <: RDF](node: Rdf#Node) = new NodeW[Rdf](node)
+
+}
+
+object NodeSyntax extends NodeSyntax
+
+class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
 
   def fold[T](funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T)(implicit ops: RDFOps[Rdf]): T =
     ops.foldNode(node)(funURI, funBNode, funLiteral)
@@ -18,7 +28,6 @@ class NodeSyntax[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
   }
 
   def relativizeAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
-    import ops.uriSyntax
     ops.foldNode(node)(_.relativizeAgainst(baseUri), bn => bn, lit => lit)
   }
 

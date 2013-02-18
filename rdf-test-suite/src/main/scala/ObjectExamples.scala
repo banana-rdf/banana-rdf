@@ -1,11 +1,13 @@
-package org.w3.banana
+package org.w3.banana.binder
 
+import org.w3.banana._
+import org.w3.banana.diesel._
 import scala.util._
 
-class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
+class ObjectExamples[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: RecordBinder[Rdf]) {
 
-  import diesel._
   import ops._
+  import recordBinder._
 
   val foaf = FOAFPrefix[Rdf]
 
@@ -33,13 +35,13 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     implicit val classUris = classUrisFor[Address](clazz)
 
     // not sure if this could be made more general, nor if we actually want to do that
-    implicit val binder: PointedGraphBinder[Rdf, Address] = new PointedGraphBinder[Rdf, Address] {
-      def fromPointedGraph(pointed: PointedGraph[Rdf]): Try[Address] =
-        Unknown.binder.fromPointedGraph(pointed) orElse VerifiedAddress.binder.fromPointedGraph(pointed)
+    implicit val binder: PGBinder[Rdf, Address] = new PGBinder[Rdf, Address] {
+      def fromPG(pointed: PointedGraph[Rdf]): Try[Address] =
+        Unknown.binder.fromPG(pointed) orElse VerifiedAddress.binder.fromPG(pointed)
 
-      def toPointedGraph(address: Address): PointedGraph[Rdf] = address match {
-        case va: VerifiedAddress => VerifiedAddress.binder.toPointedGraph(va)
-        case Unknown => Unknown.binder.toPointedGraph(Unknown)
+      def toPG(address: Address): PointedGraph[Rdf] = address match {
+        case va: VerifiedAddress => VerifiedAddress.binder.toPG(va)
+        case Unknown => Unknown.binder.toPG(Unknown)
       }
     }
 
@@ -51,7 +53,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     implicit val classUris = classUrisFor[Unknown.type](clazz, Address.clazz)
 
     // there is a question about constants and the classes they live in
-    implicit val binder: PointedGraphBinder[Rdf, Unknown.type] = constant(this, URI("http://example.com/Unknown#thing")) withClasses classUris
+    implicit val binder: PGBinder[Rdf, Unknown.type] = constant(this, URI("http://example.com/Unknown#thing")) withClasses classUris
 
   }
 
@@ -81,7 +83,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
     val cityName = property[String](foaf("cityName"))
     val otherNames = set[String](foaf("otherNames"))
 
-    implicit val binder: PointedGraphBinder[Rdf, City] =
+    implicit val binder: PGBinder[Rdf, City] =
       pgbWithId[City](t => URI("http://example.com/" + t.cityName))
         .apply(cityName, otherNames)(City.apply, City.unapply) withClasses classUris
 
@@ -95,7 +97,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) {
 
     val name = property[String](foaf.name)
 
-    implicit val binder: PointedGraphBinder[Rdf, Me] =
+    implicit val binder: PGBinder[Rdf, Me] =
       pgbWithConstId[Me]("http://example.com#me")
         .apply(name)(Me.apply, Me.unapply) withClasses classUris
   }

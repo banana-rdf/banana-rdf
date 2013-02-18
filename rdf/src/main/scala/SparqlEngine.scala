@@ -3,7 +3,7 @@ package org.w3.banana
 /**
  * to execute Sparql queries
  */
-trait SparqlEngine[Rdf <: RDF, M[_]] {
+trait SparqlEngine[Rdf <: RDF, M[_]] extends Any {
 
   def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Solutions]
 

@@ -2,7 +2,16 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-class LiteralSyntax[Rdf <: RDF](val literal: Rdf#Literal) extends AnyVal {
+trait LiteralSyntax {
+
+  implicit def literalW[Rdf <: RDF](literal: Rdf#Literal) =
+    new LiteralW[Rdf](literal)
+
+}
+
+object LiteralSyntax extends LiteralSyntax
+
+class LiteralW[Rdf <: RDF](val literal: Rdf#Literal) extends AnyVal {
 
   def fold[T](funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T)(implicit ops: RDFOps[Rdf]): T =
     ops.foldLiteral(literal)(funTL, funLL)

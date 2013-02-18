@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.syntax._
+import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers._
 import scala.concurrent._
@@ -10,11 +12,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf, Future])(
     implicit reader: RDFReader[Rdf, RDFXML],
-    diesel: Diesel[Rdf],
+    ops: RDFOps[Rdf],
     sparqlOps: SparqlOps[Rdf])
     extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
-  import diesel._
   import ops._
   import sparqlOps._
 

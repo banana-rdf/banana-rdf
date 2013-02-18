@@ -1,11 +1,12 @@
-package org.w3.banana
+package org.w3.banana.syntax
 
+import org.w3.banana._
+import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 
-abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
+abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with MustMatchers {
 
-  import diesel._
   import ops._
 
   ".fragmentLess should remove the fragment part of a URI" in {
@@ -43,7 +44,7 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends
     /* URI("bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/bar")) */
   }
 
-  "should be able to create and work with relative URIs" taggedAs(SesameWIP) in {
+  "should be able to create and work with relative URIs" in {
     val me = URI("/people/card/henry#me")
     me.fragment must be(Some("me"))
     me.fragmentLess must be(URI("/people/card/henry"))

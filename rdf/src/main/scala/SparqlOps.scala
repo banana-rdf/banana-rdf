@@ -2,6 +2,12 @@ package org.w3.banana
 
 import scala.util._
 
+object SparqlOps {
+
+  def apply[Rdf <: RDF](implicit sparqlOps: SparqlOps[Rdf]): SparqlOps[Rdf] = sparqlOps
+
+}
+
 trait SparqlOps[Rdf <: RDF] {
 
   def SelectQuery(query: String): Rdf#SelectQuery

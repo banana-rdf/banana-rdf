@@ -3,7 +3,17 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import java.net.{ URI => jURI }
 
-trait URISyntax[Rdf <: RDF] extends Any {
+trait URISyntax {
+
+  implicit def uriW[Rdf <: RDF](uri: Rdf#URI): URIW[Rdf] = new URIWDefault(uri)
+
+  def foo() = ()
+
+}
+
+object URISyntax extends URISyntax
+
+trait URIW[Rdf <: RDF] extends Any {
 
   def getString(implicit ops: RDFOps[Rdf]): String
 
@@ -31,7 +41,7 @@ trait URISyntax[Rdf <: RDF] extends Any {
 
 }
 
-class URISyntaxDefault[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal with URISyntax[Rdf] {
+class URIWDefault[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal with URIW[Rdf] {
 
   def getString(implicit ops: RDFOps[Rdf]): String = ops.fromUri(uri)
 

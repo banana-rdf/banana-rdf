@@ -4,6 +4,7 @@ import org.w3.banana._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
 import com.hp.hpl.jena.query.{ Query => JenaQuery, QuerySolution, ResultSet }
 import com.hp.hpl.jena.sparql.core.DatasetGraph
+import scalaz.Id.Id
 
 trait Jena extends RDF {
   // types related to the RDF datamodel
@@ -30,15 +31,19 @@ trait Jena extends RDF {
   type Solutions = ResultSet
 }
 
-object Jena {
+object Jena extends JenaModule
+
+trait JenaModule {
 
   implicit val ops: RDFOps[Jena] = JenaOperations
 
-  implicit val diesel: Diesel[Jena] = JenaDiesel
+  implicit val recordBinder: binder.RecordBinder[Jena] = binder.RecordBinder[Jena]
 
   implicit val sparqlOps: SparqlOps[Jena] = JenaSparqlOps
 
-  implicit val graphQuery: RDFGraphQuery[Jena] = JenaGraphSparqlEngine
+  implicit val sparqlGraph: SparqlGraph[Jena] = JenaSparqlGraph
+
+  implicit val sparqlHttp: SparqlHttp[Jena, Id] = JenaSparqlHttp
 
   implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader
 

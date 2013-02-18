@@ -3,7 +3,7 @@
 dir=$(dirname $0)
 cd "$dir"
 
-url="http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.12.2/sbt-launch.jar"
+url="http://scalasbt.artifactoryonline.com/scalasbt/sbt-native-packages/org/scala-sbt/sbt/0.12.2/sbt.zip"
 
 sbt="sbt-launch-0.12.2.jar"
 
@@ -26,10 +26,14 @@ fi
 if [ ! -f "$sbt" ]; then
     case "$tool" in
         "wget"*)
-            wget "$url" -O "./$sbt"
+            wget "$url" -O ./sbt.zip
+            unzip -p sbt.zip sbt/bin/sbt-launch.jar > "./$sbt"
+            rm -f ./sbt.zip
             ;;
         "curl"*)
-            curl "$url" -o "./$sbt"
+            curl "$url" -o ./sbt.zip
+            unzip -p sbt.zip sbt/bin/sbt-launch.jar > "./$sbt"
+            rm -f ./sbt.zip
             ;;
         *)
             echo "don't know this tool: $tool"

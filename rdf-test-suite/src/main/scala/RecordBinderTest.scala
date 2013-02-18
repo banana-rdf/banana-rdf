@@ -1,12 +1,14 @@
-package org.w3.banana
+package org.w3.banana.binder
 
+import org.w3.banana._
+import org.w3.banana.syntax._
+import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 import scala.util._
 
-abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) extends WordSpec with MustMatchers {
+abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: RecordBinder[Rdf]) extends WordSpec with MustMatchers {
 
-  import diesel._
   import ops._
 
   val objects = new ObjectExamples
@@ -20,13 +22,21 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit diesel: Diesel[Rdf]) exte
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] must be(Success(city))
+
+    val expectedGraph = (
+      URI("http://example.com/Paris").a(City.clazz)
+        -- foaf("cityName") ->- "Paris"
+        -- foaf("otherNames") ->- "Panam"
+        -- foaf("otherNames") ->- "Lutetia"
+    ).graph
+    city.toPG.graph.isIsomorphicWith(expectedGraph) must be(true)
   }
 
-  "graph constant poitner" in {
+  "graph constant pointer" in {
     me.toPG.pointer must be(URI("http://example.com#me"))
   }
 
-  "graph poitner baised on record fields" in {
+  "graph pointer based on record fields" in {
     city.toPG.pointer must be(URI("http://example.com/Paris"))
   }
 
