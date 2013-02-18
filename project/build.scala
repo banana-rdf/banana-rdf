@@ -108,6 +108,8 @@ object BananaRdfBuild extends Build {
   val iterateeDeps = "play" %% "play-iteratees" % "2.1.0"
   val playDeps = "play" %% "play" % "2.1.0"
 
+  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+
   val testDeps =
     Seq(
       libraryDependencies += scalaActors % "test",
@@ -209,9 +211,6 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
       libraryDependencies += scalaIoCore,
       libraryDependencies += scalaIoFile,
-      libraryDependencies += akka,
-      libraryDependencies += akkaTransactor,
-      libraryDependencies += iterateeDeps,
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
@@ -234,6 +233,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
       libraryDependencies += iterateeDeps,
+      libraryDependencies += reactiveMongo,
       libraryDependencies += playDeps,
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
