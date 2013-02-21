@@ -29,11 +29,8 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf
   )
 
   "'/' method must traverse the graph" in {
-
-    val name = betehess / foaf.name
-
-    name.head.pointer must be(LangLiteral("Alexandre", Lang("fr")))
-
+    val names = betehess / foaf.name
+    names.map(_.pointer).toSet must be(Set(LangLiteral("Alexandre", Lang("fr")), LangLiteral("Alexander", Lang("en"))))
   }
 
   "'/' method must work with uris and bnodes" in {

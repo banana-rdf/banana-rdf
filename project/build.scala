@@ -110,6 +110,9 @@ object BananaRdfBuild extends Build {
     )
 
   val iterateeDeps = "play" %% "play-iteratees" % "2.1.0"
+  val playDeps = "play" %% "play" % "2.1.0"
+
+  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 
   val testDeps =
     Seq(
@@ -210,18 +213,9 @@ object BananaRdfBuild extends Build {
   lazy val plantain = Project(
     id = "plantain",
     base = file("plantain"),
-    settings = buildSettings ++ testDeps ++ Seq(
+    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
       libraryDependencies += scalaIoCore,
       libraryDependencies += scalaIoFile,
-      libraryDependencies += akka,
-      libraryDependencies += akkaTransactor,
-      libraryDependencies += iterateeDeps,
-      resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % "2.6.10",
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % "2.6.10",
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
@@ -244,6 +238,8 @@ object BananaRdfBuild extends Build {
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
       libraryDependencies += iterateeDeps,
+      libraryDependencies += reactiveMongo,
+      libraryDependencies += playDeps,
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
