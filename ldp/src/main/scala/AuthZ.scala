@@ -1,3 +1,5 @@
+package org.w3.banana.ldp
+
 import org.w3.banana._
 
 /**
@@ -7,8 +9,10 @@ import org.w3.banana._
  * the main method is getAuth which returns a Script
  */
 class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
-  import org.w3.banana.plantain.LDPCommand._
+  import LDPCommand._
   import ops._
+  import diesel._
+  import syntax.GraphSyntax
 
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACLPrefix[Rdf]
@@ -30,7 +34,7 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
       az match {
         case List(Agent) => `return`(az)
         case agents => {
-          val inc= (PointedGraph(URI(""), g) / wac.include).collectFirst { //todo: check that it is in the collection. What to do if it's not?
+          val inc= (PointedGraph(meta, g) / wac.include).collectFirst { //todo: check that it is in the collection. What to do if it's not?
             case PointedGraph(node,g) if isURI(node) =>
               getAuth(node.asInstanceOf[Rdf#URI],method)
           }

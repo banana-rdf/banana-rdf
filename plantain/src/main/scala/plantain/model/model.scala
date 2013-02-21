@@ -175,6 +175,10 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Sesa
     }
   }
 
+  override def toString(): String = {
+     triples.foldRight("("){ case (triple,s) => s+" "+triple.toString }+")"
+  }
+
 }
 
 object Triple {

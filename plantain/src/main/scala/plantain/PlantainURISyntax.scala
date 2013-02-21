@@ -59,7 +59,7 @@ class PlantainURISyntax(val uri: URI) extends AnyVal with syntax.URIW[Plantain] 
   }
 
 
-  def lastPathSegment: String = {
+  def lastPathSegment(implicit ops: RDFOps[Plantain]): String = {
     val path = uri.underlying.getPath
     val i = path.lastIndexOf('/')
     path.substring(i+1,path.length)

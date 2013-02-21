@@ -1,4 +1,4 @@
-package org.w3.banana.plantain
+package org.w3.banana.ldp
 
 import org.w3.banana._
 import scalaz.{ Free, Functor }
@@ -27,6 +27,8 @@ case class Admin(onBehalfOf: Subject, id: List[Principal]=List())
 case class WebIDPrincipal(webid: java.net.URI) extends Principal {
   val getName = webid.toString
 }
+
+
 
 
 case class CreateLDPR[Rdf <: RDF, A](container: Rdf#URI,

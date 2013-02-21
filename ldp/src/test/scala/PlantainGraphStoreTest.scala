@@ -1,39 +1,42 @@
-package org.w3.banana.experimental
+package org.w3.banana.ldp
 
 import org.w3.banana._
 import org.w3.banana.plantain._
 import org.w3.banana.plantain.model._
 import org.scalatest._
 import org.scalatest.matchers._
-import Plantain._
-import org.w3.banana.plantain.LDPCommand._
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.w3.banana.ldp.LDPCommand._
 import java.nio.file.Files
 import play.api.libs.iteratee.Enumerator
-import scala.concurrent.{Future, Await}
+import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 import akka.util.Timeout
 import scala.Some
+import akka.actor.Props
 
 object PlantainTest {
   implicit val timeout = Timeout(10,TimeUnit.MINUTES)
-  val dir = Files.createTempDirectory("plantain")
-  lazy val rww = new PlantainRWW(URI.fromString("http://example.com/foo/"), dir,None)(timeout)
-
+  val dir = Files.createTempDirectory("plantain" )
+  implicit val authz: AuthZ[Plantain] =  new AuthZ[Plantain]()(Plantain.ops)
+  val rww = new RWWeb[Plantain](URI.fromString("http://example.com/foo/"))(Plantain.ops,timeout)
+  rww.setLDPSActor(rww.system.actorOf(Props(new PlantainLDPCActor(rww.baseUri, dir)),"rootContainer"))
 }
-class PlantainLDPSTest extends LDPSTest[Plantain](PlantainTest.rww)
+
+class PlantainLDPSTest extends LDPSTest[Plantain](PlantainTest.rww)(Plantain.ops,Plantain.rdfxmlReader,PlantainTest.authz)
 
 abstract class LDPSTest[Rdf <: RDF](
   rww: RWW[Rdf])(
-  implicit diesel: Diesel[Rdf],
+  implicit ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, RDFXML],
   authz: AuthZ[Rdf]) extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
   import diesel._
   import ops._
+  import syntax._
   import authz._
 
+  implicit val ec = ExecutionContext.Implicits.global
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACLPrefix[Rdf]
 
@@ -102,7 +105,7 @@ abstract class LDPSTest[Rdf <: RDF](
       rGraph <- rww.execute(getLDPR(ldprUri))
     } yield {
       rUri must be(ldprUri)
-      assert(rGraph isIsomorphicWith graph)
+      assert(rGraph.relativize(ldprUri) isIsomorphicWith graph)
     }
     script.getOrFail()
 
@@ -115,7 +118,7 @@ abstract class LDPSTest[Rdf <: RDF](
         rGraph  <- getLDPR(ruri)
       } yield {
         ruri must be(ldprUri2)
-        assert(rGraph isIsomorphicWith graph)
+        assert(rGraph.relativize(ruri) isIsomorphicWith graph)
       }
     }
     script2.getOrFail()
@@ -142,7 +145,7 @@ abstract class LDPSTest[Rdf <: RDF](
           rGraph <- getLDPR(ldprUri)
         } yield {
           rUri must be(ldprUri)
-          assert(rGraph isIsomorphicWith graph)
+          assert(rGraph.relativize(rUri) isIsomorphicWith graph)
         }
       }
       script.getOrFail()
@@ -158,7 +161,7 @@ abstract class LDPSTest[Rdf <: RDF](
         _ <- deleteResource(innerldpcUri)
       } yield {
         rUri.relativizeAgainst(innerldpcUri).toString must not include ("/")
-        assert(rGraph isIsomorphicWith graph)
+        assert(rGraph.relativize(rUri) isIsomorphicWith graph)
       }
     }
     script.getOrFail()
@@ -198,7 +201,7 @@ abstract class LDPSTest[Rdf <: RDF](
         assert(acl.resolveAgainst(ldprMeta) isIsomorphicWith graphCardACL)
         cardRes match {
           case card: LDPR[Rdf] => assert( card.graph isIsomorphicWith graph.resolveAgainst(ldprUriFull))
-          case _ => throw new Exception("recived the wrong type of resource")
+          case _ => throw new Exception("received the wrong type of resource")
         }
       }
     }
@@ -326,7 +329,7 @@ abstract class LDPSTest[Rdf <: RDF](
           getLDPR(ldprUri)
         }
       } yield {
-        assert( unionG isIsomorphicWith( graph union graph2) )
+        assert( unionG.relativize(ldprUri) isIsomorphicWith( graph union graph2) )
       }
     }
 

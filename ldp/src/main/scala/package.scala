@@ -1,8 +1,8 @@
-package org.w3.banana
+package org.w3.banana.ldp
 
 import org.w3.banana.plantain._
 
-package object experimental {
+package object ldp {
 
 //  type Rdf = Plantain
 //

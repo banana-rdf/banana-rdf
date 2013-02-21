@@ -1,25 +1,16 @@
-package org.w3.banana.experimental
+package org.w3.banana.ldp
 
-import org.w3.banana._
-import java.nio.file._
-import scala.concurrent._
-import scala.concurrent.stm._
-import akka.actor._
-import akka.util._
-import akka.pattern.{ ask, pipe }
-import akka.transactor._
-import scalaz.Free
 import org.openrdf.model.{ URI => SesameURI, _ }
-import org.openrdf.model.impl._
 import org.openrdf.query.algebra.evaluation.TripleSource
 import org.openrdf.query.QueryEvaluationException
 import info.aduna.iteration.CloseableIteration
 import org.w3.banana.plantain.model.Node
 import org.w3.banana.plantain.PlantainUtil._
-import org.w3.banana.plantain.PlantainOps.uriSyntax
-import org.slf4j.{ Logger, LoggerFactory }
+import org.w3.banana.plantain.Plantain
+import org.w3.banana.syntax
 
-class TMapTripleSource(tmap: scala.collection.mutable.Map[String, PlantainLDPR]) extends TripleSource {
+class TMapTripleSource(tmap: scala.collection.mutable.Map[String, LDPRes[Plantain]]) extends TripleSource {
+  import syntax.URISyntax.uriW
 
   def getValueFactory(): org.openrdf.model.ValueFactory = ???
 
@@ -36,7 +27,7 @@ class TMapTripleSource(tmap: scala.collection.mutable.Map[String, PlantainLDPR])
         context <- contexts.iterator
         if context.isInstanceOf[SesameURI]
         uri = context.asInstanceOf[SesameURI]
-        ldpr <- tmap.lift(Node.fromSesame(uri).lastPathSegment).toIterator
+        ldpr <- tmap.lift(uriW[Plantain](Node.fromSesame(uri)).lastPathSegment).toIterator
         statement <- ldpr.graph.getStatements(subject, predicate, objectt).toIterator
       } yield {
         statement.withContext(uri)
