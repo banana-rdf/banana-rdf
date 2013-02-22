@@ -14,7 +14,15 @@ import scalaz.-\/
 import org.w3.banana.plantain.Plantain
 import collection.parallel.mutable
 
-
+/**
+ * A LDP Container actor that is responsible for the equivalent of a directory
+ *
+ *
+ * @param baseUri the URI for the container
+ * @param root the path on the file system where data is saved to
+ * @param ops
+ * @param sparqlGraph
+ */
 class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
                                  (implicit ops: RDFOps[Plantain],
                                      sparqlGraph: SparqlGraph[Plantain]) extends RActor {
