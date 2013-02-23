@@ -6,6 +6,8 @@ import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
 import scala.util._
+import java.security.KeyPairGenerator
+import java.security.interfaces.RSAPublicKey
 
 abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: RecordBinder[Rdf]) extends WordSpec with MustMatchers {
 
@@ -19,6 +21,8 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordB
   val person = Person("Alexandre Bertails")
   val personWithNickname = person.copy(nickname = Some("betehess"))
   val me = Me("Name")
+  val keyGen = KeyPairGenerator.getInstance("RSA");
+  val rsa: RSAPublicKey = { keyGen.initialize(512);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] must be(Success(city))
@@ -30,6 +34,20 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordB
         -- foaf("otherNames") ->- "Lutetia"
     ).graph
     city.toPG.graph.isIsomorphicWith(expectedGraph) must be(true)
+  }
+
+  "serializing and deserializing a public key" in {
+    import Cert._
+    val rsaPg = rsa.toPG
+//todo: there is a bug below. The isomorphism does not work, even though it should.
+//    System.out.println(s"rsag=${rsaPg.graph}")
+//    val expectedGraph = (
+//      URI("#k") -- cert.modulus ->- rsa.getModulus.toByteArray
+//              -- cert.exponent ->- rsa.getPublicExponent
+//      ).graph
+//    System.out.println(s"expectedGraph=${expectedGraph}")
+//    rsaPg.graph.isIsomorphicWith(expectedGraph) must be(true)
+    rsaPg.as[RSAPublicKey] must be(Success(rsa))
   }
 
   "graph constant pointer" in {

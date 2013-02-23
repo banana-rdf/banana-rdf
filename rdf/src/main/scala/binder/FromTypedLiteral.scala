@@ -3,6 +3,7 @@ package org.w3.banana.binder
 import org.w3.banana._
 import scala.util._
 import org.joda.time.DateTime
+import java.math.BigInteger
 
 trait FromTypedLiteral[Rdf <: RDF, +T] {
   def fromTypedLiteral(tl: Rdf#TypedLiteral): Try[T]
@@ -45,9 +46,25 @@ object FromTypedLiteral {
     import ops._
     def fromTypedLiteral(tl: Rdf#TypedLiteral): Try[Int] = {
       val TypedLiteral(lexicalForm, datatype) = tl
-      if (datatype == xsd.integer) {
+      if (datatype == xsd.int) {
         try {
           Success(lexicalForm.toInt)
+        } catch {
+          case _: NumberFormatException => Failure(FailedConversion(s"${tl} is an xsd.integer but is not an acceptable integer"))
+        }
+      } else {
+        Failure(FailedConversion(s"${tl} is not an xsd:int"))
+      }
+    }
+  }
+
+  implicit def BigIntFromTypedLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromTypedLiteral[Rdf, BigInteger] {
+    import ops._
+    def fromTypedLiteral(tl: Rdf#TypedLiteral): Try[BigInteger] = {
+      val TypedLiteral(lexicalForm, datatype) = tl
+      if (datatype == xsd.integer) {
+        try {
+          Success(new BigInteger(lexicalForm))
         } catch {
           case _: NumberFormatException => Failure(FailedConversion(s"${tl} is an xsd.integer but is not an acceptable integer"))
         }
@@ -56,6 +73,7 @@ object FromTypedLiteral {
       }
     }
   }
+
 
   implicit def DoubleFromTypedLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromTypedLiteral[Rdf, Double] {
     import ops._
@@ -88,5 +106,27 @@ object FromTypedLiteral {
       }
     }
   }
+
+  implicit def ByteArrayFromTypedLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromTypedLiteral[Rdf, Array[Byte]] {
+    import ops._
+    val whitespace = "\\s".r
+    def hex2Bytes( hex: String ): Try[Array[Byte]] = Try {
+      val cleaned = whitespace.replaceAllIn(hex,"") //avoid obvious hex encoding errors ( not standard, but no other interpretation makes sense )
+      val x = for { i <- 0 to hex.length-1 by 2 }
+              yield cleaned.substring( i, i+2 )
+      x.map( Integer.parseInt( _, 16 ).toByte ).toArray
+    }
+    def fromTypedLiteral(tl: Rdf#TypedLiteral): Try[Array[Byte]] = {
+      val TypedLiteral(lexicalForm, datatype) = tl
+      if (datatype == xsd.hexBinary) {
+        hex2Bytes(lexicalForm) recoverWith {
+          case _: NumberFormatException => Failure(FailedConversion(s"${tl} cannot be parsed as an xsd:hexBinary"))
+        }
+      } else {
+        Failure(FailedConversion(s"${tl} is not an xsd:datetime"))
+      }
+    }
+  }
+
 
 }

@@ -2,6 +2,8 @@ package org.w3.banana.binder
 
 import org.w3.banana._
 import org.joda.time.DateTime
+import util.{Failure, Try}
+import java.math.BigInteger
 
 trait ToTypedLiteral[Rdf <: RDF, -T] {
   def toTypedLiteral(t: T): Rdf#TypedLiteral
@@ -28,7 +30,13 @@ object ToTypedLiteral {
   implicit def IntToTypedLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
     new ToTypedLiteral[Rdf, Int] {
       import ops._
-      def toTypedLiteral(i: Int): Rdf#TypedLiteral = TypedLiteral(i.toString, xsd.integer)
+      def toTypedLiteral(i: Int): Rdf#TypedLiteral = TypedLiteral(i.toString, xsd.int)
+    }
+
+  implicit def BigIntToTypedLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+    new ToTypedLiteral[Rdf, BigInteger] {
+      import ops._
+      def toTypedLiteral(i: BigInteger): Rdf#TypedLiteral = TypedLiteral(i.toString, xsd.integer)
     }
 
   implicit def DoubleToTypedLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
@@ -42,5 +50,23 @@ object ToTypedLiteral {
       import ops._
       def toTypedLiteral(dateTime: DateTime): Rdf#TypedLiteral = TypedLiteral(dateTime.toString, xsd.dateTime)
     }
+
+
+  implicit def ByteArrayToTypedLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+    new ToTypedLiteral[Rdf, Array[Byte]] {
+    import ops._
+      def bytes2Hex( bytes: Array[Byte] ): String = {
+        def cvtByte( b: Byte ): String = {
+          val c = b & 0xff
+          (if ( c < 0x10 ) "0" else "" ) + java.lang.Long.toString( c & 0xff, 16 )
+        }
+        bytes.map( cvtByte( _ )).mkString
+      }
+    def toTypedLiteral(bytes: Array[Byte]): Rdf#TypedLiteral = {
+      TypedLiteral(bytes2Hex(bytes),xsd.hexBinary)
+    }
+  }
+
+
 
 }

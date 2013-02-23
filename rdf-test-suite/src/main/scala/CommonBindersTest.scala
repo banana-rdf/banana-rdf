@@ -23,6 +23,10 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     false.toPG.as[Boolean] must be(Success(false))
   }
 
+  "serializing and deserializing an Integer" in {
+    123.toPG.as[Int] must be(Success(123))
+  }
+
   "serializing and deserializing a List of simple nodes" in {
     val binder = PGBinder[Rdf, List[Int]]
     val list = List(1, 2, 3)
