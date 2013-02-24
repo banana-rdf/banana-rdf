@@ -24,10 +24,6 @@ case class Subj (id: List[Principal]) extends Subject
 
 case class Admin(onBehalfOf: Subject, id: List[Principal]=List())
 
-case class WebIDPrincipal(webid: java.net.URI) extends Principal {
-  val getName = webid.toString
-}
-
 
 
 

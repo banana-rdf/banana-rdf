@@ -1,21 +1,181 @@
-//import org.scalatest.{BeforeAndAfterAll, WordSpec}
-//import org.scalatest.matchers.MustMatchers
-//import org.w3.banana._
-//import concurrent.{Await, Future}
-//import concurrent.duration.Duration
-//import java.net.URL
-//import org.w3.banana.LinkedDataResource
-//import org.w3.banana.plantain.{Subject, RWW}
+package org.w3.banana.ldp
+
+import akka.actor.Props
+import akka.util.Timeout
+import java.nio.file.Files
+import java.security.interfaces.RSAPublicKey
+import java.security.KeyPairGenerator
+import java.util.concurrent.TimeUnit
+import org.scalatest.{BeforeAndAfterAll, WordSpec}
+import org.scalatest.matchers.MustMatchers
+import org.w3.banana._
+import concurrent.Future
+import java.net.{URL=>jURL,URI=>jURI}
+import org.w3.banana.plantain.Plantain
+import org.w3.banana.ldp.LDPCommand._
+import scala.Some
+
+
+object WebACLTestSuite {
+  import org.w3.banana.plantain.model.URI
+  implicit val timeout = Timeout(10,TimeUnit.MINUTES)
+  val dir = Files.createTempDirectory("plantain" )
+  val baseUri = URI.fromString("http://example.com/foo/")
+  implicit val authz: AuthZ[Plantain] =  new AuthZ[Plantain]()(Plantain.ops)
+  val rww = new RWWeb[Plantain](baseUri)(Plantain.ops,timeout)
+  rww.setLDPSActor(rww.system.actorOf(Props(new PlantainLDPCActor(rww.baseUri, dir)),"rootContainer"))
+}
+
+class PlantainWebACLTest extends WebACLTestSuite[Plantain](
+  WebACLTestSuite.rww,WebACLTestSuite.baseUri)(
+  Plantain.ops,Plantain.sparqlOps,Plantain.sparqlGraph,Plantain.recordBinder,Plantain.rdfxmlReader,PlantainTest.authz)
+
+abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
+                                 implicit ops: RDFOps[Rdf],
+                                 sparqlOps: SparqlOps[Rdf],
+                                 sparqlGraph: SparqlGraph[Rdf],
+                                 recordBinder: binder.RecordBinder[Rdf],
+                                 reader: RDFReader[Rdf, RDFXML],
+                                 authz: AuthZ[Rdf])
+    extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
+
+  import ops._
+  import syntax._
+  import diesel._
+
+  val certbinder = new CertBinder()
+  import certbinder._
+
+  implicit def toUri(url: jURL): Rdf#URI = URI(url.toString)
+
+  val wac = WebACLPrefix[Rdf]
+  val foaf = FOAFPrefix[Rdf]
+  val cert = CertPrefix[Rdf]
+  val keyGen = KeyPairGenerator.getInstance("RSA");
+  val henryRsaKey: RSAPublicKey = { keyGen.initialize(768);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
+  val bertailsRsaKey: RSAPublicKey = { keyGen.initialize(512);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
+
+
+  val henryCard = URI("http://bblfish.net/people/henry/card")
+  val henry =  URI(henryCard.toString+"#me")
+  val henryGraph : Rdf#Graph = (
+    URI("#me") -- cert.key ->- henryRsaKey
+               -- foaf.name ->- "Henry"
+    ).graph
+
+  val henryCardAcl = new jURL("http://bblfish.net/people/henry/card;wac")
+  val henryCardAclGraph: Rdf#Graph = (
+    bnode("t1")
+      -- wac.accessTo ->- henryCard
+      -- wac.agent ->- henry
+      -- wac.mode ->- wac.Read
+      -- wac.mode ->- wac.Write
+    ).graph
+
+  val groupACLForRegexResource: Rdf#Graph = (
+    bnode("t1")
+      -- wac.accessToClass ->- ( bnode("t2") -- wac.regex ->- "http://bblfish.net/blog/.*" )
+      -- wac.agentClass ->- ( URI("http://bblfish.net/blog/editing/.meta#a1") -- foaf("member") ->- henry )
+      -- wac.mode ->- wac.Read
+      -- wac.mode ->- wac.Write
+    ).graph
+
+  object testFetcher extends ResourceFetcher[Rdf] {
+    def fetch(url: jURL): Future[NamedResource[Rdf]] = url match {
+      case henryCard =>  Future.successful(LDPRes(henryCard,henryGraph.resolveAgainst(henryCard)))
+      case henryCardAcl =>  Future.successful(LDPRes(henryCardAcl,henryCardAclGraph.resolveAgainst(henryCardAcl)))
+
+    }
+  }
+  rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )
+
+  val webidVerifier = new WebIDVerifier(rww)
+
+  val bertailsCollection = URI("http://example.com/foo/bertails/")
+  val bertails = URI("http://example.com/foo/bertails/card#me")
+  val bertailsCard = URI("http://example.com/foo/bertails/card")
+
+  override def afterAll(): Unit = {
+    rww.shutdown()
+  }
+
+  val bertailsCardgraph: Rdf#Graph = (
+    URI("#me")
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.title ->- "Mr"
+      -- cert.key ->- bertailsRsaKey
+    ).graph
+
+
+  "Henry" when {
+
+    "can Authenticate" in {
+      val futurePrincipal = webidVerifier.verifyWebID(henry.toString,henryRsaKey)
+      val res = futurePrincipal.map{p=>
+        System.out.println(s"p=$p")
+        assert(p.isInstanceOf[WebIDPrincipal] && p.getName == henry.toString)
+      }
+      res.getOrFail()
+    }
+  }
+
+  "Alex" when {
+
+    "add bertails card" in {
+      val script = rww.execute(for {
+        rUri <- createContainer(baseUri,Some("bertails"),Graph.empty)
+        card <- createLDPR(rUri,Some(bertailsCard.lastPathSegment),bertailsCardgraph)
+        rGraph <- getLDPR(card)
+      } yield {
+        rUri must be(bertailsCollection)
+        assert(rGraph.relativize(bertailsCard) isIsomorphicWith bertailsCardgraph)
+      })
+      script.getOrFail()
+
+    }
+
+    "can Authenticate" in {
+      val futurePrincipal = webidVerifier.verifyWebID(bertails.toString,bertailsRsaKey)
+      val res = futurePrincipal.map{p=>
+        System.out.println(s"p=$p")
+        assert(p.isInstanceOf[WebIDPrincipal] && p.getName == bertails.toString)
+      }
+      res.getOrFail()
+    }
+
+  }
+
+
+//  "Henry" when {
+//    //    wac3.authorizations must have size(1)
+//    val webreq = DummyWebRequest( henryFuture, Read,
+//      new URL("http://bblfish.net/blog/editing/.meta"),
+//      new URL("http://bblfish.net/blog/editing/post1")
+//    )
 //
-//class WebACLTestSuite[Rdf<:RDF](implicit val ops: RDFOps[Rdf])
-//    extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
+//    "read mode" in {
+//      val fb=wac3.allow(webreq)
+//      Await.result(fb,Duration("1s")) mustBe henrysubjAnswer
+//    }
+//    "write mode" in {
+//      val fb=wac3.allow(webreq.copy2(mode=Write))
+//      Await.result(fb,Duration("1s")) mustBe henrysubjAnswer
+//    }
+//    "control mode" in {
+//      val fb=wac3.allow(webreq.copy2(mode=Control))
+//      try {
+//        Await.result(fb,Duration("1s"))
+//        fail("Should throw an exception")
+//      } catch {
+//        case e: Exception => System.out.println("ok:"+e)
+//      }
+//    }
 //
-//  import ops._
-//  val wac = WebACLPrefix[Rdf]
-//  val foaf = FOAFPrefix[Rdf]
-//  val rww: RWW[Rdf]
+//  }
 //
-//  def dummyCache(loc: Rdf#URI, g: Rdf#Graph) = new LinkedDataCache[Rdf]{
+//
+
+  //  def dummyCache(loc: Rdf#URI, g: Rdf#Graph) = new LinkedDataCache[Rdf]{
 //    def get(uri: Rdf#URI) =
 //      if (uri==loc) Future(LinkedDataResource(uri, PointedGraph[Rdf](uri,g)))
 //      else throw new Exception("method should never be called")
@@ -26,7 +186,7 @@
 //      if (uri==loc) Future(LinkedDataResource(uri, PointedGraph[Rdf](uri,g)))
 //      else cache.get(uri)
 //  }
-//
+
 //  case class DummyWebRequest(subject: Future[Subject], mode: Mode, meta: URL, url: URL)
 //    extends WebRequest[Any] {
 //
@@ -49,7 +209,6 @@
 //    def body = ???
 //  }
 //
-//  val henry = new java.net.URI("http://bblfish.net/people/henry/card#me")
 //  val henrysubj = Subject(List(WebIDPrincipal(henry)))
 //  val henrysubjAnswer = Subject(List(WebIDPrincipal(henry)),List(WebIDPrincipal(henry)))
 //  val henryFuture = Future(henrysubj)
@@ -66,8 +225,8 @@
 //  }
 //
 //  val wac1 = WebAccessControl[Rdf](dummyCache(URI("http://joe.example/pix/.meta"),publicACLForSingleResource))
-//
-//
+
+
 //  """Access to a Public resource by an individual
 //    (see http://www.w3.org/wiki/WebAccessControl#Public_Access)""" when {
 ////    wac1.authorizations must have size(1)
@@ -141,43 +300,7 @@
 //    }
 //  }
 //
-//  val groupACLForRegexResource: Rdf#Graph = (
-//    bnode("t1")
-//      -- wac.accessToClass ->- ( bnode("t2") -- wac.regex ->- "http://bblfish.net/blog/editing/.*" )
-//      -- wac.agentClass ->- ( URI("http://bblfish.net/blog/editing/.meta#a1") -- foaf("member") ->- URI(henry.toString) )
-//      -- wac.mode ->- wac.Read
-//      -- wac.mode ->- wac.Write
-//    ).graph
-//
-//  val wac3 = WebAccessControl[Rdf](dummyCache(URI("http://bblfish.net/blog/editing/.meta"),groupACLForRegexResource))
-//
-//
-//  "Access to group (named with a local uri) protected resources described by a regex" when {
-////    wac3.authorizations must have size(1)
-//    val webreq = DummyWebRequest( henryFuture, Read,
-//      new URL("http://bblfish.net/blog/editing/.meta"),
-//      new URL("http://bblfish.net/blog/editing/post1")
-//    )
-//
-//    "read mode" in {
-//      val fb=wac3.allow(webreq)
-//      Await.result(fb,Duration("1s")) mustBe henrysubjAnswer
-//    }
-//    "write mode" in {
-//      val fb=wac3.allow(webreq.copy2(mode=Write))
-//      Await.result(fb,Duration("1s")) mustBe henrysubjAnswer
-//    }
-//    "control mode" in {
-//      val fb=wac3.allow(webreq.copy2(mode=Control))
-//      try {
-//        Await.result(fb,Duration("1s"))
-//        fail("Should throw an exception")
-//      } catch {
-//        case e: Exception => System.out.println("ok:"+e)
-//      }
-//    }
-//
-//  }
+
 //
 //  val remoteGroupACLForRegexResource: Rdf#Graph = (
 //    bnode("t1")
@@ -216,6 +339,6 @@
 //    }
 //
 //  }
-//
-//
-//}
+
+
+}

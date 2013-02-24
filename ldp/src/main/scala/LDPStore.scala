@@ -210,6 +210,7 @@ case class AccessDenied(message: String) extends Exception(message) with BananaE
 
 
 trait RWW[Rdf <: RDF] {  //not sure which of exec or execute is going to be needed
+  def system: ActorSystem
   def execute[A](script: LDPCommand.Script[Rdf,A]): Future[A]
   def exec[A](cmd: LDPCommand[Rdf, LDPCommand.Script[Rdf,A]]): Future[A]
   /*

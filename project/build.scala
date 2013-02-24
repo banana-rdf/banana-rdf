@@ -253,7 +253,9 @@ object BananaRdfBuild extends Build {
         libraryDependencies += scalaIoFile,
         libraryDependencies += akka,
         libraryDependencies += akkaTransactor,
+        libraryDependencies += scalaz,
         libraryDependencies += iterateeDeps,
+        libraryDependencies += playDeps,
         libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
         libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )

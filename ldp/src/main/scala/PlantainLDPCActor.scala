@@ -189,8 +189,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
     }
   }
 
-  def receive = {
-    returnErrors {
+  def receive = returnErrors {
       case s: Scrpt[Plantain,_]  => {
           run(sender, s.script)
       }
@@ -200,6 +199,5 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
         run(sender, script)
       }
     }
-  }
 
 }
