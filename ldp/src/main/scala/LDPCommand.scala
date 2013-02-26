@@ -114,7 +114,7 @@ object LDPCommand {
     suspend(CreateBinary(container, slug, mime, bin => `return`(bin)))
 
 
-  def getLDPR[Rdf <: RDF, A](uri: Rdf#URI): Script[Rdf, Rdf#Graph] =
+  def getLDPR[Rdf <: RDF, A](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Script[Rdf, Rdf#Graph] =
     getResource(uri).map{res =>
       res match {
         case ldpr: LDPR[Rdf] =>  ldpr.relativeGraph

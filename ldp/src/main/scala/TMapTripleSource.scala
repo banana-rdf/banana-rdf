@@ -9,7 +9,7 @@ import org.w3.banana.plantain.PlantainUtil._
 import org.w3.banana.plantain.Plantain
 import org.w3.banana.syntax
 
-class TMapTripleSource(tmap: scala.collection.mutable.Map[String, LDPRes[Plantain]]) extends TripleSource {
+class TMapTripleSource(tmap: scala.collection.mutable.Map[String, LocalLDPR[Plantain]]) extends TripleSource {
   import syntax.URISyntax.uriW
 
   def getValueFactory(): org.openrdf.model.ValueFactory = ???

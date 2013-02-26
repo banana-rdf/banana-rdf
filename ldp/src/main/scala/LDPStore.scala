@@ -82,12 +82,8 @@ trait Meta[Rdf <: RDF] {
 
   /**
    * location of initial ACL for this resource
-   * This initial implementation is too hard wired. IT should be something that is settable at configuration time
    **/
-  lazy val acl: Option[Rdf#URI] = Some{
-    if (uri.toString.endsWith(";acl")) uri
-    else ops.URI(uri.toString+";acl")
-  }
+  def acl: Option[Rdf#URI]
 
   //other metadata candidates:
   // - owner
@@ -115,17 +111,20 @@ trait BinaryResource[Rdf<:RDF] extends NamedResource[Rdf]  {
 }
 
 /*
- * TODO
+ * And LDPC is currently defined in the LDP ontology as a subclass of an LDPR.
+ * This LDPR class is more what we are thinking as the non binary non LDPCs...
  * - an LDPS must subscribe to the death of its LDPC
  */
 
 trait LDPR[Rdf <: RDF] extends NamedResource[Rdf]  {
-  def uri: Rdf#URI // *no* trailing slash
+  import org.w3.banana.syntax._
+  def uri: Rdf#URI
 
   def graph: Rdf#Graph // all uris are relative to uri
 
   /* the graph such that all URIs are relative to $uri */
-  def relativeGraph: Rdf#Graph
+  def relativeGraph(implicit ops: RDFOps[Rdf]): Rdf#Graph  = graph.resolveAgainst(uri)
+
 }
 
 trait LDPC[Rdf <: RDF] extends NamedResource[Rdf] {
@@ -134,9 +133,20 @@ trait LDPC[Rdf <: RDF] extends NamedResource[Rdf] {
 }
 
 
+
 case class OperationNotSupported(msg: String) extends Exception(msg)
 
-case class BinaryRes[Rdf<:RDF](root: Path, uri: Rdf#URI)(implicit val ops: RDFOps[Rdf]) extends BinaryResource[Rdf] {
+trait LocalNamedResource[Rdf<:RDF] extends NamedResource[Rdf] {
+  lazy val acl: Option[Rdf#URI]= Some{
+    if (uri.toString.endsWith(";acl")) uri
+    else ops.URI(uri.toString+";acl")
+  }
+}
+
+
+case class LocalBinaryR[Rdf<:RDF](root: Path, uri: Rdf#URI)
+                                   (implicit val ops: RDFOps[Rdf])
+  extends BinaryResource[Rdf] with LocalNamedResource[Rdf] {
   import org.w3.banana.syntax.URISyntax.uriW
 
   lazy val path = root.resolve(uriW(uri).lastPathSegment)
@@ -152,7 +162,7 @@ case class BinaryRes[Rdf<:RDF](root: Path, uri: Rdf#URI)(implicit val ops: RDFOp
   // creates a new BinaryResource, with new time stamp, etc...
   //here I can just write to the file, as that should be a very quick operation, which even if it blocks,
   //should be extreemly fast server side.  Iteratee
-  def write: Iteratee[Array[Byte], BinaryRes[Rdf] ] = {
+  def write: Iteratee[Array[Byte], LocalBinaryR[Rdf] ] = {
     val tmpfile = Files.createTempFile(path.getParent,path.getFileName.toString,"tmp")
     val out = Files.newOutputStream(tmpfile, StandardOpenOption.WRITE)
     val i = Iteratee.fold[Array[Byte],OutputStream](out){ (out, bytes ) =>
@@ -178,14 +188,11 @@ case class BinaryRes[Rdf<:RDF](root: Path, uri: Rdf#URI)(implicit val ops: RDFOp
  * it's important for the uris in the graph to be absolute
  * this invariant is assumed by the sparql engine (TripleSource)
  */
-case class LDPRes[Rdf<:RDF](uri: Rdf#URI,
+case class LocalLDPR[Rdf<:RDF](uri: Rdf#URI,
                                   graph: Rdf#Graph,
                                   updated: Option[Date] = Some(new Date))
-                                 (implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
-  import org.w3.banana.syntax._
-
-  def relativeGraph: Rdf#Graph =graph.resolveAgainst(uri)
-}
+                                 (implicit val ops: RDFOps[Rdf])
+  extends LDPR[Rdf] with LocalNamedResource[Rdf]
 
 
 case class Scrpt[Rdf<:RDF,A](script:LDPCommand.Script[Rdf,A])

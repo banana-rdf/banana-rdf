@@ -59,7 +59,7 @@ class WSFetcher[Rdf<:RDF](graphSelector: ReaderSelector[Rdf])
               case Some(r) => r.read(response.body, url.toString) match {
                 //todo: add base & use binary type
                 case Success(g) => {
-                  Future.successful(LDPRes(URI(url.toString), g, None))
+                  Future.successful(LocalLDPR(URI(url.toString), g, None))
                 }
                 case Failure(e) => Future.failed(WrappedException("had problems parsing document returned by server", e))
               }

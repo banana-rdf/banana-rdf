@@ -14,6 +14,7 @@ import java.net.{URL=>jURL,URI=>jURI}
 import org.w3.banana.plantain.Plantain
 import org.w3.banana.ldp.LDPCommand._
 import scala.Some
+import java.util.Date
 
 
 object WebACLTestSuite {
@@ -80,11 +81,23 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       -- wac.mode ->- wac.Write
     ).graph
 
+  case class TestLDPR[Rdf<:RDF](uri: Rdf#URI, graph: Rdf#Graph)(implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
+
+    def updated = Some(new Date())
+
+    /**
+     * location of initial ACL for this resource
+     **/
+    def acl = Some{
+      if (uri.toString.endsWith(";wac")) uri
+      else ops.URI(uri.toString+";wac")
+    }
+  }
+
   object testFetcher extends ResourceFetcher[Rdf] {
     def fetch(url: jURL): Future[NamedResource[Rdf]] = url match {
-      case henryCard =>  Future.successful(LDPRes(henryCard,henryGraph.resolveAgainst(henryCard)))
-      case henryCardAcl =>  Future.successful(LDPRes(henryCardAcl,henryCardAclGraph.resolveAgainst(henryCardAcl)))
-
+      case henryCard =>  Future.successful(TestLDPR(henryCard,henryGraph.resolveAgainst(henryCard)))
+      case henryCardAcl =>  Future.successful(TestLDPR(henryCardAcl,henryCardAclGraph.resolveAgainst(henryCardAcl)))
     }
   }
   rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )

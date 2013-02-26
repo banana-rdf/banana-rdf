@@ -33,8 +33,8 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
   val NonLDPRs: Map[String,NamedResource[Plantain]] = Map.empty[String, NamedResource[Plantain]]
   // invariant to be preserved: the Graph are always relative to
 
-  val LDPRs: Map[String,LDPRes[Plantain]] = scala.collection.mutable.Map("" -> LDPRes[Plantain](baseUri,Graph.empty),
-    ";acl"-> LDPRes[Plantain](URI(baseUri.toString+";acl"), Graph.empty))
+  val LDPRs: Map[String,LocalLDPR[Plantain]] = scala.collection.mutable.Map("" -> LocalLDPR[Plantain](baseUri,Graph.empty),
+    ";acl"-> LocalLDPR[Plantain](URI(baseUri.toString+";acl"), Graph.empty))
 
 
   val tripleSource: TripleSource = new TMapTripleSource(LDPRs)
@@ -82,16 +82,16 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
     cmd match {
       case CreateLDPR(_, slugOpt, graph, k) => {
         val (uri, pathSegment) = deconstruct(slugOpt)
-        val ldpr = LDPRes[Plantain](uri, graphW[Plantain](graph).resolveAgainst(uri))
+        val ldpr = LocalLDPR[Plantain](uri, graphW[Plantain](graph).resolveAgainst(uri))
         LDPRs.put(pathSegment, ldpr)
         if (!pathSegment.endsWith(";acl"))
-          LDPRs.put(pathSegment+";acl",LDPRes[Plantain](ldpr.acl.get, Graph.empty))
+          LDPRs.put(pathSegment+";acl",LocalLDPR[Plantain](ldpr.acl.get, Graph.empty))
         k(uri)
       }
       case CreateBinary(_, slugOpt, mime: MimeType, k) => {
         val (uri, pathSegment) = deconstruct(slugOpt)
         //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
-        val bin = BinaryRes[Plantain](root, uri)
+        val bin = LocalBinaryR[Plantain](root, uri)
         NonLDPRs.put(pathSegment, bin)
         k(bin)
       }
@@ -139,7 +139,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
         val resultGraph = add.foldLeft(temp) {
           (graph, triple) => graph + triple.resolveAgainst(uriW[Plantain](uri).resolveAgainst(baseUri))
         }
-        val ldpr = LDPRes[Plantain](uri, resultGraph)
+        val ldpr = LocalLDPR[Plantain](uri, resultGraph)
         LDPRs.put(pathSegment, ldpr)
         a //todo: why no function here?
       }
