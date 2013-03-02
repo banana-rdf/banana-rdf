@@ -74,8 +74,19 @@ object DCPrefix {
 }
 
 class DCPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/elements/1.1/")(ops) {
+   val language = apply("language")
 
 }
+
+object DCTPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new DCTPrefix(ops)
+}
+
+class DCTPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/terms/")(ops) {
+  val title = apply("title")
+
+}
+
 
 object FOAFPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FOAFPrefix(ops)
@@ -92,9 +103,84 @@ class FOAFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("foaf", "ht
   val height = apply("height")
   val mbox = apply("mbox")
   val publication = apply("publication")
+  val homepage = apply("homepage")
   val wants = apply("wants")
   val author = apply("author")
   val member = apply("member")
+}
+
+object IANALinkPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new IANALinkPrefix(ops)
+}
+
+class IANALinkPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "http://www.iana.org/assignments/link-relations/#")(ops) {
+  val about = apply("about")
+  val alternate = apply("alternate")
+  val appendix = apply("appendix")
+  val archives = apply("archives")
+  val author = apply("author")
+  val bookmark = apply("bookmark")
+  val canonical = apply("canonical")
+  val chapter = apply("chapter")
+  val collection = apply("collection")
+  val contents = apply("contents")
+  val copyright = apply("copyright")
+  val create_form = apply("create-form")
+  val current = apply("current")
+  val describedby = apply("describedby")
+  val describes = apply("describes")
+  val disclosure = apply("disclosure")
+  val duplicate = apply("duplicate")
+  val edit = apply("edit")
+  val edit_form = apply("edit-form")
+  val edit_media = apply("edit-media")
+  val enclosure = apply("enclosure")
+  val first = apply("first")
+  val glossary = apply("glossary")
+  val help = apply("help")
+  val hosts = apply("hosts")
+  val hub = apply("hub")
+  val icon = apply("icon")
+  val index = apply("index")
+  val item = apply("item")
+  val last = apply("last")
+  val latest_version = apply("latest-version")
+  val license = apply("license")
+  val lrdd = apply("lrdd")
+  val monitor = apply("monitor")
+  val monitor_group = apply("monitor-group")
+  val next = apply("next")
+  val next_archive = apply("next-archive")
+  val nofollow = apply("nofollow")
+  val noreferrer = apply("noreferrer")
+  val payment = apply("payment")
+  val predecessor_version = apply("predecessor-version")
+  val prefetch = apply("prefetch")
+  val prev = apply("prev")
+  val prev_archive = apply("prev-archive")
+  val preview = apply("preview")
+  val previous = apply("previous")
+  val privacy_policy = apply("privacy-policy")
+  val profile = apply("profile")
+  val related = apply("related")
+  val replies = apply("replies")
+  val search = apply("search")
+  val section = apply("section")
+  val self = apply("self")
+  val service = apply("service")
+  val start = apply("start")
+  val stylesheet = apply("stylesheet")
+  val subsection = apply("subsection")
+  val successor_version = apply("successor-version")
+  val tag = apply("tag")
+  val terms_of_service = apply("terms-of-service")
+  val tpe = apply("type")
+  val up = apply("up")
+  val version_history = apply("version-history")
+  val via = apply("via")
+  val working_copy = apply("working-copy")
+  val working_copy_of = apply("working-copy-of")
+
 }
 
 trait CommonPrefixes[Rdf <: RDF] { this: RDFOps[Rdf] =>
