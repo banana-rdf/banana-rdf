@@ -33,6 +33,12 @@ class PointedGraphW[Rdf <: RDF](val pointed: PointedGraph[Rdf]) extends AnyVal {
     new PointedGraphs[Rdf](nodes, graph)
   }
 
+  /** Get Subjects */
+  def /-(p: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraphs[Rdf] = {
+    val nodes = ops.getSubjects(graph, p, pointer)
+    new PointedGraphs[Rdf](nodes, graph)
+  }
+
   def pointer: Rdf#Node = pointed.pointer
 
   def predicates(implicit ops: RDFOps[Rdf]) = ops.getPredicates(graph, pointer)

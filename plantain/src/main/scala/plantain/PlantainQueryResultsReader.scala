@@ -26,7 +26,8 @@ object PlantainQueryResultsReader {
           case e: QueryResultParseException =>
             val tupleQueryResult =
               QueryResultIO.parse(new ByteArrayInputStream(bytes), sesameSparqlSyntax.tupleFormat)
-            Left(tupleQueryResult.toIterator)
+            import collection.convert.wrapAsScala._
+            Left(BoundSolutions(tupleQueryResult.toIterator,tupleQueryResult.getBindingNames.toList))
         }
       }
 

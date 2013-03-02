@@ -7,8 +7,9 @@ trait ReaderSelector[Rdf <: RDF] extends (MimeType => Option[RDFReader[Rdf, Any]
 
   def combineWith(otherSelector: ReaderSelector[Rdf]): ReaderSelector[Rdf] =
     new ReaderSelector[Rdf] {
-      def apply(mime: MimeType): Option[RDFReader[Rdf, Any]] =
-        this(mime) orElse otherSelector(mime)
+      def apply(mime: MimeType): Option[RDFReader[Rdf, Any]] =  {
+        ReaderSelector.this(mime) orElse otherSelector(mime)
+      }
     }
 
 

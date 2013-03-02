@@ -58,6 +58,11 @@ class PlantainURISyntax(val uri: URI) extends AnyVal with syntax.URIW[Plantain] 
     URI(other.underlying.relativize(uri.underlying))
   }
 
-  def lastPathSegment: String = uri.underlying.toString.replaceFirst(".*/([^/?]+).*", "$1")
+
+  def lastPathSegment(implicit ops: RDFOps[Plantain]): String = {
+    val path = uri.underlying.getPath
+    val i = path.lastIndexOf('/')
+    path.substring(i+1,path.length)
+  }
 
 }

@@ -19,4 +19,6 @@ object PointedGraph {
   def apply[Rdf <: RDF](node: Rdf#Node)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] =
     PointedGraph[Rdf](node, ops.emptyGraph)
 
+  def unapply[Rdf <: RDF](pg: PointedGraph[Rdf]): Option[(Rdf#Node,Rdf#Graph)] = Some((pg.pointer,pg.graph))
+
 }

@@ -27,11 +27,15 @@ trait Plantain extends RDF {
   type AskQuery = ParsedBooleanQuery
   type Solution = BindingSet
   // instead of TupleQueryResult so that it's eager instead of lazy
-  type Solutions = Iterator[BindingSet]
+  type Solutions = BoundSolutions
 
 }
 
+case class BoundSolutions(iterator: Iterator[BindingSet], bindings: List[String])
+
 object Plantain {
+
+  import Syntax._
 
   implicit val ops: RDFOps[Plantain] = PlantainOps
 
@@ -45,7 +49,7 @@ object Plantain {
 
   implicit val turtleReader: RDFReader[Plantain, Turtle] = PlantainTurtleReader
 
-//  implicit val readerSelector: ReaderSelector[Plantain] = PlantainRDFReader.selector
+  implicit val readerSelector: ReaderSelector[Plantain] = ReaderSelector[Plantain,Turtle] combineWith ReaderSelector[Plantain,RDFXML]
 
   implicit val rdfxmlWriter: RDFWriter[Plantain, RDFXML] = PlantainRDFWriter.rdfxmlWriter
 
@@ -66,5 +70,6 @@ object Plantain {
 
   implicit val queryResultsReaderXml: SparqlQueryResultsReader[Plantain, SparqlAnswerXml] =
     PlantainQueryResultsReader.queryResultsReaderXml
+
 
 }

@@ -15,7 +15,8 @@ object PlantainUtil {
     val tupleExpr = query.getTupleExpr
     val evaluationStrategy = new EvaluationStrategyImpl(tripleSource)
     val results = evaluationStrategy.evaluate(tupleExpr, bindings.asSesame)
-    results.toIterator
+    import collection.convert.wrapAsScala._
+    BoundSolutions(results.toIterator,query.getTupleExpr.getBindingNames.toList)
   }
 
   def executeConstruct(tripleSource: TripleSource, query: Plantain#ConstructQuery, bindings: Map[String, Plantain#Node]): Plantain#Graph = {
