@@ -3,6 +3,10 @@ package org.w3.banana.binder
 import org.w3.banana._
 import org.w3.banana.diesel._
 import scala.util._
+import java.security.interfaces.RSAPublicKey
+import java.security.KeyFactory
+import java.security.spec.RSAPublicKeySpec
+import java.math.BigInteger
 
 class ObjectExamples[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: RecordBinder[Rdf]) {
 
@@ -10,6 +14,7 @@ class ObjectExamples[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: Reco
   import recordBinder._
 
   val foaf = FOAFPrefix[Rdf]
+  val cert = CertPrefix[Rdf]
 
   case class Person(name: String, nickname: Option[String] = None)
 
@@ -100,6 +105,22 @@ class ObjectExamples[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: Reco
     implicit val binder: PGBinder[Rdf, Me] =
       pgbWithConstId[Me]("http://example.com#me")
         .apply(name)(Me.apply, Me.unapply) withClasses classUris
+  }
+
+  object Cert {
+    import org.w3.banana.syntax._
+
+    implicit val rsaClassUri = classUrisFor[RSAPublicKey](cert.RSAPublicKey)
+    val factory = KeyFactory.getInstance("RSA")
+    val exponent = property[BigInteger](cert.exponent)
+    val modulus = property[Array[Byte]](cert.modulus)
+
+    implicit val binder: PGBinder[Rdf, RSAPublicKey] =
+      pgb[RSAPublicKey](modulus, exponent)(
+        (m,e)=>factory.generatePublic(new RSAPublicKeySpec(new BigInteger(m),e)).asInstanceOf[RSAPublicKey],
+        key => Some((key.getModulus.toByteArray,key.getPublicExponent))
+    ) // withClasses rsaClassUri
+
   }
 
 }

@@ -37,7 +37,9 @@ trait URIW[Rdf <: RDF] extends Any {
 
   def relativizeAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
 
-  def lastPathSegment: String
+  def lastPathSegment(implicit ops: RDFOps[Rdf]): String
+
+  def underlying(implicit ops:RDFOps[Rdf]): jURI = new jURI(this.getString)
 
 }
 
@@ -88,7 +90,13 @@ class URIWDefault[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal with URIW[Rdf] {
 
   def relativizeAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.relativize(other, uri)(ops)
 
-  def lastPathSegment: String = uri.toString.replaceFirst(".*/([^/?]+).*", "$1")
+  def lastPathSegment(implicit ops: RDFOps[Rdf]): String = {
+    val path = new jURI(ops.fromUri(uri)).getPath
+    val i = path.lastIndexOf('/')
+    if (i <0) path
+    else path.substring(i+1,path.length)
+    //    uri.toString.replaceFirst(".*/([^/?]+).*", "$1")
+  }
 
 }
 

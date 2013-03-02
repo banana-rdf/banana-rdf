@@ -1,4 +1,4 @@
-package org.w3.banana.experimental
+package org.w3.banana.ldp
 
 import org.w3.banana._
 import scala.concurrent._
@@ -19,7 +19,7 @@ trait LinkedResource[Rdf <: RDF, LR] {
 
 }
 
-/** A [[LinkedDataResource]] is obviously a [[LinkedResource]] */
+/** A [[org.w3.banana.LinkedDataResource]] is obviously a [[org.w3.banana.ldp.LinkedResource]] */
 class LDRLinkedResource[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LinkedResource[Rdf, LinkedDataResource[Rdf]] {
 
   def ~(uri: Rdf#URI): Future[LinkedDataResource[Rdf]] = ???

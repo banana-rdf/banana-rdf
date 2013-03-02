@@ -2,8 +2,7 @@ package org.w3.banana.plantain.model
 
 import org.w3.banana.TripleMatch
 import java.net.{ URI => jURI }
-import java.util.UUID
-import org.slf4j.{ Logger, LoggerFactory }
+import org.slf4j.LoggerFactory
 import java.util.{ Set => jSet, List => jList, Collection => jCollection, Iterator => jIterator }
 import scala.collection.JavaConverters._
 import org.openrdf.model.{ Graph => SesameGraph, Literal => SesameLiteral, BNode => SesameBNode, URI => SesameURI, _ }
@@ -22,7 +21,7 @@ object Graph {
 
 case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends SesameGraph with TripleSource {
 
-  import Graph.{ logger }
+  import Graph.logger
 
   def triples: Iterable[Triple] =
     for {
@@ -174,6 +173,10 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Sesa
         def remove(): Unit = throw new UnsupportedOperationException
       }
     }
+  }
+
+  override def toString(): String = {
+     triples.foldRight("("){ case (triple,s) => s+" "+triple.toString }+")"
   }
 
 }

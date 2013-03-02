@@ -11,11 +11,10 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-//    version      := "0.3-SNAPSHOT",
-    version      := "x14-SNAPSHOT",
+    version      := "2013_02_21-SNAPSHOT",
     scalaVersion := "2.10.0",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
-
+    fork := false,
     parallelExecution in Test := false,
     offline := true,
     testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
@@ -58,6 +57,11 @@ object BuildSettings {
           <name>Alexandre Bertails</name>
           <url>http://bertails.org</url>
         </developer>
+        <developer>
+          <id>bblfish</id>
+          <name>Henry Story</name>
+          <url>http://bblfish.net/</url>
+        </developer>
       </developers>
     )
   )
@@ -84,7 +88,7 @@ object BananaRdfBuild extends Build {
   val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.0"
   val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.0"
 
-  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
+//  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
 
@@ -97,7 +101,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M5b"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP8"
   
   val testsuiteDeps =
     Seq(
@@ -157,6 +161,7 @@ object BananaRdfBuild extends Build {
       jena,
       sesame,
       plantain,
+      ldp,
       examples))
   
   lazy val rdf = Project(
@@ -243,10 +248,18 @@ object BananaRdfBuild extends Build {
   lazy val ldp = Project(
     id = "ldp",
     base = file("ldp"),
-    settings = buildSettings ++ testDeps ++ Seq(
-      libraryDependencies += scalaStm
+    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
+        libraryDependencies += scalaIoCore,
+        libraryDependencies += scalaIoFile,
+        libraryDependencies += akka,
+        libraryDependencies += akkaTransactor,
+        libraryDependencies += scalaz,
+        libraryDependencies += iterateeDeps,
+        libraryDependencies += playDeps,
+        libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
+        libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (rdf, jena % "test", sesame % "test")
+  ) dependsOn (plantain, rdfTestSuite % "test")
 
   
 }

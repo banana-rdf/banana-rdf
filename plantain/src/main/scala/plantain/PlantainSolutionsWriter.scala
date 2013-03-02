@@ -12,17 +12,18 @@ object PlantainSolutionsWriter {
 
       val syntax = _syntax
 
-      def write[R <: jWriter](answers: Plantain#Solutions, wcr: WriteCharsResource[R], base: String) =
+      def write[R <: jWriter](answers: Plantain#Solutions, wcr: WriteCharsResource[R], base: String) = {
+        import collection.convert.wrapAsJava._
+        val bindings = answers.bindings
         Try {
           val baos = new ByteArrayOutputStream()
           val sWriter = sesameSparqlSyntax.writer(baos)
-          // sWriter.startQueryResult(answers.getBindingNames)
-          sWriter.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
-          answers foreach { answer => sWriter.handleSolution(answer) }
+          sWriter.startQueryResult(bindings)
+          answers.iterator foreach { answer => sWriter.handleSolution(answer) }
           sWriter.endQueryResult()
           wcr.write(baos.toString("UTF-8"))
         }
-
+      }
     }
 
   implicit val solutionsWriterJson = PlantainSolutionsWriter[SparqlAnswerJson]
