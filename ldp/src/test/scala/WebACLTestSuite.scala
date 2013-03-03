@@ -64,13 +64,18 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
                -- foaf.name ->- "Henry"
     ).graph
 
-  val henryCardAcl = new jURL("http://bblfish.net/people/henry/card;wac")
+  val henryCardAcl = URI("http://bblfish.net/people/henry/card;wac")
   val henryCardAclGraph: Rdf#Graph = (
-    bnode("t1")
+     bnode("t1")
       -- wac.accessTo ->- henryCard
       -- wac.agent ->- henry
       -- wac.mode ->- wac.Read
       -- wac.mode ->- wac.Write
+    ).graph union (
+     bnode("t2")
+       -- wac.accessTo ->- henryCard
+       -- wac.agentClass ->- foaf.Agent
+       -- wac.mode ->- wac.Read
     ).graph
 
   val groupACLForRegexResource: Rdf#Graph = (
@@ -81,7 +86,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       -- wac.mode ->- wac.Write
     ).graph
 
-  case class TestLDPR[Rdf<:RDF](uri: Rdf#URI, graph: Rdf#Graph)(implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
+  case class TestLDPR(uri: Rdf#URI, graph: Rdf#Graph, metaGraph: Rdf#Graph=Graph.empty)(implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
 
     def updated = Some(new Date())
 
@@ -92,12 +97,18 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       if (uri.toString.endsWith(";wac")) uri
       else ops.URI(uri.toString+";wac")
     }
+
+    //move all the metadata to this, and have the other functions
+    def meta = PointedGraph(uri,metaGraph)
   }
 
   object testFetcher extends ResourceFetcher[Rdf] {
-    def fetch(url: jURL): Future[NamedResource[Rdf]] = url match {
-      case henryCard =>  Future.successful(TestLDPR(henryCard,henryGraph.resolveAgainst(henryCard)))
-      case henryCardAcl =>  Future.successful(TestLDPR(henryCardAcl,henryCardAclGraph.resolveAgainst(henryCardAcl)))
+    def fetch(url: jURL): Future[NamedResource[Rdf]] = {
+      System.out.println(s"fetching($url)")
+      URI(url.toString) match {
+        case `henryCard` =>  Future.successful(TestLDPR(henryCard,henryGraph.resolveAgainst(henryCard)))
+        case `henryCardAcl` =>  Future.successful(TestLDPR(henryCardAcl,henryCardAclGraph.resolveAgainst(henryCardAcl)))
+      }
     }
   }
   rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )
@@ -120,15 +131,38 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     ).graph
 
 
-  "Henry" when {
+  "access to Henry's resource" when {
 
-    "can Authenticate" in {
+    "Henry can Authenticate" in {
       val futurePrincipal = webidVerifier.verifyWebID(henry.toString,henryRsaKey)
       val res = futurePrincipal.map{p=>
-        System.out.println(s"p=$p")
         assert(p.isInstanceOf[WebIDPrincipal] && p.getName == henry.toString)
       }
       res.getOrFail()
+    }
+
+    "Henry can access his profile" in {
+      val ex = rww.execute{
+         for {
+          read <- authz.getAuthFor(henryCard,wac.Read)
+          write <- authz.getAuthFor(henryCard,wac.Write)
+         } yield {
+            assert(read.exists{agent =>
+              agent.contains(henry)
+            })
+           assert(read.exists{agent =>
+             agent.contains(foaf.Agent)
+           })
+           System.out.println(s"write=$write")
+           assert(write.exists{agent =>
+             agent.contains(henry)
+           })
+           assert(!write.exists{agent =>
+             agent.contains(foaf.Agent)
+           })
+         }
+       }
+      ex.getOrFail()
     }
   }
 

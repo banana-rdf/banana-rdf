@@ -73,13 +73,13 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher
       //        k(uri)
       //      }
       case GetResource(uri,_, k) => {
-        val result = fetch(uri)
         val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
+        val result = fetch(uri)
         result.onComplete { tryres =>
           tryres match {
             case Success(response) => {
               log.info(s"cache received $response")
-              self tell (k(response),sender)
+              self tell (Scrpt(k(response)),sender)
             }
             case Failure(e) => {
               log.info(s"Cache failed with $e")
@@ -93,15 +93,30 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher
           }
         }
       }
-      //      case GetMeta(uri, k) => {
-      //        //todo: GetMeta here is very close to GetResource, as currently there is no big work difference between the two
-      //        //The point of GetMeta is mostly to remove work if there were work that was very time
-      //        //consuming ( such as serialising a graph )
-      //        val path = uri.lastPathSegment
-      //        val res = LDPRs.get(path).getOrElse(NonLDPRs(path))
-      //        k(res.asInstanceOf[Meta[Rdf]])
-      //      }
-      //      case DeleteResource(uri, a) => {
+      case GetMeta(uri, k) => {
+        val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
+        //todo: develop a special fetch that will only do a HEAD
+        val result = fetch(uri)
+        result.onComplete { tryres =>
+          tryres match {
+            case Success(response) => {
+              log.info(s"cache received $response")
+              self tell (Scrpt(k(response.asInstanceOf[Meta[Rdf]])),sender)
+            }
+            case Failure(e) => {
+              log.info(s"Cache failed with $e")
+              sender ! akka.actor.Status.Failure({
+                e match {
+                  case be : BananaException => be
+                  case other: Throwable => WrappedException("failure fetching resource", other.getCause)
+                }
+              })
+            }
+          }
+        }
+      }
+
+////      case DeleteResource(uri, a) => {
       //        LDPRs.remove(uri.lastPathSegment).orElse {
       //          NonLDPRs.remove(uri.lastPathSegment)
       //        } orElse (throw new NoSuchElementException("Could not find resource " + uri))

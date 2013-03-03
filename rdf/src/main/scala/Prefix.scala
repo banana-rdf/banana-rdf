@@ -115,6 +115,7 @@ object IANALinkPrefix {
 
 class IANALinkPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "http://www.iana.org/assignments/link-relations/#")(ops) {
   val about = apply("about")
+  val acl = apply("acl")               //needs to be registered
   val alternate = apply("alternate")
   val appendix = apply("appendix")
   val archives = apply("archives")
@@ -147,6 +148,7 @@ class IANALinkPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "
   val latest_version = apply("latest-version")
   val license = apply("license")
   val lrdd = apply("lrdd")
+  val meta = apply("meta")       //needs to be registered
   val monitor = apply("monitor")
   val monitor_group = apply("monitor-group")
   val next = apply("next")

@@ -107,16 +107,19 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
   object Agent extends Agent {
     //ok really the id should represent an Agent, and not say a stone
     def contains(id: Rdf#URI) = true
+    override def toString = "Agent(*)"
   }
 
   case class Group(members: List[Rdf#URI]) extends Agent {
     override
     def contains(id: Rdf#URI): Boolean = members.contains(id)
+    override def toString = s"Agent($members)"
   }
 
   case class Person(id: Rdf#URI) extends Agent {
     override
     def contains(webid: Rdf#URI) = id == webid
+    override def toString = s"Person($id)"
   }
 
 

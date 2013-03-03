@@ -71,6 +71,9 @@ trait NamedResource[Rdf<:RDF] extends Meta[Rdf] {
 trait Meta[Rdf <: RDF] {
   def uri: Rdf#URI
 
+  //move all the metadata to this, and have the other functions
+  def meta: PointedGraph[Rdf]
+
   def ops: RDFOps[Rdf]
 
   def updated: Option[Date]
@@ -148,8 +151,10 @@ case class LocalBinaryR[Rdf<:RDF](root: Path, uri: Rdf#URI)
                                    (implicit val ops: RDFOps[Rdf])
   extends BinaryResource[Rdf] with LocalNamedResource[Rdf] {
   import org.w3.banana.syntax.URISyntax.uriW
+  import ops._
 
   lazy val path = root.resolve(uriW(uri).lastPathSegment)
+  def meta = PointedGraph(uri,Graph.empty)  //build up meta graph from local info
 
 
   // also should be on a metadata trait, since all resources have update times
@@ -192,8 +197,23 @@ case class LocalLDPR[Rdf<:RDF](uri: Rdf#URI,
                                   graph: Rdf#Graph,
                                   updated: Option[Date] = Some(new Date))
                                  (implicit val ops: RDFOps[Rdf])
-  extends LDPR[Rdf] with LocalNamedResource[Rdf]
+  extends LDPR[Rdf] with LocalNamedResource[Rdf]{
+  import ops._
+  def meta = PointedGraph(uri,Graph.empty)  //todo: build up meta from local info
+}
 
+
+case class RemoteLDPR[Rdf<:RDF](uri: Rdf#URI, graph: Rdf#Graph, meta: PointedGraph[Rdf], updated: Option[Date])
+                               (implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
+  import diesel._
+
+  val link = IANALinkPrefix[Rdf]
+
+  /**
+   * location of initial ACL for this resource
+   **/
+  lazy val acl: Option[Rdf#URI] = (meta/link.acl).collectFirst{ case PointedGraph(p: Rdf#URI,g) => p }
+}
 
 case class Scrpt[Rdf<:RDF,A](script:LDPCommand.Script[Rdf,A])
 case class Cmd[Rdf<:RDF,A](command: LDPCommand[Rdf, LDPCommand.Script[Rdf,A]])
@@ -267,7 +287,6 @@ case class LDPSActor(ldps: ActorRef)
 class RWWebActor[Rdf<:RDF](val baseUri: Rdf#URI)
                              (implicit ops: RDFOps[Rdf], timeout: Timeout) extends RActor {
   import syntax.URISyntax.uriW
-  import ops._
 
   var rootContainer: Option[ActorRef] = None
   var web : Option[ActorRef] = None

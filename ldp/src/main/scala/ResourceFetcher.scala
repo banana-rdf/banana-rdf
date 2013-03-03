@@ -7,13 +7,13 @@ import org.slf4j.LoggerFactory
 import play.api.libs.ws.WS
 import com.ning.http.client.FluentCaseInsensitiveStringsMap
 import collection.JavaConverters._
-import util.Success
-import util.Failure
+import util.{Try, Success, Failure}
 import play.api.libs.ws.ResponseHeaders
 import scala.Some
 import play.core.utils.CaseInsensitiveOrdered
 import collection.immutable.TreeMap
 import util.parsing.combinator.JavaTokenParsers
+import com.ning.http.util.DateUtil
 
 
 trait ResourceFetcher[Rdf<:RDF] {
@@ -126,7 +126,6 @@ class LinkHeaderParser[Rdf<:RDF](implicit ops: RDFOps[Rdf]) extends JavaTokenPar
 }
 
 
-
 /**
 * This Fetcher uses Play's WS
 *
@@ -145,8 +144,12 @@ class WSFetcher[Rdf<:RDF](graphSelector: ReaderSelector[Rdf])
    * following RFC5988 http://tools.ietf.org/html/rfc5988
    * todo: map all the other headers to RDF graphs where it makes sense
    */
-  def parseLinkHeaders(base: Rdf#URI, linkHeaders: List[String]): PointedGraph[Rdf] =
-    PointedGraph(base,union(linkHeaders.map(parser.parse(_).resolveAgainst(base))))
+  def parseHeaders(base: Rdf#URI, headers: FluentCaseInsensitiveStringsMap): PointedGraph[Rdf] = {
+    import collection.convert.decorateAsScala._
+    val linkHeaders = headers.get("Link").asScala.toList
+    val linkgraph = union(linkHeaders.map(parser.parse(_).resolveAgainst(base)))
+    PointedGraph(base,linkgraph)
+  }
 
 
   def fetch(url: URL): Future[NamedResource[Rdf]] = {
@@ -174,8 +177,10 @@ class WSFetcher[Rdf<:RDF](graphSelector: ReaderSelector[Rdf])
               case Some(r) => r.read(response.body, url.toString) match {
                 //todo: add base & use binary type
                 case Success(g) => {
-//                 val l = parseLinkHeaders(response.ahcResponse.getHeaders.get("Link"))
-                 Future.successful(LocalLDPR(URI(url.toString), g, None))
+                  val headers: FluentCaseInsensitiveStringsMap = response.ahcResponse.getHeaders
+                  val meta = parseHeaders(URI(url.toString), headers)
+                  val updated = Try { DateUtil.parseDate(headers.getFirstValue("Last-Modified")) }
+                  Future.successful(RemoteLDPR(URI(url.toString), g, meta, updated.toOption))
                 }
                 case Failure(e) => Future.failed(WrappedException("had problems parsing document returned by server", e))
               }
