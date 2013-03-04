@@ -1,7 +1,7 @@
 banana-rdf
 ==========
 
-[![Build Status](https://secure.travis-ci.org/bblfish/banana-rdf.png?branch=ldp)](http://travis-ci.org/bblfish/banana-rdf)
+[![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png)](http://travis-ci.org/w3c/banana-rdf)
 
 An RDF library in Scala
 -----------------------
