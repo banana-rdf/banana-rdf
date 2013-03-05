@@ -115,20 +115,44 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   val webidVerifier = new WebIDVerifier(rww)
 
-  val bertailsCollection = URI("http://example.com/foo/bertails/")
-  val bertails = URI("http://example.com/foo/bertails/card#me")
-  val bertailsCard = URI("http://example.com/foo/bertails/card")
+  //
+  // local resources
+  //
+
+  val bertailsContainer =    URI("http://example.com/foo/bertails/")
+  val bertailsContainerAcl = URI("http://example.com/foo/bertails/;acl")
+  val bertails =             URI("http://example.com/foo/bertails/card#me")
+  val bertailsCard =         URI("http://example.com/foo/bertails/card")
+  val bertailsCardAcl =      URI("http://example.com/foo/bertails/card;acl")
 
   override def afterAll(): Unit = {
     rww.shutdown()
   }
 
-  val bertailsCardgraph: Rdf#Graph = (
+  val bertailsCardGraph: Rdf#Graph = (
     URI("#me")
       -- foaf.name ->- "Alexandre".lang("fr")
       -- foaf.title ->- "Mr"
       -- cert.key ->- bertailsRsaKey
     ).graph
+
+  val bertailsCardAclGraph: Rdf#Graph = (
+    bnode("t1")
+      -- wac.accessTo ->- bertailsCard
+      -- wac.agent ->- bertails
+      -- wac.mode ->- wac.Write
+    ).graph  union (
+      URI("") -- wac.include ->- URI(";acl")
+    ).graph
+
+
+  val bertailsContainerAclGraph: Rdf#Graph = (
+      bnode("t2")
+        -- wac.accessToClass ->- ( bnode -- wac.regex ->- bertailsContainer.toString+".*" )
+        -- wac.agentClass ->- foaf.Agent
+        -- wac.mode ->- wac.Read
+    ).graph
+
 
 
   "access to Henry's resource" when {
@@ -153,7 +177,6 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
            assert(read.exists{agent =>
              agent.contains(foaf.Agent)
            })
-           System.out.println(s"write=$write")
            assert(write.exists{agent =>
              agent.contains(henry)
            })
@@ -168,14 +191,23 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   "Alex" when {
 
-    "add bertails card" in {
+    "add bertails card and acls" in {
       val script = rww.execute(for {
-        rUri <- createContainer(baseUri,Some("bertails"),Graph.empty)
-        card <- createLDPR(rUri,Some(bertailsCard.lastPathSegment),bertailsCardgraph)
-        rGraph <- getLDPR(card)
+        ldpc     <- createContainer(baseUri,Some("bertails"),Graph.empty)
+        ldpcMeta <- getMeta(ldpc)
+        card     <- createLDPR(ldpc,Some(bertailsCard.lastPathSegment),bertailsCardGraph)
+        cardMeta <- getMeta(card)
+        _        <- updateLDPR(ldpcMeta.acl.get, add=bertailsContainerAclGraph.toIterable)
+        _        <- updateLDPR(cardMeta.acl.get, add=bertailsCardAclGraph.toIterable)
+        rGraph   <- getLDPR(card)
+        aclGraph <- getLDPR(cardMeta.acl.get)
+        containerAclGraph <- getLDPR(ldpcMeta.acl.get)
       } yield {
-        rUri must be(bertailsCollection)
-        assert(rGraph.relativize(bertailsCard) isIsomorphicWith bertailsCardgraph)
+        ldpc must be(bertailsContainer)
+        cardMeta.acl.get must be(bertailsCardAcl)
+        assert(rGraph isIsomorphicWith bertailsCardGraph.resolveAgainst(bertailsCard))
+        assert(aclGraph isIsomorphicWith bertailsCardAclGraph.resolveAgainst(bertailsCardAcl))
+        assert(containerAclGraph isIsomorphicWith bertailsContainerAclGraph.resolveAgainst(bertailsContainerAcl))
       })
       script.getOrFail()
 
@@ -184,11 +216,34 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     "can Authenticate" in {
       val futurePrincipal = webidVerifier.verifyWebID(bertails.toString,bertailsRsaKey)
       val res = futurePrincipal.map{p=>
-        System.out.println(s"p=$p")
         assert(p.isInstanceOf[WebIDPrincipal] && p.getName == bertails.toString)
       }
       res.getOrFail()
     }
+
+    "can Access his own profile" in {
+      val ex = rww.execute{
+        for {
+          read <- authz.getAuthFor(bertailsCard,wac.Read)
+          write <- authz.getAuthFor(bertailsCard,wac.Write)
+        } yield {
+          assert(read.exists{agent =>
+            agent.contains(bertails)
+          })
+          assert(read.exists{agent =>
+            agent.contains(foaf.Agent)
+          })
+          assert(write.exists{agent =>
+            agent.contains(bertails)
+          })
+          assert(!write.exists{agent =>
+            agent.contains(foaf.Agent)
+          })
+        }
+      }
+      ex.getOrFail()
+    }
+
 
   }
 

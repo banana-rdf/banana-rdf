@@ -28,17 +28,18 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
    * @param method the method of access asked for ( in wac ontology )
    * @return a Free based recursive structure that will return a list of agents ( identified by WebIDs. )
    * */
-  def getAuth(meta: Rdf#URI, method: Rdf#URI): Script[Rdf, List[Agent]] =  {
+  def getAuth(meta: Rdf#URI, method: Rdf#URI, include: List[Agent] = List()): Script[Rdf, List[Agent]] =  {
     getLDPR(meta).flatMap { g: Rdf#Graph =>
       val az = authz(g, meta, method)
       az match {
-        case List(Agent) => `return`(az)
+        case List(Agent) => `return`(az:::include)
         case agents => {
+          //todo: we get the first, add support for more than one include...
           val inc= (PointedGraph(meta, g) / wac.include).collectFirst { //todo: check that it is in the collection. What to do if it's not?
             case PointedGraph(node,g) if isURI(node) =>
-              getAuth(node.asInstanceOf[Rdf#URI],method)
+              getAuth(node.asInstanceOf[Rdf#URI],method,az)
           }
-          val res = inc.getOrElse(`return`(az))
+          val res = inc.getOrElse(`return`(az:::include))
           res
         }
       }
@@ -79,7 +80,7 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
       } else {
         val az = auths.next
         val ac = (az / wac.agentClass).map { agent _ }.toList
-        if (ac.contains(foaf.Agent))  List(Agent)
+        if (ac.contains(foaf.Agent))  List(Agent)  //we simplify
         else {
           (az/wac.agent).collect { case PointedGraph(p,_) if isURI(p) => p.asInstanceOf[Rdf#URI]}.toList match {
             case Nil => ac
