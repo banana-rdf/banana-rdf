@@ -124,6 +124,8 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   val bertails =             URI("http://example.com/foo/bertails/card#me")
   val bertailsCard =         URI("http://example.com/foo/bertails/card")
   val bertailsCardAcl =      URI("http://example.com/foo/bertails/card;acl")
+  val bertailsFoaf =         URI("http://example.com/foo/bertails/foaf")
+  val bertailsFoafAcl =      URI("http://example.com/foo/bertails/foaf;acl")
 
   override def afterAll(): Unit = {
     rww.shutdown()
@@ -139,8 +141,8 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   val bertailsCardAclGraph: Rdf#Graph = (
     bnode("t1")
       -- wac.accessTo ->- bertailsCard
-      -- wac.agent ->- bertails
-      -- wac.mode ->- wac.Write
+      -- wac.agentClass ->- foaf.Agent
+      -- wac.mode ->- wac.Read
     ).graph  union (
       URI("") -- wac.include ->- URI(";acl")
     ).graph
@@ -148,11 +150,19 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   val bertailsContainerAclGraph: Rdf#Graph = (
       bnode("t2")
-        -- wac.accessToClass ->- ( bnode -- wac.regex ->- bertailsContainer.toString+".*" )
-        -- wac.agentClass ->- foaf.Agent
+        -- wac.accessToClass ->- ( bnode -- wac.regex ->- (bertailsContainer.toString+".*") )
+        -- wac.agent ->- bertails
+        -- wac.mode ->- wac.Write
         -- wac.mode ->- wac.Read
     ).graph
 
+   val bertailsFoafGraph: Rdf#Graph = (
+     URI("card#me") -- foaf.knows ->- henry
+   ).graph
+
+  val bertailsFoafAclGraph: Rdf#Graph = (
+    URI("") -- wac.include ->- URI(";acl")
+  ).graph
 
 
   "access to Henry's resource" when {
@@ -189,7 +199,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     }
   }
 
-  "Alex" when {
+  "Alex's profile" when {
 
     "add bertails card and acls" in {
       val script = rww.execute(for {
@@ -213,7 +223,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
     }
 
-    "can Authenticate" in {
+    "Alex can Authenticate" in {
       val futurePrincipal = webidVerifier.verifyWebID(bertails.toString,bertailsRsaKey)
       val res = futurePrincipal.map{p=>
         assert(p.isInstanceOf[WebIDPrincipal] && p.getName == bertails.toString)
@@ -221,7 +231,33 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       res.getOrFail()
     }
 
-    "can Access his own profile" in {
+    "can Access Alex's profile" in {
+      val ex = rww.execute{
+        for {
+          read <- authz.getAuthFor(bertailsCard,wac.Read)
+          write <- authz.getAuthFor(bertailsCard,wac.Write)
+        } yield {
+          assert(read.exists{agent =>
+            agent.contains(bertails)
+          })
+          assert(read.exists{agent =>
+            agent.contains(foaf.Agent)
+          })
+          assert(write.exists{agent =>
+            agent.contains(bertails)
+          })
+          assert(!write.exists{agent =>
+            agent.contains(henry)
+          })
+          assert(!write.exists{agent =>
+            agent.contains(foaf.Agent)
+          })
+        }
+      }
+      ex.getOrFail()
+    }
+
+    "can Access other resources in Alex's container" in {
       val ex = rww.execute{
         for {
           read <- authz.getAuthFor(bertailsCard,wac.Read)

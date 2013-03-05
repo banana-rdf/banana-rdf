@@ -1,6 +1,8 @@
 package org.w3.banana.ldp
 
 import org.w3.banana._
+import java.util.regex.Pattern
+import scala.util.Try
 
 /**
  * Authorization class
@@ -13,6 +15,7 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
   import ops._
   import diesel._
   import syntax.GraphSyntax
+  import syntax.LiteralSyntax._
 
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACLPrefix[Rdf]
@@ -24,20 +27,21 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
    *
    *
    * but is not tail rec because of flatMap
-   * @param meta metadata
+   * @param aclUri metadata
    * @param method the method of access asked for ( in wac ontology )
+   * @param on the resource to which access is requested
    * @return a Free based recursive structure that will return a list of agents ( identified by WebIDs. )
    * */
-  def getAuth(meta: Rdf#URI, method: Rdf#URI, include: List[Agent] = List()): Script[Rdf, List[Agent]] =  {
-    getLDPR(meta).flatMap { g: Rdf#Graph =>
-      val az = authz(g, meta, method)
+  def getAuth(aclUri: Rdf#URI, method: Rdf#URI, on: Rdf#URI, include: List[Agent] = List()): Script[Rdf, List[Agent]] =  {
+    getLDPR(aclUri).flatMap { g: Rdf#Graph =>
+      val az = authz(g, on, method)
       az match {
         case List(Agent) => `return`(az:::include)
         case agents => {
           //todo: we get the first, add support for more than one include...
-          val inc= (PointedGraph(meta, g) / wac.include).collectFirst { //todo: check that it is in the collection. What to do if it's not?
+          val inc= (PointedGraph(aclUri, g) / wac.include).collectFirst { //todo: check that it is in the collection. What to do if it's not?
             case PointedGraph(node,g) if isURI(node) =>
-              getAuth(node.asInstanceOf[Rdf#URI],method,az)
+              getAuth(node.asInstanceOf[Rdf#URI],method,on,az)
           }
           val res = inc.getOrElse(`return`(az:::include))
           res
@@ -54,42 +58,62 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
    * @return
    */
   def getAuthFor(resource: Rdf#URI,  method: Rdf#URI, noMeta: List[Agent]=List()): Script[Rdf, List[Agent]] = {
-    getMeta(resource).flatMap{nr =>
-      nr.acl.map { acl => getAuth(acl, method)}.getOrElse {
+    getMeta(resource).flatMap{meta =>
+      meta.acl.map { acl => getAuth(acl, method, resource)}.getOrElse {
         `return`(noMeta)
       }
     }
   }
 
+
   /**
    * return the list of agents that are allowed access to the given resource
    * stop looking if everybody is authorized
+   * @param aclGraph the graph which contains the acl rules
+   * @param on the resoure on which access is being requested
+   * @param method the type of access requested
    * @return A list of Agents with access ( should be perhaps just an Agent.
    **/
   protected
-  def authz(acl: Rdf#Graph, resource: Rdf#URI, method: Rdf#URI): List[Agent]  = {
+  def authz(aclGraph: Rdf#Graph, on: Rdf#URI, method: Rdf#URI): List[Agent]  = {
     def agent(a: PointedGraph[Rdf]): Agent = if (a.pointer == foaf.Agent) Agent
     else {
       val people = (a/foaf.member).collect{ case PointedGraph(p,_) if isURI(p)  => p.asInstanceOf[Rdf#URI]}.toList
       Group(people)
     }
 
+    // does the authorization a give access to the resource?
+    def filterOn(a: PointedGraph[Rdf]): Boolean = {
+      (a/wac.accessTo).exists( _.pointer == on) ||
+        (a/wac.accessToClass).exists{ clazzPg =>
+          (clazzPg/wac.regex).exists{ regexPg =>
+            foldNode(regexPg.pointer)(
+              uri=>false,
+              bnode=>false,
+              lit=>Try(Pattern.compile(lit.lexicalForm).matcher(on.toString).matches()).getOrElse(false))
+        }
+      }
+    }
     def authorized(auths: Iterator[PointedGraph[Rdf]]): List[Agent] =
       if (!auths.hasNext) {
         List()
       } else {
         val az = auths.next
-        val ac = (az / wac.agentClass).map { agent _ }.toList
-        if (ac.contains(foaf.Agent))  List(Agent)  //we simplify
-        else {
-          (az/wac.agent).collect { case PointedGraph(p,_) if isURI(p) => p.asInstanceOf[Rdf#URI]}.toList match {
-            case Nil => ac
-            case list: List[Rdf#URI] => Group(list)::ac:::authorized(auths)
+        if (!filterOn(az)) {
+          authorized(auths)
+        } else {
+          val ac = (az / wac.agentClass).map { agent _ }.toList
+          if (ac.contains(foaf.Agent))  List(Agent)  //we simplify
+          else {
+            (az/wac.agent).collect { case PointedGraph(p,_) if isURI(p) => p.asInstanceOf[Rdf#URI]}.toList match {
+              case Nil => ac
+              case list: List[Rdf#URI] => Group(list)::ac:::authorized(auths)
+            }
           }
         }
       }
 
-    val it = (PointedGraph(method,acl)/-wac.mode)
+    val it = (PointedGraph(method,aclGraph)/-wac.mode)
     val result = authorized(it.iterator)
     //compress result
     if (result.contains(Agent)) List(Agent)

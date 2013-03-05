@@ -33,7 +33,7 @@ abstract class LDPSTest[Rdf <: RDF](
 
   import diesel._
   import ops._
-  import syntax._
+  import syntax.{graphW,uriW,stringW}
   import authz._
 
   implicit val ec = ExecutionContext.Implicits.global
@@ -63,13 +63,14 @@ abstract class LDPSTest[Rdf <: RDF](
       URI(betehessCard.toString+";acl") -- wac.include ->- URI("http://example.com/foo/bertails/;acl")
     ).graph
 
-  // this makes all of the files under the betehess collection read/write to an Alex
-  val graphCollectionACL: Rdf#Graph = (
-    bnode()
-       -- wac.accessToClass ->- ( bnode() -- wac.regex ->- "http://example.com/foo/bertails/.*" )
-       -- wac.accessTo ->- betehessCard
-       -- wac.agent ->-  betehess
-       -- wac.mode  ->- (wac.Read, wac.Write)
+
+  val graphCollectionACL: Rdf#Graph = ( bnode()
+      -- wac.accessTo ->- betehessCard
+      -- wac.agent    ->-  betehess
+      -- wac.mode     ->- (wac.Read, wac.Write)
+      -- wac.accessToClass ->- (
+        bnode() -- wac.regex ->- TypedLiteral("http://example.com/foo/bertails/.*")
+    )
   ).graph
 
   val graph2: Rdf#Graph = (
@@ -169,6 +170,7 @@ abstract class LDPSTest[Rdf <: RDF](
 
 
   "CreateLDPC & LDPR with ACLs" in {
+
     val ldpcUri = URI("http://example.com/foo/bertails/")
     val ldpcMetaFull = URI("http://example.com/foo/bertails/;acl")
     val ldprUri = URI("card")
@@ -212,7 +214,7 @@ abstract class LDPSTest[Rdf <: RDF](
     val authZ1 =  rww.execute (
        for {
          meta <- getMeta(ldprUriFull)
-         athzd <- getAuth(meta.acl.get,wac.Read)
+         athzd <- getAuth(meta.acl.get,wac.Read,ldprUriFull)
        } yield { athzd.contains(Agent)  }
     )
 
