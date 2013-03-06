@@ -56,7 +56,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   val henryRsaKey: RSAPublicKey = { keyGen.initialize(768);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
   val bertailsRsaKey: RSAPublicKey = { keyGen.initialize(512);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
 
-
+  val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
   val henryCard = URI("http://bblfish.net/people/henry/card")
   val henry =  URI(henryCard.toString+"#me")
   val henryGraph : Rdf#Graph = (
@@ -78,10 +78,31 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
        -- wac.mode ->- wac.Read
     ).graph
 
+  val henryFoaf = URI("http://bblfish.net/people/henry/foaf")
+  lazy val henryFoafGraph: Rdf#Graph = (
+      henry -- foaf.knows ->- timbl
+         -- foaf.knows ->- bertails
+    ).graph
+
+  val henryFoafWac = URI("http://bblfish.net/people/henry/foaf;wac")
+  lazy val henryFoafWacGraph : Rdf#Graph = (
+    bnode() -- wac.accessTo ->- henryFoaf
+       -- wac.agentClass ->- tpacGroup
+       -- wac.mode ->- wac.Read
+    ).graph
+
+  val tpacGroup = URI("http://www.w3.org/2005/Incubator/webid/tpac/group")
+  lazy val tpacGroupGraph: Rdf#Graph = (
+    URI("#socWeb").a(foaf.Group)
+      -- foaf.member ->- henry
+      -- foaf.member ->- bertails
+      -- foaf.member ->- timbl
+    ).graph
+
   val groupACLForRegexResource: Rdf#Graph = (
     bnode("t1")
       -- wac.accessToClass ->- ( bnode("t2") -- wac.regex ->- "http://bblfish.net/blog/.*" )
-      -- wac.agentClass ->- ( URI("http://bblfish.net/blog/editing/.meta#a1") -- foaf("member") ->- henry )
+      -- wac.agentClass ->- ( URI("http://bblfish.net/blog/editing/.meta#a1") -- foaf.member ->- henry )
       -- wac.mode ->- wac.Read
       -- wac.mode ->- wac.Write
     ).graph
@@ -105,10 +126,20 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   object testFetcher extends ResourceFetcher[Rdf] {
     def fetch(url: jURL): Future[NamedResource[Rdf]] = {
       System.out.println(s"fetching($url)")
-      URI(url.toString) match {
-        case `henryCard` =>  Future.successful(TestLDPR(henryCard,henryGraph.resolveAgainst(henryCard)))
-        case `henryCardAcl` =>  Future.successful(TestLDPR(henryCardAcl,henryCardAclGraph.resolveAgainst(henryCardAcl)))
+      val r = URI(url.toString)
+      r match {
+        case `henryCard` =>  futuRes(r,henryGraph)
+        case `henryCardAcl` =>  futuRes(r,henryCardAclGraph)
+        case `tpacGroup` => futuRes(r,tpacGroupGraph)
+        case `henryFoaf` => futuRes(r,henryFoafGraph)
+        case `henryFoafWac` => futuRes(r,henryFoafWacGraph)
+        case _ => { System.out.println(s"testFetcher cannot find graph for <$r>"); futuRes(r,Graph.empty)} //todo: should be 404 or something
       }
+    }
+
+    def futuRes(r: Rdf#URI, graph: Rdf#Graph): Future[WebACLTestSuite.this.type#TestLDPR] = {
+      System.out.println(s"futuRes($r,$graph)")
+      Future.successful(TestLDPR(r, graph.resolveAgainst(r)))
     }
   }
   rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )
@@ -165,7 +196,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   ).graph
 
 
-  "access to Henry's resource" when {
+  "access to Henry's resources" when {
 
     "Henry can Authenticate" in {
       val futurePrincipal = webidVerifier.verifyWebID(henry.toString,henryRsaKey)
@@ -175,7 +206,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       res.getOrFail()
     }
 
-    "Henry can access his profile" in {
+    "Who can access Henry's WebID profile?" in {
       val ex = rww.execute{
          for {
           read <- authz.getAuthFor(henryCard,wac.Read)
@@ -197,7 +228,39 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
        }
       ex.getOrFail()
     }
+
+//    "Who can access Henry's foaf profile?" in {
+//      val ex = rww.execute{
+//        for {
+//          read <- authz.getAuthFor(henryFoaf,wac.Read)
+//          write <- authz.getAuthFor(henryFoaf,wac.Write)
+//        } yield {
+//          assert(read.exists{agent =>
+//            agent.contains(timbl)
+//          },"timbl is in group")
+//          assert(read.exists{agent =>
+//            agent.contains(bertails)
+//          },"alex is in group")
+//          assert(!read.exists{agent =>
+//            agent.contains(foaf.Agent)
+//          },"not everyone can see profile")
+//          assert(write.exists{agent =>
+//            agent.contains(henry)
+//          })
+//          assert(!write.exists{agent =>
+//            agent.contains(foaf.Agent)
+//          })
+//        }
+//      }
+//      ex.getOrFail()
+//    }
   }
+
+
+
+
+
+
 
   "Alex's profile" when {
 

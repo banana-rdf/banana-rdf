@@ -72,7 +72,7 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
    * @param aclGraph the graph which contains the acl rules
    * @param on the resoure on which access is being requested
    * @param method the type of access requested
-   * @return A list of Agents with access ( should be perhaps just an Agent.
+   * @return A list of Agents with access ( sometimes just an Agent )
    **/
   protected
   def authz(aclGraph: Rdf#Graph, on: Rdf#URI, method: Rdf#URI): List[Agent]  = {
@@ -103,6 +103,9 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
           authorized(auths)
         } else {
           val ac = (az / wac.agentClass).map { agent _ }.toList
+//          val todo = (az / wac.agentClass).filter { pg =>
+//            if (pg.pointer)   // I need the notion of a pointedNamedGraph, otherwise I cannot tell here if the URI is local or remote.
+//          }.toList
           if (ac.contains(foaf.Agent))  List(Agent)  //we simplify
           else {
             (az/wac.agent).collect { case PointedGraph(p,_) if isURI(p) => p.asInstanceOf[Rdf#URI]}.toList match {
@@ -130,7 +133,7 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
   }
 
   object Agent extends Agent {
-    //ok really the id should represent an Agent, and not say a stone
+    //the id should represent an Agent of course, and not something inanimate such as a stone, but we don't verify
     def contains(id: Rdf#URI) = true
     override def toString = "Agent(*)"
   }
