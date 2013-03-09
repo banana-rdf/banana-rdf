@@ -1,24 +1,21 @@
 package org.w3.banana.sesame
 
-import org.w3.banana._
-import SesameUtil.withConnection
+import scala.collection.JavaConverters._
+import scala.concurrent._
+
+import java.util.concurrent.{ ExecutorService, Executors }
+
 import org.openrdf.model._
 import org.openrdf.model.impl._
-import org.openrdf.repository.sail._
-import org.openrdf.repository.{RepositoryConnection, RepositoryResult}
-import scala.collection.JavaConverters._
-import info.aduna.iteration.CloseableIteration
-import org.openrdf.sail.SailException
+import org.openrdf.repository.{Repository, RepositoryConnection, RepositoryResult}
 import org.openrdf.query._
-import org.openrdf.query.impl._
-import org.openrdf.sail.memory.MemoryStore
+
 import scalaz.Free
-import scala.concurrent._
-import java.util.concurrent.{ ExecutorService, Executors }
+import org.w3.banana._
 
 object SesameStore {
 
-  def apply(repository: SailRepository): SesameStore =
+  def apply(repository: Repository): SesameStore =
     new SesameStore(repository)
 
   def appendToGraph(conn: RepositoryConnection, uri: Sesame#URI, triples: Iterable[Sesame#Triple]): Unit = {
@@ -84,7 +81,7 @@ object SesameStore {
 
 import SesameStore._
 
-class SesameStore(repository: SailRepository) extends RDFStore[Sesame, Future] {
+class SesameStore(repository: Repository) extends RDFStore[Sesame, Future] {
 
   val executorService: ExecutorService = Executors.newFixedThreadPool(8)
 
@@ -94,7 +91,7 @@ class SesameStore(repository: SailRepository) extends RDFStore[Sesame, Future] {
     repository.shutDown()
   }
 
-  def run[A](conn: SailRepositoryConnection, script: Free[({ type l[+x] = Command[Sesame, x] })#l, A]): A = {
+  def run[A](conn: RepositoryConnection, script: Free[({ type l[+x] = Command[Sesame, x] })#l, A]): A = {
     script.resume fold (
       {
         case Create(uri, a) => {
