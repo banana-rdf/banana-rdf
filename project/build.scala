@@ -161,7 +161,6 @@ object BananaRdfBuild extends Build {
       jena,
       sesame,
       plantain,
-      ldp,
       examples))
   
   lazy val rdf = Project(
