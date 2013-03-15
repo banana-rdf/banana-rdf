@@ -100,6 +100,31 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     assert(g.graph isIsomorphicWith expectedGraph)
   }
 
+  "Diesel must allow pointed graph objectList definition" in {
+    val alexs = Seq(
+      bnode("a") -- foaf.name ->- "Alexandre".lang("fr"),
+      bnode("b") -- foaf.name ->- "Alexander".lang("en")
+    )
+
+    val g =
+      (
+        URI("http://bblfish.net/#hjs")
+          -- foaf.name ->- "Henry Story"
+          -- foaf.knows ->- (alexs: _*)
+      )
+
+    val expectedGraph =
+      Graph(
+        Triple(URI("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")),
+        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, bnode("a")),
+        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, bnode("b")),
+        Triple(bnode("a"), foaf.name, LangLiteral("Alexander", Lang("en"))),
+        Triple(bnode("b"), foaf.name, LangLiteral("Alexandre", Lang("fr")))
+      )
+
+    assert(g.graph isIsomorphicWith expectedGraph)
+  }
+
   "Diesel must understand Scala's native types" in {
 
     val g = (

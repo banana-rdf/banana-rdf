@@ -7,25 +7,24 @@ import scala.util._
 
 class PointedGraphPredicate[Rdf <: RDF](pointed: PointedGraph[Rdf], p: Rdf#URI) {
 
-  def ->-(o: Rdf#Node, os: Rdf#Node*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
+  def ->-(os: Rdf#Node*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
     import ops._
     import pointed.{ pointer => s, graph => acc }
-    val graph: Rdf#Graph =
-      if (os.isEmpty) {
-        val g = Graph(Triple(s, p, o))
-        acc union g
-      } else {
-        val triples: Iterable[Rdf#Triple] = (o :: os.toList) map { o => Triple(s, p, o) }
-        Graph(triples) union acc
-      }
+
+    val triples = os map { o => Triple(s, p, o) }
+    val graph = Graph(triples) union acc
     PointedGraph(s, graph)
   }
 
-  def ->-(pointedObject: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
+  /**
+   * We need to use DummyImplicit here, to make overloaded methods distinguishable after type erasure.
+   **/
+  def ->-(pointedObjects: PointedGraph[Rdf]*)(implicit ops: RDFOps[Rdf], di: DummyImplicit): PointedGraph[Rdf] = {
     import ops._
     import pointed.{ pointer => s, graph => acc }
-    import pointedObject.{ pointer => o, graph => graphObject }
-    val graph = Graph(Triple(s, p, o)) union acc union graphObject
+
+    val triples = pointedObjects map (pg => Triple(s, p, pg.pointer))
+    val graph = pointedObjects.foldLeft(Graph(triples) union acc)(_ union _.graph)
     PointedGraph(s, graph)
   }
 
