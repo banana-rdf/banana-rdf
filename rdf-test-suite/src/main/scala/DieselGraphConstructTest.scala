@@ -1,5 +1,6 @@
 package org.w3.banana.diesel
 
+import diesel.ObjectList
 import org.w3.banana._
 import org.w3.banana.syntax._
 import org.scalatest._
@@ -87,7 +88,7 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     assert(g.graph isIsomorphicWith expectedGraph)
   }
 
-  "Diesel must allow objectList definition" in {
+  "Diesel must allow objectList definition with simple syntax" in {
 
     val g: PointedGraph[Rdf] =
       bnode("betehess") -- foaf.name ->- ("Alexandre".lang("fr"), "Alexander".lang("en"))
@@ -96,6 +97,47 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
       Graph(
         Triple(bnode("betehess"), foaf.name, LangLiteral("Alexandre", Lang("fr"))),
         Triple(bnode("betehess"), foaf.name, LangLiteral("Alexander", Lang("en"))))
+
+    assert(g.graph isIsomorphicWith expectedGraph)
+  }
+
+  "Diesel must allow explicit objectList definition" in {
+    val alexs = Seq(
+      bnode("a") -- foaf.name ->- "Alexandre".lang("fr"),
+      bnode("b") -- foaf.name ->- "Alexander".lang("en")
+    )
+
+    val g =
+      (
+        URI("http://bblfish.net/#hjs")
+          -- foaf.name ->- "Henry Story"
+          -- foaf.knows ->- ObjectList(alexs)
+        )
+
+    val expectedGraph =
+      Graph(
+        Triple(URI("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story")),
+        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, bnode("a")),
+        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, bnode("b")),
+        Triple(bnode("a"), foaf.name, LangLiteral("Alexander", Lang("en"))),
+        Triple(bnode("b"), foaf.name, LangLiteral("Alexandre", Lang("fr")))
+      )
+
+    assert(g.graph isIsomorphicWith expectedGraph)
+  }
+
+  "Diesel with empty explicit objectList definition" in {
+    val g =
+      (
+        URI("http://bblfish.net/#hjs")
+          -- foaf.name ->- "Henry Story"
+          -- foaf.knows ->- ObjectList(Seq.empty[Int])
+      )
+
+    val expectedGraph =
+      Graph(
+        Triple(URI("http://bblfish.net/#hjs"), foaf.name, TypedLiteral("Henry Story"))
+      )
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
