@@ -1,4 +1,4 @@
-package diesel
+package org.w3.banana.diesel
 
 class ObjectList[T](val ts: Traversable[T]) extends AnyVal { }
 
