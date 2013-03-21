@@ -15,6 +15,7 @@ import org.w3.banana.plantain.Plantain
 import org.w3.banana.ldp.LDPCommand._
 import scala.Some
 import java.util.Date
+import play.api.libs.iteratee._
 
 
 object WebACLTestSuite {
@@ -43,9 +44,11 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   import ops._
   import syntax._
   import diesel._
+  import System.out
 
   val certbinder = new CertBinder()
   import certbinder._
+  implicit val _rww = rww
 
   implicit def toUri(url: jURL): Rdf#URI = URI(url.toString)
 
@@ -57,6 +60,11 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   val bertailsRsaKey: RSAPublicKey = { keyGen.initialize(512);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
 
   val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
+  val timblCard = URI("http://www.w3.org/People/Berners-Lee/card")
+  val timblGraph: Rdf#Graph = (
+    URI("#i") -- foaf.name ->- "Tim Berners-Lee"
+    ).graph
+
   val henryCard = URI("http://bblfish.net/people/henry/card")
   val henry =  URI(henryCard.toString+"#me")
   val henryGraph : Rdf#Graph = (
@@ -87,11 +95,12 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   val henryFoafWac = URI("http://bblfish.net/people/henry/foaf;wac")
   lazy val henryFoafWacGraph : Rdf#Graph = (
     bnode() -- wac.accessTo ->- henryFoaf
-       -- wac.agentClass ->- tpacGroup
+       -- wac.agentClass ->- tpacGroupDoc
        -- wac.mode ->- wac.Read
     ).graph
 
-  val tpacGroup = URI("http://www.w3.org/2005/Incubator/webid/tpac/group")
+  val tpacGroupDoc = URI("http://www.w3.org/2005/Incubator/webid/tpac/group")
+  val tpacGroup = URI("http://www.w3.org/2005/Incubator/webid/tpac/group#socWeb")
   lazy val tpacGroupGraph: Rdf#Graph = (
     URI("#socWeb").a(foaf.Group)
       -- foaf.member ->- henry
@@ -107,7 +116,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       -- wac.mode ->- wac.Write
     ).graph
 
-  case class TestLDPR(uri: Rdf#URI, graph: Rdf#Graph, metaGraph: Rdf#Graph=Graph.empty)(implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
+  case class TestLDPR(location: Rdf#URI, graph: Rdf#Graph, metaGraph: Rdf#Graph=Graph.empty)(implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
 
     def updated = Some(new Date())
 
@@ -115,30 +124,29 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
      * location of initial ACL for this resource
      **/
     def acl = Some{
-      if (uri.toString.endsWith(";wac")) uri
-      else ops.URI(uri.toString+";wac")
+      if (location.toString.endsWith(";wac")) location
+      else ops.URI(location.toString+";wac")
     }
 
     //move all the metadata to this, and have the other functions
-    def meta = PointedGraph(uri,metaGraph)
+    def meta = PointedGraph(location,metaGraph)
   }
 
   object testFetcher extends ResourceFetcher[Rdf] {
     def fetch(url: jURL): Future[NamedResource[Rdf]] = {
-      System.out.println(s"fetching($url)")
       val r = URI(url.toString)
       r match {
         case `henryCard` =>  futuRes(r,henryGraph)
         case `henryCardAcl` =>  futuRes(r,henryCardAclGraph)
-        case `tpacGroup` => futuRes(r,tpacGroupGraph)
+        case `tpacGroupDoc` => futuRes(r,tpacGroupGraph)
+        case `timblCard` => futuRes(r,timblGraph)
         case `henryFoaf` => futuRes(r,henryFoafGraph)
         case `henryFoafWac` => futuRes(r,henryFoafWacGraph)
-        case _ => { System.out.println(s"testFetcher cannot find graph for <$r>"); futuRes(r,Graph.empty)} //todo: should be 404 or something
+        case _ => {futuRes(r,Graph.empty)} //todo: should be 404 or something
       }
     }
 
     def futuRes(r: Rdf#URI, graph: Rdf#Graph): Future[WebACLTestSuite.this.type#TestLDPR] = {
-      System.out.println(s"futuRes($r,$graph)")
       Future.successful(TestLDPR(r, graph.resolveAgainst(r)))
     }
   }
@@ -346,8 +354,55 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   }
 
+  val web = new WebResource[Rdf]()
 
-//  "Henry" when {
+  "Test WebResource ~" in {
+    val futureLDR = web~(tpacGroup)
+    val ldr = futureLDR.getOrFail()
+    ldr.location must be(tpacGroupDoc)
+    ldr.resource.pointer must be(tpacGroup)
+    assert(ldr.resource.graph isIsomorphicWith tpacGroupGraph.resolveAgainst(tpacGroupDoc))
+  }
+
+  "Test WebResource ~>" in {
+    val names: Future[Enumerator[LinkedDataResource[Rdf]]] =
+      web~(tpacGroup) map { ldr => web~>(ldr,foaf.member) }
+
+    val enum = names.getOrFail()
+    val it = Iteratee.getChunks[LinkedDataResource[Rdf]]
+    val futureIt = enum(it)
+    val futureRes = futureIt.flatMap(_.run)
+    val list = futureRes.getOrFail()
+    val answers = list.map(ldr => ldr.resource.pointer)
+    answers must have length (3)
+    assert(answers.contains(henry))
+    assert(answers.contains(bertails))
+    assert(answers.contains(timbl))
+  }
+
+  "Test WebResource ~> followed by ~>" in {
+    val names: Future[Enumerator[LinkedDataResource[Rdf]]] =
+      web~(tpacGroup) map { ldr =>
+        val m= web~>(ldr,foaf.member)
+        m.flatMap{ ldr2=>
+          web~>(ldr2,foaf.name)
+        }
+      }
+
+    val enum = names.getOrFail()
+    val it = Iteratee.getChunks[LinkedDataResource[Rdf]]
+    val futureIt = enum(it)
+    val futureRes = futureIt.flatMap(_.run)
+    val list = futureRes.getOrFail()
+    val answers = list.map(ldr => ldr.resource.pointer)
+    answers must have length (3)
+    assert(answers.contains("Henry"))
+    assert(answers.contains("Alexandre".lang("fr")))
+//    assert(answers.contains(timbl))
+  }
+
+
+  //  "Henry" when {
 //    //    wac3.authorizations must have size(1)
 //    val webreq = DummyWebRequest( henryFuture, Read,
 //      new URL("http://bblfish.net/blog/editing/.meta"),

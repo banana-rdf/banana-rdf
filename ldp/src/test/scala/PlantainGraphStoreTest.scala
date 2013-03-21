@@ -198,7 +198,7 @@ abstract class LDPSTest[Rdf <: RDF](
         x    <- updateLDPR(cardRes.acl.get, add = graphCardACL.toIterable )
         acl  <- getLDPR(cardRes.acl.get)
       } yield {
-        cardRes.uri must be(ldprUriFull)
+        cardRes.location must be(ldprUriFull)
         cardRes.acl.get must be(ldprMeta)
         assert(acl.resolveAgainst(ldprMeta) isIsomorphicWith graphCardACL)
         cardRes match {
@@ -261,8 +261,8 @@ abstract class LDPSTest[Rdf <: RDF](
         newbin <- Enumerator(helloWorldBinary).apply(it)
         newres <-  newbin.run
       } yield {
-        bin.uri must be(binUri)
-        newres.uri must be(binUri)
+        bin.location must be(binUri)
+        newres.location must be(binUri)
       }
 
     createBin.getOrFail()
@@ -293,7 +293,7 @@ abstract class LDPSTest[Rdf <: RDF](
         case _ => throw new Exception("Object MUST be binary - given that this test is not running in an open world")
       }
     } yield {
-      bin.uri must be(binUri)
+      bin.location must be(binUri)
     }
     editBin.getOrFail()
 

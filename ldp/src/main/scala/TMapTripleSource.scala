@@ -20,7 +20,7 @@ class TMapTripleSource(tmap: scala.collection.mutable.Map[String, LocalLDPR[Plan
         ldpr <- tmap.values.iterator
         statement <- ldpr.graph.getStatements(subject, predicate, objectt).toIterator
       } yield {
-        statement.withContext(ldpr.uri.asSesame.asInstanceOf[Resource])
+        statement.withContext(ldpr.location.asSesame.asInstanceOf[Resource])
       }
     } else {
       for {

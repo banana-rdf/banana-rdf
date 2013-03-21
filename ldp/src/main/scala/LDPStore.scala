@@ -59,7 +59,7 @@ trait RActor extends Actor with akka.actor.ActorLogging {
 // There can be named and unamed resources, as when a POST creates a
 // resource that is not given a name... so this should probably extend a more abstract resource
 trait NamedResource[Rdf<:RDF] extends Meta[Rdf] {
-   def uri: Rdf#URI
+   def location: Rdf#URI
 }
 
 /**
@@ -69,7 +69,7 @@ trait NamedResource[Rdf<:RDF] extends Meta[Rdf] {
  *   better done in form methods for efficiency reasons.
  */
 trait Meta[Rdf <: RDF] {
-  def uri: Rdf#URI
+  def location: Rdf#URI
 
   //move all the metadata to this, and have the other functions
   def meta: PointedGraph[Rdf]
@@ -119,20 +119,17 @@ trait BinaryResource[Rdf<:RDF] extends NamedResource[Rdf]  {
  * - an LDPS must subscribe to the death of its LDPC
  */
 
-trait LDPR[Rdf <: RDF] extends NamedResource[Rdf]  {
+trait LDPR[Rdf <: RDF] extends NamedResource[Rdf] with LinkedDataResource[Rdf]  {
   import org.w3.banana.syntax._
-  def uri: Rdf#URI
+  def location: Rdf#URI
 
-  def graph: Rdf#Graph // all uris are relative to uri
+  def graph: Rdf#Graph // all uris are relative to location
 
-  /* the graph such that all URIs are relative to $uri */
-  def relativeGraph(implicit ops: RDFOps[Rdf]): Rdf#Graph  = graph.resolveAgainst(uri)
+  /* the graph such that all URIs are relative to $location */
+  def relativeGraph(implicit ops: RDFOps[Rdf]): Rdf#Graph  = graph.resolveAgainst(location)
 
-}
+  def resource: PointedGraph[Rdf] = PointedGraph(location,graph)
 
-trait LDPC[Rdf <: RDF] extends NamedResource[Rdf] {
-  def uri: Rdf#URI // *with* a trailing slash
-  def execute[A](script: LDPCommand.Script[Rdf, A]): Future[A]
 }
 
 
@@ -141,20 +138,20 @@ case class OperationNotSupported(msg: String) extends Exception(msg)
 
 trait LocalNamedResource[Rdf<:RDF] extends NamedResource[Rdf] {
   lazy val acl: Option[Rdf#URI]= Some{
-    if (uri.toString.endsWith(";acl")) uri
-    else ops.URI(uri.toString+";acl")
+    if (location.toString.endsWith(";acl")) location
+    else ops.URI(location.toString+";acl")
   }
 }
 
 
-case class LocalBinaryR[Rdf<:RDF](root: Path, uri: Rdf#URI)
+case class LocalBinaryR[Rdf<:RDF](root: Path, location: Rdf#URI)
                                    (implicit val ops: RDFOps[Rdf])
   extends BinaryResource[Rdf] with LocalNamedResource[Rdf] {
   import org.w3.banana.syntax.URISyntax.uriW
   import ops._
 
-  lazy val path = root.resolve(uriW(uri).lastPathSegment)
-  def meta = PointedGraph(uri,Graph.empty)  //build up meta graph from local info
+  lazy val path = root.resolve(uriW(location).lastPathSegment)
+  def meta = PointedGraph(location,Graph.empty)  //build up meta graph from local info
 
 
   // also should be on a metadata trait, since all resources have update times
@@ -193,17 +190,17 @@ case class LocalBinaryR[Rdf<:RDF](root: Path, uri: Rdf#URI)
  * it's important for the uris in the graph to be absolute
  * this invariant is assumed by the sparql engine (TripleSource)
  */
-case class LocalLDPR[Rdf<:RDF](uri: Rdf#URI,
+case class LocalLDPR[Rdf<:RDF](location: Rdf#URI,
                                   graph: Rdf#Graph,
                                   updated: Option[Date] = Some(new Date))
                                  (implicit val ops: RDFOps[Rdf])
   extends LDPR[Rdf] with LocalNamedResource[Rdf]{
   import ops._
-  def meta = PointedGraph(uri,Graph.empty)  //todo: build up meta from local info
+  def meta = PointedGraph(location,Graph.empty)  //todo: build up meta from local info
 }
 
 
-case class RemoteLDPR[Rdf<:RDF](uri: Rdf#URI, graph: Rdf#Graph, meta: PointedGraph[Rdf], updated: Option[Date])
+case class RemoteLDPR[Rdf<:RDF](location: Rdf#URI, graph: Rdf#Graph, meta: PointedGraph[Rdf], updated: Option[Date])
                                (implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
   import diesel._
 
