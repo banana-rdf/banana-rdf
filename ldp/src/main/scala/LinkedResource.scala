@@ -2,8 +2,9 @@ package org.w3.banana.ldp
 
 import org.w3.banana._
 import scala.concurrent._
-import play.api.libs.iteratee.Enumerator
+import play.api.libs.iteratee._
 import scala.util.{Failure, Success, Try}
+import scala.Error
 
 /** A resource that can be found with its URI, and is linked to other
   * resources through links as URIs
@@ -14,10 +15,13 @@ import scala.util.{Failure, Success, Try}
 trait LinkedResource[Rdf <: RDF, LR] {
 
   /** retrieves a resource based on its URI */
-  def ~(uri: Rdf#URI): Future[LR]
+  def ~(uri: Rdf#URI): Enumerator[LR]
 
-  /** follow the  */
+  /** follow the predicate */
   def ~> (lr: LR, predicate: Rdf#URI): Enumerator[LR]
+
+  /** follow the predicate in reverse order  */
+  def <~ (lr: LR, predicate: Rdf#URI): Enumerator[LR]
 
 }
 
@@ -35,7 +39,7 @@ trait LinkedMeta[Rdf <: RDF, LR] {
 trait LinkedWebResource[Rdf <: RDF, LR] extends LinkedResource[Rdf,LR] with LinkedMeta[Rdf,LR]
 
 
-class WebResource[Rdf <:RDF]()(implicit rww: RWW[Rdf], ops: RDFOps[Rdf], ec: ExecutionContext)
+class WebResource[Rdf <:RDF](rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: ExecutionContext)
   extends LinkedResource[Rdf,LinkedDataResource[Rdf]] {
   import LDPCommand._
   import ops._
@@ -43,86 +47,101 @@ class WebResource[Rdf <:RDF]()(implicit rww: RWW[Rdf], ops: RDFOps[Rdf], ec: Exe
   import syntax._
 
   /** retrieves a resource based on its URI */
-  def ~(uri: Rdf#URI): Future[LinkedDataResource[Rdf]] = rww.execute{
-    //todo: this code could be moved somewhere else see: Command.GET
-    val docUri = uri.fragmentLess
-    getLDPR(docUri).map{graph=>
-      val pointed = PointedGraph(uri, graph)
-      LinkedDataResource(docUri, pointed)
+  def ~(uri: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = {
+    val futureLDR = rww.execute{
+      //todo: this code could be moved somewhere else see: Command.GET
+      val docUri = uri.fragmentLess
+      getLDPR(docUri).map{graph=>
+        val pointed = PointedGraph(uri, graph)
+        LinkedDataResource(docUri, pointed)
+      }
+    }
+    new Enumerator[LinkedDataResource[Rdf]] {
+      def apply[A](i: Iteratee[LinkedDataResource[Rdf], A]) = futureLDR.flatMap { ldr =>
+        i.feed(Input.El(ldr))
+      }
     }
   }
+
 
   /** follow the  */
   def ~>(lr: LinkedDataResource[Rdf], predicate: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = {
     val res = lr.resource/predicate
-    val local_remote = res.groupBy{pg =>
-       foldNode(pg.pointer)(
-         uri=>if (uri.fragmentLess == lr.location) "local" else "remote",
-         bnode => "local",
-         lit => "local"
-       )
-    }
-    val localEnum = Enumerator(local_remote.get("local").getOrElse(Iterable()).toSeq.map {pg => LinkedDataResource(lr.location,pg)}: _*)
-
-    local_remote.get("remote").map { remote =>
-      val remoteLdrs = remote.map { pg =>
-        val pgUri = pg.pointer.asInstanceOf[Rdf#URI]
-        //todo: the following code does not take redirects into account
-        //todo: we need a GET that returns a LinkedDataResource, that knows how to follow redirects
-        rww.execute(getLDPR(pgUri)).map {g => LinkedDataResource(pgUri.fragmentLess,PointedGraph(pgUri,g))}
-      }
-
-      val rem = Enumerator.unfoldM(remoteLdrs.toSeq){s =>
-        if (s.isEmpty) {
-          Future(None)
-        } else {
-          FutureUtil.select(s).map {
-            case (t, seqFuture) => t.toOption.map {
-              ldr => (seqFuture, ldr)
-            }
-          }
-        }
-      }
-      localEnum andThen rem
-    } getOrElse(localEnum)
+    follow(lr.location,  res)
   }
-}
 
-object FutureUtil {
+  /** follow the predicate in reverse order  */
+  def <~(lr: LinkedDataResource[Rdf], predicate: Rdf#URI) = {
+    val res = lr.resource/-predicate
+    follow(lr.location,  res)
+  }
+
 
   /**
-   * "Select" off the first future to be satisfied.  Return this as a
-   * result, with the remainder of the Futures as a sequence.
+   * Transform the pointed Graphs to LinkedDataResources. If a graph is remote jump to the remote graph
+   * definition.
    *
-   * @param fs a scala.collection.Seq
+   * @param local the URI for local resources, others are remote and create a graph jump
+   * @param res pointed Graphs to follow
+   * @return An Enumerator that will feed the results to an Iteratee
    */
-  def select[A](fs: Seq[Future[A]])(implicit ec: ExecutionContext): Future[(Try[A], Seq[Future[A]])] = {
-    //todo: this just seems very inefficient. There must be a way to improve this
-    @scala.annotation.tailrec
-    def stripe(p: Promise[(Try[A], Seq[Future[A]])],
-               heads: Seq[Future[A]],
-               elem: Future[A],
-               tail: Seq[Future[A]]): Future[(Try[A], Seq[Future[A]])] = {
-      elem onComplete { res => if (!p.isCompleted) p.trySuccess((res, heads ++ tail)) }
-      if (tail.isEmpty) p.future
-      else stripe(p, heads :+ elem, tail.head, tail.tail)
+  protected def follow(local: Rdf#URI,res: PointedGraphs[Rdf]): Enumerator[LinkedDataResource[Rdf]] = {
+    val local_remote = res.groupBy {
+      pg =>
+        foldNode(pg.pointer)(
+          uri => if (uri.fragmentLess == local)  "local" else "remote",
+          bnode => "local",
+          lit => "local"
+        )
+    }
+    val localEnum = Enumerator(local_remote.get("local").getOrElse(Iterable()).toSeq.map {
+      pg => LinkedDataResource(local, pg)
+    }: _*)
+
+    def toEnumerator(seqFutureLdr: Seq[Future[LinkedDataResource[Rdf]]]) = new Enumerator[LinkedDataResource[Rdf]] {
+      def apply[A](i: Iteratee[LinkedDataResource[Rdf], A]): Future[Iteratee[LinkedDataResource[Rdf], A]] = {
+        Future.sequence(seqFutureLdr).flatMap {
+          seqLdrs: Seq[LinkedDataResource[Rdf]] =>
+            seqLdrs.foldRight(Future.successful(i)) {
+              case (ldr, i) =>
+                i.flatMap(_.feed(Input.El(ldr)))
+            }
+        }
+      }
     }
 
-    if (fs.isEmpty) Future.failed(new IllegalArgumentException("empty future list!"))
-    else stripe(Promise(), fs.genericBuilder[Future[A]].result, fs.head, fs.tail)
+    local_remote.get("remote").map {
+      remote =>
+        val remoteLdrs = remote.map {
+          pg =>
+            val pgUri = pg.pointer.asInstanceOf[Rdf#URI]
+            val pgDoc = pgUri.fragmentLess
+            //todo: the following code does not take redirects into account
+            //todo: we need a GET that returns a LinkedDataResource, that knows how to follow redirects
+            rww.execute(getLDPR(pgDoc)).map {
+              g => LinkedDataResource(pgDoc, PointedGraph(pgUri, g))
+            }
+        }
+
+        val rem = toEnumerator(remoteLdrs.toSeq)
+        localEnum andThen rem
+    } getOrElse (localEnum)
   }
 
 }
+
 
 
 
 /** A [[org.w3.banana.LinkedDataResource]] is obviously a [[org.w3.banana.ldp.LinkedResource]] */
 class LDRLinkedResource[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LinkedResource[Rdf, LinkedDataResource[Rdf]] {
 
-  def ~(uri: Rdf#URI): Future[LinkedDataResource[Rdf]] = ???
+  def ~(uri: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = ???
 
   def ~> (lr: LinkedDataResource[Rdf], predicate: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = ???
 
+  /** follow the predicate in reverse order  */
+  def <~(lr: LinkedDataResource[Rdf], predicate: Rdf#URI) = ???
 }
 
 /** Resources within a same RDF graph are linked together */

@@ -48,7 +48,6 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   val certbinder = new CertBinder()
   import certbinder._
-  implicit val _rww = rww
 
   implicit def toUri(url: jURL): Rdf#URI = URI(url.toString)
 
@@ -95,7 +94,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   val henryFoafWac = URI("http://bblfish.net/people/henry/foaf;wac")
   lazy val henryFoafWacGraph : Rdf#Graph = (
     bnode() -- wac.accessTo ->- henryFoaf
-       -- wac.agentClass ->- tpacGroupDoc
+       -- wac.agentClass ->- tpacGroup
        -- wac.mode ->- wac.Read
     ).graph
 
@@ -266,10 +265,6 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
 
 
-
-
-
-
   "Alex's profile" when {
 
     "add bertails card and acls" in {
@@ -354,51 +349,80 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   }
 
-  val web = new WebResource[Rdf]()
+  val web = new WebResource[Rdf](rww)
 
   "Test WebResource ~" in {
-    val futureLDR = web~(tpacGroup)
-    val ldr = futureLDR.getOrFail()
+    val ldrEnum = web~(tpacGroup)
+    val futureResList = ldrEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
+    val resList = futureResList.getOrFail()
+    resList must have length(1)
+    val ldr = resList.head
     ldr.location must be(tpacGroupDoc)
     ldr.resource.pointer must be(tpacGroup)
     assert(ldr.resource.graph isIsomorphicWith tpacGroupGraph.resolveAgainst(tpacGroupDoc))
   }
 
   "Test WebResource ~>" in {
-    val names: Future[Enumerator[LinkedDataResource[Rdf]]] =
-      web~(tpacGroup) map { ldr => web~>(ldr,foaf.member) }
+    val memberEnum: Enumerator[LinkedDataResource[Rdf]] = for {
+      groupLdr <- web~(tpacGroup)
+      member <-  web~>(groupLdr,foaf.member)
+    } yield {
+      member
+    }
+    val memberFuture = memberEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
+    val memberList = memberFuture.getOrFail()
 
-    val enum = names.getOrFail()
-    val it = Iteratee.getChunks[LinkedDataResource[Rdf]]
-    val futureIt = enum(it)
-    val futureRes = futureIt.flatMap(_.run)
-    val list = futureRes.getOrFail()
-    val answers = list.map(ldr => ldr.resource.pointer)
-    answers must have length (3)
-    assert(answers.contains(henry))
-    assert(answers.contains(bertails))
-    assert(answers.contains(timbl))
+    val answersMap = Map(memberList.map{ldr => (ldr.resource.pointer,ldr.resource)} : _*)
+
+    val pointers = answersMap.keys.toList
+    answersMap must have size (3)
+
+    assert(pointers.contains(henry))
+    assert(pointers.contains(bertails))
+    assert(pointers.contains(timbl))
+
+    assert(answersMap(bertails).graph isIsomorphicWith(bertailsCardGraph.resolveAgainst(bertailsCard)))
+    assert(answersMap(henry).graph isIsomorphicWith(henryGraph.resolveAgainst(henryCard)))
+    assert(answersMap(timbl).graph isIsomorphicWith(timblGraph.resolveAgainst(timblCard)))
+
   }
 
-  "Test WebResource ~> followed by ~>" in {
-    val names: Future[Enumerator[LinkedDataResource[Rdf]]] =
-      web~(tpacGroup) map { ldr =>
-        val m= web~>(ldr,foaf.member)
-        m.flatMap{ ldr2=>
-          web~>(ldr2,foaf.name)
-        }
-      }
+  "Test WebResource ~> followed by ~> to literal" in {
+    val nameEnum = for {
+      groupLdr <- web~(tpacGroup)
+      member <-  web~>(groupLdr,foaf.member)
+      name <- web~>(member,foaf.name)
+    } yield {
+      name
+    }
+    val nameFuture = nameEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
+    val namesLDR = nameFuture.getOrFail()
 
-    val enum = names.getOrFail()
-    val it = Iteratee.getChunks[LinkedDataResource[Rdf]]
-    val futureIt = enum(it)
-    val futureRes = futureIt.flatMap(_.run)
-    val list = futureRes.getOrFail()
-    val answers = list.map(ldr => ldr.resource.pointer)
+    val answers = namesLDR.map{ldr => ldr.resource.pointer}
     answers must have length (3)
-    assert(answers.contains("Henry"))
+    assert(answers.contains(TypedLiteral("Henry")))
     assert(answers.contains("Alexandre".lang("fr")))
-//    assert(answers.contains(timbl))
+    assert(answers.contains(TypedLiteral("Tim Berners-Lee")))
+  }
+
+  "Test ACLs with ~ and ~> and <~ (tests bnode support too)" in {
+    val nameEnum = for {
+      wacLdr <- web~(henryFoafWac)
+      auth  <-  web<~(LinkedDataResource(wacLdr.location,PointedGraph(henryFoaf,wacLdr.resource.graph)),wac.accessTo)
+      agentClass <-  web~>(auth,wac.agentClass)
+      member <-  web~>(agentClass,foaf.member)
+      name <- web~>(member,foaf.name)
+    } yield {
+      name
+    }
+    val nameFuture = nameEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
+    val namesLDR = nameFuture.getOrFail()
+
+    val answers = namesLDR.map{ldr => ldr.resource.pointer}
+    answers must have length (3)
+    assert(answers.contains(TypedLiteral("Henry")))
+    assert(answers.contains("Alexandre".lang("fr")))
+    assert(answers.contains(TypedLiteral("Tim Berners-Lee")))
   }
 
 
