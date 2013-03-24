@@ -102,8 +102,8 @@ class WebResource[Rdf <:RDF](rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: Execu
       def apply[A](i: Iteratee[LinkedDataResource[Rdf], A]): Future[Iteratee[LinkedDataResource[Rdf], A]] = {
         Future.sequence(seqFutureLdr).flatMap {
           seqLdrs: Seq[LinkedDataResource[Rdf]] =>
-            seqLdrs.foldRight(Future.successful(i)) {
-              case (ldr, i) =>
+            seqLdrs.foldLeft(Future.successful(i)) {
+              case (i, ldr) =>
                 i.flatMap(_.feed(Input.El(ldr)))
             }
         }
