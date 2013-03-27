@@ -67,4 +67,8 @@ object Syntax {
     val mimeTypes = NonEmptyList(MimeType("application/sparql-results+xml"))
   }
 
+  implicit val textPlain = new Syntax[String] {
+    val mimeTypes = NonEmptyList(MimeType("text/plain"))
+  }
+
 }

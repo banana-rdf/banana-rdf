@@ -12,4 +12,12 @@ object ToURI {
     def toURI(t: Rdf#URI): Rdf#URI = t
   }
 
+  implicit def javaURLToURI[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new ToURI[Rdf, java.net.URL] {
+    def toURI(t: java.net.URL): Rdf#URI = ops.URI(t.toString)
+  }
+
+  implicit def javaURIToURI[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new ToURI[Rdf, java.net.URI] {
+    def toURI(t: java.net.URI): Rdf#URI = ops.URI(t.toString)
+  }
+
 }

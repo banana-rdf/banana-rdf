@@ -4,6 +4,7 @@ import org.w3.banana._
 import org.w3.banana.diesel._
 import org.scalatest._
 import org.scalatest.matchers.MustMatchers
+import java.net.URL
 
 abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with MustMatchers {
 
@@ -50,6 +51,16 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
     me.fragmentLess must be(URI("/people/card/henry"))
     val host = URI("http://bblfish.net")
     me.resolveAgainst(host) must be(URI("http://bblfish.net/people/card/henry#me"))
+  }
+
+  "transforming java URIs and URLs to Rdf#URI" in {
+    import syntax.URIW
+    val card = "http://bblfish.net/people/henry/card"
+    val uri: Rdf#URI = URI(card)
+
+    new URL(card).toUri must be(uri)
+    new java.net.URI(card).toUri must be(uri)
+
   }
 
 }
