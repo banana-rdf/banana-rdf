@@ -90,7 +90,7 @@ object BananaRdfBuild extends Build {
 
 //  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
 
-  val asyncHttpClient = "com.ning" % "async-http-client" % "1.8.0-SNAPSHOT"
+  val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.12"
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
 
@@ -251,10 +251,10 @@ object BananaRdfBuild extends Build {
         libraryDependencies += scalaIoCore,
         libraryDependencies += scalaIoFile,
         libraryDependencies += akka,
+        libraryDependencies += asyncHttpClient,
         libraryDependencies += akkaTransactor,
         libraryDependencies += scalaz,
         libraryDependencies += iterateeDeps,
-        libraryDependencies += playDeps,
         libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
         libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )

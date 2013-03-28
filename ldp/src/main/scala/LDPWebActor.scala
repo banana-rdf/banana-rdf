@@ -8,26 +8,27 @@ import scalaz.\/-
 import scalaz.-\/
 import util.Failure
 import util.Success
+import java.net.URL
 
 /**
 * A LDP actor that interacts with remote LDP resources
 *
 * @param excluding base of URIs that the local server is listening to. So don't fetch those URIs externally
-* @param fetcher   fetches resources off the web. Important for testing, among other things.
+* @param webc   fetches resources off the web. Important for testing, among other things.
 * @tparam Rdf
 */
-class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher[Rdf])
-                           (implicit ops: RDFOps[Rdf], sparqlGraph: SparqlGraph[Rdf], ec: ExecutionContext) extends RActor {
+class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
+                           (implicit ops: RDFOps[Rdf], sparqlGraph: SparqlGraph[Rdf], ec: ExecutionContext,
+                            turtleWriter: RDFWriter[Rdf,Turtle]) extends RActor {
 
+  import ops._
   import org.w3.banana.syntax._
 
   val cache = mutable.HashMap[Rdf#URI,Future[NamedResource[Rdf]]]()
 
   def fetch(uri: Rdf#URI): Future[NamedResource[Rdf]] = {
-    val url = uri.underlying
-    log.info(s"WebProxy: fetching $uri")
     cache.get(uri).getOrElse {
-      val result = fetcher.fetch(url.toURL)
+      val result = webc.get(uri)
       cache.put(uri, result)
       result
     }
@@ -43,22 +44,36 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher
   }
 
 
+
   /**
    * Runs a command that can be evaluated on this container.
    * @param cmd the command to evaluate
    * @tparam A The final return type of the script
    * @return a script for further evaluation
    */
-  def runLocalCmd[A](cmd: LDPCommand[Rdf, LDPCommand.Script[Rdf,A]]) {
+  def runCmd[A](cmd: LDPCommand[Rdf, LDPCommand.Script[Rdf,A]]) {
     log.info(s"in RunLocalCmd - received $cmd")
 
+    def failMsg(e: Throwable, sender: ActorRef, msg: =>String) {
+      sender ! akka.actor.Status.Failure({
+        e match {
+          case be: BananaException => be
+          case other: Throwable => WrappedException(msg, other.getCause)
+        }
+      })
+    }
     cmd match {
-      //      case CreateLDPR(_, slugOpt, graph, k) => {
-      //        val ldpr = PlantainLDPR(uri, graph.resolveAgainst(uri))
-      //        LDPRs.put(pathSegment, ldpr)
-      //        k(uri)
-      //      }
-      //      case CreateBinary(_, slugOpt, mime: MimeType, k) => {
+      case CreateLDPR(container, slugOpt, graph, k) => {
+        val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
+        val result = webc.post(container,slugOpt,graph,Syntax.Turtle)
+        result.onComplete{ tryres =>
+          tryres match {
+            case Success(url) => self tell (Scrpt(k(url)),sender)
+            case Failure(e) => failMsg(e, sender,s"failure POSTing to remote container <$container>")
+          }
+        }
+      }
+//      case CreateBinary(_, slugOpt, mime: MimeType, k) => {
       //        val (uri, pathSegment) = deconstruct(slugOpt)
       //        //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
       //        val bin = PlantainBinary(root, uri)
@@ -77,20 +92,8 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher
         val result = fetch(uri)
         result.onComplete { tryres =>
           tryres match {
-            case Success(response) => {
-              log.info(s"cache received $response")
-              self tell (Scrpt(k(response)),sender)
-            }
-            case Failure(e) => {
-              log.info(s"Cache failed with $e")
-              sender ! akka.actor.Status.Failure({
-                e match {
-                  case be : BananaException => be
-                  case other: Throwable => WrappedException("failure fetching resource", other.getCause)
-                }
-              })
-            }
-          }
+            case Success(response) =>  self tell (Scrpt(k(response)),sender)
+            case Failure(e) => failMsg(e, sender,s"failure fetching resource <$uri>")          }
         }
       }
       case GetMeta(uri, k) => {
@@ -103,15 +106,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher
               log.info(s"cache received $response")
               self tell (Scrpt(k(response.asInstanceOf[Meta[Rdf]])),sender)
             }
-            case Failure(e) => {
-              log.info(s"Cache failed with $e")
-              sender ! akka.actor.Status.Failure({
-                e match {
-                  case be : BananaException => be
-                  case other: Throwable => WrappedException("failure fetching resource", other.getCause)
-                }
-              })
-            }
+            case Failure(e) => failMsg(e, sender,s"failure fetching meta for resource <$uri>")
           }
         }
       }
@@ -195,7 +190,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher
     script.resume match {
       case -\/(cmd) => {
         if(local(cmd.uri.underlying,excluding.underlying) == None) {
-          runLocalCmd(cmd)
+          runCmd(cmd)
           //if we were to have some commands return an immediate value, then we could do
           // the following with the returned script
           //  run(sender, script)
@@ -219,7 +214,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val fetcher: ResourceFetcher
       run(sender, s.script)
     }
     case cmd: Cmd[Rdf,_] => {
-      runLocalCmd(cmd.command)
+      runCmd(cmd.command)
     }
   }
 }

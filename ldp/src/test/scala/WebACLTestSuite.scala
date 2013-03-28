@@ -10,12 +10,14 @@ import org.scalatest.{BeforeAndAfterAll, WordSpec}
 import org.scalatest.matchers.MustMatchers
 import org.w3.banana._
 import concurrent.Future
-import java.net.{URL=>jURL,URI=>jURI}
+import java.net.{URL => jURL, URI => jURI}
 import org.w3.banana.plantain.Plantain
 import org.w3.banana.ldp.LDPCommand._
 import scala.Some
 import java.util.Date
 import play.api.libs.iteratee._
+import org.w3.banana
+import org.w3.play.api.libs.ws.ResponseHeaders
 
 
 object WebACLTestSuite {
@@ -30,13 +32,14 @@ object WebACLTestSuite {
 
 class PlantainWebACLTest extends WebACLTestSuite[Plantain](
   WebACLTestSuite.rww,WebACLTestSuite.baseUri)(
-  Plantain.ops,Plantain.sparqlOps,Plantain.sparqlGraph,Plantain.recordBinder,Plantain.rdfxmlReader,PlantainTest.authz)
+  Plantain.ops,Plantain.sparqlOps,Plantain.sparqlGraph,Plantain.recordBinder,Plantain.turtleWriter,Plantain.rdfxmlReader,PlantainTest.authz)
 
 abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
                                  implicit ops: RDFOps[Rdf],
                                  sparqlOps: SparqlOps[Rdf],
                                  sparqlGraph: SparqlGraph[Rdf],
                                  recordBinder: binder.RecordBinder[Rdf],
+                                 turtleWriter: RDFWriter[Rdf,Turtle],
                                  reader: RDFReader[Rdf, RDFXML],
                                  authz: AuthZ[Rdf])
     extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
@@ -53,6 +56,9 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   val wac = WebACLPrefix[Rdf]
   val foaf = FOAFPrefix[Rdf]
+  val rdf = RDFPrefix[Rdf]
+  val rdfs = RDFSPrefix[Rdf]
+  val ldp = LDPPrefix[Rdf]
   val cert = CertPrefix[Rdf]
   val keyGen = KeyPairGenerator.getInstance("RSA");
   val henryRsaKey: RSAPublicKey = { keyGen.initialize(768);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
@@ -70,6 +76,9 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     URI("#me") -- cert.key ->- henryRsaKey
                -- foaf.name ->- "Henry"
     ).graph
+
+  val henryColl = URI("http://bblfish.net/people/henry/")
+  val henryCollGraph: Rdf#Graph = henryColl.a(ldp.Container).graph
 
   val henryCardAcl = URI("http://bblfish.net/people/henry/card;wac")
   val henryCardAclGraph: Rdf#Graph = (
@@ -131,22 +140,44 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     def meta = PointedGraph(location,metaGraph)
   }
 
-  object testFetcher extends ResourceFetcher[Rdf] {
-    def fetch(url: jURL): Future[NamedResource[Rdf]] = {
-      val r = URI(url.toString)
-      r match {
-        case `henryCard` =>  futuRes(r,henryGraph)
-        case `henryCardAcl` =>  futuRes(r,henryCardAclGraph)
-        case `tpacGroupDoc` => futuRes(r,tpacGroupGraph)
-        case `timblCard` => futuRes(r,timblGraph)
-        case `henryFoaf` => futuRes(r,henryFoafGraph)
-        case `henryFoafWac` => futuRes(r,henryFoafWacGraph)
-        case _ => {futuRes(r,Graph.empty)} //todo: should be 404 or something
-      }
+
+  object testFetcher extends WebClient[Rdf] {
+    import collection.mutable.{Map,SynchronizedMap}
+    val counter = new java.util.concurrent.atomic.AtomicInteger(0)
+    class SynMap extends collection.mutable.HashMap[Rdf#URI,Rdf#Graph] with collection.mutable.SynchronizedMap[Rdf#URI,Rdf#Graph]
+    lazy val synMap = new SynMap() ++= Seq(
+      henryColl -> henryCollGraph,
+      henryCard -> henryGraph,
+      henryCardAcl -> henryCardAclGraph,
+      tpacGroupDoc-> tpacGroupGraph,
+      timblCard -> timblGraph,
+      henryFoafWac -> henryFoafWacGraph
+    )
+
+    def get(url: Rdf#URI): Future[NamedResource[Rdf]] = {
+      synMap.get(url).map{g=>futuRes(url,g)}.getOrElse(futuRes(url,Graph.empty))  //todo: getOrElse should be 404 or something
     }
 
     def futuRes(r: Rdf#URI, graph: Rdf#Graph): Future[WebACLTestSuite.this.type#TestLDPR] = {
-      Future.successful(TestLDPR(r, graph.resolveAgainst(r)))
+      Future.successful(TestLDPR(r, graph.resolveAgainst(r)))   //todo: should this really not be a relative graph?
+    }
+
+    def post[S](url: Rdf#URI, slug: Option[String], graph: Rdf#Graph, syntax: banana.Syntax[S])
+               (implicit writer: Writer[Rdf#Graph, S]): Future[Rdf#URI] = {
+      val collectionURL = url.fragmentLess
+      if (!collectionURL.toString.endsWith("/")) {
+         Future.failed(RemoteException("cannot create resource",ResponseHeaders(405,collection.immutable.Map())))
+      } else {
+        synMap.get(collectionURL).map { gr =>
+          if ((PointedGraph(collectionURL, gr) / rdf.typ).exists(_.pointer == ldp.Container)) {
+             val newURI = URI(collectionURL.toString+slug.getOrElse(counter.addAndGet(1)))
+             synMap.put(collectionURL,gr union (collectionURL -- rdfs.member ->- newURI).graph)
+             Future.successful(newURI)
+          } else {
+             Future.failed(RemoteException("Post not on container",ResponseHeaders(405,collection.immutable.Map())))
+          }
+        }.getOrElse(Future.failed(RemoteException("resource does not exist",ResponseHeaders(404,collection.immutable.Map()))))
+      }
     }
   }
   rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )
@@ -236,7 +267,23 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       ex.getOrFail()
     }
 
-//    "Who can access Henry's foaf profile?" in {
+    "henry creates his foaf list ( no ACL here )" in {
+      val ex = rww.execute{
+        for {
+          foaf <- createLDPR(henryColl,Some("foaf"),henryFoafGraph)
+          collGr <- getLDPR(henryColl)
+        } yield {
+          foaf must be(henryFoaf)
+          assert{
+            (PointedGraph(henryColl,collGr)/rdfs.member).exists(_.pointer == henryFoaf)
+          }
+        }
+      }
+      ex.getOrFail()
+    }
+
+
+    //    "Who can access Henry's foaf profile?" in {
 //      val ex = rww.execute{
 //        for {
 //          read <- authz.getAuthFor(henryFoaf,wac.Read)
