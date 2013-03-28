@@ -38,16 +38,48 @@ class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(i
 
 }
 
+object RDFSPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new RDFSPrefix(ops)
+}
+
+class RDFSPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("rdf", "http://www.w3.org/2000/01/rdf-schema#")(ops) {
+  val Class = apply("Class")
+  val Container = apply("Container")
+  val ContainerMembershipProperty = apply("ContainerMembershipProperty")
+  val Datatype = apply("Datatype")
+  val Literal = apply("Literal")
+  val Resource = apply("Resource")
+  val comment = apply("comment")
+  val domain = apply("domain")
+  val isDefinedBy = apply("isDefinedBy")
+  val label = apply("label")
+  val member = apply("member")
+  val range = apply("range")
+  val seeAlso = apply("seeAlso")
+  val subClassOf = apply("subClassOf")
+  val subPropertyOf = apply("subPropertyOf")
+}
+
 object RDFPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new RDFPrefix(ops)
 }
 
 class RDFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")(ops) {
-  val langString = apply("langString")
-  val typ = apply("type")
-  val first = apply("first")
-  val rest = apply("rest")
+  val langString = apply("langString") //todo: does not exist in ontology
   val nil = apply("nil")
+  val typ = apply("type")
+  val Alt = apply("Alt")
+  val Bag = apply("Bag")
+  val List = apply("List")
+  val Property = apply("Property")
+  val Seq = apply("Seq")
+  val Statement = apply("Statement")
+  val first = apply("first")
+  val obj = apply("object")
+  val predicate = apply("predicate")
+  val rest = apply("rest")
+  val subject = apply("subject")
+  val value = apply("value")
 }
 
 object XSDPrefix {
@@ -178,10 +210,33 @@ class FOAFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("foaf", "ht
 
 }
 
+object LDPPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new LDPPrefix(ops)
+}
+
+class LDPPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("ldp", "http://www.w3.org/ns/ldp#")(ops) {
+  val AggregateContainer = apply("AggregateContainer")
+  val CompositeContainer = apply("CompositeContainer")
+  val Container = apply("Container")
+  val Page = apply("Page")
+  val Resource = apply("Resource")
+  val containerSortPredicates = apply("containerSortPredicates")
+  val membershipPredicate = apply("membershipPredicate")
+  val membershipSubject = apply("membershipSubject")
+  val nextPage = apply("nextPage")
+  val pageOf = apply("pageOf")
+}
+
 object IANALinkPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new IANALinkPrefix(ops)
 }
 
+/**
+ * The Iana Link Relations are not linked data so these URLs are currently invented ones, and need
+ * not reflect what may be used if ever such URIs are coined.
+ * @param ops
+ * @tparam Rdf
+ */
 class IANALinkPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "http://www.iana.org/assignments/link-relations/#")(ops) {
   val about = apply("about")
   val acl = apply("acl")               //needs to be registered
