@@ -21,6 +21,7 @@ trait WebClient[Rdf<:RDF] {
   def get(url: Rdf#URI): Future[NamedResource[Rdf]]
   def post[S](url: Rdf#URI, slug: Option[String], graph: Rdf#Graph,syntax: Syntax[S])
              (implicit writer: Writer[Rdf#Graph,S]): Future[Rdf#URI]
+  def delete(url: Rdf#URI): Future[Unit]
 }
 
 object WebClient {
@@ -119,6 +120,17 @@ class WSClient[Rdf<:RDF](graphSelector: ReaderSelector[Rdf], rdfWriter: RDFWrite
         }
       } else {
         Future.failed(RemoteException.netty("Resource creation failed", resp))
+      }
+    }
+  }
+
+  def delete(url: Rdf#URI): Future[Unit] = {
+    val futureResp = WS.url(url.toString).delete()
+    futureResp.flatMap{ resp =>
+      if (resp.status == 200 || resp.status == 202 || resp.status == 204) {
+        Future.successful(())
+      } else {
+        Future.failed(RemoteException.netty("resource deletion failed",resp))
       }
     }
   }

@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 import org.scalatest.{BeforeAndAfterAll, WordSpec}
 import org.scalatest.matchers.MustMatchers
 import org.w3.banana._
-import concurrent.Future
+import scala.concurrent.{Await, Future}
 import java.net.{URL => jURL, URI => jURI}
 import org.w3.banana.plantain.Plantain
 import org.w3.banana.ldp.LDPCommand._
@@ -18,6 +18,8 @@ import java.util.Date
 import play.api.libs.iteratee._
 import org.w3.banana
 import org.w3.play.api.libs.ws.ResponseHeaders
+import scala.util.{Success, Failure}
+import scala.concurrent.duration.Duration
 
 
 object WebACLTestSuite {
@@ -60,6 +62,7 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
   val rdfs = RDFSPrefix[Rdf]
   val ldp = LDPPrefix[Rdf]
   val cert = CertPrefix[Rdf]
+
   val keyGen = KeyPairGenerator.getInstance("RSA");
   val henryRsaKey: RSAPublicKey = { keyGen.initialize(768);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
   val bertailsRsaKey: RSAPublicKey = { keyGen.initialize(512);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
@@ -155,7 +158,11 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     )
 
     def get(url: Rdf#URI): Future[NamedResource[Rdf]] = {
-      synMap.get(url).map{g=>futuRes(url,g)}.getOrElse(futuRes(url,Graph.empty))  //todo: getOrElse should be 404 or something
+      synMap.get(url).map{g=>futuRes(url,g)}.getOrElse(
+        Future.failed(RemoteException("resource does not exist",
+          ResponseHeaders(404, collection.immutable.Map()))
+        )
+      )
     }
 
     def futuRes(r: Rdf#URI, graph: Rdf#Graph): Future[WebACLTestSuite.this.type#TestLDPR] = {
@@ -177,6 +184,18 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
              Future.failed(RemoteException("Post not on container",ResponseHeaders(405,collection.immutable.Map())))
           }
         }.getOrElse(Future.failed(RemoteException("resource does not exist",ResponseHeaders(404,collection.immutable.Map()))))
+      }
+    }
+
+    def delete(url: Rdf#URI): Future[Unit] = {
+      val old = synMap.remove(url.fragmentLess)
+      old.fold{
+        Future.failed[Unit](
+          RemoteException("cannot delete non existent resource",
+            ResponseHeaders(404, collection.immutable.Map()))
+        )
+      }{x=>
+        Future.successful[Unit](())
       }
     }
   }
@@ -470,6 +489,39 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     assert(answers.contains(TypedLiteral("Henry")))
     assert(answers.contains("Alexandre".lang("fr")))
     assert(answers.contains(TypedLiteral("Tim Berners-Lee")))
+  }
+
+  "Test WebResource ~> with missing remote resource" in {
+    //we delete timbl
+    val ex = rww.execute(deleteResource(timblCard))
+    ex.getOrFail()
+    val ex2 = rww.execute(getResource(timblCard))
+    out.println("going to test fetching remote card of tim delete ")
+    val res = ex2.failed.map{_=>true}
+    assert{ Await.result(res,Duration(2,TimeUnit.SECONDS)) == true}
+    //now we should only have two resources returned
+    val memberEnum: Enumerator[LinkedDataResource[Rdf]] = for {
+      groupLdr <- web~(tpacGroup)
+      member <-  web~>(groupLdr,foaf.member)
+    } yield {
+      member
+    }
+    val memberFuture = memberEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
+    val memberList = memberFuture.getOrFail()
+
+    val answersMap = Map(memberList.map{ldr => (ldr.resource.pointer,ldr.resource)} : _*)
+
+    val pointers = answersMap.keys.toList
+    answersMap must have size (2)
+
+    assert(pointers.contains(henry))
+    assert(pointers.contains(bertails))
+    //assert(pointers.contains(timbl))
+
+    assert(answersMap(bertails).graph isIsomorphicWith(bertailsCardGraph.resolveAgainst(bertailsCard)))
+    assert(answersMap(henry).graph isIsomorphicWith(henryGraph.resolveAgainst(henryCard)))
+    //assert(answersMap(timbl).graph isIsomorphicWith(timblGraph.resolveAgainst(timblCard)))
+
   }
 
 

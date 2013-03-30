@@ -98,33 +98,44 @@ class WebResource[Rdf <:RDF](rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: Execu
       pg => LinkedDataResource(local, pg)
     }: _*)
 
-    def toEnumerator(seqFutureLdr: Seq[Future[LinkedDataResource[Rdf]]]) = new Enumerator[LinkedDataResource[Rdf]] {
-      def apply[A](i: Iteratee[LinkedDataResource[Rdf], A]): Future[Iteratee[LinkedDataResource[Rdf], A]] = {
-        Future.sequence(seqFutureLdr).flatMap {
-          seqLdrs: Seq[LinkedDataResource[Rdf]] =>
-            seqLdrs.foldLeft(Future.successful(i)) {
-              case (i, ldr) =>
-                i.flatMap(_.feed(Input.El(ldr)))
-            }
+    /*
+     * see discussion http://stackoverflow.com/questions/15543261/transforming-a-seqfuturex-into-an-enumeratorx
+     * In order to avoid the whole failing if only one of the Future[LDR]s fails, the failures of the sequence of Futures
+     * have to be made visible by a Try. Then the results can be collected by the flt partial function.
+     * @param seqFutureLdr: the Sequence of Futures where Failed Futures are mapped to try
+     * @param flt: filter out all elements that don't succeed with the partial function
+     */
+    def toEnumerator[LDR](seqFutureLdr: Seq[Future[Try[LDR]]])(flt: PartialFunction[Try[LDR],LDR]) = new Enumerator[LDR] {
+      def apply[A](i: Iteratee[LDR, A]): Future[Iteratee[LDR, A]] = {
+        Future.sequence(seqFutureLdr).flatMap { seqLdrs: Seq[Try[LDR]] =>
+          seqLdrs.collect(flt).foldLeft(Future.successful(i)) {
+            case (i, ldr) => i.flatMap(_.feed(Input.El(ldr)))
+          }
         }
       }
     }
 
-    local_remote.get("remote").map {
-      remote =>
-        val remoteLdrs = remote.map {
-          pg =>
-            val pgUri = pg.pointer.asInstanceOf[Rdf#URI]
-            val pgDoc = pgUri.fragmentLess
-            //todo: the following code does not take redirects into account
-            //todo: we need a GET that returns a LinkedDataResource, that knows how to follow redirects
-            rww.execute(getLDPR(pgDoc)).map {
-              g => LinkedDataResource(pgDoc, PointedGraph(pgUri, g))
-            }
+    local_remote.get("remote").map { remote =>
+      val remoteLdrs = remote.map { pg =>
+        val pgUri = pg.pointer.asInstanceOf[Rdf#URI]
+        val pgDoc = pgUri.fragmentLess
+        //todo: the following code does not take redirects into account
+        //todo: we need a GET that returns a LinkedDataResource, that knows how to follow redirects
+        rww.execute(getLDPR(pgDoc)).map {
+          g => LinkedDataResource(pgDoc, PointedGraph(pgUri, g))
         }
+      }
+      //move failures into a Try, so that the toEnumerator method does not fail if one future fails
+      val nonFailing: Iterable[Future[Try[LinkedDataResource[Rdf]]]] = for {
+        futureLdr <- remoteLdrs
+      } yield {
+        val f: Future[Try[LinkedDataResource[Rdf]]] = futureLdr.map(Success(_))
+        f recover { case e => Failure(e) }
+      }
 
-        val rem = toEnumerator(remoteLdrs.toSeq)
-        localEnum andThen rem
+      val rem = toEnumerator(nonFailing.toSeq) { case Success(ldr) => ldr}
+      localEnum andThen rem
+
     } getOrElse (localEnum)
   }
 

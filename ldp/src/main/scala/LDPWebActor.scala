@@ -2,13 +2,14 @@ package org.w3.banana.ldp
 
 import org.w3.banana._
 import akka.actor.ActorRef
-import collection.mutable
+import scala.collection.{immutable, mutable}
 import concurrent.{ExecutionContext, Future}
 import scalaz.\/-
 import scalaz.-\/
 import util.Failure
 import util.Success
 import java.net.URL
+import java.util.concurrent.atomic.AtomicReference
 
 /**
 * A LDP actor that interacts with remote LDP resources
@@ -24,12 +25,14 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
   import ops._
   import org.w3.banana.syntax._
 
-  val cache = mutable.HashMap[Rdf#URI,Future[NamedResource[Rdf]]]()
+  //cache does not need to be strongly synchronised, as losses are permissible
+  val cache = new AtomicReference(immutable.HashMap[Rdf#URI,Future[NamedResource[Rdf]]]())
 
   def fetch(uri: Rdf#URI): Future[NamedResource[Rdf]] = {
-    cache.get(uri).getOrElse {
+    val c = cache.get()
+    c.get(uri).getOrElse {
       val result = webc.get(uri)
-      cache.put(uri, result)
+      cache.set(c + (uri -> result))
       result
     }
   }
@@ -110,14 +113,20 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
           }
         }
       }
-
-////      case DeleteResource(uri, a) => {
-      //        LDPRs.remove(uri.lastPathSegment).orElse {
-      //          NonLDPRs.remove(uri.lastPathSegment)
-      //        } orElse (throw new NoSuchElementException("Could not find resource " + uri))
-      //        a //todo: why no function here?
-      //      }
-      //      case UpdateLDPR(uri, remove, add, a) => {
+      case DeleteResource(uri, a) => {
+        val sender = context.sender
+        val result = webc.delete(uri)
+        result.onComplete{ tryres =>
+          tryres match {
+            case Success(()) => {
+              cache.set(cache.get() - uri.fragmentLess)
+              self tell (Scrpt(a),sender)
+            }
+            case Failure(e) => failMsg(e, sender,s"failure DELETing remote resource <$uri>")
+          }
+        }
+      }
+      //            case UpdateLDPR(uri, remove, add, a) => {
       //        val pathSegment = uri.lastPathSegment
       //        val graph = LDPRs.get(pathSegment).map(_.graph).getOrElse {
       //          throw new NoSuchElementException(s"Resource does not exist at $uri with path segment '$pathSegment'")
