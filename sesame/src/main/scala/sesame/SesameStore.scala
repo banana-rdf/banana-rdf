@@ -32,7 +32,7 @@ object SesameStore {
   }
 
   def getGraph(conn: RepositoryConnection, uri: Sesame#URI): Sesame#Graph = {
-    val graph = new GraphImpl
+    val graph = new LinkedHashModel
     val rr: RepositoryResult[Statement] = conn.getStatements(null, null, null, false, uri)
     while (rr.hasNext) {
       val s = rr.next()
@@ -62,7 +62,7 @@ object SesameStore {
     val graphQuery: GraphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, query.getSourceString)
     bindings foreach { case (name, value) => graphQuery.setBinding(name, value) }
     val result: GraphQueryResult = graphQuery.evaluate()
-    val graph = new GraphImpl
+    val graph = new LinkedHashModel
     while (result.hasNext) {
       graph.add(result.next())
     }

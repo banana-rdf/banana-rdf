@@ -13,7 +13,7 @@ object BuildSettings {
     organization := "org.w3",
     version      := "2013_02_21-SNAPSHOT",
     scalaVersion := "2.10.0",
-    javacOptions ++= Seq("-source","1.7", "-target","1.7"),
+    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     fork := false,
     parallelExecution in Test := false,
     offline := true,
@@ -130,11 +130,10 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
 
-  val sesameVersion = "2.6.10"
+  val sesameVersion = "2.7.0-beta2"
   
   val sesameCoreDeps =
     Seq(
-      resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % sesameVersion,

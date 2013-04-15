@@ -14,10 +14,10 @@ object SesameOperations extends RDFOps[Sesame] {
 
   // graph
 
-  def emptyGraph: Sesame#Graph = new GraphImpl
+  def emptyGraph: Sesame#Graph = new LinkedHashModel
 
   def makeGraph(it: Iterable[Sesame#Triple]): Sesame#Graph = {
-    val graph = new GraphImpl
+    val graph = new LinkedHashModel
     it foreach { t => graph add t }
     graph
   }
@@ -172,7 +172,7 @@ object SesameOperations extends RDFOps[Sesame] {
       s <- sOpt
       p <- pOpt
     } yield {
-      graph.`match`(s, p, objectt).asScala
+      graph.filter(s, p, objectt).iterator.asScala
     }
     r getOrElse Iterator.empty
   }
@@ -183,7 +183,7 @@ object SesameOperations extends RDFOps[Sesame] {
     graphs match {
       case x :: Nil => x
       case _ =>
-        val graph = new GraphImpl
+        val graph = new LinkedHashModel
         graphs.foreach(g => graphToIterable(g) foreach { t => graph add t })
         graph
     }
@@ -191,7 +191,13 @@ object SesameOperations extends RDFOps[Sesame] {
 
   // graph isomorphism
 
-  def isomorphism(left: Sesame#Graph, right: Sesame#Graph): Boolean =
-    ModelUtil.equals(left, right)
-
+  /** the new ModelUtil.equals changed its semantics. See 
+    * - https://openrdf.atlassian.net/browse/SES-1695
+    * - https://groups.google.com/forum/#!topic/sesame-devel/CGFDn7mESLg/discussion
+    */
+  def isomorphism(left: Sesame#Graph, right: Sesame#Graph): Boolean = {
+    val leftNoContext = left.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava
+    val rightNoContext = right.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava
+    ModelUtil.equals(leftNoContext, rightNoContext)
+  }
 }
