@@ -23,4 +23,6 @@ object LinkedDataResource {
       val resource = _resource
     }
 
+  def unapply[Rdf<:RDF](ldr: LinkedDataResource[Rdf]): Option[(Rdf#URI,PointedGraph[Rdf])] = Some((ldr.location,ldr.resource))
+
 }
