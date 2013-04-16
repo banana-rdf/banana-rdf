@@ -92,7 +92,7 @@ object BananaRdfBuild extends Build {
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.12"
 
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.0-RC1"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
