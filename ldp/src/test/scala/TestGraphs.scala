@@ -53,7 +53,7 @@ trait TestGraphs[Rdf<:RDF] {
     ).graph
 
   val henryColl = URI("http://bblfish.net/people/henry/")
-  val henryCollGraph: Rdf#Graph = henryColl.a(ldp.Container).graph
+  val henryCollGraph: Rdf#Graph = URI("").a(ldp.Container).graph
 
   val henryCardAcl = URI("http://bblfish.net/people/henry/card;wac")
   val henryCardAclGraph: Rdf#Graph = (
@@ -81,6 +81,11 @@ trait TestGraphs[Rdf<:RDF] {
       -- wac.agentClass ->- tpacGroup
       -- wac.mode ->- wac.Read
     ).graph
+
+  val webidColl = URI("http://www.w3.org/2005/Incubator/webid/")
+  val simpleColl = ( URI("") a ldp.Container).graph
+
+  val tpacColl =  URI("http://www.w3.org/2005/Incubator/webid/tpac/")
 
   val tpacGroupDoc = URI("http://www.w3.org/2005/Incubator/webid/tpac/group")
   val tpacGroup = URI("http://www.w3.org/2005/Incubator/webid/tpac/group#socWeb")
@@ -173,7 +178,8 @@ trait TestGraphs[Rdf<:RDF] {
       henryColl -> henryCollGraph,
       henryCard -> henryGraph,
       henryCardAcl -> henryCardAclGraph,
-      tpacGroupDoc-> tpacGroupGraph,
+//      tpacGroupDoc-> tpacGroupGraph,
+      webidColl -> simpleColl,
       timblCard -> timblGraph,
       henryFoafWac -> henryFoafWacGraph
     )
@@ -197,10 +203,18 @@ trait TestGraphs[Rdf<:RDF] {
         Future.failed(RemoteException("cannot create resource",ResponseHeaders(405,collection.immutable.Map())))
       } else {
         synMap.get(collectionURL).map { gr =>
-          if ((PointedGraph(collectionURL, gr) / rdf.typ).exists(_.pointer == ldp.Container)) {
-            val newURI = URI(collectionURL.toString+slug.getOrElse(counter.addAndGet(1)))
-            synMap.put(collectionURL,gr union (collectionURL -- rdfs.member ->- newURI).graph)
-            Future.successful(newURI)
+          if ((PointedGraph(URI(""), gr) / rdf.typ).exists(_.pointer == ldp.Container)) {
+            if ((PointedGraph(URI(""),graph)/rdf.typ).exists(_.pointer == ldp.Container)) {
+              //we have to create a new container in the container
+              val newCollectionURI = URI(collectionURL.toString+slug.getOrElse(counter.addAndGet(1))+"/")
+              synMap.put(newCollectionURI,graph)
+              Future.successful(newCollectionURI)
+            } else {
+              val newURI = URI(collectionURL.toString+slug.getOrElse(counter.addAndGet(1)))
+              synMap.put(collectionURL,gr union (collectionURL -- rdfs.member ->- newURI).graph)
+              synMap.put(newURI,graph)
+              Future.successful(newURI)
+            }
           } else {
             Future.failed(RemoteException("Post not on container",ResponseHeaders(405,collection.immutable.Map())))
           }

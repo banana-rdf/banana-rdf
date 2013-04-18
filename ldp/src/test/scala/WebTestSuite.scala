@@ -16,7 +16,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 
-object WebACLTestSuite {
+object WebTestSuite {
 
   import org.w3.banana.plantain.model.URI
 
@@ -28,11 +28,16 @@ object WebACLTestSuite {
   rww.setLDPSActor(rww.system.actorOf(Props(new PlantainLDPCActor(rww.baseUri, dir)),"rootContainer"))
 }
 
-class PlantainWebACLTest extends WebACLTestSuite[Plantain](
-  WebACLTestSuite.rww,WebACLTestSuite.baseUri)(
+class PlantainWebTest extends WebTestSuite[Plantain](
+  WebTestSuite.rww,WebTestSuite.baseUri)(
   Plantain.ops,Plantain.sparqlOps,Plantain.sparqlGraph,Plantain.recordBinder,Plantain.turtleWriter,Plantain.rdfxmlReader,PlantainTest.authz)
 
-abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
+/**
+ *
+ * tests the local and remote LDPR request, creation, LDPC creation, access control, etc...
+
+ */
+abstract class WebTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
                                  implicit val ops: RDFOps[Rdf],
                                   sparqlOps: SparqlOps[Rdf],
                                   sparqlGraph: SparqlGraph[Rdf],
@@ -211,116 +216,28 @@ abstract class WebACLTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       ex.getOrFail()
     }
 
-
   }
 
-  val web = new WebResource[Rdf](rww)
 
-  "Test WebResource ~" in {
-    val ldrEnum = web~(tpacGroup)
-    val futureResList = ldrEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
-    val resList = futureResList.getOrFail()
-    resList must have length(1)
-    val ldr = resList.head
-    ldr.location must be(tpacGroupDoc)
-    ldr.resource.pointer must be(tpacGroup)
-    assert(ldr.resource.graph isIsomorphicWith tpacGroupGraph.resolveAgainst(tpacGroupDoc))
-  }
+  "w3c WebID group" when {
 
-  "Test WebResource ~>" in {
-    val memberEnum: Enumerator[LinkedDataResource[Rdf]] = for {
-      groupLdr <- web~(tpacGroup)
-      member <-  web~>(groupLdr,foaf.member)
-    } yield {
-      member
+    "tpac group creation" in {
+      val ex = rww.execute {
+        for {
+          tpac <- createContainer(webidColl, Some("tpac"), Graph.empty)
+          tpacGroup <- createLDPR(tpac, Some("group"), tpacGroupGraph)
+          graph <- getLDPR(tpacGroup)
+        } yield {
+          tpac must be(tpacColl)
+          tpacGroup must be(tpacGroupDoc)
+          assert(graph.relativize(tpacGroupDoc) isIsomorphicWith (tpacGroupGraph))
+        }
+      }
+      ex.getOrFail()
     }
-    val memberFuture = memberEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
-    val memberList = memberFuture.getOrFail()
-
-    val answersMap = Map(memberList.map{ldr => (ldr.resource.pointer,ldr.resource)} : _*)
-
-    val pointers = answersMap.keys.toList
-    answersMap must have size (3)
-
-    assert(pointers.contains(henry))
-    assert(pointers.contains(bertails))
-    assert(pointers.contains(timbl))
-
-    assert(answersMap(bertails).graph isIsomorphicWith(bertailsCardGraph.resolveAgainst(bertailsCard)))
-    assert(answersMap(henry).graph isIsomorphicWith(henryGraph.resolveAgainst(henryCard)))
-    assert(answersMap(timbl).graph isIsomorphicWith(timblGraph.resolveAgainst(timblCard)))
 
   }
 
-  "Test WebResource ~> followed by ~> to literal" in {
-    val nameEnum = for {
-      groupLdr <- web~(tpacGroup)
-      member <-  web~>(groupLdr,foaf.member)
-      name <- web~>(member,foaf.name)
-    } yield {
-      name
-    }
-    val nameFuture = nameEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
-    val namesLDR = nameFuture.getOrFail()
-
-    val answers = namesLDR.map{ldr => ldr.resource.pointer}
-    answers must have length (3)
-    assert(answers.contains(TypedLiteral("Henry")))
-    assert(answers.contains("Alexandre".lang("fr")))
-    assert(answers.contains(TypedLiteral("Tim Berners-Lee")))
-  }
-
-  "Test ACLs with ~ and ~> and <~ (tests bnode support too)" in {
-    val nameEnum = for {
-      wacLdr <- web~(henryFoafWac)
-      auth  <-  web<~(LinkedDataResource(wacLdr.location,PointedGraph(henryFoaf,wacLdr.resource.graph)),wac.accessTo)
-      agentClass <-  web~>(auth,wac.agentClass)
-      member <-  web~>(agentClass,foaf.member)
-      name <- web~>(member,foaf.name)
-    } yield {
-      name
-    }
-    val nameFuture = nameEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
-    val namesLDR = nameFuture.getOrFail()
-
-    val answers = namesLDR.map{ldr => ldr.resource.pointer}
-    answers must have length (3)
-    assert(answers.contains(TypedLiteral("Henry")))
-    assert(answers.contains("Alexandre".lang("fr")))
-    assert(answers.contains(TypedLiteral("Tim Berners-Lee")))
-  }
-
-  "Test WebResource ~> with missing remote resource" in {
-    //we delete timbl
-    val ex = rww.execute(deleteResource(timblCard))
-    ex.getOrFail()
-    val ex2 = rww.execute(getResource(timblCard))
-    val res = ex2.failed.map{_=>true}
-    assert{ Await.result(res,Duration(2,TimeUnit.SECONDS)) == true}
-    //now we should only have two resources returned
-    val memberEnum: Enumerator[LinkedDataResource[Rdf]] = for {
-      groupLdr <- web~(tpacGroup)
-      member <-  web~>(groupLdr,foaf.member)
-    } yield {
-      member
-    }
-    val memberFuture = memberEnum(Iteratee.getChunks[LinkedDataResource[Rdf]]).flatMap(_.run)
-    val memberList = memberFuture.getOrFail()
-
-    val answersMap = Map(memberList.map{ldr => (ldr.resource.pointer,ldr.resource)} : _*)
-
-    val pointers = answersMap.keys.toList
-    answersMap must have size (2)
-
-    assert(pointers.contains(henry))
-    assert(pointers.contains(bertails))
-    //assert(pointers.contains(timbl))
-
-    assert(answersMap(bertails).graph isIsomorphicWith(bertailsCardGraph.resolveAgainst(bertailsCard)))
-    assert(answersMap(henry).graph isIsomorphicWith(henryGraph.resolveAgainst(henryCard)))
-    //assert(answersMap(timbl).graph isIsomorphicWith(timblGraph.resolveAgainst(timblCard)))
-
-  }
 
 
   //  "Henry" when {

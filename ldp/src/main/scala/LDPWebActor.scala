@@ -46,6 +46,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
     }
   }
 
+  val ldp = LDPPrefix[Rdf]
 
 
   /**
@@ -72,7 +73,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
         result.onComplete{ tryres =>
           tryres match {
             case Success(url) => self tell (Scrpt(k(url)),sender)
-            case Failure(e) => failMsg(e, sender,s"failure POSTing to remote container <$container>")
+            case Failure(e) => failMsg(e, sender,s"failure creating LDPR with $slugOpt to remote container <$container>")
           }
         }
       }
@@ -83,13 +84,22 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
       //        NonLDPRs.put(pathSegment, bin)
       //        k(bin)
       //      }
-      //      case CreateContainer(_,slugOpt,graph,k) => {
-      //        val (uri,pathSegment) = deconstruct(slugOpt) //todo: deconstruct should check the file system. This should in fact use a file sytem call
-      //        val p = root.resolve(pathSegment)
-      //        Files.createDirectory(p)
-      //        context.actorOf(Props(new PlantainLDPCActor(uri, p)),pathSegment)
-      //        k(uri)
-      //      }
+      case CreateContainer(container,slugOpt,graph,k) => {
+        val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
+        val result = webc.post(container,slugOpt,graph.union(Graph(Triple(URI(""),rdf.typ, ldp.Container))),Syntax.Turtle)
+        result.onComplete{ tryres =>
+          tryres match {
+            case Success(url) => self tell (Scrpt(k(url)),sender)
+            case Failure(e) => failMsg(e, sender,s"failure creating a container with POST and slug $slugOpt in remote <$container>")
+          }
+        }
+
+//        val (uri,pathSegment) = deconstruct(slugOpt) //todo: deconstruct should check the file system. This should in fact use a file sytem call
+//        val p = root.resolve(pathSegment)
+//        Files.createDirectory(p)
+//        context.actorOf(Props(new PlantainLDPCActor(uri, p)),pathSegment)
+//        k(uri)
+      }
       case GetResource(uri,_, k) => {
         val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
         val result = fetch(uri)
