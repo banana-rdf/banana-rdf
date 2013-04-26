@@ -8,13 +8,14 @@ import java.util.Date
 import scala.concurrent.Future
 import org.w3.play.api.libs.ws.ResponseHeaders
 import org.w3.banana
+import org.scalatest.{Suite, BeforeAndAfter}
 
 /**
  * Build up a set of Graphs with representing some realistic scenarios that can then be used
  * across a number of different tests
  * @tparam Rdf
  */
-trait TestGraphs[Rdf<:RDF] {
+trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
   implicit val ops: RDFOps[Rdf]
   implicit val recordBinder: binder.RecordBinder[Rdf]
 
@@ -24,6 +25,11 @@ trait TestGraphs[Rdf<:RDF] {
 
   val certbinder = new CertBinder()
   import certbinder._
+
+  //reset the web before each (major "in" ?) test
+  before {
+    testFetcher.resetWeb
+  }
 
 
   implicit def toUri(url: jURL): Rdf#URI = URI(url.toString)
@@ -52,9 +58,6 @@ trait TestGraphs[Rdf<:RDF] {
       -- foaf.name ->- "Henry"
     ).graph
 
-  val henryColl = URI("http://bblfish.net/people/henry/")
-  val henryCollGraph: Rdf#Graph = URI("").a(ldp.Container).graph
-
   val henryCardAcl = URI("http://bblfish.net/people/henry/card;wac")
   val henryCardAclGraph: Rdf#Graph = (
     bnode("t1")
@@ -80,6 +83,21 @@ trait TestGraphs[Rdf<:RDF] {
     bnode() -- wac.accessTo ->- henryFoaf
       -- wac.agentClass ->- tpacGroup
       -- wac.mode ->- wac.Read
+    ).graph union (URI("") -- wac.include ->- henryCollWac).graph
+
+  val henryColl = URI("http://bblfish.net/people/henry/")
+  val henryCollGraph: Rdf#Graph = (
+     URI("").a(ldp.Container)
+       -- rdfs.member ->- henryFoaf
+       -- rdfs.member ->- henryCard
+    ).graph
+
+  val henryCollWac = URI("http://bblfish.net/people/henry/;wac")
+  val henryCollWacGraph: Rdf#Graph = (
+     bnode() -- wac.mode ->- wac.Read
+         -- wac.mode ->- wac.Write
+         -- wac.accessToClass ->- ( bnode() -- wac.regex ->- "http://bblfish.net/people/henry/.*" )
+         -- wac.agent ->- henry
     ).graph
 
   val webidColl = URI("http://www.w3.org/2005/Incubator/webid/")
@@ -154,8 +172,25 @@ trait TestGraphs[Rdf<:RDF] {
     URI("") -- wac.include ->- URI(";acl")
     ).graph
 
+  val defaultSynMap = Seq(
+    henryColl -> henryCollGraph,
+    henryCollWac -> henryCollWacGraph,
+    henryCard -> henryGraph,
+    henryCardAcl -> henryCardAclGraph,
+    tpacGroupDoc-> tpacGroupGraph,
+    webidColl -> simpleColl,
+    timblCard -> timblGraph,
+    henryFoaf -> henryFoafGraph,
+    henryFoafWac -> henryFoafWacGraph
+  )
 
   object testFetcher extends WebClient[Rdf] {
+
+    def resetWeb {
+      synMap.clear()
+      synMap  ++= defaultSynMap
+    }
+
     case class TestLDPR(location: Rdf#URI, graph: Rdf#Graph, metaGraph: Rdf#Graph=Graph.empty)(implicit val ops: RDFOps[Rdf]) extends LDPR[Rdf] {
       def updated = Some(new Date())
 
@@ -174,17 +209,10 @@ trait TestGraphs[Rdf<:RDF] {
     import collection.mutable.{Map,SynchronizedMap}
     val counter = new java.util.concurrent.atomic.AtomicInteger(0)
     class SynMap extends collection.mutable.HashMap[Rdf#URI,Rdf#Graph] with collection.mutable.SynchronizedMap[Rdf#URI,Rdf#Graph]
-    lazy val synMap = new SynMap() ++= Seq(
-      henryColl -> henryCollGraph,
-      henryCard -> henryGraph,
-      henryCardAcl -> henryCardAclGraph,
-//      tpacGroupDoc-> tpacGroupGraph,
-      webidColl -> simpleColl,
-      timblCard -> timblGraph,
-      henryFoafWac -> henryFoafWacGraph
-    )
+    lazy val synMap = new SynMap()
 
-    def get(url: Rdf#URI): Future[NamedResource[Rdf]] = {
+    def get(uri: Rdf#URI): Future[NamedResource[Rdf]] = {
+      val url = uri.fragmentLess
       synMap.get(url).map{g=>futuRes(url,g)}.getOrElse(
         Future.failed(RemoteException("resource does not exist",
           ResponseHeaders(404, collection.immutable.Map()))

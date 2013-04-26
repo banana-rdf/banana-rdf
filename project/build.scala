@@ -12,7 +12,7 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
     version      := "2013_02_21-SNAPSHOT",
-    scalaVersion := "2.10.0",
+    scalaVersion := "2.10.1",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
@@ -109,8 +109,8 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "play" %% "play-iteratees" % "2.1.0"
-  val playDeps = "play" %% "play" % "2.1.0"
+  val iterateeDeps = "play" %% "play-iteratees" % "2.1.1"
+  val playDeps = "play" %% "play" % "2.1.1"
 
   val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 

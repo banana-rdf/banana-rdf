@@ -3,6 +3,9 @@ package org.w3.banana.ldp
 import org.w3.banana._
 import java.util.regex.Pattern
 import scala.util.Try
+import play.api.libs.iteratee.{Enumeratee, Input, Iteratee, Enumerator}
+import scala.concurrent.{ExecutionContext, Future}
+import ExecutionContext.Implicits.global
 
 /**
  * Authorization class
@@ -10,16 +13,18 @@ import scala.util.Try
  * This is an application of LDPCommand for authorization.
  * the main method is getAuth which returns a Script
  */
-class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
+class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf],web: WebResource[Rdf]) {
   import LDPCommand._
   import ops._
   import diesel._
   import syntax.GraphSyntax
   import syntax.LiteralSyntax._
+  import syntax.URISyntax._
+  import web.rww
 
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACLPrefix[Rdf]
-
+  val rdfs = RDFSPrefix[Rdf]
   /**
    * Returns a Script for authentication that looks in the metadata file for a resource
    * to see what agents have access to a given resource in a given manner, following
@@ -32,36 +37,47 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
    * @param on the resource to which access is requested
    * @return a Free based recursive structure that will return a list of agents ( identified by WebIDs. )
    * */
-  def getAuth(aclUri: Rdf#URI, method: Rdf#URI, on: Rdf#URI, include: List[Agent] = List()): Script[Rdf, List[Agent]] =  {
-    getLDPR(aclUri).flatMap { g: Rdf#Graph =>
-      val az = authz(g, on, method)
-      az match {
-        case List(Agent) => `return`(az:::include)
-        case agents => {
-          //todo: we get the first, add support for more than one include...
-          val inc= (PointedGraph(aclUri, g) / wac.include).collectFirst { //todo: check that it is in the collection. What to do if it's not?
-            case PointedGraph(node,g) if isURI(node) =>
-              getAuth(node.asInstanceOf[Rdf#URI],method,on,az)
-          }
-          val res = inc.getOrElse(`return`(az:::include))
-          res
-        }
-      }
-    }
-  }
+  def getAuth(aclUri: Rdf#URI, method: Rdf#URI, on: Rdf#URI): Future[List[Rdf#URI]] =
+    getAuthEnum(web~(aclUri),method,on)
+
+
+  protected def getAuthEnum(acls: Enumerator[LinkedDataResource[Rdf]],
+                            method: Rdf#URI, on: Rdf#URI): Future[List[Rdf#URI]] =
+       acls.flatMap(ldr=>authzWebIDs(ldr,on,method)) |>>> Iteratee.fold[Rdf#URI,List[Rdf#URI]](Nil){case (list,uri)=>uri::list}
 
   /**
    * getAuth for a resource ( fetch metadata for it )
    * @param resource the resource to check authorization for
    * @param method the type of access requested
-   * @param noMeta what should be assumed if no acl location is found?
    * @return
    */
-  def getAuthFor(resource: Rdf#URI,  method: Rdf#URI, noMeta: List[Agent]=List()): Script[Rdf, List[Agent]] = {
-    getMeta(resource).flatMap{meta =>
-      meta.acl.map { acl => getAuth(acl, method, resource)}.getOrElse {
-        `return`(noMeta)
+  def getAuthFor(resource: Rdf#URI,  method: Rdf#URI): Future[List[Rdf#URI]] =
+    getAuthEnum(acl(resource),method,resource)
+
+  /** retrieves the acl for a resource */
+  def acl(uri: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = {
+    val futureACL: Future[Option[LinkedDataResource[Rdf]]] = rww.execute {
+      //todo: this code could be moved somewhere else see: Command.GET
+      val docUri = uri.fragmentLess
+      getMeta(docUri).flatMap { m =>
+        val x: LDPCommand.Script[Rdf, Option[LinkedDataResource[Rdf]]] = m.acl match {
+          case Some(uri) => getLDPR(uri).map { g =>
+            Some(LinkedDataResource(uri, PointedGraph(uri, g)))
+          }
+          case None => `return`(None)
+        }
+        x
       }
+    }
+    //todo we require an execution context here - I imported a global one, but user choice may be better
+    new Enumerator[LinkedDataResource[Rdf]] {
+      def apply[A](i: Iteratee[LinkedDataResource[Rdf], A]): Future[Iteratee[LinkedDataResource[Rdf], A]] =
+        futureACL.flatMap { aclOpt =>
+          i.feed(aclOpt match {
+            case Some(ldr) => Input.El(ldr)
+            case None => Input.Empty
+          })
+        }
     }
   }
 
@@ -69,21 +85,17 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
   /**
    * return the list of agents that are allowed access to the given resource
    * stop looking if everybody is authorized
-   * @param aclGraph the graph which contains the acl rules
+   * @param acldr the graph which contains the acl rules
    * @param on the resoure on which access is being requested
    * @param method the type of access requested
    * @return A list of Agents with access ( sometimes just an Agent )
    **/
   protected
-  def authz(aclGraph: Rdf#Graph, on: Rdf#URI, method: Rdf#URI): List[Agent]  = {
-    def agent(a: PointedGraph[Rdf]): Agent = if (a.pointer == foaf.Agent) Agent
-    else {
-      val people = (a/foaf.member).collect{ case PointedGraph(p,_) if isURI(p)  => p.asInstanceOf[Rdf#URI]}.toList
-      Group(people)
-    }
+  def authzWebIDs(acldr: LinkedDataResource[Rdf], on: Rdf#URI, method: Rdf#URI): Enumerator[Rdf#URI]  = {
+    val authDefs = Enumerator((PointedGraph(method,acldr.resource.graph)/-wac.mode).toSeq:_*)
 
-    // does the authorization a give access to the resource?
-    def filterOn(a: PointedGraph[Rdf]): Boolean = {
+    // filter those pointedGraphs that give access to the required resource
+    val accessToResourceFilter = Enumeratee.filter[PointedGraph[Rdf]]{ a=>
       (a/wac.accessTo).exists( _.pointer == on) ||
         (a/wac.accessToClass).exists{ clazzPg =>
           (clazzPg/wac.regex).exists{ regexPg =>
@@ -91,36 +103,37 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf]) {
               uri=>false,
               bnode=>false,
               lit=>Try(Pattern.compile(lit.lexicalForm).matcher(on.toString).matches()).getOrElse(false))
-        }
-      }
-    }
-    def authorized(auths: Iterator[PointedGraph[Rdf]]): List[Agent] =
-      if (!auths.hasNext) {
-        List()
-      } else {
-        val az = auths.next
-        if (!filterOn(az)) {
-          authorized(auths)
-        } else {
-          val ac = (az / wac.agentClass).map { agent _ }.toList
-//          val todo = (az / wac.agentClass).filter { pg =>
-//            if (pg.pointer)   // I need the notion of a pointedNamedGraph, otherwise I cannot tell here if the URI is local or remote.
-//          }.toList
-          if (ac.contains(foaf.Agent))  List(Agent)  //we simplify
-          else {
-            (az/wac.agent).collect { case PointedGraph(p,_) if isURI(p) => p.asInstanceOf[Rdf#URI]}.toList match {
-              case Nil => ac
-              case list: List[Rdf#URI] => Group(list)::ac:::authorized(auths)
-            }
           }
         }
-      }
+    }
+    val relevantAcls: Enumerator[PointedGraph[Rdf]] = authDefs.through(accessToResourceFilter)
 
-    val it = (PointedGraph(method,aclGraph)/-wac.mode)
-    val result = authorized(it.iterator)
-    //compress result
-    if (result.contains(Agent)) List(Agent)
-    else result
+    //follow the wac.agent relations add those that are not bnodes to a list
+    val agents: Enumerator[List[Rdf#URI]] = relevantAcls.map[List[Rdf#URI]]{ pg=>
+      val webids = (pg/wac.agent).collect { case PointedGraph(p,_) if isURI(p) => p.asInstanceOf[Rdf#URI]}
+      webids.toList
+     }
+
+    val agentClassLDRs: Enumerator[LinkedDataResource[Rdf]] =
+      relevantAcls.flatMap( pg => web.~>(LinkedDataResource(acldr.location,pg),wac.agentClass){_.pointer != foaf.Agent})
+
+    val seeAlso: Enumerator[Rdf#URI] = for {
+      ldr <-  web.~>(acldr,wac.include)()
+      uri <- authzWebIDs(ldr, on, method)
+    } yield {
+      uri
+    }
+
+    val groupMembers: Enumerator[List[Rdf#URI]] = agentClassLDRs.map{ldr=>
+      val webids = if (ldr.resource.pointer == foaf.Agent) Iterable(foaf.Agent) //todo <- here we can stop
+                   else (ldr.resource / foaf.member).collect { case PointedGraph(p, _) if isURI(p) => p.asInstanceOf[Rdf#URI]}
+      webids.toList
+    }
+
+    //todo: stop at the first discovery of a foaf:Agent?
+    //todo: collapse all agents into one foaf:Agent
+
+    (agents andThen groupMembers).flatMap(uris=>Enumerator(uris.toSeq: _*)) andThen seeAlso
   }
 
 

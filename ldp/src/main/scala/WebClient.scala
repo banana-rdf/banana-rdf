@@ -9,6 +9,8 @@ import org.w3.banana._
 import org.w3.play.api.libs.ws.{Response, ResponseHeaders, WS}
 import scala.Some
 import util.{Try, Success, Failure}
+import java.util.concurrent.atomic.AtomicReference
+import scala.collection.immutable
 
 /**
  * A Web Client interacts directly with http resources on the web.
@@ -18,10 +20,12 @@ import util.{Try, Success, Failure}
  * @tparam Rdf
  */
 trait WebClient[Rdf<:RDF] {
+
   def get(url: Rdf#URI): Future[NamedResource[Rdf]]
   def post[S](url: Rdf#URI, slug: Option[String], graph: Rdf#Graph,syntax: Syntax[S])
              (implicit writer: Writer[Rdf#Graph,S]): Future[Rdf#URI]
   def delete(url: Rdf#URI): Future[Unit]
+  def patch(uri: Rdf#URI, remove: Iterable[TripleMatch[Rdf]], add: Iterable[Rdf#Triple]): Future[Void]  = ???
 }
 
 object WebClient {
@@ -42,6 +46,7 @@ class WSClient[Rdf<:RDF](graphSelector: ReaderSelector[Rdf], rdfWriter: RDFWrite
 
   import ops._
   import syntax.graphW
+  import syntax.URISyntax._
 
   val parser = new LinkHeaderParser[Rdf]
 
@@ -56,8 +61,10 @@ class WSClient[Rdf<:RDF](graphSelector: ReaderSelector[Rdf], rdfWriter: RDFWrite
     PointedGraph(base, linkgraph)
   }
 
+  //cache does not need to be strongly synchronised, as losses are permissible
+  val cache = new AtomicReference(immutable.HashMap[Rdf#URI,Future[NamedResource[Rdf]]]())
 
-  def get(url: Rdf#URI): Future[NamedResource[Rdf]] = {
+  protected def fetch(url: Rdf#URI): Future[NamedResource[Rdf]] = {
     WebClient.log.info(s"WebProxy: fetching $url")
     /**
      * note we prefer rdf/xml and turtle over html, as html does not always contain rdfa, and we prefer those over n3,
@@ -100,6 +107,16 @@ class WSClient[Rdf<:RDF](graphSelector: ReaderSelector[Rdf], rdfWriter: RDFWrite
     }
   }
 
+  /** This caches results */
+  def get(url: Rdf#URI): Future[NamedResource[Rdf]] = {
+    val c = cache.get()
+    c.get(url).getOrElse {
+      val result = fetch(url)
+      cache.set(c + (url -> result))
+      result
+    }
+  }
+
   /**
    * Post a graph to the given URL which should be a collection. Graph is posted in Turtle.
    * @param url the LDPC URL
@@ -128,12 +145,14 @@ class WSClient[Rdf<:RDF](graphSelector: ReaderSelector[Rdf], rdfWriter: RDFWrite
     val futureResp = WS.url(url.toString).delete()
     futureResp.flatMap{ resp =>
       if (resp.status == 200 || resp.status == 202 || resp.status == 204) {
+        cache.set(cache.get() - url.fragmentLess)
         Future.successful(())
       } else {
         Future.failed(RemoteException.netty("resource deletion failed",resp))
       }
     }
   }
+
 }
 
 

@@ -14,12 +14,13 @@ import java.util.concurrent.TimeUnit
 import akka.util.Timeout
 import scala.Some
 import akka.actor.Props
+import ExecutionContext.Implicits.global
 
 object PlantainTest {
   implicit val timeout = Timeout(10,TimeUnit.MINUTES)
   val dir = Files.createTempDirectory("plantain" )
-  implicit val authz: AuthZ[Plantain] =  new AuthZ[Plantain]()(Plantain.ops)
   val rww = new RWWeb[Plantain](URI.fromString("http://example.com/foo/"))(Plantain.ops,timeout)
+  implicit val authz: AuthZ[Plantain] =  new AuthZ[Plantain]()(Plantain.ops,new WebResource(rww))
   rww.setLDPSActor(rww.system.actorOf(Props(new PlantainLDPCActor(rww.baseUri, dir)),"rootContainer"))
 }
 
@@ -36,7 +37,6 @@ abstract class LDPSTest[Rdf <: RDF](
   import syntax.{graphW,uriW,stringW}
   import authz._
 
-  implicit val ec = ExecutionContext.Implicits.global
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACLPrefix[Rdf]
 
@@ -211,22 +211,19 @@ abstract class LDPSTest[Rdf <: RDF](
     createProfile.getOrFail()
 
 
-    val authZ1 =  rww.execute (
-       for {
-         meta <- getMeta(ldprUriFull)
-         athzd <- getAuth(meta.acl.get,wac.Read,ldprUriFull)
-       } yield { athzd.contains(Agent)  }
-    )
+    val authZ1 = for {
+         athzd <- getAuthFor(ldprUriFull, wac.Read)
+       } yield { athzd.contains(foaf.Agent)  }
+
 
     authZ1.getOrFail()
 
-    val authZ2 = rww.execute (
-        for {
-          athzd <- getAuthFor(ldprUriFull,wac.Write)
-        } yield  {
-          assert( athzd.exists(a => a.contains(betehess) ))
-        }
-      )
+    val authZ2 = for {
+      athzd <- getAuthFor(ldprUriFull, wac.Write)
+    } yield {
+      assert(athzd.contains(betehess))
+    }
+
 
     authZ2.getOrFail()
 
