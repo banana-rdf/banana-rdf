@@ -1,7 +1,7 @@
 package org.w3.banana.ldp
 
-import java.security.interfaces.RSAPublicKey
-import java.security.KeyPairGenerator
+import java.security.interfaces.{RSAPrivateKey, RSAPublicKey}
+import java.security.{KeyPair, KeyPairGenerator}
 import org.w3.banana._
 import java.net.{URL => jURL}
 import java.util.Date
@@ -31,6 +31,10 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
     testFetcher.resetWeb
   }
 
+  object RsaKeyPair {
+    def apply(pair: KeyPair) = new RsaKeyPair(pair.getPublic.asInstanceOf[RSAPublicKey], pair.getPrivate.asInstanceOf[RSAPrivateKey])
+  }
+  case class RsaKeyPair(val pub: RSAPublicKey, val priv: RSAPrivateKey)
 
   implicit def toUri(url: jURL): Rdf#URI = URI(url.toString)
 
@@ -42,8 +46,8 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
   val cert = CertPrefix[Rdf]
 
   val keyGen = KeyPairGenerator.getInstance("RSA");
-  val henryRsaKey: RSAPublicKey = { keyGen.initialize(768);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
-  val bertailsRsaKey: RSAPublicKey = { keyGen.initialize(512);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
+  val henryKeys: RsaKeyPair = { keyGen.initialize(768); RsaKeyPair(keyGen.genKeyPair()) }
+  val bertailsKeys: RsaKeyPair = { keyGen.initialize(512); RsaKeyPair(keyGen.genKeyPair()) }
 
   val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
   val timblCard = URI("http://www.w3.org/People/Berners-Lee/card")
@@ -54,7 +58,7 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
   val henryCard = URI("http://bblfish.net/people/henry/card")
   val henry =  URI(henryCard.toString+"#me")
   val henryGraph : Rdf#Graph = (
-    URI("#me") -- cert.key ->- henryRsaKey
+    URI("#me") -- cert.key ->- henryKeys.pub
       -- foaf.name ->- "Henry"
     ).graph
 
@@ -143,7 +147,7 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
     URI("#me")
       -- foaf.name ->- "Alexandre".lang("fr")
       -- foaf.title ->- "Mr"
-      -- cert.key ->- bertailsRsaKey
+      -- cert.key ->- bertailsKeys.pub
     ).graph
 
   val bertailsCardAclGraph: Rdf#Graph = (

@@ -138,31 +138,6 @@ class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf],web: WebResource[Rdf]) {
 
 
 
-  trait Agent {
-   /**
-    * @return true if the agent contain an agent referred to by the WebID. An Agent contains itself.
-    **/
-    def contains(id: Rdf#URI): Boolean
-  }
-
-  object Agent extends Agent {
-    //the id should represent an Agent of course, and not something inanimate such as a stone, but we don't verify
-    def contains(id: Rdf#URI) = true
-    override def toString = "Agent(*)"
-  }
-
-  case class Group(members: List[Rdf#URI]) extends Agent {
-    override
-    def contains(id: Rdf#URI): Boolean = members.contains(id)
-    override def toString = s"Agent($members)"
-  }
-
-  case class Person(id: Rdf#URI) extends Agent {
-    override
-    def contains(webid: Rdf#URI) = id == webid
-    override def toString = s"Person($id)"
-  }
-
 
 }
 

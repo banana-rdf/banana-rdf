@@ -74,7 +74,7 @@ abstract class WebTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
 
     "Henry can Authenticate" in {
-      val futurePrincipal = webidVerifier.verifyWebID(henry.toString,henryRsaKey)
+      val futurePrincipal = webidVerifier.verifyWebID(henry.toString, henryKeys.pub)
       val res = futurePrincipal.map{p=>
         assert(p.isInstanceOf[WebIDPrincipal] && p.getName == henry.toString)
       }
@@ -155,7 +155,7 @@ abstract class WebTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
     }
 
     "Alex can Authenticate" in {
-      val futurePrincipal = webidVerifier.verifyWebID(bertails.toString,bertailsRsaKey)
+      val futurePrincipal = webidVerifier.verifyWebID(bertails.toString,bertailsKeys.pub)
       val res = futurePrincipal.map{p=>
         assert(p.isInstanceOf[WebIDPrincipal] && p.getName == bertails.toString)
       }
@@ -167,8 +167,6 @@ abstract class WebTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
           read <- authz.getAuthFor(bertailsCard,wac.Read)
           write <- authz.getAuthFor(bertailsCard,wac.Write)
         } yield {
-          println(s"~~~> read=$read")
-          println(s"~~~> write=$write")
           assert(read.contains(bertails))
           assert(read.contains(foaf.Agent))
           assert(write.contains(bertails))

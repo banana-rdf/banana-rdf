@@ -11,7 +11,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-    version      := "2013_02_21-SNAPSHOT",
+    version      := "2013_04_29-SNAPSHOT",
     scalaVersion := "2.10.1",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
@@ -161,6 +161,7 @@ object BananaRdfBuild extends Build {
       jena,
       sesame,
       plantain,
+      ldp,
       examples))
   
   lazy val rdf = Project(
