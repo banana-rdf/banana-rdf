@@ -14,6 +14,7 @@ import play.api.libs.iteratee._
 import scala.Some
 import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration.Duration
+import org.w3.banana.ldp.auth.{WebIDPrincipal, WebIDVerifier, WACAuthZ}
 
 
 object WebTestSuite {
@@ -55,8 +56,7 @@ abstract class WebTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
 
   rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )
   val webidVerifier = new WebIDVerifier(rww)
-  implicit val authz: AuthZ[Rdf] =  new AuthZ[Rdf]()(ops,new WebResource(rww))
-
+  implicit val authz: WACAuthZ[Rdf] =  new WACAuthZ[Rdf](new WebResource(rww))(ops)
 
 
   "access to Henry's resources" when {

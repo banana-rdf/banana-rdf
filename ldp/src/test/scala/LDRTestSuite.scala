@@ -3,7 +3,7 @@ package org.w3.banana.ldp
 import akka.actor.Props
 import akka.util.Timeout
 import java.net.{URL => jURL, URI => jURI}
-import java.nio.file.Files
+import java.nio.file.{Path, Files}
 import java.util.concurrent.TimeUnit
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.{BeforeAndAfterAll, WordSpec}
@@ -13,45 +13,43 @@ import org.w3.banana.plantain.Plantain
 import play.api.libs.iteratee._
 import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration.Duration
-import ExecutionContext.Implicits.global
+import auth._
 
 
 object LDRTestSuite {
 
   import org.w3.banana.plantain.model.URI
 
-  implicit val timeout = Timeout(10,TimeUnit.MINUTES)
-  val dir = Files.createTempDirectory("plantain" )
+  val dir: Path = Files.createTempDirectory("plantain" )
   val baseUri = URI.fromString("http://example.com/foo/")
-  val rww = new RWWeb[Plantain](baseUri)(Plantain.ops,timeout)
-  implicit val authz: AuthZ[Plantain] =  new AuthZ[Plantain]()(Plantain.ops,new WebResource(rww))
-  rww.setLDPSActor(rww.system.actorOf(Props(new PlantainLDPCActor(rww.baseUri, dir)),"rootContainer"))
+  val rootLDPCActorProps = Props(new PlantainLDPCActor(baseUri, dir))
 }
 
-class PlantainLDRTest extends LDRTestSuite[Plantain](
-  LDRTestSuite.rww,LDRTestSuite.baseUri)(
+class PlantainLDRTest extends LDRTestSuite[Plantain](LDRTestSuite.baseUri, LDRTestSuite.dir, LDRTestSuite.rootLDPCActorProps)(
   Plantain.ops,Plantain.sparqlOps,Plantain.sparqlGraph,
   Plantain.recordBinder,Plantain.turtleWriter,
-  Plantain.rdfxmlReader,PlantainTest.authz)
+  Plantain.rdfxmlReader)
 
 /**
  * test the LinkedResource ~ and ~> implementations
  */
-abstract class LDRTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
+abstract class LDRTestSuite[Rdf<:RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorProps: Props )(
   implicit val ops: RDFOps[Rdf],
   sparqlOps: SparqlOps[Rdf],
   sparqlGraph: SparqlGraph[Rdf],
   val recordBinder: binder.RecordBinder[Rdf],
   turtleWriter: RDFWriter[Rdf,Turtle],
-  reader: RDFReader[Rdf, RDFXML],
-  authz: AuthZ[Rdf])
+  reader: RDFReader[Rdf, RDFXML])
   extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper with TestGraphs[Rdf] {
 
   import diesel._
   import ops._
   import syntax._
 
-
+  implicit val timeout = Timeout(10,TimeUnit.MINUTES)
+  val rww = new RWWeb[Rdf](baseUri)
+  implicit val authz =  new WACAuthZ[Rdf](new WebResource(rww))
+  rww.setLDPSActor(rww.system.actorOf(rootLDPCActorProps,"rootContainer"))
   rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )
 
   val webidVerifier = new WebIDVerifier(rww)

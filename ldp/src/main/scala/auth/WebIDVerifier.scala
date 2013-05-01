@@ -1,4 +1,4 @@
-package org.w3.banana.ldp
+package org.w3.banana.ldp.auth
 
 
 import java.security.cert.X509Certificate
@@ -6,6 +6,8 @@ import scalaz.{ Success => _, Failure => _, Validation =>_ , _ }
 import scalaz.Scalaz._
 import java.security.{Principal, PublicKey}
 import java.net.{MalformedURLException, URL, URISyntaxException}
+import org.w3.banana.ldp.{LDPCommand, RWW}
+
 //import org.www.play.remote.{ FetchException, GraphFetcher}
 import org.w3.banana._
 import java.math.BigInteger

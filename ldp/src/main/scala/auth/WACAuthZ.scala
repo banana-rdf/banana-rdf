@@ -1,25 +1,31 @@
-package org.w3.banana.ldp
+package org.w3.banana.ldp.auth
 
-import org.w3.banana._
-import java.util.regex.Pattern
-import scala.util.Try
-import play.api.libs.iteratee.{Enumeratee, Input, Iteratee, Enumerator}
 import scala.concurrent.{ExecutionContext, Future}
 import ExecutionContext.Implicits.global
+import java.util.regex.Pattern
+import org.w3.banana._
+import org.w3.banana.ldp.{LDPCommand, WebResource}
+import play.api.libs.iteratee.{Enumeratee, Input, Iteratee, Enumerator}
+import scala.Some
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 /**
- * Authorization class
+ * WACAuthZ groups methods to find the authorized WebIDs for a particular resource
+ * using a simple implementation of WebAccessControl http://www.w3.org/wiki/WebAccessControl
  *
- * This is an application of LDPCommand for authorization.
- * the main method is getAuth which returns a Script
+ * @param web object that makes it easy to access web resources (local or remote) asynchronously
+ * @param ops
+ * @tparam Rdf
  */
-class AuthZ[Rdf<:RDF]( implicit ops: RDFOps[Rdf],web: WebResource[Rdf]) {
+class WACAuthZ[Rdf<:RDF](web: WebResource[Rdf])(implicit ops: RDFOps[Rdf]) {
+
   import LDPCommand._
   import ops._
-  import diesel._
-  import syntax.GraphSyntax
-  import syntax.LiteralSyntax._
-  import syntax.URISyntax._
+  import org.w3.banana.diesel._
+  import org.w3.banana.syntax.GraphSyntax
+  import org.w3.banana.syntax.LiteralSyntax._
+  import org.w3.banana.syntax.URISyntax._
   import web.rww
 
   val foaf = FOAFPrefix[Rdf]

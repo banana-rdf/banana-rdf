@@ -2,9 +2,9 @@ package org.w3.banana.ldp
 
 import akka.actor.Props
 import akka.util.Timeout
-import auth.X509CertSigner
+import org.w3.banana.ldp.auth.{Claim, WebIDVerifier, WACAuthZ, X509CertSigner}
 import java.net.URL
-import java.nio.file.Files
+import java.nio.file.{Path, Files}
 import java.util.concurrent.TimeUnit
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.{BeforeAndAfterAll, WordSpec}
@@ -12,23 +12,20 @@ import org.w3.banana._
 import org.w3.banana.plantain.Plantain
 import org.w3.banana.plantain.model.URI
 import scala.concurrent.{ExecutionContext, Future}
-import ExecutionContext.Implicits.global
 import org.w3.banana.ldp.LDPCommand._
 import scala.Some
 import sun.security.x509.X500Name
 import java.security.Principal
 
+
 object PlantainWebIDVerifierTest {
-  implicit val timeout = Timeout(10,TimeUnit.MINUTES)
   val dir = Files.createTempDirectory("plantain" )
-  val rww = new RWWeb[Plantain](URI.fromString("http://example.com/foo/"))(Plantain.ops,timeout)
-  implicit val authz: AuthZ[Plantain] =  new AuthZ[Plantain]()(Plantain.ops,new WebResource(rww))
   val baseUri = URI.fromString("http://example.com/foo/")
-  rww.setLDPSActor(rww.system.actorOf(Props(new PlantainLDPCActor(rww.baseUri, dir)),"rootContainer"))
+  val rootLDPCActorProps = Props(new PlantainLDPCActor(baseUri, dir))
 }
 
 class PlantainWebIDVerifierTest extends WebIDVerifierTest[Plantain](
-  PlantainTest.rww, PlantainWebIDVerifierTest.baseUri)(
+  PlantainWebIDVerifierTest.baseUri, PlantainWebIDVerifierTest.dir,PlantainWebIDVerifierTest.rootLDPCActorProps)(
   Plantain.ops,Plantain.sparqlOps,Plantain.recordBinder,Plantain.sparqlGraph, Plantain.turtleWriter,Plantain.rdfxmlReader)
 
 
@@ -36,7 +33,7 @@ class PlantainWebIDVerifierTest extends WebIDVerifierTest[Plantain](
  * Test WebIDVerifier
  *
  */
-abstract class WebIDVerifierTest[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)
+abstract class WebIDVerifierTest[Rdf<:RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorProps: Props )
                                           (implicit val ops: RDFOps[Rdf],
                                            val sparqlOps: SparqlOps[Rdf],
                                            val recordBinder: binder.RecordBinder[Rdf],
@@ -49,10 +46,15 @@ abstract class WebIDVerifierTest[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)
   import ops._
   import syntax._
 
+  implicit val timeout = Timeout(10,TimeUnit.MINUTES)
+  val rww = new RWWeb[Rdf](baseUri)
+  implicit val authz =  new WACAuthZ[Rdf](new WebResource(rww))
+  rww.setLDPSActor(rww.system.actorOf(rootLDPCActorProps,"rootContainer"))
   rww.setWebActor( rww.system.actorOf(Props(new LDPWebActor[Rdf](baseUri,testFetcher)),"webActor")  )
 
-
   val webidVerifier = new WebIDVerifier(rww)
+
+  val web = new WebResource[Rdf](rww)
 
 
   val bertailsCertSigner = new X509CertSigner(bertailsKeys.priv)

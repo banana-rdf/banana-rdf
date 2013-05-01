@@ -21,7 +21,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package auth;
+package org.w3.banana.ldp.auth;
 
 import java.math.BigInteger
 import java.net.URL
