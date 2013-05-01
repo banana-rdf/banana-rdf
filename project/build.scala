@@ -1,15 +1,15 @@
 import sbt._
 import sbt.Keys._
-import org.ensime.sbt.Plugin.Settings.ensimeConfig
-import org.ensime.sbt.util.SExp._
-import com.typesafe.sbtscalariform.ScalariformPlugin._
-import scalariform.formatter.preferences._
+//import org.ensime.sbt.Plugin.Settings.ensimeConfig
+//import org.ensime.sbt.util.SExp._
+//import com.typesafe.sbtscalariform.ScalariformPlugin._
+//import scalariform.formatter.preferences._
 
 object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
+  val buildSettings = Defaults.defaultSettings  ++ Seq (         //used to have ++  defaultScalariformSettings
     organization := "org.w3",
     version      := "2013_04_29-SNAPSHOT",
     scalaVersion := "2.10.1",
@@ -23,13 +23,13 @@ object BuildSettings {
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    ensimeConfig := sexp(
-      key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
-      key(":formatting-prefs"), sexp(
-        key(":rewriteArrowSymbols"), true,
-        key(":doubleIndentClassDeclaration"), true
-      )
-    ),
+//    Config := sexp(
+//      key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
+//      key(":formatting-prefs"), sexp(
+//        key(":rewriteArrowSymbols"), true,
+//        key(":doubleIndentClassDeclaration"), true
+//      )
+//    ),
     licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
     homepage := Some(url("https://github.com/w3c/banana-rdf")),
     publishTo <<= version { (v: String) =>
@@ -85,8 +85,8 @@ object BananaRdfBuild extends Build {
   val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
   val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
 
-  val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.0"
-  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.0"
+  val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.2"
+  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.2"
 
 //  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
 

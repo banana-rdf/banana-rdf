@@ -44,12 +44,14 @@ trait RActor extends Actor with akka.actor.ActorLogging {
     }
 
   def local(u: jURI, base: jURI): Option[String] = {
-    if ((!u.isAbsolute ) || (u.getScheme == base.getScheme && u.getHost == base.getHost && u.getPort == base.getPort)) {
+    val res = if ((!u.isAbsolute ) || (u.getScheme == base.getScheme && u.getHost == base.getHost && u.getPort == base.getPort)) {
       if (u.getPath.startsWith(base.getPath)) {
         val res = Some(u.getPath.substring(base.getPath.size))
         res
       } else None
     } else None
+    println(s"~~>local($u,$base)=$res")
+    res
   }
 
 }
