@@ -1,15 +1,15 @@
 import sbt._
 import sbt.Keys._
-//import org.ensime.sbt.Plugin.Settings.ensimeConfig
-//import org.ensime.sbt.util.SExp._
-//import com.typesafe.sbtscalariform.ScalariformPlugin._
-//import scalariform.formatter.preferences._
+import org.ensime.sbt.Plugin.Settings.ensimeConfig
+import org.ensime.sbt.util.SExp._
+import com.typesafe.sbtscalariform.ScalariformPlugin._
+import scalariform.formatter.preferences._
 
 object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings  ++ Seq (         //used to have ++  defaultScalariformSettings
+  val buildSettings = Defaults.defaultSettings  ++  defaultScalariformSettings ++ Seq ( 
     organization := "org.w3",
     version      := "2013_04_29-SNAPSHOT",
     scalaVersion := "2.10.1",
@@ -23,13 +23,13 @@ object BuildSettings {
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-//    Config := sexp(
-//      key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
-//      key(":formatting-prefs"), sexp(
-//        key(":rewriteArrowSymbols"), true,
-//        key(":doubleIndentClassDeclaration"), true
-//      )
-//    ),
+    ensimeConfig := sexp(
+      key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
+      key(":formatting-prefs"), sexp(
+        key(":rewriteArrowSymbols"), true,
+        key(":doubleIndentClassDeclaration"), true
+      )
+    ),
     licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
     homepage := Some(url("https://github.com/w3c/banana-rdf")),
     publishTo <<= version { (v: String) =>
@@ -101,7 +101,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP8"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP9"
   
   val testsuiteDeps =
     Seq(
@@ -112,7 +112,7 @@ object BananaRdfBuild extends Build {
   val iterateeDeps = "play" %% "play-iteratees" % "2.1.1"
   val playDeps = "play" %% "play" % "2.1.1"
 
-  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 
   val testDeps =
     Seq(
@@ -188,7 +188,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert
     )
-  ) dependsOn (rdf)
+  ).dependsOn (rdf) 
 
   lazy val jena = Project(
     id = "banana-jena",
@@ -198,7 +198,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ).dependsOn (rdf, rdfTestSuite % "test")
   
   lazy val sesame = Project(
     id = "banana-sesame",
@@ -208,7 +208,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ).dependsOn (rdf, rdfTestSuite % "test")
 
   lazy val plantain = Project(
     id = "plantain",
@@ -219,13 +219,13 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ).dependsOn (rdf, rdfTestSuite % "test")
 
   lazy val examples = Project(
     id = "examples",
     base = file("examples"),
     settings = buildSettings
-  ) dependsOn (sesame, jena)
+  ).dependsOn (sesame, jena)
 
   // this is _experimental_
   // please do not add this projet to the main one
@@ -243,7 +243,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (plantain, rdfTestSuite % "test")
+  ).dependsOn (plantain, rdfTestSuite % "test")
 
   lazy val ldp = Project(
     id = "ldp",
@@ -252,14 +252,14 @@ object BananaRdfBuild extends Build {
         libraryDependencies += scalaIoCore,
         libraryDependencies += scalaIoFile,
         libraryDependencies += akka,
-        libraryDependencies += asyncHttpClient,
         libraryDependencies += akkaTransactor,
+        libraryDependencies += asyncHttpClient,
         libraryDependencies += scalaz,
         libraryDependencies += iterateeDeps,
         libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
         libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (plantain, rdfTestSuite % "test")
+  ).dependsOn (plantain, rdfTestSuite % "test")
 
   
 }
