@@ -24,6 +24,9 @@ object PlantainSparqlOps extends SparqlOps[Plantain] {
     p.parseQuery(query, "http://todo.example/")
   }
 
+  // FIXME added just to avoid compilation error
+  def UpdateQuery(query: String): Plantain#UpdateQuery = ???
+
   def fold[T](query: Plantain#Query)(
     select: (Plantain#SelectQuery) => T,
     construct: (Plantain#ConstructQuery) => T,

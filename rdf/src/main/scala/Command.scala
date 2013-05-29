@@ -114,6 +114,12 @@ object Command {
         bindings,
         b => Return[({ type l[+x] = Command[Rdf, x] })#l, Boolean](b)))
 
+  def update[Rdf <: RDF](query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
+    Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](
+      Update(query,
+        bindings,
+        Return[({ type l[+x] = Command[Rdf, x] })#l, Unit]()))
+
   implicit def ldcFunctor[Rdf <: RDF]: Functor[({ type l[+x] = Command[Rdf, x] })#l] =
     new Functor[({ type l[+ x] = Command[Rdf, x] })#l] {
 
@@ -127,6 +133,7 @@ object Command {
           case Select(query, bindings, k) => Select(query, bindings, x => f(k(x)))
           case Construct(query, bindings, k) => Construct(query, bindings, x => f(k(x)))
           case Ask(query, bindings, k) => Ask(query, bindings, x => f(k(x)))
+          case Update(query, bindings, k) => Update(query, bindings, f(k))
         }
 
     }
@@ -150,3 +157,5 @@ case class Select[Rdf <: RDF, A](query: Rdf#SelectQuery, bindings: Map[String, R
 case class Construct[Rdf <: RDF, A](query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node], k: Rdf#Graph => A) extends Command[Rdf, A]
 
 case class Ask[Rdf <: RDF, A](query: Rdf#AskQuery, bindings: Map[String, Rdf#Node], k: Boolean => A) extends Command[Rdf, A]
+
+case class Update[Rdf <: RDF, A](query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node], k: A) extends Command[Rdf, A]

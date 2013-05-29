@@ -77,6 +77,11 @@ object SesameStore {
     result
   }
 
+  def executeUpdate(conn: RepositoryConnection, query: Sesame#UpdateQuery, bindings: Map[String, Sesame#Node]) {
+    val updateQuery = conn.prepareUpdate(QueryLanguage.SPARQL, query.query)
+    bindings foreach { case (name, value) => updateQuery.setBinding(name, value) }
+    updateQuery.execute()
+  }
 }
 
 import SesameStore._
@@ -125,6 +130,10 @@ class SesameStore(repository: Repository) extends RDFStore[Sesame, Future] {
         case Ask(query, bindings, k) => {
           val b = executeAsk(conn, query, bindings)
           run(conn, k(b))
+        }
+        case org.w3.banana.Update(query, bindings, k) => {
+          executeUpdate(conn, query, bindings)
+          run(conn, k)
         }
       },
       a => a
