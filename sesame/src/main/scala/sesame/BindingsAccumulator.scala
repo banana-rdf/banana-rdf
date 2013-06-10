@@ -14,6 +14,10 @@ class BindingsAccumulator() extends TupleQueryResultHandler {
   def handleSolution(bindingSet: BindingSet): Unit =
     builder += bindingSet
 
+  def handleBoolean(boolean: Boolean): Unit = new UnsupportedOperationException
+
+  def handleLinks(linkUrls: java.util.List[String]): Unit = new UnsupportedOperationException
+
   def bindings(): Vector[BindingSet] = builder.result()
 
 }
