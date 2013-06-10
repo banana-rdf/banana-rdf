@@ -21,6 +21,7 @@ sbt-launch*.jar
 .idea_modules
 bin
 .ensime
+.ensime_lucene
 *.egp
 
 # just for convenience
