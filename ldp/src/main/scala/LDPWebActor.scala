@@ -68,7 +68,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
       }
 //      case CreateBinary(_, slugOpt, mime: MimeType, k) => {
       //        val (uri, pathSegment) = deconstruct(slugOpt)
-      //        //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
+      //        //todo: make sure the uri does not end in ";aclPath" or whatever else the aclPath standard will be
       //        val bin = PlantainBinary(root, uri)
       //        NonLDPRs.put(pathSegment, bin)
       //        k(bin)
@@ -95,7 +95,10 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
         result.onComplete { tryres =>
           tryres match {
             case Success(response) =>  self tell (Scrpt(k(response)),sender)
-            case Failure(e) => failMsg(e, sender,s"failure fetching resource <$uri>")          }
+            case Failure(e) => {
+              failMsg(e, sender,s"failure fetching resource <$uri>")
+            }
+          }
         }
       }
       case GetMeta(uri, k) => {
@@ -108,7 +111,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
               log.info(s"cache received $response")
               self tell (Scrpt(k(response.asInstanceOf[Meta[Rdf]])),sender)
             }
-            case Failure(e) => failMsg(e, sender,s"failure fetching meta for resource <$uri>")
+            case Failure(e) => failMsg(e, sender,s"failure fetching acl for resource <$uri>")
           }
         }
       }

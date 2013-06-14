@@ -123,7 +123,7 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
   val groupACLForRegexResource: Rdf#Graph = (
     bnode("t1")
       -- wac.accessToClass ->- ( bnode("t2") -- wac.regex ->- "http://bblfish.net/blog/.*" )
-      -- wac.agentClass ->- ( URI("http://bblfish.net/blog/editing/.meta#a1") -- foaf.member ->- henry )
+      -- wac.agentClass ->- ( URI("http://bblfish.net/blog/editing/.acl#a1") -- foaf.member ->- henry )
       -- wac.mode ->- wac.Read
       -- wac.mode ->- wac.Write
     ).graph
@@ -135,12 +135,12 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
   //
 
   val bertailsContainer =    URI("http://example.com/foo/bertails/")
-  val bertailsContainerAcl = URI("http://example.com/foo/bertails/;acl")
+  val bertailsContainerAcl = URI("http://example.com/foo/bertails/.acl")
   val bertails =             URI("http://example.com/foo/bertails/card#me")
   val bertailsCard =         URI("http://example.com/foo/bertails/card")
-  val bertailsCardAcl =      URI("http://example.com/foo/bertails/card;acl")
+  val bertailsCardAcl =      URI("http://example.com/foo/bertails/card.acl")
   val bertailsFoaf =         URI("http://example.com/foo/bertails/foaf")
-  val bertailsFoafAcl =      URI("http://example.com/foo/bertails/foaf;acl")
+  val bertailsFoafAcl =      URI("http://example.com/foo/bertails/foaf.acl")
 
 
   val bertailsCardGraph: Rdf#Graph = (
@@ -156,7 +156,7 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
       -- wac.agentClass ->- foaf.Agent
       -- wac.mode ->- wac.Read
     ).graph  union (
-    URI("") -- wac.include ->- URI(";acl")
+    URI("") -- wac.include ->- URI(".acl")
     ).graph
 
 
@@ -173,7 +173,7 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
     ).graph
 
   val bertailsFoafAclGraph: Rdf#Graph = (
-    URI("") -- wac.include ->- URI(";acl")
+    URI("") -- wac.include ->- URI(".acl")
     ).graph
 
   val defaultSynMap = Seq(

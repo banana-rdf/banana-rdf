@@ -55,12 +55,14 @@ class WSClient[Rdf<:RDF](graphSelector: ReaderSelector[Rdf], rdfWriter: RDFWrite
    * todo: map all the other headers to RDF graphs where it makes sense
    */
   def parseHeaders(base: Rdf#URI, headers: FluentCaseInsensitiveStringsMap): PointedGraph[Rdf] = {
-    import collection.convert.decorateAsScala._
-    val linkHeaders = headers.get("Link").asScala.toList
+    import collection.convert.wrapAsScala._
+    val linkHeaders = Option(headers.get("Link")).map{_.toList}.getOrElse(Nil)
     val linkgraph = union(linkHeaders.map(parser.parse(_).resolveAgainst(base)))
     PointedGraph(base, linkgraph)
   }
 
+  //todo: the HashMap does not give enough information on how the failure occurred. It should contain metadata on the
+  //todo: response, so that decisions can be taken to fetch anew
   //cache does not need to be strongly synchronised, as losses are permissible
   val cache = new AtomicReference(immutable.HashMap[Rdf#URI,Future[NamedResource[Rdf]]]())
 
@@ -108,11 +110,18 @@ class WSClient[Rdf<:RDF](graphSelector: ReaderSelector[Rdf], rdfWriter: RDFWrite
   }
 
   /** This caches results */
+  //todo: it's important that if the future is a failure of the right type ( say a timeout execption ) that it retry fetching the resource
   def get(url: Rdf#URI): Future[NamedResource[Rdf]] = {
     val c = cache.get()
     c.get(url).getOrElse {
       val result = fetch(url)
       cache.set(c + (url -> result))
+      result.onFailure{ case _ =>
+        val futureCache = cache.get
+        futureCache.get(url).foreach{ futNamedRes =>
+          if (futNamedRes == result) cache.set(futureCache - url) //todo: slight possibility that we loose a cache
+        }
+      }
       result
     }
   }

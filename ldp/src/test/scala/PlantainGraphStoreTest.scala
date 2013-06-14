@@ -10,11 +10,12 @@ import java.nio.file.{Path, Files}
 import play.api.libs.iteratee.Enumerator
 import scala.concurrent.{ExecutionContext, Await}
 import scala.concurrent.duration.Duration
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.{TimeoutException, TimeUnit}
 import akka.util.Timeout
 import scala.Some
 import akka.actor.Props
 import org.w3.banana.ldp.auth.WACAuthZ
+import scala.util.Try
 
 object PlantainTest {
   val dir = Files.createTempDirectory("plantain" )
@@ -58,7 +59,7 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
       -- wac.agentClass ->- foaf.Agent
       -- wac.mode     ->- wac.Read
     ).graph union (
-      URI(betehessCard.toString+";acl") -- wac.include ->- URI("http://example.com/foo/bertails/;acl")
+      URI(betehessCard.toString+".acl") -- wac.include ->- URI("http://example.com/foo/bertails/.acl")
     ).graph
 
 
@@ -152,27 +153,46 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
   "CreateLDPR should create an LDPR with the given graph -- no given uri" in {
     val ldpcUri = URI("http://example.com/foo/")
     val innerldpcUri = ldpcUri/"test1/"
+    val content = innerldpcUri/"ouch"
     val script = rww.execute { for {
         ldpc <- createContainer(ldpcUri,Some("test1"),Graph.empty)
-        rUri <- createLDPR(ldpc,None, graph)
+        rUri <- createLDPR(ldpc,Some("ouch"), graph)
         rGraph <- getLDPR(rUri)
-        _ <- deleteResource(innerldpcUri)
       } yield {
-        rUri.relativizeAgainst(innerldpcUri).toString must not include ("/")
+        rUri  must be(content)
         assert(rGraph.relativize(rUri) isIsomorphicWith graph)
       }
     }
     script.getOrFail()
+
+    //can't delete the container, because this requires it to have no members
+    val scr2 = rww.execute( deleteResource(innerldpcUri) )
+    try {
+      scr2.getOrFail()
+    } catch {
+      case e: PreconditionFailed => //it's ok
+    }
+
+    val scr3 = rww.execute(
+      for {
+        _ <- deleteResource(content)
+        _ <- deleteResource(innerldpcUri)
+      } yield {}
+    )
+
+    scr3.getOrFail()
   }
+
+
 
 
   "CreateLDPC & LDPR with ACLs" in {
 
     val ldpcUri = URI("http://example.com/foo/bertails/")
-    val ldpcMetaFull = URI("http://example.com/foo/bertails/;acl")
+    val ldpcMetaFull = URI("http://example.com/foo/bertails/.acl")
     val ldprUri = URI("card")
 
-    val ldprMeta = URI("http://example.com/foo/bertails/card;acl")
+    val ldprMeta = URI("http://example.com/foo/bertails/card.acl")
 
     //create container with ACLs
     val createContainerScript = rww.execute {
@@ -223,12 +243,12 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
 
 
     authZ2.getOrFail()
+  }
 
-
-//    val meta =  rww.execute{
+//    val aclPath =  rww.execute{
 //      for {
-//        meta <- getMeta(ldprUri)
-//        acl = meta.acl.get
+//        aclPath <- getMeta(ldprUri)
+//        acl = aclPath.acl.get
 //        _   <- updateLDPR(acl,Iterable.empty,graphMeta.toIterable)
 //      } yield acl
 //    }
@@ -236,12 +256,11 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
    //add access control tests here on the graph created above
 
 
-  }
 
   "Create Binary" in {
     val ldpcUri = URI("http://example.com/foo/cb/")
-    val binUri = URI("http://example.com/foo/cb/img.jpg")
-    val ldprMeta = URI("http://example.com/foo/cb/img.jpg;meta")
+    val binUri = URI("http://example.com/foo/cb/img")
+    val ldprMeta = URI("http://example.com/foo/cb/img.acl.ttl")
 
     val createBin =
       for {
@@ -301,37 +320,40 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
     })
 
     val res = Await.result(deleteBin.failed,Duration(1,TimeUnit.SECONDS))
-    assert(res.isInstanceOf[NoSuchElementException])
+    assert(res.isInstanceOf[ResourceDoesNotExist])
 
   }
+//
+//
+//  "appendToGraph should be equivalent to graph union" in {
+//    val ldpcUri = URI("http://example.com/foo/3/")
+//    val ldprUri = URI("http://example.com/foo/3/betehess")
+//    val script = rww.execute{
+//      for {
+//        ldpc <- createContainer(baseLdpc,Some("3"),Graph.empty)
+//        rUri <- createLDPR(ldpc, Some(ldprUri.lastPathSegment), graph)
+//      } yield {
+//        rUri must be(ldprUri)
+//      }
+//    }
+//    script.getOrFail()
+//
+//    val script2 = rww.execute {
+//      for {
+//        unionG <- updateLDPR(ldprUri, Iterable.empty, graph2.toIterable).flatMap { _ =>
+//          getLDPR(ldprUri)
+//        }
+//      } yield {
+//        assert( unionG.relativize(ldprUri) isIsomorphicWith( graph union graph2) )
+//      }
+//    }
+//
+//    script2.getOrFail()
+//
+//  }
 
 
-  "appendToGraph should be equivalent to graph union" in {
-    val ldpcUri = URI("http://example.com/foo/3/")
-    val ldprUri = URI("http://example.com/foo/3/betehess")
-    val script = rww.execute{
-      for {
-        ldpc <- createContainer(baseLdpc,Some("3"),Graph.empty)
-        rUri <- createLDPR(ldpc, Some(ldprUri.lastPathSegment), graph)
-      } yield {
-        rUri must be(ldprUri)
-      }
-    }
-    script.getOrFail()
 
-    val script2 = rww.execute {
-      for {
-        unionG <- updateLDPR(ldprUri, Iterable.empty, graph2.toIterable).flatMap { _ =>
-          getLDPR(ldprUri)
-        }
-      } yield {
-        assert( unionG.relativize(ldprUri) isIsomorphicWith( graph union graph2) )
-      }
-    }
-
-    script2.getOrFail()
-
-  }
 //
 //  "access control test" in {
 //
