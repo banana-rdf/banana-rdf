@@ -26,4 +26,6 @@ class JenaSparqlHttpEngine(val endpointUrl: String) extends SparqlEngine[Jena, I
   def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Jena#Solutions =
      qexec(query, bindings).execSelect()
 
+  // FIXME added just to avoid compilation error
+  def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Unit = ???
 }

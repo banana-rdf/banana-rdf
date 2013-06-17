@@ -2,8 +2,7 @@ package org.w3.banana.sesame
 
 import org.w3.banana._
 import org.openrdf.query.parser.sparql.SPARQLParserFactory
-import org.openrdf.query.parser.{ ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery }
-import org.openrdf.query.MalformedQueryException
+import org.openrdf.query.parser.{ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery}
 import scala.collection.JavaConverters._
 import scala.util._
 
@@ -19,6 +18,12 @@ object SesameSparqlOps extends SparqlOps[Sesame] {
 
   def AskQuery(query: String): Sesame#AskQuery =
     p.parseQuery(query, "http://todo.example/").asInstanceOf[ParsedBooleanQuery]
+
+  //FIXME
+  def UpdateQuery(query: String): Sesame#UpdateQuery = {
+    p.parseUpdate(query, "http://todo.example/")
+    SesameParseUpdate(query)
+  }
 
   def Query(query: String): Try[Sesame#Query] = Try {
     p.parseQuery(query, "http://todo.example/")

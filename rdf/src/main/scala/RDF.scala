@@ -21,6 +21,7 @@ trait RDF {
   type SelectQuery <: Query
   type ConstructQuery <: Query
   type AskQuery <: Query
+  type UpdateQuery
   type Solution
   type Solutions
 }
