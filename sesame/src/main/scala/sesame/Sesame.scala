@@ -68,4 +68,10 @@ object Sesame {
   implicit val queryResultsReaderXml: SparqlQueryResultsReader[Sesame, SparqlAnswerXml] =
     SesameQueryResultsReader.queryResultsReaderXml
 
+  implicit val readerSelector: ReaderSelector[Sesame] =
+    ReaderSelector[Sesame, RDFXML] combineWith ReaderSelector[Sesame, Turtle] combineWith ReaderSelector[Sesame, JSONLD]
+
+  implicit val writerSelector: RDFWriterSelector[Sesame] =
+    RDFWriterSelector[Sesame, RDFXML] combineWith RDFWriterSelector[Sesame, Turtle] combineWith RDFWriterSelector[Sesame, JSONLD]
+
 }
