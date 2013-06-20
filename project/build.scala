@@ -112,7 +112,7 @@ object BananaRdfBuild extends Build {
   val iterateeDeps = "play" %% "play-iteratees" % "2.1.0"
   val playDeps = "play" %% "play" % "2.1.0"
 
-  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 
   val testDeps =
     Seq(
@@ -130,7 +130,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
 
-  val sesameVersion = "2.7.0"
+  val sesameVersion = "2.7.2"
   
   val sesameCoreDeps =
     Seq(
@@ -138,7 +138,9 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion,
-      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % sesameVersion)
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % sesameVersion,
+      libraryDependencies += "com.github.jsonld-java" % "jsonld-java-sesame" % "0.2"
+    )
 
   val sesameDeps = sesameCoreDeps ++
     Seq(

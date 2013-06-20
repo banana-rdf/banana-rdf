@@ -9,6 +9,8 @@ import java.util.LinkedList
 import scalax.io._
 import scala.util._
 
+import com.github.jsonldjava.impl._
+
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
   override def handleStatement(st: Statement): Unit = st.getObject match {
     case o: Literal if o.getDatatype == null && o.getLanguage == null =>
@@ -50,6 +52,25 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
   def read[R <: Reader](resource: ReadCharsResource[R], base: String): Try[Sesame#Graph] = Try {
     resource acquireAndGet { reader =>
       val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
+      val triples = new LinkedList[Statement]
+      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
+      parser.setRDFHandler(collector)
+      parser.parse(reader, base)
+      new LinkedHashModel(triples)
+    }
+  }
+
+}
+
+object SesameJSONLDReader extends RDFReader[Sesame, JSONLD] {
+
+  import SesameOperations._
+
+  val syntax = Syntax[JSONLD]
+
+  def read[R <: Reader](resource: ReadCharsResource[R], base: String): Try[Sesame#Graph] = Try {
+    resource acquireAndGet { reader =>
+      val parser = new SesameJSONLDParser
       val triples = new LinkedList[Statement]
       val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
       parser.setRDFHandler(collector)

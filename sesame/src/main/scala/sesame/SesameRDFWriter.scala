@@ -32,6 +32,8 @@ object SesameRDFWriter {
 
   val turtleWriter: RDFWriter[Sesame, Turtle] = SesameRDFWriter[Turtle]
 
+  val jsonldWriter: RDFWriter[Sesame, JSONLD] = SesameRDFWriter[JSONLD]
+
   implicit val selector: RDFWriterSelector[Sesame] =
     RDFWriterSelector[Sesame, RDFXML] combineWith RDFWriterSelector[Sesame, Turtle]
 

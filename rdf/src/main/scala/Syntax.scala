@@ -7,6 +7,7 @@ import scalaz.NonEmptyList
 trait SparqlQuery
 trait N3
 trait Turtle
+trait JSONLD
 trait RDFXML
 trait RDFaXHTML
 trait SparqlAnswerJson
@@ -53,6 +54,10 @@ object Syntax {
 
   implicit val RDFXML: Syntax[RDFXML] = new Syntax[RDFXML] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application/rdf+xml"))
+  }
+
+  implicit val JSONLD: Syntax[JSONLD] = new Syntax[JSONLD] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application/ld+json"))
   }
 
   implicit val RDFaXHTML: Syntax[RDFaXHTML] = new Syntax[RDFaXHTML] {

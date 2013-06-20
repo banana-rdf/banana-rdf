@@ -7,6 +7,9 @@ import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
 import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 import org.openrdf.model.URI
 
+import com.github.jsonldjava.impl._
+import org.openrdf.rio.helpers.{JSONLDMode, JSONLDSettings}
+
 /**typeclass that reflects a Jena String that can be used to construct a BlockingReader */
 trait SesameSyntax[T] {
   def rdfWriter(os: OutputStream, base: String): RDFWriter
@@ -39,6 +42,21 @@ object SesameSyntax {
 
     def rdfWriter(wr: Writer, base: String) = new STurtleWriter(wr) {
       override def writeURI(uri: URI): Unit = write(uri, writer, base)
+    }
+  }
+
+  implicit val JSONLD: SesameSyntax[JSONLD] = new SesameSyntax[JSONLD] {
+    def rdfWriter(os: OutputStream, base: String) =
+    {
+      val writer = new SesameJSONLDWriter(os)
+      writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, JSONLDMode.COMPACT);
+      writer
+    }
+
+    def rdfWriter(wr: Writer, base: String) = {
+      val writer = new SesameJSONLDWriter(wr)
+      writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, JSONLDMode.COMPACT);
+      writer
     }
   }
 
