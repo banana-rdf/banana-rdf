@@ -7,7 +7,7 @@ trait BananaSparqlSolutionWriterSelector {
     def apply[Rdf <: RDF, T](implicit syntax: Syntax[T], writer: SparqlSolutionsWriter[Rdf, T]): SparqlSolutionsWriterSelector[Rdf] =
       new SparqlSolutionsWriterSelector[Rdf] {
         def apply(range: MediaRange): Option[SparqlSolutionsWriter[Rdf, Any]] =
-          syntax.mimeTypes.list.find(m => range.matches(m)).map(_ => writer)
+          syntax.mimeTypes.list.find(m => range.accepts(m)).map(_ => writer)
       }
   }
 
