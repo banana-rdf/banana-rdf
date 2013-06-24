@@ -45,19 +45,27 @@ object SesameSyntax {
     }
   }
 
-  implicit val JSONLD: SesameSyntax[JSONLD] = new SesameSyntax[JSONLD] {
-    def rdfWriter(os: OutputStream, base: String) =
-    {
-      val writer = new SesameJSONLDWriter(os)
-      writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, JSONLDMode.COMPACT);
-      writer
-    }
+  implicit val JSONLD_COMPACT: SesameSyntax[JSONLD_COMPACTED] = jsonldSyntax(JSONLDMode.COMPACT)
 
-    def rdfWriter(wr: Writer, base: String) = {
-      val writer = new SesameJSONLDWriter(wr)
-      writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, JSONLDMode.COMPACT);
-      writer
+  implicit val JSONLD_EXPANDED: SesameSyntax[JSONLD_EXPANDED] = jsonldSyntax(JSONLDMode.EXPAND)
+
+  implicit val JSONLD_FLATTENED: SesameSyntax[JSONLD_FLATTENED] = jsonldSyntax(JSONLDMode.FLATTEN)
+
+
+  private def jsonldSyntax[T <: JSONLD](mode: JSONLDMode) = {
+    new SesameSyntax[T] {
+      def rdfWriter(os: OutputStream, base: String) =
+      {
+        val writer = new SesameJSONLDWriter(os)
+        writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, mode);
+        writer
+      }
+
+      def rdfWriter(wr: Writer, base: String) = {
+        val writer = new SesameJSONLDWriter(wr)
+        writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, mode);
+        writer
+      }
     }
   }
-
 }
