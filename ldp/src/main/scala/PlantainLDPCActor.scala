@@ -22,6 +22,7 @@ import scala.io.Codec
 import java.io.{File, FileOutputStream}
 import java.nio.file.DirectoryStream.Filter
 import scala.collection.parallel.mutable
+import org.w3.banana.ldp.ResourceDoesNotExist
 
 /**
  * A LDP Container actor that is responsible for the equivalent of a directory
@@ -66,10 +67,11 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
 
         override def visitFile(file: Path, attrs: BasicFileAttributes) = {
           val pathSegment = file.getFileName.toString
-          val fullURI = uriW[Plantain](baseUri)/pathSegment
           if (attrs.isDirectory) {
+            val fullURI = uriW[Plantain](baseUri)/(pathSegment+"/")
             context.actorOf(Props(new PlantainLDPCActor(fullURI,root.resolve(file))),pathSegment)
           } else if (attrs.isSymbolicLink) {
+            val fullURI = uriW[Plantain](baseUri)/pathSegment
             //we use symbolic links to point to the file that contains the default representation
             //this is because we may have many different representations, and we don't want an actor
             //for each of the representations.
@@ -92,6 +94,22 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
   protected def aclPath(path: String) = path+".acl"
 
   protected def isAclPath(path: String) = path.endsWith(".acl")
+
+  /**
+   * for directories we resolve requests for metadata files as referring to .xxx.ext files
+   * inside the directory
+   *
+   * @param name
+   * @return
+   */
+  override
+  private def fileFrom(name: String): File = {
+    //note any request to this method means that the initial request started with collection.xxxx
+    //so we know that the first part of the string is a collection
+    val doti = name.indexOf('.')
+    val afterDot = if (doti>=0) name.substring(doti) else ""
+    root.resolve(afterDot+ext).toFile
+  }
 
 
   /**
@@ -297,7 +315,7 @@ class PlantainLDPRActor(baseUri: Plantain#URI,path: Path)
   /**
    *
    * @param name the name of the file - with extensions.
-   * @throws
+   * @throws ResourceDoesNotExist
    * @return
    */
   @throws[ResourceDoesNotExist]
@@ -311,18 +329,19 @@ class PlantainLDPRActor(baseUri: Plantain#URI,path: Path)
 
       if (file.createNewFile()) {
         if (file.toString.endsWith(ext)) {
-           LocalLDPR[Plantain](baseUri,Graph.empty,Option(new Date(path.toFile.lastModified())))
+           LocalLDPR[Plantain](iri,Graph.empty,Option(new Date(path.toFile.lastModified())))
         } else {
            LocalBinaryR[Plantain](file.toPath, iri)
         }
       } else {
         val res = xResource.fromFile(file)
-        val ldprOpt = reader.read(res, "").toOption.map { g =>
-            LocalLDPR[Plantain](baseUri, g, Option(new Date(path.toFile.lastModified())))
+        val ldprOpt = reader.read(res, iri.toString).map { g =>
+            LocalLDPR[Plantain](iri, g, Option(new Date(path.toFile.lastModified())))
         }
         ldprOpt.get //todo: this could break
       }
     })
+
 //      //todo: this globbing is not secure. Requests could contain files with globs in them.
 //      val pathStream = Files.newDirectoryStream(path.getParent,fileName+".*")
 //      val paths = try {
@@ -351,15 +370,22 @@ class PlantainLDPRActor(baseUri: Plantain#URI,path: Path)
    * @return
    */
   private def path(name: String): (File,Plantain#URI) = {
-    println(s"~~~~path($name)")
     //note: this is really simple at present, but is bound to get more complex,...
-    val file = if (name.endsWith(acl)) path.resolveSibling(name+ext).toFile
-               else if (Files.isSymbolicLink(path )) path.resolveSibling(Files.readSymbolicLink(path)).toFile
-               else path.resolveSibling(name+ext).toFile
+    val file = fileFrom(name)
     val uriw =uriW[Plantain](baseUri)
     val iri = uriw.resolve(name)
-    println(s"====($file,$iri)")
     (file,iri)
+  }
+
+  /**
+   * //todo: this feels like it is missing a parameter for mime types...
+   * @param name the name of the requested resource
+   * @return the file name on disk for it
+   */
+  def fileFrom(name: String): File = {
+    if (name.endsWith(acl)) path.resolveSibling(name + ext).toFile
+    else if (Files.isSymbolicLink(path)) path.resolveSibling(Files.readSymbolicLink(path)).toFile
+    else path.resolveSibling(name + ext).toFile
   }
 
   def setResource(name: String, graph: Plantain#Graph) {

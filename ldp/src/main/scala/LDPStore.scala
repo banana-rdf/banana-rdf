@@ -146,8 +146,9 @@ case class OperationNotSupported(msg: String) extends Exception(msg)
 //todo: the way of finding the meta data should not be set here, but in the implementation
 trait LocalNamedResource[Rdf<:RDF] extends NamedResource[Rdf] {
   lazy val acl: Option[Rdf#URI]= Some{
-    if (location.toString.endsWith(".acl")) location
-    else ops.URI(location.toString+".acl")
+    var loc=location.toString
+    if (loc.endsWith(".acl")) location
+    else ops.URI(loc+".acl")
   }
 }
 
