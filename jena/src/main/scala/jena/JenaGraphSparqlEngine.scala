@@ -5,6 +5,7 @@ import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import scalaz.Id._
+import com.hp.hpl.jena.update.UpdateAction
 
 object JenaSparqlGraph extends SparqlGraph[Jena] {
 
@@ -31,6 +32,14 @@ object JenaSparqlGraph extends SparqlGraph[Jena] {
 
     def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = {
       qexec(query, bindings).execAsk()
+    }
+
+    def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) {
+      val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
+      if (bindings.isEmpty)
+        UpdateAction.execute(query, model)
+      else
+        UpdateAction.execute(query, model, querySolution.getMap(bindings))
     }
   }
 

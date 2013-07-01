@@ -29,6 +29,8 @@ trait PlantainSparqlGraph extends SparqlGraph[Plantain] {
     def executeAsk(query: Plantain#AskQuery, bindings: Map[String, Plantain#Node]): Boolean =
       PlantainUtil.executeAsk(graph, query, bindings)
 
+    // FIXME added just to avoid compilation error
+    def executeUpdate(query: Plantain#UpdateQuery, bindings: Map[String, Plantain#Node]) = ???
   }
 
 

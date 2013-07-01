@@ -25,6 +25,10 @@ trait Plantain extends RDF {
   type SelectQuery = ParsedTupleQuery
   type ConstructQuery = ParsedGraphQuery
   type AskQuery = ParsedBooleanQuery
+
+  // FIXME added just to avoid compilation error
+  type UpdateQuery = Any
+
   type Solution = BindingSet
   // instead of TupleQueryResult so that it's eager instead of lazy
   type Solutions = BoundSolutions

@@ -5,6 +5,8 @@ import org.w3.banana._
 import com.hp.hpl.jena.query.{ Query => JenaQuery, QueryException, QueryFactory }
 import com.hp.hpl.jena.graph.{ Node => JenaNode }
 import com.hp.hpl.jena.rdf.model.RDFNode
+import com.hp.hpl.jena.update.UpdateFactory
+
 import scala.collection.JavaConverters._
 import scala.util._
 
@@ -15,6 +17,8 @@ object JenaSparqlOps extends SparqlOps[Jena] {
   def ConstructQuery(query: String): Jena#ConstructQuery = QueryFactory.create(query)
 
   def AskQuery(query: String): Jena#AskQuery = QueryFactory.create(query)
+
+  def UpdateQuery(query: String): Jena#UpdateQuery = UpdateFactory.create(query)
 
   def Query(query: String): Try[Jena#Query] = Try {
     QueryFactory.create(query)
