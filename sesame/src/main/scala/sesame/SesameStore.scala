@@ -32,7 +32,7 @@ object SesameStore {
   }
 
   def getGraph(conn: RepositoryConnection, uri: Sesame#URI): Sesame#Graph = {
-    val graph = new GraphImpl
+    val graph = new LinkedHashModel
     val rr: RepositoryResult[Statement] = conn.getStatements(null, null, null, false, uri)
     while (rr.hasNext) {
       val s = rr.next()
@@ -62,7 +62,7 @@ object SesameStore {
     val graphQuery: GraphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL, query.getSourceString)
     bindings foreach { case (name, value) => graphQuery.setBinding(name, value) }
     val result: GraphQueryResult = graphQuery.evaluate()
-    val graph = new GraphImpl
+    val graph = new LinkedHashModel
     while (result.hasNext) {
       graph.add(result.next())
     }
@@ -77,6 +77,11 @@ object SesameStore {
     result
   }
 
+  def executeUpdate(conn: RepositoryConnection, query: Sesame#UpdateQuery, bindings: Map[String, Sesame#Node]) {
+    val updateQuery = conn.prepareUpdate(QueryLanguage.SPARQL, query.query)
+    bindings foreach { case (name, value) => updateQuery.setBinding(name, value) }
+    updateQuery.execute()
+  }
 }
 
 import SesameStore._
@@ -125,6 +130,10 @@ class SesameStore(repository: Repository) extends RDFStore[Sesame, Future] {
         case Ask(query, bindings, k) => {
           val b = executeAsk(conn, query, bindings)
           run(conn, k(b))
+        }
+        case org.w3.banana.Update(query, bindings, k) => {
+          executeUpdate(conn, query, bindings)
+          run(conn, k)
         }
       },
       a => a

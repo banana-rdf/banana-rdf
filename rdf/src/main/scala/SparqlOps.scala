@@ -16,6 +16,8 @@ trait SparqlOps[Rdf <: RDF] {
 
   def AskQuery(query: String): Rdf#AskQuery
 
+  def UpdateQuery(query: String): Rdf#UpdateQuery
+
   /**
    * A general query constructor. When this is used it is usually
    * because the query type is not known in advance, ( as when a query is received
@@ -68,6 +70,11 @@ trait SparqlOps[Rdf <: RDF] {
   def AskQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#AskQuery = {
     val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
     AskQuery(completeQuery)
+  }
+
+  def UpdateQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#UpdateQuery = {
+    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
+    UpdateQuery(completeQuery)
   }
 
 }

@@ -3,7 +3,7 @@ package org.w3.banana.sesame
 import org.w3.banana._
 import SesamePrefix._
 import org.openrdf.model._
-import org.openrdf.model.impl.{ GraphImpl, StatementImpl, LiteralImpl }
+import org.openrdf.model.impl.{ LinkedHashModel, StatementImpl, LiteralImpl }
 import java.io._
 import java.util.LinkedList
 import scalax.io._
@@ -35,7 +35,7 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
       val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
       turtleParser.setRDFHandler(collector)
       turtleParser.parse(reader, base)
-      new GraphImpl(triples)
+      new LinkedHashModel(triples)
     }
   }
 
@@ -54,7 +54,7 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
       val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
       parser.setRDFHandler(collector)
       parser.parse(reader, base)
-      new GraphImpl(triples)
+      new LinkedHashModel(triples)
     }
   }
 

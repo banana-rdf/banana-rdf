@@ -9,7 +9,7 @@ object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings  ++  defaultScalariformSettings ++ Seq ( 
+  val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
     version      := "2013_06_14-SNAPSHOT",
     scalaVersion := "2.10.1",
@@ -130,7 +130,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
 
-  val sesameVersion = "2.6.10"
+  val sesameVersion = "2.7.0"
   
   val sesameCoreDeps =
     Seq(
@@ -188,7 +188,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert
     )
-  ).dependsOn (rdf) 
+  ) dependsOn (rdf)
 
   lazy val jena = Project(
     id = "banana-jena",
@@ -198,7 +198,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka
     )
-  ).dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test")
   
   lazy val sesame = Project(
     id = "banana-sesame",
@@ -208,7 +208,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaIoFile,
       libraryDependencies += akka
     )
-  ).dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test")
 
   lazy val plantain = Project(
     id = "plantain",
@@ -219,13 +219,13 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ).dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test")
 
   lazy val examples = Project(
     id = "examples",
     base = file("examples"),
     settings = buildSettings
-  ).dependsOn (sesame, jena)
+  ) dependsOn (sesame, jena)
 
   // this is _experimental_
   // please do not add this projet to the main one
@@ -243,7 +243,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ).dependsOn (plantain, rdfTestSuite % "test")
+  ) dependsOn (plantain, rdfTestSuite % "test")
 
   lazy val ldp = Project(
     id = "ldp",
@@ -252,14 +252,14 @@ object BananaRdfBuild extends Build {
         libraryDependencies += scalaIoCore,
         libraryDependencies += scalaIoFile,
         libraryDependencies += akka,
-        libraryDependencies += akkaTransactor,
         libraryDependencies += asyncHttpClient,
+        libraryDependencies += akkaTransactor,
         libraryDependencies += scalaz,
         libraryDependencies += iterateeDeps,
         libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
         libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ).dependsOn (plantain, rdfTestSuite % "test")
+  ) dependsOn (plantain, rdfTestSuite % "test")
 
   
 }

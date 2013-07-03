@@ -39,6 +39,9 @@ trait SesameSparqlGraph extends SparqlGraph[Sesame] {
     def executeAsk(query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Boolean =
       withConnection(repository) { conn => SesameStore.executeAsk(conn, query, bindings) }
 
+    def executeUpdate(query: Sesame#UpdateQuery, bindings: Map[String, Sesame#Node]){
+      withConnection(repository) { conn => SesameStore.executeUpdate(conn, query, bindings) }
+    }
   }
 
 }

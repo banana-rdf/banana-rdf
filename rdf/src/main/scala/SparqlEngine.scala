@@ -11,12 +11,15 @@ trait SparqlEngine[Rdf <: RDF, M[_]] extends Any {
 
   def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): M[Boolean]
 
+  def executeUpdate(query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): M[Unit]
+
   def executeSelect(query: Rdf#SelectQuery): M[Rdf#Solutions] = executeSelect(query, Map.empty)
 
   def executeConstruct(query: Rdf#ConstructQuery): M[Rdf#Graph] = executeConstruct(query, Map.empty)
 
   def executeAsk(query: Rdf#AskQuery): M[Boolean] = executeAsk(query, Map.empty)
 
+  def executeUpdate(query: Rdf#UpdateQuery): M[Unit] = executeUpdate(query, Map.empty)
 }
 
 object SparqlEngine {
@@ -32,6 +35,8 @@ object SparqlEngine {
     def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): M[Boolean] =
       store.execute(Command.ask(query, bindings))
 
+    def executeUpdate(query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): M[Unit] =
+      store.execute(Command.update(query, bindings))
   }
 
 }

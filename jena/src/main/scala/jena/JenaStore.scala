@@ -13,6 +13,7 @@ import scala.concurrent.{ ops => _, _ }
 import java.util.concurrent.{ Executors, ExecutorService }
 import scalaz.Free
 import org.slf4j.{ Logger, LoggerFactory }
+import com.hp.hpl.jena.update.UpdateAction
 
 object JenaStore {
 
@@ -123,6 +124,10 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
           val b = executeAsk(query, bindings)
           run(k(b))
         }
+        case Update(query, bindings, k) => {
+          executeUpdate(query, bindings)
+          run(k)
+        }
       },
       a => a
     )
@@ -135,6 +140,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
         case Select(_, _, k) => operationType(k(null))
         case Construct(_, _, k) => operationType(k(null))
         case Ask(_, _, k) => operationType(k(false))
+        case Update(_, _, k) => operationType(k)
         case _ => WRITE
       },
       _ => READ
@@ -203,6 +209,13 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
         QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings))
     val result = qexec.execAsk()
     result
+  }
+
+  def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) {
+    if (bindings.isEmpty)
+      UpdateAction.execute(query, dataset)
+    else
+      UpdateAction.execute(query, dataset, querySolution.getMap(bindings))
   }
 
 }
