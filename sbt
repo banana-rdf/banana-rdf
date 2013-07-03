@@ -3,9 +3,9 @@
 dir=$(dirname $0)
 cd "$dir"
 
-url="http://scalasbt.artifactoryonline.com/scalasbt/sbt-native-packages/org/scala-sbt/sbt/0.13.0-M1/sbt.zip"
+url="http://scalasbt.artifactoryonline.com/scalasbt/sbt-native-packages/org/scala-sbt/sbt/0.13.0-RC1/sbt.zip"
 
-sbt="sbt-launch-0.13.0-M1.jar"
+sbt="sbt-launch-0.13.0-RC1.jar"
 
 # set the right tool to download sbt
 if [ -n "$tool" ]; then

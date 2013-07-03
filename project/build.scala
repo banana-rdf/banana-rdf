@@ -134,7 +134,6 @@ object BananaRdfBuild extends Build {
   
   val sesameCoreDeps =
     Seq(
-      resolvers += "sesame-repo-releases" at "http://repo.aduna-software.org/maven2/releases/",
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % sesameVersion,

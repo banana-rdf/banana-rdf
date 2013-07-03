@@ -22,6 +22,8 @@ trait SparqlEngine[Rdf <: RDF, M[_]] extends Any {
   def executeUpdate(query: Rdf#UpdateQuery): M[Unit] = executeUpdate(query, Map.empty)
 }
 
+trait SparqlUpdateEngine[Rdf <: RDF] //todo: implement a version for updates
+
 object SparqlEngine {
 
   def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]): SparqlEngine[Rdf, M] = new SparqlEngine[Rdf, M] {
