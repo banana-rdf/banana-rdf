@@ -6,16 +6,24 @@ import org.slf4j.LoggerFactory
 import java.util.{ Set => jSet, List => jList, Collection => jCollection, Iterator => jIterator }
 import scala.collection.JavaConverters._
 import org.openrdf.model.{ Graph => SesameGraph, Literal => SesameLiteral, BNode => SesameBNode, URI => SesameURI, _ }
-import org.openrdf.model.impl.{ URIImpl, BNodeImpl, LiteralImpl, StatementImpl }
+import org.openrdf.model.impl._
 import org.openrdf.query.algebra.evaluation.TripleSource
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.query.QueryEvaluationException
+import org.w3.banana.plantain.model.PlainNode
+import org.w3.banana.plantain.model.BNode
+import org.openrdf.model.BNode
+import org.w3.banana.plantain.model.LangLiteral
+import scala.Some
+import org.w3.banana.plantain.model.TypedLiteral
 
 object Graph {
 
   val logger = LoggerFactory.getLogger(classOf[Graph])
 
   val empty = Graph(Map.empty, 0)
+
+  val vf: ValueFactory = ValueFactoryImpl.getInstance()
 
 }
 
@@ -144,7 +152,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Sesa
   
   def add(subject: Resource, predicate: SesameURI, objectt: Value, contexts: Resource*): Boolean =
     throw new UnsupportedOperationException
-  def getValueFactory(): ValueFactory = ???
+  def getValueFactory(): ValueFactory = Graph.vf
   def `match`(subject: Resource, predicate: SesameURI, objectt: Value, contexts: Resource*): jIterator[Statement] = {
     if (contexts.nonEmpty)
       throw new UnsupportedOperationException

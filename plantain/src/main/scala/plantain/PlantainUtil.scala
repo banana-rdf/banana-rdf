@@ -17,8 +17,7 @@ import scala.util.Try
 
 object PlantainUtil {
   //todo: Is it a good idea to put this here?
-  val vf: ValueFactory = ValueFactoryImpl.getInstance()
-
+  import model.Graph.vf
 
   def executeSelect(tripleSource: TripleSource, query: Plantain#SelectQuery, bindings: Map[String, Plantain#Node]): Plantain#Solutions = {
     val tupleExpr = query.getTupleExpr
