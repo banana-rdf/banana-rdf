@@ -103,7 +103,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
    * @return
    */
   override
-  private def fileFrom(name: String): File = {
+  def fileFrom(name: String): File = {
     //note any request to this method means that the initial request started with collection.xxxx
     //so we know that the first part of the string is a collection
     val doti = name.indexOf('.')
