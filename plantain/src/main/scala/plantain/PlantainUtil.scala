@@ -13,6 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import org.w3.banana.plantain.BoundSolutions
 import org.openrdf.query.algebra.helpers.StatementPatternCollector
 import org.w3.banana.plantain.BoundSolutions
+import scala.util.Try
 
 object PlantainUtil {
   //todo: Is it a good idea to put this here?
@@ -176,10 +177,11 @@ object PlantainUtil {
 
 
 
-  def executeUpdate(graph: Plantain#Graph, query: Plantain#UpdateQuery, map: Map[String, Plantain#Node])
-                   (implicit ec: ExecutionContext): Future[Plantain#Graph] = {
+  def executeUpdate(graph: Plantain#Graph,
+                    query: Plantain#UpdateQuery,
+                    map: Map[String, Plantain#Node]): Try[Plantain#Graph] = {
     import scala.collection.convert.wrapAsScala._
-    Future {
+    Try {
       val bindingSet = map.asSesame
 
       //implementation based on  org.openrdf.sail.helpers.SailUpdateExecutor

@@ -8,7 +8,7 @@ import akka.actor._
 import org.openrdf.query.algebra.evaluation.TripleSource
 import annotation.tailrec
 import java.net.{URI => jURI}
-import org.w3.banana.plantain.Plantain
+import org.w3.banana.plantain.{PlantainLDPatch, PlantainUtil, Plantain}
 import java.nio.file.attribute.BasicFileAttributes
 import java.util
 import org.w3.banana.syntax._
@@ -16,7 +16,7 @@ import scalaz.-\/
 import scalaz.\/-
 import scala.Some
 import java.nio.file.Path
-import scala.util.{Failure, Try}
+import scala.util.{Success, Failure, Try}
 import java.util.Date
 import scala.io.Codec
 import java.io.{File, FileOutputStream}
@@ -450,8 +450,24 @@ class PlantainLDPRActor(baseUri: Plantain#URI,path: Path)
             }
             setResource(nme,resultGraph)
           }
+          case _ => throw RequestNotAcceptable(s"$uri does not contain a GRAPH, cannot Update")
         }
         self forward Scrpt(a)
+      }
+      case PatchLDPR(uri, update, bindings, k) => {
+        val nme = name(uri)
+        getResource(nme) match {
+          case LocalLDPR(_,graph,updated) => {
+            PlantainLDPatch.executePatch(graph,update,bindings) match {
+              case Success(gr) => {
+                setResource(nme, gr)
+                self forward Scrpt(k(true))
+              }
+              case Failure(e) => throw e
+             }
+          }
+          case _ => throw RequestNotAcceptable(s"$uri does not contain a GRAPH - PATCH is not possible")
+        }
       }
       case SelectLDPR(uri, query, bindings, k) => {
         getResource(name(uri)) match {

@@ -5,10 +5,11 @@ import org.scalatest.matchers.MustMatchers
 import org.w3.banana.{RDFOps, SparqlOps, RDF}
 import org.w3.banana.plantain.LDPatch
 import org.w3.banana._
+import scala.util.Try
 
 class PlantainLDPatchTest extends LDPatchTest[Plantain](PlantainLDPatch)
 
-abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf])
+abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf,Try])
                                (implicit ops: RDFOps[Rdf],sparqlOps: SparqlOps[Rdf])
   extends WordSpec with MustMatchers with BeforeAndAfterAll {
 
@@ -31,9 +32,8 @@ abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf])
         | INSERT DATA { <http://joe.name/#me> foaf:knows <http://jane.name/#her> }
       """.stripMargin)
 
-    val futureGraph = ldpatch.executePatch(Graph.empty,updtQuery)
-    val result = futureGraph.getOrFail()
-    result.isIsomorphicWith(g1)
+    val resultGraph = ldpatch.executePatch(Graph.empty,updtQuery).get
+    resultGraph.isIsomorphicWith(g1)
   }
 
   "SPARQL Delete Data removes only relation " in {
@@ -43,9 +43,8 @@ abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf])
         | DELETE DATA { <http://joe.name/#me> foaf:knows <http://jane.name/#her> }
       """.stripMargin)
 
-    val futureGraph = ldpatch.executePatch(g1,updtQuery)
-    val result = futureGraph.getOrFail()
-    result.isIsomorphicWith(Graph.empty)
+    val resultGraph = ldpatch.executePatch(g1,updtQuery).get
+    resultGraph.isIsomorphicWith(Graph.empty)
   }
 
   val timbl =    URI("http://www.w3.org/People/Berners-Lee/card#i")
@@ -66,10 +65,9 @@ abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf])
         | DELETE { <$henry> foaf:knows ?p } WHERE { <$henry> foaf:knows ?p }
       """.stripMargin)
 
-    val futureGraph = ldpatch.executePatch(g1,updtQuery)
-    val result = futureGraph.getOrFail()
+    val resultGraph = ldpatch.executePatch(g1,updtQuery).get
     val res =  ( henry.a(foaf.Person) ).graph
-    result.isIsomorphicWith(res)
+    resultGraph.isIsomorphicWith(res)
 
   }
 
@@ -100,9 +98,8 @@ abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf])
         | WHERE { ?acl wac:accessToClass ?clzz .
                               ?clzz wac:regex ?regex . }
       """.stripMargin)
-    val futureGraph = ldpatch.executePatch(bertailsContainerAclGraph,updtQuery)
-    val result = futureGraph.getOrFail()
-    result.isIsomorphicWith(bertailsContainerAclGraph2)
+    val resultGraph = ldpatch.executePatch(bertailsContainerAclGraph,updtQuery).get
+    resultGraph.isIsomorphicWith(bertailsContainerAclGraph2)
 
   }
 
