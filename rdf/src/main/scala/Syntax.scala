@@ -5,6 +5,7 @@ import scalaz.NonEmptyList
 /* some well-known mime-types so that we can refer to them in banana-rdf */
 
 trait SparqlQuery
+trait SparqlUpdate
 trait N3
 trait Turtle
 trait RDFXML
@@ -66,9 +67,13 @@ object Syntax {
   implicit val SparqlAnswerXml = new Syntax[SparqlAnswerXml] {
     val mimeTypes = NonEmptyList(MimeType("application/sparql-results+xml"))
   }
+  implicit val SparqlUpdate = new Syntax[SparqlUpdate] {
+    val mimeTypes = NonEmptyList(MimeType("application/sparql-update"))
+  }
 
   implicit val textPlain = new Syntax[String] {
     val mimeTypes = NonEmptyList(MimeType("text/plain"))
   }
+
 
 }

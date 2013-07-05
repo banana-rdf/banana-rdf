@@ -1,4 +1,4 @@
-package org.w3.banana.ldp
+package org.w3.banana.ldp.auth
 
 
 import java.security.cert.X509Certificate
@@ -6,6 +6,8 @@ import scalaz.{ Success => _, Failure => _, Validation =>_ , _ }
 import scalaz.Scalaz._
 import java.security.{Principal, PublicKey}
 import java.net.{MalformedURLException, URL, URISyntaxException}
+import org.w3.banana.ldp.{LDPCommand, RWW}
+
 //import org.www.play.remote.{ FetchException, GraphFetcher}
 import org.w3.banana._
 import java.math.BigInteger
@@ -119,7 +121,7 @@ class WebIDVerifier[Rdf <: RDF](rww: RWW[Rdf])
    * function to verifyWebIDClaim that a given Subject Alternative Name referent is the owner of a public key
    * @param san
    * @param key
-   * @return a Promise of a Validation of the WebIDPrincipal if it is
+   * @return a Future Try of the WebIDPrincipal. The Try is not merged into the future
    */
   def verifyWebID(san: String, key: PublicKey):  Future[Principal] =  try {
     logger.info(s"in verifyWebID for san=$san")

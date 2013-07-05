@@ -17,11 +17,20 @@ trait LinkedResource[Rdf <: RDF, LR] {
   /** retrieves a resource based on its URI */
   def ~(uri: Rdf#URI): Enumerator[LR]
 
-  /** follow the predicate */
-  def ~> (lr: LR, predicate: Rdf#URI): Enumerator[LR]
+  /**
+   * todo: could the fetchCond be better be done by an Enumeratee?
+   *   ( eg if one could have an enumeratee that could transform an enumerator, by fetching the remote resource?
+   *     but then one would want order not to be important !)
+   *
+   * @param lr
+   * @param predicate
+   * @param fetchCond
+   * @return
+   */
+  def ~> (lr: LR, predicate: Rdf#URI)(fetchCond: PointedGraph[Rdf] => Boolean): Enumerator[LR]
 
   /** follow the predicate in reverse order  */
-  def <~ (lr: LR, predicate: Rdf#URI): Enumerator[LR]
+  def <~ (lr: LR, predicate: Rdf#URI)(fetchCond: PointedGraph[Rdf] => Boolean): Enumerator[LR]
 
 }
 
@@ -39,7 +48,7 @@ trait LinkedMeta[Rdf <: RDF, LR] {
 trait LinkedWebResource[Rdf <: RDF, LR] extends LinkedResource[Rdf,LR] with LinkedMeta[Rdf,LR]
 
 
-class WebResource[Rdf <:RDF](rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: ExecutionContext)
+class WebResource[Rdf <:RDF](val rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: ExecutionContext)
   extends LinkedResource[Rdf,LinkedDataResource[Rdf]] {
   import LDPCommand._
   import ops._
@@ -48,7 +57,7 @@ class WebResource[Rdf <:RDF](rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: Execu
 
   /** retrieves a resource based on its URI */
   def ~(uri: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = {
-    val futureLDR = rww.execute{
+    val futureLDR: Future[LinkedDataResource[Rdf]] = rww.execute{
       //todo: this code could be moved somewhere else see: Command.GET
       val docUri = uri.fragmentLess
       getLDPR(docUri).map{graph=>
@@ -57,23 +66,28 @@ class WebResource[Rdf <:RDF](rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: Execu
       }
     }
     new Enumerator[LinkedDataResource[Rdf]] {
-      def apply[A](i: Iteratee[LinkedDataResource[Rdf], A]) = futureLDR.flatMap { ldr =>
+      def apply[A](i: Iteratee[LinkedDataResource[Rdf], A]): Future[Iteratee[LinkedDataResource[Rdf], A]] =
+        futureLDR.flatMap { ldr =>
         i.feed(Input.El(ldr))
       }
     }
   }
 
 
-  /** follow the  */
-  def ~>(lr: LinkedDataResource[Rdf], predicate: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = {
+  def ~>(lr: LinkedDataResource[Rdf], predicate: Rdf#URI)(fetchCond: PointedGraph[Rdf]=>Boolean=_=>true): Enumerator[LinkedDataResource[Rdf]] = {
     val res = lr.resource/predicate
-    follow(lr.location,  res)
+    follow(lr.location, res, fetchCond )
   }
 
+  //todo: add ~>(lr, predicate, condition: LR=>Where) Where can be Local, Remote, Union ( or binary ? )
+  //I wonder if a LinkedDataResource is not a special case of a more general TrackerResource(Set[URI],PointedGraph)
+  // which would keep track of where data came from.
+  // So that ldr1 union ldr2 = a TrackerResource( Set(ldr1,ldr2), pointedGraph )
+
   /** follow the predicate in reverse order  */
-  def <~(lr: LinkedDataResource[Rdf], predicate: Rdf#URI) = {
+  def <~(lr: LinkedDataResource[Rdf], predicate: Rdf#URI)(fetchCond: PointedGraph[Rdf]=>Boolean=_=>true) = {
     val res = lr.resource/-predicate
-    follow(lr.location,  res)
+    follow(lr.location,  res, fetchCond)
   }
 
 
@@ -85,10 +99,11 @@ class WebResource[Rdf <:RDF](rww: RWW[Rdf])(implicit ops: RDFOps[Rdf], ec: Execu
    * @param res pointed Graphs to follow
    * @return An Enumerator that will feed the results to an Iteratee
    */
-  protected def follow(local: Rdf#URI,res: PointedGraphs[Rdf]): Enumerator[LinkedDataResource[Rdf]] = {
+  protected def follow(local: Rdf#URI,res: PointedGraphs[Rdf], fetchCond: PointedGraph[Rdf]=>Boolean): Enumerator[LinkedDataResource[Rdf]] = {
     val local_remote = res.groupBy {
       pg =>
-        foldNode(pg.pointer)(
+        if (!fetchCond(pg)) "local"
+        else foldNode(pg.pointer)(
           uri => if (uri.fragmentLess == local)  "local" else "remote",
           bnode => "local",
           lit => "local"
@@ -149,10 +164,10 @@ class LDRLinkedResource[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LinkedR
 
   def ~(uri: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = ???
 
-  def ~> (lr: LinkedDataResource[Rdf], predicate: Rdf#URI): Enumerator[LinkedDataResource[Rdf]] = ???
+  def ~> (lr: LinkedDataResource[Rdf], predicate: Rdf#URI)(cond: PointedGraph[Rdf]=>Boolean): Enumerator[LinkedDataResource[Rdf]] = ???
 
   /** follow the predicate in reverse order  */
-  def <~(lr: LinkedDataResource[Rdf], predicate: Rdf#URI) = ???
+  def <~(lr: LinkedDataResource[Rdf], predicate: Rdf#URI)(fetchCond: PointedGraph[Rdf] => Boolean) = ???
 }
 
 /** Resources within a same RDF graph are linked together */

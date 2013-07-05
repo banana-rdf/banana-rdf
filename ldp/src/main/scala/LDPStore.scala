@@ -21,16 +21,6 @@ import scalaz.-\/
 
 trait RActor extends Actor with akka.actor.ActorLogging {
 
-  /**
-   * @param path of the resource
-   * @return the pair consisting of the collection and the name of the resource to make a request on
-   */
-  def split(path: String): Pair[String, String] = {
-    val i = path.lastIndexOf('/')
-    if (i <0) ("",path)
-    else (path.substring(0,i+1),path.substring(i+1,path.length))
-  }
-
   def returnErrors[A,B](pf: Receive): Receive = new PartialFunction[Any,Unit] {
     //interestingly it seems we can't catch an error here! If we do, we have to return a true or a false
     // and whatever we choose it could have bad sideffects. What happens if the isDefinedAt throws an exception?
@@ -44,14 +34,31 @@ trait RActor extends Actor with akka.actor.ActorLogging {
     }
 
   def local(u: jURI, base: jURI): Option[String] = {
-    if ((!u.isAbsolute ) || (u.getScheme == base.getScheme && u.getHost == base.getHost && u.getPort == base.getPort)) {
+    val res = if ((!u.isAbsolute ) || (u.getScheme == base.getScheme && u.getHost == base.getHost && u.getPort == base.getPort)) {
       if (u.getPath.startsWith(base.getPath)) {
-        val res = Some(u.getPath.substring(base.getPath.size))
-        res
+        val res = u.getPath.substring(base.getPath.size)
+        val sections = res.split('/')
+        val fileName = sections.last
+        var idot= fileName.indexOf('.')
+        if (idot>=0) sections.update(sections.length-1,fileName.substring(0,idot))
+        Option(sections.mkString("/"))
       } else None
     } else None
+    res
   }
 
+}
+
+class LocalSetup {
+  def aclPath(path: String) = {
+    val p = path+".acl"
+    p
+  }
+
+  def isAclPath(path: String) = {
+    val a =path.endsWith(".acl")
+    a
+  }
 }
 
 // A resource on the server ( Resource is already taken. )
@@ -136,22 +143,23 @@ trait LDPR[Rdf <: RDF] extends NamedResource[Rdf] with LinkedDataResource[Rdf]  
 
 case class OperationNotSupported(msg: String) extends Exception(msg)
 
+//todo: the way of finding the meta data should not be set here, but in the implementation
 trait LocalNamedResource[Rdf<:RDF] extends NamedResource[Rdf] {
   lazy val acl: Option[Rdf#URI]= Some{
-    if (location.toString.endsWith(";acl")) location
-    else ops.URI(location.toString+";acl")
+    var loc=location.toString
+    if (loc.endsWith(".acl")) location
+    else ops.URI(loc+".acl")
   }
 }
 
 
-case class LocalBinaryR[Rdf<:RDF](root: Path, location: Rdf#URI)
+case class LocalBinaryR[Rdf<:RDF](path: Path, location: Rdf#URI)
                                    (implicit val ops: RDFOps[Rdf])
   extends BinaryResource[Rdf] with LocalNamedResource[Rdf] {
   import org.w3.banana.syntax.URISyntax.uriW
   import ops._
 
-  lazy val path = root.resolve(uriW(location).lastPathSegment)
-  def meta = PointedGraph(location,Graph.empty)  //build up meta graph from local info
+  def meta = PointedGraph(location,Graph.empty)  //todo: need to build it correctly
 
 
   // also should be on a metadata trait, since all resources have update times
@@ -196,7 +204,7 @@ case class LocalLDPR[Rdf<:RDF](location: Rdf#URI,
                                  (implicit val ops: RDFOps[Rdf])
   extends LDPR[Rdf] with LocalNamedResource[Rdf]{
   import ops._
-  def meta = PointedGraph(location,Graph.empty)  //todo: build up meta from local info
+  def meta = PointedGraph(location,Graph.empty)  //todo: build up aclPath from local info
 }
 
 
@@ -228,10 +236,11 @@ object RWWeb {
 }
 
 case class ParentDoesNotExist(message: String) extends Exception(message) with BananaException
-case class ResourceExists(message: String) extends Exception(message) with BananaException
+case class ResourceDoesNotExist(message: String) extends Exception(message) with BananaException
+case class RequestNotAcceptable(message: String) extends Exception(message) with BananaException
 case class AccessDenied(message: String) extends Exception(message) with BananaException
-
-
+case class PreconditionFailed(message: String) extends Exception(message) with BananaException
+case class UnsupportedMediaType(message: String) extends Exception(message) with BananaException
 
 trait RWW[Rdf <: RDF] {  //not sure which of exec or execute is going to be needed
   def system: ActorSystem
@@ -254,6 +263,15 @@ class RWWeb[Rdf<:RDF](val baseUri: Rdf#URI)
   import RWWeb.logger
 
   logger.info(s"Created rwwActorRef=<$rwwActorRef>")
+
+  val listener = system.actorOf(Props(new Actor {
+    def receive = {
+      case d: DeadLetter if ( d.message.isInstanceOf[Scrpt[_,_]] || d.message.isInstanceOf[Cmd[_,_]] ) ⇒ {
+        d.sender !  akka.actor.Status.Failure(ResourceDoesNotExist(s"could not find actor for ${d.recipient}"))
+      }
+    }
+  }))
+  system.eventStream.subscribe(listener, classOf[DeadLetter])
 
 
   def execute[A](script: LDPCommand.Script[Rdf, A]) = {
@@ -312,10 +330,16 @@ class RWWebActor[Rdf<:RDF](val baseUri: Rdf#URI)
       local(cmd.command.uri.underlying,baseUri.underlying).map { path=>
         rootContainer match {
           case Some(root) => {
-            val (coll,file) = split(path)
-            val p = if (""==coll) root.path else root.path/coll.split('/').toIterable
-            log.info(s"sending message $cmd to akka('$path')=$p ")
-            context.actorFor(p) forward cmd
+            val p = root.path / path.split('/').toIterable
+            val to = context.actorFor(p)
+            if (context.system.deadLetters == to) {
+              log.info(s"message $cmd to akka('$path')=$to -- dead letter - returning error ")
+              sender ! ResourceDoesNotExist(s"could not find actor for ${cmd.command.uri}")
+            }
+            else {
+              log.info(s"forwarding message $cmd to akka('$path')=$to ")
+              to forward cmd
+            }
           }
           case None => log.warning("RWWebActor not set up yet: missing rootContainer")
         }
