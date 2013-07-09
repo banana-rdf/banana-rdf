@@ -35,13 +35,13 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
     val g: PointedGraph[Rdf] = (
       bnode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -- foaf.knows ->- (
+        -- foaf.name ->- "Alexandre".lang("fr")
+        -- foaf.knows ->- (
         URI("http://bblfish.net/#hjs")
-        -- foaf.name ->- "Henry Story"
-        -- foaf.currentProject ->- URI("http://webid.info/")
+          -- foaf.name ->- "Henry Story"
+          -- foaf.currentProject ->- URI("http://webid.info/")
+        )
       )
-    )
 
     val expectedGraph =
       Graph(

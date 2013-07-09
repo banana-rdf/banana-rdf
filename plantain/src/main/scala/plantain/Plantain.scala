@@ -2,7 +2,8 @@ package org.w3.banana.plantain
 
 import org.w3.banana._
 import org.openrdf.query.BindingSet
-import org.openrdf.query.parser.{ ParsedQuery, ParsedTupleQuery, ParsedGraphQuery, ParsedBooleanQuery }
+import org.openrdf.query.parser._
+import org.w3.banana.plantain.BoundSolutions
 
 trait Plantain extends RDF {
   // types related to the RDF datamodel
@@ -27,7 +28,7 @@ trait Plantain extends RDF {
   type AskQuery = ParsedBooleanQuery
 
   // FIXME added just to avoid compilation error
-  type UpdateQuery = Any
+  type UpdateQuery = ParsedUpdate
 
   type Solution = BindingSet
   // instead of TupleQueryResult so that it's eager instead of lazy

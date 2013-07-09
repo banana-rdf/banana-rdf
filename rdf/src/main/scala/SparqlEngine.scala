@@ -40,3 +40,6 @@ object SparqlEngine {
   }
 
 }
+
+trait SparqlUpdateEngine[Rdf <: RDF, M[_]] //todo: implement a version for updates
+

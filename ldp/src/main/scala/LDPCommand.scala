@@ -87,6 +87,21 @@ case class ConstructLDPC[Rdf <: RDF, A](container: Rdf#URI,
                                         bindings: Map[String, Rdf#Node],
                                         k: Rdf#Graph => A) extends LDPContainerCmd[Rdf, A]
 
+/**
+ *
+ * @param uri
+ * @param query
+ * @param bindings
+ * @param k function from boolean to A, boolean would be true if say PATCH changes something.
+ * @tparam Rdf
+ * @tparam A
+ */
+case class PatchLDPR[Rdf <: RDF, A](uri: Rdf#URI,
+                                    query: Rdf#UpdateQuery,
+                                    bindings: Map[String, Rdf#Node],
+                                    k: Boolean => A) extends LDPCommand[Rdf, A]
+
+
 case class AskLDPC[Rdf <: RDF, A](container: Rdf#URI,
                                   query: Rdf#AskQuery,
                                   bindings: Map[String, Rdf#Node],
@@ -145,6 +160,9 @@ object LDPCommand {
   def askLDPR[Rdf <: RDF](uri: Rdf#URI, query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Script[Rdf, Boolean] =
     suspend(AskLDPR(uri, query, bindings, b => `return`(b)))
 
+  def patchLDPR[Rdf <: RDF](uri: Rdf#URI, query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): Script[Rdf, Boolean] =
+    suspend(PatchLDPR(uri, query, bindings, b => `return`(b)))
+
   def selectLDPC[Rdf <: RDF](container: Rdf#URI, query: Rdf#SelectQuery,
                              bindings: Map[String, Rdf#Node]): Script[Rdf, Rdf#Solutions] =
     suspend(SelectLDPC(container, query, bindings, solutions => `return`(solutions)))
@@ -172,6 +190,7 @@ object LDPCommand {
           case SelectLDPR(uri, query, bindings, k) => SelectLDPR(uri, query, bindings, x => f(k(x)))
           case ConstructLDPR(uri, query, bindings, k) => ConstructLDPR(uri, query, bindings, x => f(k(x)))
           case AskLDPR(uri, query, bindings, k) => AskLDPR(uri, query, bindings, x => f(k(x)))
+          case PatchLDPR(uri, query, bindings, k) => PatchLDPR(uri, query, bindings, x => f(k(x)))
           case SelectLDPC(uric, query, bindings, k) => SelectLDPC(uric, query, bindings, x => f(k(x)))
           case ConstructLDPC(uric, query, bindings, k) => ConstructLDPC(uric, query, bindings, x => f(k(x)))
           case AskLDPC(uric, query, bindings, k) => AskLDPC(uric, query, bindings, x => f(k(x)))

@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.TextHtmlMime
+
 object MimeType {
 
   /**
@@ -29,6 +31,38 @@ case class MimeType(mime: String) {
     if (res.size != 2) Array("broken", "mime")
     else res
   }
+}
+
+object ImageJpegMime extends MimeType("image/jpeg")
+object ImageGifMime extends MimeType("image/gif")
+object ImagePngMime extends MimeType("image/png")
+object RdfTurtleMime extends MimeType("text/turtle")
+object TextHtmlMime extends MimeType("text/html")
+
+
+trait MimeExtensions {
+  def extension(mime: MimeType): Option[String]
+  def mime(extension: String): Option[MimeType]
+}
+
+object WellKnownMimeExtensions extends MimeExtensions {
+  val mimeExt = collection.immutable.Map(
+    ImageJpegMime -> ".jpg",
+    ImageGifMime -> ".gif",
+    ImagePngMime -> ".png",
+    RdfTurtleMime -> ".ttl",
+    TextHtmlMime -> ".html"
+  )
+  val extMime = {
+    val content = for {
+      (k,v) <- mimeExt.toSeq
+    } yield (v,k)
+    collection.immutable.Map(content: _*)
+  }
+
+  def extension(mime: MimeType) = mimeExt.get(mime)
+  def mime(extension: String)   = extMime.get(extension)
+
 }
 
 object MediaRange {

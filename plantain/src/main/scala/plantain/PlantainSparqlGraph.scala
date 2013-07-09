@@ -10,6 +10,7 @@ import org.openrdf.query.impl._
 import scalaz.Id._
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl
 import PlantainUtil._
+import scala.concurrent.Future
 
 object PlantainSparqlGraph extends PlantainSparqlGraph
 

@@ -11,9 +11,9 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-    version      := "2013_02_21-SNAPSHOT",
-    scalaVersion := "2.10.0",
-    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+    version      := "2013_06_14-SNAPSHOT",
+    scalaVersion := "2.10.1",
+    javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
     offline := true,
@@ -85,14 +85,14 @@ object BananaRdfBuild extends Build {
   val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
   val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
 
-  val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.0"
-  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.0"
+  val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.4"
+  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.4"
 
 //  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.12"
 
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0-SNAPSHOT"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.0-RC1"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -101,7 +101,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP8"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP9"
   
   val testsuiteDeps =
     Seq(
@@ -109,10 +109,10 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "play" %% "play-iteratees" % "2.1.0"
-  val playDeps = "play" %% "play" % "2.1.0"
+  val iterateeDeps = "play" %% "play-iteratees" % "2.1.1"
+  val playDeps = "play" %% "play" % "2.1.1"
 
-  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 
   val testDeps =
     Seq(
@@ -160,6 +160,7 @@ object BananaRdfBuild extends Build {
       jena,
       sesame,
       plantain,
+      ldp,
       examples))
   
   lazy val rdf = Project(

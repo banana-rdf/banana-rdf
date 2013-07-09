@@ -25,20 +25,9 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
   import ops._
   import org.w3.banana.syntax._
 
-  //cache does not need to be strongly synchronised, as losses are permissible
-  val cache = new AtomicReference(immutable.HashMap[Rdf#URI,Future[NamedResource[Rdf]]]())
-
-  def fetch(uri: Rdf#URI): Future[NamedResource[Rdf]] = {
-    val c = cache.get()
-    c.get(uri).getOrElse {
-      val result = webc.get(uri)
-      cache.set(c + (uri -> result))
-      result
-    }
-  }
 
   def fetchGraph(uri: Rdf#URI): Future[LDPR[Rdf]] = {
-    fetch(uri).flatMap { res =>
+    webc.get(uri).flatMap { res =>
       res match {
         case ldpr: LDPR[Rdf] => Future.successful(ldpr)
         case _ => Future.failed(WrongTypeException("remote resource cannot be transformed to a graph"))
@@ -46,6 +35,7 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
     }
   }
 
+  val ldp = LDPPrefix[Rdf]
 
 
   /**
@@ -72,44 +62,56 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
         result.onComplete{ tryres =>
           tryres match {
             case Success(url) => self tell (Scrpt(k(url)),sender)
-            case Failure(e) => failMsg(e, sender,s"failure POSTing to remote container <$container>")
+            case Failure(e) => failMsg(e, sender,s"failure creating LDPR with $slugOpt to remote container <$container>")
           }
         }
       }
 //      case CreateBinary(_, slugOpt, mime: MimeType, k) => {
       //        val (uri, pathSegment) = deconstruct(slugOpt)
-      //        //todo: make sure the uri does not end in ";meta" or whatever else the meta standard will be
+      //        //todo: make sure the uri does not end in ";aclPath" or whatever else the aclPath standard will be
       //        val bin = PlantainBinary(root, uri)
       //        NonLDPRs.put(pathSegment, bin)
       //        k(bin)
       //      }
-      //      case CreateContainer(_,slugOpt,graph,k) => {
-      //        val (uri,pathSegment) = deconstruct(slugOpt) //todo: deconstruct should check the file system. This should in fact use a file sytem call
-      //        val p = root.resolve(pathSegment)
-      //        Files.createDirectory(p)
-      //        context.actorOf(Props(new PlantainLDPCActor(uri, p)),pathSegment)
-      //        k(uri)
-      //      }
+      case CreateContainer(container,slugOpt,graph,k) => {
+        val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
+        val result = webc.post(container,slugOpt,graph.union(Graph(Triple(URI(""),rdf.typ, ldp.Container))),Syntax.Turtle)
+        result.onComplete{ tryres =>
+          tryres match {
+            case Success(url) => self tell (Scrpt(k(url)),sender)
+            case Failure(e) => failMsg(e, sender,s"failure creating a container with POST and slug $slugOpt in remote <$container>")
+          }
+        }
+
+//        val (uri,pathSegment) = deconstruct(slugOpt) //todo: deconstruct should check the file system. This should in fact use a file sytem call
+//        val p = root.resolve(pathSegment)
+//        Files.createDirectory(p)
+//        context.actorOf(Props(new PlantainLDPCActor(uri, p)),pathSegment)
+//        k(uri)
+      }
       case GetResource(uri,_, k) => {
         val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
-        val result = fetch(uri)
+        val result = webc.get(uri)
         result.onComplete { tryres =>
           tryres match {
             case Success(response) =>  self tell (Scrpt(k(response)),sender)
-            case Failure(e) => failMsg(e, sender,s"failure fetching resource <$uri>")          }
+            case Failure(e) => {
+              failMsg(e, sender,s"failure fetching resource <$uri>")
+            }
+          }
         }
       }
       case GetMeta(uri, k) => {
         val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
         //todo: develop a special fetch that will only do a HEAD
-        val result = fetch(uri)
+        val result = webc.get(uri)
         result.onComplete { tryres =>
           tryres match {
             case Success(response) => {
               log.info(s"cache received $response")
               self tell (Scrpt(k(response.asInstanceOf[Meta[Rdf]])),sender)
             }
-            case Failure(e) => failMsg(e, sender,s"failure fetching meta for resource <$uri>")
+            case Failure(e) => failMsg(e, sender,s"failure fetching acl for resource <$uri>")
           }
         }
       }
@@ -119,41 +121,35 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
         result.onComplete{ tryres =>
           tryres match {
             case Success(()) => {
-              cache.set(cache.get() - uri.fragmentLess)
               self tell (Scrpt(a),sender)
             }
             case Failure(e) => failMsg(e, sender,s"failure DELETing remote resource <$uri>")
           }
         }
       }
-      //            case UpdateLDPR(uri, remove, add, a) => {
-      //        val pathSegment = uri.lastPathSegment
-      //        val graph = LDPRs.get(pathSegment).map(_.graph).getOrElse {
-      //          throw new NoSuchElementException(s"Resource does not exist at $uri with path segment '$pathSegment'")
-      //        }
-      //        val temp = remove.foldLeft(graph) {
-      //          (graph, tripleMatch) => graph - tripleMatch.resolveAgainst(uri.resolveAgainst(baseUri))
-      //        }
-      //        val resultGraph = add.foldLeft(temp) {
-      //          (graph, triple) => graph + triple.resolveAgainst(uri.resolveAgainst(baseUri))
-      //        }
-      //        val ldpr = PlantainLDPR(uri, resultGraph)
-      //        LDPRs.put(pathSegment, ldpr)
-      //        a //todo: why no function here?
-      //      }
+      case UpdateLDPR(uri, remove, add, a) => {
+        val sender = context.sender
+        sender ! akka.actor.Status.Failure(new NotImplementedError("UpdateLDPR on remote resource not implemented"))
+//        val result = webc.patch(uri,remove,add)
+//        result.onComplete{ tryres =>
+//          tryres match {
+//            case Success(()) => {
+//              self tell (Scrpt(a),sender)
+//            }
+//            case Failure(e) => failMsg(e, sender,s"failure PATCHing remote resource <$uri>")
+//          }
+//        }
+      }
       case SelectLDPR(uri, query, bindings, k) => {
         val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
-        log.info(s"received SelectLDPR($uri,_,_,_) from ${sender}")
         val result = fetchGraph(uri)
         result.onComplete{ tryRes =>
           tryRes match {
             case Success(ldpr) => {
               val solutions = sparqlGraph(ldpr.graph).executeSelect(query, bindings)
-              log.info(s"sending solutions for SelectLDPR($uri,_,_) to $self with sender ${sender}")
               self tell  (Scrpt(k(solutions)),sender)
             }
             case Failure(e) => sender ! akka.actor.Status.Failure({
-              log.info(s"sederror cause=${e.getCause} stack trace =${e.getStackTraceString}")
               e match {
                 case e: BananaException => e
                 case other: Throwable => WrappedException("failure fetching resource", other.getCause)
@@ -163,28 +159,58 @@ class LDPWebActor[Rdf<:RDF](val excluding: Rdf#URI, val webc: WebClient[Rdf])
 
         }
       }
-      //      case ConstructLDPR(uri, query, bindings, k) => {
-      //        val graph = LDPRs(uri.lastPathSegment).graph
-      //        val resultGraph = PlantainUtil.executeConstruct(graph, query, bindings)
-      //        k(resultGraph)
-      //      }
-      //      case AskLDPR(uri, query, bindings, k) => {
-      //        val graph = LDPRs(uri.lastPathSegment).graph
-      //        val resultGraph = PlantainUtil.executeAsk(graph, query, bindings)
-      //        k(resultGraph)
-      //      }
-      //      case SelectLDPC(_,query, bindings, k) => {
-      //        val solutions = PlantainUtil.executeSelect(tripleSource, query, bindings)
-      //        k(solutions)
-      //      }
-      //      case ConstructLDPC(_,query, bindings, k) => {
-      //        val graph = PlantainUtil.executeConstruct(tripleSource, query, bindings)
-      //        k(graph)
-      //      }
-      //      case AskLDPC(_,query, bindings, k) => {
-      //        val b = PlantainUtil.executeAsk(tripleSource, query, bindings)
-      //        k(b)
-      //      }
+      case ConstructLDPR(uri, query, bindings, k) => {
+        val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
+        val result = fetchGraph(uri)
+        result.onComplete{ tryRes =>
+          tryRes match {
+            case Success(ldpr) => {
+              val solutions = sparqlGraph(ldpr.graph).executeConstruct(query, bindings)
+              self tell  (Scrpt(k(solutions)),sender)
+            }
+            case Failure(e) => sender ! akka.actor.Status.Failure({
+              e match {
+                case e: BananaException => e
+                case other: Throwable => WrappedException("failure fetching resource", other.getCause)
+              }
+            })
+          }
+        }
+      }
+      case AskLDPR(uri, query, bindings, k) => {
+        val sender = context.sender  //very important. Calling in function onComplete will return deadLetter
+        val result = fetchGraph(uri)
+        result.onComplete{ tryRes =>
+          tryRes match {
+            case Success(ldpr) => {
+              val solutions = sparqlGraph(ldpr.graph).executeAsk(query, bindings)
+              self tell  (Scrpt(k(solutions)),sender)
+            }
+            case Failure(e) => sender ! akka.actor.Status.Failure({
+              e match {
+                case e: BananaException => e
+                case other: Throwable => WrappedException("failure fetching resource", other.getCause)
+              }
+            })
+          }
+        }
+
+      }
+      case SelectLDPC(_,query, bindings, k) => {
+        context.sender ! akka.actor.Status.Failure(new NotImplementedError("SelectLDPC on remote Container not standardised"))
+//        val solutions = PlantainUtil.executeSelect(tripleSource, query, bindings)
+//        k(solutions)
+      }
+      case ConstructLDPC(_,query, bindings, k) => {
+        context.sender ! akka.actor.Status.Failure(new NotImplementedError("ConstructLDPC on remote Container not standardised"))
+//        val graph = PlantainUtil.executeConstruct(tripleSource, query, bindings)
+//        k(graph)
+      }
+      case AskLDPC(_,query, bindings, k) => {
+        context.sender ! akka.actor.Status.Failure(new NotImplementedError("AskLDPC on remote Container not standardised"))
+        //        val b = PlantainUtil.executeAsk(tripleSource, query, bindings)
+        //        k(b)
+      }
     }
   }
 
