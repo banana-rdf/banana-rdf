@@ -277,6 +277,7 @@ class PlantainLDPRActor(baseUri: Plantain#URI,path: Path)
                        ) extends RActor {
   var ext = ".ttl"
   val acl = ".acl"
+  import syntax._
 
   val mimeExt = WellKnownMimeExtensions
 
@@ -393,7 +394,7 @@ class PlantainLDPRActor(baseUri: Plantain#URI,path: Path)
     implicit val codec = Codec.UTF8
     val (file,iri) = path(name)
     file.createNewFile()
-    writer.write(graph,xResource.fromOutputStream(new FileOutputStream(file)),"") match {
+    writer.write(graphW[Plantain](graph).relativize(baseUri),xResource.fromOutputStream(new FileOutputStream(file)),"") match {
       case scala.util.Failure(t) => throw new StoreProblem(t)
       case x => x
     }

@@ -132,7 +132,7 @@ object LDPCommand {
   def getLDPR[Rdf <: RDF, A](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Script[Rdf, Rdf#Graph] =
     getResource(uri).map{res =>
       res match {
-        case ldpr: LDPR[Rdf] =>  ldpr.relativeGraph
+        case ldpr: LDPR[Rdf] =>  ldpr.graph
         case obj => throw OperationNotSupported("cannot do this operation on a "+obj.getClass)
       }
     }
