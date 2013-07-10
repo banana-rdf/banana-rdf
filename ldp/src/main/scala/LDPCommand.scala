@@ -26,7 +26,9 @@ case class Admin(onBehalfOf: Subject, id: List[Principal]=List())
 
 
 
-
+//todo: all these Create Methods should probably return something richer, like a Graph containing
+//all the metadata. It is very usual that one needs info on the acl for example. Does one also
+//in HTTP need info on etags? ... ( A question to consider)
 case class CreateLDPR[Rdf <: RDF, A](container: Rdf#URI,
                                      slug: Option[String],
                                      graph: Rdf#Graph,
@@ -132,7 +134,7 @@ object LDPCommand {
   def getLDPR[Rdf <: RDF, A](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Script[Rdf, Rdf#Graph] =
     getResource(uri).map{res =>
       res match {
-        case ldpr: LDPR[Rdf] =>  ldpr.relativeGraph
+        case ldpr: LDPR[Rdf] =>  ldpr.graph
         case obj => throw OperationNotSupported("cannot do this operation on a "+obj.getClass)
       }
     }

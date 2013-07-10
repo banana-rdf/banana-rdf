@@ -133,7 +133,7 @@ trait LDPR[Rdf <: RDF] extends NamedResource[Rdf] with LinkedDataResource[Rdf]  
   def graph: Rdf#Graph // all uris are relative to location
 
   /* the graph such that all URIs are relative to $location */
-  def relativeGraph(implicit ops: RDFOps[Rdf]): Rdf#Graph  = graph.resolveAgainst(location)
+  def relativeGraph(implicit ops: RDFOps[Rdf]): Rdf#Graph  = graph.relativize(location)
 
   def resource: PointedGraph[Rdf] = PointedGraph(location,graph)
 

@@ -224,6 +224,7 @@ class LDPPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("ldp", "http:/
   val membershipPredicate = apply("membershipPredicate")
   val membershipSubject = apply("membershipSubject")
   val nextPage = apply("nextPage")
+  val created = apply("created")
   val pageOf = apply("pageOf")
 }
 
