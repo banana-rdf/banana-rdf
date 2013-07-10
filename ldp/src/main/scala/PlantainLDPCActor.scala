@@ -113,36 +113,32 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
 
     cmd match {
       case CreateLDPR(_, slugOpt, graph, k) => {
-        val (uri, path) = mkFile(slugOpt,ext)
+        val (uri, path) = mkFile(slugOpt, ext)
 
-        val (actor,iri) = try {
-          val actor = context.actorOf(Props(new PlantainLDPRActor(uri,path)),path.getFileName.toString)
-          (actor,uri)
+        val (actor, iri) = try {
+          val actor = context.actorOf(Props(new PlantainLDPRActor(uri, path)), path.getFileName.toString)
+          (actor, uri)
         } catch {
           case e: InvalidActorNameException => {
-            val (uri2,path2) = mkFile(slugOpt,ext)
+            val (uri2, path2) = mkFile(slugOpt, ext)
             Files.deleteIfExists(Files.readSymbolicLink(path))
             Files.delete(path)
-            val actor = context.actorOf(Props(new PlantainLDPRActor(uri2,path2)),path2.getFileName.toString)
-            (actor,uri2)
+            val actor = context.actorOf(Props(new PlantainLDPRActor(uri2, path2)), path2.getFileName.toString)
+            (actor, uri2)
           }
         }
-          //todo: this graph->iter is very wasteful
+        //todo: this graph->iter is very wasteful
 
         val creationRel = Triple(baseUri, ldp.created, iri)
-        //          val scrpt =  if (!isAclPath(path.toString)) { //todo: probably better to have actor deal with its own acls
-//          val aclp = aclPath(path.getFileName.toString) //todo have aclPath work with Paths?
-//            List(LDPCommand.createLDPR[Plantain](baseUri, Some(aclp), Graph.empty))
-//          } else Nil
-          val linkedGraph = graph + creationRel
-          //todo: should these be in the header?
-          val scrpt2 = LDPCommand.updateLDPR[Plantain](iri, add = graphToIterable(linkedGraph))
-          val sl =  scrpt2 :: List(k(iri))
-          val s = sl.tail.foldLeft(sl.head){case (h,n)=> h.flatMap(_=>n)}
-          val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
-          val indx = ldpr.graph +  creationRel
-          setResource(fileName,indx)
-          actor forward Scrpt(s)
+
+        val linkedGraph = graph + creationRel
+        //todo: should these be in the header?
+        val scrpt = LDPCommand.updateLDPR[Plantain](iri, add = graphToIterable(linkedGraph)).flatMap(_ => k(iri))
+        actor forward Scrpt(scrpt)
+
+        val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
+        val indx = ldpr.graph + creationRel
+        setResource(fileName, indx)
       }
       case CreateBinary(_, slugOpt, mime: MimeType, k) => {
         mimeExt.extension(mime).map { ext =>
@@ -159,6 +155,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
               (actor, uri2)
             }
           }
+          //todo: how does one set metadata for binaries, such as Link Relations for the header?
           val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
           val indx = ldpr.graph +  Triple(baseUri,ldp.created,iri)
           setResource(fileName,indx)
@@ -175,27 +172,34 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
         val p = root.resolve(pathSegment)
         val dirUri = uriW[Plantain](uri) / ""
         val ldpc = context.actorOf(Props(new PlantainLDPCActor(dirUri, p)), pathSegment.getFileName.toString)
-        val scrpt = if (graph != Graph.empty)
-          LDPCommand.updateLDPR[Plantain](uri, add = graphToIterable(graph)).flatMap(_ => k(dirUri))
-        else k(dirUri)
-        val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
-        val indx = ldpr.graph +  Triple(baseUri,ldp.created,uri)
-        setResource(fileName,indx)
+        val creationRel = Triple(baseUri, ldp.created, dirUri)
+        val linkedGraph = graph + creationRel
+        //todo: should these be in the header?
+        val scrpt = LDPCommand.updateLDPR[Plantain](dirUri, add = graphToIterable(linkedGraph)).flatMap(_ => k(dirUri))
         ldpc forward Scrpt(scrpt)
+        val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
+        val indx = ldpr.graph +  Triple(baseUri,ldp.created,dirUri)
+        setResource(fileName,indx)
       }
       case DeleteResource(uri, a) => {
 //        val name = uriW[Plantain](uri).lastPathSegment
         log.info(s"DeleteResource($uri,$a) Resource is a Container")
-        //the children may not yet have been stopped, which is why the directory needs to be looked at
-        if (context.children.size == 0 || !Files.newDirectoryStream(root).iterator().hasNext) {
+        if (context.children.size == 0 ) { //delete all special directory files
+          Files.walkFileTree(root,new SimpleFileVisitor[Path]() {
+            override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+              Files.delete(file)
+              super.visitFile(file, attrs)
+            }
+          })
+          Files.delete(root)
           context.stop(self)
         } else {
           throw PreconditionFailed("Can't delete a container that has remaining members")
         }
-//        val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
-//        val indx = ldpr.graph -  Triple(baseUri,ldp.created,uri)
-//        setResource(fileName,indx)
-        rwwActor forward Scrpt(a) //todo: why no function here?
+        val parent = uriW[Plantain](baseUri).resolve("..")
+        val scrpt = LDPCommand.updateLDPR[Plantain](parent,remove=Iterable(Triple(parent,ldp.created,baseUri)))
+        context.stop(self)
+        rwwActor forward Scrpt(scrpt.flatMap(_=>a)) //todo: why no function here?
       }
       case _ => super.runLocalCmd(cmd)
 //      case SelectLDPC(_,query, bindings, k) => {

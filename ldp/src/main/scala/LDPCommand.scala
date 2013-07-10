@@ -26,7 +26,9 @@ case class Admin(onBehalfOf: Subject, id: List[Principal]=List())
 
 
 
-
+//todo: all these Create Methods should probably return something richer, like a Graph containing
+//all the metadata. It is very usual that one needs info on the acl for example. Does one also
+//in HTTP need info on etags? ... ( A question to consider)
 case class CreateLDPR[Rdf <: RDF, A](container: Rdf#URI,
                                      slug: Option[String],
                                      graph: Rdf#Graph,
