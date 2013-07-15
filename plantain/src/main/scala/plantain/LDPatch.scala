@@ -1,8 +1,6 @@
 package org.w3.banana.plantain
 
 import org.w3.banana.RDF
-import scala.concurrent.{ExecutionContext, Future}
-import org.w3.banana.plantain.{PlantainUtil, Plantain}
 import scala.util.Try
 
 

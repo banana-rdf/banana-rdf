@@ -1,7 +1,5 @@
 package org.w3.banana
 
-import org.w3.banana.TextHtmlMime
-
 object MimeType {
 
   /**

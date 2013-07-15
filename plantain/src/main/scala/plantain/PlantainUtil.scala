@@ -1,18 +1,15 @@
 package org.w3.banana.plantain
 
 import org.w3.banana.plantain.model._
-import org.openrdf.query.{Binding, QueryEvaluationException, BindingSet, TupleQueryResult}
+import org.openrdf.query.{Binding, BindingSet}
 import org.openrdf.query.impl.{EmptyBindingSet, MapBindingSet}
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.model.{URI => SesameURI, Graph => _, _}
-import org.openrdf.model.impl.{ValueFactoryImpl, ContextStatementImpl}
+import org.openrdf.model.impl.ContextStatementImpl
 import org.openrdf.query.algebra.evaluation.TripleSource
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl
 import org.openrdf.query.algebra._
-import scala.concurrent.{ExecutionContext, Future}
-import org.w3.banana.plantain.BoundSolutions
 import org.openrdf.query.algebra.helpers.StatementPatternCollector
-import org.w3.banana.plantain.BoundSolutions
 import scala.util.Try
 
 object PlantainUtil {

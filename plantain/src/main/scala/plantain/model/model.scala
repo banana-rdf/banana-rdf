@@ -10,12 +10,7 @@ import org.openrdf.model.impl._
 import org.openrdf.query.algebra.evaluation.TripleSource
 import info.aduna.iteration.CloseableIteration
 import org.openrdf.query.QueryEvaluationException
-import org.w3.banana.plantain.model.PlainNode
-import org.w3.banana.plantain.model.BNode
-import org.openrdf.model.BNode
-import org.w3.banana.plantain.model.LangLiteral
 import scala.Some
-import org.w3.banana.plantain.model.TypedLiteral
 
 object Graph {
 

@@ -508,6 +508,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
           case _ => throw RequestNotAcceptable(s"$uri does not contain a GRAPH - SELECT is not possible")
         }
       }
+      case cmd => throw RequestNotAcceptable(s"Cannot run ${cmd.getClass} on an LDPR that is not an LDPC ")
     }
   }
 

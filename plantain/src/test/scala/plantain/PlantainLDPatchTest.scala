@@ -2,8 +2,6 @@ package org.w3.banana.plantain
 
 import org.scalatest.{BeforeAndAfterAll, WordSpec}
 import org.scalatest.matchers.MustMatchers
-import org.w3.banana.{RDFOps, SparqlOps, RDF}
-import org.w3.banana.plantain.LDPatch
 import org.w3.banana._
 import scala.util.Try
 
@@ -17,7 +15,6 @@ abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf,Try])
   import ops._
   import syntax._
   import diesel._
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACLPrefix[Rdf]
