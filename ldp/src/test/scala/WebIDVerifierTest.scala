@@ -9,16 +9,16 @@ import java.util.concurrent.TimeUnit
 import org.scalatest.matchers.MustMatchers
 import org.scalatest.{BeforeAndAfterAll, WordSpec}
 import org.w3.banana._
-import org.w3.banana.plantain.Plantain
-import org.w3.banana.plantain.model.URI
 import scala.concurrent.{ExecutionContext, Future}
 import org.w3.banana.ldp.LDPCommand._
 import scala.Some
 import sun.security.x509.X500Name
 import java.security.Principal
 
+import org.w3.banana.plantain.Plantain
 
 object PlantainWebIDVerifierTest {
+  import org.w3.banana.plantain.model.URI
   val dir = Files.createTempDirectory("plantain" )
   val baseUri = URI.fromString("http://example.com/foo/")
   val rootLDPCActorProps = Props(new PlantainLDPCActor(baseUri, dir))
@@ -79,7 +79,7 @@ abstract class WebIDVerifierTest[Rdf<:RDF](baseUri: Rdf#URI, dir: Path, rootLDPC
     } yield {
       ldpc must be(bertailsContainer)
       cardMeta.acl.get must be(bertailsCardAcl)
-      assert(rGraph isIsomorphicWith bertailsCardGraph.resolveAgainst(bertailsCard))
+      assert(rGraph isIsomorphicWith (bertailsCardGraph union containsRel).resolveAgainst(bertailsCard))
       assert(aclGraph isIsomorphicWith bertailsCardAclGraph.resolveAgainst(bertailsCardAcl))
       assert(containerAclGraph isIsomorphicWith bertailsContainerAclGraph.resolveAgainst(bertailsContainerAcl))
     })

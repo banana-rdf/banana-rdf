@@ -72,7 +72,7 @@ abstract class LDRTestSuite[Rdf<:RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActor
       } yield {
         ldpc must be(bertailsContainer)
         cardMeta.acl.get must be(bertailsCardAcl)
-        assert(rGraph isIsomorphicWith bertailsCardGraph.resolveAgainst(bertailsCard))
+        assert(rGraph isIsomorphicWith (bertailsCardGraph union containsRel).resolveAgainst(bertailsCard))
         assert(aclGraph isIsomorphicWith bertailsCardAclGraph.resolveAgainst(bertailsCardAcl))
         assert(containerAclGraph isIsomorphicWith bertailsContainerAclGraph.resolveAgainst(bertailsContainerAcl))
       })
@@ -111,7 +111,7 @@ abstract class LDRTestSuite[Rdf<:RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActor
     assert(pointers.contains(bertails))
     assert(pointers.contains(timbl))
 
-    assert(answersMap(bertails).graph isIsomorphicWith(bertailsCardGraph.resolveAgainst(bertailsCard)))
+    assert(answersMap(bertails).graph isIsomorphicWith((bertailsCardGraph union containsRel).resolveAgainst(bertailsCard)))
     assert(answersMap(henry).graph isIsomorphicWith(henryGraph.resolveAgainst(henryCard)))
     assert(answersMap(timbl).graph isIsomorphicWith(timblGraph.resolveAgainst(timblCard)))
 
@@ -180,7 +180,7 @@ abstract class LDRTestSuite[Rdf<:RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActor
     assert(pointers.contains(henry))
     assert(pointers.contains(bertails))
 
-    assert(answersMap(bertails).graph isIsomorphicWith(bertailsCardGraph.resolveAgainst(bertailsCard)))
+    assert(answersMap(bertails).graph isIsomorphicWith((bertailsCardGraph union containsRel).resolveAgainst(bertailsCard)))
     assert(answersMap(henry).graph isIsomorphicWith(henryGraph.resolveAgainst(henryCard)))
 
   }

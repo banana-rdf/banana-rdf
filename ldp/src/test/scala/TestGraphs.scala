@@ -49,6 +49,8 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
   val henryKeys: RsaKeyPair = { keyGen.initialize(768); RsaKeyPair(keyGen.genKeyPair()) }
   val bertailsKeys: RsaKeyPair = { keyGen.initialize(512); RsaKeyPair(keyGen.genKeyPair()) }
 
+  val containsRel = (URI(".") -- ldp.created ->- URI("")).graph // added by LDP to members
+
   val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
   val timblCard = URI("http://www.w3.org/People/Berners-Lee/card")
   val timblGraph: Rdf#Graph = (

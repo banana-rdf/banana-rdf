@@ -42,9 +42,12 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
 
   val foaf = FOAFPrefix[Rdf]
   val wac = WebACLPrefix[Rdf]
+  val ldp = LDPPrefix[Rdf]
 
   val betehess = URI("http://example.com/foo/bertails/card#me")
   val betehessCard = URI("http://example.com/foo/bertails/card")
+
+  val containsRel = (URI(".") -- ldp.created ->- URI("")).graph // added by LDP to members
 
   val graph: Rdf#Graph = (
     URI("#me")
@@ -104,7 +107,7 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
       rGraph <- rww.execute(getLDPR(ldprUri))
     } yield {
       rUri must be(ldprUri)
-      assert(rGraph.relativize(ldprUri) isIsomorphicWith graph)
+      assert(rGraph isIsomorphicWith (graph union containsRel).resolveAgainst(ldprUri))
     }
     script.getOrFail()
 
@@ -117,7 +120,7 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
         rGraph  <- getLDPR(ruri)
       } yield {
         ruri must be(ldprUri2)
-        assert(rGraph.relativize(ruri) isIsomorphicWith graph)
+        assert(rGraph isIsomorphicWith (graph union containsRel).resolveAgainst(ruri))
       }
     }
     script2.getOrFail()
@@ -144,7 +147,7 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
           rGraph <- getLDPR(ldprUri)
         } yield {
           rUri must be(ldprUri)
-          assert(rGraph.relativize(rUri) isIsomorphicWith graph)
+          assert(rGraph isIsomorphicWith (graph union containsRel).resolveAgainst(rUri))
         }
       }
       script.getOrFail()
@@ -160,7 +163,7 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
         rGraph <- getLDPR(rUri)
       } yield {
         rUri  must be(content)
-        assert(rGraph.relativize(rUri) isIsomorphicWith graph)
+        assert(rGraph isIsomorphicWith (graph union containsRel).resolveAgainst(rUri))
       }
     }
     script.getOrFail()
@@ -219,7 +222,7 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
         cardRes.acl.get must be(ldprMeta)
         assert(acl.resolveAgainst(ldprMeta) isIsomorphicWith graphCardACL)
         cardRes match {
-          case card: LDPR[Rdf] => assert( card.graph isIsomorphicWith graph.resolveAgainst(betehessCard))
+          case card: LDPR[Rdf] => assert( card.graph isIsomorphicWith (graph union containsRel).resolveAgainst(betehessCard))
           case _ => throw new Exception("received the wrong type of resource")
         }
       }

@@ -146,7 +146,7 @@ abstract class WebTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       } yield {
         ldpc must be(bertailsContainer)
         cardMeta.acl.get must be(bertailsCardAcl)
-        assert(rGraph isIsomorphicWith bertailsCardGraph.resolveAgainst(bertailsCard))
+        assert(rGraph isIsomorphicWith (bertailsCardGraph union containsRel).resolveAgainst(bertailsCard))
         assert(aclGraph isIsomorphicWith bertailsCardAclGraph.resolveAgainst(bertailsCardAcl))
         assert(containerAclGraph isIsomorphicWith bertailsContainerAclGraph.resolveAgainst(bertailsContainerAcl))
       })
