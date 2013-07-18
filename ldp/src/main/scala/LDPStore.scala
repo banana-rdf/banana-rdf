@@ -61,19 +61,42 @@ class LocalSetup {
   }
 }
 
-// A resource on the server ( Resource is already taken. )
-// note:
-// There can be named and unamed resources, as when a POST creates a
-// resource that is not given a name... so this should probably extend a more abstract resource
+/**
+ * A resource on the server ( Resource is already taken. )
+ * TODO: find a better name
+ *  • State?
+ *     + The resource can have different states, but it can also show different
+ *       representations for different users per state
+ *
+ *  • Representation?
+ *     + A resource returns representations. This helps explain the importance of the URL.
+ *       ( A representation is very closely tied to a resource. )
+ *     +
+ *     ? I (Henry) have tended to think of representations as binary objects, not as the
+ *       interpreted graph
+ *  • Message?
+ *     + A web server returns a message to a request, the message has an envelope
+ *       which contains the metadata.
+ *     ? A message is less closely tied to the origin of the resource.
+ *     ? the POST with the body could also be considered a message, and so could the reply
+ *
+ * There can be named and unnamed resources, as when a POST creates a
+ * resource that is not given a name... so this should probably extend a more abstract resource
+ */
 trait NamedResource[Rdf<:RDF] extends Meta[Rdf] {
    def location: Rdf#URI
 }
 
 /**
- * Metadata about a resource
+ *   Metadata about the representation of a resource, or about the state of a resource ( not sure which yet )
  *   This may be thought to be so generic that a graph representation would do,
  *   but it is very likely to be very limited set of properties and so to be
  *   better done in form methods for efficiency reasons.
+ *   todo: should the HTTP response code be part of the meta data?
+ *     That does not seem correct: The error code can only be understood in the context of the request made.
+ *     The idea of MetaData is that it should be understandable without ( but this may be a flawed assumption ),
+ *     moving us more towards a speech act view of resources
+ *
  */
 trait Meta[Rdf <: RDF] {
   def location: Rdf#URI
@@ -86,7 +109,6 @@ trait Meta[Rdf <: RDF] {
   def updated: Option[Date]
   /*
  * A resource should ideally be versioned, so any change would get a version URI
- * ( but this is probably something that should be on a MetaData trait
  **/
   def version: Option[Rdf#URI] = None
 
@@ -120,8 +142,11 @@ trait BinaryResource[Rdf<:RDF] extends NamedResource[Rdf]  {
   def reader(chunkSize: Int): Enumerator[Array[Byte]]
 }
 
-/*
- * And LDPC is currently defined in the LDP ontology as a subclass of an LDPR.
+/**
+ * todo: naming
+ *  - LDPR here could also mean LDP Representation, or LDPR State.
+ *
+ *  LDPR And LDPC is currently defined in the LDP ontology as a subclass of an LDPR.
  * This LDPR class is more what we are thinking as the non binary non LDPCs...
  * - an LDPS must subscribe to the death of its LDPC
  */

@@ -11,7 +11,7 @@ trait LinkedDataResource[Rdf <: RDF] {
   /** the location on the Web where `resource` can be found */
   def location: Rdf#URI
 
-  /** the [[PointedResource]] whose `graph` was found at `location`, and `pointer` exists in it */
+  /** the [[org.w3.banana.PointedGraph]] whose `graph` was found at `location`, and `pointer` exists in it */
   def resource: PointedGraph[Rdf]
 }
 
