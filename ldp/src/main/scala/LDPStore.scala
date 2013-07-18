@@ -138,7 +138,7 @@ trait BinaryResource[Rdf<:RDF] extends NamedResource[Rdf]  {
   def mime: MimeType
 
   // creates a new BinaryResource, with new time stamp, etc...
-  def write:  Iteratee[Array[Byte], BinaryResource[Rdf]]
+  def write(implicit ec: ExecutionContext):  Iteratee[Array[Byte], BinaryResource[Rdf]]
   def reader(chunkSize: Int): Enumerator[Array[Byte]]
 }
 
@@ -197,7 +197,7 @@ case class LocalBinaryR[Rdf<:RDF](path: Path, location: Rdf#URI)
   // creates a new BinaryResource, with new time stamp, etc...
   //here I can just write to the file, as that should be a very quick operation, which even if it blocks,
   //should be extreemly fast server side.  Iteratee
-  def write: Iteratee[Array[Byte], LocalBinaryR[Rdf] ] = {
+  def write(implicit ec: ExecutionContext): Iteratee[Array[Byte], LocalBinaryR[Rdf] ] = {
     val tmpfile = Files.createTempFile(path.getParent,path.getFileName.toString,"tmp")
     val out = Files.newOutputStream(tmpfile, StandardOpenOption.WRITE)
     val i = Iteratee.fold[Array[Byte],OutputStream](out){ (out, bytes ) =>

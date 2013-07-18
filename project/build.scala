@@ -109,8 +109,8 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "play" %% "play-iteratees" % "2.1.1"
-  val playDeps = "play" %% "play" % "2.1.1"
+  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.2-SNAPSHOT"
+  val playDeps = "com.typesafe.play" %% "play" % "2.2-SNAPSHOT"
 
   val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 

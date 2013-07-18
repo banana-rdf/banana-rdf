@@ -14,24 +14,38 @@
    limitations under the License.
 */
 
-//taken from play 2.1. appended org.w3 original package to avoid
-//name clashes when using play
+//taken from Play 2.2 because WS is not published in its own library
+//appended org.w3 original package to avoid name clashes when using play
 
 package org.w3.play.api.libs.ws
 
-import collection.immutable.TreeMap
-import com.ning.http.client.Realm.AuthScheme
+import java.io.File
+import java.util.concurrent.atomic.AtomicReference
+import scala.concurrent._
+import play.api.libs.iteratee._
+import play.api.libs.iteratee.Input._
+import scala.Some
+import org.w3.play.api.libs.ws.Response
+import com.ning.http.client.Response
+import scala.Tuple3
+import play.api.libs.iteratee.Input.El
+import org.w3.play.api.libs.ws.ResponseHeaders
+
+//import play.api.http.{ContentTypeOf, Writeable}
 import com.ning.http.client.{
-      AsyncHttpClient,
-      AsyncHttpClientConfig,
-      RequestBuilderBase,
-      FluentCaseInsensitiveStringsMap,
-      HttpResponseBodyPart,
-      HttpResponseHeaders,
-      HttpResponseStatus,
-      Response => AHCResponse,
-      PerRequestConfig
+AsyncHttpClient,
+AsyncHttpClientConfig,
+RequestBuilderBase,
+FluentCaseInsensitiveStringsMap,
+HttpResponseBodyPart,
+HttpResponseHeaders,
+HttpResponseStatus,
+Response => AHCResponse,
+PerRequestConfig
 }
+import collection.immutable.TreeMap
+//import play.core.utils.CaseInsensitiveOrdered
+import com.ning.http.client.Realm.{RealmBuilder, AuthScheme}
 import com.ning.http.util.AsyncHttpProviderUtils
 import java.io.File
 import org.w3.banana.{Writer, Syntax}
@@ -40,7 +54,9 @@ import play.api.libs.iteratee._
 import scala.Some
 import scala.Tuple3
 import scala.collection.JavaConverters._
-import scala.concurrent.{Future, Promise}
+
+//import play.core.Execution.Implicits.internalContext
+//import play.api.libs.json.{Json, JsValue}
 
 /**
  * Asynchronous API to to query web services, as an http client.
@@ -58,38 +74,31 @@ import scala.concurrent.{Future, Promise}
 object WS extends WSTrait {
 
   import com.ning.http.client.Realm.{ AuthScheme, RealmBuilder }
+  import javax.net.ssl.SSLContext
+  implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
-  private var clientHolder: Option[AsyncHttpClient] = None
+  private val clientHolder: AtomicReference[Option[AsyncHttpClient]] = new AtomicReference(None)
 
   /**
    * resets the underlying AsyncHttpClient
    */
-  def resetClient(): Unit = {
-    clientHolder.map { clientRef =>
+  private[play] def resetClient(): Unit = {
+    val oldClient = clientHolder.getAndSet(None)
+    oldClient.map { clientRef =>
       clientRef.close()
     }
-    clientHolder = None
   }
 
   /**
    * retrieves or creates underlying HTTP client.
    */
-  def client : AsyncHttpClient =
-    clientHolder.getOrElse {
+  def client = {
+    clientHolder.get.getOrElse {
       val innerClient = new AsyncHttpClient(asyncBuilder.build())
-      clientHolder = Some(innerClient)
-      innerClient
+      clientHolder.compareAndSet(None, Some(innerClient))
+      clientHolder.get.get
     }
-
-  def ningHeadersToMap(headers: java.util.Map[String, java.util.Collection[String]]): Map[String,Seq[String]] =
-    mapAsScalaMapConverter(headers).asScala.map(e => e._1 -> e._2.asScala.toSeq).toMap
-
-  def ningHeadersToMap(headers: FluentCaseInsensitiveStringsMap):  Map[String,Seq[String]] = {
-    val res = mapAsScalaMapConverter(headers).asScala.map(e => e._1 -> e._2.asScala.toSeq).toMap
-    //todo: wrap the case insensitive ning map instead of creating a new one (unless perhaps immutabilty is important)
-    TreeMap(res.toSeq: _*)(CaseInsensitiveOrdered)
   }
-
 
   /**
    * The  builder AsncBuilder for default play app
@@ -109,6 +118,15 @@ object WS extends WSTrait {
     asyncHttpConfig
   }
 
+  def ningHeadersToMap(headers: java.util.Map[String, java.util.Collection[String]]) =
+    mapAsScalaMapConverter(headers).asScala.map(e => e._1 -> e._2.asScala.toSeq).toMap
+
+  def ningHeadersToMap(headers: FluentCaseInsensitiveStringsMap) = {
+    val res = mapAsScalaMapConverter(headers).asScala.map(e => e._1 -> e._2.asScala.toSeq).toMap
+    //todo: wrap the case insensitive ning map instead of creating a new one (unless perhaps immutabilty is important)
+    TreeMap(res.toSeq: _*)(CaseInsensitiveOrdered)
+  }
+
   /**
    * A WS Request.
    */
@@ -120,7 +138,7 @@ object WS extends WSTrait {
 
     def getStringData = body.getOrElse("")
     protected var body: Option[String] = None
-    override def setBody(s: String) = { this.body = Some(s); super.setBody(s)}
+    override def setBody(s: String) = { this.body = Some(s); super.setBody(s) }
 
     protected var calculator: Option[SignatureCalculator] = _calc
 
@@ -171,6 +189,7 @@ object WS extends WSTrait {
      * The URL
      */
     def url: String = _url
+
 
     private[libs] def execute: Future[Response] = {
       import com.ning.http.client.AsyncCompletionHandler
@@ -259,7 +278,6 @@ object WS extends WSTrait {
       var iteratee: Iteratee[Array[Byte], A] = null
 
       WS.client.executeRequest(this.build(), new AsyncHandler[Unit]() {
-
         import com.ning.http.client.AsyncHandler.STATE
 
         override def onStatusReceived(status: HttpResponseStatus) = {
@@ -298,7 +316,7 @@ object WS extends WSTrait {
           } else {
             iteratee = null
             // Must close underlying connection, otherwise async http client will drain the stream
-            bodyPart.closeUnderlyingConnection()
+            bodyPart.markUnderlyingConnectionAsClosed()
             STATE.ABORT
           }
         }
@@ -323,13 +341,13 @@ object WS extends WSTrait {
  * Eg: if one wants to make requests to different servers with different client certificates...
  * @param client
  */
-case class WSx(client: AsyncHttpClient) extends WSTrait
+case class WSx(client: AsyncHttpClient)(implicit val ec: ExecutionContext) extends WSTrait
 
 
 trait  WSTrait {
 
   implicit def client: AsyncHttpClient
-
+  implicit def ec: ExecutionContext
 
   /**
    * Prepare a new request. You can then construct it by chaining calls.
@@ -498,6 +516,7 @@ trait  WSTrait {
 
     private[play] def prepare(method: String, body: File) = {
       import com.ning.http.client.generators.FileBodyGenerator
+      import java.nio.ByteBuffer
 
       val bodyGenerator = new FileBodyGenerator(body);
 
@@ -534,7 +553,6 @@ trait  WSTrait {
       }
       request
     }
-
   }
 }
 
