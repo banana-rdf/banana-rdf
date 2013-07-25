@@ -41,6 +41,18 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf
 
   }
 
+  "'/-' method must traverse the graph backward without duplicates" in {
+    val g = (
+      URI("http://example.org/1")
+      -- foaf.knows ->- URI("http://example.org/2")
+      -- foaf.knows ->- URI("http://example.org/3")
+    )
+
+    val known = PointedGraph[Rdf](URI("http://example.org/2"), g.graph) /- foaf.knows
+
+    known.map(_.pointer).toList must (have size 1 and contain (URI("http://example.org/1")))
+  }
+
   "we must be able to project nodes to Scala types" in {
 
     (betehess / foaf.age).as[Int] must be(Success(29))
