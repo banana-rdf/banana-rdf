@@ -124,7 +124,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) extends Sesa
           }
           o <- objectt match {
             case ANY => os
-            case PlainNode(node) => if (os contains node) os else Iterable.empty
+            case PlainNode(node) => os filter { _ == node }
           }
         } yield Triple(s, p, o)
       }
