@@ -19,17 +19,8 @@
 
 package org.w3.play.api.libs.ws
 
-import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 import scala.concurrent._
-import play.api.libs.iteratee._
-import play.api.libs.iteratee.Input._
-import scala.Some
-import org.w3.play.api.libs.ws.Response
-import com.ning.http.client.Response
-import scala.Tuple3
-import play.api.libs.iteratee.Input.El
-import org.w3.play.api.libs.ws.ResponseHeaders
 
 //import play.api.http.{ContentTypeOf, Writeable}
 import com.ning.http.client.{
@@ -45,7 +36,7 @@ PerRequestConfig
 }
 import collection.immutable.TreeMap
 //import play.core.utils.CaseInsensitiveOrdered
-import com.ning.http.client.Realm.{RealmBuilder, AuthScheme}
+import com.ning.http.client.Realm.AuthScheme
 import com.ning.http.util.AsyncHttpProviderUtils
 import java.io.File
 import org.w3.banana.{Writer, Syntax}
@@ -74,7 +65,6 @@ import scala.collection.JavaConverters._
 object WS extends WSTrait {
 
   import com.ning.http.client.Realm.{ AuthScheme, RealmBuilder }
-  import javax.net.ssl.SSLContext
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
   private val clientHolder: AtomicReference[Option[AsyncHttpClient]] = new AtomicReference(None)
@@ -516,7 +506,6 @@ trait  WSTrait {
 
     private[play] def prepare(method: String, body: File) = {
       import com.ning.http.client.generators.FileBodyGenerator
-      import java.nio.ByteBuffer
 
       val bodyGenerator = new FileBodyGenerator(body);
 

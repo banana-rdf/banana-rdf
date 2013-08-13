@@ -30,7 +30,8 @@ import java.nio.file.DirectoryStream.Filter
  */
 class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
                                  (implicit ops: RDFOps[Plantain],
-                                     sparqlGraph: SparqlGraph[Plantain]) extends PlantainLDPRActor(baseUri,root) {
+                                     sparqlGraph: SparqlGraph[Plantain],
+                                     adviceSelector: AdviceSelector[Plantain]=new EmptyAdviceSelector) extends PlantainLDPRActor(baseUri,root) {
   import org.w3.banana.syntax._
   import ops._
 
@@ -277,7 +278,8 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
                        (implicit ops: RDFOps[Plantain],
                                  sparqlGraph: SparqlGraph[Plantain],
                                  reader: RDFReader[Plantain,Turtle],
-                                 writer: RDFWriter[Plantain,Turtle]
+                                 writer: RDFWriter[Plantain,Turtle],
+                                 adviceSelector: AdviceSelector[Plantain]= new EmptyAdviceSelector
                        ) extends RActor {
   var ext = ".ttl"
   val acl = ".acl"
@@ -522,8 +524,8 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
   final def run[A](sender: ActorRef, script: LDPCommand.Script[Plantain,A]) {
     script.resume match {
       case -\/(cmd) => {
-        if(cmd.uri == baseUri) { //todo: improve for issues of extensions ( eg. .n3, ... )
-          runLocalCmd(cmd)
+        if(cmd.uri == baseUri) {
+          adviceCmd(cmd)
         }
         else {
           log.info(s"sending to $rwwActor")
@@ -538,6 +540,14 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
   }
 
 
+  def adviceCmd[A](cmd: LDPCommand[Plantain, LDPCommand.Script[Plantain,A]]) {
+    //todo: improve for issues of extensions ( eg. .n3, ... )
+    val advices = adviceSelector(getResource(fileName))
+    advices foreach ( _.pre(cmd) map { throw _ } )
+    runLocalCmd(cmd)
+    advices foreach (_.post(cmd))
+  }
+
   lazy val rwwActor= context.actorFor("/user/rww")
 
   def receive = returnErrors {
@@ -545,7 +555,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
       run(sender, s.script)
     }
     case cmd: Cmd[Plantain,_] => {
-      runLocalCmd(cmd.command)
+      adviceCmd(cmd.command)
     }
   }
 }
