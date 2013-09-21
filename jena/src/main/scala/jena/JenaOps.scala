@@ -46,7 +46,7 @@ object JenaOperations extends RDFOps[Jena] {
 
   // URI
 
-  def makeUri(iriStr: String): Jena#URI = { JenaNode.createURI(iriStr).asInstanceOf[Node_URI] }
+  def makeUri(iriStr: String): Jena#URI = { NodeFactory.createURI(iriStr).asInstanceOf[Node_URI] }
 
   def fromUri(node: Jena#URI): String =
     if (node.isURI)
@@ -56,11 +56,11 @@ object JenaOperations extends RDFOps[Jena] {
 
   // bnode
 
-  def makeBNode() = JenaNode.createAnon().asInstanceOf[Node_Blank]
+  def makeBNode() = NodeFactory.createAnon().asInstanceOf[Node_Blank]
 
   def makeBNodeLabel(label: String): Jena#BNode = {
     val id = AnonId.create(label)
-    JenaNode.createAnon(id).asInstanceOf[Node_Blank]
+    NodeFactory.createAnon(id).asInstanceOf[Node_Blank]
   }
 
   def fromBNode(bn: Jena#BNode): String =
@@ -91,7 +91,7 @@ object JenaOperations extends RDFOps[Jena] {
   // typed literal
 
   def makeTypedLiteral(lexicalForm: String, iri: Jena#URI): Jena#TypedLiteral = {
-    JenaNode.createLiteral(lexicalForm, null, jenaDatatype(iri)).asInstanceOf[Node_Literal]
+    NodeFactory.createLiteral(lexicalForm, null, jenaDatatype(iri)).asInstanceOf[Node_Literal]
   }
 
   def fromTypedLiteral(typedLiteral: Jena#TypedLiteral): (String, Jena#URI) = {
@@ -108,7 +108,7 @@ object JenaOperations extends RDFOps[Jena] {
 
   def makeLangLiteral(lexicalForm: String, lang: Jena#Lang): Jena#LangLiteral = {
     val langString = fromLang(lang)
-    JenaNode.createLiteral(lexicalForm, langString, null).asInstanceOf[Node_Literal]
+    NodeFactory.createLiteral(lexicalForm, langString, null).asInstanceOf[Node_Literal]
   }
 
   def fromLangLiteral(langLiteral: Jena#LangLiteral): (String, Jena#Lang) = {

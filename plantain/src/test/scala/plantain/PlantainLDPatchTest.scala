@@ -1,7 +1,7 @@
 package org.w3.banana.plantain
 
 import org.scalatest.{BeforeAndAfterAll, WordSpec}
-import org.scalatest.matchers.MustMatchers
+import org.scalatest.Matchers
 import org.w3.banana._
 import scala.util.Try
 
@@ -9,7 +9,7 @@ class PlantainLDPatchTest extends LDPatchTest[Plantain](PlantainLDPatch)
 
 abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf,Try])
                                (implicit ops: RDFOps[Rdf],sparqlOps: SparqlOps[Rdf])
-  extends WordSpec with MustMatchers with BeforeAndAfterAll {
+  extends WordSpec with Matchers with BeforeAndAfterAll {
 
   import sparqlOps._
   import ops._

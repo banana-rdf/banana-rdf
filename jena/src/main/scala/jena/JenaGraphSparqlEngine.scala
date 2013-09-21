@@ -34,9 +34,6 @@ object JenaSparqlGraph extends SparqlGraph[Jena] {
       qexec(query, bindings).execAsk()
     }
 
-    def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Unit = {
-      ???
-    }
   }
 
 }
