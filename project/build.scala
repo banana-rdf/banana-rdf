@@ -2,22 +2,23 @@ import sbt._
 import sbt.Keys._
 import org.ensime.sbt.Plugin.Settings.ensimeConfig
 import org.ensime.sbt.util.SExp._
-import com.typesafe.sbtscalariform.ScalariformPlugin._
 import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 
 object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
+  val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ Seq (
     organization := "org.w3",
     version      := "2013_06_14-SNAPSHOT",
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
     offline := true,
-    testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
+    // TODO
+    testOptions in Test += Tests.Argument("-oD"),
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
@@ -67,11 +68,11 @@ object BuildSettings {
   )
 
   val jenaTestWIPFilter = Seq (
-    testOptions in Test += Tests.Argument("exclude(org.w3.banana.jenaWIP)")
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
   )
 
   val sesameTestWIPFilter = Seq (
-    testOptions in Test += Tests.Argument("exclude(org.w3.banana.sesameWIP)")
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.sesameWIP")
   )
 
 }
@@ -80,7 +81,7 @@ object BananaRdfBuild extends Build {
 
   import BuildSettings._
   
-  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0"
+  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.2"
 
   val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
   val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
@@ -88,7 +89,7 @@ object BananaRdfBuild extends Build {
   val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.4"
   val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.4"
 
-//  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
+//  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.7"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.12"
 
@@ -101,11 +102,11 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP9"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0.RC1-SNAP4"
   
   val testsuiteDeps =
     Seq(
-      libraryDependencies += scalaActors,
+//      libraryDependencies += scalaActors,
       libraryDependencies += scalatest
     )
 
@@ -116,21 +117,20 @@ object BananaRdfBuild extends Build {
 
   val testDeps =
     Seq(
-      libraryDependencies += scalaActors % "test",
+//      libraryDependencies += scalaActors % "test",
       libraryDependencies += scalatest % "test"
     )
   
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      libraryDependencies += "org.apache.jena" % "jena-arq" % "2.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
-      libraryDependencies += "org.apache.jena" % "jena-tdb" % "0.9.1" excludeAll(ExclusionRule(organization = "org.slf4j")),
+      libraryDependencies += "org.apache.jena" % "apache-jena-libs" % "2.11.0" excludeAll(ExclusionRule(organization = "org.slf4j")),
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided",
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
 
-  val sesameVersion = "2.7.0"
+  val sesameVersion = "2.7.6"
   
   val sesameCoreDeps =
     Seq(
@@ -160,7 +160,7 @@ object BananaRdfBuild extends Build {
       jena,
       sesame,
       plantain,
-      ldp,
+      //ldp,
       examples))
   
   lazy val rdf = Project(

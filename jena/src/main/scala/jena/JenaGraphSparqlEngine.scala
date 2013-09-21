@@ -34,12 +34,8 @@ object JenaSparqlGraph extends SparqlGraph[Jena] {
       qexec(query, bindings).execAsk()
     }
 
-    def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) {
-      val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
-      if (bindings.isEmpty)
-        UpdateAction.execute(query, model)
-      else
-        UpdateAction.execute(query, model, querySolution.getMap(bindings))
+    def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Unit = {
+      ???
     }
   }
 

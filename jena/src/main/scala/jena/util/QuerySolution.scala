@@ -4,7 +4,7 @@ import org.w3.banana._
 import org.w3.banana.jena._
 import org.w3.banana.jena.JenaOperations._
 import com.hp.hpl.jena.rdf.model._
-import com.hp.hpl.jena.query._
+import com.hp.hpl.jena.query.{ QuerySolution => JenaQuerySolution, _ }
 import com.hp.hpl.jena.datatypes.TypeMapper
 import com.hp.hpl.jena.rdf.model.ModelFactory.createModelForGraph
 
@@ -26,7 +26,7 @@ case class QuerySolution() {
     }
   )
 
-  def getMap(bindings: Map[String, Jena#Node]): QuerySolutionMap = {
+  def getMap(bindings: Map[String, Jena#Node]): JenaQuerySolution = {
     val map = new QuerySolutionMap()
     bindings foreach {
       case (name, node) =>

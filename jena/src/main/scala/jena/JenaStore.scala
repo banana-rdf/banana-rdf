@@ -211,11 +211,8 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena,
     result
   }
 
-  def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) {
-    if (bindings.isEmpty)
-      UpdateAction.execute(query, dataset)
-    else
-      UpdateAction.execute(query, dataset, querySolution.getMap(bindings))
+  def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Unit = {
+    ???
   }
 
 }
