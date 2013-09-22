@@ -11,27 +11,29 @@ import scalaz.Id._
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl
 import PlantainUtil._
 import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
 object PlantainSparqlGraph extends PlantainSparqlGraph
 
 trait PlantainSparqlGraph extends SparqlGraph[Plantain] {  
 
-  def apply(graph: Plantain#Graph): SparqlEngine[Plantain, Id] =
+  def apply(graph: Plantain#Graph): SparqlEngine[Plantain] =
     new PlantainSparqlEngine(graph)
 
-  class PlantainSparqlEngine(graph: Plantain#Graph) extends SparqlEngine[Plantain, Id] {
+  class PlantainSparqlEngine(graph: Plantain#Graph) extends SparqlEngine[Plantain] {
 
-    def executeSelect(query: Plantain#SelectQuery, bindings: Map[String, Plantain#Node]): Plantain#Solutions =
+    def executeSelect(query: Plantain#SelectQuery, bindings: Map[String, Plantain#Node]): Future[Plantain#Solutions] = successful {
       PlantainUtil.executeSelect(graph, query, bindings)
+    }
 
-    def executeConstruct(query: Plantain#ConstructQuery, bindings: Map[String, Plantain#Node]): Plantain#Graph =
+    def executeConstruct(query: Plantain#ConstructQuery, bindings: Map[String, Plantain#Node]): Future[Plantain#Graph] = successful {
       PlantainUtil.executeConstruct(graph, query, bindings)
+    }
 
-    def executeAsk(query: Plantain#AskQuery, bindings: Map[String, Plantain#Node]): Boolean =
+    def executeAsk(query: Plantain#AskQuery, bindings: Map[String, Plantain#Node]): Future[Boolean] = successful {
       PlantainUtil.executeAsk(graph, query, bindings)
+    }
 
-    // FIXME added just to avoid compilation error
-    def executeUpdate(query: Plantain#UpdateQuery, bindings: Map[String, Plantain#Node]) = ???
   }
 
 

@@ -3,10 +3,9 @@ package org.w3.banana
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.scalatest._
-import org.scalatest.matchers._
 
 abstract class GraphUnionTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
-    extends WordSpec with MustMatchers {
+    extends WordSpec with Matchers {
 
   import ops._
 
@@ -43,20 +42,20 @@ abstract class GraphUnionTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
   "union must compute the union of two graphs, and should not touch the graphs" in {
     val result = union(foo :: bar :: Nil)
-    isomorphism(foo, fooReference) must be(true)
-    isomorphism(bar, barReference) must be(true)
-    isomorphism(foo, bar) must be(false)
-    isomorphism(foobar, result) must be(true)
+    isomorphism(foo, fooReference) should be(true)
+    isomorphism(bar, barReference) should be(true)
+    isomorphism(foo, bar) should be(false)
+    isomorphism(foobar, result) should be(true)
   }
 
   "union of Nil must return an empty graph" in {
     val result: Rdf#Graph = union(Nil)
-    isomorphism(result, emptyGraph) must be(true)
+    isomorphism(result, emptyGraph) should be(true)
   }
 
   "union of a single graph must return an isomorphic graph" in {
     val result = union(foo :: Nil)
-    isomorphism(result, foo) must be(true)
+    isomorphism(result, foo) should be(true)
   }
 
 }

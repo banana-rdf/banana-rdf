@@ -3,7 +3,6 @@ package org.w3.banana
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.scalatest._
-import org.scalatest.matchers._
 import scala.concurrent._
 import scala.concurrent.util._
 import scalax.io._
@@ -14,7 +13,7 @@ class SparqlEngineTest[Rdf <: RDF](
     implicit reader: RDFReader[Rdf, RDFXML],
     ops: RDFOps[Rdf],
     sparqlOps: SparqlOps[Rdf])
-    extends WordSpec with MustMatchers with BeforeAndAfterAll {
+    extends WordSpec with Matchers with BeforeAndAfterAll {
 
   import ops._
   import sparqlOps._
@@ -79,7 +78,7 @@ class SparqlEngineTest[Rdf <: RDF](
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
 
-    names.getOrFail() must contain("Alexandre Bertails")
+    names.getOrFail() should contain("Alexandre Bertails")
 
   }
 
@@ -105,9 +104,9 @@ class SparqlEngineTest[Rdf <: RDF](
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
 
-    names.getOrFail() must have size (4)
+    names.getOrFail() should have size (4)
 
-    names.getOrFail() must contain("Alexandre Bertails")
+    names.getOrFail() should contain("Alexandre Bertails")
 
   }
 
@@ -144,7 +143,7 @@ class SparqlEngineTest[Rdf <: RDF](
 
     val alexIsThere = sparqlEngine.executeAsk(query).getOrFail()
 
-    alexIsThere must be(true)
+    alexIsThere should be(true)
 
   }
 
@@ -170,7 +169,7 @@ class SparqlEngineTest[Rdf <: RDF](
 
     val alexIsThere = sparqlEngine.executeAsk(query, bindings).getOrFail()
 
-    alexIsThere must be(true)
+    alexIsThere should be(true)
 
   }
 
@@ -186,7 +185,7 @@ class SparqlEngineTest[Rdf <: RDF](
 
     val alexKnowsHenry = sparqlEngine.executeAsk(query).getOrFail()
 
-    alexKnowsHenry must be(true)
+    alexKnowsHenry should be(true)
 
   }
 

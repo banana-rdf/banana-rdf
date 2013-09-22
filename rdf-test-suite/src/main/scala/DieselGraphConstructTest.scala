@@ -3,12 +3,10 @@ package org.w3.banana.diesel
 import org.w3.banana._
 import org.w3.banana.syntax._
 import org.scalatest._
-import org.scalatest._
-import org.scalatest.matchers._
 import scalaz.Scalaz._
 
 abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
-    extends WordSpec with MustMatchers {
+    extends WordSpec with Matchers {
 
   import ops._
 

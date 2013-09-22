@@ -3,7 +3,6 @@ package org.w3.banana
 import org.w3.banana.diesel._
 import org.w3.banana.syntax._
 import org.scalatest._
-import org.scalatest.matchers._
 import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
 import scalax.io._
 
@@ -13,7 +12,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
     sparqlOperations: SparqlOps[Rdf],
     sparqlGraph: SparqlGraph[Rdf],
     sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
-    sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with MustMatchers with Inside {
+    sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]) extends WordSpec with Matchers with Inside {
 
   import ops._
   import sparqlOperations._
@@ -43,10 +42,10 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
         row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
       }
 
-      names must contain("Alexandre Bertails")
+      names should contain("Alexandre Bertails")
 
       val row = rows(0)
-      row("unknown") must be('failure)
+      row("unknown") should be('failure)
       true
     }
 

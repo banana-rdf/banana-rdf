@@ -3,54 +3,53 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import org.w3.banana.diesel._
 import org.scalatest._
-import org.scalatest.matchers.MustMatchers
 import java.net.URL
 
-abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with MustMatchers {
+abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers {
 
   import ops._
 
   ".fragmentLess should remove the fragment part of a URI" in {
     val uri = URI("http://example.com/foo#bar")
-    uri.fragmentLess must be(URI("http://example.com/foo"))
+    uri.fragmentLess should be(URI("http://example.com/foo"))
   }
 
   ".fragment should set the fragment part of a URI" in {
     val uri = URI("http://example.com/foo")
-    uri.fragment("bar") must be(URI("http://example.com/foo#bar"))
+    uri.fragment("bar") should be(URI("http://example.com/foo#bar"))
   }
 
   ".fragment should return the fragment part of a URI" in {
     val uri = URI("http://example.com/foo#bar")
-    uri.fragment must be(Some("bar"))
+    uri.fragment should be(Some("bar"))
     val uriNoFrag = URI("http://example.com/foo")
-    uriNoFrag.fragment must be(None)
+    uriNoFrag.fragment should be(None)
   }
 
   "/ should create a sub-resource uri" in {
-    (URI("http://example.com/foo") / "bar") must be(URI("http://example.com/foo/bar"))
-    (URI("http://example.com/foo/") / "bar") must be(URI("http://example.com/foo/bar"))
+    (URI("http://example.com/foo") / "bar") should be(URI("http://example.com/foo/bar"))
+    (URI("http://example.com/foo/") / "bar") should be(URI("http://example.com/foo/bar"))
   }
 
   "resolve should resolve the uri against the passed string" in {
-    URI("http://example.com/foo").resolve("bar") must be(URI("http://example.com/bar"))
-    URI("http://example.com/foo/").resolve("bar") must be(URI("http://example.com/foo/bar"))
+    URI("http://example.com/foo").resolve("bar") should be(URI("http://example.com/bar"))
+    URI("http://example.com/foo/").resolve("bar") should be(URI("http://example.com/foo/bar"))
   }
 
   "resolveAgainst should work like resolve, just the other way around" in {
-    URI("http://example.com/foo").resolveAgainst(URI("#bar")) must be(URI("http://example.com/foo"))
-    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/bar")) */
-    URI("#bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/foo#bar"))
-    URI("#bar").resolveAgainst(URI("http://example.com/foo/")) must be(URI("http://example.com/foo/#bar"))
-    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) must be(URI("http://example.com/bar")) */
+    URI("http://example.com/foo").resolveAgainst(URI("#bar")) should be(URI("http://example.com/foo"))
+    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar")) */
+    URI("#bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/foo#bar"))
+    URI("#bar").resolveAgainst(URI("http://example.com/foo/")) should be(URI("http://example.com/foo/#bar"))
+    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar")) */
   }
 
   "should be able to create and work with relative URIs" in {
     val me = URI("/people/card/henry#me")
-    me.fragment must be(Some("me"))
-    me.fragmentLess must be(URI("/people/card/henry"))
+    me.fragment should be(Some("me"))
+    me.fragmentLess should be(URI("/people/card/henry"))
     val host = URI("http://bblfish.net")
-    me.resolveAgainst(host) must be(URI("http://bblfish.net/people/card/henry#me"))
+    me.resolveAgainst(host) should be(URI("http://bblfish.net/people/card/henry#me"))
   }
 
   "transforming java URIs and URLs to Rdf#URI" in {
@@ -58,8 +57,8 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
     val card = "http://bblfish.net/people/henry/card"
     val uri: Rdf#URI = URI(card)
 
-    new URL(card).toUri must be(uri)
-    new java.net.URI(card).toUri must be(uri)
+    new URL(card).toUri should be(uri)
+    new java.net.URI(card).toUri should be(uri)
 
   }
 

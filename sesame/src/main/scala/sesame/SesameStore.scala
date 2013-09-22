@@ -2,14 +2,11 @@ package org.w3.banana.sesame
 
 import scala.collection.JavaConverters._
 import scala.concurrent._
-
 import java.util.concurrent.{ ExecutorService, Executors }
-
 import org.openrdf.model._
 import org.openrdf.model.impl._
-import org.openrdf.repository.{Repository, RepositoryConnection, RepositoryResult}
+import org.openrdf.repository.{ Repository, RepositoryConnection, RepositoryResult }
 import org.openrdf.query._
-
 import scalaz.Free
 import org.w3.banana._
 
@@ -86,7 +83,7 @@ object SesameStore {
 
 import SesameStore._
 
-class SesameStore(repository: Repository) extends RDFStore[Sesame, Future] {
+class SesameStore(repository: Repository) extends RDFStore[Sesame] {
 
   val executorService: ExecutorService = Executors.newFixedThreadPool(8)
 

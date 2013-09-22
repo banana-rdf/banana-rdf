@@ -17,7 +17,7 @@ abstract class SesameGraphStoreTest(sesameStore: SesameStore) extends GraphStore
       } yield graph
     }
     val defaultGraph = s.getOrFail()
-    defaultGraph must have size (0)
+    defaultGraph should have size (0)
   }
 
 }

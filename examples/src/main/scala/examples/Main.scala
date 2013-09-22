@@ -70,13 +70,12 @@ object SPARQLExample {
   import org.w3.banana.syntax._
   import org.w3.banana.diesel._
   import java.net.URL
-  import scalaz.Id.Id
 
   def main(args: Array[String]): Unit = {
     /* Scala is unable to infer the types correctly when using only type projection
      * a workaround is to parameterize over RDF
      */
-    def aux[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], sparqlOps: SparqlOps[Rdf], sparqlHttp: SparqlHttp[Rdf, Id]): Unit = {
+    def aux[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], sparqlOps: SparqlOps[Rdf], sparqlHttp: SparqlHttp[Rdf]): Unit = {
       import ops._
       import sparqlOps._
 
@@ -97,7 +96,7 @@ SELECT DISTINCT ?language WHERE {
 
       /* executes the query */
 
-      val answers: Rdf#Solutions = client.executeSelect(query)
+      val answers: Rdf#Solutions = client.executeSelect(query).getOrFail()
 
       /* iterate through the solutions */
 

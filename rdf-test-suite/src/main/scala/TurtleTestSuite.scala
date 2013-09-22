@@ -3,13 +3,12 @@ package org.w3.banana
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.scalatest._
-import org.scalatest.matchers.MustMatchers
 import java.io._
 import scalax.io._
 import org.scalatest.EitherValues._
 
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
-    extends WordSpec with MustMatchers {
+    extends WordSpec with Matchers {
 
   val reader: RDFReader[Rdf, Turtle]
   val writer: RDFWriter[Rdf, Turtle]
@@ -45,7 +44,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     val resource = Resource.fromFile(file)
     val graph = reader.read(resource, file.toURI.toString).get
     //    graph.fold( _.printStackTrace, r => println(r.size))
-    graph.toIterable.size must equal(77)
+    graph.toIterable.size should equal(77)
   }
 
   "read simple TURTLE String" in {
@@ -61,7 +60,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
   "write simple graph as TURTLE string" in {
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
-    turtleString must not be ('empty)
+    turtleString should not be ('empty)
   }
 
   "works with relative uris" taggedAs (JenaWIP) in {
