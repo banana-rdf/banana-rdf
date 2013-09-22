@@ -10,10 +10,9 @@ import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
 import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype }
 import scala.collection.JavaConverters._
 import scala.concurrent.{ ops => _, _ }
-import java.util.concurrent.{ Executors, ExecutorService }
+import scala.util.Try
 import scalaz.Free
 import org.slf4j.{ Logger, LoggerFactory }
-import com.hp.hpl.jena.update.UpdateAction
 
 object JenaStore {
 
@@ -27,28 +26,9 @@ object JenaStore {
 
   val logger = LoggerFactory.getLogger(classOf[JenaStore])
 
-  implicit class FutureF[+T](val future: Future[T]) extends AnyVal {
-
-    def timer(name: String)(implicit ec: ExecutionContext): Future[T] = {
-      val start = System.currentTimeMillis
-      future onComplete { case _ =>
-        val end = System.currentTimeMillis
-        logger.debug(s"""$name: ${end - start}ms""")
-      }
-      future
-    }
-
-  }
-
 }
 
 class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena] {
-
-  import JenaStore.FutureF
-
-  val executorService: ExecutorService = Executors.newSingleThreadExecutor()
-
-  implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutorService(executorService)
 
   val supportsTransactions: Boolean = dataset.supportsTransactions()
 
@@ -57,7 +37,6 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
   lazy val querySolution = util.QuerySolution()
 
   def shutdown(): Unit = {
-    executorService.shutdown()
     dataset.close()
   }
 
@@ -147,13 +126,12 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
     )
   }
 
-  def execute[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): Future[A] = {
+  def execute[A](script: Free[({ type l[+x] = Command[Jena, x] })#l, A]): Future[A] = Try {
     operationType(script) match {
-      case READ => Future { readTransaction(run(script)) }.timer("READ")
-      case WRITE => Future { writeTransaction(run(script)) }.timer("WRITE")
+      case READ => readTransaction(run(script))
+      case WRITE => writeTransaction(run(script))
     }
-
-  }
+  }.asFuture
 
   def appendToGraph(uri: Jena#URI, triples: Iterable[Jena#Triple]): Unit = {
     triples foreach {
