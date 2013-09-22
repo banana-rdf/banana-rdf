@@ -10,7 +10,7 @@ import scalax.io._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SparqlEngineTest[Rdf <: RDF](
-  store: RDFStore[Rdf, Future])(
+  store: RDFStore[Rdf])(
     implicit reader: RDFReader[Rdf, RDFXML],
     ops: RDFOps[Rdf],
     sparqlOps: SparqlOps[Rdf])
@@ -19,7 +19,7 @@ class SparqlEngineTest[Rdf <: RDF](
   import ops._
   import sparqlOps._
 
-  val sparqlEngine = SparqlEngine[Rdf, Future](store)
+  val sparqlEngine = SparqlEngine[Rdf](store)
 
   override def afterAll(): Unit = {
     super.afterAll()

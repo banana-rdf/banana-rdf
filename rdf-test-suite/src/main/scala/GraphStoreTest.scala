@@ -3,23 +3,22 @@ package org.w3.banana
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.scalatest._
-import org.scalatest.matchers._
 import scala.concurrent._
 import scala.concurrent.util._
 import scalaz._
-import Scalaz._
+import scalaz.Scalaz._
 
 class GraphStoreTest[Rdf <: RDF](
-  store: RDFStore[Rdf, Future])(
+  store: RDFStore[Rdf])(
   implicit ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, RDFXML])
-    extends WordSpec with MustMatchers with BeforeAndAfterAll with TestHelper {
+    extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
   import ops._
 
   val foaf = FOAFPrefix[Rdf]
 
-  val graphStore = GraphStore[Rdf, Future](store)
+  val graphStore = GraphStore[Rdf](store)
 
   override def afterAll(): Unit = {
     store.shutdown()

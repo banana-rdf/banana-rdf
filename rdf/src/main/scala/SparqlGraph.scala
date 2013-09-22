@@ -4,6 +4,6 @@ import scalaz.Id._
 
 trait SparqlGraph[Rdf <: RDF] {
 
-  def apply(graph: Rdf#Graph): SparqlEngine[Rdf, Id]
+  def apply(graph: Rdf#Graph): SparqlEngine[Rdf]
 
 }

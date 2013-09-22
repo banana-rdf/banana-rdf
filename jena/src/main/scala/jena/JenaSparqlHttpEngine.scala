@@ -4,9 +4,10 @@ import org.w3.banana._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
-import scalaz.Id._
+import scala.concurrent.Future
+import scala.concurrent.Future.successful
 
-class JenaSparqlHttpEngine(val endpointUrl: String) extends SparqlEngine[Jena, Id] {
+class JenaSparqlHttpEngine(val endpointUrl: String) extends SparqlEngine[Jena] {
 
   val querySolution = util.QuerySolution()
 
@@ -17,15 +18,16 @@ class JenaSparqlHttpEngine(val endpointUrl: String) extends SparqlEngine[Jena, I
     qe
   }
 
-  def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean =
+  def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] = successful {
     qexec(query, bindings).execAsk()
+  }
 
-  def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Jena#Graph =
+  def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = successful {
     BareJenaGraph(qexec(query, bindings).execConstruct().getGraph())
+  }
 
-  def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Jena#Solutions =
+  def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = successful {
      qexec(query, bindings).execSelect()
+  }
 
-  // FIXME added just to avoid compilation error
-  def executeUpdate(query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Unit = ???
 }

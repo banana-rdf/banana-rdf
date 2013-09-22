@@ -42,7 +42,7 @@ object JenaStore {
 
 }
 
-class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena, Future] {
+class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena] {
 
   import JenaStore.FutureF
 

@@ -45,7 +45,7 @@ trait JenaModule {
 
   implicit val sparqlGraph: SparqlGraph[Jena] = JenaSparqlGraph
 
-  implicit val sparqlHttp: SparqlHttp[Jena, Id] = JenaSparqlHttp
+  implicit val sparqlHttp: SparqlHttp[Jena] = JenaSparqlHttp
 
   implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader
 

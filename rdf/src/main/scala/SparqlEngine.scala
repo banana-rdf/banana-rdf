@@ -1,40 +1,42 @@
 package org.w3.banana
 
+import scala.concurrent.Future
+
 /**
  * to execute Sparql queries
  */
-trait SparqlEngine[Rdf <: RDF, M[_]] extends Any {
+trait SparqlEngine[Rdf <: RDF] extends Any {
 
-  def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Solutions]
+  def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Solutions]
 
-  def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Graph]
+  def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Graph]
 
-  def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): M[Boolean]
+  def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Future[Boolean]
 
-  def executeSelect(query: Rdf#SelectQuery): M[Rdf#Solutions] = executeSelect(query, Map.empty)
+  def executeSelect(query: Rdf#SelectQuery): Future[Rdf#Solutions] = executeSelect(query, Map.empty)
 
-  def executeConstruct(query: Rdf#ConstructQuery): M[Rdf#Graph] = executeConstruct(query, Map.empty)
+  def executeConstruct(query: Rdf#ConstructQuery): Future[Rdf#Graph] = executeConstruct(query, Map.empty)
 
-  def executeAsk(query: Rdf#AskQuery): M[Boolean] = executeAsk(query, Map.empty)
+  def executeAsk(query: Rdf#AskQuery): Future[Boolean] = executeAsk(query, Map.empty)
 
 }
 
 object SparqlEngine {
 
-  def apply[Rdf <: RDF, M[_]](store: RDFStore[Rdf, M]): SparqlEngine[Rdf, M] = new SparqlEngine[Rdf, M] {
+  def apply[Rdf <: RDF](store: RDFStore[Rdf]): SparqlEngine[Rdf] = new SparqlEngine[Rdf] {
 
-    def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Solutions] =
+    def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Solutions] =
       store.execute(Command.select(query, bindings))
 
-    def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): M[Rdf#Graph] =
+    def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Graph] =
       store.execute(Command.construct(query, bindings))
 
-    def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): M[Boolean] =
+    def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Future[Boolean] =
       store.execute(Command.ask(query, bindings))
 
   }
 
 }
 
-trait SparqlUpdateEngine[Rdf <: RDF, M[_]] //todo: implement a version for updates
+//trait SparqlUpdateEngine[Rdf <: RDF, M[_]] //todo: implement a version for updates
 

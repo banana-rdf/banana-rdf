@@ -8,7 +8,7 @@ import scala.util.Try
 class PlantainLDPatchTest extends LDPatchTest[Plantain](PlantainLDPatch)
 
 abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf,Try])
-                               (implicit ops: RDFOps[Rdf],sparqlOps: SparqlOps[Rdf])
+  (implicit ops: RDFOps[Rdf],sparqlOps: SparqlOps[Rdf])
   extends WordSpec with Matchers with BeforeAndAfterAll {
 
   import sparqlOps._
