@@ -23,7 +23,7 @@ object JenaRDFWriter {
       def write[R <: jWriter](graph: Jena#Graph, wcr: WriteCharsResource[R], base: String): Try[Unit] =
         Try {
           wcr.acquireAndGet { writer =>
-            val model = ModelFactory.createModelForGraph(graph.jenaGraph)
+            val model = ModelFactory.createModelForGraph(graph)
             model.getWriter(serialization).write(model, writer, base)
           }
         }

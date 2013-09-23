@@ -14,11 +14,18 @@ object JenaOperations extends RDFOps[Jena] {
 
   // graph
 
-  val emptyGraph: Jena#Graph = EmptyGraph
+  def emptyGraph: Jena#Graph = Factory.createDefaultGraph
 
-  def makeGraph(triples: Iterable[Jena#Triple]): Jena#Graph = GraphAsIterable(triples)
+  def makeGraph(triples: Iterable[Jena#Triple]): Jena#Graph = {
+    val graph: JenaGraph = Factory.createDefaultGraph
+    triples.foreach { triple =>
+      graph.add(triple)
+    }
+    graph
+  }
 
-  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] = graph.toIterable
+  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] =
+    graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
 
   // triple
 
@@ -138,29 +145,23 @@ object JenaOperations extends RDFOps[Jena] {
       funConcrete(nodeMatch.asInstanceOf[JenaNode])
 
   def find(graph: Jena#Graph, subject: Jena#NodeMatch, predicate: Jena#NodeMatch, objectt: Jena#NodeMatch): Iterator[Jena#Triple] = {
-    graph.jenaGraph.find(subject, predicate, objectt).asScala.toIterator
+    graph.find(subject, predicate, objectt).asScala.toIterator
   }
 
   // graph union
 
   def union(graphs: List[Jena#Graph]): Jena#Graph = {
-    var list: List[Jena#Graph] = List.empty
-    graphs foreach {
-      case EmptyGraph => ()
-      case bjg @ BareJenaGraph(_) => list = bjg :: list
-      case gai @ GraphAsIterable(_) => list = gai :: list
-      case UnionGraphs(ugraphs) =>
-        if (list.size < ugraphs.size)
-          list = list ++ ugraphs
-        else
-          list = ugraphs ++ list
+    val g = Factory.createDefaultGraph
+    graphs.foreach { graph =>
+      val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
+      while (it.hasNext) { g.add(it.next()) }
     }
-    UnionGraphs(list)
+    g
   }
 
   // graph isomorphism
 
   def isomorphism(left: Jena#Graph, right: Jena#Graph): Boolean =
-    left.jenaGraph isIsomorphicWith right.jenaGraph
+    left isIsomorphicWith right
 
 }

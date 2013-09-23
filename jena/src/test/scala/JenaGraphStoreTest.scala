@@ -10,7 +10,7 @@ import concurrent.Future
 abstract class JenaGraphStoreTest(jenaStore: JenaStore) extends GraphStoreTest[Jena](jenaStore) {
 
   def defaultGraph: Jena#Graph = jenaStore.readTransaction {
-    BareJenaGraph(jenaStore.dg.getDefaultGraph)
+    jenaStore.dg.getDefaultGraph
   }
 
   "adding a named graph should not pollute the default graph" in {
@@ -18,7 +18,7 @@ abstract class JenaGraphStoreTest(jenaStore: JenaStore) extends GraphStoreTest[J
       Command.append[Jena]( makeUri("http://example.com/foo"), graphToIterable(graph))
     }
     s.getOrFail()
-    assert( defaultGraph.jenaGraph.size == 0)
+    assert( defaultGraph.size == 0)
   }
 
 }

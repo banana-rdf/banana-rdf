@@ -28,7 +28,7 @@ object JenaRDFReader {
         resource acquireAndGet { reader => 
           val model = ModelFactory.createDefaultModel()
           model.getReader(serialization).read(model, reader, base)
-          BareJenaGraph(model.getGraph)
+          model.getGraph
         }
       }
 

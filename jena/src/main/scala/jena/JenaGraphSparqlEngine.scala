@@ -14,7 +14,7 @@ object JenaSparqlGraph extends SparqlGraph[Jena] {
     val querySolution = util.QuerySolution()
 
     def qexec(query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
-      val model: Model = ModelFactory.createModelForGraph(graph.jenaGraph)
+      val model: Model = ModelFactory.createModelForGraph(graph)
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, model)
       else
@@ -27,7 +27,7 @@ object JenaSparqlGraph extends SparqlGraph[Jena] {
 
     def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = successful {
       val result = qexec(query, bindings).execConstruct()
-      BareJenaGraph(result.getGraph())
+      result.getGraph()
     }
 
     def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] = successful {

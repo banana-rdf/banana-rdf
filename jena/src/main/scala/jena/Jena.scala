@@ -9,7 +9,7 @@ import scalaz.Id.Id
 
 trait Jena extends RDF {
   // types related to the RDF datamodel
-  type Graph = ImmutableJenaGraph
+  type Graph = JenaGraph
   type Triple = JenaTriple
   type Node = JenaNode
   type URI = Node_URI

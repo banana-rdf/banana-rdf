@@ -148,7 +148,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
   }
 
   def getGraph(uri: Jena#URI): Jena#Graph = {
-    val graph = BareJenaGraph(dg.getGraph(uri))
+    val graph = dg.getGraph(uri)
     if (defensiveCopy)
       JenaUtil.copy(graph)
     else
@@ -176,7 +176,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
       else
         QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings))
     val result = qexec.execConstruct()
-    BareJenaGraph(result.getGraph())
+    result.getGraph()
   }
 
   def executeAsk(query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Boolean = {

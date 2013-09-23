@@ -11,6 +11,7 @@ object IOExample {
   import scala.util.Properties
   import java.io.File
   import scalax.io.Resource
+  import org.w3.banana.syntax._
 
   // just because we can :-)
   implicit class FileW(val file: File) extends AnyVal {
@@ -23,7 +24,7 @@ object IOExample {
      */
 
     // RDFOps holds all the operations to manipulate RDF graphs, plus some syntax constructs
-    val ops = RDFOps[Rdf]
+    implicit val ops = RDFOps[Rdf]
     import ops._
 
     // gets Turtle reader
@@ -50,7 +51,8 @@ object IOExample {
 
     /* prints 10 triples to stdout */
 
-    val graph10Triples = Graph(graph.toIterable.take(10).toSet)
+    // TODO: find a better way re: type inference
+    val graph10Triples = Graph(new GraphW[Rdf](graph).toIterable.take(10).toSet)
     val graphAsString = writer.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsString)
   }

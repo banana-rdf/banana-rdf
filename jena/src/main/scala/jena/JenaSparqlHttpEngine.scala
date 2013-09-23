@@ -23,7 +23,7 @@ class JenaSparqlHttpEngine(val endpointUrl: String) extends SparqlEngine[Jena] {
   }
 
   def executeConstruct(query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = successful {
-    BareJenaGraph(qexec(query, bindings).execConstruct().getGraph())
+    qexec(query, bindings).execConstruct().getGraph()
   }
 
   def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = successful {
