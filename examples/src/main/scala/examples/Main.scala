@@ -36,15 +36,14 @@ object IOExample {
     /* reads TimBL's card in Turtle */
 
     val timblCard = "http://www.w3.org/People/Berners-Lee/card.ttl"
-    // note: as we're using scalax.io, we don't need to worry about closing the streams
-    val from = Resource.fromURL(timblCard)
+    val from = new java.net.URL(timblCard).openStream()
     // reading from a stream can fail so in real life, you would have to deal with the Try[Rdf#Graph]
     val graph: Rdf#Graph = reader.read(from, base = timblCard) getOrElse sys.error("couldn't read TimBL's card")
     
     /* prints TimBL's card to a file as RDF/XML */
 
     val tmpFile = new File(Properties.tmpDir) / "card.ttl"
-    val to = Resource.fromFile(tmpFile)
+    val to = new java.io.FileOutputStream(tmpFile)
     val ret = writer.write(graph, to, base = timblCard)
     if (ret.isSuccess)
       println(s"successfuly wrote TimBL's card to ${tmpFile.getAbsolutePath}")

@@ -159,7 +159,7 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
-      plantain,
+//      plantain,
       //ldp,
       examples))
   
