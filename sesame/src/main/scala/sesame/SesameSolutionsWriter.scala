@@ -1,8 +1,7 @@
 package org.w3.banana.sesame
 
 import org.w3.banana._
-import java.io.{ ByteArrayOutputStream, Writer => jWriter }
-import scalax.io._
+import java.io._
 import scala.util._
 
 /**
@@ -15,16 +14,13 @@ object SesameSolutionsWriter {
 
       val syntax = _syntax
 
-      def write[R <: jWriter](answers: Sesame#Solutions, wcr: WriteCharsResource[R], base: String) =
-        Try {
-          val baos = new ByteArrayOutputStream()
-          val sWriter = sesameSparqlSyntax.writer(baos)
-          // sWriter.startQueryResult(answers.getBindingNames)
-          sWriter.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
-          answers foreach { answer => sWriter.handleSolution(answer) }
-          sWriter.endQueryResult()
-          wcr.write(baos.toString("UTF-8"))
-        }
+      def write(answers: Sesame#Solutions, os: OutputStream, base: String) = Try {
+        val sWriter = sesameSparqlSyntax.writer(os)
+        // sWriter.startQueryResult(answers.getBindingNames)
+        sWriter.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
+        answers foreach { answer => sWriter.handleSolution(answer) }
+        sWriter.endQueryResult()
+      }
 
     }
 

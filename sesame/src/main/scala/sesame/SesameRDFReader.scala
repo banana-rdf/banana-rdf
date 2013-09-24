@@ -6,7 +6,6 @@ import org.openrdf.model._
 import org.openrdf.model.impl.{ LinkedHashModel, StatementImpl, LiteralImpl }
 import java.io._
 import java.util.LinkedList
-import scalax.io._
 import scala.util._
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
@@ -28,15 +27,13 @@ object SesameTurtleReader extends RDFReader[Sesame, Turtle] {
 
   val syntax = Syntax[Turtle]
 
-  def read[R <: Reader](resource: ReadCharsResource[R], base: String): Try[Sesame#Graph] = Try {
-    resource acquireAndGet { reader => 
-      val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
-      val triples = new LinkedList[Statement]
-      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-      turtleParser.setRDFHandler(collector)
-      turtleParser.parse(reader, base)
-      new LinkedHashModel(triples)
-    }
+  def read(is: InputStream, base: String): Try[Sesame#Graph] = Try {
+    val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
+    val triples = new LinkedList[Statement]
+    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
+    turtleParser.setRDFHandler(collector)
+    turtleParser.parse(is, base)
+    new LinkedHashModel(triples)
   }
 
 }
@@ -47,15 +44,13 @@ object SesameRDFXMLReader extends RDFReader[Sesame, RDFXML] {
 
   val syntax = Syntax[RDFXML]
 
-  def read[R <: Reader](resource: ReadCharsResource[R], base: String): Try[Sesame#Graph] = Try {
-    resource acquireAndGet { reader =>
-      val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
-      val triples = new LinkedList[Statement]
-      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
-      parser.setRDFHandler(collector)
-      parser.parse(reader, base)
-      new LinkedHashModel(triples)
-    }
+  def read(is: InputStream, base: String): Try[Sesame#Graph] = Try {
+    val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
+    val triples = new LinkedList[Statement]
+    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix
+    parser.setRDFHandler(collector)
+    parser.parse(is, base)
+    new LinkedHashModel(triples)
   }
 
 }
