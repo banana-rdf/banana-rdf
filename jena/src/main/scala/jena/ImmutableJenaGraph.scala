@@ -1,77 +1,114 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode, _ }
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode, TripleMatch => JenaTripleMatch, _ }
+import com.hp.hpl.jena.graph.Node.ANY
+import com.hp.hpl.jena.shared.{ Command => JenaCommand, _ }
+import com.hp.hpl.jena.graph.impl.GraphMatcher
+import com.hp.hpl.jena.util.iterator.{ ExtendedIterator, WrappedIterator }
 import scala.collection.JavaConverters._
+import java.util.{ List => jList, Iterator => jIterator }
 
-sealed trait ImmutableJenaGraph {
-
-  def jenaGraph: JenaGraph
-
-  def toIterable: Iterable[Jena#Triple]
-
+object NoUpdateAllowed extends Capabilities {
+  def addAllowed(everyTriples: Boolean): Boolean = false
+  def addAllowed(): Boolean = false
+  def canBeEmpty(): Boolean = true
+  def deleteAllowed(everyTriple: Boolean): Boolean = false
+  def deleteAllowed(): Boolean = false
+  def findContractSafe(): Boolean = true
+  def handlesLiteralTyping(): Boolean = true
+  def iteratorRemoveAllowed(): Boolean = false
+  def sizeAccurate(): Boolean = true
 }
 
-case object EmptyGraph extends ImmutableJenaGraph {
-
-  val jenaGraph: JenaGraph = Factory.createDefaultGraph
-
-  def toIterable: Iterable[Jena#Triple] = List.empty
-
+object NoEventManager extends GraphEventManager {
+  // Members declared in com.hp.hpl.jena.graph.GraphEventManager
+  def listening(): Boolean = false
+  def notifyAddIterator(x$1: JenaGraph, x$2: jList[Triple]): Unit = ()
+  def notifyDeleteIterator(x$1: JenaGraph, x$2: jList[Triple]): Unit = ()
+  def register(x$1: GraphListener): GraphEventManager = this
+  def unregister(x$1: GraphListener): GraphEventManager = this
+  // Members declared in GraphListener
+  def notifyAddArray(x$1: JenaGraph, x$2: Array[Triple]): Unit = ()
+  def notifyAddGraph(x$1: JenaGraph, x$2: JenaGraph): Unit = ()
+  def notifyAddIterator(x$1: JenaGraph, x$2: jIterator[Triple]): Unit = ()
+  def notifyAddList(x$1: JenaGraph, x$2: jList[Triple]): Unit = ()
+  def notifyAddTriple(x$1: JenaGraph, x$2: Triple): Unit = ()
+  def notifyDeleteArray(x$1: JenaGraph, x$2: Array[Triple]): Unit = ()
+  def notifyDeleteGraph(x$1: JenaGraph, x$2: JenaGraph): Unit = ()
+  def notifyDeleteIterator(x$1: JenaGraph, x$2: jIterator[Triple]): Unit = ()
+  def notifyDeleteList(x$1: JenaGraph, x$2: jList[Triple]): Unit = ()
+  def notifyDeleteTriple(x$1: JenaGraph, x$2: Triple): Unit = ()
+  def notifyEvent(x$1: JenaGraph, x$2: Any): Unit = ()
 }
 
-/**
- * a simple wrapper for a plain-old Jena graph
- */
-case class BareJenaGraph(graph: JenaGraph) extends ImmutableJenaGraph {
-
-  val jenaGraph: JenaGraph = graph
-
-  def toIterable: Iterable[Jena#Triple] = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
-
+object NoTransactions extends TransactionHandler {
+  def abort(): Unit = new UnsupportedOperationException
+  def begin(): Unit = new UnsupportedOperationException
+  def commit(): Unit = new UnsupportedOperationException
+  def executeInTransaction(command: JenaCommand): Object = new UnsupportedOperationException
+  def transactionsSupported(): Boolean = false
 }
 
-/**
- * used as the result of a union between graphs
- *
- * the idea is that we don't compute the result of the union until we really need it
- *
- * note: this must verify the following invariant: the list of graph must be flat.
- * ie. the union function must maintain this invariant, and that's the *only* place
- * where this class should be used
- */
-case class UnionGraphs(graphs: List[ImmutableJenaGraph]) extends ImmutableJenaGraph {
+case class ImmutableJenaGraph(triples: Set[Jena#Triple]) extends JenaGraph {
 
-  lazy val jenaGraph: JenaGraph = {
-    val graph: JenaGraph = Factory.createDefaultGraph
-    graphs foreach {
-      case EmptyGraph => ()
-      case BareJenaGraph(graph) => {
-        val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
-        while (it.hasNext) { graph.add(it.next()) }
-      }
-      case GraphAsIterable(iterable) => {
-        val it = iterable.iterator
-        while (it.hasNext) { graph.add(it.next()) }
-      }
-      case UnionGraphs(graphs) => sys.error("you should not construct a union of unions...")
+  def matchTriples(s: JenaNode, p: JenaNode, o: JenaNode): Iterator[Jena#Triple] = {
+    triples.iterator.filter { case JenaOperations.Triple(_s, _p, _o) =>
+      (s == ANY || s == _s) && (p == ANY || p == _p)  && (o == ANY || o == _o)
     }
-    graph
   }
 
-  def toIterable: Iterable[Jena#Triple] = jenaGraph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
-
+  def add(t: Triple): Unit = new AddDeniedException("ScalaTriples::add")
+  def clear(): Unit = new DeleteDeniedException("ScalaTriples::delete")
+  def close(): Unit = ()
+  def contains(t: Triple): Boolean = triples.contains(t)
+  def contains(s: JenaNode, p: JenaNode, o: JenaNode): Boolean = triples.contains(new Triple(s, p, o))
+  def delete(t: Triple): Unit = new DeleteDeniedException("ScalaTriples::delete")
+  def dependsOn(other: JenaGraph): Boolean = false
+  def find(s: JenaNode, p: JenaNode, o: JenaNode): ExtendedIterator[Triple] = {
+    val it = matchTriples(s, p, o)
+    WrappedIterator.create(it.asJava)
+  }
+  def find(m: JenaTripleMatch): ExtendedIterator[Triple] = {
+    val s = if (m.getMatchSubject == null) ANY else m.getMatchSubject
+    val p = if (m.getMatchPredicate == null) ANY else m.getMatchPredicate
+    val o = if (m.getMatchObject == null) ANY else m.getMatchObject
+    this.find(s, p, o)
+  }
+  def getBulkUpdateHandler(): BulkUpdateHandler = ??? // deprecated
+  def getCapabilities(): Capabilities = NoUpdateAllowed
+  def getEventManager(): GraphEventManager = NoEventManager
+  def getPrefixMapping(): PrefixMapping = ???
+  def getStatisticsHandler(): GraphStatisticsHandler = new GraphStatisticsHandler {
+    def getStatistic(s: JenaNode, p: JenaNode, o: JenaNode): Long = matchTriples(s, p, o).size
+  }
+  def getTransactionHandler(): TransactionHandler = NoTransactions
+  def isClosed(): Boolean = true
+  def isEmpty(): Boolean = triples.isEmpty
+  def isIsomorphicWith(other: JenaGraph): Boolean = GraphMatcher.equals(this, other)
+  def remove(s: JenaNode, p: JenaNode, o: JenaNode): Unit = new DeleteDeniedException("this is immutable")
+  def size(): Int = triples.size
 }
 
-case class GraphAsIterable(triples: Iterable[Jena#Triple]) extends ImmutableJenaGraph {
-
-  lazy val jenaGraph: JenaGraph = {
-    val graph: JenaGraph = Factory.createDefaultGraph
-    val it = triples.iterator
-    while (it.hasNext) { graph.add(it.next()) }
-    graph
-  }
-
-  def toIterable: Iterable[Jena#Triple] = jenaGraph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
-
+case class WrappedJenaGraph(graph: JenaGraph) extends JenaGraph {
+  def add(t: Triple): Unit = new AddDeniedException("ScalaTriples::add")
+  def clear(): Unit = new DeleteDeniedException("ScalaTriples::delete")
+  def close(): Unit = graph.close()
+  def contains(t: Triple): Boolean = graph.contains(t)
+  def contains(s: JenaNode, p: JenaNode, o: JenaNode): Boolean = graph.contains(s, p, o)
+  def delete(t: Triple): Unit = new DeleteDeniedException("ScalaTriples::delete")
+  def dependsOn(other: JenaGraph): Boolean = graph.dependsOn(other)
+  def find(s: JenaNode, p: JenaNode, o: JenaNode): ExtendedIterator[Triple] = graph.find(s, p, o)
+  def find(m: JenaTripleMatch): ExtendedIterator[Triple] = graph.find(m)
+  def getBulkUpdateHandler(): BulkUpdateHandler = ??? // deprecated
+  def getCapabilities(): Capabilities = NoUpdateAllowed
+  def getEventManager(): GraphEventManager = NoEventManager
+  def getPrefixMapping(): PrefixMapping = ???
+  def getStatisticsHandler(): GraphStatisticsHandler = graph.getStatisticsHandler()
+  def getTransactionHandler(): TransactionHandler = NoTransactions
+  def isClosed(): Boolean = graph.isClosed()
+  def isEmpty(): Boolean = graph.isEmpty()
+  def isIsomorphicWith(other: JenaGraph): Boolean = graph.isIsomorphicWith(other)
+  def remove(s: JenaNode, p: JenaNode, o: JenaNode): Unit = new DeleteDeniedException("this is immutable")
+  def size(): Int = graph.size()
 }
