@@ -14,18 +14,15 @@ object JenaOperations extends RDFOps[Jena] {
 
   // graph
 
-  def emptyGraph: Jena#Graph = Factory.createDefaultGraph
+  val emptyGraph: Jena#Graph = ImmutableJenaGraph(Set.empty, Map.empty)
 
-  def makeGraph(triples: Iterable[Jena#Triple]): Jena#Graph = {
-    val graph: JenaGraph = Factory.createDefaultGraph
-    triples.foreach { triple =>
-      graph.add(triple)
-    }
-    graph
+  def makeGraph(triples: Iterable[Jena#Triple]): Jena#Graph =
+    ImmutableJenaGraph(triples.toSet, Map.empty)
+
+  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] = graph match {
+    case ig: ImmutableJenaGraph => ig.triples.toIterable
+    case _ => graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
   }
-
-  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] =
-    graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
 
   // triple
 
@@ -84,6 +81,9 @@ object JenaOperations extends RDFOps[Jena] {
     val iriString = fromUri(datatype)
     mapper.getTypeByName(iriString)
   }
+
+  protected [jena] val xsdString = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
+//  protected [jena] val langString = jenaDatatype("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
 
   /**
    * LangLiteral are not different types in Jena

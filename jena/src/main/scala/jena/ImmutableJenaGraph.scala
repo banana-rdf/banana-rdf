@@ -43,14 +43,24 @@ object NoEventManager extends GraphEventManager {
 }
 
 object NoTransactions extends TransactionHandler {
-  def abort(): Unit = new UnsupportedOperationException
-  def begin(): Unit = new UnsupportedOperationException
-  def commit(): Unit = new UnsupportedOperationException
-  def executeInTransaction(command: JenaCommand): Object = new UnsupportedOperationException
+  def abort(): Unit = throw new UnsupportedOperationException
+  def begin(): Unit = throw new UnsupportedOperationException
+  def commit(): Unit = throw new UnsupportedOperationException
+  def executeInTransaction(command: JenaCommand): Object = throw new UnsupportedOperationException
   def transactionsSupported(): Boolean = false
 }
 
-case class ImmutableJenaGraph(triples: Set[Jena#Triple]) extends JenaGraph {
+class PrefixMappingW(val prefixes: Map[String, String]) extends AnyVal {
+
+  def toPrefixMapping: PrefixMapping = {
+    val pm = PrefixMapping.Factory.create()
+    prefixes.foreach { case (prefix, uri) => pm.setNsPrefix(prefix, uri) }
+    pm
+  }
+
+}
+
+case class ImmutableJenaGraph(triples: Set[Jena#Triple], prefixes: Map[String, String]) extends JenaGraph {
 
   def matchTriples(s: JenaNode, p: JenaNode, o: JenaNode): Iterator[Jena#Triple] = {
     triples.iterator.filter { case JenaOperations.Triple(_s, _p, _o) =>
@@ -78,7 +88,7 @@ case class ImmutableJenaGraph(triples: Set[Jena#Triple]) extends JenaGraph {
   def getBulkUpdateHandler(): BulkUpdateHandler = ??? // deprecated
   def getCapabilities(): Capabilities = NoUpdateAllowed
   def getEventManager(): GraphEventManager = NoEventManager
-  def getPrefixMapping(): PrefixMapping = ???
+  def getPrefixMapping(): PrefixMapping = new PrefixMappingW(prefixes).toPrefixMapping
   def getStatisticsHandler(): GraphStatisticsHandler = new GraphStatisticsHandler {
     def getStatistic(s: JenaNode, p: JenaNode, o: JenaNode): Long = matchTriples(s, p, o).size
   }
@@ -103,7 +113,7 @@ case class WrappedJenaGraph(graph: JenaGraph) extends JenaGraph {
   def getBulkUpdateHandler(): BulkUpdateHandler = ??? // deprecated
   def getCapabilities(): Capabilities = NoUpdateAllowed
   def getEventManager(): GraphEventManager = NoEventManager
-  def getPrefixMapping(): PrefixMapping = ???
+  def getPrefixMapping(): PrefixMapping = graph.getPrefixMapping()
   def getStatisticsHandler(): GraphStatisticsHandler = graph.getStatisticsHandler()
   def getTransactionHandler(): TransactionHandler = NoTransactions
   def isClosed(): Boolean = graph.isClosed()
