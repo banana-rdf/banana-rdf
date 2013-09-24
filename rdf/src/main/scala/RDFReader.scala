@@ -1,7 +1,6 @@
 package org.w3.banana
 
 import java.io._
-import scalax.io._
 import scala.util._
 
 object RDFReader {
@@ -14,14 +13,11 @@ trait RDFReader[Rdf <: RDF, +S] {
 
   def syntax: Syntax[S]
 
-  def read[R <: Reader](resource: ReadCharsResource[R], base: String): Try[Rdf#Graph]
-
-  def read[R](inputResource: InputResource[R], base: String): Try[Rdf#Graph] =
-    read(inputResource.reader(Codec.UTF8), base)
+  def read(is: InputStream, base: String): Try[Rdf#Graph]
 
   def read(input: String, base: String): Try[Rdf#Graph] = {
-    val reader = new StringReader(input)
-    read(Resource.fromReader(reader), base)
+    val is = new ByteArrayInputStream(input.getBytes("UTF-8"))
+    read(is, base)
   }
 
 }

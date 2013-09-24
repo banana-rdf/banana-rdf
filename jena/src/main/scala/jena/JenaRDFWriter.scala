@@ -2,37 +2,26 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 import java.io.{ Writer => jWriter }
-import scalax.io._
 import com.hp.hpl.jena.rdf.model.ModelFactory
 import scala.util._
+import java.io._
+import org.apache.jena.riot._
 
 /**
  * Create an RDF Writer using Jena's serialisers
  */
 object JenaRDFWriter {
 
-  import JenaGraphSyntax._
-
-  def apply[T](implicit jenaSyntax: JenaGraphSyntax[T], _syntax: Syntax[T]): RDFWriter[Jena, T] =
-    new RDFWriter[Jena, T] {
-
-      val syntax: Syntax[T] = _syntax
-
-      val serialization = jenaSyntax.value
-
-      def write[R <: jWriter](graph: Jena#Graph, wcr: WriteCharsResource[R], base: String): Try[Unit] =
-        Try {
-          wcr.acquireAndGet { writer =>
-            val model = ModelFactory.createModelForGraph(graph)
-            model.getWriter(serialization).write(model, writer, base)
-          }
-        }
-
+  def makeRDFWriter[S](lang: Lang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
+    val syntax = _syntax
+    def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
+      RDFDataMgr.write(os, graph, lang)
     }
+  }
 
-  implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter[RDFXML]
+  implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = makeRDFWriter[RDFXML](Lang.RDFXML)
 
-  implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter[Turtle]
+  implicit val turtleWriter: RDFWriter[Jena, Turtle] = makeRDFWriter[Turtle](Lang.TURTLE)
 
   val selector: RDFWriterSelector[Jena] =
     RDFWriterSelector[Jena, RDFXML] combineWith RDFWriterSelector[Jena, Turtle]

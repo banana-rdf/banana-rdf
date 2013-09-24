@@ -3,8 +3,7 @@ package org.w3.banana
 import org.w3.banana.diesel._
 import org.w3.banana.syntax._
 import org.scalatest._
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, OutputStreamWriter, StringWriter }
-import scalax.io._
+import java.io._
 
 class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
     implicit ops: RDFOps[Rdf],
@@ -19,7 +18,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
 
   val foaf = FOAFPrefix[Rdf]
 
-  val resource = Resource.fromFile("rdf-test-suite/src/main/resources/new-tr.rdf")
+  val resource = new FileInputStream("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(resource, "http://foo.com").get
   val sparqlEngine = sparqlGraph(graph)
@@ -62,7 +61,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = sparqlWriter.write(answers, Resource.fromOutputStream(out), "")
+      val serialisedAnswer = sparqlWriter.write(answers, out, "")
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
       val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
@@ -139,29 +138,6 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
       val alexIsThere = sparqlEngine.executeAsk(query).getOrFail()
 
       assert(alexIsThere, " query " + query + " must return true")
-    }
-
-    "the sparql answer should serialise and deserialise " in {
-      //in any case we must re-execute query, as the results returned can often only be read once
-      val answers = sparqlEngine.executeAsk(query).getOrFail()
-
-      val out = new ByteArrayOutputStream()
-
-      val serialisedAnswer = BooleanWriter.selector(MediaRange(sparqlWriter.syntax.mime)).map {
-        l =>
-          l.write(answers, Resource.fromOutputStream(out), "")
-      }.getOrElse(fail("could not find sparql boolean writer for " + sparqlWriter.syntax.mime))
-
-      assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
-
-      val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
-      assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable ")
-
-      answr2.map { a =>
-        assert(a.isRight, "The answer to a ASK is a boolean")
-        val result = a.right.get
-        assert(result, " query " + query + "must return true")
-      }
     }
   }
 

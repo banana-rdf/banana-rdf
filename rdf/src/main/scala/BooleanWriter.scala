@@ -1,14 +1,14 @@
 package org.w3.banana
 
-import scalax.io._
+import java.io._
 import scala.util._
 
 trait BooleanWriter[T] extends Writer[Boolean, T] {
 
   def format(bool: Boolean): String
 
-  def write[R](bool: Boolean, wcr: WriteCharsResource[R], base: String): Try[Unit] = Try {
-    wcr.write(format(bool))
+  def write(bool: Boolean, os: OutputStream, base: String): Try[Unit] = Try {
+    os.write(format(bool).getBytes("UTF-8"))
   }
 
 }

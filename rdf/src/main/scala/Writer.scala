@@ -1,7 +1,6 @@
 package org.w3.banana
 
-import java.io.{ Writer => jWriter }
-import scalax.io._
+import java.io.{ OutputStream, ByteArrayOutputStream }
 import scala.util.Try
 
 /**
@@ -12,14 +11,12 @@ trait Writer[-O, +T] {
 
   def syntax: Syntax[T]
 
-  def write[R <: jWriter](obj: O, wcr: WriteCharsResource[R], base: String): Try[Unit]
+  def write(obj: O, outputstream: OutputStream, base: String): Try[Unit]
 
-  def write[R](obj: O, outputResource: OutputResource[R], base: String): Try[Unit] =
-    write(obj, outputResource.writer(Codec.UTF8), base)
-
-  def asString(obj: O, base: String): Try[String] = {
-    val stringWriter = new java.io.StringWriter
-    write(obj, Resource.fromWriter(stringWriter), base).map(_ => stringWriter.toString)
+  def asString(obj: O, base: String): Try[String] = Try {
+    val baos = new ByteArrayOutputStream
+    write(obj, baos, base)
+    new String(baos.toByteArray(), "UTF-8")
   }
 
 }

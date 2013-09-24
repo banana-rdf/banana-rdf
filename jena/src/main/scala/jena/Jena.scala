@@ -57,7 +57,7 @@ trait JenaModule {
 
   implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
 
-  implicit val rdfWriterSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector //
+  implicit val writerSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector //
 
   implicit val solutionsWriterJson: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter.solutionsWriterJson

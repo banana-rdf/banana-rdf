@@ -1,8 +1,7 @@
 package org.w3.banana.jena
 
-import java.io.{ ByteArrayOutputStream, Writer => jWriter }
-import scalax.io._
 import org.w3.banana._
+import java.io._
 import scala.util._
 
 /**
@@ -15,13 +14,9 @@ object JenaSolutionsWriter {
 
       val syntax = _syntax
 
-      def write[R <: jWriter](answers: Jena#Solutions, wcr: WriteCharsResource[R], base: String) =
+      def write(answers: Jena#Solutions, os: OutputStream, base: String) =
         Try {
-          // Jena's OutputFormater has no method operating over a Writer
-          // so we need to a temporary String
-          val baos = new ByteArrayOutputStream()
-          jenaSparqlSyntax.formatter.format(baos, answers)
-          wcr.write(baos.toString("UTF-8"))
+          jenaSparqlSyntax.formatter.format(os, answers)
         }
 
     }

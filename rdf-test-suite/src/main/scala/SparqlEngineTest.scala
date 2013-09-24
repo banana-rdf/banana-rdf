@@ -5,8 +5,8 @@ import org.w3.banana.diesel._
 import org.scalatest._
 import scala.concurrent._
 import scala.concurrent.util._
-import scalax.io._
 import scala.concurrent.ExecutionContext.Implicits.global
+import java.io.FileInputStream
 
 class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf])(
@@ -27,7 +27,7 @@ class SparqlEngineTest[Rdf <: RDF](
 
   val foaf = FOAFPrefix(ops)
 
-  val resource = Resource.fromFile("rdf-test-suite/src/main/resources/new-tr.rdf")
+  val resource = new FileInputStream("rdf-test-suite/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(resource, "http://example.com") getOrElse sys.error("ouch")
 

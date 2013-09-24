@@ -41,9 +41,8 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
   "read TURTLE version of timbl's card" in {
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
-    val resource = Resource.fromFile(file)
-    val graph = reader.read(resource, file.toURI.toString).get
-    //    graph.fold( _.printStackTrace, r => println(r.size))
+    val fis = new FileInputStream(file)
+    val graph = reader.read(fis, file.toURI.toString).get
     graph.toIterable.size should equal(77)
   }
 
