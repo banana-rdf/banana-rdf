@@ -11,7 +11,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-    version      := "2013_06_14-SNAPSHOT",
+    version      := "0.4",
     scalaVersion := "2.10.2",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
@@ -31,23 +31,24 @@ object BuildSettings {
         key(":doubleIndentClassDeclaration"), true
       )
     ),
-    licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
-    homepage := Some(url("https://github.com/w3c/banana-rdf")),
-    publishTo <<= version { (v: String) =>
-      //eg: export SBT_PROPS=-Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
+    publishTo := {
       val nexus = "https://oss.sonatype.org/"
-      val other = Option(System.getProperty("banana.publish")).map(_.split(":"))
-      if (v.trim.endsWith("SNAPSHOT")) {
-        val repo = other.map(p=>Resolver.ssh("banana.publish specified server", p(0), p(1)+"snapshots"))
-        repo.orElse(Some("snapshots" at nexus + "content/repositories/snapshots"))
-      } else {
-        val repo = other.map(p=>Resolver.ssh("banana.publish specified server", p(0), p(1)+"resolver"))
-        repo.orElse(Some("releases" at nexus + "service/local/staging/deploy/maven2"))
-      }
+      if (version.value.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => false },
     pomExtra := (
+      <url>https://github.com/w3c/banana-rdf</url>
+      <licenses>
+        <license>
+          <name>W3C License</name>
+          <url>http://opensource.org/licenses/W3C</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
       <scm>
         <url>git@github.com:w3c/banana-rdf.git</url>
         <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
