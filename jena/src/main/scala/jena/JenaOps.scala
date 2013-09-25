@@ -163,7 +163,7 @@ object JenaOperations extends RDFOps[Jena] {
           case graph =>
             val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
             while (it.hasNext) { triples += it.next() }
-            val pmId = graph.getPrefixMapping.getNsPrefixMap.entrySet.iterator()
+            val pmIt = graph.getPrefixMapping.getNsPrefixMap.entrySet.iterator()
             while (pmIt.hasNext) {
               val entry = pmIt.next()
               prefixes += (entry.getKey -> entry.getValue)
