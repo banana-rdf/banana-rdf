@@ -3,12 +3,11 @@ package org.w3.banana.jena
 import org.w3.banana._
 import JenaUtil._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
-import com.hp.hpl.jena.rdf.model.AnonId
-import com.hp.hpl.jena.datatypes.TypeMapper
-import scala.collection.JavaConverters._
-import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
+import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, Seq => _, _ }
 import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
+import com.hp.hpl.jena.datatypes.TypeMapper
+import scala.collection.JavaConverters._
 
 object JenaOperations extends RDFOps[Jena] {
 
@@ -150,13 +149,28 @@ object JenaOperations extends RDFOps[Jena] {
 
   // graph union
 
-  def union(graphs: List[Jena#Graph]): Jena#Graph = {
-    val g = Factory.createDefaultGraph
-    graphs.foreach { graph =>
-      val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
-      while (it.hasNext) { g.add(it.next()) }
+  def union(graphs: Seq[Jena#Graph]): Jena#Graph = {
+    graphs match {
+      case Seq() => emptyGraph
+      case Seq(graph) => graph
+      case _ =>
+        var triples: Set[Jena#Triple] = Set.empty
+        var prefixes: Map[String, String] = Map.empty
+        graphs.foreach {
+          case ImmutableJenaGraph(_triples, _prefixes) =>
+            triples ++= _triples
+            prefixes ++= _prefixes
+          case graph =>
+            val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
+            while (it.hasNext) { triples += it.next() }
+            val pmId = graph.getPrefixMapping.getNsPrefixMap.entrySet.iterator()
+            while (pmIt.hasNext) {
+              val entry = pmIt.next()
+              prefixes += (entry.getKey -> entry.getValue)
+            }
+        }
+        ImmutableJenaGraph(triples, prefixes)
     }
-    g
   }
 
   // graph isomorphism

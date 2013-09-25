@@ -85,7 +85,7 @@ trait RDFOps[Rdf <: RDF]
   def find(graph: Rdf#Graph, subject: Rdf#NodeMatch, predicate: Rdf#NodeMatch, objectt: Rdf#NodeMatch): Iterator[Rdf#Triple]
 
   // graph union
-  def union(graphs: List[Rdf#Graph]): Rdf#Graph
+  def union(graphs: Seq[Rdf#Graph]): Rdf#Graph
 
   // graph isomorphism
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean

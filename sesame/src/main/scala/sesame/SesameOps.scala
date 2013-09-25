@@ -179,9 +179,9 @@ object SesameOperations extends RDFOps[Sesame] {
 
   // graph union
 
-  def union(graphs: List[Sesame#Graph]): Sesame#Graph = {
+  def union(graphs: Seq[Sesame#Graph]): Sesame#Graph = {
     graphs match {
-      case x :: Nil => x
+      case Seq(x) => x
       case _ =>
         val graph = new LinkedHashModel
         graphs.foreach(g => graphToIterable(g) foreach { t => graph add t })
