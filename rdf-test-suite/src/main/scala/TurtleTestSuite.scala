@@ -4,7 +4,6 @@ import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.scalatest._
 import java.io._
-import scalax.io._
 import org.scalatest.EitherValues._
 
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
@@ -51,7 +50,6 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    import scalax.io.JavaConverters._
     val graph = reader.read(turtleString, rdfCore).get
     assert(referenceGraph isIsomorphicWith graph)
 

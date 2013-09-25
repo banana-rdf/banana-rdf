@@ -83,9 +83,6 @@ object BananaRdfBuild extends Build {
   
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.2"
 
-  val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
-  val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
-
   val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.4"
   val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.4"
 
@@ -159,7 +156,6 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
-//      plantain,
       //ldp,
       examples))
   
@@ -167,8 +163,6 @@ object BananaRdfBuild extends Build {
     id = "banana-rdf",
     base = file("rdf"),
     settings = buildSettings ++ testDeps ++ Seq(
-      libraryDependencies += scalaIoCore,
-      libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
@@ -181,8 +175,6 @@ object BananaRdfBuild extends Build {
     id = "banana-rdf-test-suite",
     base = file("rdf-test-suite"),
     settings = buildSettings ++ testsuiteDeps ++ Seq(
-      libraryDependencies += scalaIoCore,
-      libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert
@@ -193,8 +185,6 @@ object BananaRdfBuild extends Build {
     id = "banana-jena",
     base = file("jena"),
     settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
-      libraryDependencies += scalaIoCore,
-      libraryDependencies += scalaIoFile,
       libraryDependencies += akka
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
@@ -203,20 +193,7 @@ object BananaRdfBuild extends Build {
     id = "banana-sesame",
     base = file("sesame"),
     settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps ++ Seq(
-      libraryDependencies += scalaIoCore,
-      libraryDependencies += scalaIoFile,
       libraryDependencies += akka
-    )
-  ) dependsOn (rdf, rdfTestSuite % "test")
-
-  lazy val plantain = Project(
-    id = "plantain",
-    base = file("plantain"),
-    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
-      libraryDependencies += scalaIoCore,
-      libraryDependencies += scalaIoFile,
-      libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
-      libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
 
@@ -232,8 +209,6 @@ object BananaRdfBuild extends Build {
     id = "experimental",
     base = file("experimental"),
     settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
-      libraryDependencies += scalaIoCore,
-      libraryDependencies += scalaIoFile,
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
       libraryDependencies += iterateeDeps,
@@ -242,14 +217,12 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (plantain, rdfTestSuite % "test")
+  ) dependsOn (rdfTestSuite % "test")
 
   lazy val ldp = Project(
     id = "ldp",
     base = file("ldp"),
     settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
-        libraryDependencies += scalaIoCore,
-        libraryDependencies += scalaIoFile,
         libraryDependencies += akka,
         libraryDependencies += asyncHttpClient,
         libraryDependencies += akkaTransactor,
@@ -258,7 +231,7 @@ object BananaRdfBuild extends Build {
         libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
         libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (plantain, rdfTestSuite % "test")
+  ) dependsOn (rdfTestSuite % "test")
 
   
 }
