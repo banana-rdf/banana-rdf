@@ -2,14 +2,12 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait TypedLiteralSyntax {
+trait TypedLiteralSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
-  implicit def typedLiteralW[Rdf <: RDF](tl: Rdf#TypedLiteral) =
+  implicit def typedLiteralW(tl: Rdf#TypedLiteral) =
     new TypedLiteralW[Rdf](tl)
 
 }
-
-object TypedLiteralSyntax extends TypedLiteralSyntax
 
 class TypedLiteralW[Rdf <: RDF](val tl: Rdf#TypedLiteral) extends AnyVal {
 

@@ -3,47 +3,13 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import java.net.{ URI => jURI }
 
-trait URISyntax {
+trait URISyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
-  implicit def uriW[Rdf <: RDF](uri: Rdf#URI): URIW[Rdf] = new URIWDefault(uri)
-
-  def foo() = ()
+  implicit def uriW(uri: Rdf#URI): URIW[Rdf] = new URIW[Rdf](uri)
 
 }
 
-object URISyntax extends URISyntax
-
-trait URIW[Rdf <: RDF] extends Any {
-
-  def getString(implicit ops: RDFOps[Rdf]): String
-
-  def fragmentLess(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def fragment(frag: String)(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def fragment(implicit ops: RDFOps[Rdf]): Option[String]
-
-  def isPureFragment(implicit ops: RDFOps[Rdf]): Boolean
-
-  def /(str: String)(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def newChildUri()(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def resolve(str: String)(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def resolveAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def relativize(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def relativizeAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI
-
-  def lastPathSegment(implicit ops: RDFOps[Rdf]): String
-
-  def underlying(implicit ops:RDFOps[Rdf]): jURI = new jURI(this.getString)
-
-}
-
-class URIWDefault[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal with URIW[Rdf] {
+class URIW[Rdf <: RDF] (val uri: Rdf#URI) extends AnyVal {
 
   def getString(implicit ops: RDFOps[Rdf]): String = ops.fromUri(uri)
 

@@ -4,13 +4,11 @@ import org.w3.banana._
 import org.w3.banana.binder._
 import scala.util.Try
 
-trait NodeSyntax {
+trait NodeSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
-  implicit def nodeW[Rdf <: RDF](node: Rdf#Node) = new NodeW[Rdf](node)
+  implicit def nodeW(node: Rdf#Node) = new NodeW[Rdf](node)
 
 }
-
-object NodeSyntax extends NodeSyntax
 
 class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
 
@@ -28,6 +26,7 @@ class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
   }
 
   def relativizeAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
+    import ops._
     ops.foldNode(node)(_.relativizeAgainst(baseUri), bn => bn, lit => lit)
   }
 

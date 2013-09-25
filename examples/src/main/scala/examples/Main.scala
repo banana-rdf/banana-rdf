@@ -49,8 +49,7 @@ object IOExample {
 
     /* prints 10 triples to stdout */
 
-    // TODO: find a better way re: type inference
-    val graph10Triples = Graph(new GraphW[Rdf](graph).toIterable.take(10).toSet)
+    val graph10Triples = Graph(graph.toIterable.take(10).toSet)
     val graphAsString = writer.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsString)
   }

@@ -3,22 +3,20 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import org.w3.banana.binder._
 
-trait AnySyntax {
+trait AnySyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
-  implicit def anyW[T](t: T): AnyW[T] = new AnyW[T](t)
+  implicit def anyW[T](t: T): AnyW[Rdf, T] = new AnyW[Rdf, T](t)
 
 }
 
-object AnySyntax extends AnySyntax
+class AnyW[Rdf <: RDF, T](val t: T) extends AnyVal {
 
-class AnyW[T](val t: T) extends AnyVal {
+  def toUri(implicit uriMaker: ToURI[Rdf, T]): Rdf#URI = uriMaker.toURI(t)
 
-  def toUri[Rdf <: RDF](implicit uriMaker: ToURI[Rdf, T]): Rdf#URI = uriMaker.toURI(t)
+  def toNode(implicit to: ToNode[Rdf, T]): Rdf#Node = to.toNode(t)
 
-  def toNode[Rdf <: RDF](implicit to: ToNode[Rdf, T]): Rdf#Node = to.toNode(t)
+  def toPointedGraph(implicit to: ToPG[Rdf, T]): PointedGraph[Rdf] = to.toPG(t)
 
-  def toPointedGraph[Rdf <: RDF](implicit to: ToPG[Rdf, T]): PointedGraph[Rdf] = to.toPG(t)
-
-  def toPG[Rdf <: RDF](implicit to: ToPG[Rdf, T]): PointedGraph[Rdf] = this.toPointedGraph(to)
+  def toPG(implicit to: ToPG[Rdf, T]): PointedGraph[Rdf] = this.toPointedGraph(to)
 
 }

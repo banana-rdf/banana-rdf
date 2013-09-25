@@ -2,9 +2,9 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait SparqlSolutionsSyntax {
+trait SparqlSolutionsSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
-  implicit def sparqlSolutionsSyntax[Rdf <: RDF](solutions: Rdf#Solutions) = new SparqlSolutionsSyntaxW[Rdf](solutions)
+  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions) = new SparqlSolutionsSyntaxW[Rdf](solutions)
 
 }
 

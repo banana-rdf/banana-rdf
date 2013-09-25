@@ -15,7 +15,8 @@ object RDFOps {
  */
 trait RDFOps[Rdf <: RDF]
     extends RDFDSL[Rdf]
-    with CommonPrefixes[Rdf] {
+    with CommonPrefixes[Rdf]
+    with syntax.Syntax[Rdf] {
 
   // graph
 

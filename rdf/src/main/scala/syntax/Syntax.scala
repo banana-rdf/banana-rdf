@@ -1,16 +1,18 @@
 package org.w3.banana.syntax
 
-trait Syntax
-extends GraphSyntax
-with TripleMatchSyntax
-with TripleSyntax
-with NodeMatchSyntax
-with NodeSyntax
-with URISyntax
-with LiteralSyntax
-with TypedLiteralSyntax
-with LangLiteralSyntax
-with StringSyntax
-with AnySyntax
-with SparqlSolutionSyntax
-with SparqlSolutionsSyntax
+import org.w3.banana._
+
+trait Syntax[Rdf <: RDF]
+extends GraphSyntax[Rdf]
+with TripleMatchSyntax[Rdf]
+with TripleSyntax[Rdf]
+with NodeMatchSyntax[Rdf]
+with NodeSyntax[Rdf]
+with URISyntax[Rdf]
+with LiteralSyntax[Rdf]
+with TypedLiteralSyntax[Rdf]
+with LangLiteralSyntax[Rdf]
+with StringSyntax[Rdf]
+with AnySyntax[Rdf]
+with SparqlSolutionSyntax[Rdf]
+with SparqlSolutionsSyntax[Rdf]

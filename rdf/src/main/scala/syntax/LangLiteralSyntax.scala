@@ -2,14 +2,12 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait LangLiteralSyntax {
+trait LangLiteralSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
-  implicit def langLiteralW[Rdf <: RDF](ll: Rdf#LangLiteral) =
+  implicit def langLiteralW(ll: Rdf#LangLiteral) =
     new LangLiteralW[Rdf](ll)
 
 }
-
-object LangLiteralSyntax extends LangLiteralSyntax
 
 class LangLiteralW[Rdf <: RDF](val ll: Rdf#LangLiteral) extends AnyVal {
 
