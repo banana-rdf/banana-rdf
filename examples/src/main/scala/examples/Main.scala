@@ -10,7 +10,6 @@ object IOExample {
   import org.w3.banana._
   import scala.util.Properties
   import java.io.File
-  import scalax.io.Resource
   import org.w3.banana.syntax._
 
   // just because we can :-)
