@@ -122,7 +122,7 @@ object BananaRdfBuild extends Build {
   val jenaDeps =
     Seq(
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      libraryDependencies += "org.apache.jena" % "apache-jena-libs" % "2.11.0" excludeAll(ExclusionRule(organization = "org.slf4j")),
+      libraryDependencies += "org.apache.jena" % "apache-jena-libs" % "2.11.0" ,//excludeAll(ExclusionRule(organization = "org.slf4j")),
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided",
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
@@ -157,7 +157,6 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
-      //ldp,
       examples))
   
   lazy val rdf = Project(
@@ -171,6 +170,14 @@ object BananaRdfBuild extends Build {
       publishMavenStyle := true
     )
   )
+
+  lazy val patch = Project(
+    id = "patch",
+    base = file("patch"),
+    settings = buildSettings ++ testDeps ++ Seq(
+      publishMavenStyle := true
+    )
+  ) dependsOn (rdf, jena, rdfTestSuite % "test")
 
   lazy val rdfTestSuite = Project(
     id = "banana-rdf-test-suite",
