@@ -54,6 +54,32 @@ WHERE {
     parsed should be(expected)
   }
 
+  "parse patch query with prefixes" in {
+    val parser = new PCPatchParser[Rdf]
+    val query = """
+BASE http://example.com/
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+DELETE {
+  <a> foaf:b ?o
+}
+INSERT {
+  ?s foaf:b <c>
+}
+WHERE {
+  ?s <b> ?o .
+  ?o <b> ?z
+}
+"""
+    val parsed = parser.parse(parser.patch, new StringReader(query)).get
+    val expected =
+      LDPPatch(
+        Some(Delete(TriplesBlock(Vector(TriplePattern(Term(URI("http://example.com/a")),URI("http://xmlns.com/foaf/0.1/b"),Var("o")))))),
+        Some(Insert(TriplesBlock(Vector(TriplePattern(Var("s"),URI("http://xmlns.com/foaf/0.1/b"),Term(URI("http://example.com/c"))))))),
+        Some(Where(TriplesBlock(Vector(
+          TriplePattern(Var("s"),URI("http://example.com/b"),Var("o")),
+          TriplePattern(Var("o"),URI("http://example.com/b"),Var("z")))))))
+    parsed should be(expected)
+  }
 
 
 }

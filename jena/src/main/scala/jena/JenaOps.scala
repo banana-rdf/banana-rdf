@@ -173,6 +173,25 @@ object JenaOperations extends RDFOps[Jena] {
     }
   }
 
+  def diff(g1: Jena#Graph, g2: Jena#Graph): Jena#Graph = {
+    g1 match {
+      case ImmutableJenaGraph(_triples, _prefixes) =>
+        ImmutableJenaGraph(_triples -- graphToIterable(g2), _prefixes)
+      case graph =>
+        // TODO factorize in a helper function
+        var triples: Set[Jena#Triple] = Set.empty
+        var prefixes: Map[String, String] = Map.empty
+        val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
+        while (it.hasNext) { triples += it.next() }
+        val pmIt = graph.getPrefixMapping.getNsPrefixMap.entrySet.iterator()
+        while (pmIt.hasNext) {
+          val entry = pmIt.next()
+          prefixes += (entry.getKey -> entry.getValue)
+        }
+        ImmutableJenaGraph(triples -- graphToIterable(g2), prefixes)
+    }
+  }
+
   // graph isomorphism
 
   def isomorphism(left: Jena#Graph, right: Jena#Graph): Boolean =

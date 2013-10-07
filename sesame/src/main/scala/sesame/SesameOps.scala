@@ -189,6 +189,8 @@ object SesameOperations extends RDFOps[Sesame] {
     }
   }
 
+  def diff(g1: Sesame#Graph, g2: Sesame#Graph): Sesame#Graph = ???
+
   // graph isomorphism
 
   /** the new ModelUtil.equals changed its semantics. See 

@@ -87,6 +87,8 @@ trait RDFOps[Rdf <: RDF]
   // graph union
   def union(graphs: Seq[Rdf#Graph]): Rdf#Graph
 
+  def diff(g1: Rdf#Graph, g2: Rdf#Graph): Rdf#Graph
+
   // graph isomorphism
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
 
