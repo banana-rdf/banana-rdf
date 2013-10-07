@@ -208,7 +208,7 @@ case class LocalBinaryR[Rdf<:RDF](path: Path, location: Rdf#URI)
       }
       out
     }
-    i.mapDone{ _ =>
+    i.map{ _ =>
        Files.move(tmpfile,path,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING)
        this // we can return this
     }
@@ -356,14 +356,14 @@ class RWWebActor[Rdf<:RDF](val baseUri: Rdf#URI)
         rootContainer match {
           case Some(root) => {
             val p = root.path / path.split('/').toIterable
-            val to = context.actorFor(p)
+            val to = context.actorSelection(p)
             if (context.system.deadLetters == to) {
               log.info(s"message $cmd to akka('$path')=$to -- dead letter - returning error ")
               sender ! ResourceDoesNotExist(s"could not find actor for ${cmd.command.uri}")
             }
             else {
               log.info(s"forwarding message $cmd to akka('$path')=$to ")
-              to forward cmd
+              to.tell(cmd,context.sender)
             }
           }
           case None => log.warning("RWWebActor not set up yet: missing rootContainer")

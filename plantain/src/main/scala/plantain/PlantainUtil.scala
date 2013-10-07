@@ -215,30 +215,27 @@ object PlantainUtil {
             }
           }
           case modify: Modify => {
-            val whereClause = modify.getWhereExpr match {
+            val whereClause: QueryRoot = modify.getWhereExpr match {
               case qr: QueryRoot => qr
               case whereClause => new QueryRoot(whereClause)
             }
             val evStrat = new EvaluationStrategyImpl(graph)
             val it = evStrat.evaluate(whereClause,bindingSet)
-            val it2 = for ( bs <- it.toIterator) yield { //see SailUpateExecutor.evaluateWhereClause
-              if (whereClause.isInstanceOf[SingletonSet] && bs.isInstanceOf[EmptyBindingSet] && bindingSet != null) {
-                bindingSet
-              } else {
-                import scala.collection.convert.decorateAsScala._
-                val uniqueBindings = bindingSet.getBindingNames.asScala -- bs.getBindingNames.asScala
-                if (uniqueBindings.size>0) {
-                  val mergedSet = new MapBindingSet();
-                  for (bindingName <- bs.getBindingNames()) {
-                    mergedSet.addBinding(bs.getBinding(bindingName));
-                  }
-                  for (bindingName <- uniqueBindings) {
-                    mergedSet.addBinding(bindingSet.getBinding(bindingName));
-                  }
-                  mergedSet
-                } else {
-                   bs
+            val it2 = for ( bs <- it.toIterator) yield {
+              //see SailUpateExecutor.evaluateWhereClause
+              import scala.collection.convert.decorateAsScala._
+              val uniqueBindings = bindingSet.getBindingNames.asScala -- bs.getBindingNames.asScala
+              if (uniqueBindings.size > 0) {
+                val mergedSet = new MapBindingSet();
+                for (bindingName <- bs.getBindingNames()) {
+                  mergedSet.addBinding(bs.getBinding(bindingName));
                 }
+                for (bindingName <- uniqueBindings) {
+                  mergedSet.addBinding(bindingSet.getBinding(bindingName));
+                }
+                mergedSet
+              } else {
+                bs
               }
             }
             for (sourceBinding<-it2) {

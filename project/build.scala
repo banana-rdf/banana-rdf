@@ -11,7 +11,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
-    version      := "2013_06_14-SNAPSHOT",
+    version      := "2013_10_07-SNAPSHOT",
     scalaVersion := "2.10.1",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
@@ -85,8 +85,8 @@ object BananaRdfBuild extends Build {
   val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
   val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
 
-  val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.4"
-  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.4"
+  val akka = "com.typesafe.akka" %% "akka-actor" % "2.2.0"
+  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.2.0"
 
 //  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.6"
 

@@ -200,7 +200,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
         val parent = uriW[Plantain](baseUri).resolve("..")
         val scrpt = LDPCommand.updateLDPR[Plantain](parent,remove=Iterable(Triple(parent,ldp.created,baseUri)))
         context.stop(self)
-        rwwActor forward Scrpt(scrpt.flatMap(_=>a)) //todo: why no function here?
+        rwwActor.tell(Scrpt(scrpt.flatMap(_=>a)),context.sender) //todo: why no function here?
       }
       case _ => super.runLocalCmd(cmd)
 //      case SelectLDPC(_,query, bindings, k) => {
@@ -449,7 +449,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
         val parent = uriW[Plantain](baseUri).resolve(".")
         val scrpt = LDPCommand.updateLDPR[Plantain](parent,remove=Iterable(Triple(parent,ldp.created,baseUri)))
         context.stop(self)
-        rwwActor forward Scrpt(scrpt.flatMap(_=>a)) //todo: why no function here?
+        rwwActor.tell(Scrpt(scrpt.flatMap(_=>a)),context.sender) //todo: why no function here?
       }
       case UpdateLDPR(uri, remove, add, a) => {
         val nme = name(uri)
@@ -529,7 +529,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
         }
         else {
           log.info(s"sending to $rwwActor")
-          rwwActor forward Cmd(cmd)
+          rwwActor.tell(Cmd(cmd),context.sender)
         }
       }
       case \/-(a) => {
@@ -548,7 +548,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
     advices foreach (_.post(cmd))
   }
 
-  lazy val rwwActor= context.actorFor("/user/rww")
+  lazy val rwwActor= context.actorSelection("/user/rww")
 
   def receive = returnErrors {
     case s: Scrpt[Plantain,_]  => {
