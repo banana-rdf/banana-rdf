@@ -162,7 +162,7 @@ abstract class LDPPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], re
   val graph: Rdf#Graph = reader.read("""
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-<http://bertails.org/alex#me> foaf:name "Alex" ;
+_:betehess foaf:name "Alex" ;
   foaf:knows <http://bblfish.net/#hjs> .
 
 <http://bblfish.net/#hjs> foaf:name "Henry Story" ;
@@ -186,7 +186,7 @@ WHERE {
   val expectedGraph: Rdf#Graph = reader.read("""
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-<http://bertails.org/alex#me> foaf:name "Alexandre" ;
+[] foaf:name "Alexandre" ;
   foaf:knows <http://bblfish.net/#hjs> .
 
 <http://bblfish.net/#hjs> foaf:name "Henry Story" ;
@@ -199,6 +199,29 @@ WHERE {
 
     assert(patchedGraph isIsomorphicWith expectedGraph)
 
+  }
+
+  "PATCH2" in {
+    val patch = LDPPatchParser.parseOne[Rdf]("""
+DELETE {
+  <http://bblfish.net/#hjs> ?p ?o
+}
+WHERE {
+  <http://bblfish.net/#hjs> ?p ?o
+}
+""").get
+
+  val expectedGraph: Rdf#Graph = reader.read("""
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+[] foaf:name "Alex" ;
+  foaf:knows <http://bblfish.net/#hjs> .
+""", "http://example.com").get
+
+    val patcher: LDPPatchCommand[Rdf] = new LDPPatchCommandImpl[Rdf]
+
+    val patchedGraph = patcher.PATCH(graph, patch).get
+
+    assert(patchedGraph isIsomorphicWith expectedGraph)
   }
 
 }

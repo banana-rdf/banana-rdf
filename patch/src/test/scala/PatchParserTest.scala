@@ -46,11 +46,11 @@ WHERE {
     val parsed = parser.parse(parser.patch, new StringReader(query)).get
     val expected =
       LDPPatch(
-        Some(Delete(TriplesBlock(Vector(TriplePattern(Term(URI("http://example.com/a")),URI("http://example.com/b"),Var("o")))))),
-        Some(Insert(TriplesBlock(Vector(TriplePattern(Var("s"),URI("http://example.com/b"),Term(URI("http://example.com/c"))))))),
+        Some(Delete(TriplesBlock(Vector(TriplePattern(Term(URI("http://example.com/a")),IRIRef(URI("http://example.com/b")),Var("o")))))),
+        Some(Insert(TriplesBlock(Vector(TriplePattern(Var("s"),IRIRef(URI("http://example.com/b")),Term(URI("http://example.com/c"))))))),
         Some(Where(TriplesBlock(Vector(
-          TriplePattern(Var("s"),URI("http://example.com/b"),Var("o")),
-          TriplePattern(Var("o"),URI("http://example.com/b"),Var("z")))))))
+          TriplePattern(Var("s"),IRIRef(URI("http://example.com/b")),Var("o")),
+          TriplePattern(Var("o"),IRIRef(URI("http://example.com/b")),Var("z")))))))
     parsed should be(expected)
   }
 
@@ -73,11 +73,11 @@ WHERE {
     val parsed = parser.parse(parser.patch, new StringReader(query)).get
     val expected =
       LDPPatch(
-        Some(Delete(TriplesBlock(Vector(TriplePattern(Term(URI("http://example.com/a")),URI("http://xmlns.com/foaf/0.1/b"),Var("o")))))),
-        Some(Insert(TriplesBlock(Vector(TriplePattern(Var("s"),URI("http://xmlns.com/foaf/0.1/b"),Term(URI("http://example.com/c"))))))),
+        Some(Delete(TriplesBlock(Vector(TriplePattern(Term(URI("http://example.com/a")),IRIRef(URI("http://xmlns.com/foaf/0.1/b")),Var("o")))))),
+        Some(Insert(TriplesBlock(Vector(TriplePattern(Var("s"),IRIRef(URI("http://xmlns.com/foaf/0.1/b")),Term(URI("http://example.com/c"))))))),
         Some(Where(TriplesBlock(Vector(
-          TriplePattern(Var("s"),URI("http://example.com/b"),Var("o")),
-          TriplePattern(Var("o"),URI("http://example.com/b"),Var("z")))))))
+          TriplePattern(Var("s"),IRIRef(URI("http://example.com/b")),Var("o")),
+          TriplePattern(Var("o"),IRIRef(URI("http://example.com/b")),Var("z")))))))
     parsed should be(expected)
   }
 

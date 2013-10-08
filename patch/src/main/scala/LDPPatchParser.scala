@@ -84,9 +84,10 @@ class PCPatchParser[Rdf <: RDF](
     | varr
   )
 
-  def predicate: Parser[Rdf#URI] = (
-      qnameORuri
-    | "a" ^^ { _ => rdf.typ }
+  def predicate: Parser[VarOrIRIRef[Rdf]] = (
+      qnameORuri ^^ { uri => IRIRef(uri) }
+    | "a" ^^ { _ => IRIRef(rdf.typ) }
+    | varr
   )
 
   def objectt: Parser[VarOrTerm[Rdf]] = (

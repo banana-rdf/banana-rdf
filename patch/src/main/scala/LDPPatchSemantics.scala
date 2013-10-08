@@ -7,11 +7,18 @@ import scala.util.Try
 case class SolutionMapping[Rdf <: RDF](map: Map[Var[Rdf], Rdf#Node]) {
 
   def apply(tp: TriplePattern[Rdf])(ops: RDFOps[Rdf]): Rdf#Triple = {
-    def toNode(vt: VarOrTerm[Rdf]): Rdf#Node = vt match {
+    def varOrTermtoNode(vt: VarOrTerm[Rdf]): Rdf#Node = vt match {
       case v: Var[Rdf] => map(v)
       case Term(node)  => node
     }
-    ops.Triple(toNode(tp.s), tp.p, toNode(tp.o))
+    def varOrIRIReftoNode(vi: VarOrIRIRef[Rdf]): Rdf#URI = vi match {
+      case v: Var[Rdf] => ops.foldNode(map(v))(
+        uri => uri,
+        bnode => sys.error(s"$v matched a bnode and was used in predicate position"),
+        literal => sys.error(s"$v matched a literal (value $literal) and was used in predicate position"))
+      case IRIRef(uri) => uri
+    }
+    ops.Triple(varOrTermtoNode(tp.s), varOrIRIReftoNode(tp.p), varOrTermtoNode(tp.o))
   }
 
 }
@@ -56,21 +63,28 @@ class LDPPatchCommandImpl[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LDPPa
   import ops._
 
   def toNodeMatch(vt: VarOrTerm[Rdf]): Rdf#NodeMatch = vt match {
-    case Var(_)     => ANY
-    case Term(node) => node
+    case _: Var[Rdf] => ANY
+    case Term(node)  => node
+  }
+
+  def toNodeMatch(vi: VarOrIRIRef[Rdf]): Rdf#NodeMatch = vi match {
+    case Var(_)      => ANY
+    case IRIRef(uri) => uri
   }
 
   def triplePatternMatching(graph: Rdf#Graph, tp: TriplePattern[Rdf]): ResultSet[Rdf] = {
     val vars: Set[Var[Rdf]] = {
       var vars = Set.empty[Var[Rdf]]
       tp.s match { case v: Var[Rdf] => vars += v ; case _ => () }
+      tp.p match { case v: Var[Rdf] => vars += v ; case _ => () }
       tp.o match { case v: Var[Rdf] => vars += v ; case _ => () }
       vars
     }
     val builder = Vector.newBuilder[SolutionMapping[Rdf]]
-    find(graph, toNodeMatch(tp.s), tp.p, toNodeMatch(tp.o)) foreach { case t@Triple(s, _, o) =>
+    find(graph, toNodeMatch(tp.s), toNodeMatch(tp.p), toNodeMatch(tp.o)) foreach { case t@Triple(s, p, o) =>
       var binding = Map.empty[Var[Rdf], Rdf#Node]
       tp.s match { case v: Var[Rdf] => binding += (v -> s) ; case _ => () }
+      tp.p match { case v: Var[Rdf] => binding += (v -> p) ; case _ => () }
       tp.o match { case v: Var[Rdf] => binding += (v -> o) ; case _ => () }
       builder += SolutionMapping[Rdf](binding)
     }
