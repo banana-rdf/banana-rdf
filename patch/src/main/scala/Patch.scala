@@ -1,6 +1,8 @@
 package org.w3.banana
 
-case class LDPPatch[Rdf <: RDF](
+/* the grammar for an LDP PATCH */
+
+case class Patch[Rdf <: RDF](
   delete: Option[Delete[Rdf]],
   insert: Option[Insert[Rdf]],
   where: Option[Where[Rdf]])

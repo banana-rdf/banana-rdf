@@ -9,13 +9,13 @@ abstract class PatchParserTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends 
   import ops._
 
   "parse variable" in {
-    val parser = new PCPatchParser[Rdf]
+    val parser = new PatchParserCombinator[Rdf]
     val v = parser.parse(parser.varr, new StringReader("?foo"))
     v.get should be (Var("foo"))
   }
 
   "parse literal" in {
-    val parser = new PCPatchParser[Rdf](prefixes = Map(xsd.prefixName -> xsd.prefixIri))
+    val parser = new PatchParserCombinator[Rdf](prefixes = Map(xsd.prefixName -> xsd.prefixIri))
     parser.parse(parser.literal, new StringReader("4")).get should be(TypedLiteral("4", xsd.integer))
     parser.parse(parser.literal, new StringReader(""""foo"""")).get should be(TypedLiteral("foo", xsd.string))
     parser.parse(parser.literal, new StringReader(""""foo"^^xsd:string""")).get should be(TypedLiteral("foo", xsd.string))
@@ -23,13 +23,13 @@ abstract class PatchParserTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends 
   }
 
   "parse qname or uri" in {
-    val parser = new PCPatchParser[Rdf](prefixes = Map(xsd.prefixName -> xsd.prefixIri))
+    val parser = new PatchParserCombinator[Rdf](prefixes = Map(xsd.prefixName -> xsd.prefixIri))
     parser.parse(parser.qnameORuri, new StringReader("""<http://example.com>""")).get should be(URI("http://example.com"))
     parser.parse(parser.qnameORuri, new StringReader("""xsd:foo""")).get should be(xsd("foo"))
   }
 
   "parse patch query" in {
-    val parser = new PCPatchParser[Rdf]
+    val parser = new PatchParserCombinator[Rdf]
     val query = """
 BASE http://example.com/
 DELETE {
@@ -45,7 +45,7 @@ WHERE {
 """
     val parsed = parser.parse(parser.patch, new StringReader(query)).get
     val expected =
-      LDPPatch(
+      Patch(
         Some(Delete(TriplesBlock(Vector(TriplePattern(Term(URI("http://example.com/a")),IRIRef(URI("http://example.com/b")),Var("o")))))),
         Some(Insert(TriplesBlock(Vector(TriplePattern(Var("s"),IRIRef(URI("http://example.com/b")),Term(URI("http://example.com/c"))))))),
         Some(Where(TriplesBlock(Vector(
@@ -55,7 +55,7 @@ WHERE {
   }
 
   "parse patch query with prefixes" in {
-    val parser = new PCPatchParser[Rdf]
+    val parser = new PatchParserCombinator[Rdf]
     val query = """
 BASE http://example.com/
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -72,7 +72,7 @@ WHERE {
 """
     val parsed = parser.parse(parser.patch, new StringReader(query)).get
     val expected =
-      LDPPatch(
+      Patch(
         Some(Delete(TriplesBlock(Vector(TriplePattern(Term(URI("http://example.com/a")),IRIRef(URI("http://xmlns.com/foaf/0.1/b")),Var("o")))))),
         Some(Insert(TriplesBlock(Vector(TriplePattern(Var("s"),IRIRef(URI("http://xmlns.com/foaf/0.1/b")),Term(URI("http://example.com/c"))))))),
         Some(Where(TriplesBlock(Vector(

@@ -4,26 +4,26 @@ import scala.util.Try
 import scala.util.parsing.combinator._
 import java.io._
 
-trait LDPPatchParser[Rdf <: RDF] {
-  def parseOne(s: String): Try[LDPPatch[Rdf]]
-  def parse(s: String): Try[List[LDPPatch[Rdf]]]
+trait PatchParser[Rdf <: RDF] {
+  def parseOne(s: String): Try[Patch[Rdf]]
+  def parse(s: String): Try[List[Patch[Rdf]]]
 }
 
-object LDPPatchParser {
+object PatchParser {
 
-  def parseOne[Rdf <: RDF](s: String)(implicit ops: RDFOps[Rdf]): Try[LDPPatch[Rdf]] = Try {
-    val parser = new PCPatchParser[Rdf]
+  def parseOne[Rdf <: RDF](s: String)(implicit ops: RDFOps[Rdf]): Try[Patch[Rdf]] = Try {
+    val parser = new PatchParserCombinator[Rdf]
     parser.parse(parser.patch, new StringReader(s)).get
   }
 
-  def parse[Rdf <: RDF](s: String)(implicit ops: RDFOps[Rdf]): Try[List[LDPPatch[Rdf]]] = Try {
-    val parser = new PCPatchParser[Rdf]
+  def parse[Rdf <: RDF](s: String)(implicit ops: RDFOps[Rdf]): Try[List[Patch[Rdf]]] = Try {
+    val parser = new PatchParserCombinator[Rdf]
     parser.parse(parser.patches, new StringReader(s)).get
   }
 
 }
-/** a Parser Combinator-based parser for the LDPPatch format */
-object PCPatchParser {
+/** a Parser Combinator-based parser for the Patch format */
+object PatchParserCombinator {
 
   val uri = """[a-zA-Z0-9:/#_\.\-\+]+""".r
   val integer = """[0-9]+""".r
@@ -31,21 +31,21 @@ object PCPatchParser {
 
 }
 
-class PCPatchParser[Rdf <: RDF](
+class PatchParserCombinator[Rdf <: RDF](
   var base: Option[String] = None,
   var prefixes: Map[String, String] = Map.empty)(
   implicit ops: RDFOps[Rdf])
-  extends LDPPatchParser[Rdf] with RegexParsers with JavaTokenParsers with PackratParsers {
+  extends PatchParser[Rdf] with RegexParsers with JavaTokenParsers with PackratParsers {
 
-  import PCPatchParser._
+  import PatchParserCombinator._
   import ops._
 
-  def patches: Parser[List[LDPPatch[Rdf]]] =
+  def patches: Parser[List[Patch[Rdf]]] =
     rep(patch)
 
-  def patch: Parser[LDPPatch[Rdf]] =
+  def patch: Parser[Patch[Rdf]] =
     opt(prologue) ~ opt(delete) ~ opt(insert) ~ opt(where) ^^ {
-      case _ ~ deleteOpt ~ insertOpt ~ whereOpt => LDPPatch(deleteOpt, insertOpt, whereOpt)
+      case _ ~ deleteOpt ~ insertOpt ~ whereOpt => Patch(deleteOpt, insertOpt, whereOpt)
     }
 
   def prologue: Parser[Unit] =
@@ -127,13 +127,13 @@ class PCPatchParser[Rdf <: RDF](
 
   def varr: Parser[Var[Rdf]] = "?" ~ ident ^^ { case "?" ~ x => Var(x) }
 
-  def parseOne(s: String): Try[LDPPatch[Rdf]] = Try {
-    val parser = new PCPatchParser[Rdf]
+  def parseOne(s: String): Try[Patch[Rdf]] = Try {
+    val parser = new PatchParserCombinator[Rdf]
     parser.parse(parser.patch, new StringReader(s)).get
   }
 
-  def parse(s: String): Try[List[LDPPatch[Rdf]]] = Try {
-    val parser = new PCPatchParser[Rdf]
+  def parse(s: String): Try[List[Patch[Rdf]]] = Try {
+    val parser = new PatchParserCombinator[Rdf]
     parser.parse(parser.patches, new StringReader(s)).get
   }
 

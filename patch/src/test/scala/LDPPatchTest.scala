@@ -4,9 +4,11 @@ import org.w3.banana._
 import org.scalatest._
 import java.io._
 
-abstract class LDPPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle]) extends WordSpec with Matchers {
+abstract class LDPPatchTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle]) extends WordSpec with Matchers {
 
   import ops._
+
+  val patcher = LDPPatch[Rdf]
 
   "join with common key ?x" in {
     val rs1 = ResultSet[Rdf](
@@ -170,7 +172,7 @@ _:betehess foaf:name "Alex" ;
 """, "http://example.com").get
 
   "PATCH!" in {
-    val patch = LDPPatchParser.parseOne[Rdf]("""
+    val patch = PatchParser.parseOne[Rdf]("""
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 DELETE {
   ?s foaf:name "Alex"
@@ -193,15 +195,13 @@ WHERE {
   foaf:currentProject <http://webid.info/> .
 """, "http://example.com").get
 
-    val patcher: LDPPatchCommand[Rdf] = new LDPPatchCommandImpl[Rdf]
-
     val patchedGraph = patcher.PATCH(graph, patch).get
 
     assert(patchedGraph isIsomorphicWith expectedGraph)
   }
 
   "PATCH2" in {
-    val patch = LDPPatchParser.parseOne[Rdf]("""
+    val patch = PatchParser.parseOne[Rdf]("""
 DELETE {
   <http://bblfish.net/#hjs> ?p ?o
 }
@@ -216,15 +216,13 @@ WHERE {
   foaf:knows <http://bblfish.net/#hjs> .
 """, "http://example.com").get
 
-    val patcher: LDPPatchCommand[Rdf] = new LDPPatchCommandImpl[Rdf]
-
     val patchedGraph = patcher.PATCH(graph, patch).get
 
     assert(patchedGraph isIsomorphicWith expectedGraph)
   }
 
   "PATCH3" in {
-    val patch = LDPPatchParser.parseOne[Rdf]("""
+    val patch = PatchParser.parseOne[Rdf]("""
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 INSERT {
   ?s foaf:knows ?name
@@ -246,12 +244,7 @@ WHERE {
   foaf:currentProject <http://webid.info/> .
 """, "http://example.com").get
 
-    val patcher: LDPPatchCommand[Rdf] = new LDPPatchCommandImpl[Rdf]
-
     val patchedGraph = patcher.PATCH(graph, patch).get
-
-    println(writer.asString(expectedGraph, ""))
-    println(writer.asString(patchedGraph, ""))
 
     assert(patchedGraph isIsomorphicWith expectedGraph)
 
@@ -261,4 +254,4 @@ WHERE {
 
 import org.w3.banana.jena._
 
-class JenaPatchSemanticsTest extends LDPPatchSemanticsTest[Jena]
+class JenaPatchTest extends LDPPatchTest[Jena]
