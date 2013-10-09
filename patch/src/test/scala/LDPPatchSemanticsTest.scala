@@ -4,7 +4,7 @@ import org.w3.banana._
 import org.scalatest._
 import java.io._
 
-abstract class LDPPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle]) extends WordSpec with Matchers {
+abstract class LDPPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle]) extends WordSpec with Matchers {
 
   import ops._
 
@@ -198,7 +198,6 @@ WHERE {
     val patchedGraph = patcher.PATCH(graph, patch).get
 
     assert(patchedGraph isIsomorphicWith expectedGraph)
-
   }
 
   "PATCH2" in {
@@ -222,6 +221,40 @@ WHERE {
     val patchedGraph = patcher.PATCH(graph, patch).get
 
     assert(patchedGraph isIsomorphicWith expectedGraph)
+  }
+
+  "PATCH3" in {
+    val patch = LDPPatchParser.parseOne[Rdf]("""
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+INSERT {
+  ?s foaf:knows ?name
+}
+WHERE {
+  ?s foaf:knows _:foo .
+  _:foo foaf:name ?name
+}
+""").get
+
+  val expectedGraph: Rdf#Graph = reader.read("""
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+[] foaf:name "Alex" ;
+  foaf:knows <http://bblfish.net/#hjs> ;
+  foaf:knows "Henry Story" .
+
+<http://bblfish.net/#hjs> foaf:name "Henry Story" ;
+  foaf:currentProject <http://webid.info/> .
+""", "http://example.com").get
+
+    val patcher: LDPPatchCommand[Rdf] = new LDPPatchCommandImpl[Rdf]
+
+    val patchedGraph = patcher.PATCH(graph, patch).get
+
+    println(writer.asString(expectedGraph, ""))
+    println(writer.asString(patchedGraph, ""))
+
+    assert(patchedGraph isIsomorphicWith expectedGraph)
+
   }
 
 }
