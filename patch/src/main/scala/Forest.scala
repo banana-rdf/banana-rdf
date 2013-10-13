@@ -1,17 +1,7 @@
 package org.w3.banana
 
 /** in this context, Tree is a rooted directed tree, and we don't care care about the tree structure */
-case class Tree[Rdf <: RDF](root: VarOrTerm[Rdf], nodes: Set[VarOrTerm[Rdf]]) {
-
-  /** adds a TriplePattern in the root position if possible */
-  def addRoot(tp: TriplePattern[Rdf])(implicit ops: RDFOps[Rdf]): Option[Tree[Rdf]] =
-    if (tp.o == root && !nodes.contains(tp.s)) Some(Tree(tp.s, nodes + root)) else None
-
-  /** adds a TriplePattern in a branch position if possible */
-  def addBranch(tp: TriplePattern[Rdf])(implicit ops: RDFOps[Rdf]): Option[Tree[Rdf]] =
-    if (nodes.contains(tp.s) && tp.o != root) Some(Tree(root, nodes + tp.o)) else None
-
-}
+case class Tree[Rdf <: RDF](root: VarOrTerm[Rdf], nodes: Set[VarOrTerm[Rdf]])
 
 object Forest {
 
