@@ -81,6 +81,36 @@ WHERE {
     parsed should be(expected)
   }
 
+  "all variables under the DELETE clause must be bound in the WHERE clause" in {
+    val parser = new PatchParserCombinator[Rdf]
+    val query = """
+DELETE {
+  ?foo <blah> ?o
+}
+WHERE {
+  [] <blah> ?o
+}
+"""
+    intercept[AssertionError] {
+      parser.parse(parser.patch, new StringReader(query)).get
+    }
+  }
+
+  "the BGP in the WHERE clause must be a Tree pattern" in {
+    val parser = new PatchParserCombinator[Rdf]
+    val query = """
+DELETE {
+  <a> <b> <c>
+}
+WHERE {
+  ?a <p> "foo" .
+  ?b <q> "bar"
+}
+"""
+    intercept[AssertionError] {
+      parser.parse(parser.patch, new StringReader(query)).get
+    }
+  }
 
 }
 
