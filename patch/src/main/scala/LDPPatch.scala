@@ -30,9 +30,9 @@ object ResultSet {
 case class ResultSet[Rdf <: RDF](vars: Set[VarPattern[Rdf]], bindings: Vector[SolutionMapping[Rdf]]) {
 
   /** applies this ResultSet to the given TriplesBlock */
-  def apply(block: TriplesBlock[Rdf])(implicit ops: RDFOps[Rdf]): Rdf#Graph = {
+  def apply(pattern: TriplesPattern[Rdf])(implicit ops: RDFOps[Rdf]): Rdf#Graph = {
     import ops._
-    block.triples.foldLeft(emptyGraph){ case (graph, triplePattern) =>
+    pattern.triples.foldLeft(emptyGraph){ case (graph, triplePattern) =>
       graph union makeGraph(bindings.map(binding => binding(triplePattern)(ops)))
     }
   }
@@ -67,34 +67,36 @@ class LDPPatchImpl[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LDPPatch[Rdf
 
   import ops._
 
-  def toNodeMatch(vt: VarOrTerm[Rdf]): Rdf#NodeMatch = vt match {
-    case _: Var[Rdf] => ANY
-    case Term(node)  => foldNode(node)(uri => uri, bnode => ANY, literal => literal)
-  }
-
-  def toNodeMatch(vi: VarOrIRIRef[Rdf]): Rdf#NodeMatch = vi match {
-    case _: Var[Rdf] => ANY
-    case IRIRef(uri) => uri
+  def findPath(graph: Rdf#Graph, tp: TriplePath[Rdf]): Iterator[Rdf#Triple] = {
+    def toNodeMatch(vt: VarOrTerm[Rdf]): Rdf#NodeMatch = vt match {
+      case _: Var[Rdf] => ANY
+      case Term(node)  => foldNode(node)(uri => uri, bnode => ANY, literal => literal)
+    }
+    tp.verb match {
+      case _: Var[Rdf] => find(graph, toNodeMatch(tp.s), ANY, toNodeMatch(tp.o))
+      case IRIRef(uri) => find(graph, toNodeMatch(tp.s), uri, toNodeMatch(tp.o))
+      case Path(seq)   => ???
+    }
   }
 
   /** computes the set of solutions for the given TriplePattern against the given graph */
-  def triplePatternMatching(graph: Rdf#Graph, tp: TriplePattern[Rdf]): ResultSet[Rdf] = {
-    // the set of vars in the TriplePattern (either from a ?v or from a bnode, which actually behaves like a var)
+  def triplePathMatching(graph: Rdf#Graph, tp: TriplePath[Rdf]): ResultSet[Rdf] = {
+    // the set of vars in the TriplePath (either from a ?v or from a bnode, which actually behaves like a var)
     val vars: Set[VarPattern[Rdf]] = {
       var vars = Set.empty[VarPattern[Rdf]]
       tp.s match { case v: Var[Rdf] => vars += v ; case Term(node) => node.fold(uri => (), bn => vars += VarBNode(bn), literal => ()) }
-      tp.p match { case v: Var[Rdf] => vars += v ; case _ => () }
+      tp.verb match { case v: Var[Rdf] => vars += v ; case _ => () }
       tp.o match { case v: Var[Rdf] => vars += v ; case Term(node) => node.fold(uri => (), bn => vars += VarBNode(bn), literal => ()) }
       vars
     }
     // builder accumulates all the bindings satisfying the pattern
     val builder = Vector.newBuilder[SolutionMapping[Rdf]]
     // the vars are turned into wildcars and passed to find which returns the matching triples
-    find(graph, toNodeMatch(tp.s), toNodeMatch(tp.p), toNodeMatch(tp.o)) foreach { case t@Triple(s, p, o) =>
+    findPath(graph, tp) foreach { case t@Triple(s, p, o) =>
       // a binding is just about remember what value is associated with what var
       var binding = Map.empty[VarPattern[Rdf], Rdf#Node]
       tp.s match { case v: Var[Rdf] => binding += (v -> s) ; case Term(node) => node.fold(uri => (), bn => binding += (VarBNode(bn) -> s), literal => ()) }
-      tp.p match { case v: Var[Rdf] => binding += (v -> p) ; case _ => () }
+      tp.verb match { case v: Var[Rdf] => binding += (v -> p) ; case _ => () }
       tp.o match { case v: Var[Rdf] => binding += (v -> o) ; case Term(node) => node.fold(uri => (), bn => binding += (VarBNode(bn) -> o), literal => ()) }
       builder += SolutionMapping[Rdf](binding)
     }
@@ -106,7 +108,7 @@ class LDPPatchImpl[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LDPPatch[Rdf
     * graph. We just compute the bindings for each pattern and then
     * apply a join on them. */
   def BGPMatching(graph: Rdf#Graph, where: Where[Rdf]): ResultSet[Rdf] = {
-    where.block.triples.map(triplePatternMatching(graph, _)).reduceLeft(_ join _)
+    where.pattern.triples.map(triplePathMatching(graph, _)).reduceLeft(_ join _)
   }
 
   def PATCH(graph: Rdf#Graph, patch: Patch[Rdf]): Try[Rdf#Graph] = Try {

@@ -7,8 +7,8 @@ object Forest {
 
   def empty[Rdf <: RDF]: Forest[Rdf] = Forest[Rdf](Set.empty[Tree[Rdf]], Map.empty[VarOrTerm[Rdf], Tree[Rdf]])
 
-  /** builds a Forest out of a bunch of TriplePattern-s */
-  def apply[Rdf <: RDF](triples: Iterable[TriplePattern[Rdf]]): Forest[Rdf] =
+  /** builds a Forest out of a bunch of TriplePath-s */
+  def apply[Rdf <: RDF](triples: Iterable[TriplePath[Rdf]]): Forest[Rdf] =
     triples.foldLeft(Forest.empty[Rdf])(_ add _)
 
 }
@@ -20,9 +20,9 @@ case class Forest[Rdf <: RDF](trees: Set[Tree[Rdf]], index: Map[VarOrTerm[Rdf], 
 
   def isSingleTree: Boolean = trees.size == 1
 
-  def add(triplePattern: TriplePattern[Rdf]): Forest[Rdf] = {
-    val TriplePattern(s, _, o) = triplePattern
-    if (s == o) throw new AssertionError(s"subject and object cannot be the same for TriplePattern $triplePattern")
+  def add(triplePath: TriplePath[Rdf]): Forest[Rdf] = {
+    val TriplePath(s, _, o) = triplePath
+    if (s == o) throw new AssertionError(s"subject and object cannot be the same for TriplePath $triplePath")
     (index.get(s), index.get(o)) match {
       // neither s nor o appear in any tree
       case (None, None) =>
@@ -39,9 +39,9 @@ case class Forest[Rdf <: RDF](trees: Set[Tree[Rdf]], index: Map[VarOrTerm[Rdf], 
       // o appears as a node in an existing tree, NOT in the subject position
       case (None, Some(t)) =>
         throw new AssertionError(s"$s is another root for tree $t")
-      // the TriplePattern connects two existing trees
+      // the TriplePath connects two existing trees
       case (Some(t1), Some(t2)) if t1 == t2  =>
-        throw new AssertionError(s"$triplePattern is binding that graph onto itself $t1")
+        throw new AssertionError(s"$triplePath is binding that graph onto itself $t1")
       case (Some(t1), Some(t2)) =>
         val tree = Tree(t1.root, t1.nodes ++ t2.nodes)
         Forest(trees - t1 - t2 + tree, index ++ tree.nodes.map(_ -> tree))

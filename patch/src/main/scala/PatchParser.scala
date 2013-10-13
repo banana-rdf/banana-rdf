@@ -58,13 +58,13 @@ class PatchParserCombinator[Rdf <: RDF](
     "PREFIX" ~ name ~ ":" ~ "<" ~ uri ~ ">" ^^ { case "PREFIX" ~ qname ~ ":" ~ "<" ~ uri ~ ">" => prefixes += (qname -> uri) }
 
   def delete: Parser[Delete[Rdf]] =
-    ( "DELETE" | "delete" ) ~ "{" ~ triplesBlock ~ "}" ^^ {
-      case _ ~ "{" ~ block ~ "}" => Delete[Rdf](block)
+    ( "DELETE" | "delete" ) ~ "{" ~ triplesPattern ~ "}" ^^ {
+      case _ ~ "{" ~ pattern ~ "}" => Delete[Rdf](pattern)
     }
 
   def insert: Parser[Insert[Rdf]] =
-    ( "INSERT" | "insert" ) ~ "{" ~ triplesBlock ~ "}" ^^ {
-      case _ ~ "{" ~ block ~ "}" => Insert[Rdf](block)
+    ( "INSERT" | "insert" ) ~ "{" ~ triplesPattern ~ "}" ^^ {
+      case _ ~ "{" ~ pattern ~ "}" => Insert[Rdf](pattern)
     }
 
   def where: Parser[Where[Rdf]] =
@@ -72,11 +72,25 @@ class PatchParserCombinator[Rdf <: RDF](
       case _ ~ "{" ~ block ~ "}" => Where[Rdf](block)
     }
 
+  def triplesPattern: Parser[TriplesPattern[Rdf]] =
+    rep1sep(triplePattern, ".") ~ opt(".") ^^ { case pats ~ x => TriplesPattern[Rdf](pats.toVector) }
+
   def triplesBlock: Parser[TriplesBlock[Rdf]] =
-    rep1sep(triplePattern, ".") ~ opt(".") ^^ { case pats ~ x => TriplesBlock[Rdf](pats.toVector) }
+    rep1sep(triplePath, ".") ~ opt(".") ^^ { case paths ~ x => TriplesBlock[Rdf](paths.toVector) }
 
   def triplePattern: Parser[TriplePattern[Rdf]] =
     subject ~ predicate ~ objectt ^^ { case s ~ p ~ o => TriplePattern[Rdf](s, p, o) }
+
+  def triplePath: Parser[TriplePath[Rdf]] =
+    subject ~ verb ~ objectt ^^ { case s ~ verb ~ o => TriplePath[Rdf](s, verb, o) }
+
+  def verb: Parser[Verb[Rdf]] = (
+      qnameORuri ^^ { uri => IRIRef(uri) }
+    | rep1sep(qnameORuri, "/") ^^ { elements => Path(elements) }
+    | "a" ^^ { _ => IRIRef(rdf.typ) }
+    | varr
+  )
+
 
   def subject: Parser[VarOrTerm[Rdf]] = (
       qnameORuri ^^ { case x => Term(x) }
