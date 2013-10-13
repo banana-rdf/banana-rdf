@@ -96,7 +96,7 @@ WHERE {
     }
   }
 
-  "the BGP in the WHERE clause must be a Tree pattern" in {
+  "the BGP in the WHERE clause must be a Tree pattern -- disconnected trees" in {
     val parser = new PatchParserCombinator[Rdf]
     val query = """
 DELETE {
@@ -105,6 +105,22 @@ DELETE {
 WHERE {
   ?a <p> "foo" .
   ?b <q> "bar"
+}
+"""
+    intercept[AssertionError] {
+      parser.parse(parser.patch, new StringReader(query)).get
+    }
+  }
+
+  "the BGP in the WHERE clause must be a Tree pattern -- tree with 2 subjects" in {
+    val parser = new PatchParserCombinator[Rdf]
+    val query = """
+DELETE {
+  <a> <b> <c>
+}
+WHERE {
+  ?a <p> ?c .
+  ?b <q> ?c
 }
 """
     intercept[AssertionError] {
