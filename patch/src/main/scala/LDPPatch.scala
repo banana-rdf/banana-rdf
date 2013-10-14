@@ -75,7 +75,7 @@ class LDPPatchImpl[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LDPPatch[Rdf
     tp.verb match {
       case _: Var[Rdf] => find(graph, toNodeMatch(tp.s), ANY, toNodeMatch(tp.o))
       case IRIRef(uri) => find(graph, toNodeMatch(tp.s), uri, toNodeMatch(tp.o))
-      case Path(seq)   => ???
+      case Path(_)     => sys.error("Path directives should have been expanded at this point")
     }
   }
 
@@ -103,12 +103,27 @@ class LDPPatchImpl[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends LDPPatch[Rdf
     ResultSet(vars, builder.result())
   }
 
+  /** expands all { s p1/p2 o } to { s p1 _:b . _b p2 o }  */
+  def expandPaths(block: TriplesBlock[Rdf]): TriplesBlock[Rdf] = {
+    def aux(s: VarOrTerm[Rdf], elems: List[Rdf#URI], o: VarOrTerm[Rdf]): Vector[TriplePath[Rdf]] =
+      elems match {
+        case List(elem)    => Vector(TriplePath(s, IRIRef(elem), o))
+        case elem :: elems =>
+          val objectBNode = Term(BNode())
+          TriplePath(s, IRIRef(elem), objectBNode) +: aux(objectBNode, elems, o)
+      }
+    TriplesBlock(block.triples flatMap {
+      case TriplePath(s, Path(elems), o) => aux(s, elems, o)
+      case tp                            => Vector(tp)
+    })
+  }
+
   /** computes the set of solutions for the given BGP (the PATCH grammar
     * restricts the WHERE clause to a simple BGP) against the given
     * graph. We just compute the bindings for each pattern and then
     * apply a join on them. */
   def BGPMatching(graph: Rdf#Graph, where: Where[Rdf]): ResultSet[Rdf] = {
-    where.pattern.triples.map(triplePathMatching(graph, _)).reduceLeft(_ join _)
+    expandPaths(where.pattern).triples.map(triplePathMatching(graph, _)).reduceLeft(_ join _)
   }
 
   def PATCH(graph: Rdf#Graph, patch: Patch[Rdf]): Try[Rdf#Graph] = Try {

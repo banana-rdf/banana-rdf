@@ -85,8 +85,10 @@ class PatchParserCombinator[Rdf <: RDF](
     subject ~ verb ~ objectt ^^ { case s ~ verb ~ o => TriplePath[Rdf](s, verb, o) }
 
   def verb: Parser[Verb[Rdf]] = (
-      qnameORuri ^^ { uri => IRIRef(uri) }
-    | rep1sep(qnameORuri, "/") ^^ { elements => Path(elements) }
+      rep1sep(qnameORuri, "/") ^^ {
+        case List(uri) => IRIRef(uri)
+        case elements => Path(elements)
+      }
     | "a" ^^ { _ => IRIRef(rdf.typ) }
     | varr
   )

@@ -171,7 +171,7 @@ _:betehess foaf:name "Alex" ;
   foaf:currentProject <http://webid.info/> .
 """, "http://example.com").get
 
-  "PATCH!" in {
+  "PATCH1" in {
     val patch = PatchParser.parseOne[Rdf]("""
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 DELETE {
@@ -233,6 +233,34 @@ WHERE {
 }
 """).get
 
+  val expectedGraph: Rdf#Graph = reader.read("""
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+[] foaf:name "Alex" ;
+  foaf:knows <http://bblfish.net/#hjs> ;
+  foaf:knows "Henry Story" .
+
+<http://bblfish.net/#hjs> foaf:name "Henry Story" ;
+  foaf:currentProject <http://webid.info/> .
+""", "http://example.com").get
+
+    val patchedGraph = patcher.PATCH(graph, patch).get
+
+    assert(patchedGraph isIsomorphicWith expectedGraph)
+
+  }
+
+  "PATCH4" in {
+    val patch = PatchParser.parseOne[Rdf]("""
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+INSERT {
+  ?s foaf:knows ?name
+}
+WHERE {
+  ?s foaf:knows/foaf:name ?name
+}
+""").get
+  
   val expectedGraph: Rdf#Graph = reader.read("""
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 

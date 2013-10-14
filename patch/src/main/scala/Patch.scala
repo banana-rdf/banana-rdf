@@ -44,7 +44,7 @@ case class TriplesBlock[Rdf <: RDF](triples: Vector[TriplePath[Rdf]]) {
   }
 
   def vars: Set[Var[Rdf]] =
-    triples.foldLeft(Set.empty[Var[Rdf]]){ case (acc, TriplePath(s, verb, o)) =>
+    triples.foldLeft(Set.empty[Var[Rdf]]){ case (acc, tp@TriplePath(s, verb, o)) =>
       var set = Set.empty[Var[Rdf]]
       s match { case v: Var[Rdf] => set += v ; case _ => () }
       verb match { case v: Var[Rdf] => set += v ; case _ => () }

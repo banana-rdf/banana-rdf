@@ -81,6 +81,30 @@ WHERE {
     parsed should be(expected)
   }
 
+  "parse patch query with path predicates" in {
+    val parser = new PatchParserCombinator[Rdf]
+    val query = """
+BASE http://example.com/
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+DELETE {
+  <a> foaf:b ?o
+}
+WHERE {
+  ?s <a>/foaf:b/<http://example.com/c> ?o .
+  ?o <b> ?z
+}
+"""
+    val parsed = parser.parse(parser.patch, new StringReader(query)).get
+    val expected =
+      Patch(
+        Some(Delete(TriplesPattern(Vector(TriplePattern(Term(URI("http://example.com/a")),IRIRef(URI("http://xmlns.com/foaf/0.1/b")),Var("o")))))),
+        None,
+        Some(Where(TriplesBlock(Vector(
+          TriplePath(Var("s"),Path(List(URI("http://example.com/a"), URI("http://xmlns.com/foaf/0.1/b"), URI("http://example.com/c"))),Var("o")),
+          TriplePath(Var("o"),IRIRef(URI("http://example.com/b")),Var("z")))))))
+    parsed should be(expected)
+  }
+
   "all variables under the DELETE clause must be bound in the WHERE clause" in {
     val parser = new PatchParserCombinator[Rdf]
     val query = """
