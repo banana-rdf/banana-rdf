@@ -213,7 +213,7 @@ abstract class WebTestSuite[Rdf<:RDF](rww: RWW[Rdf], baseUri: Rdf#URI)(
       ex.getOrFail()
     }
 
-    ""
+
 
   }
 

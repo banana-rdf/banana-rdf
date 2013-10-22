@@ -210,6 +210,8 @@ trait TestGraphs[Rdf<:RDF] extends BeforeAndAfter {  this: Suite =>
 
       //move all the metadata to this, and have the other functions
       def meta = PointedGraph(location,metaGraph)
+
+      def size = None
     }
 
     import collection.mutable.{Map,SynchronizedMap}

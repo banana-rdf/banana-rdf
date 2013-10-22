@@ -102,8 +102,9 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
    */
   override def getResource(name: String): NamedResource[Plantain] = {
     val ldpr = super.getResource(name).asInstanceOf[LDPR[Plantain]]
-    var contentGrph = ldpr.graph
-    Files.walkFileTree(root,util.Collections.emptySet(), 1,
+    if (name==fileName) { //if this is the index file, add all the content info
+      var contentGrph = ldpr.graph
+      Files.walkFileTree(root,util.Collections.emptySet(), 1,
       new SimpleFileVisitor[Path] {
 
         override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes) = {
@@ -116,7 +117,8 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
           FileVisitResult.CONTINUE
         }
       })
-    LocalLDPR[Plantain](baseUri,contentGrph,Some(new Date(Files.getLastModifiedTime(root).toMillis)))
+      LocalLDPR[Plantain](baseUri,contentGrph,Some(new Date(Files.getLastModifiedTime(root).toMillis)))
+    } else ldpr
   }
 
   def randomPathSegment(): String = java.util.UUID.randomUUID().toString.replaceAll("-", "")
@@ -170,7 +172,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
         }
 
         //todo: move this into the resource created ( it should know on creation how to find the parent )
-        val linkedGraph = Graph(Triple(baseUri, ldp.created, iri))
+        val linkedGraph = graph + Triple(baseUri, ldp.created, iri)
 
         //todo: should these be in the header?
         val scrpt = LDPCommand.updateLDPR[Plantain](iri, add = graphToIterable(linkedGraph)).flatMap(_ => k(iri))
@@ -328,7 +330,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
 
   val cache = scala.collection.mutable.Map[String, NamedResource[Plantain]]()
 
-  val filter = new Filter[Path]() {
+  def filter = new Filter[Path]() {
     val fileName = path.getFileName.toString
     def accept(entry: Path) = {
       val ename = entry.getFileName.toString
@@ -477,10 +479,8 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
         } finally {
           pathStream.close()
         }
-        val parent = uriW[Plantain](baseUri).resolve(".")
-        val scrpt = LDPCommand.updateLDPR[Plantain](parent,remove=Iterable(Triple(parent,ldp.created,baseUri)))
         context.stop(self)
-        rwwActor.tell(Scrpt(scrpt.flatMap(_=>a)),context.sender) //todo: why no function here?
+        rwwActor.tell(Scrpt(a),context.sender) //todo: why no function here?
       }
       case UpdateLDPR(uri, remove, add, a) => {
         val nme = name(uri)

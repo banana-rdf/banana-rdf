@@ -124,16 +124,30 @@ abstract class LDPSTest[Rdf <: RDF](baseUri: Rdf#URI, dir: Path, rootLDPCActorPr
       }
     }
     script2.getOrFail()
-
     val deleteScript = rww.execute {
       for {
         _ <- deleteResource(ldprUri)
         _ <- deleteResource(ldprUri2)
-        x <- getResource(ldprUri)
+      } yield ()
+    }
+    deleteScript.getOrFail()
+
+    val testDeleteScript = rww.execute {
+       for {
+         x <- getResource(ldprUri)
+       } yield x
+    }
+    val failure = Await.result(testDeleteScript.failed,Duration(3,TimeUnit.SECONDS))
+    failure.getClass must equal (classOf[ResourceDoesNotExist])
+
+    val testDeleteScript2 = rww.execute {
+      for {
+        x <- getResource(ldprUri2)
       } yield x
     }
-    deleteScript.failed.getOrFail()
 
+    val failure2 = Await.result(testDeleteScript2.failed,Duration(3,TimeUnit.SECONDS))
+    failure2.getClass must equal (classOf[ResourceDoesNotExist])
 
 
   }
