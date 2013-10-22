@@ -39,7 +39,7 @@ object BuildSettings {
     licenses := Seq("W3C License" -> url("http://opensource.org/licenses/W3C")),
     homepage := Some(url("https://github.com/w3c/banana-rdf")),
     publishTo <<= version { (v: String) =>
-      //eg: export SBT_PROPS=-Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
+      //eg: ./sbt -Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
       val nexus = "https://oss.sonatype.org/"
       val other = Option(System.getProperty("banana.publish")).map(_.split(":"))
       if (v.trim.endsWith("SNAPSHOT")) {
