@@ -228,6 +228,26 @@ class LDPPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("ldp", "http:/
   val pageOf = apply("pageOf")
 }
 
+object STATPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new STATPrefix(ops)
+}
+
+class STATPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("stat", "http://www.w3.org/ns/posix/stat#")(ops) {
+  val atime = apply("atime")
+  val blksize = apply("blksize")
+  val blocks = apply("blocks")
+  val ctime = apply("ctime")
+  val dev = apply("dev")
+  val gid = apply("gid")
+  val ino = apply("ino")
+  val mode = apply("mode")
+  val mtime = apply("mtime")
+  val nlink = apply("nlink")
+  val rdev = apply("rdev")
+  val size = apply("size")
+  val uid = apply("uid")
+}
+
 object IANALinkPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new IANALinkPrefix(ops)
 }

@@ -106,7 +106,7 @@ trait Meta[Rdf <: RDF] {
 
   def ops: RDFOps[Rdf]
 
-  def updated: Option[Date]
+  def size: Option[Long]
   /*
  * A resource should ideally be versioned, so any change would get a version URI
  **/
@@ -139,7 +139,7 @@ trait BinaryResource[Rdf<:RDF] extends NamedResource[Rdf]  {
 
   // creates a new BinaryResource, with new time stamp, etc...
   def write(implicit ec: ExecutionContext):  Iteratee[Array[Byte], BinaryResource[Rdf]]
-  def reader(chunkSize: Int): Enumerator[Array[Byte]]
+  def reader(chunkSize: Int)(implicit ec: ExecutionContext): Enumerator[Array[Byte]]
 }
 
 /**
@@ -215,7 +215,7 @@ case class LocalBinaryR[Rdf<:RDF](path: Path, location: Rdf#URI)
   }
 
   //this will probably require an agent to push things along.
-  def reader(chunkSize: Int=1024*8) = Enumerator.fromFile(path.toFile,chunkSize)
+  def reader(chunkSize: Int=1024*8)(implicit ec: ExecutionContext) = Enumerator.fromFile(path.toFile,chunkSize)
 
 }
 
@@ -230,6 +230,7 @@ case class LocalLDPR[Rdf<:RDF](location: Rdf#URI,
   extends LDPR[Rdf] with LocalNamedResource[Rdf]{
   import ops._
   def meta = PointedGraph(location,Graph.empty)  //todo: build up aclPath from local info
+  def size = None
 }
 
 
@@ -243,6 +244,7 @@ case class RemoteLDPR[Rdf<:RDF](location: Rdf#URI, graph: Rdf#Graph, meta: Point
    * location of initial ACL for this resource
    **/
   lazy val acl: Option[Rdf#URI] = (meta/link.acl).collectFirst{ case PointedGraph(p: Rdf#URI,g) => p }
+  def size = None
 }
 
 case class Scrpt[Rdf<:RDF,A](script:LDPCommand.Script[Rdf,A])

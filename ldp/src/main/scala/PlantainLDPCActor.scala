@@ -18,6 +18,7 @@ import java.util.Date
 import scala.io.Codec
 import java.io.{File, FileOutputStream}
 import java.nio.file.DirectoryStream.Filter
+import org.w3.banana.diesel.Diesel
 
 /**
  * A LDP Container actor that is responsible for the equivalent of a directory
@@ -34,6 +35,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
                                      adviceSelector: AdviceSelector[Plantain]=new EmptyAdviceSelector) extends PlantainLDPRActor(baseUri,root) {
   import org.w3.banana.syntax._
   import ops._
+  import diesel._
 
 
 
@@ -49,7 +51,6 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
     //todo: memory optimizations
     //todo: handle exceptions
     //todo: deal with index file...
-    var contentGrph = Graph(Triple(baseUri,rdf.typ,ldp.Container))
     Files.walkFileTree(root,util.Collections.emptySet(), 1,
       new SimpleFileVisitor[Path] {
 
@@ -61,23 +62,62 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
         override def visitFile(file: Path, attrs: BasicFileAttributes) = {
           val pathSegment = file.getFileName.toString
           if (attrs.isDirectory) {
-            val fullURI = uriW[Plantain](baseUri)/(pathSegment+"/")
-            context.actorOf(Props(new PlantainLDPCActor(fullURI,root.resolve(file))),pathSegment)
-            contentGrph =  contentGrph + Triple(baseUri,ldp.created,fullURI)
+            context.actorOf(Props(new PlantainLDPCActor(absoluteUri(pathSegment+"/"),root.resolve(file))),pathSegment)
           } else if (attrs.isSymbolicLink) {
-            val fullURI = uriW[Plantain](baseUri)/pathSegment
             //we use symbolic links to point to the file that contains the default representation
             //this is because we may have many different representations, and we don't want an actor
             //for each of the representations.
-            context.actorOf(Props(new PlantainLDPRActor(fullURI,root.resolve(file))),pathSegment)
-            contentGrph =  contentGrph + Triple(baseUri,ldp.created,fullURI)
+            context.actorOf(Props(new PlantainLDPRActor(absoluteUri(pathSegment),root.resolve(file))),pathSegment)
           }
         FileVisitResult.CONTINUE
       }
     })
-    setResource(fileName,contentGrph)
   }
 
+  private def descriptionFor(pathSegment: String, attrs: BasicFileAttributes): Plantain#Graph = {
+    def graphFor(uri: Plantain#URI) = {
+      emptyGraph +
+        Triple(baseUri, ldp.created, uri) +
+        Triple(uri, stat.mtime, TypedLiteral(attrs.lastModifiedTime().toMillis.toString,xsd.integer)) + {
+        if (!attrs.isDirectory)
+          Triple(uri, stat.size, TypedLiteral(attrs.size().toString,xsd.integer))
+        else
+          Triple(uri, rdf.typ, ldp.Container)
+      }
+    }
+    if (attrs.isDirectory) {
+      graphFor(absoluteUri(pathSegment+"/"))
+    } else if (attrs.isSymbolicLink){
+      graphFor(absoluteUri(pathSegment))
+    } else Graph.empty
+  }
+
+  private def absoluteUri(pathSegment: String) =  uriW[Plantain](baseUri)/pathSegment
+
+  /**
+   *
+   * @param name the name of the file ( only the index file in the case of LPDCs
+   * @throws ResourceDoesNotExist
+   * @return
+   */
+  override def getResource(name: String): NamedResource[Plantain] = {
+    val ldpr = super.getResource(name).asInstanceOf[LDPR[Plantain]]
+    var contentGrph = ldpr.graph
+    Files.walkFileTree(root,util.Collections.emptySet(), 1,
+      new SimpleFileVisitor[Path] {
+
+        override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes) = {
+          if (dir == root) super.preVisitDirectory(dir,attrs)
+          else FileVisitResult.SKIP_SUBTREE
+        }
+
+        override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+          contentGrph =  contentGrph union  descriptionFor(file.getFileName.toString,attrs)
+          FileVisitResult.CONTINUE
+        }
+      })
+    LocalLDPR[Plantain](baseUri,contentGrph,Some(new Date(Files.getLastModifiedTime(root).toMillis)))
+  }
 
   def randomPathSegment(): String = java.util.UUID.randomUUID().toString.replaceAll("-", "")
 
@@ -128,18 +168,13 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
             (actor, uri2)
           }
         }
-        //todo: this graph->iter is very wasteful
 
-        val creationRel = Triple(baseUri, ldp.created, iri)
+        //todo: move this into the resource created ( it should know on creation how to find the parent )
+        val linkedGraph = Graph(Triple(baseUri, ldp.created, iri))
 
-        val linkedGraph = graph + creationRel
         //todo: should these be in the header?
         val scrpt = LDPCommand.updateLDPR[Plantain](iri, add = graphToIterable(linkedGraph)).flatMap(_ => k(iri))
         actor forward Scrpt(scrpt)
-
-        val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
-        val indx = ldpr.graph + creationRel
-        setResource(fileName, indx)
       }
       case CreateBinary(_, slugOpt, mime: MimeType, k) => {
         mimeExt.extension(mime).map { ext =>
@@ -156,10 +191,6 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
               (actor, uri2)
             }
           }
-          //todo: how does one set metadata for binaries, such as Link Relations for the header?
-          val ldpr = getResource(fileName).asInstanceOf[LDPR[Plantain]]
-          val indx = ldpr.graph +  Triple(baseUri,ldp.created,iri)
-          setResource(fileName,indx)
           val s = LDPCommand.getResource[Plantain,NamedResource[Plantain]](iri)
           actor forward Scrpt(s.flatMap{
             case br: BinaryResource[Plantain] =>k(br)
@@ -287,7 +318,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
   val ldp = LDPPrefix[Plantain]
   val rdfs = RDFSPrefix[Plantain]
   val rdf = RDFPrefix[Plantain]
-
+  val stat = STATPrefix[Plantain]
 
   val mimeExt = WellKnownMimeExtensions
 
@@ -433,7 +464,7 @@ class PlantainLDPRActor(val baseUri: Plantain#URI,path: Path)
         //The point of GetMeta is mostly to remove work if there were work that was very time
         //consuming ( such as serialising a graph )
         val res = getResource(uriW[Plantain](uri).lastPathSegment)
-        self forward  Scrpt(k(res))
+        self forward Scrpt(k(res))
       }
       case DeleteResource(uri, a) => {
         log.info(s"DeleteResource($uri,$a)")

@@ -2,8 +2,8 @@ import sbt._
 import sbt.Keys._
 import org.ensime.sbt.Plugin.Settings.ensimeConfig
 import org.ensime.sbt.util.SExp._
-import com.typesafe.sbtscalariform.ScalariformPlugin._
 import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 
 object BuildSettings {
 
@@ -12,13 +12,19 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++  defaultScalariformSettings ++ Seq (
     organization := "org.w3",
     version      := "2013_10_07-SNAPSHOT",
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
+    initialize := {
+      //thanks to http://stackoverflow.com/questions/19208942/enforcing-java-version-for-scala-project-in-sbt/19271814?noredirect=1#19271814
+      val _ = initialize.value // run the previous initialization
+      val specVersion = sys.props("java.specification.version")
+      assert(java.lang.Float.parseFloat(specVersion) >= 1.7, "Java 1.7 or above required. Your version is " + specVersion)
+    },
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
     offline := true,
-    testOptions in Test += Tests.Argument("""stdout(config="durations")"""),
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
+    testOptions in Test += Tests.Argument("-oD"),
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Yinline-warnings"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
@@ -47,6 +53,14 @@ object BuildSettings {
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => false },
     pomExtra := (
+      <url>https://github.com/w3c/banana-rdf</url>
+      <licenses>
+        <license>
+          <name>W3C License</name>
+          <url>http://opensource.org/licenses/W3C</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
       <scm>
         <url>git@github.com:w3c/banana-rdf.git</url>
         <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
@@ -67,11 +81,11 @@ object BuildSettings {
   )
 
   val jenaTestWIPFilter = Seq (
-    testOptions in Test += Tests.Argument("exclude(org.w3.banana.jenaWIP)")
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
   )
 
   val sesameTestWIPFilter = Seq (
-    testOptions in Test += Tests.Argument("exclude(org.w3.banana.sesameWIP)")
+    testOptions in Test += Tests.Argument("-l", "org.w3.banana.sesameWIP")
   )
 
 }
@@ -80,7 +94,7 @@ object BananaRdfBuild extends Build {
 
   import BuildSettings._
   
-  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.0"
+  val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.2"
 
   val scalaIoCore = "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.2"
   val scalaIoFile = "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.2"
@@ -101,7 +115,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0.M6-SNAP9"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0.RC1-SNAP4"
   
   val testsuiteDeps =
     Seq(
@@ -109,8 +123,8 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.2.0-M1"
-  val playDeps = "com.typesafe.play" %% "play" % "2.2.0-M1"
+  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.2.0"
+  val playDeps = "com.typesafe.play" %% "play" % "2.2.0"
 
   val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 
