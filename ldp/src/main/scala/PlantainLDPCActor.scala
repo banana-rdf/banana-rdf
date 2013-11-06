@@ -74,21 +74,24 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
     })
   }
 
-  private def descriptionFor(pathSegment: String, attrs: BasicFileAttributes): Plantain#Graph = {
+  private def descriptionFor(path: Path, attrs: BasicFileAttributes): Plantain#Graph = {
     def graphFor(uri: Plantain#URI) = {
-      emptyGraph +
+      var res = emptyGraph +
         Triple(baseUri, ldp.created, uri) +
-        Triple(uri, stat.mtime, TypedLiteral(attrs.lastModifiedTime().toMillis.toString,xsd.integer)) + {
-        if (!attrs.isDirectory)
-          Triple(uri, stat.size, TypedLiteral(attrs.size().toString,xsd.integer))
-        else
-          Triple(uri, rdf.typ, ldp.Container)
+        Triple(uri, stat.mtime, TypedLiteral(attrs.lastModifiedTime().toMillis.toString,xsd.integer))
+      if (attrs.isDirectory)
+        res + Triple(uri, rdf.typ, ldp.Container)
+      else if (attrs.isSymbolicLink) {
+        val target: Path = root.resolve(Files.readSymbolicLink(path))
+        res + Triple(uri, stat.size, TypedLiteral((target.toFile.length()).toString, xsd.integer))
+      } else {
+        res
       }
     }
     if (attrs.isDirectory) {
-      graphFor(absoluteUri(pathSegment+"/"))
+      graphFor(absoluteUri(path.getFileName+"/"))
     } else if (attrs.isSymbolicLink){
-      graphFor(absoluteUri(pathSegment))
+      graphFor(absoluteUri(path.getFileName.toString))
     } else Graph.empty
   }
 
@@ -113,7 +116,7 @@ class PlantainLDPCActor(baseUri: Plantain#URI, root: Path)
         }
 
         override def visitFile(file: Path, attrs: BasicFileAttributes) = {
-          contentGrph =  contentGrph union  descriptionFor(file.getFileName.toString,attrs)
+          contentGrph =  contentGrph union  descriptionFor(file,attrs)
           FileVisitResult.CONTINUE
         }
       })
