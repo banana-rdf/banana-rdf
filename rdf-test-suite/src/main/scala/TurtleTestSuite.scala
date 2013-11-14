@@ -16,16 +16,16 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   import org.scalatest.matchers.{ BeMatcher, MatchResult }
 
   def graphBuilder(prefix: Prefix[Rdf]) = {
-    val ntriples = prefix("ntriples/")
+    val ntriplesDoc = prefix("ntriples/")
     val creator = URI("http://purl.org/dc/elements/1.1/creator")
     val publisher = URI("http://purl.org/dc/elements/1.1/publisher")
     val dave = TypedLiteral("Dave Beckett")
     val art = TypedLiteral("Art Barstow")
     val w3org = URI("http://www.w3.org/")
     Graph(
-      Triple(ntriples, creator, dave),
-      Triple(ntriples, creator, art),
-      Triple(ntriples, publisher, w3org)
+      Triple(ntriplesDoc, creator, dave),
+      Triple(ntriplesDoc, creator, art),
+      Triple(ntriplesDoc, publisher, w3org)
     )
   }
 
@@ -58,6 +58,8 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   "write simple graph as TURTLE string" in {
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
+    val graph = reader.read(turtleString, rdfCore).get
+    assert(referenceGraph isIsomorphicWith graph)
   }
 
   "works with relative uris" taggedAs (JenaWIP) in {
