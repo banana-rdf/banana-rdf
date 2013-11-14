@@ -48,6 +48,11 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
     binder
   }
 
+  def id: Property[Rdf, Rdf#Node] = new Property[Rdf, Rdf#Node] {
+    def pos(ts: Rdf#Node): Iterable[(Rdf#URI, PointedGraph[Rdf])] = Set()
+    def extract(pointed: PointedGraph[Rdf]): Try[Rdf#Node] = Try(pointed.pointer)
+  }
+
   /**
    * declares a Property/Object element where T is in the object position
    */
@@ -89,8 +94,8 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
   /**
    * Create PGB with pointer based on record fields.
    */
-  def pgbWithId[T](id: T => Rdf#URI) = new PGB[T] {
-    def makeSubject(t: T): Rdf#URI = id(t)
+  def pgbWithId[T](id: T => Rdf#Node) = new PGB[T] {
+    def makeSubject(t: T): Rdf#Node = id(t)
   }
 
   /**
@@ -107,7 +112,7 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
 
   abstract class PGB[T] {
 
-    def makeSubject(t: T): Rdf#URI
+    def makeSubject(t: T): Rdf#Node
 
     def make(t: T, pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
       val subject = makeSubject(t)

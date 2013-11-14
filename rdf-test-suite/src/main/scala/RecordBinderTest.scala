@@ -15,7 +15,7 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordB
   val objects = new ObjectExamples
   import objects._
 
-  val city = City("Paris", Set("Panam", "Lutetia"))
+  val city = City(URI("http://example.com/Paris"), "Paris", Set("Panam", "Lutetia"))
   val verifiedAddress = VerifiedAddress("32 Vassar st", city)
   val person = Person("Alexandre Bertails")
   val personWithNickname = person.copy(nickname = Some("betehess"))

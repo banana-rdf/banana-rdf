@@ -78,19 +78,20 @@ class ObjectExamples[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: Reco
 
   }
 
-  case class City(cityName: String, otherNames: Set[String] = Set.empty)
+  case class City(uri: Rdf#Node, cityName: String, otherNames: Set[String] = Set.empty)
 
   object City {
 
     val clazz = URI("http://example.com/City#class")
     implicit val classUris = classUrisFor[City](clazz)
 
+    val uri = id
     val cityName = property[String](foaf("cityName"))
     val otherNames = set[String](foaf("otherNames"))
 
     implicit val binder: PGBinder[Rdf, City] =
-      pgbWithId[City](t => URI("http://example.com/" + t.cityName))
-        .apply(cityName, otherNames)(City.apply, City.unapply) withClasses classUris
+      pgbWithId[City](_.uri)
+        .apply(uri, cityName, otherNames)(City.apply, City.unapply) withClasses classUris
 
   }
 
