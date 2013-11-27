@@ -64,7 +64,7 @@ case class ImmutableJenaGraph(triples: Set[Jena#Triple], prefixes: Map[String, S
 
   def matchTriples(s: JenaNode, p: JenaNode, o: JenaNode): Iterator[Jena#Triple] = {
     triples.iterator.filter { case JenaOperations.Triple(_s, _p, _o) =>
-      (s == ANY || s == _s) && (p == ANY || p == _p)  && (o == ANY || o == _o)
+      (s == null || s == ANY || s == _s) && (p == null || p == ANY || p == _p)  && (o == null || o == ANY || o == _o)
     }
   }
 
