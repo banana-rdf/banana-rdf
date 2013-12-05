@@ -51,6 +51,7 @@ abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf,Try])
 
   lazy val henryFoafGraph: Rdf#Graph = (
     henry.a(foaf.Person)
+      -- foaf.name ->- "Henry Story"
       -- foaf.knows ->- timbl
       -- foaf.knows ->- bertails
     ).graph
@@ -93,11 +94,32 @@ abstract class LDPatchTest[Rdf<:RDF](ldpatch: LDPatch[Rdf,Try])
         |          ?clzz wac:regex ?regex . }
         | INSERT { ?acl wac:accessToClass foaf:Agent }
         | WHERE { ?acl wac:accessToClass ?clzz .
-                              ?clzz wac:regex ?regex . }
+        |                                ?clzz wac:regex ?regex . }
       """.stripMargin)
     val resultGraph = ldpatch.executePatch(bertailsContainerAclGraph,updtQuery).get
     resultGraph.isIsomorphicWith(bertailsContainerAclGraph2)
 
   }
+
+
+  "Inserting and deleting a literal" in {
+    val changeLit = UpdateQuery(
+      s"""
+        |PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        |PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        |DELETE DATA {
+        |   <$henry> foaf:name "Henry Story"^^xsd:string .
+        |};
+        |INSERT DATA {
+        |   <$henry> foaf:name "Henry Story"@en .
+        |}
+      """.stripMargin)
+     val changedGraph = ldpatch.executePatch(henryFoafGraph,changeLit).get
+     val names = PointedGraph(henry,changedGraph)/foaf.name
+    for {pg<-names} yield { println("found "+pg.pointer) }
+     names.exactlyOnePointedGraph.get.pointer must be(LangLiteral("Henry Story",Lang("en")))
+  }
+
+
 
 }

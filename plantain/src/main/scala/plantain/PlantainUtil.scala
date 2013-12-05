@@ -211,7 +211,7 @@ object PlantainUtil {
               val o = bs.getValue("object").asInstanceOf[Value]
               val context = bs.getValue("context").asInstanceOf[Resource];
               if (context == null)
-                resultGraph.removeExistingTriple(Triple(Node.fromSesame(s), Node.fromSesame(p), Node.fromSesame(o)))
+                resultGraph = resultGraph.removeExistingTriple(Triple(Node.fromSesame(s), Node.fromSesame(p), Node.fromSesame(o)))
             }
           }
           case modify: Modify => {
