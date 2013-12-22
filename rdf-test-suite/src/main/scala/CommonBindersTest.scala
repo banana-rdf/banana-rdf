@@ -18,18 +18,42 @@ abstract class CommonBindersTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   }
 
   "serializing and deserialiazing a Boolean" in {
+    val truePg = true.toPG
+    truePg.pointer should be (TypedLiteral("true",xsd.boolean))
+    truePg.graph should be (Graph.empty)
     true.toPG.as[Boolean] should be(Success(true))
+
+    val falsePg = false.toPG
+    truePg.pointer should be (TypedLiteral("true",xsd.boolean))
+    truePg.graph should be (Graph.empty)
     false.toPG.as[Boolean] should be(Success(false))
+
   }
 
   "serializing and deserializing an Integer" in {
-    123.toPG.as[Int] should be(Success(123))
+    val pg123 = 123.toPG
+    pg123.pointer should be (TypedLiteral("123",xsd.int))
+    pg123.graph should be (Graph.empty)
+    pg123.toPG.as[Int] should be(Success(123))
   }
 
   "serializing and deserializing a List of simple nodes" in {
+    val bn1 = BNode()
+    val bn2 = BNode()
+    val bn3 = BNode()
+    val constructedListGr = Graph(
+      Triple(bn1, rdf.first, TypedLiteral("1",xsd.int)),
+      Triple(bn1, rdf.rest, bn2),
+      Triple(bn2, rdf.first, TypedLiteral("2",xsd.int)),
+      Triple(bn2, rdf.rest, bn3),
+      Triple(bn3, rdf.first, TypedLiteral("3",xsd.int)),
+      Triple(bn3, rdf.rest, rdf.nil)
+     )
     val binder = PGBinder[Rdf, List[Int]]
     val list = List(1, 2, 3)
-    binder.fromPG(binder.toPG(list)) should be(Success(list))
+    val listPg = binder.toPG(list)
+    assert( listPg.graph isIsomorphicWith(constructedListGr) )
+    binder.fromPG(listPg) should be(Success(list))
   }
 
   "serializing and deserializing a List of complex types" in {

@@ -1,5 +1,13 @@
 package org.w3.banana
 
+/*
+ * A pointer into a graph,  enabling an object oriented way to traverse
+ * the graph of relations.
+ *
+ * Note: because a pointer can be a blank node, and the blank node only
+ * has meaning within the graph, there is no way to compare two pointed graphs
+ * in the general case. Hence we use Object equality.
+ */
 trait PointedGraph[Rdf <: RDF] {
 
   def pointer: Rdf#Node
