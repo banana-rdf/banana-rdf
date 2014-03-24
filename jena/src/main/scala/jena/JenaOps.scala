@@ -9,7 +9,9 @@ import com.hp.hpl.jena.util.iterator._
 import com.hp.hpl.jena.datatypes.TypeMapper
 import scala.collection.JavaConverters._
 
-object JenaOperations extends RDFOps[Jena] {
+object JenaOperations extends JenaOperations
+
+trait JenaOperations extends RDFOps[Jena] {
 
   // graph
 
