@@ -1,7 +1,5 @@
 import sbt._
 import sbt.Keys._
-import org.ensime.sbt.Plugin.Settings.ensimeConfig
-import org.ensime.sbt.util.SExp._
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 
@@ -24,13 +22,6 @@ object BuildSettings {
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    ensimeConfig := sexp(
-      key(":compiler-args"), sexp("-Ywarn-dead-code", "-Ywarn-shadowing"),
-      key(":formatting-prefs"), sexp(
-        key(":rewriteArrowSymbols"), true,
-        key(":doubleIndentClassDeclaration"), true
-      )
-    ),
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (version.value.trim.endsWith("SNAPSHOT"))
