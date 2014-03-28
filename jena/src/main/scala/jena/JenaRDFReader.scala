@@ -7,13 +7,12 @@ import com.hp.hpl.jena.graph.{ Triple => JenaTriple, Node => JenaNode, _ }
 import scala.util._
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
-import JenaOperations.xsdString
 
-class TripleSink() extends StreamRDF {
+class TripleSink(ops: JenaOpsSpecifics) extends StreamRDF {
 
   var triples: Set[Jena#Triple] = Set.empty
   var prefixes: Map[String, String] = Map.empty
-  def graph: Jena#Graph = ImmutableJenaGraph(triples, prefixes)
+  def graph: Jena#Graph = ops.makeGraph(triples)
 
   def base(base: String): Unit = ()
   def finish(): Unit = ()
@@ -33,7 +32,7 @@ class TripleSink() extends StreamRDF {
         new JenaTriple(
           triple.getSubject,
           triple.getPredicate,
-          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, xsdString))
+          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, ops.xsdString))
       else
         // otherwise everything is fine
         triple
@@ -44,18 +43,18 @@ class TripleSink() extends StreamRDF {
 
 object JenaRDFReader {
 
-  def makeRDFReader[S](lang: Lang)(implicit _syntax: Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
+  def makeRDFReader[S](ops: JenaOpsSpecifics, lang: Lang)(implicit _syntax: Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
     val syntax = _syntax
     def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
-      val sink = new TripleSink
+      val sink = new TripleSink(ops)
       RDFDataMgr.parse(sink, is, base, lang)
       sink.graph
     }
   }
 
-  implicit val rdfxmlReader: RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](Lang.RDFXML)
+  implicit def rdfxmlReader(ops: JenaOpsSpecifics): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
 
-  implicit val turtleReader: RDFReader[Jena, Turtle] = makeRDFReader[Turtle](Lang.TURTLE)
+  implicit def turtleReader(ops: JenaOpsSpecifics): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
 
   implicit val selector: ReaderSelector[Jena] = 
     ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]

@@ -1,7 +1,6 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import JenaOperations._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
 import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
@@ -16,10 +15,10 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 object JenaStore {
 
-  def apply(dataset: Dataset, defensiveCopy: Boolean): JenaStore =
-    new JenaStore(dataset, defensiveCopy)
+  def apply(dataset: Dataset, defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil): JenaStore =
+    new JenaStore(dataset, defensiveCopy, ops, jenaUtil)
 
-  def apply(dg: DatasetGraph, defensiveCopy: Boolean = false): JenaStore = {
+  def apply(dg: DatasetGraph, defensiveCopy: Boolean = false)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil): JenaStore = {
     val dataset = new GraphStoreBasic(dg).toDataset
     JenaStore(dataset, defensiveCopy)
   }
@@ -28,13 +27,13 @@ object JenaStore {
 
 }
 
-class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena] {
+class JenaStore(dataset: Dataset, defensiveCopy: Boolean, ops: RDFOps[Jena], jenaUtil: JenaUtil) extends RDFStore[Jena] {
 
   val supportsTransactions: Boolean = dataset.supportsTransactions()
 
   val dg: DatasetGraph = dataset.asDatasetGraph
 
-  lazy val querySolution = util.QuerySolution()
+  lazy val querySolution = new util.QuerySolution(ops)
 
   def shutdown(): Unit = {
     dataset.close()
@@ -135,7 +134,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
 
   def appendToGraph(uri: Jena#URI, triples: Iterable[Jena#Triple]): Unit = {
     triples foreach {
-      case Triple(s, p, o) =>
+      case ops.Triple(s, p, o) =>
         dg.add(uri, s, p, o)
     }
   }
@@ -150,7 +149,7 @@ class JenaStore(dataset: Dataset, defensiveCopy: Boolean) extends RDFStore[Jena]
   def getGraph(uri: Jena#URI): Jena#Graph = {
     val graph = dg.getGraph(uri)
     if (defensiveCopy)
-      JenaUtil.copy(graph)
+      jenaUtil.copy(graph)
     else
       graph
   }

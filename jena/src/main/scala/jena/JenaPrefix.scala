@@ -2,14 +2,14 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-object JenaPrefix {
+class JenaPrefix(ops: RDFOps[Jena]) {
 
-  val rdf = RDFPrefix(JenaOperations)
+  val rdf = RDFPrefix(ops)
 
-  val xsd = XSDPrefix(JenaOperations)
+  val xsd = XSDPrefix(ops)
 
-  val dc = DCPrefix(JenaOperations)
+  val dc = DCPrefix(ops)
 
-  val foaf = FOAFPrefix(JenaOperations)
+  val foaf = FOAFPrefix(ops)
 
 }

@@ -4,10 +4,11 @@ import org.w3.banana._
 import com.hp.hpl.jena.sparql.core._
 import Jena._
 import com.hp.hpl.jena.tdb.{ TDB, TDBFactory }
-import JenaOperations._
 import concurrent.Future
 
-abstract class JenaGraphStoreTest(jenaStore: JenaStore) extends GraphStoreTest[Jena](jenaStore) {
+abstract class JenaGraphStoreTest(ops: RDFOps[Jena], jenaStore: JenaStore) extends GraphStoreTest[Jena](jenaStore) {
+
+  import ops._
 
   def defaultGraph: Jena#Graph = jenaStore.readTransaction {
     jenaStore.dg.getDefaultGraph
@@ -23,8 +24,8 @@ abstract class JenaGraphStoreTest(jenaStore: JenaStore) extends GraphStoreTest[J
 
 }
 
-class JenaMemGraphStoreTest extends JenaGraphStoreTest(JenaStore(DatasetGraphFactory.createMem()))
+class JenaMemGraphStoreTest extends JenaGraphStoreTest(Jena.Ops, JenaStore(DatasetGraphFactory.createMem())(Jena.Ops, Jena.JenaUtil))
 
-class JenaTDBGraphStoreTest extends JenaGraphStoreTest(JenaStore(TDBFactory.createDataset("test.tdb"), defensiveCopy = true)) {
+class JenaTDBGraphStoreTest extends JenaGraphStoreTest(Jena.Ops, JenaStore(TDBFactory.createDataset("test.tdb"), defensiveCopy = true)(Jena.Ops, Jena.JenaUtil)) {
   TDB.getContext().set(TDB.symUnionDefaultGraph, false)
 }

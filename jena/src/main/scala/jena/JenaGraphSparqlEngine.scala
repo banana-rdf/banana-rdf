@@ -7,11 +7,11 @@ import com.hp.hpl.jena.query._
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
-object JenaSparqlGraph extends SparqlGraph[Jena] {
+class JenaSparqlGraph(ops: RDFOps[Jena]) extends SparqlGraph[Jena] {
 
   def apply(graph: Jena#Graph): SparqlEngine[Jena] = new SparqlEngine[Jena] {
 
-    val querySolution = util.QuerySolution()
+    val querySolution = new util.QuerySolution(ops)
 
     def qexec(query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
       val model: Model = ModelFactory.createModelForGraph(graph)

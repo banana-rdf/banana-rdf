@@ -3,10 +3,8 @@ package org.w3.banana.jena
 import org.w3.banana._
 import java.net.URL
 
-object JenaSparqlHttp extends JenaSparqlHttp
+class JenaSparqlHttp(ops: RDFOps[Jena]) extends SparqlHttp[Jena] {
 
-trait JenaSparqlHttp extends SparqlHttp[Jena] {
-
-  def apply(endpoint: URL): SparqlEngine[Jena] = new JenaSparqlHttpEngine(endpoint.toString)
+  def apply(endpoint: URL): SparqlEngine[Jena] = new JenaSparqlHttpEngine(ops, endpoint.toString)
 
 }

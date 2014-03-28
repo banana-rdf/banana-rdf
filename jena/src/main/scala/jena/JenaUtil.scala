@@ -5,9 +5,10 @@ import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
 import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
 import com.hp.hpl.jena.graph.{ Factory, Node => JenaNode }
-import JenaOperations._
 
-object JenaUtil {
+class JenaUtil(jenaOps: RDFOps[Jena]) {
+
+  import jenaOps._
 
   val toNodeVisitor: RDFVisitor = new RDFVisitor {
     def visitBlank(r: Resource, id: AnonId) = makeBNodeLabel(id.getLabelString)
@@ -21,7 +22,7 @@ object JenaUtil {
 
   // usefull when you want to dump a graph for debugging :-)
   def dump[Rdf <: RDF](graph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Unit = {
-    val mToJena = new RDFTransformer[Rdf, Jena](ops, JenaOperations)
+    val mToJena = new RDFTransformer[Rdf, Jena](ops, jenaOps)
     val jenaGraph = mToJena.transform(graph)
     println(JenaRDFWriter.turtleWriter.asString(jenaGraph, ""))
   }

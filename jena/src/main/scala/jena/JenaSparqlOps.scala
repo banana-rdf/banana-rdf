@@ -10,7 +10,7 @@ import com.hp.hpl.jena.update.UpdateFactory
 import scala.collection.JavaConverters._
 import scala.util._
 
-object JenaSparqlOps extends SparqlOps[Jena] {
+class JenaSparqlOps(JenaUtil: JenaUtil) extends SparqlOps[Jena] {
 
   def SelectQuery(query: String): Jena#SelectQuery = QueryFactory.create(query)
 

@@ -1,29 +1,35 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import JenaUtil._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
 import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, Seq => _, _ }
 import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
-import com.hp.hpl.jena.datatypes.TypeMapper
+import com.hp.hpl.jena.datatypes.{TypeMapper, RDFDatatype}
 import scala.collection.JavaConverters._
 
-object JenaOperations extends JenaOperations
+trait JenaOpsSpecifics extends RDFOps[Jena] {
 
-trait JenaOperations extends RDFOps[Jena] {
+  def xsdString: RDFDatatype
+
+}
+
+trait JenaOperations extends JenaOpsSpecifics {
 
   // graph
 
-  val emptyGraph: Jena#Graph = ImmutableJenaGraph(Set.empty, Map.empty)
+  val emptyGraph: Jena#Graph = Factory.createDefaultGraph
 
-  def makeGraph(triples: Iterable[Jena#Triple]): Jena#Graph =
-    ImmutableJenaGraph(triples.toSet, Map.empty)
-
-  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] = graph match {
-    case ig: ImmutableJenaGraph => ig.triples.toIterable
-    case _ => graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
+  def makeGraph(triples: Iterable[Jena#Triple]): Jena#Graph = {
+    val graph: JenaGraph = Factory.createDefaultGraph
+    triples.foreach { triple =>
+      graph.add(triple)
+    }
+    graph
   }
+
+  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] =
+    graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
 
   // triple
 
@@ -83,8 +89,7 @@ trait JenaOperations extends RDFOps[Jena] {
     mapper.getTypeByName(iriString)
   }
 
-  protected [jena] val xsdString = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
-//  protected [jena] val langString = jenaDatatype("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
+  val xsdString = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
 
   /**
    * LangLiteral are not different types in Jena
@@ -152,46 +157,19 @@ trait JenaOperations extends RDFOps[Jena] {
   // graph union
 
   def union(graphs: Seq[Jena#Graph]): Jena#Graph = {
-    graphs match {
-      case Seq() => emptyGraph
-      case Seq(graph) => graph
-      case _ =>
-        var triples: Set[Jena#Triple] = Set.empty
-        var prefixes: Map[String, String] = Map.empty
-        graphs.foreach {
-          case ImmutableJenaGraph(_triples, _prefixes) =>
-            triples ++= _triples
-            prefixes ++= _prefixes
-          case graph =>
-            val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
-            while (it.hasNext) { triples += it.next() }
-            val pmIt = graph.getPrefixMapping.getNsPrefixMap.entrySet.iterator()
-            while (pmIt.hasNext) {
-              val entry = pmIt.next()
-              prefixes += (entry.getKey -> entry.getValue)
-            }
-        }
-        ImmutableJenaGraph(triples, prefixes)
+    val g = Factory.createDefaultGraph
+    graphs.foreach { graph =>
+      val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
+      while (it.hasNext) { g.add(it.next()) }
     }
+    g
   }
 
   def diff(g1: Jena#Graph, g2: Jena#Graph): Jena#Graph = {
-    g1 match {
-      case ImmutableJenaGraph(_triples, _prefixes) =>
-        ImmutableJenaGraph(_triples -- graphToIterable(g2), _prefixes)
-      case graph =>
-        // TODO factorize in a helper function
-        var triples: Set[Jena#Triple] = Set.empty
-        var prefixes: Map[String, String] = Map.empty
-        val it = graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY)
-        while (it.hasNext) { triples += it.next() }
-        val pmIt = graph.getPrefixMapping.getNsPrefixMap.entrySet.iterator()
-        while (pmIt.hasNext) {
-          val entry = pmIt.next()
-          prefixes += (entry.getKey -> entry.getValue)
-        }
-        ImmutableJenaGraph(triples -- graphToIterable(g2), prefixes)
-    }
+    val g = Factory.createDefaultGraph
+    GraphUtil.addInto(g, g1)
+    GraphUtil.delete(g, g2.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY))
+    g
   }
 
   // graph isomorphism

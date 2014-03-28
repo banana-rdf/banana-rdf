@@ -7,9 +7,9 @@ import com.hp.hpl.jena.query._
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
-class JenaSparqlHttpEngine(val endpointUrl: String) extends SparqlEngine[Jena] {
+class JenaSparqlHttpEngine(ops: RDFOps[Jena], endpointUrl: String) extends SparqlEngine[Jena] {
 
-  val querySolution = util.QuerySolution()
+  val querySolution = new util.QuerySolution(ops)
 
   def qexec(query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
     val qe = QueryExecutionFactory.sparqlService(endpointUrl, query)

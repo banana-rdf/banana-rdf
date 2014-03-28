@@ -21,19 +21,21 @@ with XmlQueryResultsReaderModule {
 
   type Rdf = Jena
 
-  implicit val Ops: RDFOps[Jena] = JenaOperations
+  implicit val Ops: JenaOperations = new JenaOperations { }
+
+  implicit val JenaUtil: JenaUtil = new JenaUtil(Ops)
 
   implicit val RecordBinder: binder.RecordBinder[Jena] = binder.RecordBinder[Jena]
 
-  implicit val SparqlOps: SparqlOps[Jena] = JenaSparqlOps
+  implicit val SparqlOps: SparqlOps[Jena] = new JenaSparqlOps(JenaUtil)
 
-  implicit val SparqlGraph: SparqlGraph[Jena] = JenaSparqlGraph
+  implicit val SparqlGraph: SparqlGraph[Jena] = new JenaSparqlGraph(Ops)
 
-  implicit val SparqlHttp: SparqlHttp[Jena] = JenaSparqlHttp
+  implicit val SparqlHttp: SparqlHttp[Jena] = new JenaSparqlHttp(Ops)
 
-  implicit val RDFXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader
+  implicit val RDFXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader(Ops)
 
-  implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader
+  implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader(Ops)
 
   implicit val ReaderSelector: ReaderSelector[Jena] = JenaRDFReader.selector
 
