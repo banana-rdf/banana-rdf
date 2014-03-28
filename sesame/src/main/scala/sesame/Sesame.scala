@@ -40,34 +40,4 @@ trait Sesame extends RDF {
   type Solutions = Vector[BindingSet]
 }
 
-object Sesame {
-
-  implicit val ops: RDFOps[Sesame] = SesameOperations
-
-  implicit val recordBinder: binder.RecordBinder[Sesame] = binder.RecordBinder[Sesame]
-
-  implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
-
-  implicit val sparqlGraph: SparqlGraph[Sesame] = SesameSparqlGraph
-
-  implicit val rdfxmlReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
-
-  implicit val turtleReader: RDFReader[Sesame, Turtle] = SesameTurtleReader
-
-  implicit val rdfxmlWriter: RDFWriter[Sesame, RDFXML] = SesameRDFWriter.rdfxmlWriter
-
-  implicit val turtleWriter: RDFWriter[Sesame, Turtle] = SesameRDFWriter.turtleWriter
-
-  implicit val solutionsWriterJson: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
-    SesameSolutionsWriter.solutionsWriterJson
-
-  implicit val solutionsWriterXml: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] =
-    SesameSolutionsWriter.solutionsWriterXml
-
-  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
-    SesameQueryResultsReader.queryResultsReaderJson
-
-  implicit val queryResultsReaderXml: SparqlQueryResultsReader[Sesame, SparqlAnswerXml] =
-    SesameQueryResultsReader.queryResultsReaderXml
-
-}
+object Sesame extends SesameModule
