@@ -75,8 +75,8 @@ object BananaRdfBuild extends Build {
   
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.2"
 
-  val akka = "com.typesafe.akka" %% "akka-actor" % "2.1.4"
-  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.1.4"
+  val akka = "com.typesafe.akka" %% "akka-actor" % "2.2.0"
+  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.2.0"
 
 //  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.7"
 
@@ -91,7 +91,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0.RC1-SNAP4"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.0"
   
   val testsuiteDeps =
     Seq(
@@ -99,8 +99,8 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "play" %% "play-iteratees" % "2.1.1"
-  val playDeps = "play" %% "play" % "2.1.1"
+  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.2.1"
+  val playDeps = "com.typesafe.play" %% "play" % "2.2.1"
 
   val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
 
