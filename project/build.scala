@@ -157,6 +157,7 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
+      plantain,
       examples))
   
   lazy val rdf = Project(
@@ -213,33 +214,46 @@ object BananaRdfBuild extends Build {
 
   // this is _experimental_
   // please do not add this projet to the main one
-  lazy val experimental = Project(
-    id = "experimental",
-    base = file("experimental"),
+// lazy val experimental = Project(
+//   id = "experimental",
+//   base = file("experimental"),
+//   settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
+//     libraryDependencies += akka,
+//     libraryDependencies += akkaTransactor,
+//     libraryDependencies += iterateeDeps,
+//     libraryDependencies += reactiveMongo,
+//     libraryDependencies += playDeps,
+//     libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
+//     libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
+//   )
+// ) dependsOn (rdfTestSuite % "test")
+
+  lazy val plantain = Project(
+    id = "plantain",
+    base = file("plantain"),
     settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
-      libraryDependencies += akka,
-      libraryDependencies += akkaTransactor,
-      libraryDependencies += iterateeDeps,
-      libraryDependencies += reactiveMongo,
-      libraryDependencies += playDeps,
+//      libraryDependencies += scalaIoCore,
+//      libraryDependencies += scalaIoFile,
       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
     )
-  ) dependsOn (rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test")
 
-  lazy val ldp = Project(
-    id = "ldp",
-    base = file("ldp"),
-    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
-        libraryDependencies += akka,
-        libraryDependencies += asyncHttpClient,
-        libraryDependencies += akkaTransactor,
-        libraryDependencies += scalaz,
-        libraryDependencies += iterateeDeps,
-        libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
-        libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
-    )
-  ) dependsOn (rdfTestSuite % "test")
+
+
+// lazy val ldp = Project(
+//   id = "ldp",
+//   base = file("ldp"),
+//   settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
+//       libraryDependencies += akka,
+//       libraryDependencies += asyncHttpClient,
+//       libraryDependencies += akkaTransactor,
+//       libraryDependencies += scalaz,
+//       libraryDependencies += iterateeDeps,
+//       libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.7" % "provided",
+//       libraryDependencies += "log4j" % "log4j" % "1.2.16" % "provided"
+//   )
+// ) dependsOn (rdfTestSuite % "test")
 
   
 }
