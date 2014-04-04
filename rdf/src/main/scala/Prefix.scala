@@ -355,3 +355,14 @@ class CertPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("cert", "ht
    val exponent = apply("exponent")
    val modulus = apply("modulus")
 }
+
+object OWLPrefix {
+  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new OWLPrefix(ops)
+}
+
+class OWLPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("owl", "http://www.w3.org/2002/07/owl#")(ops) {
+  val Class = apply("Class")
+  val DatatypeProperty = apply("DatatypeProperty")
+  val ObjectProperty = apply("ObjectProperty")
+  val sameAs = apply("sameAs")
+}
