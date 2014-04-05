@@ -12,7 +12,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ bintrayPublishSettings ++ Seq (
     organization := "org.w3",
-    version      := "0.5",
+    version      := "0.6-SNAPSHOT",
     scalaVersion := "2.10.4",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
