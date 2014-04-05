@@ -3,14 +3,17 @@ import sbt.Keys._
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 
+import bintray.Plugin._
+import bintray.Keys._
+
 object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ Seq (
+  val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ bintrayPublishSettings ++ Seq (
     organization := "org.w3",
-    version      := "0.5-SNAPSHOT",
-    scalaVersion := "2.10.3",
+    version      := "0.5",
+    scalaVersion := "2.10.4",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
@@ -22,14 +25,14 @@ object BuildSettings {
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    publishTo := {
-      val nexus = "https://oss.sonatype.org/"
-      if (version.value.trim.endsWith("SNAPSHOT"))
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-    },
     publishArtifact in Test := false,
+//    publishTo := {
+//      val nexus = "https://oss.sonatype.org/"
+//      if (version.value.trim.endsWith("SNAPSHOT"))
+//        Some("snapshots" at nexus + "content/repositories/snapshots")
+//      else
+//        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+//    },
     pomIncludeRepository := { _ => false },
     pomExtra := (
       <url>https://github.com/w3c/banana-rdf</url>
@@ -56,7 +59,11 @@ object BuildSettings {
           <url>http://bblfish.net/</url>
         </developer>
       </developers>
-    )
+    ),
+    // bintray
+    repository in bintray := "banana-rdf",
+    bintrayOrganization in bintray := None,
+    licenses += ("W3C", url("http://opensource.org/licenses/W3C"))
   )
 
   val jenaTestWIPFilter = Seq (
