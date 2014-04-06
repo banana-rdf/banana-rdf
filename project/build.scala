@@ -36,17 +36,6 @@ object BuildSettings {
     pomIncludeRepository := { _ => false },
     pomExtra := (
       <url>https://github.com/w3c/banana-rdf</url>
-      <licenses>
-        <license>
-          <name>W3C License</name>
-          <url>http://opensource.org/licenses/W3C</url>
-          <distribution>repo</distribution>
-        </license>
-      </licenses>
-      <scm>
-        <url>git@github.com:w3c/banana-rdf.git</url>
-        <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
-      </scm>
       <developers>
         <developer>
           <id>betehess</id>
@@ -59,6 +48,10 @@ object BuildSettings {
           <url>http://bblfish.net/</url>
         </developer>
       </developers>
+      <scm>
+        <url>git@github.com:w3c/banana-rdf.git</url>
+        <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
+      </scm>
     ),
     // bintray
     repository in bintray := "banana-rdf",
