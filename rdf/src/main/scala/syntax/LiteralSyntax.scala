@@ -11,13 +11,10 @@ trait LiteralSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
 class LiteralW[Rdf <: RDF](val literal: Rdf#Literal) extends AnyVal {
 
-  def fold[T](funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T)(implicit ops: RDFOps[Rdf]): T =
-    ops.foldLiteral(literal)(funTL, funLL)
+  def lexicalForm(implicit ops: RDFOps[Rdf]): String = ops.fromLiteral(literal)._1
 
-  def lexicalForm(implicit ops: RDFOps[Rdf]): String =
-    ops.foldLiteral(literal)(
-      tl => ops.fromTypedLiteral(tl)._1,
-      ll => ops.fromLangLiteral(ll)._1
-    )
+  def datatype(implicit ops: RDFOps[Rdf]): Rdf#URI = ops.fromLiteral(literal)._2
+
+  def lang(implicit ops: RDFOps[Rdf]): Option[Rdf#Lang] = ops.fromLiteral(literal)._3
 
 }

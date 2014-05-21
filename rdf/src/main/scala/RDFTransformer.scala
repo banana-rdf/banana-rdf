@@ -22,19 +22,9 @@ class RDFTransformer[A <: RDF, B <: RDF](
   def transformNode(node: A#Node): B#Node = a.foldNode(node)(
     uri => b.makeUri(a.fromUri(uri)),
     bnode => b.makeBNodeLabel(a.fromBNode(bnode)),
-    literal => transformLiteral(literal)
-  )
-
-  def transformLiteral(literal: A#Literal): B#Literal = a.foldLiteral(literal)(
-    tl => {
-      val (lexicalForm, datatypeUri) = a.fromTypedLiteral(tl)
-      val datatype = a.fromUri(datatypeUri)
-      b.makeTypedLiteral(lexicalForm, b.makeUri(datatype))
-    },
-    ll => {
-      val (lexicalForm, lang) = a.fromLangLiteral(ll)
-      val langString = a.fromLang(lang)
-      b.makeLangLiteral(lexicalForm, b.makeLang(langString))
+    {
+      case a.Literal(lexicalForm, a.URI(datatype), None) => b.makeLiteral(lexicalForm, b.URI(datatype))
+      case a.Literal(lexicalForm, _, Some(a.Lang(lang))) => b.makeLangTaggedLiteral(lexicalForm, b.Lang(lang))
     }
   )
 
