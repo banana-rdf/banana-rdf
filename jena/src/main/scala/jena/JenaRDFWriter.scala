@@ -15,7 +15,9 @@ object JenaRDFWriter {
   def makeRDFWriter[S](lang: Lang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
     val syntax = _syntax
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
-      RDFDataMgr.write(os, graph, lang)
+      import Jena.Ops._
+      val relativeGraph = graph.relativize(URI(base))
+      RDFDataMgr.write(os, relativeGraph, lang)
     }
   }
 

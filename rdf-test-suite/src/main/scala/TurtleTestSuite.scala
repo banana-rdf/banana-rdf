@@ -62,7 +62,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     assert(referenceGraph isIsomorphicWith graph)
   }
 
-  "works with relative uris" taggedAs (JenaWIP) in {
+  "works with relative uris" in {
     val bar = for {
       turtleString <- writer.asString(referenceGraph, rdfCore)
       computedFooGraph <- reader.read(turtleString, foo)
