@@ -39,6 +39,7 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
 
   object Literal {
     val xsdString = makeUri("http://www.w3.org/2001/XMLSchema#string")
+    val rdfLangString = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
     def unapply(literal: Rdf#Literal): Some[(String, Rdf#URI, Option[Rdf#Lang])] = Some(fromLiteral(literal))
     def apply(lexicalForm: String): Rdf#Literal = makeLiteral(lexicalForm, xsdString)
     def apply(lexicalForm: String, datatype: Rdf#URI): Rdf#Literal = makeLiteral(lexicalForm, datatype)

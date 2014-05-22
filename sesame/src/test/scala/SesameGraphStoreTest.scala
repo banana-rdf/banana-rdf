@@ -5,9 +5,10 @@ import org.openrdf.sail.memory.MemoryStore
 import org.openrdf.repository.Repository
 import org.openrdf.repository.sail.SailRepository
 import Sesame._
-import SesameOperations._
 
 abstract class SesameGraphStoreTest(sesameStore: SesameStore) extends GraphStoreTest[Sesame](sesameStore) {
+
+  import Sesame.Ops._
 
   "adding a named graph should not pollute the default graph" in {
     val s = sesameStore.execute {

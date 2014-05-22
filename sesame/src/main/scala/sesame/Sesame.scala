@@ -17,8 +17,6 @@ trait Sesame extends RDF {
   type URI = SesameURI
   type BNode = SesameBNode
   type Literal = SesameLiteral
-  type TypedLiteral = SesameLiteral
-  type LangLiteral = SesameLiteral
   type Lang = String
 
   // types for the graph traversal API

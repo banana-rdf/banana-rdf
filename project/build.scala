@@ -119,7 +119,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
 
-  val sesameVersion = "2.7.6"
+  val sesameVersion = "2.8.0-beta1"
   
   val sesameCoreDeps =
     Seq(
