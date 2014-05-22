@@ -5,8 +5,6 @@ import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node =>
 import com.hp.hpl.jena.query.{ Query => JenaQuery, QuerySolution, ResultSet }
 import com.hp.hpl.jena.update.{UpdateRequest, UpdateAction}
 
-import scalaz.Id.Id
-
 trait Jena extends RDF {
   // types related to the RDF datamodel
   type Graph = JenaGraph
@@ -15,8 +13,6 @@ trait Jena extends RDF {
   type URI = Node_URI
   type BNode = Node_Blank
   type Literal = Node_Literal
-  type TypedLiteral = Node_Literal
-  type LangLiteral = Node_Literal
   type Lang = String
 
   // types for the graph traversal API

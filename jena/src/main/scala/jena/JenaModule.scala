@@ -21,7 +21,7 @@ with XmlQueryResultsReaderModule {
 
   type Rdf = Jena
 
-  implicit val Ops: JenaOperations = new JenaOperations { }
+  implicit val Ops: JenaOps = new JenaOps
 
   implicit val JenaUtil: JenaUtil = new JenaUtil(Ops)
 
