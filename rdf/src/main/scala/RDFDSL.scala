@@ -14,14 +14,14 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
 
   object Triple {
     def apply(s: Rdf#Node, p: Rdf#URI, o: Rdf#Node): Rdf#Triple = makeTriple(s, p, o)
-    def unapply(triple: Rdf#Triple): Option[(Rdf#Node, Rdf#URI, Rdf#Node)] = Some(fromTriple(triple))
+    def unapply(triple: Rdf#Triple): Some[(Rdf#Node, Rdf#URI, Rdf#Node)] = Some(fromTriple(triple))
   }
 
   // URI
 
   object URI {
     def apply(s: String): Rdf#URI = makeUri(s)
-    def unapply(uri: Rdf#URI): Option[String] = Some(fromUri(uri))
+    def unapply(uri: Rdf#URI): Some[String] = Some(fromUri(uri))
   }
 
   // bnode
@@ -29,7 +29,7 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
   object BNode {
     def apply(): Rdf#BNode = makeBNode()
     def apply(s: String): Rdf#BNode = makeBNodeLabel(s)
-    def unapply(bn: Rdf#BNode): Option[String] = Some(fromBNode(bn))
+    def unapply(bn: Rdf#BNode): Some[String] = Some(fromBNode(bn))
   }
 
   def bnode(): Rdf#BNode = BNode()
@@ -50,7 +50,7 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
 
   object Lang {
     def apply(s: String): Rdf#Lang = makeLang(s)
-    def unapply(l: Rdf#Lang): Option[String] = Some(fromLang(l))
+    def unapply(l: Rdf#Lang): Some[String] = Some(fromLang(l))
   }
 
   // graph traversal
