@@ -89,7 +89,18 @@ object PlantainOps extends RDFOps[Plantain] {
   def union(graphs: Seq[Plantain#Graph]): Plantain#Graph =
     graphs.foldLeft(Graph.empty){ _ union _ }
 
-  def diff(g1: Plantain#Graph, g2: Plantain#Graph): Plantain#Graph = ???
+  def diff(g1: Plantain#Graph, g2: Plantain#Graph): Plantain#Graph = {
+    @annotation.tailrec
+    def loop(g: Plantain#Graph, triples: Iterator[Plantain#Triple]): Plantain#Graph = {
+      if (triples.hasNext) {
+        val triple = triples.next()
+        loop(g.removeExistingTriple(triple), triples)
+      } else {
+        g
+      }
+    }
+    loop(g1, g2.triples.iterator)
+  }
 
   // graph isomorphism
 
