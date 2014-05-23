@@ -83,14 +83,14 @@ class JenaOps extends RDFOps[Jena] {
     mapper.getTypeByName(iriString)
   }
 
-  val xsdString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
-  val rdfLangString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
+  val __xsdString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
+  val __rdfLangString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
 
   def makeLiteral(lexicalForm: String, datatype: Jena#URI): Jena#Literal =
     NodeFactory.createLiteral(lexicalForm, null, jenaDatatype(datatype)).asInstanceOf[Node_Literal]
 
   def makeLangTaggedLiteral(lexicalForm: String, lang: Jena#Lang): Jena#Literal =
-    NodeFactory.createLiteral(lexicalForm, fromLang(lang), rdfLangString).asInstanceOf[Node_Literal]
+    NodeFactory.createLiteral(lexicalForm, fromLang(lang), __rdfLangString).asInstanceOf[Node_Literal]
 
   def fromLiteral(literal: Jena#Literal): (String, Jena#URI, Option[Jena#Lang]) = {
     val lexicalForm = literal.getLiteralLexicalForm.toString

@@ -32,7 +32,7 @@ class TripleSink(ops: JenaOps) extends StreamRDF {
         new JenaTriple(
           triple.getSubject,
           triple.getPredicate,
-          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, ops.xsdString))
+          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, ops.__xsdString))
       else
         // otherwise everything is fine
         triple
