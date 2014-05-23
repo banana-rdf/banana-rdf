@@ -19,11 +19,9 @@ class QuerySolution(ops: RDFOps[Jena]) {
   def toRDFNode(node: Jena#Node): RDFNode = foldNode(node)(
     { case URI(str) => modelForBindings.createResource(str) },
     { case BNode(label) => modelForBindings.createResource(AnonId.create(label)) },
-    { literal =>
-      foldLiteral(literal) (
-        { case TypedLiteral(lexicalForm, URI(datatype)) => modelForBindings.createTypedLiteral(lexicalForm, typeMapper.getSafeTypeByName(datatype)) },
-        { case LangLiteral(lexicalForm, Lang(lang)) => modelForBindings.createLiteral(lexicalForm, lang) }
-      )
+    {
+      case Literal(lexicalForm, URI(datatype), None) => modelForBindings.createTypedLiteral(lexicalForm, typeMapper.getSafeTypeByName(datatype))
+      case Literal(lexicalForm, _, Some(Lang(lang))) => modelForBindings.createLiteral(lexicalForm, lang)
     }
   )
 

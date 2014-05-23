@@ -19,8 +19,8 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     val ntriplesDoc = prefix("ntriples/")
     val creator = URI("http://purl.org/dc/elements/1.1/creator")
     val publisher = URI("http://purl.org/dc/elements/1.1/publisher")
-    val dave = TypedLiteral("Dave Beckett")
-    val art = TypedLiteral("Art Barstow")
+    val dave = Literal("Dave Beckett")
+    val art = Literal("Art Barstow")
     val w3org = URI("http://www.w3.org/")
     Graph(
       Triple(ntriplesDoc, creator, dave),

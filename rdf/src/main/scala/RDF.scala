@@ -8,8 +8,6 @@ trait RDF {
   type URI <: Node
   type BNode <: Node
   type Literal <: Node
-  type TypedLiteral <: Literal
-  type LangLiteral <: Literal
   type Lang
 
   // types for the graph traversal API

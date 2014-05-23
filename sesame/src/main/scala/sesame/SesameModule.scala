@@ -21,7 +21,7 @@ with XmlQueryResultsReaderModule {
 
   type Rdf = Sesame
 
-  implicit val Ops: RDFOps[Sesame] = SesameOperations
+  implicit val Ops: SesameOps = new SesameOps
 
   implicit val RecordBinder: binder.RecordBinder[Sesame] = binder.RecordBinder[Sesame]
 
@@ -29,13 +29,15 @@ with XmlQueryResultsReaderModule {
 
   implicit val SparqlGraph: SparqlGraph[Sesame] = SesameSparqlGraph
 
-  implicit val RDFXMLReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
+  implicit val RDFXMLReader: RDFReader[Sesame, RDFXML] = new SesameRDFXMLReader
 
-  implicit val TurtleReader: RDFReader[Sesame, Turtle] = SesameTurtleReader
+  implicit val TurtleReader: RDFReader[Sesame, Turtle] = new SesameTurtleReader
 
-  implicit val RDFXMLWriter: RDFWriter[Sesame, RDFXML] = SesameRDFWriter.rdfxmlWriter
+  val SesameRDFWriterHelper = new SesameRDFWriterHelper
 
-  implicit val TurtleWriter: RDFWriter[Sesame, Turtle] = SesameRDFWriter.turtleWriter
+  implicit val RDFXMLWriter: RDFWriter[Sesame, RDFXML] = SesameRDFWriterHelper.rdfxmlWriter
+
+  implicit val TurtleWriter: RDFWriter[Sesame, Turtle] = SesameRDFWriterHelper.turtleWriter
 
   implicit val JsonSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
     SesameSolutionsWriter.solutionsWriterJson

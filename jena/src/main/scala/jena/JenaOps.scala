@@ -8,13 +8,7 @@ import com.hp.hpl.jena.util.iterator._
 import com.hp.hpl.jena.datatypes.{TypeMapper, RDFDatatype}
 import scala.collection.JavaConverters._
 
-trait JenaOpsSpecifics extends RDFOps[Jena] {
-
-  def xsdString: RDFDatatype
-
-}
-
-trait JenaOperations extends JenaOpsSpecifics {
+class JenaOps extends RDFOps[Jena] {
 
   // graph
 
@@ -89,47 +83,21 @@ trait JenaOperations extends JenaOpsSpecifics {
     mapper.getTypeByName(iriString)
   }
 
-  val xsdString = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
+  val __xsdString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
+  val __rdfLangString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
 
-  /**
-   * LangLiteral are not different types in Jena
-   * we can discriminate on the lang tag presence
-   */
-  def foldLiteral[T](literal: Jena#Literal)(funTL: Jena#TypedLiteral => T, funLL: Jena#LangLiteral => T): T = literal match {
-    case typedLiteral: Jena#TypedLiteral if literal.getLiteralLanguage == null || literal.getLiteralLanguage.isEmpty =>
-      funTL(typedLiteral)
-    case langLiteral: Jena#LangLiteral => funLL(langLiteral)
-  }
+  def makeLiteral(lexicalForm: String, datatype: Jena#URI): Jena#Literal =
+    NodeFactory.createLiteral(lexicalForm, null, jenaDatatype(datatype)).asInstanceOf[Node_Literal]
 
-  // typed literal
+  def makeLangTaggedLiteral(lexicalForm: String, lang: Jena#Lang): Jena#Literal =
+    NodeFactory.createLiteral(lexicalForm, fromLang(lang), __rdfLangString).asInstanceOf[Node_Literal]
 
-  def makeTypedLiteral(lexicalForm: String, iri: Jena#URI): Jena#TypedLiteral = {
-    NodeFactory.createLiteral(lexicalForm, null, jenaDatatype(iri)).asInstanceOf[Node_Literal]
-  }
-
-  def fromTypedLiteral(typedLiteral: Jena#TypedLiteral): (String, Jena#URI) = {
-    val typ = typedLiteral.getLiteralDatatype
-    if (typ != null)
-      (typedLiteral.getLiteralLexicalForm.toString, makeUri(typ.getURI))
-    else if (typedLiteral.getLiteralLanguage.isEmpty)
-      (typedLiteral.getLiteralLexicalForm.toString, makeUri("http://www.w3.org/2001/XMLSchema#string"))
-    else
-      throw new RuntimeException("fromTypedLiteral: " + typedLiteral.toString() + " must be a TypedLiteral")
-  }
-
-  // lang literal
-
-  def makeLangLiteral(lexicalForm: String, lang: Jena#Lang): Jena#LangLiteral = {
-    val langString = fromLang(lang)
-    NodeFactory.createLiteral(lexicalForm, langString, null).asInstanceOf[Node_Literal]
-  }
-
-  def fromLangLiteral(langLiteral: Jena#LangLiteral): (String, Jena#Lang) = {
-    val l = langLiteral.getLiteralLanguage
-    if (l != "")
-      (langLiteral.getLiteralLexicalForm.toString, makeLang(l))
-    else
-      throw new RuntimeException("fromLangLiteral: " + langLiteral.toString() + " must be a LangLiteral")
+  def fromLiteral(literal: Jena#Literal): (String, Jena#URI, Option[Jena#Lang]) = {
+    val lexicalForm = literal.getLiteralLexicalForm.toString
+    val datatype = makeUri(literal.getLiteralDatatype.getURI)
+    val literalLanguage = literal.getLiteralLanguage
+    val langOpt = if (literalLanguage.isEmpty) None else Some(makeLang(literalLanguage))
+    (lexicalForm, datatype, langOpt)
   }
 
   // lang
