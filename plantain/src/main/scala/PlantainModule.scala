@@ -1,0 +1,19 @@
+package org.w3.banana.plantain
+
+import org.w3.banana._
+
+trait PlantainModule
+extends RDFModule
+with RDFOpsModule
+with TurtleReaderModule
+with TurtleWriterModule {
+
+  type Rdf = Plantain
+
+  implicit val Ops: RDFOps[Plantain] = PlantainOps
+
+  implicit val TurtleReader: RDFReader[Plantain, Turtle] = PlantainTurtleReader
+
+  implicit val TurtleWriter: RDFWriter[Plantain, Turtle] = PlantainTurtleWriter
+
+}
