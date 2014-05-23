@@ -17,13 +17,13 @@ trait URIOps[Rdf <: RDF] {
   def isPureFragment(uri: Rdf#URI): Boolean
 
   /** */
-  def resolve(uri: Rdf#URI, against: Rdf#URI): Rdf#URI
+  def resolve(uri: Rdf#URI, other: Rdf#URI): Rdf#URI
 
   /** */
   def appendSegment(uri: Rdf#URI, segment: String): Rdf#URI
 
   /** */
-  def relativize(uri: Rdf#URI, against: Rdf#URI): Rdf#URI
+  def relativize(uri: Rdf#URI, other: Rdf#URI): Rdf#URI
 
   /** appends a randomly generated pathname to `uri` */
   def newChildUri(uri: Rdf#URI): Rdf#URI
@@ -88,7 +88,7 @@ trait DefaultURIOps[Rdf <: RDF] extends URIOps[Rdf] { ops: RDFOps[Rdf] =>
   }
 
   def newChildUri(uri: Rdf#URI): Rdf#URI = {
-    appendSegment(uri, java.util.UUID.randomUUID().toString.replaceAll("-", ""))
+    appendSegment(uri, java.util.UUID.randomUUID().toString.replace("-", ""))
   }
 
   def lastSegment(uri: Rdf#URI): String = {
