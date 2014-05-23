@@ -58,9 +58,8 @@ object Command {
     //  pointed.pointer.as[Rdf#URI] flatMap { uri =>
     //    if (uri.isPureFragment) Success(uri) else Failure(NotPureFragment)
     val docUri = collection.newChildUri
-    POST(docUri, pointed) map { _ => docUri.resolve(fragment.toString) }
+    POST(docUri, pointed) map { _ => docUri.withFragment(fragment.toString) }
   }
-
 
   def DELETE[Rdf <: RDF](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
     Command.delete(uri)

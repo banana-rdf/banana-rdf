@@ -14,9 +14,10 @@ object RDFOps {
  *   - we allow literals in subject position
  */
 trait RDFOps[Rdf <: RDF]
-    extends RDFDSL[Rdf]
-    with CommonPrefixes[Rdf]
-    with syntax.Syntax[Rdf] {
+extends URIOps[Rdf]
+with RDFDSL[Rdf]
+with CommonPrefixes[Rdf]
+with syntax.Syntax[Rdf] {
 
   // graph
 

@@ -3,6 +3,7 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import java.net.{ URI => jURI }
 
+/** all syntax enhancement are directly derived from URIOps */
 trait URISyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
   implicit def uriW(uri: Rdf#URI): URIW[Rdf] = new URIW[Rdf](uri)
@@ -11,58 +12,27 @@ trait URISyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
 class URIW[Rdf <: RDF] (val uri: Rdf#URI) extends AnyVal {
 
-  def getString(implicit ops: RDFOps[Rdf]): String = ops.fromUri(uri)
+  def getString(implicit ops: URIOps[Rdf]): String = ops.getString(uri)
 
-  def fragmentLess(implicit ops: RDFOps[Rdf]): Rdf#URI = {
-    val uriString = ops.fromUri(uri)
-    val juri = new jURI(uriString)
-    import juri._
-    val uriNoFrag = new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, null)
-    ops.makeUri(uriNoFrag.toString)
-  }
+  def fragmentLess(implicit ops: URIOps[Rdf]): Rdf#URI = ops.withoutFragment(uri)
 
-  def fragment(frag: String)(implicit ops: RDFOps[Rdf]): Rdf#URI = {
-    val uriString = ops.fromUri(uri)
-    val juri = new jURI(uriString)
-    import juri._
-    val uriWithFrag = new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, frag)
-    ops.makeUri(uriWithFrag.toString)
-  }
+  def withFragment(fragment: String)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.withFragment(uri, fragment)
 
-  def fragment(implicit ops: RDFOps[Rdf]): Option[String] = {
-    val uriString = ops.fromUri(uri)
-    val juri = new jURI(uriString)
-    Option(juri.getFragment)
-  }
+  def fragment(implicit ops: URIOps[Rdf]): Option[String] = ops.getFragment(uri)
 
-  def isPureFragment(implicit ops: RDFOps[Rdf]): Boolean = {
-    val uriString = ops.fromUri(uri)
-    val juri = new jURI(uriString)
-    (juri.getScheme == null || juri.getScheme.isEmpty) && (juri.getSchemeSpecificPart == null || juri.getSchemeSpecificPart.isEmpty)
-  }
+  def isPureFragment(implicit ops: URIOps[Rdf]): Boolean = ops.isPureFragment(uri)
 
-  def /(str: String)(implicit ops: RDFOps[Rdf]): Rdf#URI = {
-    val juri = new jURI(ops.fromUri(uri) + "/").resolve(str)
-    ops.makeUri(juri.toString)
-  }
+  def /(segment: String)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.appendSegment(uri, segment)
 
-  def newChildUri()(implicit ops: RDFOps[Rdf]): Rdf#URI = this / java.util.UUID.randomUUID().toString.replaceAll("-", "")
+  def newChildUri()(implicit ops: URIOps[Rdf]): Rdf#URI = ops.newChildUri(uri)
 
-  def resolve(str: String)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.resolve(uri, str)(ops)
+  def resolve(other: Rdf#URI)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.resolve(uri, other)
 
-  def resolveAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.resolve(other, uri.toString)(ops)
+  def relativize(other: Rdf#URI)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.relativize(uri, other)
 
-  def relativize(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.relativize(uri, other)(ops)
+  def relativizeAgainst(other: Rdf#URI)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.relativize(other, uri)
 
-  def relativizeAgainst(other: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#URI = URIHelper.relativize(other, uri)(ops)
-
-  def lastPathSegment(implicit ops: RDFOps[Rdf]): String = {
-    val path = new jURI(ops.fromUri(uri)).getPath
-    val i = path.lastIndexOf('/')
-    if (i <0) path
-    else path.substring(i+1,path.length)
-    //    uri.toString.replaceFirst(".*/([^/?]+).*", "$1")
-  }
+  def lastPathSegment(implicit ops: URIOps[Rdf]): String = ops.lastSegment(uri)
 
 }
 

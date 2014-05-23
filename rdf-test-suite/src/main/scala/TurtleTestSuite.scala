@@ -57,6 +57,9 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
     val graph = reader.read(turtleString, rdfCore).get
+    println(referenceGraph)
+    println("***")
+    println(graph)
     assert(referenceGraph isIsomorphicWith graph)
   }
 

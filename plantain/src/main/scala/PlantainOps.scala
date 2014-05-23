@@ -3,7 +3,7 @@ package org.w3.banana.plantain
 import org.w3.banana._
 import spray.http.Uri
 
-object PlantainOps extends RDFOps[Plantain] {
+object PlantainOps extends RDFOps[Plantain] with DefaultURIOps[Plantain] {
 
   // graph
 

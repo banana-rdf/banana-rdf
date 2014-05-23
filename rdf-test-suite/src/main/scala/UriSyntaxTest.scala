@@ -16,7 +16,7 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
 
   ".fragment should set the fragment part of a URI" in {
     val uri = URI("http://example.com/foo")
-    uri.fragment("bar") should be(URI("http://example.com/foo#bar"))
+    uri.withFragment("bar") should be(URI("http://example.com/foo#bar"))
   }
 
   ".fragment should return the fragment part of a URI" in {
@@ -32,16 +32,23 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
   }
 
   "resolve should resolve the uri against the passed string" in {
-    URI("http://example.com/foo").resolve("bar") should be(URI("http://example.com/bar"))
-    URI("http://example.com/foo/").resolve("bar") should be(URI("http://example.com/foo/bar"))
+    URI("http://example.com/foo").resolve(URI("bar")) should be(URI("http://example.com/bar"))
+    URI("http://example.com/foo/").resolve(URI("bar")) should be(URI("http://example.com/foo/bar"))
   }
 
   "resolveAgainst should work like resolve, just the other way around" in {
     URI("http://example.com/foo").resolveAgainst(URI("#bar")) should be(URI("http://example.com/foo"))
-    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar")) */
+    URI("bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar"))
     URI("#bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/foo#bar"))
     URI("#bar").resolveAgainst(URI("http://example.com/foo/")) should be(URI("http://example.com/foo/#bar"))
-    /* URI("bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar")) */
+    URI("bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar"))
+    (URI("bar"): Rdf#Node).resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar"))
+  }
+
+  ".relativize() should relativize the uri against the passed string" in {
+    URI("http://example.com/foo").relativize(URI("http://example.com/foo#bar")) should be(URI("#bar"))
+    (URI("http://example.com/foo"): Rdf#Node).relativize(URI("http://example.com/foo#bar")) should be(URI("#bar"))
+    URI("http://example.com/foo#bar").relativizeAgainst(URI("http://example.com/foo")) should be(URI("#bar"))
   }
 
   "should be able to create and work with relative URIs" in {
@@ -59,7 +66,8 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
 
     new URL(card).toUri should be(uri)
     new java.net.URI(card).toUri should be(uri)
-
   }
+
+
 
 }

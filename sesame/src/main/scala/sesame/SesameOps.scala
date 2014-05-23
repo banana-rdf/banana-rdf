@@ -6,7 +6,7 @@ import org.openrdf.model.impl._
 import org.openrdf.model.util._
 import scala.collection.JavaConverters._
 
-class SesameOps extends RDFOps[Sesame] {
+class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
 
   val valueFactory: ValueFactory = ValueFactoryImpl.getInstance()
 

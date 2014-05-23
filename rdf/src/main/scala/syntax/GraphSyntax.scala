@@ -35,11 +35,11 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
 
   def copy(implicit ops: RDFOps[Rdf]): Rdf#Graph = copy { uri => uri }
 
-  def resolveAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph =
-    copy { uri => URIHelper.resolve(baseUri, uri.toString)(ops) }
+  def resolveAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf], uriOps: URIOps[Rdf]): Rdf#Graph =
+    copy { uri => uriOps.resolve(baseUri, uri) }
 
-  def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph =
-    copy { uri => URIHelper.relativize(baseUri, uri)(ops) }
+  def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf], uriOps: URIOps[Rdf]): Rdf#Graph =
+    copy { uri => uriOps.relativize(baseUri, uri) }
 
   def getAllInstancesOf(clazz: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraphs[Rdf] = {
     val instances = ops.getSubjects(graph, ops.rdf("type"), clazz): Iterable[Rdf#Node]
