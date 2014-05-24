@@ -6,7 +6,7 @@ import spray.http.Uri
 
 trait PlantainURIOps extends URIOps[Plantain] {
 
-  def getString(uri: Plantain#URI): String = uri.toString
+  def getString(uri: Plantain#URI): String = uri.underlying.toString
 
   def withoutFragment(uri: Plantain#URI): Plantain#URI =
     URI(uri.underlying.withoutFragment)
