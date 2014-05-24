@@ -99,6 +99,9 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
   // graph isomorphism
 
+  // TODO: remove dependency on Sesame
+  // the definition for RDF Graph isomorphism can be found at http://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/#h3_graph-isomorphism
+  // here is an old paper discussing implementation details http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
   def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
     // as long as Sesame is in scope, let's just rely on it for the complex stuff
     import org.openrdf.{ model => sesame }
