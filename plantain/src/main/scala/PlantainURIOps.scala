@@ -16,7 +16,10 @@ trait PlantainURIOps extends URIOps[Plantain] {
 
   def getFragment(uri: Plantain#URI): Option[String] = uri.underlying.fragment
 
-  def isPureFragment(uri: Plantain#URI): Boolean = uri.underlying.fragment.isDefined
+  def isPureFragment(uri: Plantain#URI): Boolean = {
+    val u = uri.underlying
+    u.scheme.isEmpty && u.authority.isEmpty && u.path.isEmpty && u.query.isEmpty && u.fragment.isDefined
+  }
 
   def resolve(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
     URI(other.underlying.resolvedAgainst(uri.underlying))
