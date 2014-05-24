@@ -29,7 +29,8 @@ trait PlantainURIOps extends URIOps[Plantain] {
   }
 
   def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
-    // TODO. see https://github.com/stain/cxf/blob/trunk/rt/frontend/jaxrs/src/main/java/org/apache/cxf/jaxrs/utils/HttpUtils.java
+    // TODO should rely on a spray.http.Uri when https://github.com/spray/spray/issues/818 is addressed
+    // for implementation algorithm, see https://github.com/stain/cxf/blob/trunk/rt/frontend/jaxrs/src/main/java/org/apache/cxf/jaxrs/utils/HttpUtils.java
     import java.net.{ URI => jURI }
     val juri = new jURI(uri.underlying.toString).relativize(new jURI(other.underlying.toString))
     PlantainOps.makeUri(juri.toString)
