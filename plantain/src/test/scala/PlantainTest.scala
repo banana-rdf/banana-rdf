@@ -20,6 +20,6 @@ class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
 
 class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
 
-//import org.w3.banana.syntax._
-//
-//class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
+import org.w3.banana.syntax._
+
+class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]

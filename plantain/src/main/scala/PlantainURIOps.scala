@@ -27,8 +27,11 @@ trait PlantainURIOps extends URIOps[Plantain] {
 
   def appendSegment(uri: Plantain#URI, segment: String): Plantain#URI = {
     val underlying = uri.underlying
-    val path = underlying.path / segment
-    URI(underlying.copy(path = path))
+    val path = underlying.path
+    if (path.reverse.startsWithSlash)
+      URI(underlying.copy(path = path + segment))
+    else
+      URI(underlying.copy(path = path / segment))
   }
 
   def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {

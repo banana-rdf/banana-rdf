@@ -26,6 +26,12 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
     uriNoFrag.fragment should be(None)
   }
 
+  "isPureGragment should should say if a URI is a pure fragment" in {
+    URI("http://example.com/foo").isPureFragment should be(false)
+    URI("http://example.com/foo#bar").isPureFragment should be(false)
+    URI("#bar").isPureFragment should be(true)
+  }
+
   "/ should create a sub-resource uri" in {
     (URI("http://example.com/foo") / "bar") should be(URI("http://example.com/foo/bar"))
     (URI("http://example.com/foo/") / "bar") should be(URI("http://example.com/foo/bar"))
@@ -37,7 +43,8 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
   }
 
   "resolveAgainst should work like resolve, just the other way around" in {
-    URI("http://example.com/foo").resolveAgainst(URI("#bar")) should be(URI("http://example.com/foo"))
+    // the following test does not make sense as the resolution base Uri must be absolute
+    // URI("http://example.com/foo").resolveAgainst(URI("#bar")) should be(URI("http://example.com/foo"))
     URI("bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/bar"))
     URI("#bar").resolveAgainst(URI("http://example.com/foo")) should be(URI("http://example.com/foo#bar"))
     URI("#bar").resolveAgainst(URI("http://example.com/foo/")) should be(URI("http://example.com/foo/#bar"))
