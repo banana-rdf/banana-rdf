@@ -17,7 +17,7 @@ class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
 
   def resolveAgainst(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
     import ops._
-    foldNode(node)(_.resolveAgainst(baseUri), bn => bn, lit => lit)
+    foldNode(node)(ops.resolve(baseUri, _), bn => bn, lit => lit)
   }
 
   def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {

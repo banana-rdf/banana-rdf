@@ -6,11 +6,9 @@ import org.scalatest._
 import java.io._
 import org.scalatest.EitherValues._
 
-abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
+abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle])
     extends WordSpec with Matchers {
 
-  val reader: RDFReader[Rdf, Turtle]
-  val writer: RDFWriter[Rdf, Turtle]
   import ops._
 
   import org.scalatest.matchers.{ BeMatcher, MatchResult }
@@ -59,6 +57,9 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
     val graph = reader.read(turtleString, rdfCore).get
+    println(referenceGraph)
+    println("***")
+    println(graph)
     assert(referenceGraph isIsomorphicWith graph)
   }
 
