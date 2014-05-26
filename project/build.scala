@@ -12,7 +12,7 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ bintrayPublishSettings ++ Seq (
     organization := "org.w3",
-    version      := "0.6-SNAPSHOT",
+    version      := "0.6",
     scalaVersion := "2.10.4",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
@@ -167,7 +167,8 @@ object BananaRdfBuild extends Build {
     id = "patch",
     base = file("patch"),
     settings = buildSettings ++ testDeps ++ Seq(
-      publishMavenStyle := true
+      publishMavenStyle := true,
+      libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0-RC1"
     )
   ) dependsOn (rdf, jena, rdfTestSuite % "test")
 
