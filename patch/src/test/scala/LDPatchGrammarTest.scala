@@ -15,6 +15,9 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   def newParser(input: String) =
     new ldpatch.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map("foaf" -> URI("http://xmlns.com/foaf/")))
 
+  def newFreshParser(input: String) =
+    new ldpatch.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map.empty)
+
   "parse IRIREF" in {
     newParser("""<http://example.com/foo#\u2665>""").IRIREF.run().success.value should be(URI("http://example.com/foo#♥"))
   }
@@ -61,6 +64,10 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     newParser(""""foo"^^foaf:name""").literal.run().success.value should be(Literal("foo", URI("http://xmlns.com/foaf/name")))
     newParser("""-3.14""").literal.run().success.value should be(Literal("-3.14", xsd.decimal))
     newParser("""true""").literal.run().success.value should be(xsd.`true`)
+  }
+
+  "parse Var" in {
+    newParser("""?name""").Var.run().success.value should be(Var("name"))
   }
 
   "parse Add Object" in {
@@ -135,6 +142,19 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
       ))
     )
 
+    newParser("""/foaf:knows [ /foaf:holdsAccount /foaf:accountName = "bertails" ]""").Path.run().success.value should be(
+      Path(Seq(
+        StepForward(PatchIRI(URI("http://xmlns.com/foaf/knows"))),
+        Filter(
+          Path(Seq(
+            StepForward(PatchIRI(URI("http://xmlns.com/foaf/holdsAccount"))),
+            StepForward(PatchIRI(URI("http://xmlns.com/foaf/accountName")))
+          )),
+          Some(PatchLiteral(Literal("bertails")))
+        )
+      ))
+    )
+
   }
 
 
@@ -160,6 +180,27 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
       )
     )
 
+    val bind = """Bind ?alex
+     <http://champin.net/#pa>/foaf:knows
+        [/foaf:holdsAccount/foaf:accountName="bertails"]"""
+    newParser(bind).Bind.run().success.value should be(
+      Bind(
+        Var("alex"),
+        PatchIRI(URI("http://champin.net/#pa")),
+        Path(Seq(
+          StepForward(PatchIRI(URI("http://xmlns.com/foaf/knows"))),
+          Filter(
+            Path(Seq(
+              StepForward(PatchIRI(URI("http://xmlns.com/foaf/holdsAccount"))),
+              StepForward(PatchIRI(URI("http://xmlns.com/foaf/accountName")))
+            )),
+            Some(PatchLiteral(Literal("bertails")))
+          )
+        ))
+      )
+    )
+
+
   }
 
   "parse Slice" in {
@@ -173,9 +214,56 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     newParser("""Replace ?alex foaf:prefLang 0> ( "fr" "en" )""").Replace.run().success.value should be(
       Replace(Var("alex"), PatchIRI(URI("http://xmlns.com/foaf/prefLang")), EverythingAfter(0), Seq(PatchLiteral(Literal("fr")), PatchLiteral(Literal("en"))))
     )
-
-
   }
+
+  "parse Prologue" in {
+    newFreshParser("""Prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+Prefix foaf: <http://xmlns.com/foaf/0.1/>
+Prefix v: <http://example.org/vocab#>""").Prologue.run().success.value should be(
+      Map("rdf" -> URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#"), "foaf" -> URI("http://xmlns.com/foaf/0.1/"), "v" -> URI("http://example.org/vocab#"))
+    )
+  }
+
+  "parse LDPatch" in {
+    val patch = """
+Prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+Prefix foaf: <http://xmlns.com/foaf/0.1/>
+Prefix v: <http://example.org/vocab#>
+
+Bind ?alex
+     <http://champin.net/#pa> /foaf:knows
+        [/foaf:holdsAccount/foaf:accountName="bertails"]
+
+Replace ?alex v:prefLang 0> ( "fr" "en" )
+"""
+    newFreshParser(patch).LDPatch.run().success.value should be(
+      model.LDPatch(Seq(
+        Bind(
+          Var("alex"),
+          PatchIRI(URI("http://champin.net/#pa")),
+          Path(Seq(
+            StepForward(PatchIRI(URI("http://xmlns.com/foaf/0.1/knows"))),
+            Filter(
+              Path(Seq(
+                StepForward(PatchIRI(URI("http://xmlns.com/foaf/0.1/holdsAccount"))),
+                StepForward(PatchIRI(URI("http://xmlns.com/foaf/0.1/accountName")))
+              )),
+              Some(PatchLiteral(Literal("bertails")))
+            )
+          ))
+        ),
+        Replace(
+          Var("alex"),
+          PatchIRI(URI("http://example.org/vocab#prefLang")),
+          EverythingAfter(0),
+          Seq(PatchLiteral(Literal("fr")), PatchLiteral(Literal("en")))
+        )
+      ))
+    )
+
+    
+  }
+
 
 }
 

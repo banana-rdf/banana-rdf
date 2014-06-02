@@ -20,8 +20,8 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
     class PEGPatchParser(val input: ParserInput, baseURI: Rdf#URI, var prefixes: Map[String, Rdf#URI] = Map.empty) extends Parser with StringBuilding {
 
       // LDPatch ::= Prologue Statement*
-      def LDPatch: Rule1[Seq[m.Statement[Rdf]]] = rule {
-        Prologue ~> (prefixes => this.prefixes = prefixes) ~ WS1 ~ zeroOrMore(Statement).separatedBy(WS1) ~ EOI
+      def LDPatch: Rule1[m.LDPatch[Rdf]] = rule {
+        WS0 ~ Prologue ~> (prefixes => this.prefixes = prefixes) ~ WS1 ~ zeroOrMore(Statement).separatedBy(WS1) ~ WS0 ~ EOI ~> ((statements: Seq[m.Statement[Rdf]]) => m.LDPatch(statements))
       }
 
       // Statement ::= Bind | Add | Delete | Replace
@@ -52,7 +52,7 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
 
       // Bind ::= "Bind" Var Value Path?
       def Bind: Rule1[m.Bind[Rdf]] = rule (
-        "Bind" ~ WS1 ~ Var ~ WS1 ~ Value ~ optional(WS1 ~ Path) ~> ((varr: m.Var, value: m.Value[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
+        "Bind" ~ WS1 ~ Var ~ WS1 ~ Value ~ optional(WS0 ~ Path) ~> ((varr: m.Var, value: m.Value[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
       )
 
       // Replace ::= "Replace" Subject Predicate Slice List
@@ -62,7 +62,7 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
 
       // Path ::= ( Step | Constraint )*
       def Path: Rule1[m.Path[Rdf]] = rule (
-        zeroOrMore(Step | Constraint) ~> ((pathElems: Seq[m.PathElement[Rdf]]) => m.Path(pathElems))
+        zeroOrMore(Step | Constraint).separatedBy(WS0) ~> ((pathElems: Seq[m.PathElement[Rdf]]) => m.Path(pathElems))
       )
 
       // Step ::= '/' ( '-' iri | Index | iri )
@@ -81,7 +81,7 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
 
       // Constraint ::= '[' Path ( '=' Value )? ']' | '!'
       def Constraint: Rule1[m.Constraint[Rdf]] = rule (
-          '[' ~ Path ~ optional('=' ~ Value) ~ ']' ~> ((path: m.Path[Rdf], valueOpt: Option[m.Value[Rdf]]) => m.Filter(path, valueOpt))
+          '[' ~ WS0 ~ Path ~ optional(WS0 ~ '=' ~ WS0 ~ Value) ~ WS0 ~ ']' ~> ((path: m.Path[Rdf], valueOpt: Option[m.Value[Rdf]]) => m.Filter(path, valueOpt))
         | '!' ~ push(m.UnicityConstraint)
       )
 
@@ -313,7 +313,7 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
       def WS1: Rule0 = rule { oneOrMore(WS) }
   
       // Prologue ::= Prefix*
-      def Prologue: Rule1[Map[String, Rdf#URI]] = rule { push(this.prefixes) ~ zeroOrMore(Prefix ~> ((prefixes: Map[String, Rdf#URI], prefix) => push(prefixes + prefix))) }
+      def Prologue: Rule1[Map[String, Rdf#URI]] = rule { zeroOrMore(Prefix).separatedBy(WS1) ~> ((prefixes: Seq[(String, Rdf#URI)]) => push(this.prefixes ++ prefixes)) }
   
       // Prefix ::= "Prefix" PNAME_NS IRIREF
       def Prefix: Rule1[(String, Rdf#URI)] = rule {
