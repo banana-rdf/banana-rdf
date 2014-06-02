@@ -29,10 +29,11 @@ case class EverythingBefore(index: Int) extends Slice
 case class EverythingAfter(index: Int) extends Slice
 case object End extends Slice
 
-sealed trait Subject[+Rdf <: RDF]
-sealed trait Predicate[Rdf <: RDF]
-sealed trait Object[+Rdf <: RDF]
-sealed trait Value[+Rdf <: RDF]
+sealed trait VarOrConcreteNode[+Rdf <: RDF]
+sealed trait Subject[+Rdf <: RDF]   extends VarOrConcreteNode[Rdf]
+sealed trait Predicate[Rdf <: RDF]  extends VarOrConcreteNode[Rdf]
+sealed trait Object[+Rdf <: RDF]    extends VarOrConcreteNode[Rdf]
+sealed trait Value[+Rdf <: RDF]     extends VarOrConcreteNode[Rdf]
 
 case class PatchIRI[Rdf <: RDF](uri: Rdf#URI) extends Subject[Rdf] with Predicate[Rdf] with Object[Rdf] with Value[Rdf]
 case class PatchBNode[Rdf <: RDF](bnode: Rdf#BNode) extends Subject[Rdf] with Object[Rdf]
