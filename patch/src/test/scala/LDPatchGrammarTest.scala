@@ -6,17 +6,17 @@ import java.io._
 import scala.util.{ Try, Success, Failure }
 import org.w3.banana.ldpatch.model._
 
-abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers with TryValues {
+abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers with TryValues { self =>
 
   import ops._
 
-  val ldpatch = LDPatch[Rdf]
+  val g = new Grammar[Rdf] { implicit val ops = self.ops }
 
   def newParser(input: String) =
-    new ldpatch.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map("foaf" -> URI("http://xmlns.com/foaf/")))
+    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map("foaf" -> URI("http://xmlns.com/foaf/")))
 
   def newFreshParser(input: String) =
-    new ldpatch.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map.empty)
+    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map.empty)
 
   "parse IRIREF" in {
     newParser("""<http://example.com/foo#\u2665>""").IRIREF.run().success.value should be(URI("http://example.com/foo#♥"))
