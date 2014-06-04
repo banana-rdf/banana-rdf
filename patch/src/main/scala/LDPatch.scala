@@ -17,8 +17,24 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
     import org.parboiled2._
     import CharPredicate._
 
-    class PEGPatchParser(val input: ParserInput, baseURI: Rdf#URI, var prefixes: Map[String, Rdf#URI] = Map.empty) extends Parser with StringBuilding {
+    class PEGPatchParser(
+      val input: ParserInput,
+      baseURI: Rdf#URI,
+      var prefixes: Map[String, Rdf#URI] = Map.empty,
+      var bnodeMap: Map[String, Rdf#BNode] = Map.empty
+    ) extends Parser with StringBuilding {
 
+      /** use this method to maintain the map from bnodes label to actual
+        * unique labels
+        */
+      def makeBNode(label: String): Rdf#BNode = {
+        this.bnodeMap.getOrElse(label, {
+          val bnode = BNode()
+          this.bnodeMap += (label -> bnode)
+          bnode
+        })
+      }
+      
       // LDPatch ::= Prologue Statement*
       def LDPatch: Rule1[m.LDPatch[Rdf]] = rule {
         WS0 ~ Prologue ~> (prefixes => this.prefixes = prefixes) ~ WS1 ~ zeroOrMore(Statement).separatedBy(WS1) ~ WS0 ~ EOI ~> ((statements: Seq[m.Statement[Rdf]]) => m.LDPatch(statements))
@@ -131,12 +147,12 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
       
       // BlankNode ::= BLANK_NODE_LABEL | ANON
       def BlankNode: Rule1[Rdf#BNode] = rule (
-        BLANK_NODE_LABEL | ANON
+        (BLANK_NODE_LABEL | ANON)
       )
 
       // BLANK_NODE_LABEL ::= '_:' (PN_CHARS_U | [0-9]) ((PN_CHARS | '.')* PN_CHARS)?
       def BLANK_NODE_LABEL: Rule1[Rdf#BNode] = rule (
-        "_:" ~ clearSB() ~ BLANK_NODE_LABEL1 ~ optional(BLANK_NODE_LABEL2) ~ push(BNode(sb.toString()))
+        "_:" ~ clearSB() ~ BLANK_NODE_LABEL1 ~ optional(BLANK_NODE_LABEL2) ~ push(makeBNode(sb.toString()))
       )
 
       // PN_CHARS_U | [0-9]
@@ -380,15 +396,16 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
 
   object semantics {
 
-    type Mapping = Map[m.Var, Set[Rdf#Node]]
-
-    case class State(graph: Rdf#Graph, mapping: Map[m.Var, Set[Rdf#Node]])
+    case class State(
+      graph: Rdf#Graph,
+      varmap: Map[m.Var, Set[Rdf#Node]]
+    )
 
     def LDPatch(patch: m.LDPatch[Rdf], graph: Rdf#Graph): Rdf#Graph = ???
 
     def Add(add: m.Add[Rdf], state: State): State = {
-      val Add(s, p, o) => add
-      val State(graph, matching) = state
+      val m.Add(s, p, o) = add
+      val State(graph, varmap) = state
 
       ???
     }
@@ -397,11 +414,11 @@ class LDPatch[Rdf <: RDF](implicit val ops: RDFOps[Rdf]) {
 
     def Delete(delete: m.Delete[Rdf], state: State): State = ???
 
-    def VarOrConcreteNode(vcn: m.VarOrConcreteNode[Rdf], mapping: Mapping): Set[Rdf#Node] = vcn match {
+    def VarOrConcreteNode(vcn: m.VarOrConcreteNode[Rdf], varmap: Map[m.Var, Set[Rdf#Node]]): Set[Rdf#Node] = vcn match {
       case m.PatchIRI(uri)         => Set(uri)
       case m.PatchBNode(bnode)     => Set(bnode)
       case m.PatchLiteral(literal) => Set(literal)
-      case varr@m.Var(_)           => mapping(varr)
+      case varr@m.Var(_)           => varmap(varr)
     }
 
     def Bind(bind: m.Bind[Rdf], state: State): State = {

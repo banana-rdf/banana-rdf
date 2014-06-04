@@ -36,6 +36,9 @@ sealed trait Object[+Rdf <: RDF]    extends VarOrConcreteNode[Rdf]
 sealed trait Value[+Rdf <: RDF]     extends VarOrConcreteNode[Rdf]
 
 case class PatchIRI[Rdf <: RDF](uri: Rdf#URI) extends Subject[Rdf] with Predicate[Rdf] with Object[Rdf] with Value[Rdf]
-case class PatchBNode[Rdf <: RDF](bnode: Rdf#BNode) extends Subject[Rdf] with Object[Rdf]
+case class PatchBNode[Rdf <: RDF](bnode: Rdf#BNode) extends Subject[Rdf] with Object[Rdf] {
+  // awful hack to compare PatchBNode without referring to the mapping
+  override def equals(o: Any): Boolean = o.isInstanceOf[PatchBNode[Rdf]]
+}
 case class PatchLiteral[Rdf <: RDF](literal: Rdf#Literal) extends Object[Rdf] with Value[Rdf]
 case class Var(label: String) extends Subject[Nothing] with Object[Nothing] with Value[Nothing]

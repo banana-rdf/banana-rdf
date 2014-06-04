@@ -34,7 +34,10 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   }
 
   "parse BlankNode" in {
-    newParser("""_:foo""").BlankNode.run().success.value should be(BNode("foo"))
+    // the only way to know about the expected bnode is to look into the map built by the parser
+    val parser = newParser("""_:foo""")
+    val parsedValue = parser.BlankNode.run().success.value
+    parsedValue should be(parser.bnodeMap("foo"))
     newParser("""[]""").BlankNode.run() shouldBe a [Success[_]]
     newParser("""[ ]""").BlankNode.run() shouldBe a [Success[_]]
   }
