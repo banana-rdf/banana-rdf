@@ -48,30 +48,30 @@ trait Grammar[Rdf <: RDF] {
         "Add" ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ (
             List ~> (Right(_))
           | Object ~> (Left(_))
-        ) ~> ((s: m.Subject[Rdf], p: m.Predicate[Rdf], objectOrList: Either[m.Object[Rdf], Seq[m.Object[Rdf]]]) => objectOrList match {
+        ) ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, objectOrList: Either[m.VarOrConcrete[Rdf], Seq[m.VarOrConcrete[Rdf]]]) => objectOrList match {
           case Left(o)     => m.Add(s, p, o)
           case Right(list) => m.AddList(s, p, list)
         })
       )
 
       // List ::= '(' Object* ')'
-      def List: Rule1[Seq[m.Object[Rdf]]] = rule (
+      def List: Rule1[Seq[m.VarOrConcrete[Rdf]]] = rule (
         '(' ~ WS0 ~ zeroOrMore(Object).separatedBy(WS1) ~ WS0 ~ ')'
       )
 
       // Delete ::= "Delete" Subject Predicate Object
       def Delete: Rule1[m.Delete[Rdf]] = rule (
-        "Delete" ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Object ~> ((s: m.Subject[Rdf], p: m.Predicate[Rdf], o: m.Object[Rdf]) => m.Delete(s, p, o))
+        "Delete" ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Object ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, o: m.VarOrConcrete[Rdf]) => m.Delete(s, p, o))
       )
 
       // Bind ::= "Bind" Var Value Path?
       def Bind: Rule1[m.Bind[Rdf]] = rule (
-        "Bind" ~ WS1 ~ Var ~ WS1 ~ Value ~ optional(WS0 ~ Path) ~> ((varr: m.Var, value: m.Value[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
+        "Bind" ~ WS1 ~ Var ~ WS1 ~ Value ~ optional(WS0 ~ Path) ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
       )
 
       // Replace ::= "Replace" Subject Predicate Slice List
       def Replace: Rule1[m.Replace[Rdf]] = rule (
-        "Replace" ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Slice ~ WS1 ~ List ~> ((s: m.Subject[Rdf], p: m.Predicate[Rdf], slice: m.Slice, list: Seq[m.Object[Rdf]]) => m.Replace(s, p, slice, list))
+        "Replace" ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Slice ~ WS1 ~ List ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.Replace(s, p, slice, list))
       )
 
       // Path ::= ( Step | Constraint )*
@@ -82,9 +82,9 @@ trait Grammar[Rdf <: RDF] {
       // Step ::= '/' ( '-' iri | Index | iri )
       def Step: Rule1[m.Step[Rdf]] = rule (
         '/' ~ (
-            '-' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(m.PatchIRI(uri)))
+            '-' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(uri))
           | Index ~> (m.StepAt(_: Int))
-          | iri ~> ((uri: Rdf#URI) => m.StepForward(m.PatchIRI(uri)))
+          | iri ~> ((uri: Rdf#URI) => m.StepForward(uri))
         )
       )
 
@@ -95,7 +95,7 @@ trait Grammar[Rdf <: RDF] {
 
       // Constraint ::= '[' Path ( '=' Value )? ']' | '!'
       def Constraint: Rule1[m.Constraint[Rdf]] = rule (
-          '[' ~ WS0 ~ Path ~ optional(WS0 ~ '=' ~ WS0 ~ Value) ~ WS0 ~ ']' ~> ((path: m.Path[Rdf], valueOpt: Option[m.Value[Rdf]]) => m.Filter(path, valueOpt))
+          '[' ~ WS0 ~ Path ~ optional(WS0 ~ '=' ~ WS0 ~ Value) ~ WS0 ~ ']' ~> ((path: m.Path[Rdf], valueOpt: Option[m.VarOrConcrete[Rdf]]) => m.Filter(path, valueOpt))
         | '!' ~ push(m.UnicityConstraint)
       )
 
@@ -112,29 +112,29 @@ trait Grammar[Rdf <: RDF] {
 
 
       // Subject ::= iri | BlankNode | Var
-      def Subject: Rule1[m.Subject[Rdf]] = rule (
-          iri ~> (m.PatchIRI(_))
-        | BlankNode ~> (m.PatchBNode(_))
+      def Subject: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | BlankNode ~> (m.Concrete(_))
         | Var
       )
 
       // Predicate ::= iri
-      def Predicate: Rule1[m.Predicate[Rdf]] = rule (
-        iri ~> (m.PatchIRI(_: Rdf#URI))
+      def Predicate: Rule1[Rdf#URI] = rule (
+        iri
       )
 
       // Object ::= iri | BlankNode | literal | Var
-      def Object: Rule1[m.Object[Rdf]] = rule (
-          iri ~> (m.PatchIRI(_))
-        | BlankNode ~> (m.PatchBNode(_))
-        | literal ~> (m.PatchLiteral(_))
+      def Object: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | BlankNode ~> (m.Concrete(_))
+        | literal ~> (m.Concrete(_))
         | Var
       )
 
       // Value ::= iri | literal | Var
-      def Value: Rule1[m.Value[Rdf]] = rule (
-          iri ~> (m.PatchIRI(_))
-        | literal ~> (m.PatchLiteral(_))
+      def Value: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | literal ~> (m.Concrete(_))
         | Var
       )
 

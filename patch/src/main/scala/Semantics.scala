@@ -30,17 +30,15 @@ trait Semantics[Rdf <: RDF] {
 
     def Delete(delete: m.Delete[Rdf], state: State): State = ???
 
-    def VarOrConcreteNode(vcn: m.VarOrConcreteNode[Rdf], varmap: Map[m.Var, Set[Rdf#Node]]): Set[Rdf#Node] = vcn match {
-      case m.PatchIRI(uri)         => Set(uri)
-      case m.PatchBNode(bnode)     => Set(bnode)
-      case m.PatchLiteral(literal) => Set(literal)
-      case varr@m.Var(_)           => varmap(varr)
+    def VarOrConcrete(vcn: m.VarOrConcrete[Rdf], varmap: Map[m.Var, Set[Rdf#Node]]): Set[Rdf#Node] = vcn match {
+      case m.Concrete(node) => Set(node)
+      case varr@m.Var(_)    => varmap(varr)
     }
 
     def Bind(bind: m.Bind[Rdf], state: State): State = {
       val m.Bind(varr, startingNode, path) = bind
       val State(graph, matching) = state
-      val nodes = Path(path, graph, VarOrConcreteNode(startingNode, matching))
+      val nodes = Path(path, graph, VarOrConcrete(startingNode, matching))
       State(graph, matching + (varr -> nodes))
     }
 
@@ -49,8 +47,8 @@ trait Semantics[Rdf <: RDF] {
     def Path(path: m.Path[Rdf], graph: Rdf#Graph, nodes: Set[Rdf#Node]): Set[Rdf#Node] = {
 
       def PathElement(pathElem: m.PathElement[Rdf], nodes: Set[Rdf#Node]): Set[Rdf#Node] = pathElem match {
-        case m.StepForward(m.PatchIRI(uri)) => nodes.flatMap(node => ops.getObjects(graph, node, uri))
-        case m.StepBackward(m.PatchIRI(uri)) => nodes.flatMap(node => ops.getSubjects(graph, uri, node))
+        case m.StepForward(uri) => nodes.flatMap(node => ops.getObjects(graph, node, uri))
+        case m.StepBackward(uri) => nodes.flatMap(node => ops.getSubjects(graph, uri, node))
         case m.StepAt(index) =>
           @annotation.tailrec
           def loop(nodes: Set[Rdf#Node], index: Int): Set[Rdf#Node] = index match {
