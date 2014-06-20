@@ -213,7 +213,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   "parse Slice" in {
     newParser("""42>2868""").Slice.run().success.value should be(Range(42, 2868))
     newParser("""42>""").Slice.run().success.value should be(EverythingAfter(42))
-    newParser(""">2868""").Slice.run().success.value should be(EverythingBefore(2868))
+    newParser(""">2868""").Slice.run().success.value should be(Range(0, 2868))
     newParser(""">""").Slice.run().success.value should be(End)
   }
 

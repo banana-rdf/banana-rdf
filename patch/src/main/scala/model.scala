@@ -31,7 +31,6 @@ sealed trait PathElement[+Rdf <: RDF]
 
 sealed trait Slice
 case class Range(leftIndex: Int, rightIndex: Int) extends Slice
-case class EverythingBefore(index: Int) extends Slice
 case class EverythingAfter(index: Int) extends Slice
 case object End extends Slice
 

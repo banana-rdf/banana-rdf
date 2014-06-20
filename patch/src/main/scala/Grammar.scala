@@ -105,7 +105,7 @@ trait Grammar[Rdf <: RDF] {
         optional(Index) ~ '>' ~ optional(Index) ~> ((leftOpt: Option[Int], rightOpt: Option[Int]) => (leftOpt, rightOpt) match {
           case (Some(left), Some(right)) => m.Range(left, right)
           case (Some(index), None)       => m.EverythingAfter(index)
-          case (None, Some(index))       => m.EverythingBefore(index)
+          case (None, Some(index))       => m.Range(0, index)
           case (None, None)              => m.End
         })
       )
