@@ -27,10 +27,10 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     newParser("""foaf:name""").iri.run().success.value should be(URI("http://xmlns.com/foaf/name"))
   }
 
-  "parse Prefix" in {
-    newParser("""Prefix example:<http://example.com/foo#>""").Prefix.run().success.value should be("example" -> URI("http://example.com/foo#"))
-    newParser("""Prefix   example: <http://example.com/foo#>""").Prefix.run().success.value should be("example" -> URI("http://example.com/foo#"))
-    newParser("""Prefix : <http://example.com/foo#>""").Prefix.run().success.value should be("" -> URI("http://example.com/foo#"))
+  "parse prefixID" in {
+    newParser("""@prefix example:<http://example.com/foo#> .""").prefixID.run().success.value should be("example" -> URI("http://example.com/foo#"))
+    newParser("""@prefix   example: <http://example.com/foo#> .""").prefixID.run().success.value should be("example" -> URI("http://example.com/foo#"))
+    newParser("""@prefix : <http://example.com/foo#> .""").prefixID.run().success.value should be("" -> URI("http://example.com/foo#"))
   }
 
   "parse BlankNode" in {
@@ -74,7 +74,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   }
 
   "parse Add Object" in {
-    val parser = newParser("""Add _:betehess foaf:name "Alexandre Bertails"""")
+    val parser = newParser("""Add _:betehess foaf:name "Alexandre Bertails" .""")
     val parsedAdd = parser.Add.run().success.value
     parsedAdd should be(
       Add(
@@ -86,7 +86,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   }
 
   "parse Add List" in {
-    val parser = newParser("""Add _:betehess foaf:name ( "Alexandre Bertails" "Betehess" )""")
+    val parser = newParser("""Add _:betehess foaf:name ( "Alexandre Bertails" "Betehess" ).""")
     val parsedAdd = parser.Add.run().success.value
     parsedAdd should be(
       AddList(
@@ -98,7 +98,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   }
 
   "parse Delete" in {
-    newParser("""Delete ?betehess foaf:name "Alexandre Bertails"""").Delete.run().success.value should be(
+    newParser("""Delete ?betehess foaf:name "Alexandre Bertails" .""").Delete.run().success.value should be(
       Delete(
         Var("betehess"),
         URI("http://xmlns.com/foaf/name"),
@@ -167,7 +167,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
 
   "parse Bind" in {
 
-    newParser("""Bind ?foo <http://example.com/blah>""").Bind.run().success.value should be(
+    newParser("""Bind ?foo <http://example.com/blah> .""").Bind.run().success.value should be(
       Bind(
         Var("foo"),
         Concrete(URI("http://example.com/blah")),
@@ -175,7 +175,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
       )
     )
 
-    newParser("""Bind ?foo <http://example.com/blah> /foaf:name/-foaf:name/<http://example.com/foo>""").Bind.run().success.value should be(
+    newParser("""Bind ?foo <http://example.com/blah> /foaf:name/-foaf:name/<http://example.com/foo> .""").Bind.run().success.value should be(
       Bind(
         Var("foo"),
         Concrete(URI("http://example.com/blah")),
@@ -189,7 +189,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
 
     val bind = """Bind ?alex
      <http://champin.net/#pa>/foaf:knows
-        [/foaf:holdsAccount/foaf:accountName="bertails"]"""
+        [/foaf:holdsAccount/foaf:accountName="bertails"] ."""
     newParser(bind).Bind.run().success.value should be(
       Bind(
         Var("alex"),
@@ -217,31 +217,31 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     newParser(""">""").Slice.run().success.value should be(End)
   }
 
-  "parse Replace" in {
-    newParser("""Replace ?alex foaf:prefLang 0> ( "fr" "en" )""").Replace.run().success.value should be(
-      Replace(Var("alex"), URI("http://xmlns.com/foaf/prefLang"), EverythingAfter(0), Seq(Concrete(Literal("fr")), Concrete(Literal("en"))))
+  "parse UpdateList" in {
+    newParser("""UpdateList ?alex foaf:prefLang 0> ( "fr" "en" ) .""").UpdateList.run().success.value should be(
+      UpdateList(Var("alex"), URI("http://xmlns.com/foaf/prefLang"), EverythingAfter(0), Seq(Concrete(Literal("fr")), Concrete(Literal("en"))))
     )
   }
 
   "parse Prologue" in {
-    newFreshParser("""Prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-Prefix foaf: <http://xmlns.com/foaf/0.1/>
-Prefix v: <http://example.org/vocab#>""").Prologue.run().success.value should be(
+    newFreshParser("""@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix v: <http://example.org/vocab#> .""").Prologue.run().success.value should be(
       Map("rdf" -> URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#"), "foaf" -> URI("http://xmlns.com/foaf/0.1/"), "v" -> URI("http://example.org/vocab#"))
     )
   }
 
   "parse LDPatch" in {
     val patch = """
-Prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-Prefix foaf: <http://xmlns.com/foaf/0.1/>
-Prefix v: <http://example.org/vocab#>
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix v: <http://example.org/vocab#> .
 
 Bind ?alex
      <http://champin.net/#pa> /foaf:knows
-        [/foaf:holdsAccount/foaf:accountName="bertails"]
+        [/foaf:holdsAccount/foaf:accountName="bertails"] .
 
-Replace ?alex v:prefLang 0> ( "fr" "en" )
+UpdateList ?alex v:prefLang 0> ( "fr" "en" ) .
 """
     newFreshParser(patch).LDPatch.run().success.value should be(
       model.LDPatch(Seq(
@@ -259,7 +259,7 @@ Replace ?alex v:prefLang 0> ( "fr" "en" )
             )
           ))
         ),
-        Replace(
+        UpdateList(
           Var("alex"),
           URI("http://example.org/vocab#prefLang"),
           EverythingAfter(0),

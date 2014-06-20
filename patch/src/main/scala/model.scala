@@ -16,7 +16,7 @@ case class Add[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[R
 case class AddList[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, list: Seq[VarOrConcrete[Rdf]]) extends Statement[Rdf]
 case class Delete[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[Rdf]) extends Statement[Rdf]
 case class Bind[Rdf <: RDF](varr: Var, startingNode: VarOrConcrete[Rdf], path: Path[Rdf]) extends Statement[Rdf]
-case class Replace[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, slice: Slice, list: Seq[VarOrConcrete[Rdf]]) extends Statement[Rdf]
+case class UpdateList[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, slice: Slice, list: Seq[VarOrConcrete[Rdf]]) extends Statement[Rdf]
 
 case class Path[Rdf <: RDF](elems: Seq[PathElement[Rdf]])
 
