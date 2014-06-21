@@ -227,7 +227,7 @@ trait Grammar[Rdf <: RDF] {
 
       // IRIREF ::= '<' ([^#x00-#x20<>"{}|^`\] | UCHAR)* '>' /* #x00=NULL #01-#x1F=control codes #x20=space */
       def IRIREF: Rule1[Rdf#URI] = rule {
-        '<' ~ clearSB() ~ zeroOrMore(IRIREF_CHAR) ~ '>' ~ push(URI(sb.toString()))
+        '<' ~ clearSB() ~ zeroOrMore(IRIREF_CHAR) ~ '>' ~ push(baseURI.resolve(URI(sb.toString())))
       }
   
       // matches a Char in [^#x00-#x20<>"{}|^`\] or /uxxxx or /Uxxxxxxxx, and pushes it on the StringBuffer

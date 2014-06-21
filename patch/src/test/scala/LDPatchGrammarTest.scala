@@ -13,13 +13,14 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   val g = new Grammar[Rdf] { implicit val ops = self.ops }
 
   def newParser(input: String) =
-    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map("foaf" -> URI("http://xmlns.com/foaf/")))
+    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo"), prefixes = Map("foaf" -> URI("http://xmlns.com/foaf/")))
 
   def newFreshParser(input: String) =
-    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo#"), prefixes = Map.empty)
+    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo"), prefixes = Map.empty)
 
   "parse IRIREF" in {
     newParser("""<http://example.com/foo#\u2665>""").IRIREF.run().success.value should be(URI("http://example.com/foo#♥"))
+    newParser("""<#\u2665>""").IRIREF.run().success.value should be(URI("http://example.com/foo#♥"))
   }
 
   "parse iri" in {
@@ -267,8 +268,33 @@ UpdateList ?alex v:prefLang 0> ( "fr" "en" ) .
         )
       ))
     )
-
     
+  }
+
+  "parse Example 2 from spec" in {
+    val patch = """
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org> .
+@prefix profile: <http://ogp.me/ns/profile#> .
+@prefix ex: <http://example.org/vocab#> .
+
+Delete <#> profile:first_name "Tim" .
+Add    <#> profile:first_name "Timothy" .
+
+UpdateList <#> ex:preferredLanguages 1>2 ( "fr-CH" ) .
+
+Bind ?event <#> /schema:attendee[/schema:url = <http://conferences.ted.com/TED2009/>]  .
+Add ?event rdf:type schema:Event .
+
+Bind ?ted <http://conferences.ted.com/TED2009/> /-schema:url! .
+Delete ?ted schema:startDate "2009-02-04".
+Add ?ted schema:location _:loc .
+Add _:loc schema:name "Long Beach, California" .
+Add _:loc schema:geo _:geo .
+Add _:geo schema:latitude "33.7817" .
+Add _:geo schema:longitude "-118.2054" .
+"""
+    newFreshParser(patch).LDPatch.run() should be a ('Success)
   }
 
 
