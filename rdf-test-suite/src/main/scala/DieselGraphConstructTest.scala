@@ -65,7 +65,8 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
       Graph(
         Triple(bnode("betehess"), foaf.name, Literal.tagged("Alexandre", Lang("fr"))),
         Triple(URI("http://bblfish.net/#hjs"), foaf.knows, bnode("betehess")),
-        Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story")))
+        Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
+      )
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -93,7 +94,8 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     val expectedGraph =
       Graph(
         Triple(bnode("betehess"), foaf.name, Literal.tagged("Alexandre", Lang("fr"))),
-        Triple(bnode("betehess"), foaf.name, Literal.tagged("Alexander", Lang("en"))))
+        Triple(bnode("betehess"), foaf.name, Literal.tagged("Alexander", Lang("en")))
+      )
 
     assert(g.graph isIsomorphicWith expectedGraph)
   }
@@ -104,12 +106,11 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
       bnode("b") -- foaf.name ->- "Alexander".lang("en")
     )
 
-    val g =
-      (
-        URI("http://bblfish.net/#hjs")
-          -- foaf.name ->- "Henry Story"
-          -- foaf.knows ->- ObjectList(alexs)
-        )
+    val g = (
+      URI("http://bblfish.net/#hjs")
+        -- foaf.name ->- "Henry Story"
+        -- foaf.knows ->- ObjectList(alexs)
+    )
 
     val expectedGraph =
       Graph(
@@ -234,13 +235,12 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   "disconnected graph construction" in {
 
     val g = (
-        bnode("a") -- foaf.name ->- "Alexandre"
-                -- foaf.age ->- 29
-      ).graph union (
-        bnode("h") -- foaf.name ->- "Henry"
-            -- foaf.height ->- 1.92
-      ).graph
-
+      bnode("a") -- foaf.name ->- "Alexandre"
+                 -- foaf.age ->- 29
+    ).graph union (
+      bnode("h") -- foaf.name ->- "Henry"
+                 -- foaf.height ->- 1.92
+    ).graph
 
     val expectedGraph =
       Graph(
@@ -248,10 +248,29 @@ abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
         Triple(bnode("a"), foaf.age, Literal("29", xsd.int)),
         Triple(bnode("h"), foaf.name, Literal("Henry", xsd.string)),
         Triple(bnode("h"), foaf.height, Literal("1.92", xsd.double))
-          )
+      )
 
     assert(g.graph isIsomorphicWith expectedGraph)
 
   }
+
+  "Diesel must support sets" in {
+
+    val pg: PointedGraph[Rdf] = (
+      bnode("betehess") -- foaf.name ->- Set(1.toPG,
+                                             "blah".toPG,
+                                             bnode("foo") -- foaf.homepage ->- URI("http://example.com"))
+    )
+
+    val expectedGraph = Graph(Set(
+      Triple(bnode("betehess"), foaf.name, Literal("1", xsd.int)),
+      Triple(bnode("betehess"), foaf.name, Literal("blah")),
+      Triple(bnode("betehess"), foaf.name, bnode("foo")),
+      Triple(bnode("foo"), foaf.homepage, URI("http://example.com"))
+    ))
+
+    assert(pg.graph isIsomorphicWith expectedGraph)
+  }
+
 
 }
