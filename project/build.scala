@@ -1,10 +1,10 @@
-import sbt._
-import sbt.Keys._
-import scalariform.formatter.preferences._
-import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
-
 import bintray.Plugin._
 import bintray.Keys._
+import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
+import sbt.Keys._
+import sbt._
+
+import scala.scalajs.sbtplugin.ScalaJSPlugin._
 
 object BuildSettings {
 
@@ -13,7 +13,7 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ bintrayPublishSettings ++ Seq (
     organization := "org.w3",
     version      := "0.6-SNAPSHOT",
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.11.1",
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
@@ -33,6 +33,8 @@ object BuildSettings {
 //      else
 //        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 //    },
+    description := "RDF framework for Scala",
+    startYear := Some(2012),
     pomIncludeRepository := { _ => false },
     pomExtra := (
       <url>https://github.com/w3c/banana-rdf</url>
@@ -75,14 +77,14 @@ object BananaRdfBuild extends Build {
   
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.2"
 
-  val akka = "com.typesafe.akka" %% "akka-actor" % "2.2.0"
-  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.2.0"
+  val akka = "com.typesafe.akka" %% "akka-actor" % "2.3.4"
+  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.3.4"
 
 //  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.7"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.12"
 
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.4"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -91,7 +93,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.2.0"
   
   val testsuiteDeps =
     Seq(
@@ -99,10 +101,12 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.2.1"
-  val playDeps = "com.typesafe.play" %% "play" % "2.2.1"
+  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.3.0"
+  val playDeps = "com.typesafe.play" %% "play" % "2.3.0"
 
-  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+  val reactiveMongoDeps = Seq(
+        resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/" )
 
   val testDeps =
     Seq(
@@ -207,6 +211,14 @@ object BananaRdfBuild extends Build {
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
 
+  lazy val pome = Project(
+    id = "banana-pome",
+    base = file("pome"),
+    settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
+     libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1"
+    )
+  ) dependsOn (rdf, rdfTestSuite % "test")
+
   lazy val examples = Project(
     id = "examples",
     base = file("examples"),
@@ -218,7 +230,7 @@ object BananaRdfBuild extends Build {
   lazy val experimental = Project(
     id = "experimental",
     base = file("experimental"),
-    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
+    settings = buildSettings ++ testDeps ++ reactiveMongoDeps ++ sesameCoreDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
       libraryDependencies += iterateeDeps,

@@ -1,4 +1,4 @@
-package org.w3.banana.plantain
+package org.w3.banana.pome
 
 import org.w3.banana._
 
