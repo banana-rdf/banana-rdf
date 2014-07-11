@@ -3,7 +3,7 @@ package org.w3.banana.plantain
 import org.w3.banana._
 import java.io.InputStream
 import scala.util.Try
-import spray.http.Uri
+import akka.http.model.Uri
 import org.openrdf.rio._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }

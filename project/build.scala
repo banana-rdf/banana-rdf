@@ -205,9 +205,9 @@ object BananaRdfBuild extends Build {
     id = "banana-plantain",
     base = file("plantain"),
     settings = buildSettings ++ testDeps ++  Seq(
-//      libraryDependencies += "org.semarglproject" % "semargl-rdf" % "0.6.1",
+      //      libraryDependencies += "org.semarglproject" % "semargl-rdf" % "0.6.1",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion,
-      libraryDependencies += "io.spray" % "spray-http" % "1.3.1"
+      libraryDependencies += "com.typesafe.akka" %% "akka-http-core-experimental" % "0.4"
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
 
@@ -215,7 +215,8 @@ object BananaRdfBuild extends Build {
     id = "banana-pome",
     base = file("pome"),
     settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
-     libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1"
+      resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
+      libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1"
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
 

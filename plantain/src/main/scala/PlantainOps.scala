@@ -2,7 +2,7 @@ package org.w3.banana.plantain
 
 import org.w3.banana._
 import model._
-import spray.http.Uri
+import akka.http.model.Uri
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 

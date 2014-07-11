@@ -1,7 +1,7 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import spray.http.Uri
+import akka.http.model.Uri
 
 trait Plantain extends RDF {
 
