@@ -12,18 +12,19 @@ import org.w3.banana.jena.JenaModule
  * 
  * To run this example from sbt:
  *   project examples
- *   run-main org.w3.banana.examples.BananaDSLApp
+ *   run-main org.w3.banana.examples.BananaDSLApp2
  */
-object BananaDSLApp extends App 
-		with TestBananaDSL
+object BananaDSLApp2 extends App 
+		with TestBananaDSL2
 		with JenaModule {
-  println( exampleGraph.toString )
+  println( createGraph.toString )
 }
 
-trait TestBananaDSL extends RDFOpsModule {
+trait TestBananaDSL2 extends RDFOpsModule {
+  def createGraph() : Rdf#Graph = {
   import Ops._
-  lazy val foaf = FOAFPrefix[Rdf]
-  lazy val exampleGraph = (
+  val foaf = FOAFPrefix[Rdf]
+  val exampleGraph = (
     URI("betehess")
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.title ->- "Mr"
@@ -31,4 +32,6 @@ trait TestBananaDSL extends RDFOpsModule {
       URI("http://bblfish.net/#hjs")
       -- foaf.name ->- "Henry Story"
       -- foaf.currentProject ->- URI("http://webid.info/"))).graph
+  exampleGraph
+  }
 }
