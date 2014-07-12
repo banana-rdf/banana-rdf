@@ -10,6 +10,6 @@ trait StringSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
 class StringW[Rdf <: RDF](val s: String) extends AnyVal {
 
-  def lang(langString: String)(implicit ops: RDFOps[Rdf]): Rdf#LangLiteral = ops.makeLangLiteral(s, ops.makeLang(langString))
+  def lang(langString: String)(implicit ops: RDFOps[Rdf]): Rdf#Literal = ops.makeLangTaggedLiteral(s, ops.makeLang(langString))
 
 }

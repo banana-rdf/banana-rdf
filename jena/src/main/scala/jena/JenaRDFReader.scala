@@ -8,7 +8,7 @@ import scala.util._
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
 
-class TripleSink(ops: JenaOpsSpecifics) extends StreamRDF {
+class TripleSink(ops: JenaOps) extends StreamRDF {
 
   var triples: Set[Jena#Triple] = Set.empty
   var prefixes: Map[String, String] = Map.empty
@@ -32,7 +32,7 @@ class TripleSink(ops: JenaOpsSpecifics) extends StreamRDF {
         new JenaTriple(
           triple.getSubject,
           triple.getPredicate,
-          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, ops.xsdString))
+          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, ops.__xsdString))
       else
         // otherwise everything is fine
         triple
@@ -43,7 +43,7 @@ class TripleSink(ops: JenaOpsSpecifics) extends StreamRDF {
 
 object JenaRDFReader {
 
-  def makeRDFReader[S](ops: JenaOpsSpecifics, lang: Lang)(implicit _syntax: Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
+  def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax: Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
     val syntax = _syntax
     def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink(ops)
@@ -52,9 +52,9 @@ object JenaRDFReader {
     }
   }
 
-  implicit def rdfxmlReader(ops: JenaOpsSpecifics): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
+  implicit def rdfxmlReader(ops: JenaOps): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
 
-  implicit def turtleReader(ops: JenaOpsSpecifics): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
+  implicit def turtleReader(ops: JenaOps): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
 
   implicit val selector: ReaderSelector[Jena] = 
     ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]

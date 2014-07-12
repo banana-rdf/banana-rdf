@@ -96,8 +96,8 @@ class XSDPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("xsd", "http
   val double = apply("double")
   val hexBinary = apply("hexBinary")
   val boolean = apply("boolean")
-  val trueLit: Rdf#TypedLiteral = makeTypedLiteral("true", boolean)
-  val falseLit: Rdf#TypedLiteral = makeTypedLiteral("false", boolean)
+  val `true` = makeLiteral("true", boolean)
+  val `false` = makeLiteral("false", boolean)
   val dateTime = apply("dateTime")
 }
 

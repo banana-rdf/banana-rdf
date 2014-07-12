@@ -14,9 +14,10 @@ object RDFOps {
  *   - we allow literals in subject position
  */
 trait RDFOps[Rdf <: RDF]
-    extends RDFDSL[Rdf]
-    with CommonPrefixes[Rdf]
-    with syntax.Syntax[Rdf] {
+extends URIOps[Rdf]
+with RDFDSL[Rdf]
+with CommonPrefixes[Rdf]
+with syntax.Syntax[Rdf] {
 
   // graph
 
@@ -54,19 +55,11 @@ trait RDFOps[Rdf <: RDF]
 
   // literal
 
-  def foldLiteral[T](literal: Rdf#Literal)(funTL: Rdf#TypedLiteral => T, funLL: Rdf#LangLiteral => T): T
+  def makeLiteral(lexicalForm: String, datatype: Rdf#URI): Rdf#Literal
 
-  // typed literal
+  def makeLangTaggedLiteral(lexicalForm: String, lang: Rdf#Lang): Rdf#Literal
 
-  def makeTypedLiteral(lexicalForm: String, datatype: Rdf#URI): Rdf#TypedLiteral
-
-  def fromTypedLiteral(tl: Rdf#TypedLiteral): (String, Rdf#URI)
-
-  // lang literal
-
-  def makeLangLiteral(lexicalForm: String, lang: Rdf#Lang): Rdf#LangLiteral
-
-  def fromLangLiteral(ll: Rdf#LangLiteral): (String, Rdf#Lang)
+  def fromLiteral(literal: Rdf#Literal): (String, Rdf#URI, Option[Rdf#Lang])
 
   // lang
 

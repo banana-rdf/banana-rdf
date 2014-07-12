@@ -119,7 +119,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "com.fasterxml" % "aalto-xml" % "0.9.7"
   )
 
-  val sesameVersion = "2.7.6"
+  val sesameVersion = "2.8.0-beta1"
   
   val sesameCoreDeps =
     Seq(
@@ -148,6 +148,7 @@ object BananaRdfBuild extends Build {
       rdfTestSuite,
       jena,
       sesame,
+      plantain,
       examples))
   
   lazy val rdf = Project(
@@ -193,6 +194,16 @@ object BananaRdfBuild extends Build {
     base = file("sesame"),
     settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
+    )
+  ) dependsOn (rdf, rdfTestSuite % "test")
+
+  lazy val plantain = Project(
+    id = "banana-plantain",
+    base = file("plantain"),
+    settings = buildSettings ++ testDeps ++  Seq(
+//      libraryDependencies += "org.semarglproject" % "semargl-rdf" % "0.6.1",
+      libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion,
+      libraryDependencies += "io.spray" % "spray-http" % "1.3.1"
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
 

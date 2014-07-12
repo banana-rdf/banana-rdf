@@ -6,9 +6,7 @@ import org.openrdf.model.impl._
 import org.openrdf.model.util._
 import scala.collection.JavaConverters._
 
-import SesamePrefix._
-
-object SesameOperations extends RDFOps[Sesame] {
+class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
 
   val valueFactory: ValueFactory = ValueFactoryImpl.getInstance()
 
@@ -69,25 +67,6 @@ object SesameOperations extends RDFOps[Sesame] {
 
   }
 
-
-//    try {
-//      valueFactory.createURI(iriStr).asInstanceOf[Sesame#URI]
-//    } catch {
-//      case e: Exception =>
-//        if (iriStr.nonEmpty && iriStr.charAt(0) == '#')
-//          new URI {
-//            override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == this.toString
-//            def getLocalName: String = iriStr
-//            def getNamespace: String = ""
-//            override def hashCode: Int = iriStr.hashCode
-//            override def toString: String = iriStr
-//            def stringValue: String = iriStr
-//          }
-//        else {
-//          throw e
-//        }
-//    }
-
   def fromUri(node: Sesame#URI): String = node.toString
 
   // bnode
@@ -100,50 +79,27 @@ object SesameOperations extends RDFOps[Sesame] {
 
   // literal
 
-  def foldLiteral[T](literal: Sesame#Literal)(funTL: Sesame#TypedLiteral => T, funLL: Sesame#LangLiteral => T): T =
-    literal match {
-      case typedLiteral: Sesame#TypedLiteral if literal.getLanguage == null || literal.getLanguage.isEmpty =>
-        funTL(typedLiteral)
-      case langLiteral: Sesame#LangLiteral => funLL(langLiteral)
-    }
+  val __xsdString = makeUri("http://www.w3.org/2001/XMLSchema#string")
+  val __rdfLangString = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
 
-  // typed literal
-
-  def makeTypedLiteral(lexicalForm: String, iri: Sesame#URI): Sesame#TypedLiteral = new LiteralImpl(lexicalForm, iri)
-
-  def fromTypedLiteral(typedLiteral: Sesame#TypedLiteral): (String, Sesame#URI) = {
-    val lexicalForm = typedLiteral.getLabel
-    val typ = typedLiteral.getDatatype
-    if (typedLiteral.getLanguage == null) {
-      if (typ != null)
-        (lexicalForm, typ)
-      else
-        (lexicalForm, makeUri("http://www.w3.org/2001/XMLSchema#string"))
-    } else {
-      throw new RuntimeException("fromTypedLiteral: " + typedLiteral.toString() + " must be a TypedLiteral")
-    }
+  class LangLiteral(label: String, language: String) extends LiteralImpl(label, language) {
+    this.setDatatype(__rdfLangString)
   }
 
-  // lang literal
+  def makeLiteral(lexicalForm: String, datatype: Sesame#URI): Sesame#Literal =
+    new LiteralImpl(lexicalForm, datatype)
 
-  def makeLangLiteral(lexicalForm: String, lang: Sesame#Lang): Sesame#LangLiteral = {
-    val langString = fromLang(lang)
-    new LiteralImpl(lexicalForm, langString)
-  }
+  def makeLangTaggedLiteral(lexicalForm: String, lang: Sesame#Lang): Sesame#Literal =
+    new LangLiteral(lexicalForm, lang)
 
-  def fromLangLiteral(langLiteral: Sesame#LangLiteral): (String, Sesame#Lang) = {
-    val l = langLiteral.getLanguage
-    if (l != null && l != "")
-      (langLiteral.getLabel, makeLang(l))
-    else
-      throw new RuntimeException("fromLangLiteral: " + langLiteral.toString() + " must be a LangLiteral")
-  }
+  def fromLiteral(literal: Sesame#Literal): (String, Sesame#URI, Option[Sesame#Lang]) =
+    (literal.getLabel, literal.getDatatype, Option(literal.getLanguage))
 
   // lang
 
-  def makeLang(langString: String) = langString
+  def makeLang(langString: String): Sesame#Lang = langString
 
-  def fromLang(lang: Sesame#Lang) = lang
+  def fromLang(lang: Sesame#Lang): String = lang
 
   // graph traversal
 

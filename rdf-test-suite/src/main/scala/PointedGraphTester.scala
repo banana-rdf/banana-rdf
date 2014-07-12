@@ -27,7 +27,7 @@ class PointedGraphTester[Rdf<:RDF]()(implicit ops: RDFOps[Rdf])
 
     "with bnode pointers" in {
         val bnode = BNode()
-        val graph = Graph(Triple(bnode,rdf.first,LangLiteral("Henry",Lang("en"))))
+        val graph = Graph(Triple(bnode,rdf.first,Literal.tagged("Henry",Lang("en"))))
         val pg1 = PointedGraph(bnode,graph)
         val pg2 = PointedGraph(bnode,graph)
 
