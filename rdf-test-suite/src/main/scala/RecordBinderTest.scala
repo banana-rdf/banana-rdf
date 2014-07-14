@@ -21,16 +21,16 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordB
   val personWithNickname = person.copy(nickname = Some("betehess"))
   val me = Me("Name")
   val keyGen = KeyPairGenerator.getInstance("RSA");
-  val rsa: RSAPublicKey = { keyGen.initialize(512);  keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
+  val rsa: RSAPublicKey = { keyGen.initialize(512); keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] should be(Success(city))
 
     val expectedGraph = (
       URI("http://example.com/Paris").a(City.clazz)
-        -- foaf("cityName") ->- "Paris"
-        -- foaf("otherNames") ->- "Panam"
-        -- foaf("otherNames") ->- "Lutetia"
+      -- foaf("cityName") ->- "Paris"
+      -- foaf("otherNames") ->- "Panam"
+      -- foaf("otherNames") ->- "Lutetia"
     ).graph
     city.toPG.graph.isIsomorphicWith(expectedGraph) should be(true)
   }
@@ -38,14 +38,14 @@ abstract class RecordBinderTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordB
   "serializing and deserializing a public key" in {
     import Cert._
     val rsaPg = rsa.toPG
-//todo: there is a bug below. The isomorphism does not work, even though it should.
-//    System.out.println(s"rsag=${rsaPg.graph}")
-//    val expectedGraph = (
-//      URI("#k") -- cert.modulus ->- rsa.getModulus.toByteArray
-//              -- cert.exponent ->- rsa.getPublicExponent
-//      ).graph
-//    System.out.println(s"expectedGraph=${expectedGraph}")
-//    rsaPg.graph.isIsomorphicWith(expectedGraph) must be(true)
+    //todo: there is a bug below. The isomorphism does not work, even though it should.
+    //    System.out.println(s"rsag=${rsaPg.graph}")
+    //    val expectedGraph = (
+    //      URI("#k") -- cert.modulus ->- rsa.getModulus.toByteArray
+    //              -- cert.exponent ->- rsa.getPublicExponent
+    //      ).graph
+    //    System.out.println(s"expectedGraph=${expectedGraph}")
+    //    rsaPg.graph.isIsomorphicWith(expectedGraph) must be(true)
     rsaPg.as[RSAPublicKey] should be(Success(rsa))
   }
 

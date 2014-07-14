@@ -5,7 +5,7 @@ import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node =>
 import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, Seq => _, _ }
 import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
-import com.hp.hpl.jena.datatypes.{TypeMapper, RDFDatatype}
+import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype }
 import scala.collection.JavaConverters._
 
 class JenaOps extends RDFOps[Jena] with DefaultURIOps[Jena] {

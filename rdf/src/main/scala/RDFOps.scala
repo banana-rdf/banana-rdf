@@ -14,10 +14,10 @@ object RDFOps {
  *   - we allow literals in subject position
  */
 trait RDFOps[Rdf <: RDF]
-extends URIOps[Rdf]
-with RDFDSL[Rdf]
-with CommonPrefixes[Rdf]
-with syntax.Syntax[Rdf] {
+    extends URIOps[Rdf]
+    with RDFDSL[Rdf]
+    with CommonPrefixes[Rdf]
+    with syntax.Syntax[Rdf] {
 
   // graph
 
@@ -37,7 +37,7 @@ with syntax.Syntax[Rdf] {
 
   def foldNode[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
 
-  def isURI[T](node: Rdf#Node) = foldNode[Boolean](node)(uri=>true, bn=>false,lit=>false)
+  def isURI[T](node: Rdf#Node) = foldNode[Boolean](node)(uri => true, bn => false, lit => false)
 
   // URI
 
@@ -85,8 +85,8 @@ with syntax.Syntax[Rdf] {
   // graph isomorphism
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
 
-//  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): syntax.SparqlSolutionSyntax[Rdf] = new syntax.SparqlSolutionSyntax[Rdf](solution)
-//
-//  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions): syntax.SparqlSolutionsSyntax[Rdf] = new syntax.SparqlSolutionsSyntax[Rdf](solutions)
+  //  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): syntax.SparqlSolutionSyntax[Rdf] = new syntax.SparqlSolutionSyntax[Rdf](solution)
+  //
+  //  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions): syntax.SparqlSolutionsSyntax[Rdf] = new syntax.SparqlSolutionsSyntax[Rdf](solutions)
 
 }

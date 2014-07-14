@@ -19,8 +19,8 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
   def isIsomorphicWith(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Boolean = ops.isomorphism(graph, otherGraph)
 
   /**
-    * returns a copy of the graph where uri are transformed through urifunc
-    */
+   * returns a copy of the graph where uri are transformed through urifunc
+   */
   def copy(urifunc: Rdf#URI => Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph = {
     def nodefunc(node: Rdf#Node) = ops.foldNode(node)(urifunc, bn => bn, lit => lit)
     var triples = Set[Rdf#Triple]()

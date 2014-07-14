@@ -35,18 +35,18 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
 
     def statement(s: model.Node, p: model.URI, o: model.Node): sesame.Statement = {
       val subject: sesame.Resource = s match {
-        case Uri(uri)                       => new MyUri(uri)
-        case model.BNode(label)             => new BNodeImpl(label)
-        case literal@model.Literal(_, _, _) => throw new IllegalArgumentException(s"$literal was in subject position")
+        case Uri(uri) => new MyUri(uri)
+        case model.BNode(label) => new BNodeImpl(label)
+        case literal @ model.Literal(_, _, _) => throw new IllegalArgumentException(s"$literal was in subject position")
       }
       val predicate: sesame.URI = p match {
         case model.URI(uri) => new MyUri(uri.toString)
       }
       val objectt: sesame.Value = o match {
-        case Uri(uri)                                         => new MyUri(uri)
-        case model.BNode(label)                               => new BNodeImpl(label)
+        case Uri(uri) => new MyUri(uri)
+        case model.BNode(label) => new BNodeImpl(label)
         case model.Literal(lexicalForm, model.URI(uri), None) => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
-        case model.Literal(lexicalForm, _, Some(lang))        => new LiteralImpl(lexicalForm, lang)
+        case model.Literal(lexicalForm, _, Some(lang)) => new LiteralImpl(lexicalForm, lang)
       }
       new StatementImpl(subject, predicate, objectt)
     }
@@ -54,12 +54,14 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
     def write(): Try[Unit] = Try {
       val writer = new TurtleWriter(outputstream)
       writer.startRDF()
-      graph.spo foreach { case (s, pos) =>
-        pos foreach { case (p, os) =>
-          os foreach { o =>
-            writer.handleStatement(statement(s, p, o))
+      graph.spo foreach {
+        case (s, pos) =>
+          pos foreach {
+            case (p, os) =>
+              os foreach { o =>
+                writer.handleStatement(statement(s, p, o))
+              }
           }
-        }
       }
       writer.endRDF()
     }
@@ -71,17 +73,13 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
     writer.write()
   }
 
-
-
-
   def main(args: Array[String]): Unit = {
     val is = new java.io.FileInputStream("/home/betehess/projects/banana-rdf/rdf-test-suite/src/main/resources/card.ttl")
-    
+
     val graph = PlantainTurtleReader.read(is, "http://example.com/").get
 
     println(write(graph, System.out, "http://example.com/"))
 
   }
-
 
 }

@@ -52,21 +52,19 @@ object ToLiteral {
       def toLiteral(dateTime: DateTime): Rdf#Literal = Literal(dateTime.toString, xsd.dateTime)
     }
 
-
   implicit def ByteArrayToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
     new ToLiteral[Rdf, Array[Byte]] {
-    import ops._
-      def bytes2Hex( bytes: Array[Byte] ): String = {
-        def cvtByte( b: Byte ): String = {
+      import ops._
+      def bytes2Hex(bytes: Array[Byte]): String = {
+        def cvtByte(b: Byte): String = {
           val c = b & 0xff
-          (if ( c < 0x10 ) "0" else "" ) + java.lang.Long.toString( c & 0xff, 16 )
+          (if (c < 0x10) "0" else "") + java.lang.Long.toString(c & 0xff, 16)
         }
-        bytes.map( cvtByte( _ )).mkString
+        bytes.map(cvtByte(_)).mkString
       }
-    def toLiteral(bytes: Array[Byte]): Rdf#Literal = {
-      Literal(bytes2Hex(bytes),xsd.hexBinary)
+      def toLiteral(bytes: Array[Byte]): Rdf#Literal = {
+        Literal(bytes2Hex(bytes), xsd.hexBinary)
+      }
     }
-  }
-
 
 }

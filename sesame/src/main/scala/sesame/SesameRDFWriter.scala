@@ -17,7 +17,7 @@ class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T],
     ops.graphToIterable(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
   }
-  
+
 }
 
 class SesameRDFWriterHelper(implicit ops: SesameOps) {

@@ -36,7 +36,6 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
 
   }
 
-
   def read(is: InputStream, base: String): Try[Plantain#Graph] = Try {
     val sink = new Sink
     val parser = new TurtleParser
