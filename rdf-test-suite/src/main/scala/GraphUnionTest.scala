@@ -5,7 +5,7 @@ import org.w3.banana.diesel._
 import org.scalatest._
 
 abstract class GraphUnionTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
-    extends WordSpec with Matchers {
+extends WordSpec with Matchers {
 
   import ops._
 

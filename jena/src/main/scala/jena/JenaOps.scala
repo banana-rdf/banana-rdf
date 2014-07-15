@@ -5,7 +5,7 @@ import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node =>
 import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, Seq => _, _ }
 import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
-import com.hp.hpl.jena.datatypes.{TypeMapper, RDFDatatype}
+import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype, BaseDatatype }
 import scala.collection.JavaConverters._
 
 class JenaOps extends RDFOps[Jena] with DefaultURIOps[Jena] {
@@ -76,28 +76,45 @@ class JenaOps extends RDFOps[Jena] with DefaultURIOps[Jena] {
 
   // literal
 
+  // TODO the javadoc doesn't say if this is thread safe
   lazy val mapper = TypeMapper.getInstance
 
   def jenaDatatype(datatype: Jena#URI) = {
     val iriString = fromUri(datatype)
-    mapper.getTypeByName(iriString)
+    val typ = mapper.getTypeByName(iriString)
+    if (typ == null) {
+      val datatype = new BaseDatatype(iriString)
+      mapper.registerDatatype(datatype)
+      datatype
+    } else {
+      typ
+    }
   }
 
   val __xsdString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
-  val __rdfLangString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
-
+  val __xsdStringURI: Jena#URI = makeUri("http://www.w3.org/2001/XMLSchema#string")
+  val __rdfLangStringURI: Jena#URI = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
+  
   def makeLiteral(lexicalForm: String, datatype: Jena#URI): Jena#Literal =
-    NodeFactory.createLiteral(lexicalForm, null, jenaDatatype(datatype)).asInstanceOf[Node_Literal]
+    if (datatype == __xsdStringURI)
+      NodeFactory.createLiteral(lexicalForm, null, null).asInstanceOf[Node_Literal]
+    else
+      NodeFactory.createLiteral(lexicalForm, null, jenaDatatype(datatype)).asInstanceOf[Node_Literal]
 
   def makeLangTaggedLiteral(lexicalForm: String, lang: Jena#Lang): Jena#Literal =
-    NodeFactory.createLiteral(lexicalForm, fromLang(lang), __rdfLangString).asInstanceOf[Node_Literal]
+    NodeFactory.createLiteral(lexicalForm, fromLang(lang), null).asInstanceOf[Node_Literal]
 
   def fromLiteral(literal: Jena#Literal): (String, Jena#URI, Option[Jena#Lang]) = {
     val lexicalForm = literal.getLiteralLexicalForm.toString
-    val datatype = makeUri(literal.getLiteralDatatype.getURI)
     val literalLanguage = literal.getLiteralLanguage
-    val langOpt = if (literalLanguage.isEmpty) None else Some(makeLang(literalLanguage))
-    (lexicalForm, datatype, langOpt)
+    def getDatatype: Jena#URI = {
+      val typ = literal.getLiteralDatatype
+      if (typ == null) __xsdStringURI else makeUri(typ.getURI)
+    }
+    if (literalLanguage == null || literalLanguage.isEmpty)
+      (lexicalForm, getDatatype, None)
+    else
+      (lexicalForm, __rdfLangStringURI, Some(makeLang(literalLanguage)))
   }
 
   // lang
