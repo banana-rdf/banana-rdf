@@ -5,6 +5,7 @@ import sbt.Keys._
 import sbt._
 
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
+import ScalaJSKeys._
 
 object BuildSettings {
 
@@ -74,7 +75,11 @@ object BuildSettings {
 object BananaRdfBuild extends Build {
 
   import BuildSettings._
-  
+
+  // rdfstorew settings
+  skip in ScalaJSKeys.packageJSDependencies := false
+
+
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.2"
 
   val akka = "com.typesafe.akka" %% "akka-actor" % "2.3.4"
@@ -219,6 +224,16 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1"
     )
   ) dependsOn (rdf, rdfTestSuite % "test")
+
+  lazy val rdfstorew = Project(
+    id = "banana-rdfstorew",
+    base = file("rdfstorew"),
+    settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
+      jsDependencies += ProvidedJS / "rdf_store.js",
+      skip in packageJSDependencies := false
+    )
+  ) dependsOn (rdf, rdfTestSuite % "test")
+
 
   lazy val examples = Project(
     id = "examples",
