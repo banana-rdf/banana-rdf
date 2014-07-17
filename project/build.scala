@@ -230,6 +230,7 @@ object BananaRdfBuild extends Build {
     base = file("rdfstorew"),
     settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
       jsDependencies += ProvidedJS / "rdf_store.js",
+      //libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "0.9.1",
       skip in packageJSDependencies := false
     )
   ) dependsOn (rdf, rdfTestSuite % "test")

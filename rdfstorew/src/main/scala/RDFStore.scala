@@ -1,14 +1,18 @@
 package org.w3c.banana.rdfstorew
 
-import scala.concurrent.{Promise, Await}
-import scala.concurrent.duration._
-import scala.scalajs.js
+import scala.{ Any }
+import scala.concurrent._
+
+import scala.scalajs.js.{ Dynamic, Dictionary }
 import scala.scalajs.js.Dynamic.global
+
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+
 import scala.language.postfixOps
 
-class RDFStore(store: js.Dynamic){
+class RDFStore(store: Dynamic){
 
-  def execute(sparql: String) : Any = {
+  def execute(sparql: String) : Future[Any] = {
 
     val promise = Promise[Any]
 
@@ -23,14 +27,15 @@ class RDFStore(store: js.Dynamic){
       }
     })
     println("WAITING...")
-    Await.result(promise.future, 10 seconds)
+
+    promise.future
   }
 
-  def load(mediaType:String, data:String, graph:String) : Boolean = {
+  def load(mediaType:String, data:String, graph:String=null) : Future[Boolean] = {
 
     val promise = Promise[Boolean]
 
-    store.applyDynamic("load")(mediaType, data, graph, {
+    val cb =  {
       (success:Boolean, res:Any) =>
         println("BACK FROM LOAD")
         println(success)
@@ -38,11 +43,19 @@ class RDFStore(store: js.Dynamic){
         if(success) {
           promise.success(true)
         } else {
-          promise.failure(new Exception("Error loading data into the sotre: "+res))
+          promise.failure(new Exception("Error loading data into the store: "+res))
         }
-    })
-    println("WAITING...")
-    Await.result(promise.future, 10 seconds)
+    }
+
+    if(graph == null){
+      store.applyDynamic("load")(mediaType,data,cb)
+    } else {
+      store.applyDynamic("load")(mediaType,data,graph,cb)
+    }
+
+    //store.applyDynamic("load")(mediaType, data, graph, )
+
+    promise.future
   }
 
 }
@@ -51,7 +64,7 @@ object RDFStore {
 
   def apply(options: Map[String,Any]): RDFStore = {
 
-    val dic = options.foldLeft[js.Dictionary[Any]](js.Dictionary())({
+    val dic = options.foldLeft[Dictionary[Any]](Dictionary())({
       case (acc, (key, value)) =>
         acc.update(key,value); acc
     })
@@ -59,7 +72,9 @@ object RDFStore {
     val promise = Promise[RDFStore]
 
 
-    global.rdfstore.applyDynamic("create")(dic, (store: js.Dynamic) => promise.success(new RDFStore(store)) )
-    Await.result(promise.future, 10 seconds)
+    global.rdfstore.applyDynamic("create")(dic, (store: Dynamic) => promise.success(new RDFStore(store)) )
+
+    // always succeeds
+    promise.future.value.get.get
   }
 }

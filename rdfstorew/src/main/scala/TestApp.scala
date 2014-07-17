@@ -1,7 +1,7 @@
 package org.w3c.banana.rdfstorew
 
-import java.net.URI
 import scala.scalajs.js.JSApp
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 object TestApp extends JSApp {
 
@@ -13,10 +13,11 @@ object TestApp extends JSApp {
     println("FOUND STORE:")
     println(store)
 
-
-    // Inserting data into the store
     val data = "<http://test.com/something#me> <http://test.com/something/name> \"antonio\" ."
     val graph = "http://test.com/test_graph"
+
+    /*
+    // Inserting data into the store
     if(store.load("text/n3",data, graph)) {
       println("Data loaded into the store")
     } else {
@@ -28,6 +29,16 @@ object TestApp extends JSApp {
     var results = store.execute("SELECT * WHERE { ?s ?p ?o }")
     println("EXECUTE RESULTS")
     println(results)
+    */
+
+
+
+    store.load("text/n3",data).flatMap { _ =>
+      store.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o }")
+    } map { results =>
+      println("EXECUTE RESULTS")
+      println(results)
+    }
   }
 
 }
