@@ -1,6 +1,5 @@
 package org.w3.banana.plantain.model
 
-import org.w3.banana._
 import akka.http.model.Uri
 
 object Graph {
@@ -41,18 +40,22 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
     }
   }
 
+  @throws[java.util.NoSuchElementException]("if a triple does not exist")
   def removeExistingTriple(triple: Triple): Graph = {
-    import triple.{ subject, predicate, objectt }
+    import triple.{objectt, predicate, subject}
     val pos = spo(subject)
     val os = pos(predicate)
     if (os.size == 1) { // then it must contains only $objectt
+      if (!os.contains(objectt)) throw new NoSuchElementException(s"$objectt not found")
       val newPos = pos - predicate
       if (newPos.isEmpty) // then it was actually the only spo!
         Graph(spo - subject, size - 1)
       else
         Graph(spo + (subject -> newPos), size - 1)
     } else {
-      val newPos = pos + (predicate -> (os filterNot { _ == objectt }))
+      val newos = os filterNot { _ == objectt }
+      if (newos.size == os.size) throw new NoSuchElementException(s"$objectt not found")
+      val newPos = pos + (predicate -> newos)
       Graph(spo + (subject -> newPos), size - 1)
     }
   }
