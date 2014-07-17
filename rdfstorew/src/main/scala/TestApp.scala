@@ -1,4 +1,4 @@
-package org.w3c.banana.rdfstorew
+package org.w3.banana.rdfstorew
 
 import scala.scalajs.js.JSApp
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue

@@ -1,4 +1,4 @@
-package org.w3c.banana.rdfstorew
+package org.w3.banana.rdfstorew
 
 import scala.concurrent._
 
@@ -69,7 +69,7 @@ object RDFStore {
     val promise = Promise[RDFStore]
 
 
-    global.rdfstore.applyDynamic("create")(dic, (store: Dynamic) => promise.success(new RDFStore(store)) )
+    global.rdfstore.applyDynamic("create")(dic, (store: js.Dynamic) => promise.success(new RDFStore(store)) )
 
     // always succeeds
     promise.future.value.get.get
