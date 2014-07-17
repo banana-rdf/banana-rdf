@@ -1,16 +1,15 @@
 package org.w3c.banana.rdfstorew
 
-import scala.{ Any }
 import scala.concurrent._
 
-import scala.scalajs.js.{ Dynamic, Dictionary }
+import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 import scala.language.postfixOps
 
-class RDFStore(store: Dynamic){
+class RDFStore(store: js.Dynamic){
 
   def execute(sparql: String) : Future[Any] = {
 
@@ -53,8 +52,6 @@ class RDFStore(store: Dynamic){
       store.applyDynamic("load")(mediaType,data,graph,cb)
     }
 
-    //store.applyDynamic("load")(mediaType, data, graph, )
-
     promise.future
   }
 
@@ -64,7 +61,7 @@ object RDFStore {
 
   def apply(options: Map[String,Any]): RDFStore = {
 
-    val dic = options.foldLeft[Dictionary[Any]](Dictionary())({
+    val dic = options.foldLeft[js.Dictionary[Any]](js.Dictionary())({
       case (acc, (key, value)) =>
         acc.update(key,value); acc
     })
