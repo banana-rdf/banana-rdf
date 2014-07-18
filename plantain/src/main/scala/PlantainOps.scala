@@ -1,5 +1,7 @@
 package org.w3.banana.plantain
 
+import java.util.NoSuchElementException
+
 import org.w3.banana._
 import model._
 import spray.http.Uri
@@ -89,7 +91,13 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
     def loop(g: Plantain#Graph, triples: Iterator[Plantain#Triple]): Plantain#Graph = {
       if (triples.hasNext) {
         val triple = triples.next()
-        loop(g.removeExistingTriple(triple), triples)
+        loop(
+          try {
+            g.removeExistingTriple(triple)
+          } catch {
+            case e: NoSuchElementException => g
+          },
+          triples)
       } else {
         g
       }
