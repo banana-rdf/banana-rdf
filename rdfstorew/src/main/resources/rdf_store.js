@@ -30136,8 +30136,7 @@ Store.Store = function(arg1, arg2) {
     }
 
     this.functionMap = {};
-    console.log("IN RDFSTORE.JS....")
-    console.log(params);
+
     this.name = params['name'] || 'nuse'
     var that = this;
     this.customFns = {};

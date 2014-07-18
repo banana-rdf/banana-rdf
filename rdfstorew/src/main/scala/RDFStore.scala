@@ -1,77 +1,34 @@
 package org.w3.banana.rdfstorew
 
-import scala.concurrent._
-
+import org.w3.banana._
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.global
-
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-
-import scala.language.postfixOps
-
-class RDFStore(store: js.Dynamic){
-
-  def execute(sparql: String) : Future[Any] = {
-
-    val promise = Promise[Any]
-
-    store.applyDynamic("execute")(sparql, {(success:Boolean, res:Any) =>
-      println("BACK FROM EXECUTE")
-      println(success)
-      println(res)
-      if(success) {
-        promise.success(res)
-      } else {
-        promise.failure(new Exception("Error running query: "+res))
-      }
-    })
-    println("WAITING...")
-
-    promise.future
-  }
-
-  def load(mediaType:String, data:String, graph:String=null) : Future[Boolean] = {
-
-    val promise = Promise[Boolean]
-
-    val cb =  {
-      (success:Boolean, res:Any) =>
-        println("BACK FROM LOAD")
-        println(success)
-        println(res)
-        if(success) {
-          promise.success(true)
-        } else {
-          promise.failure(new Exception("Error loading data into the store: "+res))
-        }
-    }
-
-    if(graph == null){
-      store.applyDynamic("load")(mediaType,data,cb)
-    } else {
-      store.applyDynamic("load")(mediaType,data,graph,cb)
-    }
-
-    promise.future
-  }
-
-}
-
-object RDFStore {
-
-  def apply(options: Map[String,Any]): RDFStore = {
-
-    val dic = options.foldLeft[js.Dictionary[Any]](js.Dictionary())({
-      case (acc, (key, value)) =>
-        acc.update(key,value); acc
-    })
-
-    val promise = Promise[RDFStore]
 
 
-    global.rdfstore.applyDynamic("create")(dic, (store: js.Dynamic) => promise.success(new RDFStore(store)) )
+trait RDFStore extends RDF {
+  // types related to the RDF datamodel
+  type Graph = js.Dynamic
+  type Triple = js.Dynamic
+  type Node = js.Dynamic
+  type URI = js.Dynamic
+  type BNode = js.Dynamic
+  type Literal = js.Dynamic
+  type Lang = String
 
-    // always succeeds
-    promise.future.value.get.get
-  }
+  // types for the graph traversal API
+  type NodeMatch = Nothing
+  type NodeAny = Nothing
+  type NodeConcrete = Nothing
+
+  // types related to Sparql
+  type Query = Nothing
+  type SelectQuery = Nothing
+  type ConstructQuery = Nothing
+  type AskQuery = Nothing
+
+  //FIXME Can't use ParsedUpdate because of https://openrdf.atlassian.net/browse/SES-1847
+  type UpdateQuery = Nothing
+
+  type Solution = Nothing
+  // instead of TupleQueryResult so that it's eager instead of lazy
+  type Solutions = Nothing
 }
