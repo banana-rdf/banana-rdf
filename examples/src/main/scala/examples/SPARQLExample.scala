@@ -7,10 +7,10 @@ import java.net.URL
 /* declare your dependencies as a trait with all the modules you need
  */
 trait SPARQLExampleDependencies
-extends RDFModule
-with RDFOpsModule
-with SparqlOpsModule
-with SparqlHttpModule
+  extends RDFModule
+  with RDFOpsModule
+  with SparqlOpsModule
+  with SparqlHttpModule
 
 /* Here is an example doing some IO. Read below to see what's
  * happening.

@@ -3,11 +3,11 @@ package org.w3.banana.plantain
 import org.w3.banana._
 
 trait PlantainModule
-extends RDFModule
-with RDFOpsModule
-with RecordBinderModule
-with TurtleReaderModule
-with TurtleWriterModule {
+    extends RDFModule
+    with RDFOpsModule
+    with RecordBinderModule
+    with TurtleReaderModule
+    with TurtleWriterModule {
 
   type Rdf = Plantain
 

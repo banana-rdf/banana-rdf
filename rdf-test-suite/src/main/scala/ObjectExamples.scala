@@ -117,9 +117,9 @@ class ObjectExamples[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: Reco
 
     implicit val binder: PGBinder[Rdf, RSAPublicKey] =
       pgb[RSAPublicKey](modulus, exponent)(
-        (m,e)=>factory.generatePublic(new RSAPublicKeySpec(new BigInteger(m),e)).asInstanceOf[RSAPublicKey],
-        key => Some((key.getModulus.toByteArray,key.getPublicExponent))
-    ) // withClasses rsaClassUri
+        (m, e) => factory.generatePublic(new RSAPublicKeySpec(new BigInteger(m), e)).asInstanceOf[RSAPublicKey],
+        key => Some((key.getModulus.toByteArray, key.getPublicExponent))
+      ) // withClasses rsaClassUri
 
   }
 

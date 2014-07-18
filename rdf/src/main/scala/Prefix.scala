@@ -106,7 +106,7 @@ object DCPrefix {
 }
 
 class DCPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/elements/1.1/")(ops) {
-   val language = apply("language")
+  val language = apply("language")
 
 }
 
@@ -118,7 +118,6 @@ class DCTPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("dc", "http:
   val title = apply("title")
 
 }
-
 
 object FOAFPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FOAFPrefix(ops)
@@ -214,7 +213,7 @@ object LDPPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new LDPPrefix(ops)
 }
 
-class LDPPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("ldp", "http://www.w3.org/ns/ldp#")(ops) {
+class LDPPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("ldp", "http://www.w3.org/ns/ldp#")(ops) {
   val AggregateContainer = apply("AggregateContainer")
   val CompositeContainer = apply("CompositeContainer")
   val Container = apply("Container")
@@ -238,9 +237,9 @@ object IANALinkPrefix {
  * @param ops
  * @tparam Rdf
  */
-class IANALinkPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "http://www.iana.org/assignments/link-relations/#")(ops) {
+class IANALinkPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "http://www.iana.org/assignments/link-relations/#")(ops) {
   val about = apply("about")
-  val acl = apply("acl")               //needs to be registered
+  val acl = apply("acl") //needs to be registered
   val alternate = apply("alternate")
   val appendix = apply("appendix")
   val archives = apply("archives")
@@ -273,7 +272,7 @@ class IANALinkPrefix[Rdf<:RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "
   val latest_version = apply("latest-version")
   val license = apply("license")
   val lrdd = apply("lrdd")
-  val meta = apply("meta")       //needs to be registered
+  val meta = apply("meta") //needs to be registered
   val monitor = apply("monitor")
   val monitor_group = apply("monitor-group")
   val next = apply("next")
@@ -317,7 +316,6 @@ trait CommonPrefixes[Rdf <: RDF] { this: RDFOps[Rdf] =>
 
 }
 
-
 object WebACLPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new WebACLPrefix(ops)
 }
@@ -349,11 +347,11 @@ object CertPrefix {
 }
 
 class CertPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("cert", "http://www.w3.org/ns/auth/cert#")(ops) {
-   val key = apply("key")
-   val RSAKey = apply("RSAKey")
-   val RSAPublicKey = apply("RSAPublicKey")
-   val exponent = apply("exponent")
-   val modulus = apply("modulus")
+  val key = apply("key")
+  val RSAKey = apply("RSAKey")
+  val RSAPublicKey = apply("RSAPublicKey")
+  val exponent = apply("exponent")
+  val modulus = apply("modulus")
 }
 
 object OWLPrefix {

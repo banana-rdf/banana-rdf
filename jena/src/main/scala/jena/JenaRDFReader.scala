@@ -21,9 +21,9 @@ class TripleSink(ops: JenaOps) extends StreamRDF {
   def start(): Unit = ()
   def triple(triple: JenaTriple): Unit = {
     def isPlainLiteral(node: JenaNode): Boolean =
-      node.isLiteral &&                     // it's really a literal
-      node.getLiteralDatatypeURI == null && // not intended to be a typed literal
-      node.getLiteralLanguage.isEmpty       // and not a lang literal either
+      node.isLiteral && // it's really a literal
+        node.getLiteralDatatypeURI == null && // not intended to be a typed literal
+        node.getLiteralLanguage.isEmpty // and not a lang literal either
     val o = triple.getObject
     val t =
       // if o is a plain literal
@@ -56,7 +56,7 @@ object JenaRDFReader {
 
   implicit def turtleReader(ops: JenaOps): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
 
-  implicit val selector: ReaderSelector[Jena] = 
+  implicit val selector: ReaderSelector[Jena] =
     ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
 
 }

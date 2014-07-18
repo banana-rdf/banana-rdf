@@ -10,8 +10,8 @@ import scalaz.Scalaz._
 
 class GraphStoreTest[Rdf <: RDF](
   store: RDFStore[Rdf])(
-  implicit ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, RDFXML])
+    implicit ops: RDFOps[Rdf],
+    reader: RDFReader[Rdf, RDFXML])
     extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
   import ops._

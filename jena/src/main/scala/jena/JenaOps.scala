@@ -94,7 +94,7 @@ class JenaOps extends RDFOps[Jena] with DefaultURIOps[Jena] {
   val __xsdString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string")
   val __xsdStringURI: Jena#URI = makeUri("http://www.w3.org/2001/XMLSchema#string")
   val __rdfLangStringURI: Jena#URI = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
-  
+
   def makeLiteral(lexicalForm: String, datatype: Jena#URI): Jena#Literal =
     if (datatype == __xsdStringURI)
       NodeFactory.createLiteral(lexicalForm, null, null).asInstanceOf[Node_Literal]

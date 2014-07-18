@@ -48,8 +48,8 @@ object ToPG {
     import ops._
     def toPG(t: (T1, T2)): PointedGraph[Rdf] = (
       bnode().a(rdf("Tuple2"))
-        -- rdf("_1") ->- t._1
-        -- rdf("_2") ->- t._2
+      -- rdf("_1") ->- t._1
+      -- rdf("_2") ->- t._2
     )
   }
 

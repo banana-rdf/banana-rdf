@@ -189,43 +189,43 @@ class SparqlEngineTest[Rdf <: RDF](
 
   }
 
-//  "Henry Story must have banana-rdf as current-project" in {
-//    val query = UpdateQuery(
-//      """
-//        |prefix foaf: <http://xmlns.com/foaf/0.1/>
-//        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-//        |
-//        |INSERT {
-//        | GRAPH <http://example.com/graph2> {
-//        |   ?author foaf:currentProject <http://github.com/w3c/banana-rdf>
-//        | }
-//        |} WHERE {
-//        | GRAPH <http://example.com/graph2> {
-//        |   ?author foaf:name "Henry Story"^^xsd:string
-//        | }
-//        |}
-//      """.stripMargin
-//    )
-//
-//    sparqlEngine.executeUpdate(query).getOrFail()
-//    val result = sparqlEngine.executeSelect(SelectQuery(
-//      """
-//        |prefix foaf: <http://xmlns.com/foaf/0.1/>
-//        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-//        |
-//        |SELECT ?currentProject
-//        |WHERE {
-//        | GRAPH <http://example.com/graph2> {
-//        |   ?author foaf:name "Henry Story"^^xsd:string .
-//        |   ?author foaf:currentProject ?currentProject
-//        | }
-//        |}
-//      """.stripMargin)
-//    ).map(_.toIterable.map(
-//      row => row("currentProject").flatMap(_.as[Rdf#URI]) getOrElse sys.error("")
-//    )).getOrFail()
-//
-//    result must have size (2)
-//    result must contain(URI("http://github.com/w3c/banana-rdf"))
-//  }
+  //  "Henry Story must have banana-rdf as current-project" in {
+  //    val query = UpdateQuery(
+  //      """
+  //        |prefix foaf: <http://xmlns.com/foaf/0.1/>
+  //        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+  //        |
+  //        |INSERT {
+  //        | GRAPH <http://example.com/graph2> {
+  //        |   ?author foaf:currentProject <http://github.com/w3c/banana-rdf>
+  //        | }
+  //        |} WHERE {
+  //        | GRAPH <http://example.com/graph2> {
+  //        |   ?author foaf:name "Henry Story"^^xsd:string
+  //        | }
+  //        |}
+  //      """.stripMargin
+  //    )
+  //
+  //    sparqlEngine.executeUpdate(query).getOrFail()
+  //    val result = sparqlEngine.executeSelect(SelectQuery(
+  //      """
+  //        |prefix foaf: <http://xmlns.com/foaf/0.1/>
+  //        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+  //        |
+  //        |SELECT ?currentProject
+  //        |WHERE {
+  //        | GRAPH <http://example.com/graph2> {
+  //        |   ?author foaf:name "Henry Story"^^xsd:string .
+  //        |   ?author foaf:currentProject ?currentProject
+  //        | }
+  //        |}
+  //      """.stripMargin)
+  //    ).map(_.toIterable.map(
+  //      row => row("currentProject").flatMap(_.as[Rdf#URI]) getOrElse sys.error("")
+  //    )).getOrFail()
+  //
+  //    result must have size (2)
+  //    result must contain(URI("http://github.com/w3c/banana-rdf"))
+  //  }
 }

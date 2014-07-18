@@ -39,7 +39,7 @@ object SesameQueryResultsReader {
       def parse(bytes: Array[Byte]): Try[Either[Sesame#Solutions, Boolean]] = Try {
         try {
           val parsed = QueryResultIO.parse(new ByteArrayInputStream(bytes),
-                                           sesameSparqlSyntax.booleanFormat)
+            sesameSparqlSyntax.booleanFormat)
           Right(parsed)
         } catch {
           case e: QueryResultParseException =>

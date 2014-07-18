@@ -34,7 +34,6 @@ class JenaSparqlEngine(ops: RDFOps[Jena], graph: Jena#Graph) extends SparqlEngin
 
 }
 
-
 class JenaSparqlGraph(ops: RDFOps[Jena]) extends SparqlGraph[Jena] {
 
   def apply(graph: Jena#Graph): SparqlEngine[Jena] =
@@ -42,11 +41,11 @@ class JenaSparqlGraph(ops: RDFOps[Jena]) extends SparqlGraph[Jena] {
 
 }
 
-
-/** see
-  * - https://jena.apache.org/documentation/tdb/datasets.html
-  * - http://jena.apache.org/documentation/tdb/assembler.html#union-default-graph
-  */
+/**
+ * see
+ * - https://jena.apache.org/documentation/tdb/datasets.html
+ * - http://jena.apache.org/documentation/tdb/assembler.html#union-default-graph
+ */
 trait UnionGraph extends JenaSparqlEngine {
 
   override def qexec(query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {

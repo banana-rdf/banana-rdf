@@ -30,9 +30,9 @@ object FromLiteral {
       val Literal(lexicalForm, datatype, _) = literal
       if (datatype == xsd.boolean) {
         lexicalForm match {
-          case "true" | "1"  => Success(true)
+          case "true" | "1" => Success(true)
           case "false" | "0" => Success(false)
-          case other         => Failure(FailedConversion(s"${other} is not in the lexical space for xsd:boolean"))
+          case other => Failure(FailedConversion(s"${other} is not in the lexical space for xsd:boolean"))
         }
       } else {
         Failure(FailedConversion(s"${literal} is not an xsd:boolean"))
@@ -74,7 +74,6 @@ object FromLiteral {
     }
   }
 
-
   implicit def DoubleFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Double] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[Double] = {
@@ -113,10 +112,10 @@ object FromLiteral {
     import ops._
     val whitespace = "\\s".r
     def hex2Bytes(hex: String): Try[Array[Byte]] = Try {
-      val cleaned = whitespace.replaceAllIn(hex,"") //avoid obvious hex encoding errors ( not standard, but no other interpretation makes sense )
-      val x = for { i <- 0 to hex.length-1 by 2 }
-              yield cleaned.substring( i, i+2 )
-      x.map( Integer.parseInt( _, 16 ).toByte ).toArray
+      val cleaned = whitespace.replaceAllIn(hex, "") //avoid obvious hex encoding errors ( not standard, but no other interpretation makes sense )
+      val x = for { i <- 0 to hex.length - 1 by 2 }
+        yield cleaned.substring(i, i + 2)
+      x.map(Integer.parseInt(_, 16).toByte).toArray
     }
     def fromLiteral(literal: Rdf#Literal): Try[Array[Byte]] = {
       val Literal(lexicalForm, datatype, _) = literal

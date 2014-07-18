@@ -20,10 +20,11 @@ object SesameStore {
   }
 
   def removeFromGraph(conn: RepositoryConnection, uri: Sesame#URI, tripleMatches: Iterable[TripleMatch[Sesame]]): Unit = {
-    val ts = tripleMatches map { case (s, p, o) =>
-      // I don't really know what else to do...
-      // in Sesame, a Triple is not a (Node, Node, Node)
-      new StatementImpl(s.asInstanceOf[Resource], p.asInstanceOf[URI], o)
+    val ts = tripleMatches map {
+      case (s, p, o) =>
+        // I don't really know what else to do...
+        // in Sesame, a Triple is not a (Node, Node, Node)
+        new StatementImpl(s.asInstanceOf[Resource], p.asInstanceOf[URI], o)
     }
     conn.remove(ts.asJava, uri)
   }

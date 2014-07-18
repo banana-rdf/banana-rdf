@@ -59,7 +59,7 @@ object FromPG {
 
   implicit def Tuple2FromPG[Rdf <: RDF, T1, T2](implicit ops: RDFOps[Rdf], fromPG1: FromPG[Rdf, T1], fromPG2: FromPG[Rdf, T2]): FromPG[Rdf, (T1, T2)] = new FromPG[Rdf, (T1, T2)] {
     import ops._
-    def fromPG(pointed: PointedGraph[Rdf]): Try[(T1, T2)] ={
+    def fromPG(pointed: PointedGraph[Rdf]): Try[(T1, T2)] = {
       for {
         t1 <- (pointed / rdf("_1")).as[T1]
         t2 <- (pointed / rdf("_2")).as[T2]

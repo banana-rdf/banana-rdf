@@ -109,7 +109,7 @@ abstract class DieselGraphExplorationTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf
 
     val persons = betehess.graph.getAllInstancesOf(foaf.Person).nodes
 
-    persons.toSet should be (Set(URI("http://bertails.org/#betehess"), URI("http://bblfish.net/#hjs")))
+    persons.toSet should be(Set(URI("http://bertails.org/#betehess"), URI("http://bblfish.net/#hjs")))
 
   }
 
