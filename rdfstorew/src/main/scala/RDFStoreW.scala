@@ -70,7 +70,6 @@ object RDFStoreW {
 
     val promise = Promise[RDFStoreW]
 
-
     global.rdfstore.applyDynamic("create")(dic, (store: js.Dynamic) => promise.success(new RDFStoreW(store)) )
 
     // always succeeds

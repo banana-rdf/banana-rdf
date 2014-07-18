@@ -3,6 +3,12 @@ package org.w3.banana.rdfstorew
 import org.w3.banana._
 import scala.scalajs.js
 
+sealed trait JsNodeMatch
+
+case class PlainNode(node: RDFStore#Node) extends JsNodeMatch
+
+case object JsANY extends JsNodeMatch
+
 
 trait RDFStore extends RDF {
   // types related to the RDF datamodel
@@ -15,20 +21,21 @@ trait RDFStore extends RDF {
   type Lang = String
 
   // types for the graph traversal API
-  type NodeMatch = Nothing
-  type NodeAny = Nothing
-  type NodeConcrete = Nothing
+  type NodeMatch = JsNodeMatch
+  type NodeAny = JsANY.type
+  type NodeConcrete = JsNodeMatch
 
   // types related to Sparql
-  type Query = Nothing
-  type SelectQuery = Nothing
-  type ConstructQuery = Nothing
-  type AskQuery = Nothing
-
-  //FIXME Can't use ParsedUpdate because of https://openrdf.atlassian.net/browse/SES-1847
-  type UpdateQuery = Nothing
+  type Query = String
+  type SelectQuery = String
+  type ConstructQuery = String
+  type AskQuery = String
+  type UpdateQuery = String
 
   type Solution = Nothing
+
   // instead of TupleQueryResult so that it's eager instead of lazy
   type Solutions = Nothing
 }
+
+object RDFStore extends RDFStoreModule

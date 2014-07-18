@@ -228,7 +228,7 @@ object BananaRdfBuild extends Build {
   lazy val rdfstorew = Project(
     id = "banana-rdfstorew",
     base = file("rdfstorew"),
-    settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
+    settings =  buildSettings ++ scalaJSSettings ++ testDeps ++ Seq(
       jsDependencies += ProvidedJS / "rdf_store.js",
       resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
       libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1",

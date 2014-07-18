@@ -31,13 +31,20 @@ object TestApp extends JSApp with JSUtils {
      */
 
 
-    val ops = new RDFStoreOps()
     println("** building uri")
-    val uri = ops.makeUri("http://test.com/something#mytype")
+    val uri = RDFStoreOps.makeUri("http://test.com/something#mytype")
     println("** building literal")
-    val literal = ops.makeLiteral("this is a test", uri)
-    log("*** FINAL RESULT:")
+    val literal = RDFStoreOps.makeLiteral("this is a test", uri)
+    log("*** THE LITERAL")
     log(literal)
+
+    val triple = RDFStoreOps.makeTriple(
+      RDFStoreOps.makeUri("http://test.com/me"),
+      RDFStoreOps.makeUri("foaf:name"),
+      RDFStoreOps.makeLiteral("Antonio",null)
+    )
+    log("** THE TRIPLE")
+    log(triple)
   }
 
 }
