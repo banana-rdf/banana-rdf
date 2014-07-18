@@ -5,8 +5,7 @@ import org.w3.banana.syntax._
 import org.scalatest._
 import scalaz.Scalaz._
 
-abstract class
-DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
+abstract class DieselGraphConstructTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     extends WordSpec with Matchers {
 
   import ops._

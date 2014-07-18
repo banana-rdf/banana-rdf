@@ -42,7 +42,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
 
   @throws[java.util.NoSuchElementException]("if a triple does not exist")
   def removeExistingTriple(triple: Triple): Graph = {
-    import triple.{objectt, predicate, subject}
+    import triple.{ objectt, predicate, subject }
     val pos = spo(subject)
     val os = pos(predicate)
     if (os.size == 1) { // then it must contains only $objectt

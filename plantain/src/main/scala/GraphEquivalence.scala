@@ -19,20 +19,20 @@ object GraphEquivalence {
    * @param graph
    * @return a pair of Ground graph and non ground graph
    */
-  def groundTripleFilter(graph: Graph): (Graph,Graph) = {
+  def groundTripleFilter(graph: Graph): (Graph, Graph) = {
     var ground = Graph.empty
     var nonGround = Graph.empty
-    for (triple <- graph.triples ) {
+    for (triple <- graph.triples) {
       triple match {
-        case Triple(s,r,o) if  s.isInstanceOf[BNode] || o.isInstanceOf[BNode] => nonGround = nonGround + triple
+        case Triple(s, r, o) if s.isInstanceOf[BNode] || o.isInstanceOf[BNode] => nonGround = nonGround + triple
         case _ => ground = ground + triple
       }
     }
-    (ground,nonGround)
+    (ground, nonGround)
   }
 
   //add explanation later
-  def bnodeMappingGenerator(g1: Graph, g2: Graph): Try[List[List[(BNode,BNode)]]] = Try {
+  def bnodeMappingGenerator(g1: Graph, g2: Graph): Try[List[List[(BNode, BNode)]]] = Try {
     if (g1.size != g2.size)
       throw MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}")
     val (grnd1, nongrnd1) = groundTripleFilter(g1)
@@ -43,13 +43,13 @@ object GraphEquivalence {
     val clz1 = bnodeClassify(g1)
     val clz2 = bnodeClassify(g2)
     if (clz1.size != clz2.size)
-      throw ClassificationException("the two graphs don't have the same number of classes.",clz1,clz2)
+      throw ClassificationException("the two graphs don't have the same number of classes.", clz1, clz2)
     for {
-      (vt,bnds1) <- clz1.toList.sortBy { case (vt,bn) => bn.size }
+      (vt, bnds1) <- clz1.toList.sortBy { case (vt, bn) => bn.size }
       bnds2 <- clz2.get(vt).toList.map(_.toList)
     } yield {
       if (bnds2.size != bnds1.size)
-        throw ClassificationException(s"the two graphs don't have the same number of bindings for type $vt",clz1,clz2)
+        throw ClassificationException(s"the two graphs don't have the same number of bindings for type $vt", clz1, clz2)
       for {
         bn1 <- bnds1.toList
         bn2 <- bnds2
@@ -67,7 +67,7 @@ object GraphEquivalence {
    * @param bnodeBijection
    * @return a list of exceptions in case of failure or an empty list in case of success
    */
-  def mapVerify(graph1: Graph, graph2: Graph, bnodeBijection: Map[BNode,BNode]): List[MappingException] = {
+  def mapVerify(graph1: Graph, graph2: Graph, bnodeBijection: Map[BNode, BNode]): List[MappingException] = {
     def map(node: Node) = node match {
       case bnode: BNode => bnodeBijection(bnode)
       case other => other
@@ -87,7 +87,7 @@ object GraphEquivalence {
           println(s"map($triple)=>$mappedTriple")
         } catch {
           case e: java.util.NoSuchElementException => {
-            println("cought "+e)
+            println("cought " + e)
             throw MappingException(s"could not find map for $sub or $obj")
           }
         }
@@ -95,13 +95,13 @@ object GraphEquivalence {
           graphTmp = graphTmp.removeExistingTriple(mappedTriple)
         } catch {
           case e: java.util.NoSuchElementException => {
-            println("cought "+e)
+            println("cought " + e)
             throw MappingException(s"could not find map($triple)=$mappedTriple")
           }
         }
       }
     } catch {
-      case e : MappingException => return List(e)
+      case e: MappingException => return List(e)
       case nse => println(nse)
     }
 
@@ -112,49 +112,46 @@ object GraphEquivalence {
     //do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
   }
 
-  def bnodeClassify(graph: Graph): Map[VerticeType,Set[BNode]] = {
-    val bnodeClass = mutable.HashMap[BNode,VerticeType]()
-    for (Triple(subj,rel,obj) <- graph.triples) {
-       if (subj.isInstanceOf[BNode]) {
-         val bn = subj.asInstanceOf[BNode]
-         bnodeClass.get(bn) orElse {
-           val vt = VerticeType()
-           bnodeClass.put(bn,vt)
-           Some(vt)
-         } map { vt =>
-           vt.setForwardRel(rel,obj)
-         }
-       }
+  def bnodeClassify(graph: Graph): Map[VerticeType, Set[BNode]] = {
+    val bnodeClass = mutable.HashMap[BNode, VerticeType]()
+    for (Triple(subj, rel, obj) <- graph.triples) {
+      if (subj.isInstanceOf[BNode]) {
+        val bn = subj.asInstanceOf[BNode]
+        bnodeClass.get(bn) orElse {
+          val vt = VerticeType()
+          bnodeClass.put(bn, vt)
+          Some(vt)
+        } map { vt =>
+          vt.setForwardRel(rel, obj)
+        }
+      }
       if (obj.isInstanceOf[BNode]) {
         val bn = obj.asInstanceOf[BNode]
         bnodeClass.get(bn) orElse {
           val vt = VerticeType()
-          bnodeClass.put(bn,vt)
+          bnodeClass.put(bn, vt)
           Some(vt)
         } map { vt =>
-          vt.setBackwardRel(rel,subj)
+          vt.setBackwardRel(rel, subj)
         }
       }
     }
     bnodeClass.groupBy(_._2).mapValues(_.keys.toSet)
   }
 
-
-
-
 }
 
-case class VerticeType(forwardRels: mutable.Map[URI,Int]=mutable.HashMap().withDefaultValue(0),
-                       backwardRels: mutable.Map[URI,Int]=mutable.HashMap().withDefaultValue(0)) {
+case class VerticeType(forwardRels: mutable.Map[URI, Int] = mutable.HashMap().withDefaultValue(0),
+    backwardRels: mutable.Map[URI, Int] = mutable.HashMap().withDefaultValue(0)) {
 
-  def this(forward: List[(URI,Int)] ,
-           backward: List[(URI,Int)]) =  this(mutable.HashMap(forward:_*),mutable.HashMap(backward:_*))
+  def this(forward: List[(URI, Int)],
+    backward: List[(URI, Int)]) = this(mutable.HashMap(forward: _*), mutable.HashMap(backward: _*))
 
   def setForwardRel(rel: URI, obj: Node) {
-    forwardRels.put(rel,forwardRels(rel)+1)
+    forwardRels.put(rel, forwardRels(rel) + 1)
   }
   def setBackwardRel(rel: URI, subj: Node) {
-    backwardRels.put(rel,backwardRels(rel)+1)
+    backwardRels.put(rel, backwardRels(rel) + 1)
   }
 
 }
@@ -162,5 +159,5 @@ case class VerticeType(forwardRels: mutable.Map[URI,Int]=mutable.HashMap().withD
 case class MappingException(msg: String) extends Throwable(msg)
 
 case class ClassificationException(msg: String,
-                                   clz1: Map[VerticeType,Set[BNode]],
-                                   clz2: Map[VerticeType,Set[BNode]]) extends Throwable(msg)
+  clz1: Map[VerticeType, Set[BNode]],
+  clz2: Map[VerticeType, Set[BNode]]) extends Throwable(msg)
