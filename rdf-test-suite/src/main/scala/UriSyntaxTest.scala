@@ -75,6 +75,4 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
     new java.net.URI(card).toUri should be(uri)
   }
 
-
-
 }

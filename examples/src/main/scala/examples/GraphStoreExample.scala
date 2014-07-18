@@ -21,8 +21,8 @@ trait GraphStoreExample extends IOExampleDependencies {
 
   import Ops._
 
-  /*abstract*/ def makeRDFStore( file:String ) : RDFStore[Rdf]
-  
+  /*abstract*/ def makeRDFStore(file: String): RDFStore[Rdf]
+
   def main(args: Array[String]): Unit = {
 
     /* reads TimBL's card in Turtle */
@@ -34,17 +34,17 @@ trait GraphStoreExample extends IOExampleDependencies {
 
     val jmvCard = "http://jmvanel.free.fr/jmv.rdf"
     val foaf = FOAFPrefix(Ops)
-    val triples = List( makeTriple(
-        makeUri(timblCard + "#i"),
-        foaf.knows,
-        makeUri(jmvCard + "#me") ))
+    val triples = List(makeTriple(
+      makeUri(timblCard + "#i"),
+      foaf.knows,
+      makeUri(jmvCard + "#me")))
 
-    val store = makeRDFStore( "tmpGraphStoreDir" )
+    val store = makeRDFStore("tmpGraphStoreDir")
     val init = store.execute {
       Command.append(makeUri("urn:foafs"), graph.toIterable)
       Command.append(makeUri("urn:foafs"), triples)
     }
-    init onSuccess{ case _ => println("Successfully stored triples in store") }
+    init onSuccess { case _ => println("Successfully stored triples in store") }
   }
 
 }

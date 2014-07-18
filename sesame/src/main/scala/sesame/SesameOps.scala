@@ -145,14 +145,21 @@ class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
     }
   }
 
-  def diff(g1: Sesame#Graph, g2: Sesame#Graph): Sesame#Graph = ???
+  def diff(g1: Sesame#Graph, g2: Sesame#Graph): Sesame#Graph = {
+    val graph = new LinkedHashModel
+    graphToIterable(g1) foreach { triple =>
+      if (!g2.contains(triple)) graph add triple
+    }
+    graph
+  }
 
   // graph isomorphism
 
-  /** the new ModelUtil.equals changed its semantics. See 
-    * - https://openrdf.atlassian.net/browse/SES-1695
-    * - https://groups.google.com/forum/#!topic/sesame-devel/CGFDn7mESLg/discussion
-    */
+  /**
+   * the new ModelUtil.equals changed its semantics. See
+   * - https://openrdf.atlassian.net/browse/SES-1695
+   * - https://groups.google.com/forum/#!topic/sesame-devel/CGFDn7mESLg/discussion
+   */
   def isomorphism(left: Sesame#Graph, right: Sesame#Graph): Boolean = {
     val leftNoContext = left.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava
     val rightNoContext = right.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava

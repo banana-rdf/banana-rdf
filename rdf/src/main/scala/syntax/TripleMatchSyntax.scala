@@ -6,7 +6,7 @@ trait TripleMatchSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
   implicit def tripleMatchW(tripleMatch: TripleMatch[Rdf]) =
     new TripleMatchW[Rdf](tripleMatch)
-  
+
 }
 
 class TripleMatchW[Rdf <: RDF](val tripleMatch: TripleMatch[Rdf]) extends AnyVal {

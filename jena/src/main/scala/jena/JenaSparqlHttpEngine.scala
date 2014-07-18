@@ -27,7 +27,7 @@ class JenaSparqlHttpEngine(ops: RDFOps[Jena], endpointUrl: String) extends Sparq
   }
 
   def executeSelect(query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = successful {
-     qexec(query, bindings).execSelect()
+    qexec(query, bindings).execSelect()
   }
 
 }

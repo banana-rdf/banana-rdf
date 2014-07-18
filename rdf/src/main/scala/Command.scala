@@ -13,8 +13,8 @@ case object WRITE extends RW
 
 object Command {
 
-  def GET[Rdf <: RDF](hyperlink: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, LinkedDataResource[Rdf]] = {
-    import ops._    
+  def GET[Rdf <: RDF](hyperlink: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, LinkedDataResource[Rdf]] = {
+    import ops._
     val docUri = hyperlink.fragmentLess
     Command.get(docUri) map { graph =>
       val pointed = PointedGraph(hyperlink, graph)
@@ -22,15 +22,15 @@ object Command {
     }
   }
 
-  def GET[Rdf <: RDF](hyperlinks: Iterable[Rdf#URI])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Set[LinkedDataResource[Rdf]]] = {
+  def GET[Rdf <: RDF](hyperlinks: Iterable[Rdf#URI])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Set[LinkedDataResource[Rdf]]] = {
     import ops._
-    implicit val functor: Functor[({type l[+x] = Command[Rdf, x]})#l] = Command.ldcFunctor[Rdf]
-    implicit val applicative: Applicative[({type f[+y] = Free[({type l[+x] = Command[Rdf, x]})#l, y]})#f] =
-      Free.freeMonad[({type l[+x] = Command[Rdf, x]})#l]
-    hyperlinks.map{ hyperlink => GET(hyperlink) }.toList.sequence[({type f[+y] = Free[({type l[+x] = Command[Rdf, x]})#l, y]})#f, LinkedDataResource[Rdf]].map(_.toSet)
+    implicit val functor: Functor[({ type l[+x] = Command[Rdf, x] })#l] = Command.ldcFunctor[Rdf]
+    implicit val applicative: Applicative[({ type f[+y] = Free[({ type l[+x] = Command[Rdf, x] })#l, y] })#f] =
+      Free.freeMonad[({ type l[+x] = Command[Rdf, x] })#l]
+    hyperlinks.map { hyperlink => GET(hyperlink) }.toList.sequence[({ type f[+y] = Free[({ type l[+x] = Command[Rdf, x] })#l, y] })#f, LinkedDataResource[Rdf]].map(_.toSet)
   }
 
-  def POST[Rdf <: RDF](uri: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def POST[Rdf <: RDF](uri: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     import ops._
     val docUri = uri.fragmentLess
     Command.append(docUri, graphToIterable(pointed.graph.resolveAgainst(docUri)))
@@ -42,14 +42,14 @@ object Command {
     foldNodeMatch[Rdf#NodeMatch](nodeMatch)(ANY, node => node.resolveAgainst(docUri))
   }
 
-  def PATCH[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]] /*, TODO insertTriples: Iterable[Rdf#Triple]*/)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def PATCH[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]] /*, TODO insertTriples: Iterable[Rdf#Triple]*/ )(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     import ops._
     val docUri = uri.fragmentLess
     val deletePattern = tripleMatches map { case (s, p, o) => (resolveAgainst(s, docUri), resolveAgainst(p, docUri), resolveAgainst(o, docUri)) }
     Command.patch(docUri, deletePattern, List.empty)
   }
 
-  def POSTToCollection[Rdf <: RDF](collection: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#URI] = {
+  def POSTToCollection[Rdf <: RDF](collection: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Rdf#URI] = {
     import ops._
     import org.w3.banana.binder._
     val AsURI = implicitly[PGBinder[Rdf, Rdf#URI]]
@@ -61,11 +61,11 @@ object Command {
     POST(docUri, pointed) map { _ => docUri.withFragment(fragment.toString) }
   }
 
-  def DELETE[Rdf <: RDF](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def DELETE[Rdf <: RDF](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     Command.delete(uri)
   }
 
-  def PUT[Rdf <: RDF](ldr: LinkedDataResource[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def PUT[Rdf <: RDF](ldr: LinkedDataResource[Rdf])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     for {
       _ <- DELETE(ldr.location)
       _ <- POST(ldr.location, ldr.resource)

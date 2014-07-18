@@ -80,15 +80,16 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
    * note: this is very different from as[List[T]], which is an encoding of a List in RDF
    */
   def asSet[T](implicit fromPG: FromPG[Rdf, T]): Try[Set[T]] = Try {
-    this.iterator.foldLeft[Set[T]](Set.empty[T]){ case (acc, pg) => acc + fromPG.fromPG(pg).get }
+    this.iterator.foldLeft[Set[T]](Set.empty[T]) { case (acc, pg) => acc + fromPG.fromPG(pg).get }
   }
 
   def asSet2[T1, T2](implicit fromPG1: FromPG[Rdf, T1], fromPG2: FromPG[Rdf, T2]): Try[Set[(T1, T2)]] =
-    this.iterator.foldLeft[Try[Set[(T1, T2)]]](Success(Set.empty)){ case (accT, g) =>
-      for {
-        acc <- accT
-        t1 <- g.as[T1]
-        t2 <- g.as[T2]
-      } yield acc + ((t1, t2))
+    this.iterator.foldLeft[Try[Set[(T1, T2)]]](Success(Set.empty)) {
+      case (accT, g) =>
+        for {
+          acc <- accT
+          t1 <- g.as[T1]
+          t2 <- g.as[T2]
+        } yield acc + ((t1, t2))
     }
 }
