@@ -3,6 +3,8 @@ package org.w3.banana.rdfstorew
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
 
+import akka.http.model.{IllegalUriException, Uri}
+
 import org.w3.banana.{URIOps, RDFOps}
 
 trait JSUtils {
@@ -12,25 +14,53 @@ trait JSUtils {
 
 trait RDFStoreURIOps extends URIOps[RDFStore] {
 
-  def getString(uri: RDFStore#URI): String = ???
+  def akka(uri:RDFStore#URI) : Uri = Uri(uri.valueOf().asInstanceOf[String])
 
-  def withoutFragment(uri: RDFStore#URI): RDFStore#URI =  ???
+  def rdfjs(uri:Uri) : RDFStore#URI = {
+    val ops = new RDFStoreOps()
+    ops.makeUri(uri.toString)
+  }
 
-  def withFragment(uri: RDFStore#URI, frag: String): RDFStore#URI = ???
+  def getString(uri: RDFStore#URI): String = akka(uri).toString
 
-  def getFragment(uri: RDFStore#URI): Option[String] = ???
+  def withoutFragment(uri: RDFStore#URI): RDFStore#URI =  {
+    val ops = new RDFStoreOps()
+    ops.makeUri(uri.valueOf().asInstanceOf[String].split("#")(0))
+  }
 
-  def isPureFragment(uri: RDFStore#URI): Boolean = ???
+  def withFragment(uri: RDFStore#URI, frag: String): RDFStore#URI = {
+    rdfjs(akka(uri).withFragment(frag))
+  }
 
-  def resolve(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = ???
+  def getFragment(uri: RDFStore#URI): Option[String] = akka(uri).fragment
 
-  def appendSegment(uri: RDFStore#URI, segment: String): RDFStore#URI = ???
+  def isPureFragment(uri: RDFStore#URI): Boolean = {
+    val u = akka(uri)
+    u.scheme.isEmpty && u.authority.isEmpty && u.path.isEmpty && u.query.isEmpty && u.fragment.isDefined
+  }
+
+
+
+  def resolve(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI =
+    rdfjs(akka(other).resolvedAgainst(akka(uri).toString))
+
+  def appendSegment(uri: RDFStore#URI, segment: String): RDFStore#URI = {
+    val underlying = akka(uri)
+    val path = underlying.path
+    if (path.reverse.startsWithSlash)
+      rdfjs(underlying.copy(path = path + segment))
+    else
+      rdfjs(underlying.copy(path = path / segment))
+  }
 
   def relativize(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = ???
 
-  def newChildUri(uri: RDFStore#URI): RDFStore#URI = ???
+  def newChildUri(uri: RDFStore#URI): RDFStore#URI = {
+    val segment = java.util.UUID.randomUUID().toString.replace("-", "")
+    appendSegment(uri, segment)
+  }
 
-  def lastSegment(uri: RDFStore#URI): String = ???
+  def lastSegment(uri: RDFStore#URI): String = akka(uri).path.reverse.head.toString
 
 }
 

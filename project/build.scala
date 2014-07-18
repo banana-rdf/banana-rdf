@@ -163,7 +163,7 @@ object BananaRdfBuild extends Build {
   lazy val rdf = Project(
     id = "banana-rdf",
     base = file("rdf"),
-    settings = buildSettings ++ testDeps ++ Seq(
+    settings = scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
@@ -230,6 +230,8 @@ object BananaRdfBuild extends Build {
     base = file("rdfstorew"),
     settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
       jsDependencies += ProvidedJS / "rdf_store.js",
+      resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
+      libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1",
       //libraryDependencies += "org.scala-lang.modules" %% "scala-async" % "0.9.1",
       skip in packageJSDependencies := false
     )
