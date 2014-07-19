@@ -62,7 +62,9 @@ object RDFStoreW {
   val rdf_api = apply(Map()).RDF_API
 
   def apply(options: Map[String,Any]): RDFStoreW = {
-
+    println("************ BEFORE")
+    println(js.Dynamic.global)
+    println("************")
     val dic = options.foldLeft[js.Dictionary[Any]](js.Dictionary())({
       case (acc, (key, value)) =>
         acc.update(key,value); acc
@@ -70,7 +72,13 @@ object RDFStoreW {
 
     val promise = Promise[RDFStoreW]
 
-    global.rdfstore.applyDynamic("create")(dic, (store: js.Dynamic) => promise.success(new RDFStoreW(store)) )
+    // hack for Rhino/browser execution
+    var rdfstore = if(global.window != null){
+      global.window.rdfstore
+    } else {
+      global.rdfstore
+    }
+    rdfstore.applyDynamic("create")(dic, (store: js.Dynamic) => promise.success(new RDFStoreW(store)) )
 
     // always succeeds
     promise.future.value.get.get

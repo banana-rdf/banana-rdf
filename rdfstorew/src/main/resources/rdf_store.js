@@ -1,13 +1,15 @@
 (function() {
-
-
+   if(typeof(window) == "undefined") {
+       window = {}
+   }
+             
   if(typeof(console)=='undefined') {
      console = {};
      console.log = function(e){};
   }
   
   window.process = {};
-  process.nextTick = function(f) {
+  window.process.nextTick = function(f) {
     setTimeout(f,0);
   };
 var Utils = {};
@@ -5420,7 +5422,7 @@ N3Lexer.prototype = {
     if (typeof(input) === 'string') {
       this._input = input;
       this._inputComplete = true;
-      process.nextTick(function () {
+      window.process.nextTick(function () {
         while (self._next(callback)) {} ;
       });
     }

@@ -94,7 +94,13 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
     (lexicalForm, datatype, lang)
   }
 
-  override def makeUri(s: String): RDFStore#URI = RDFStoreW.rdf.createNamedNode(s)
+  override def makeUri(s: String): RDFStore#URI = {
+    println("************************************* THIS IS THE OUTPUT")
+    println("*************************************")
+    println(RDFStoreW)
+    println("*************************************")
+    RDFStoreW.rdf.createNamedNode(s)
+  }
 
   override def makeTriple(s: RDFStore#Node, p: RDFStore#URI, o: RDFStore#Node): RDFStore#Triple = RDFStoreW.rdf.createTriple(s,p,o)
 
