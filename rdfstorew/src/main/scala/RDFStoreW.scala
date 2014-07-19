@@ -62,9 +62,6 @@ object RDFStoreW {
   val rdf_api = apply(Map()).RDF_API
 
   def apply(options: Map[String,Any]): RDFStoreW = {
-    println("************ BEFORE")
-    println(js.Dynamic.global)
-    println("************")
     val dic = options.foldLeft[js.Dictionary[Any]](js.Dictionary())({
       case (acc, (key, value)) =>
         acc.update(key,value); acc

@@ -95,10 +95,6 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
   }
 
   override def makeUri(s: String): RDFStore#URI = {
-    println("************************************* THIS IS THE OUTPUT")
-    println("*************************************")
-    println(RDFStoreW)
-    println("*************************************")
     RDFStoreW.rdf.createNamedNode(s)
   }
 
