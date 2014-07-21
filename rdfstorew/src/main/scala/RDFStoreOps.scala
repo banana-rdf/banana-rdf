@@ -165,7 +165,7 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
   override def fromUri(uri: RDFStore#URI): String = getString(uri)
 
   // graph union
-  override def union(graphs: Seq[RDFStore#Graph]): RDFStore#Graph = ??? //graphs.fold(emptyGraph)(_.merge(_))
+  override def union(graphs: Seq[RDFStore#Graph]): RDFStore#Graph = graphs.fold(emptyGraph)(_.merge(_))
 
 
   override def makeLiteral(lexicalForm: String, datatype: RDFStore#URI): RDFStore#Literal = {

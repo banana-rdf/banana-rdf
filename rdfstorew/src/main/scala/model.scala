@@ -103,6 +103,8 @@ class RDFStoreGraph(node:js.Dynamic) {
     this
   }
 
+  def merge(other:RDFStoreGraph) : RDFStoreGraph = new RDFStoreGraph(graph.merge(other.graph))
+
   override def equals(other:Any) : Boolean = {
     if(other.isInstanceOf[RDFStoreGraph])
       graph.asInstanceOf[js.Dynamic].applyDynamic("equals")(other.asInstanceOf[RDFStoreGraph].graph).asInstanceOf[Boolean]
