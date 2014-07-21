@@ -7,8 +7,8 @@ class RDFStoreRDFNode(node:js.Dynamic) {
 
   val jsNode = node
 
-  val interfaceName:js.String = node.interfaceName.asInstanceOf[String]
-  val attributes:js.Array[js.String] = node.attributes.asInstanceOf[js.Array[String]]
+  val interfaceName:js.String = if(node.interfaceName.isInstanceOf[js.String]) { node.interfaceName.asInstanceOf[String] } else { null }
+  val attributes:js.Array[js.String] = if(node.attributes.isInstanceOf[js.Array[String]]) { node.attributes.asInstanceOf[js.Array[String]] } else { null }
 
   override def equals(other:Any) : Boolean = {
     if(other.isInstanceOf[RDFStoreRDFNode]) {
@@ -34,9 +34,8 @@ class RDFStoreBlankNode(node:js.Dynamic) extends  RDFStoreRDFNode(node) {
 class RDFStoreLiteral(node:js.Dynamic) extends  RDFStoreRDFNode(node) {
 
   val nominalValue:js.String = if(node.nominalValue.isInstanceOf[js.String]) { node.nominalValue.asInstanceOf[js.String] } else { null }
-  val datatype:js.String = if(node.datatype.isInstanceOf[js.String]) { node.datatype.asInstanceOf[js.String] } else { null}
+  val datatype:js.String = if (node.datatype.isInstanceOf[js.String]) { node.datatype.asInstanceOf[js.String] } else { null }
   val language:js.String = if(node.language.isInstanceOf[js.String]) { node.language.asInstanceOf[js.String] } else { null }
-
 }
 
 
@@ -54,27 +53,27 @@ class RDFStoreTriple(node:js.Dynamic) {
     val nodeSubject = new RDFStoreRDFNode(node.subject)
     nodeSubject.interfaceName match {
       case "BlankNode" =>
-        new RDFStoreBlankNode(node.subject)
+        new RDFStoreBlankNode(triple.subject)
       case "Literal" =>
-        new RDFStoreLiteral(node.subject)
+        new RDFStoreLiteral(triple.subject)
       case "NamedNode" =>
-        new RDFStoreNamedNode(node.subject)
+        new RDFStoreNamedNode(triple.subject)
       case _ =>
         throw new Exception("Unknown RDF JS interface "+nodeSubject.interfaceName)
     }
   }
 
-  val predicate:RDFStoreNamedNode = new RDFStoreNamedNode(node.predicate)
+  val predicate:RDFStoreNamedNode = new RDFStoreNamedNode(triple.predicate)
 
   val objectt:RDFStoreRDFNode = {
-    val nodeObject = new RDFStoreRDFNode(node.selectDynamic("object"))
+    val nodeObject = new RDFStoreRDFNode(triple.selectDynamic("object"))
     nodeObject.interfaceName match {
       case "BlankNode" =>
-        new RDFStoreBlankNode(node.subject)
+        new RDFStoreBlankNode(nodeObject.jsNode)
       case "Literal" =>
-        new RDFStoreLiteral(node.subject)
+        new RDFStoreLiteral(nodeObject.jsNode)
       case "NamedNode" =>
-        new RDFStoreNamedNode(node.subject)
+        new RDFStoreNamedNode(nodeObject.jsNode)
       case _ =>
         throw new Exception("Unknown RDF JS interface "+nodeObject.interfaceName)
     }

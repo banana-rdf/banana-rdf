@@ -24785,6 +24785,14 @@ RDFJSInterface.Graph.prototype.every = function(p) {
     return true;
 };
 
+RDFJSInterface.Graph.prototype.equals = function(g) {
+    if(g.triples.length != this.triples.length) return false;
+
+    return this.every(function(triple) {
+        return g.some(function(otherTriple){ triple.equals(otherTriple) })
+    })
+}
+
 RDFJSInterface.Graph.prototype.filter = function(f) {
     var tmp = new RDFJSInterface.Graph();
 

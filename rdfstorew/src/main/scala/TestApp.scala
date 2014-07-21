@@ -1,8 +1,9 @@
 package org.w3.banana.rdfstorew
 
-import scala.scalajs.js.JSApp
+import scala.scalajs.js.{RegExp, Dynamic, JSApp}
 import scala.scalajs.js
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
+
 
 object TestApp extends JSApp with JSUtils {
 
@@ -31,6 +32,7 @@ object TestApp extends JSApp with JSUtils {
      */
 
 
+
     println("** building uri")
     val uri = RDFStoreOps.makeUri("http://test.com/something#mytype")
     println("** building literal")
@@ -38,6 +40,10 @@ object TestApp extends JSApp with JSUtils {
     log("*** THE LITERAL")
     log(literal)
     println(literal)
+    println("datatype")
+    println(literal.datatype)
+    println("language")
+    println(literal.language)
 
     val triple = RDFStoreOps.makeTriple(
       RDFStoreOps.makeUri("http://test.com/me"),
@@ -47,6 +53,9 @@ object TestApp extends JSApp with JSUtils {
     log("** THE TRIPLE")
     log(triple)
     println(triple)
+
+
+
   }
 
 }
