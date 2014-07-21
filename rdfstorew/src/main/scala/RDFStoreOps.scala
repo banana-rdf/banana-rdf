@@ -8,13 +8,20 @@ import akka.http.model.{IllegalUriException, Uri}
 import org.w3.banana.{URIOps, RDFOps}
 
 trait JSUtils {
-  def log(obj:js.Any) = js.Dynamic.global.console.log(obj)
+  def log(obj:RDFStoreRDFNode) = js.Dynamic.global.console.log(obj.jsNode)
+  def log(obj:RDFStoreTriple) = js.Dynamic.global.console.log(obj.triple)
+  def log(obj:RDFStoreGraph) = js.Dynamic.global.console.log(obj.graph)
+  def log(obj:js.Dynamic) = {
+    js.Dynamic.global.console.log(obj)
+  }
+  def log(obj:String) = js.Dynamic.global.console.log(obj)
+
   def global = js.Dynamic.global
 }
 
 trait RDFStoreURIOps extends URIOps[RDFStore] {
 
-  def akka(uri:RDFStore#URI) : Uri = Uri(uri.valueOf().asInstanceOf[String])
+  def akka(uri:RDFStore#URI) : Uri = Uri(uri.valueOf)
 
   def rdfjs(uri:Uri) : RDFStore#URI = {
     RDFStoreOps.makeUri(uri.toString)
@@ -23,7 +30,7 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
   def getString(uri: RDFStore#URI): String = akka(uri).toString
 
   def withoutFragment(uri: RDFStore#URI): RDFStore#URI =  {
-    RDFStoreOps.makeUri(uri.valueOf().asInstanceOf[String].split("#")(0))
+    RDFStoreOps.makeUri(uri.valueOf.split("#")(0))
   }
 
   def withFragment(uri: RDFStore#URI, frag: String): RDFStore#URI = {
@@ -64,15 +71,15 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
 
 object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
-  override def emptyGraph: RDFStore#Graph = RDFStoreW.rdf.createGraph()
+  override def emptyGraph: RDFStore#Graph = new RDFStoreGraph(RDFStoreW.rdf.createGraph())
 
   override implicit def toConcreteNodeMatch(node: RDFStore#Node): RDFStore#NodeMatch = PlainNode(node)
 
   override def diff(g1: RDFStore#Graph, g2: RDFStore#Graph): RDFStore#Graph = ???
 
-  override def fromTriple(triple: RDFStore#Triple): (RDFStore#Node, RDFStore#URI, RDFStore#Node) = (triple.subject, triple.predicate, triple.selectDynamic("object"))
+  override def fromTriple(triple: RDFStore#Triple): (RDFStore#Node, RDFStore#URI, RDFStore#Node) = (triple.subject, triple.predicate, triple.objectt)
 
-  override def makeBNode(): RDFStore#BNode = RDFStoreW.rdf.createBlankNode()
+  override def makeBNode(): RDFStore#BNode = new RDFStoreBlankNode(RDFStoreW.rdf.createBlankNode())
 
   override def graphToIterable(graph: RDFStore#Graph): Iterable[RDFStore#Triple] = graph.triples.asInstanceOf[js.Array[RDFStore#Triple]]
 
@@ -81,34 +88,36 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
   override def makeLang(s: String): RDFStore#Lang = s
 
-  override def makeBNodeLabel(s: String): RDFStore#BNode = js.Dynamic.newInstance(RDFStoreW.rdf_api.BlankNode)(s)
+  override def makeBNodeLabel(s: String): RDFStore#BNode = new RDFStoreBlankNode(js.Dynamic.newInstance(RDFStoreW.rdf_api.BlankNode)(s))
 
   override def makeLangTaggedLiteral(lexicalForm: String, lang: RDFStore#Lang): RDFStore#Literal =
-    js.Dynamic.newInstance(RDFStoreW.rdf_api.Literal)(lexicalForm,lang,null)
+    new RDFStoreLiteral(js.Dynamic.newInstance(RDFStoreW.rdf_api.Literal)(lexicalForm,lang,null))
 
   override def fromLiteral(literal: RDFStore#Literal): (String, RDFStore#URI, Option[RDFStore#Lang]) = {
     val lexicalForm:String = literal.nominalValue.asInstanceOf[String]
-    val datatype:RDFStore#URI = null //literal.datatype
+    val datatype:RDFStore#URI = if(literal.datatype == null) { null } else { makeUri(literal.datatype) }
     var lang:Option[RDFStore#Lang] = if(literal.language == null) { None } else { Some(literal.language.asInstanceOf[RDFStore#Lang]) }
 
     (lexicalForm, datatype, lang)
   }
 
   override def makeUri(s: String): RDFStore#URI = {
-    RDFStoreW.rdf.createNamedNode(s)
+    new RDFStoreNamedNode(RDFStoreW.rdf.createNamedNode(s))
   }
 
-  override def makeTriple(s: RDFStore#Node, p: RDFStore#URI, o: RDFStore#Node): RDFStore#Triple = RDFStoreW.rdf.createTriple(s,p,o)
+  override def makeTriple(s: RDFStore#Node, p: RDFStore#URI, o: RDFStore#Node): RDFStore#Triple = {
+    new RDFStoreTriple(RDFStoreW.rdf.createTriple(s.jsNode,p.jsNode,o.jsNode))
+  }
 
   override def ANY: RDFStore#NodeAny = JsANY
 
   override def makeGraph(it: Iterable[RDFStore#Triple]): RDFStore#Graph = {
     var triplesArray = js.Dynamic.newInstance(global.Array)()
     for(triple <- it) {
-      triplesArray.push(triple)
+      triplesArray.push(triple.triple)
     }
 
-    RDFStoreW.rdf.createGraph(triplesArray)
+    new RDFStoreGraph(RDFStoreW.rdf.createGraph(triplesArray))
   }
 
   override def fromLang(l: RDFStore#Lang): String = l
@@ -136,12 +145,16 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
     }
 
 
-    var toFind:RDFStore#Triple = makeTriple(subjectNode, predicateNode, objectNode)
-    var filtered:js.Array[RDFStore#Triple] = graph.filter((triple:RDFStore#Triple, g:RDFStore#Graph) => triple.equals(toFind)).asInstanceOf[js.Array[RDFStore#Triple]]
+    var toFind:RDFStore#Triple = makeTriple(subjectNode, predicateNode.asInstanceOf[RDFStore#URI], objectNode)
+    var filtered:js.Array[js.Dynamic] = graph.graph.filter({
+      (t:js.Dynamic, g:js.Dynamic) =>
+        val triple = new RDFStoreTriple(t)
+        t.equals(toFind)
+    }).asInstanceOf[js.Array[js.Dynamic]]
 
     var filteredList:List[RDFStore#Triple] = List[RDFStore#Triple]()
     for(triple <- filtered) {
-      filteredList = filteredList.::(triple)
+      filteredList = filteredList.::(new RDFStoreTriple(triple))
     }
 
     filteredList.toIterator
@@ -152,7 +165,7 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
   override def fromUri(uri: RDFStore#URI): String = getString(uri)
 
   // graph union
-  override def union(graphs: Seq[RDFStore#Graph]): RDFStore#Graph = graphs.fold(emptyGraph)(_.merge(_))
+  override def union(graphs: Seq[RDFStore#Graph]): RDFStore#Graph = ??? //graphs.fold(emptyGraph)(_.merge(_))
 
 
   override def makeLiteral(lexicalForm: String, datatype: RDFStore#URI): RDFStore#Literal = {
@@ -170,6 +183,6 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
       datatypeString = getString(datatype)
     }
 
-    js.Dynamic.newInstance(RDFStoreW.rdf_api.Literal)(value,lang,datatypeString)
+    new RDFStoreLiteral(js.Dynamic.newInstance(RDFStoreW.rdf_api.Literal)(value,lang,datatypeString))
   }
 }

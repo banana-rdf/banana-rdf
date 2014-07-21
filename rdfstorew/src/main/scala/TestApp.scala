@@ -37,6 +37,7 @@ object TestApp extends JSApp with JSUtils {
     val literal = RDFStoreOps.makeLiteral("this is a test", uri)
     log("*** THE LITERAL")
     log(literal)
+    println(literal)
 
     val triple = RDFStoreOps.makeTriple(
       RDFStoreOps.makeUri("http://test.com/me"),
@@ -45,6 +46,7 @@ object TestApp extends JSApp with JSUtils {
     )
     log("** THE TRIPLE")
     log(triple)
+    println(triple)
   }
 
 }

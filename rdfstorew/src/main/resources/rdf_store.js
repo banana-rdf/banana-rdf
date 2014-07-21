@@ -24577,6 +24577,7 @@ RDFJSInterface.RDFNode = function(interfaceName){
     this.attributes  = ["interfaceName", "nominalValue"]
 };
 
+
 RDFJSInterface.RDFNode.prototype.equals = function(otherNode) {
     if(otherNode.interfaceName == null) {
         return this.valueOf() == otherNode;
@@ -24599,7 +24600,7 @@ RDFJSInterface.RDFNode.prototype.equals = function(otherNode) {
 RDFJSInterface.BlankNode = function(bnodeId) {
     RDFJSInterface.RDFNode.call(this, "BlankNode");
     this.nominalValue = "_:"+bnodeId;
-    this.bnodeId = bnodeId;
+    this.bnodeId = ""+bnodeId;
 };
 
 Utils['extends'](RDFJSInterface.RDFNode,RDFJSInterface.BlankNode);
@@ -24665,9 +24666,11 @@ RDFJSInterface.NamedNode = function(val) {
 
 Utils['extends'](RDFJSInterface.RDFNode,RDFJSInterface.NamedNode);
 
+
 RDFJSInterface.NamedNode.prototype.toString = function(){
     return this.nominalValue;
 };
+
 
 RDFJSInterface.NamedNode.prototype.toNT = function() {
     return "<"+this.toString()+">";

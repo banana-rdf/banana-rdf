@@ -12,12 +12,12 @@ case object JsANY extends JsNodeMatch
 
 trait RDFStore extends RDF {
   // types related to the RDF datamodel
-  type Graph = js.Dynamic
-  type Triple = js.Dynamic
-  type Node = js.Dynamic
-  type URI = js.Dynamic
-  type BNode = js.Dynamic
-  type Literal = js.Dynamic
+  type Graph = RDFStoreGraph
+  type Triple = RDFStoreTriple
+  type Node = RDFStoreRDFNode
+  type URI = RDFStoreNamedNode
+  type BNode = RDFStoreBlankNode
+  type Literal = RDFStoreLiteral
   type Lang = String
 
   // types for the graph traversal API
