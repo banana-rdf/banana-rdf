@@ -2,7 +2,6 @@ package org.w3.banana.rdfstorew
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
-
 import akka.http.model.{IllegalUriException, Uri}
 
 import org.w3.banana.{URIOps, RDFOps}
@@ -124,8 +123,7 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
   override def foldNodeMatch[T](nodeMatch: RDFStore#NodeMatch)(funANY: => T, funNode: (RDFStore#Node) => T): T = ???
 
-  // graph isomorphism -> not supported
-  override def isomorphism(left: RDFStore#Graph, right: RDFStore#Graph): Boolean = ???
+  override def isomorphism(left: RDFStore#Graph, right: RDFStore#Graph): Boolean = GraphEquivalence.findAnswer(left,right).isSuccess
 
   override def find(graph: RDFStore#Graph, subject: RDFStore#NodeMatch, predicate: RDFStore#NodeMatch, objectt: RDFStore#NodeMatch): Iterator[RDFStore#Triple] = {
 

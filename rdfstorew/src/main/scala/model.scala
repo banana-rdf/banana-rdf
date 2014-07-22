@@ -102,6 +102,11 @@ class RDFStoreGraph(node:js.Dynamic) {
     this
   }
 
+  def remove(triple:RDFStoreTriple) : RDFStoreGraph = {
+    node.remove(triple.triple)
+    this
+  }
+
   def merge(other:RDFStoreGraph) : RDFStoreGraph = new RDFStoreGraph(graph.merge(other.graph))
 
   override def equals(other:Any) : Boolean = {
@@ -110,5 +115,7 @@ class RDFStoreGraph(node:js.Dynamic) {
     else
       false
   }
+
+  def size:Int = triples.length
 
 }
