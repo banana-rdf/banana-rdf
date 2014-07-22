@@ -2,11 +2,33 @@ package org.w3.banana.plantain
 
 import org.w3.banana.plantain.model._
 
+import scala.collection.immutable.ListMap
 import scala.collection.mutable
-import scala.util.Try
+import scala.util.control.NoStackTrace
+import scala.util.{Success, Failure, Try}
 
 /**
- * Created by hjs on 12/07/2014.
+ * Methods to establish Graph Equivalences
+ *
+ * Following Jeremy J. Carroll's "Matching RDF Graphs" article
+ *  http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
+ *
+ * ( Currently the first part of the algorithm p10 has been implemented )
+ *
+ * Also I found it useful to think in terms of the RDF category
+ * as defined by Benjamin Braatz in "Formal Modelling and Application of Graph Transformations
+ * in the Resource Description Framework" Proposition 2.1 ( p 16 )
+ *
+ * http://www.researchgate.net/profile/Benjamin_Braatz/publication/40635984_Formal_Modelling_and_Application_of_Graph_Transformations_in_the_Resource_Description_Framework/file/d912f50d3189b51ef1.pdf
+ *
+ * As shown by Jeremy Carroll's paper this is only the first stage in the
+ * optimisation. This code can be ameliorated in a number of ways:
+ *
+ *  - by increasing the sensitivity of categories as explained by Jeremy Caroll
+ *  - by using lazy data structures
+ *  - by optimising memory
+ *
+ *  Each optimisation makes thinking about the code harder though.
  */
 object GraphEquivalence {
 
@@ -31,8 +53,15 @@ object GraphEquivalence {
     (ground, nonGround)
   }
 
-  //add explanation later
-  def bnodeMappingGenerator(g1: Graph, g2: Graph): Try[List[List[(BNode, BNode)]]] = Try {
+  /**
+   * generate a list of possible bnode mappings, filtered by applying classification algorithm
+   * on the nodes by relating them to other edges
+   * @param g1
+   * @param g2
+   * @return a ListMap mapping BNode from graph g1 to a smaller set of Bnodes from graph g2 which
+   *         they should corresond to
+   */
+  def bnodeMappingGenerator(g1: Graph, g2: Graph): Try[ListMap[BNode,mutable.Set[BNode]]] = Try {
     if (g1.size != g2.size)
       throw MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}")
     val (grnd1, nongrnd1) = groundTripleFilter(g1)
@@ -44,28 +73,60 @@ object GraphEquivalence {
     val clz2 = bnodeClassify(g2)
     if (clz1.size != clz2.size)
       throw ClassificationException("the two graphs don't have the same number of classes.", clz1, clz2)
+    val mappingOpts: mutable.Map[BNode,mutable.Set[BNode]] = mutable.HashMap[BNode,mutable.Set[BNode]]()
     for {
-      (vt, bnds1) <- clz1.toList.sortBy { case (vt, bn) => bn.size }
-      bnds2 <- clz2.get(vt).toList.map(_.toList)
-    } yield {
+      (vt, bnds1) <- clz1 // .sortBy { case (vt, bn) => bn.size }
+      bnds2 <- clz2.get(vt)
+    } {
       if (bnds2.size != bnds1.size)
         throw ClassificationException(s"the two graphs don't have the same number of bindings for type $vt", clz1, clz2)
-      for {
-        bn1 <- bnds1.toList
-        bn2 <- bnds2
-      } yield {
-        (bn1, bn2)
+      for (bnd <- bnds1) {
+        mappingOpts.get(bnd).orElse(Some(mutable.Set.empty[BNode])).map { bnset =>
+          mappingOpts.put(bnd,bnset ++= bnds2)
+        }
       }
     }
-
+    ListMap(mappingOpts.toList.sortBy(_._2.size):_*)
   }
 
   /**
-   *
+   * Find possible bnode mappings
+   * @param g1
+   * @param g2
+   * @return A list of possible bnode mappings or a reason for the error
+   */
+  def findPossibleMappings(g1: Graph, g2: Graph): Try[List[List[(BNode,BNode)]]] =  {
+    bnodeMappingGenerator(g1, g2) map { listMap =>
+      val keys = listMap.keys.toList
+      def tree(keys: List[BNode]): List[List[(BNode,BNode)]] = {
+        keys match {
+          case head::tail =>  listMap(keys.head).toList.flatMap{ mappedBN =>
+            tree(tail).map((head,mappedBN)::_)
+          }
+          case Nil => List(List())
+        }
+      }
+      tree(keys)
+    }
+  }
+
+  def findAnswer(g1: Graph, g2: Graph): Try[List[(BNode,BNode)]] = {
+    findPossibleMappings(g1,g2).flatMap{possibleAnswers =>
+      val verifyAnswers= possibleAnswers.map(answer=>
+        answer->mapVerify(g1,g2,Map(answer:_*))
+      )
+      val answerOpt = verifyAnswers.find{case (_,err)=>err==Nil}
+      answerOpt.map(a =>Success(a._1)).getOrElse(Failure(NoMappingException(verifyAnswers)))
+    }
+  }
+
+  /**
+   * Verify that the bnode bijection allows one to map graph1 to graph2
    * @param graph1
    * @param graph2
-   * @param bnodeBijection
+   * @param bnodeBijection  a bijection of bnodes. Each kay maps to one value and vice-versa
    * @return a list of exceptions in case of failure or an empty list in case of success
+   *
    */
   def mapVerify(graph1: Graph, graph2: Graph, bnodeBijection: Map[BNode, BNode]): List[MappingException] = {
     def map(node: Node) = node match {
@@ -77,17 +138,18 @@ object GraphEquivalence {
       return List(MappingException(s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"))
     var graphTmp = graph2
 
+    //1. verify that bnodeBijection is a bijection ( it may be nicer to have a data structure that guarantees that)
+    if (bnodeBijection.values.toSet.size != bnodeBijection.size)
+      return List(MappingException(s"bnodeBijection is not a bijection: some keys map to more than one value"))
+
     try {
-      //todo: verify that bnodeBijection is a bijection
       for (triple <- graph1.toIterable) {
         val Triple(sub, rel, obj) = triple
         var mappedTriple: Triple = null
         try {
           mappedTriple = Triple(map(sub), rel, map(obj))
-          println(s"map($triple)=>$mappedTriple")
         } catch {
           case e: java.util.NoSuchElementException => {
-            println("cought " + e)
             throw MappingException(s"could not find map for $sub or $obj")
           }
         }
@@ -95,14 +157,12 @@ object GraphEquivalence {
           graphTmp = graphTmp.removeExistingTriple(mappedTriple)
         } catch {
           case e: java.util.NoSuchElementException => {
-            println("cought " + e)
             throw MappingException(s"could not find map($triple)=$mappedTriple")
           }
         }
       }
     } catch {
       case e: MappingException => return List(e)
-      case nse => println(nse)
     }
 
     if (graphTmp.size == 0) List()
@@ -112,6 +172,11 @@ object GraphEquivalence {
     //do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
   }
 
+  /**
+   * This classification can be improved, but it is easier to debug while it is not so effective.
+   * @param graph
+   * @return a classification of bnodes by type, where nodes can only be matched by other nodes of the same type
+   */
   def bnodeClassify(graph: Graph): Map[VerticeType, Set[BNode]] = {
     val bnodeClass = mutable.HashMap[BNode, VerticeType]()
     for (Triple(subj, rel, obj) <- graph.triples) {
@@ -156,8 +221,21 @@ case class VerticeType(forwardRels: mutable.Map[URI, Int] = mutable.HashMap().wi
 
 }
 
-case class MappingException(msg: String) extends Throwable(msg)
+trait MappingError extends NoStackTrace {
+  def msg: String
+}
+
+case class MappingException(msg: String) extends MappingError {
+  override def toString() = s"MappingException($msg)"
+}
+
+case class NoMappingException(val reasons: List[(List[(BNode,BNode)],List[MappingError])]) extends MappingError {
+  def msg = "No mapping found"
+  override def toString() = s"NoMappingException($reasons)"
+}
 
 case class ClassificationException(msg: String,
   clz1: Map[VerticeType, Set[BNode]],
-  clz2: Map[VerticeType, Set[BNode]]) extends Throwable(msg)
+  clz2: Map[VerticeType, Set[BNode]]) extends MappingError {
+  override def toString() = s"ClassificationException($msg,$clz1,$clz2)"
+}

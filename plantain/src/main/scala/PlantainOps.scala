@@ -2,9 +2,8 @@ package org.w3.banana.plantain
 
 import java.util.NoSuchElementException
 
-import org.w3.banana._
-import model._
 import akka.http.model.Uri
+import org.w3.banana._
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
@@ -107,47 +106,46 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
   // graph isomorphism
 
+ def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = GraphEquivalence.findAnswer(left,right).isSuccess
   // TODO: remove dependency on Sesame
   // the definition for RDF Graph isomorphism can be found at http://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/#h3_graph-isomorphism
   // here is an old paper discussing implementation details http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
-  def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
-    // as long as Sesame is in scope, let's just rely on it for the complex stuff
-    import org.openrdf.{ model => sesame }
-    import org.openrdf.model.impl._
-    import org.openrdf.model.util.ModelUtil
-    def statement(s: model.Node, p: model.URI, o: model.Node): sesame.Statement = {
-      val subject: sesame.Resource = s match {
-        case model.URI(uri) => new URIImpl(uri.toString)
-        case model.BNode(label) => new BNodeImpl(label)
-        case literal @ model.Literal(_, _, _) => throw new IllegalArgumentException(s"$literal was in subject position")
-      }
-      val predicate: sesame.URI = p match {
-        case model.URI(uri) => new URIImpl(uri.toString)
-      }
-      val objectt: sesame.Value = o match {
-        case model.URI(uri) => new URIImpl(uri.toString)
-        case model.BNode(label) => new BNodeImpl(label)
-        case model.Literal(lexicalForm, model.URI(uri), None) => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
-        case model.Literal(lexicalForm, _, Some(lang)) => new LiteralImpl(lexicalForm, lang)
-      }
-      new StatementImpl(subject, predicate, objectt)
-    }
-    def graph(g: Plantain#Graph): sesame.Graph = {
-      val graph = new LinkedHashModel
-      @annotation.tailrec
-      def loop(triples: Iterator[Plantain#Triple]): Unit = {
-        if (triples.hasNext) {
-          val Triple(s, p, o) = triples.next()
-          graph.add(statement(s, p, o))
-          loop(triples)
-        } else {
-          ()
-        }
-      }
-      loop(g.triples.iterator)
-      graph
-    }
-    ModelUtil.equals(graph(left), graph(right))
-  }
-
+  // as long as Sesame is in scope, let's just rely on it for the complex stuff
+//  import org.openrdf.{ model => sesame }
+//  import org.openrdf.model.impl._
+//  import org.openrdf.model.util.ModelUtil
+//  def statement(s: model.Node, p: model.URI, o: model.Node): sesame.Statement = {
+//    val subject: sesame.Resource = s match {
+//      case model.URI(uri) => new URIImpl(uri.toString)
+//      case model.BNode(label) => new BNodeImpl(label)
+//      case literal @ model.Literal(_, _, _) => throw new IllegalArgumentException(s"$literal was in subject position")
+//    }
+//    val predicate: sesame.URI = p match {
+//      case model.URI(uri) => new URIImpl(uri.toString)
+//    }
+//    val objectt: sesame.Value = o match {
+//      case model.URI(uri) => new URIImpl(uri.toString)
+//      case model.BNode(label) => new BNodeImpl(label)
+//      case model.Literal(lexicalForm, model.URI(uri), None) => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
+//      case model.Literal(lexicalForm, _, Some(lang)) => new LiteralImpl(lexicalForm, lang)
+//    }
+//    new StatementImpl(subject, predicate, objectt)
+//  }
+//  def graph(g: Plantain#Graph): sesame.Graph = {
+//    val graph = new LinkedHashModel
+//    @annotation.tailrec
+//    def loop(triples: Iterator[Plantain#Triple]): Unit = {
+//      if (triples.hasNext) {
+//        val Triple(s, p, o) = triples.next()
+//        graph.add(statement(s, p, o))
+//        loop(triples)
+//      } else {
+//        ()
+//      }
+//    }
+//    loop(g.triples.iterator)
+//    graph
+//  }
+//  ModelUtil.equals(graph(left), graph(right))
+//}
 }

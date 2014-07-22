@@ -3,9 +3,14 @@ package org.w3.banana.plantain
 
 import org.scalatest.{Matchers, WordSpec}
 import org.w3.banana.plantain.GraphEquivalence._
+import org.w3.banana.plantain.model.Node
+
+import scala.collection.immutable.ListMap
+import scala.util.Success
 
 /**
- * Created by hjs on 13/07/2014.
+ * Tests for the isomorphism functions
+ * Created by Henry Story on 13/07/2014.
  */
 class IsomorphismTest extends WordSpec with Matchers {
 
@@ -59,6 +64,8 @@ class IsomorphismTest extends WordSpec with Matchers {
 
   def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i,j) union bnKnowsBN(j,i)
 
+  def owlSameAs(node1: Node,node2: Node) =
+    Graph(Triple(node1,URI("http://www.w3.org/2002/07/owl#sameAs"),node2))
 
 
   "test groundTripleFilter(graph)" when {
@@ -132,7 +139,6 @@ class IsomorphismTest extends WordSpec with Matchers {
 
     "two bnodes with each 2 relations of same type" in {
       val bnGr = bnAlexRel2Graph() union bnAntonioRel2Graph()
-      println("hello !! working on "+bnGr)
       val clz = bnodeClassify(bnGr)
       clz.size should be(1)
       clz.head._2.size should be(2) // 2 bnodes in this classification
@@ -144,82 +150,148 @@ class IsomorphismTest extends WordSpec with Matchers {
 
   "test bnode mapping solutions " when {
       "two graphs with 1 relation and 1 bnode" in {
-        for (l <- bnodeMappingGenerator(bnAlexRel1Graph(1),bnAlexRel1Graph(2))) {
-          println("solution->"+l)
-        }
+        val maps = bnodeMappingGenerator(bnAlexRel1Graph(1),bnAlexRel1Graph(2))
+        maps should equal(Success(ListMap(alex(1)->Set(alex(2)))))
+        val answer = findAnswer(bnAlexRel1Graph(1),bnAlexRel1Graph(2))
+        answer should equal(Success(List(alex(1)->(alex(2)))))
       }
 
     "two graphs with 2 relation and 1 bnode each" in {
-      for (l <- bnodeMappingGenerator(bnAlexRel2Graph(1),bnAlexRel2Graph(2))) {
-        println("solution->"+l)
-      }
+      val maps = bnodeMappingGenerator(bnAlexRel2Graph(1),bnAlexRel2Graph(2))
+      maps should equal(Success(ListMap(alex(1)->Set(alex(2)))))
+      val answer = findAnswer(bnAlexRel2Graph(1),bnAlexRel2Graph(2))
+      answer should equal(Success(List(alex(1)->(alex(2)))))
     }
 
     "two graphs with 3 relations and 1 bnode each " in {
-      for (l <- bnodeMappingGenerator(bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
-        bnAlexRel1Graph(2) union bnAlexRel2Graph(2))) {
-        println("solution->"+l)
-      }
+      val maps = bnodeMappingGenerator(
+        bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
+        bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
+      maps should equal(Success(ListMap(alex(1)->Set(alex(2)))))
+      val answer = findAnswer(
+        bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
+        bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
+      answer should equal(Success(List(alex(1)->(alex(2)))))
     }
 
     "two graphs with 2 relations and 2 bnodes each" in {
-      for (l <- bnodeMappingGenerator(bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
+      for (l <- findPossibleMappings(
+        bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
         bnAlexRel1Graph(2) union bnAntonioRel1Graph(2))) {
-        println("solution->"+l)
+         //with this system of categorisation the categories are very light
+        // and they don't distinguish the literals
+        //also the returned set covers symmetric results - this can also be optimised!
+         l.size should be (4)
       }
+
+      val answer = findAnswer(
+        bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
+        bnAlexRel1Graph(2) union bnAntonioRel1Graph(2)
+      )
+      answer.isSuccess should be (true)
+      answer.get.size should be (2)
+      answer.get should contain (alex(1)->alex(2))
+      answer.get should contain (antonio(1)->antonio(2))
     }
 
     """two graphs with 3 relations each.
       | But one category has 1 solution the other that has two.
       | The category with 1 solutions must be shown first""".stripMargin in {
-      println("last")
-      for (l <- bnodeMappingGenerator(
-        bnAlexRel1Graph(1) union bnAntonioRel1Graph(1) union bnAlexRel2Graph(2) union bnAlexRel1Graph(0) union bnAlexRel2Graph(0),
-        bnAlexRel1Graph(3) union bnAntonioRel1Graph(3) union bnAntonioRel2Graph(4) union bnAlexRel1Graph(5) union bnAlexRel2Graph(5))) {
-        println("solution->"+l)
-      }
+      val g1 = bnAlexRel1Graph(1) union bnAntonioRel1Graph(1) union bnAlexRel2Graph(2)    union bnAlexRel1Graph(0) union bnAlexRel2Graph(0)
+      val g2 = bnAlexRel1Graph(3) union bnAntonioRel1Graph(3) union bnAntonioRel2Graph(4) union bnAlexRel1Graph(5) union bnAlexRel2Graph(5)
+      val answers = findPossibleMappings(g1,g2)
+      val answer= findAnswer(g1,g2)
+      answer.isFailure should be(true)
+
     }
   }
 
   "test bnode mapping" when {
 
-    "1 bnode mapped" in {
-      mapVerify(bnAlexRel1Graph(0), bnAlexRel1Graph(1), Map((alex(0), alex(1)))) should be(Nil)
+    "graphs mapped to themselves" in {
+      val a1g = bnAlexRel1Graph(0)
+      mapVerify(a1g, a1g, Map(alex(0) -> alex(0))) should be(Nil)
 
       mapVerify(bnAntonioRel1Graph(0), bnAntonioRel1Graph(0), Map((antonio(0), antonio(0)))) should be(Nil)
+
+    }
+
+    "1 bnode mapped" in {
+      mapVerify(bnAlexRel1Graph(0), bnAlexRel1Graph(1), Map((alex(0), alex(1)))) should be(Nil)
 
       mapVerify(bnAntonioRel2Graph(0), bnAntonioRel1Graph(1), Map((antonio(0), antonio(1)))) should not be empty
     }
 
     "2 bnodes mapped" in {
-      val r2g1 = bnAlexRel1Graph(0) union bnAntonioRel1Graph(1)
-      val r2g2 = bnAlexRel1Graph(2) union bnAntonioRel1Graph(3)
-      println("r2g="+r2g1)
-      println("r2g2="+r2g2)
+      val r2g1 = bnAlexRel1Graph(0) union bnAntonioRel1Graph(0)
+      val r2g2 = bnAlexRel1Graph(1) union bnAntonioRel1Graph(1)
+
+      mapVerify(r2g1, r2g1, Map(alex(0) -> alex(0), antonio(0) -> antonio(0)))
 
       mapVerify(
         r2g1,
         r2g2,
-        Map(alex(0)->alex(2),antonio(1)->antonio(3))
-      ) should be (Nil)
+        Map(alex(0) -> alex(1), antonio(0) -> antonio(1))
+      ) should be(Nil)
 
-      //some graphs have two equally good mappings
-      println("verify 2")
+      //an incorrect mapping
       val v = mapVerify(
         r2g1,
         r2g2,
-        Map(alex(0)->antonio(3),antonio(1)->alex(2))
+        Map(alex(0) -> antonio(1), antonio(0) -> alex(1))
       )
-      println("v="+v)
       v should not be empty
 
-      //some graphs have two mappings
-      val symgrph01 = symmetricGraph(0,1)
-      val symgrph23 = symmetricGraph(2,3)
-      mapVerify(symgrph01,symgrph23, Map(xbn(0)->xbn(2),xbn(1)->xbn(3))) should be (Nil)
-      mapVerify(symgrph01,symgrph23, Map(xbn(0)->xbn(3),xbn(1)->xbn(2))) should be (Nil)
+      //reverse test
+
+      mapVerify(
+        r2g2,
+        r2g1,
+        Map(alex(1) -> alex(0), antonio(1) -> antonio(0))
+      ) should be(Nil)
+
+      //an incorrect mapping
+      val v2 = mapVerify(
+        r2g2,
+        r2g1,
+        Map(alex(1) -> antonio(0), antonio(1) -> alex(0))
+      )
+      v2 should not be empty
 
     }
 
+    "some symmetric graphs can have more than one mapping - which are thus isomorphic"  in {
+
+      //some graphs have two mappings
+      val symgrph01 = symmetricGraph(0, 1)
+      val symgrph23 = symmetricGraph(2, 3)
+      mapVerify(symgrph01, symgrph23, Map(xbn(0) -> xbn(2), xbn(1) -> xbn(3))) should be(Nil)
+      mapVerify(symgrph01, symgrph23, Map(xbn(0) -> xbn(3), xbn(1) -> xbn(2))) should be(Nil)
+
+      val symgraph01ext = symgrph01 union owlSameAs(xbn(0), xbn(0)) union owlSameAs(xbn(1), xbn(1))
+      val symgraph23ext = symgrph23 union owlSameAs(xbn(2), xbn(2)) union owlSameAs(xbn(3), xbn(3))
+      mapVerify(symgraph01ext, symgraph23ext, Map(xbn(0) -> xbn(2), xbn(1) -> xbn(3))) should be(Nil)
+      mapVerify(symgraph01ext, symgraph23ext, Map(xbn(0) -> xbn(3), xbn(1) -> xbn(2))) should be(Nil)
+
+      val oneThing01 = symgraph01ext union owlSameAs(xbn(0), xbn(1)) union owlSameAs(xbn(1), xbn(0))
+      val oneThing23 = symgraph23ext union owlSameAs(xbn(2), xbn(3)) union owlSameAs(xbn(3), xbn(2))
+      mapVerify(oneThing01, oneThing23, Map(xbn(0) -> xbn(2), xbn(1) -> xbn(3))) should be(Nil)
+      mapVerify(oneThing01, oneThing23, Map(xbn(0) -> xbn(3), xbn(1) -> xbn(2))) should be(Nil)
+    }
+
+    "3 bnodes mapped" in {
+       val knows3bn = bnKnowsBN(0,1) union bnKnowsBN(1,2) union bnKnowsBN(2,0)
+
+       //three different isomorphic mappings
+       mapVerify(knows3bn,knows3bn,Map(xbn(0)->xbn(0),xbn(1)->xbn(1),xbn(2)->xbn(2))) should be(Nil)
+       mapVerify(knows3bn,knows3bn,Map(xbn(0)->xbn(1),xbn(1)->xbn(2),xbn(2)->xbn(0))) should be(Nil)
+       mapVerify(knows3bn,knows3bn,Map(xbn(0)->xbn(2),xbn(1)->xbn(0),xbn(2)->xbn(1))) should be(Nil)
+
+       val asymmetric = knows3bn union Graph(Triple(xbn(0),foaf("name"),Literal("Tim")))
+       mapVerify(asymmetric,asymmetric,Map(xbn(0)->xbn(0),xbn(1)->xbn(1),xbn(2)->xbn(2))) should be(Nil)
+       mapVerify(asymmetric,asymmetric,Map(xbn(0)->xbn(1),xbn(1)->xbn(2),xbn(2)->xbn(0))) should not be empty
+       mapVerify(asymmetric,asymmetric,Map(xbn(0)->xbn(2),xbn(1)->xbn(0),xbn(2)->xbn(1))) should not be empty
+
+    }
   }
 }
