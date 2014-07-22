@@ -219,7 +219,6 @@ object IsomorphismTest extends JasmineTest {
 
     it("1 bnode mapped") {
       expect(mapVerify(bnAlexRel1Graph(0), bnAlexRel1Graph(1), Map((alex(0), alex(1)))) == Nil).toEqual(true)
-
       expect(mapVerify(bnAntonioRel2Graph(0), bnAntonioRel1Graph(1), Map((antonio(0), antonio(1)))).empty).toEqual(false)
     }
 
@@ -244,12 +243,11 @@ object IsomorphismTest extends JasmineTest {
       expect(v.empty).toEqual(false)
 
       //reverse test
-
       expect(mapVerify(
         r2g2,
         r2g1,
         Map(alex(1) -> alex(0), antonio(1) -> antonio(0))
-      ) == Nil).toEqual(false)
+      ) == Nil).toEqual(true)
 
       //an incorrect mapping
       val v2 = mapVerify(
@@ -297,6 +295,7 @@ object IsomorphismTest extends JasmineTest {
   }
 
 }
+
 
 class PointedGraphJasmineTester[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   extends JasmineTest {
@@ -1011,13 +1010,10 @@ abstract class RecordBinderJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], 
 
   import ops._
 
-  println("-- OBJECTS??")
   val objects = new ObjectExamplesJasmine
-  println(" == CREATED")
 
   import objects._
 
-  println(" == IMPORTED")
 
   val city = City("Paris", Set("Panam", "Lutetia"))
   val verifiedAddress = VerifiedAddress("32 Vassar st", city)

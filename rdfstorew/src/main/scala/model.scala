@@ -116,6 +116,8 @@ class RDFStoreGraph(node:js.Dynamic) {
       false
   }
 
+  def dup:RDFStoreGraph = new RDFStoreGraph(graph.dup())
+
   def size:Int = triples.length
 
 }
