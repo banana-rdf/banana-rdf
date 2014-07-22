@@ -145,7 +145,13 @@ class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
     }
   }
 
-  def diff(g1: Sesame#Graph, g2: Sesame#Graph): Sesame#Graph = ???
+  def diff(g1: Sesame#Graph, g2: Sesame#Graph): Sesame#Graph = {
+    val graph = new LinkedHashModel
+    graphToIterable(g1) foreach { triple =>
+      if (!g2.contains(triple)) graph add triple
+    }
+    graph
+  }
 
   // graph isomorphism
 

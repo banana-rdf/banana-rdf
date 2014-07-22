@@ -4,7 +4,7 @@ import org.w3.banana._
 
 class PlantainTurtleTest extends TurtleTestSuite[Plantain]
 
-class PlantainGraphUnionTest extends GraphUnionTest[Plantain]
+class PlantainGraphTest extends GraphTest[Plantain]
 
 class PlantainPointedGraphTest extends PointedGraphTester[Plantain]
 
