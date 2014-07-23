@@ -1061,6 +1061,9 @@ abstract class RecordBinderJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], 
     }
 
     it("serializing and deserializing a VerifiedAddress") {
+      println("\n\n\n\n\nNOW:")
+      println(verifiedAddress.toPG.graph.asInstanceOf[RDFStoreGraph].graph.toNT())
+      println(verifiedAddress.toPG.as[VerifiedAddress])
       expect(verifiedAddress.toPG.as[VerifiedAddress] == Success(verifiedAddress)).toEqual(true)
     }
 
