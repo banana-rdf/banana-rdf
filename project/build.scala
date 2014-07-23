@@ -232,6 +232,7 @@ object BananaRdfBuild extends Build {
     settings =  buildSettings ++  scalaJSSettings ++ Seq(
     //settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
       jsDependencies += ProvidedJS / "rdf_store.js",
+      jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
       resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
       libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1",
       libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0-RC1",

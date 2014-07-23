@@ -1,6 +1,8 @@
 package org.w3.banana.rdfstorew
 
 import org.w3.banana._
+import org.w3.banana.binder._
+import scala.util._
 import scala.scalajs.js
 
 sealed trait JsNodeMatch
@@ -36,6 +38,56 @@ trait RDFStore extends RDF {
 
   // instead of TupleQueryResult so that it's eager instead of lazy
   type Solutions = Nothing
+}
+
+/*
+trait AdditionalBindings {
+
+  implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {
+    import ops._
+    def fromLiteral(literal: Rdf#Literal): Try[js.Date] = {
+      val Literal(lexicalForm, datatype, _) = literal
+      if (datatype == xsd.dateTime) {
+        try {
+          Success(new js.Date(lexicalForm))
+        } catch {
+          case _: IllegalArgumentException => Failure(FailedConversion(s"${literal} is an xsd.datetime but is not an acceptable datetime"))
+        }
+      } else {
+        Failure(FailedConversion(s"${literal} is not an xsd:datetime"))
+      }
+    }
+  }
+
+}
+*/
+
+
+object FromLiteralJS {
+/*
+  implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {
+    import ops._
+    def fromLiteral(literal: Rdf#Literal): Try[js.Date] = {
+      val Literal(lexicalForm, datatype, _) = literal
+      if (datatype == xsd.dateTime) {
+        try {
+          Success(new js.Date(lexicalForm))
+        } catch {
+          case _: IllegalArgumentException => Failure(FailedConversion(s"${literal} is an xsd.datetime but is not an acceptable js Date"))
+        }
+      } else {
+        Failure(FailedConversion(s"${literal} is not an xsd:datetime"))
+      }
+    }
+  }
+
+
+  implicit def JSDateToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+    new ToLiteral[Rdf, js.Date] {
+      import ops._
+      def toLiteral(dateTime: js.Date): Rdf#Literal = Literal(dateTime.toString, xsd.dateTime)
+    }
+*/
 }
 
 object RDFStore extends RDFStoreModule

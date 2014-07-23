@@ -57,7 +57,7 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
       rdfjs(underlying.copy(path = path / segment))
   }
 
-  def relativize(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = ???
+  def relativize(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = throw new Exception("RELATIVIZE NOT IMPLEMENTED")
 
   def newChildUri(uri: RDFStore#URI): RDFStore#URI = {
     val segment = java.util.UUID.randomUUID().toString.replace("-", "")
@@ -74,7 +74,7 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
   override implicit def toConcreteNodeMatch(node: RDFStore#Node): RDFStore#NodeMatch = PlainNode(node)
 
-  override def diff(g1: RDFStore#Graph, g2: RDFStore#Graph): RDFStore#Graph = ???
+  override def diff(g1: RDFStore#Graph, g2: RDFStore#Graph): RDFStore#Graph = throw new Exception("DIFF NOT IMPLEMENTED")
 
   override def fromTriple(triple: RDFStore#Triple): (RDFStore#Node, RDFStore#URI, RDFStore#Node) = (triple.subject, triple.predicate, triple.objectt)
 
@@ -83,7 +83,12 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
   override def graphToIterable(graph: RDFStore#Graph): Iterable[RDFStore#Triple] = graph.triples.asInstanceOf[js.Array[RDFStore#Triple]]
 
 
-  override def foldNode[T](node: RDFStore#Node)(funURI: (RDFStore#URI) => T, funBNode: (RDFStore#BNode) => T, funLiteral: (RDFStore#Literal) => T): T = ???
+  override def foldNode[T](node: RDFStore#Node)(funURI: (RDFStore#URI) => T, funBNode: (RDFStore#BNode) => T, funLiteral: (RDFStore#Literal) => T): T = node.jsNode.interfaceName.asInstanceOf[js.String] match {
+    case "NamedNode" => funURI(node.asInstanceOf[RDFStoreNamedNode])
+    case "BlankNode" => funBNode(node.asInstanceOf[RDFStoreBlankNode])
+    case "Literal"   => funLiteral(node.asInstanceOf[RDFStoreLiteral])
+  }
+
 
   override def makeLang(s: String): RDFStore#Lang = s
 
@@ -105,7 +110,10 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
   }
 
   override def makeTriple(s: RDFStore#Node, p: RDFStore#URI, o: RDFStore#Node): RDFStore#Triple = {
-    new RDFStoreTriple(RDFStoreW.rdf.createTriple(s.jsNode,p.jsNode,o.jsNode))
+    val sNode:js.Any = s.jsNode
+    val pNode:js.Any = p.jsNode
+    val oNode:js.Any = o.jsNode
+    new RDFStoreTriple(RDFStoreW.rdf.createTriple(sNode, pNode, oNode))
   }
 
   override def ANY: RDFStore#NodeAny = JsANY
@@ -121,35 +129,33 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
   override def fromLang(l: RDFStore#Lang): String = l
 
-  override def foldNodeMatch[T](nodeMatch: RDFStore#NodeMatch)(funANY: => T, funNode: (RDFStore#Node) => T): T = ???
+  override def foldNodeMatch[T](nodeMatch: RDFStore#NodeMatch)(funANY: => T, funNode: (RDFStore#Node) => T): T =
+    nodeMatch match {
+      case PlainNode(node) => funNode(node)
+      case _               => funANY
+    }
+
 
   override def isomorphism(left: RDFStore#Graph, right: RDFStore#Graph): Boolean = GraphEquivalence.findAnswer(left,right).isSuccess
 
   override def find(graph: RDFStore#Graph, subject: RDFStore#NodeMatch, predicate: RDFStore#NodeMatch, objectt: RDFStore#NodeMatch): Iterator[RDFStore#Triple] = {
 
-    val subjectNode:RDFStore#Node = subject match {
-      case PlainNode(node) => node
+    val subjectNode:js.Dynamic = subject match {
+      case PlainNode(node) => node.jsNode
       case _               => null
     }
 
-    val predicateNode:RDFStore#Node = predicate match {
-      case PlainNode(node) => node
+    val predicateNode:js.Dynamic = predicate match {
+      case PlainNode(node) => node.jsNode
       case _               => null
     }
 
-    val objectNode:RDFStore#Node = subject match {
-      case PlainNode(node) => node
+    val objectNode:js.Dynamic = objectt match {
+      case PlainNode(node) => node.jsNode
       case _               => null
     }
 
-
-    var toFind:RDFStore#Triple = makeTriple(subjectNode, predicateNode.asInstanceOf[RDFStore#URI], objectNode)
-    var filtered:js.Array[js.Dynamic] = graph.graph.filter({
-      (t:js.Dynamic, g:js.Dynamic) =>
-        val triple = new RDFStoreTriple(t)
-        t.equals(toFind)
-    }).asInstanceOf[js.Array[js.Dynamic]]
-
+    var filtered:js.Array[js.Dynamic] = graph.graph.applyDynamic("match")(subjectNode, predicateNode, objectNode, null).triples.asInstanceOf[js.Array[js.Dynamic]]
     var filteredList:List[RDFStore#Triple] = List[RDFStore#Triple]()
     for(triple <- filtered) {
       filteredList = filteredList.::(new RDFStoreTriple(triple))

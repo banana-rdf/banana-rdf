@@ -6,7 +6,6 @@ import org.w3.banana.diesel._
 import org.w3.banana.binder._
 import scalaz.Scalaz._
 import scala.util._
-import org.joda.time.DateTime
 import scala.collection.immutable.ListMap
 
 
@@ -737,10 +736,9 @@ abstract class DieselGraphExplorationJasmineTest[Rdf <: RDF]()(implicit ops: RDF
     }
 
     it("we must be able to optionally get objects") {
-
       expect((betehess / foaf.age).asOption[Int] == Success(Some(29))).toEqual(true)
 
-      expect((betehess / foaf.age).asOption[String] == Success(None)).toEqual(true)
+      expect((betehess / foaf.age).asOption[String].isFailure).toEqual(true)
 
       expect((betehess / foaf("unknown")).asOption[Int] == Success(None)).toEqual(true)
 
@@ -805,12 +803,14 @@ abstract class CommonBindersJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   extends JasmineTest {
 
   import ops._
+  import org.w3.banana.rdfstorew.FromLiteralJS
 
   describe("common binders") {
 
-    it("serializing and deserialiazing Joda DateTime") {
-      val dateTime = DateTime.now()
-      expect(dateTime.toPG.as[DateTime].get.compareTo(dateTime)).toEqual(0)
+
+    it("serializing and deserialiazing JS DateTime") {
+      val dateTime = new js.Date()
+      expect(dateTime.toPG.as[js.Date].get.getTime() == Success(dateTime).get.getTime()).toEqual(true)
     }
 
     it("serializing and deserialiazing a Boolean") {
