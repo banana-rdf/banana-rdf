@@ -15,7 +15,7 @@ import scala.concurrent.Future
 
 import scala.scalajs.js
 import scala.scalajs.test.JasmineTest
-
+/*
 object IsomorphismTest extends JasmineTest {
 
   import org.w3.banana.rdfstorew.RDFStore._
@@ -1173,9 +1173,9 @@ abstract class UriSyntaxJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) ext
 
 
 object UriSyntaxJasmineTest extends UriSyntaxJasmineTest[RDFStore]
+*/
 
-
-class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf,Turtle]/*, writer: RDFWriter[Rdf, Turtle]*/)
+class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf,Turtle], writer: RDFWriter[Rdf, Turtle])
   extends JasmineTest {
 
   import ops._
@@ -1356,26 +1356,32 @@ class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RD
       expect(referenceGraph isIsomorphicWith graph).toEqual(true)
 
     }
-/*
-        it("write simple graph as TURTLE string") {
-          val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
-          expect(turtleString.isEmpty).toEqual(false)
-          val graph = reader.read(turtleString, rdfCore).get
-          println(referenceGraph)
-          println("***")
-          println(graph)
-          expect(referenceGraph isIsomorphicWith graph).toEqual(true)
-        }
 
-        it("works with relative uris") {
-          val bar = for {
-            turtleString <- writer.asString(referenceGraph, rdfCore)
-            computedFooGraph <- reader.read(turtleString, foo)
-          } yield computedFooGraph
-          val g: Rdf#Graph = bar.get
-          expect(fooGraph isIsomorphicWith g).toEqual(true)
-        }
-    */
+    it("write simple graph as TURTLE string") {
+      val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
+      expect(turtleString.isEmpty).toEqual(false)
+
+      jasmine.Clock.useMock()
+      val g:Array[Rdf#Graph] = asyncTest[Rdf](JSExecutionContext.runNow, turtleString, rdfCore)
+      jasmine.Clock.tick(10)
+      val graph = g(0)
+      expect(referenceGraph isIsomorphicWith graph).toEqual(true)
+    }
+
+    it("works with relative uris") {
+      val turtleString = writer.asString(referenceGraph, rdfCore).get
+      jasmine.Clock.useMock()
+      val g:Array[Rdf#Graph] = asyncTest[Rdf](JSExecutionContext.runNow, turtleString, foo)
+      jasmine.Clock.tick(10)
+      val graph = g(0)
+
+      println(fooGraph.asInstanceOf[RDFStoreGraph].graph.toNT())
+      println("***")
+      println(graph.asInstanceOf[RDFStoreGraph].graph.toNT())
+
+      expect(fooGraph isIsomorphicWith graph).toEqual(true)
+    }
+
   }
 }
 

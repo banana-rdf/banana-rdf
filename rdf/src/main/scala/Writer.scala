@@ -11,12 +11,8 @@ trait Writer[-O, +T] {
 
   def syntax: Syntax[T]
 
-  def write(obj: O, outputstream: OutputStream, base: String): Try[Unit]
+  def write(obj: O, base: String): Try[String]
 
-  def asString(obj: O, base: String): Try[String] = Try {
-    val baos = new ByteArrayOutputStream
-    write(obj, baos, base)
-    new String(baos.toByteArray(), "UTF-8")
-  }
+  def asString(obj: O, base: String): Try[String] = write(obj, base)
 
 }

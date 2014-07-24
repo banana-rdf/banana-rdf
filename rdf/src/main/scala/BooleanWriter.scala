@@ -7,8 +7,8 @@ trait BooleanWriter[T] extends Writer[Boolean, T] {
 
   def format(bool: Boolean): String
 
-  def write(bool: Boolean, os: OutputStream, base: String): Try[Unit] = Try {
-    os.write(format(bool).getBytes("UTF-8"))
+  def write(bool: Boolean, base: String): Try[String] = Try {
+    format(bool)
   }
 
 }

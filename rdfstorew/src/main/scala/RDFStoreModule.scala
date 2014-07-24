@@ -6,8 +6,8 @@ trait RDFStoreModule
   extends RDFModule
   with RDFOpsModule
   with RecordBinderModule
-  with TurtleReaderModule {
-  //with TurtleWriterModule {
+  with TurtleReaderModule
+  with TurtleWriterModule {
 
   type Rdf = RDFStore
 
@@ -17,6 +17,6 @@ trait RDFStoreModule
 
   implicit val TurtleReader: RDFReader[RDFStore, Turtle] = new RDFStoreTurtleReader
 
-  //  implicit val TurtleWriter: RDFWriter[Plantain, Turtle] = PlantainTurtleWriter
+  implicit val TurtleWriter: RDFWriter[RDFStore, Turtle] = RDFStoreTurtleWriter
 
 }
