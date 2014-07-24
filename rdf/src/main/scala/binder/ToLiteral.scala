@@ -27,7 +27,7 @@ object ToLiteral {
   implicit def IntToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
     new ToLiteral[Rdf, Int] {
       import ops._
-      def toLiteral(i: Int): Rdf#Literal = Literal(i.toString, xsd.int)
+      def toLiteral(i: Int): Rdf#Literal = Literal(i.toString, xsd.integer)
     }
 
   import java.math.BigInteger

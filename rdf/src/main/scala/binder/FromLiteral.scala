@@ -44,7 +44,7 @@ object FromLiteral {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[Int] = {
       val Literal(lexicalForm, datatype, _) = literal
-      if (datatype == xsd.int) {
+      if (datatype == xsd.integer) {
         try {
           Success(lexicalForm.toInt)
         } catch {

@@ -1,6 +1,6 @@
 package org.w3.banana.ldpatch
 
-import org.w3.banana.{ Delete => _, _ }
+import org.w3.banana.{ Delete => _, Var => _, Path => _, _ }
 import org.scalatest.{ Filter => _, _ }
 import java.io._
 import scala.util.{ Try, Success, Failure }

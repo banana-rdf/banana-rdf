@@ -59,22 +59,6 @@ trait Semantics[Rdf <: RDF] {
       State(graph union Graph(triples), varmap)
     }
 
-    def foo(node: Rdf#Node, graph: Rdf#Graph): String = {
-      val s = ops.foldNode(node)(
-        uri => uri.toString,
-        bnode => {
-           ops.getObjects(graph, bnode, rdf.first).to[List] match {
-             case Nil => s"[$bnode]"
-             case l :: Nil => s"[$bnode/rdf:first = $l]"
-             case a :: b :: _ => s"[$bnode/malformed rdf:first = $a $b]"
-           }
-        },
-        literal => literal.toString
-      )
-      s
-//      println(s">> $s")
-    }
-
     def UpdateList(updateList: m.UpdateList[Rdf], state: State): State = {
       val State(graph, varmap) = state
 
@@ -90,58 +74,60 @@ trait Semantics[Rdf <: RDF] {
 
       val groundS = VarOrConcrete(s, varmap)
 
-      @annotation.tailrec
-      def loop(s: Rdf#Node, p: Rdf#URI, cursor: Rdf#Node, acc: List[Rdf#Triple], steps: Option[Int]): (List[Rdf#Triple], Rdf#Triple) =
-        if (steps.exists(_ <= 0) || cursor == rdf.nil) {
-          println("[loop] stopped at " + foo(cursor, graph))
-          (acc, Triple(s, p, cursor))
-        } else {
-          ops.getObjects(graph, cursor, rdf.rest).to[List] match {
-            case Nil         => sys.error(s"[UpdateList] out of rdf:list")
-            case next :: Nil =>
-              val elem = ops.getObjects(graph, cursor, rdf.first).headOption.getOrElse(sys.error("[UpdateList] no rdf:first"))
-              println("[loop] currently at " + foo(cursor, graph))
-              loop(cursor, rdf.rest, next, Triple(s, p, cursor) :: Triple(cursor, rdf.first, elem) :: acc, steps.map(_ - 1))
-            case _           => sys.error("[UpdateList] malformed list: more than one element after bnode rdf:rest")
-          }
-
-        }
-
-      @annotation.tailrec
-      def makeList(s: Rdf#Node, p: Rdf#URI, o: Rdf#Node, nodes: Seq[Rdf#Node], acc: List[Rdf#Triple]): List[Rdf#Triple] = {
-
-        println(s"## $s $p $o")
-        nodes match {
-          case Seq() =>
-            Triple(s, p, o) :: acc
-          case node +: restNodes =>
-            val bnode = BNode()
-            makeList(bnode, rdf.rest, o, restNodes, Triple(s, p, bnode) :: Triple(bnode, rdf.first, node) :: acc)
-        }
-      }
-
       val (left, right) = slice match {
         case m.Range(leftIndex, rightIndex) => (Some(leftIndex), Some(rightIndex))
         case m.EverythingAfter(index)       => (Some(index), None)
         case m.End                          => (None, None)
       }
-      println("@@ moving for Left")
-      val (_, Triple(sLeft, pLeft, oLeft)) = loop(groundS, p, headList, List.empty, left)
 
-      println("sLeft = "+foo(sLeft, graph))
-      println("oLeft = "+foo(oLeft, graph))
+      @annotation.tailrec
+      def step1(s: Rdf#Node, p: Rdf#URI, cursor: Rdf#Node, steps: Option[Int]): (Rdf#Node, Rdf#URI, Rdf#Node) =
+        if (steps.exists(_ <= 0) || cursor == rdf.nil) {
+          (s, p, cursor)
+        } else {
+          ops.getObjects(graph, cursor, rdf.rest).to[List] match {
+            case Nil         => sys.error(s"[UpdateList/step1] out of rdf:list")
+            case next :: Nil =>
+              val elem = ops.getObjects(graph, cursor, rdf.first).headOption.getOrElse(sys.error("[UpdateList/step1] no rdf:first"))
+              step1(cursor, rdf.rest, next, steps.map(_ - 1))
+            case _           => sys.error("[UpdateList/step1] malformed list: more than one element after bnode rdf:rest")
+          }
 
-      println("@@ moving for Right")
-      val (betweenTriples, Triple(sRight, pRight, oRight)) = loop(sLeft, pLeft, oLeft, List.empty, right.flatMap(r => left.map(l => r - l)))
-      println("sRight = "+foo(sRight, graph))
-      println("oRight = "+foo(oRight, graph))
+        }
 
-      println("betweenTriples = "+betweenTriples)
+      val (sLeft, pLeft, oLeft) = step1(groundS, p, headList, left)
 
-      val listTriples = makeList(sLeft, pLeft, sRight, groundList, List.empty)
-      println("listTriples = " + listTriples)
+      @annotation.tailrec
+      def step2(cursor: Rdf#Node, triplesToRemove: List[Rdf#Triple], steps: Option[Int]): (Rdf#Node, List[Rdf#Triple]) =
+        if (steps.exists(_ <= 0) || cursor == rdf.nil) {
+          (cursor, triplesToRemove)
+        } else {
+          ops.getObjects(graph, cursor, rdf.rest).to[List] match {
+            case Nil         => sys.error(s"[UpdateList/step2] out of rdf:list")
+            case next :: Nil =>
+              val elem = ops.getObjects(graph, cursor, rdf.first).headOption.getOrElse(sys.error("[UpdateList/step2] no rdf:first"))
+              step2(next, Triple(cursor, rdf.first, elem) :: Triple(cursor, rdf.rest, next) :: triplesToRemove, steps.map(_ - 1))
+            case _           => sys.error("[UpdateList/step2] malformed list: more than one element after bnode rdf:rest")
+          }
+        }
 
-      State(graph.diff(Graph(betweenTriples)).union(Graph(listTriples)), varmap)
+      val (headRestList, triplesToRemove) = step2(oLeft, List(Triple(sLeft, pLeft, oLeft)), right.flatMap(r => left.map(l => r - l)))
+
+      @annotation.tailrec
+      def step3(s: Rdf#Node, p: Rdf#URI, headRestList: Rdf#Node, triplesToAdd: List[Rdf#Triple], nodes: Seq[Rdf#Node]): List[Rdf#Triple] = nodes match {
+
+        case Seq() =>
+          Triple(s, p, headRestList) :: triplesToAdd
+            
+        case node +: restNodes =>
+          val bnode = BNode()
+          step3(bnode, rdf.rest, headRestList, Triple(s, p, bnode) :: Triple(bnode, rdf.first, node) :: triplesToAdd, restNodes)
+
+      }
+
+      val triplesToAdd = step3(sLeft, pLeft, headRestList, List.empty, groundList)
+
+      State(graph.diff(Graph(triplesToRemove)).union(Graph(triplesToAdd)), varmap)
 
     }
 
