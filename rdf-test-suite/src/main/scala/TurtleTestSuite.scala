@@ -5,7 +5,7 @@ import org.w3.banana.diesel._
 import org.scalatest._
 import java.io._
 import org.scalatest.EitherValues._
-
+/*
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle])
     extends WordSpec with Matchers {
 
@@ -73,3 +73,4 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
   }
 
 }
+*/

@@ -30,7 +30,7 @@ import scala.util.{Success, Failure, Try}
  */
 object GraphEquivalence {
 
-  import RDFStoreOps._
+  import RDFStore.Ops._
 
   /**
    * filter a graphs into two subgraphs the first one containing no blank nodes
@@ -40,8 +40,8 @@ object GraphEquivalence {
    * @return a pair of Ground graph and non ground graph
    */
   def groundTripleFilter(graph: RDFStoreGraph): (RDFStoreGraph, RDFStoreGraph) = {
-    var ground = RDFStoreOps.emptyGraph
-    var nonGround = RDFStoreOps.emptyGraph
+    var ground = emptyGraph
+    var nonGround = emptyGraph
     for (triple <- graph.triples) {
       if(triple.subject.isInstanceOf[RDFStoreBlankNode] || triple.objectt.isInstanceOf[RDFStoreBlankNode]) {
         nonGround = nonGround.add(triple)
@@ -148,7 +148,7 @@ object GraphEquivalence {
         val obj:RDFStoreRDFNode = triple.objectt
         var mappedTriple: RDFStoreTriple = null
         try {
-          mappedTriple = RDFStoreOps.makeTriple(map(sub), rel, map(obj))
+          mappedTriple = makeTriple(map(sub), rel, map(obj))
         } catch {
           case e: java.util.NoSuchElementException => {
             throw MappingException(s"could not find map for $sub or $obj")

@@ -34,9 +34,6 @@ class RDFStoreW(store: js.Dynamic) {
     val promise = Promise[Boolean]
     val cb =  {
       (success:Boolean, res:Any) =>
-        println("BACK FROM LOAD")
-        println(success)
-        println(res)
         if(success) {
           promise.success(true)
         } else {
@@ -53,6 +50,19 @@ class RDFStoreW(store: js.Dynamic) {
     promise.future
   }
 
+  def toGraph(base:String):Future[RDFStoreGraph] = {
+    val promise = Promise[RDFStoreGraph]
+    val cb = {
+      (success:Boolean, res:js.Dynamic) =>
+        if(success) {
+          promise.success(new RDFStoreGraph(res))
+        } else {
+          promise.failure(new Exception("Error exporting data as a RDF graph"))
+        }
+    }
+    store.applyDynamic("graph")(base, cb)
+    promise.future
+  }
 }
 
 object RDFStoreW {

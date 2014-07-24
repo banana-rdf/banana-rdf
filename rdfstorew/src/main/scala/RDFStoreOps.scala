@@ -23,13 +23,13 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
   def akka(uri:RDFStore#URI) : Uri = Uri(uri.valueOf)
 
   def rdfjs(uri:Uri) : RDFStore#URI = {
-    RDFStoreOps.makeUri(uri.toString)
+    (new RDFStoreOps()).makeUri(uri.toString)
   }
 
   def getString(uri: RDFStore#URI): String = akka(uri).toString
 
   def withoutFragment(uri: RDFStore#URI): RDFStore#URI =  {
-    RDFStoreOps.makeUri(uri.valueOf.split("#")(0))
+    (new RDFStoreOps()).makeUri(uri.valueOf.split("#")(0))
   }
 
   def withFragment(uri: RDFStore#URI, frag: String): RDFStore#URI = {
@@ -68,7 +68,7 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
 
 }
 
-object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
+class RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
   override def emptyGraph: RDFStore#Graph = new RDFStoreGraph(RDFStoreW.rdf.createGraph())
 
@@ -80,7 +80,7 @@ object RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
   override def makeBNode(): RDFStore#BNode = new RDFStoreBlankNode(RDFStoreW.rdf.createBlankNode())
 
-  override def graphToIterable(graph: RDFStore#Graph): Iterable[RDFStore#Triple] = graph.triples.asInstanceOf[js.Array[RDFStore#Triple]]
+  override def graphToIterable(graph: RDFStore#Graph): Iterable[RDFStore#Triple] = graph.triples
 
 
   override def foldNode[T](node: RDFStore#Node)(funURI: (RDFStore#URI) => T, funBNode: (RDFStore#BNode) => T, funLiteral: (RDFStore#Literal) => T): T = node.jsNode.interfaceName.asInstanceOf[js.String] match {
