@@ -1139,10 +1139,35 @@ class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
   describe("RDFSotre Banana Interface") {
 
     it("getNamedGraph should retrieve the graph added with appendToGraph") {
-      //jasmine.Clock.useMock()
+      jasmine.Clock.useMock()
 
       val u1 = URI("http://example.com/graph")
       val u2 = URI("http://example.com/graph2")
+
+      graphStore.removeGraph(u1)
+      jasmine.Clock.tick(10)
+      graphStore.removeGraph(u2)
+      jasmine.Clock.tick(10)
+      graphStore.appendToGraph(u1, graph)
+      jasmine.Clock.tick(10)
+      val rGraph = graphStore.getGraph(u1)
+      jasmine.Clock.tick(10)
+      graphStore.appendToGraph(u2, graph2)
+      jasmine.Clock.tick(10)
+      val rGraph2 = graphStore.getGraph(u2)
+      jasmine.Clock.tick(10)
+
+      rGraph.onSuccess {
+        case rg =>
+          expect(rg isIsomorphicWith graph).toEqual(true)
+          rGraph2.onSuccess {
+            case rg2 =>
+              expect(rg2 isIsomorphicWith graph2).toEqual(true)
+          }
+      }
+
+
+
       val r = for {
         _ <- graphStore.removeGraph(u1)
         _ <- graphStore.removeGraph(u2)
@@ -1151,11 +1176,44 @@ class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
         rGraph <- graphStore.getGraph(u1)
         rGraph2 <- graphStore.getGraph(u2)
       } yield {
-        expect(rGraph isIsomorphicWith graph).toEqual(true)
+        expect(rGraph isIsomorphicWith graph).toEqual(false)
         expect(rGraph2 isIsomorphicWith graph2).toEqual(true)
       }
-      //jasmine.Clock.tick(10)
-      r.getOrFail()
+
+      jasmine.Clock.tick(10)
+      r.onSuccess {
+        case res =>
+          println("RESULT!!!")
+      }
+
+    }
+
+    it("patchGraph should delete and insert triples as expected") {
+      var graphStore = GraphStore[Rdf](store)
+      jasmine.Clock.useMock()
+      val u = URI("http://example.com/graph")
+
+      graphStore.removeGraph(u)
+      jasmine.Clock.tick(10)
+      graphStore.appendToGraph(u, foo)
+      jasmine.Clock.tick(10)
+      graphStore.patchGraph(u,
+        (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable,
+        (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+      jasmine.Clock.tick(10)
+      val rGraph = graphStore.getGraph(u)
+      jasmine.Clock.tick(10)
+      val expected = (
+        URI("http://example.com/foo")
+          -- rdf("bar") ->- "bar"
+          -- rdf("baz") ->- "baz"
+        ).graph
+
+      rGraph.onSuccess {
+        case g =>
+          expect(g isIsomorphicWith expected).toEqual(true)
+      }
+
     }
 
   }

@@ -195,11 +195,8 @@ object BananaRdfBuild extends Build {
   lazy val rdfTestSuiteJS = Project(
     id = "banana-scalajs-rdf-test-suite",
     base = file("rdf-test-suite.js"),
-    settings = buildSettings ++ Seq(
+    settings = buildSettings ++  scalaJSSettings ++ Seq(
       libraryDependencies += scalatest,
-//      libraryDependencies += akka,
-//      libraryDependencies += jodaTime,
-//      libraryDependencies += jodaConvert,
       libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
     )
   ) dependsOn (rdf)

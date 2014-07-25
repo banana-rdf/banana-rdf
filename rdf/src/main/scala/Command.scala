@@ -86,7 +86,6 @@ object Command {
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Remove(uri, tripleMatches, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
   def delete[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
-    println("DELETE COMMAND")
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Delete(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
   }
 
@@ -128,7 +127,6 @@ object Command {
 
   implicit def ldcFunctor[Rdf <: RDF]: Functor[({ type l[+x] = Command[Rdf, x] })#l] =
     new Functor[({ type l[+ x] = Command[Rdf, x] })#l] {
-      println("lcdFunctor")
       def map[A, B](command: Command[Rdf, A])(f: A => B): Command[Rdf, B] =
         command match {
           case Create(uri, a) => Create(uri, f(a))

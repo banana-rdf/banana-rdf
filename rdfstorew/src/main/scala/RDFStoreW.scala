@@ -153,21 +153,6 @@ class RDFStoreW(store: js.Dynamic) extends RDFStoreInterface[RDFStore] {
           cleaned
         }
         case Delete(uri, a) => {
-          println("DELETING ")
-          println(uri)
-          /*
-          val deleted:Future[A] = clean(uri.valueOf) flatMap {
-            r => {
-              println("DELETED??")
-              println(r)
-              println("EXECUTING")
-              println(a)
-              //execute(a)
-            }
-          }
-
-          deleted
-          */
           clean(uri.valueOf)
         }
         case Get(uri, k) => {
