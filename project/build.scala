@@ -1,10 +1,12 @@
 import bintray.Plugin._
 import bintray.Keys._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
+import sbt.ExclusionRule
 import sbt.Keys._
 import sbt._
 
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
+import scala.Some
 import ScalaJSKeys._
 
 object BuildSettings {
@@ -190,6 +192,18 @@ object BananaRdfBuild extends Build {
     )
   ) dependsOn (rdf)
 
+  lazy val rdfTestSuiteJS = Project(
+    id = "banana-scalajs-rdf-test-suite",
+    base = file("rdf-test-suite.js"),
+    settings = buildSettings ++ Seq(
+      libraryDependencies += scalatest,
+//      libraryDependencies += akka,
+//      libraryDependencies += jodaTime,
+//      libraryDependencies += jodaConvert,
+      libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
+    )
+  ) dependsOn (rdf)
+
   lazy val jena = Project(
     id = "banana-jena",
     base = file("jena"),
@@ -236,10 +250,9 @@ object BananaRdfBuild extends Build {
       resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
       libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1",
       libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6",
-      libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
       skip in packageJSDependencies := false
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuiteJS % "test")
 
   lazy val examples = Project(
     id = "examples",
