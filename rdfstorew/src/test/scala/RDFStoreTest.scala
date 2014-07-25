@@ -1325,7 +1325,7 @@ class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RD
     """.stripMargin
 
 
-  def asyncTest[Rdf <: RDF](implicit executor: ExecutionContext,text:String,base:String):Array[Rdf#Graph] = {
+  def asyncTest[Rdf <: RDF](text:String,base:String)(implicit executor: ExecutionContext):Array[Rdf#Graph] = {
     val graphs:Array[Any] = new Array[Any](1)
 
     reader.read(text, base). map {
@@ -1337,11 +1337,13 @@ class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RD
     graphs.asInstanceOf[Array[Rdf#Graph]]
   }
 
+  import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+
   describe("TURTLE parser") {
 
     it("read TURTLE version of timbl's card") {
       jasmine.Clock.useMock()
-      val g:Array[Rdf#Graph] = asyncTest[Rdf](JSExecutionContext.runNow, card_ttl, "http://test.com/card.ttl")
+      val g:Array[Rdf#Graph] = asyncTest[Rdf](card_ttl, "http://test.com/card.ttl")
       jasmine.Clock.tick(10)
       expect(g(0).toIterable.size == 77).toEqual(true)
     }
@@ -1352,7 +1354,7 @@ class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RD
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
                          """
-      val g:Array[Rdf#Graph] = asyncTest[Rdf](JSExecutionContext.runNow, turtleString, rdfCore)
+      val g:Array[Rdf#Graph] = asyncTest[Rdf](turtleString, rdfCore)
       jasmine.Clock.tick(10)
       val graph = g(0)
       expect(referenceGraph isIsomorphicWith graph).toEqual(true)
@@ -1364,7 +1366,7 @@ class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RD
       expect(turtleString.isEmpty).toEqual(false)
 
       jasmine.Clock.useMock()
-      val g:Array[Rdf#Graph] = asyncTest[Rdf](JSExecutionContext.runNow, turtleString, rdfCore)
+      val g:Array[Rdf#Graph] = asyncTest[Rdf](turtleString, rdfCore)
       jasmine.Clock.tick(10)
       val graph = g(0)
       expect(referenceGraph isIsomorphicWith graph).toEqual(true)
@@ -1373,7 +1375,7 @@ class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RD
     it("works with relative uris") {
       val turtleString = writer.asString(referenceGraph, rdfCore).get
       jasmine.Clock.useMock()
-      val g:Array[Rdf#Graph] = asyncTest[Rdf](JSExecutionContext.runNow, turtleString, foo)
+      val g:Array[Rdf#Graph] = asyncTest[Rdf](turtleString, foo)
       jasmine.Clock.tick(10)
       val graph = g(0)
 
