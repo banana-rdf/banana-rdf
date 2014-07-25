@@ -34,10 +34,10 @@ trait RDFStore extends RDF {
   type AskQuery = String
   type UpdateQuery = String
 
-  type Solution = Nothing
+  type Solution = Any
 
   // instead of TupleQueryResult so that it's eager instead of lazy
-  type Solutions = Nothing
+  type Solutions = Array[Any]
 }
 
 /*

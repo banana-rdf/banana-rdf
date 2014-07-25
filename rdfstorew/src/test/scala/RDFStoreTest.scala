@@ -12,10 +12,12 @@ import scala.collection.immutable.ListMap
 import java.io._
 import org.scalatest.EitherValues._
 import scala.concurrent.Future
+import org.w3.banana.{RDFStore => RDFStoreInterface}
+
 
 import scala.scalajs.js
 import scala.scalajs.test.JasmineTest
-/*
+
 object IsomorphismTest extends JasmineTest {
 
   import org.w3.banana.rdfstorew.RDFStore._
@@ -1173,7 +1175,7 @@ abstract class UriSyntaxJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) ext
 
 
 object UriSyntaxJasmineTest extends UriSyntaxJasmineTest[RDFStore]
-*/
+
 
 class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf,Turtle], writer: RDFWriter[Rdf, Turtle])
   extends JasmineTest {
@@ -1386,3 +1388,66 @@ class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RD
 }
 
 object TurtleTestJasmineSuite extends TurtleTestJasmineSuite[RDFStore]
+
+
+class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
+  implicit ops: RDFOps[Rdf])
+  extends JasmineTest {
+
+  import ops._
+
+  import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+
+  val foaf = FOAFPrefix[Rdf]
+
+  val graphStore = GraphStore[Rdf](store)
+
+  val graph: Rdf#Graph = (
+    bnode("betehess")
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.title ->- "Mr"
+    ).graph
+
+  val graph2: Rdf#Graph = (
+    bnode("betehess")
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.knows ->- (
+      URI("http://bblfish.net/#hjs")
+        -- foaf.name ->- "Henry Story"
+        -- foaf.currentProject ->- URI("http://webid.info/")
+      )
+    ).graph
+
+  val foo: Rdf#Graph = (
+    URI("http://example.com/foo")
+      -- rdf("foo") ->- "foo"
+      -- rdf("bar") ->- "bar"
+    ).graph
+
+  describe("RDFSotre Banana Interface") {
+
+    it("getNamedGraph should retrieve the graph added with appendToGraph") {
+      //jasmine.Clock.useMock()
+
+      val u1 = URI("http://example.com/graph")
+      val u2 = URI("http://example.com/graph2")
+      val r = for {
+        _ <- graphStore.removeGraph(u1)
+        _ <- graphStore.removeGraph(u2)
+        _ <- graphStore.appendToGraph(u1, graph)
+        _ <- graphStore.appendToGraph(u2, graph2)
+        rGraph <- graphStore.getGraph(u1)
+        rGraph2 <- graphStore.getGraph(u2)
+      } yield {
+        expect(rGraph isIsomorphicWith graph).toEqual(true)
+        expect(rGraph2 isIsomorphicWith graph2).toEqual(true)
+      }
+      //jasmine.Clock.tick(10)
+      r.getOrFail()
+    }
+
+  }
+
+}
+
+object GraphStoreJasmineTest extends GraphStoreJasmineTest[RDFStore](RDFStoreW(Map()))

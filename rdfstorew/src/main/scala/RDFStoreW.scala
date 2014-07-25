@@ -4,18 +4,22 @@ import scala.concurrent._
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.global
+import org.w3.banana.{RDFStore => RDFStoreInterface}
+import org.w3.banana._
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 import scala.language.postfixOps
+import scala.util.Try
+import scalaz.Free
 
-class RDFStoreW(store: js.Dynamic) {
+class RDFStoreW(store: js.Dynamic) extends RDFStoreInterface[RDFStore] {
 
   def RDF_API = store.selectDynamic("rdf").selectDynamic("api")
 
   def RDF = store.selectDynamic("rdf")
 
-  def execute(sparql: String) : Future[Any] = {
+  def executeQuery(sparql: String) : Future[Any] = {
     val promise = Promise[Any]
 
     store.applyDynamic("execute")(sparql, {(success:Boolean, res:js.Array[js.Object]) =>
@@ -50,6 +54,74 @@ class RDFStoreW(store: js.Dynamic) {
     promise.future
   }
 
+  def clean(graph:String=null) : Future[Boolean] = {
+    val promise = Promise[Boolean]
+    val cb =  {
+      (success:Boolean, res:Any) =>
+        if(success) {
+          promise.success(true)
+        } else {
+          promise.failure(new Exception("Error cleaning graph from the store store: "+res))
+        }
+    }
+
+    if(graph == null){
+      store.applyDynamic("clear")(cb)
+    } else {
+      store.applyDynamic("clear")(graph,cb)
+    }
+
+    promise.future
+  }
+
+  def insert(triples:RDFStoreGraph, graph:String=null) : Future[Boolean] = {
+    val promise = Promise[Boolean]
+    val cb =  {
+      (success:Boolean, res:Any) =>
+        if(success) {
+          promise.success(true)
+        } else {
+          promise.failure(new Exception("Error inserting triples into the store: "+res))
+        }
+    }
+
+    if(graph == null){
+      store.applyDynamic("insert")(triples.graph, cb)
+    } else {
+      store.applyDynamic("insert")(triples.graph, graph, cb)
+    }
+
+    promise.future
+  }
+
+  def delete(triples:RDFStoreGraph, graph:String=null) : Future[Boolean] = {
+    val promise = Promise[Boolean]
+    val cb =  {
+      (success:Boolean, res:Any) =>
+        if(success) {
+          promise.success(true)
+        } else {
+          promise.failure(new Exception("Error deleting triples into the store: "+res))
+        }
+    }
+
+    if(graph == null){
+      store.applyDynamic("delete")(triples.graph, cb)
+    } else {
+      store.applyDynamic("delete")(triples.graph, graph, cb)
+    }
+
+    promise.future
+  }
+
+  def bindQuery(query:String, bindings:Map[String,RDFStoreRDFNode]):String = {
+    var tmp = query
+    for((name, node) <- bindings) {
+      tmp = tmp.replaceAll("?"+name,node.jsNode.toNT().asInstanceOf[js.String])
+    }
+    tmp
+  }
+
   def toGraph(base:String):Future[RDFStoreGraph] = {
     val promise = Promise[RDFStoreGraph]
     val cb = {
@@ -63,6 +135,97 @@ class RDFStoreW(store: js.Dynamic) {
     store.applyDynamic("graph")(base, cb)
     promise.future
   }
+
+  override def shutdown(): Unit = Unit
+
+  import org.w3.banana.rdfstorew.RDFStore.Ops._
+
+  override def execute[A](script: Free[({type l[+x] = Command[RDFStore, x]})#l, A]): Future[A] = {
+    val res = script.resume fold (
+      {
+        case Create(uri, a) => {
+          val cleaned:Future[A] = clean(uri.valueOf)flatMap   {
+            _ =>
+              load("text/n3","",uri.valueOf)
+          } flatMap  {
+            _ => execute(a)
+          }
+          cleaned
+        }
+        case Delete(uri, a) => {
+          val deleted:Future[A] = clean(uri.valueOf) flatMap {
+            _ => execute(a)
+          }
+
+          deleted
+        }
+        case Get(uri, k) => {
+          val getted:Future[A] = toGraph(uri.valueOf) flatMap {
+            graph => execute(k(graph))
+          }
+
+          getted
+        }
+        case Append(uri, triples, a) => {
+          val g = emptyGraph
+          for(triple <- triples) g.add(triple)
+          val inserted:Future[A] = insert(g, uri.valueOf) flatMap {
+            _ => execute(a)
+          }
+          inserted
+        }
+        case Remove(uri, tripleMatches, a) => {
+          val g = emptyGraph
+          for(triple <- tripleMatches) {
+            triple match {
+              case (PlainNode(s), PlainNode(p), PlainNode(o)) => {
+                val triple = makeTriple(s,p.asInstanceOf[RDFStoreNamedNode],o)
+                g.add(triple)
+              }
+              case _ => // ignore
+            }
+          }
+          val deleted:Future[A] = delete(g,uri.valueOf) flatMap {
+            _ => execute(a)
+          }
+
+          deleted
+        }
+        case Select(query, bindings, k) => {
+          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
+            solutions => execute(k(solutions.asInstanceOf[RDFStore#Solutions]))
+          }
+
+          executed
+        }
+        case Construct(query, bindings, k) => {
+          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
+            g => execute(k(new RDFStoreGraph(g.asInstanceOf[js.Dynamic])))
+          }
+
+          executed
+        }
+        case Ask(query, bindings, k) => {
+          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
+            b => execute(k(b.asInstanceOf[Boolean]))
+          }
+
+          executed
+        }
+        case org.w3.banana.Update(query, bindings, k) => {
+          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
+            b => execute(k)
+          }
+
+          executed
+        }
+      },
+      a => a
+      )
+
+    res.asInstanceOf[Future[A]]
+  }
+
 }
 
 object RDFStoreW {

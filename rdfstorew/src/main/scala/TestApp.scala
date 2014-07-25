@@ -4,7 +4,9 @@ import scala.scalajs.js.{RegExp, Dynamic, JSApp}
 import scala.scalajs.js
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
+
 import org.w3.banana._
+import org.w3.banana.{RDFStore => RDFStoreInterface}
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.w3.banana.binder._
@@ -112,14 +114,54 @@ class ObjectExamplesJasmine[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinde
 
 }
 
-object TestApp extends JSApp with JSUtils {
+class TestApp[Rdf <: RDF](store: RDFStoreInterface[Rdf])(implicit  ops:RDFOps[Rdf]) extends JSApp with JSUtils {
 
-  import org.w3.banana.rdfstorew.RDFStore._
-  import Ops._
+  import ops._
 
+  val foaf = FOAFPrefix[Rdf]
 
+  val graphStore = GraphStore[Rdf](store)
+
+  val graph: Rdf#Graph = (
+    bnode("betehess")
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.title ->- "Mr"
+    ).graph
+
+  val graph2: Rdf#Graph = (
+    bnode("betehess")
+      -- foaf.name ->- "Alexandre".lang("fr")
+      -- foaf.knows ->- (
+      URI("http://bblfish.net/#hjs")
+        -- foaf.name ->- "Henry Story"
+        -- foaf.currentProject ->- URI("http://webid.info/")
+      )
+    ).graph
+
+  val foo: Rdf#Graph = (
+    URI("http://example.com/foo")
+      -- rdf("foo") ->- "foo"
+      -- rdf("bar") ->- "bar"
+    ).graph
 
   def main(): Unit = {
+
+
+    val u1 = URI("http://example.com/graph")
+    val u2 = URI("http://example.com/graph2")
+    val r = for {
+      _ <- graphStore.removeGraph(u1)
+      _ <- graphStore.removeGraph(u2)
+      _ <- graphStore.appendToGraph(u1, graph)
+      _ <- graphStore.appendToGraph(u2, graph2)
+      rGraph <- graphStore.getGraph(u1)
+      rGraph2 <- graphStore.getGraph(u2)
+    } yield {
+      println(rGraph isIsomorphicWith graph)
+      println(rGraph2 isIsomorphicWith graph2)
+    }
+
+    /*
     val objects = new ObjectExamplesJasmine[RDFStore]()
 
     import objects._
@@ -131,6 +173,9 @@ object TestApp extends JSApp with JSUtils {
     val me = Me("Name")
 
     val res = verifiedAddress.toPG.as[VerifiedAddress]
+    */
+
+
     /*
 
 
@@ -180,3 +225,5 @@ object TestApp extends JSApp with JSUtils {
   }
 
 }
+
+object TestApp extends TestApp[RDFStore](RDFStoreW(Map()))

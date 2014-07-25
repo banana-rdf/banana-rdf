@@ -235,7 +235,7 @@ object BananaRdfBuild extends Build {
       jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
       resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
       libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1",
-      libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0-RC1",
+      libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6",
       libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
       skip in packageJSDependencies := false
     )
