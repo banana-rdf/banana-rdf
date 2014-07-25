@@ -74,12 +74,12 @@ class RDFStoreW(store: js.Dynamic) extends RDFStoreInterface[RDFStore] {
     promise.future
   }
 
-  def insert(triples:RDFStoreGraph, graph:String=null) : Future[Boolean] = {
-    val promise = Promise[Boolean]
+  def insert(triples:RDFStoreGraph, graph:String=null) : Future[RDFStoreW] = {
+    val promise = Promise[RDFStoreW]
     val cb =  {
       (success:Boolean, res:Any) =>
         if(success) {
-          promise.success(true)
+          promise.success(this)
         } else {
           promise.failure(new Exception("Error inserting triples into the store: "+res))
         }
@@ -153,26 +153,31 @@ class RDFStoreW(store: js.Dynamic) extends RDFStoreInterface[RDFStore] {
           cleaned
         }
         case Delete(uri, a) => {
+          println("DELETING ")
+          println(uri)
+          /*
           val deleted:Future[A] = clean(uri.valueOf) flatMap {
-            _ => execute(a)
+            r => {
+              println("DELETED??")
+              println(r)
+              println("EXECUTING")
+              println(a)
+              //execute(a)
+            }
           }
 
           deleted
+          */
+          clean(uri.valueOf)
         }
         case Get(uri, k) => {
-          val getted:Future[A] = toGraph(uri.valueOf) flatMap {
-            graph => execute(k(graph))
-          }
-
-          getted
+          toGraph(uri.valueOf)
         }
         case Append(uri, triples, a) => {
           val g = emptyGraph
           for(triple <- triples) g.add(triple)
-          val inserted:Future[A] = insert(g, uri.valueOf) flatMap {
-            _ => execute(a)
-          }
-          inserted
+
+          insert(g, uri.valueOf)
         }
         case Remove(uri, tripleMatches, a) => {
           val g = emptyGraph
@@ -185,7 +190,9 @@ class RDFStoreW(store: js.Dynamic) extends RDFStoreInterface[RDFStore] {
               case _ => // ignore
             }
           }
-          val deleted:Future[A] = delete(g,uri.valueOf) flatMap {
+
+
+          val deleted = delete(g,uri.valueOf) flatMap {
             _ => execute(a)
           }
 
