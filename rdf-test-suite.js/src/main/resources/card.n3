@@ -1,0 +1,238 @@
+# N3
+# Personal information in machine-readable form
+#
+# This (card.n3) is Tim Berners-Lee's FOAF file. It is a data file with the 
+#    sort of information which would be on a home page.
+# This is RDF data.
+# This is written in Notation3 - see http://www.w3.org/DesignIssues/Notation3
+# See alternatively the RDF/XML file card.rdf generated from this.
+# Use the uri <http://www.w3.org/People/Berners-Lee/card> to refer to this
+#    file independent of the format.
+# Use the uri <http://www.w3.org/People/Berners-Lee/card#i> to refer to Tim BL.
+#
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#>.
+@prefix :      <http://www.w3.org/2000/10/swap/pim/contact#>.
+@prefix s:     <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix cc:    <http://creativecommons.org/ns#>.
+@prefix dc:    <http://purl.org/dc/elements/1.1/>.
+@prefix dct:   <http://purl.org/dc/terms/>.
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#>.
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix w3c:   <http://www.w3.org/data#>.
+@prefix card:  <http://www.w3.org/People/Berners-Lee/card#>.
+@prefix cert:  <http://www.w3.org/ns/auth/cert#> .
+@prefix rsa:   <http://www.w3.org/ns/auth/rsa#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+# About this document:
+# The <> (the empty URI) means "this document".
+
+    <>   a foaf:PersonalProfileDocument;
+         cc:license <http://creativecommons.org/licenses/by-nc/3.0/>;
+	 dc:title "Tim Berners-Lee's FOAF file";
+         foaf:maker card:i;
+         foaf:primaryTopic card:i.
+
+# Below we introduce a FOAF file I have write access to, which the tabulator
+# will let me edit.
+
+
+# Turn off this section to turn off the live editing of the FOAF file extension.
+# This is where my list of people I know is:
+
+card:i    rdfs:seeAlso <http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf>.       # Suggest fetch it
+<http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf>
+        a foaf:PersonalProfileDocument;  # Suitable place to edit
+        cc:license <http://creativecommons.org/licenses/by-nc/3.0/>;
+        dc:title "Tim Berners-Lee's editable FOAF file";
+        foaf:maker card:i;
+        foaf:primaryTopic card:i.
+
+
+
+############## Stuff about me
+
+w3c:W3C foaf:member card:i.
+<http://dig.csail.mit.edu/data#DIG> foaf:member card:i.
+
+card:i
+    s:label  	"Tim Berners-Lee";   # For generic user interfaces etc
+    a :Male;
+    foaf:based_near [geo:lat "42.361860"; geo:long "-71.091840"];
+
+    :office [
+	:phone <tel:+1-617-253-5702>;
+	geo:location [geo:lat "42.361860"; geo:long "-71.091840"];
+	:address [
+		:street "32 Vassar Street";
+		:street2 "MIT CSAIL Room 32-G524";
+		:city "Cambridge";
+		:postalCode "02139";
+		:country "USA"
+	]
+    ];
+    :publicHomePage <../Berners-Lee/>;
+    :homePage <../Berners-Lee/>;     # hack - follows by RDFS from line above
+			    # The W3C structure data uses this as an IFP
+#    is foaf:member of w3c:W3C;    # SYNTAX NOT IN TURTLE :-(
+    :assistant card:amy;
+
+# Using FOAF vocabulary:
+
+    a foaf:Person;
+    # The idea is that this is the one I would suggest you use and 
+    # I use for myself, which can lead to others.
+    :preferredURI "http://www.w3.org/People/Berners-Lee/card#i"; # experimental
+    foaf:mbox <mailto:timbl@w3.org>;
+    foaf:mbox_sha1sum "965c47c5a70db7407210cef6e4e6f5374a525c5c";
+    foaf:openid <http://www.w3.org/People/Berners-Lee/>;
+    foaf:img <http://www.w3.org/Press/Stock/Berners-Lee/2001-europaeum-eighth.jpg>;
+
+    foaf:family_name "Berners-Lee";
+    foaf:givenname "Timothy";
+    foaf:title "Sir".
+
+
+card:i
+    foaf:homepage <http://www.w3.org/People/Berners-Lee/>;
+     foaf:mbox <mailto:timbl@w3.org>;
+    #	 foaf:mbox_sha1sum "1839a1cc2e719a85ea7d9007f587b2899cd94064";
+     foaf:name "Timothy Berners-Lee";
+     foaf:nick "TimBL", "timbl";
+     foaf:phone <tel:+1-(617)-253-5702>;
+    #         foaf:schoolHomepage <http://www.w3.org/People/Berners-Lee>;
+    
+    
+    foaf:account <http://twitter.com/timberners_lee>,
+        <http://en.wikipedia.org/wiki/User:Timbl>,
+        <http://identi.ca/timbl>;
+
+    #         foaf:workInfoHomepage <http://www.w3.org/People/Berners-Lee>;
+     foaf:workplaceHomepage <http://www.w3.org/>.
+
+
+## Facebook
+
+card:i owl:sameAs <http://graph.facebook.com/512908782#>.   # FB RDF feed from 2011/9
+
+
+### W3C's list of talks
+
+    card:i s:seeAlso <http://www.w3.org/2007/11/Talks/search/query?date=All+past+and+future+talks&event=None&activity=None&name=Tim+Berners-Lee&country=None&language=None&office=None&rdfOnly=yes&submit=Submit>.
+
+##### My Web ID cert
+# As of 2012-01-14:
+
+ <#i> cert:key  [ a cert:RSAPublicKey;
+    cert:modulus """d7a0e91eedddcc905d5eccd1e412ab0c5bdbe118fa99b7132d915452f0b09af5ebc0096ca1dbdeec32723f5ddd2b05564e2ce67effba8e86778e114a02a3907c2e6c6b28cf16fee77d0ef0c44d2e3ccd3e0b6e8cfdd197e3aa86ec199980729af4451f7999bce55eb34bd5a5350470463700f7308e372bdb6e075e0bb8a8dba93686fa4ae51317a44382bb09d09294c1685b1097ffd59c446ae567faece6b6aa27897906b524a64989bd48cfeaec61d12cc0b63ddb885d2dadb0b358c666aa93f5a443fb91fc2a3dc699eb46159b05c5758c9f13ed2844094cc539e582e11de36c6733a67b5125ef407b329ef5e922ca5746a5ffc67b650b4ae36610fca0cd7b"""^^xsd:hexBinary ;
+        cert:exponent "65537"^^xsd:integer ] .
+
+
+
+# Pre 2012:
+#card:i is cert:identity of [ 
+#    a rsa:RSAPublicKey;
+#    rsa:public_exponent "65537"^cert:decimal ;
+#    rsa:modulus
+#
+#        """d7 a0 e9 1e ed dd cc 90 5d 5e cc d1 e4 12 ab 0c 
+#5b db e1 18 fa 99 b7 13 2d 91 54 52 f0 b0 9a f5 
+#eb c0 09 6c a1 db de ec 32 72 3f 5d dd 2b 05 56 
+#4e 2c e6 7e ff ba 8e 86 77 8e 11 4a 02 a3 90 7c 
+#2e 6c 6b 28 cf 16 fe e7 7d 0e f0 c4 4d 2e 3c cd 
+#3e 0b 6e 8c fd d1 97 e3 aa 86 ec 19 99 80 72 9a 
+#f4 45 1f 79 99 bc e5 5e b3 4b d5 a5 35 04 70 46 
+#37 00 f7 30 8e 37 2b db 6e 07 5e 0b b8 a8 db a9 
+#36 86 fa 4a e5 13 17 a4 43 82 bb 09 d0 92 94 c1 
+#68 5b 10 97 ff d5 9c 44 6a e5 67 fa ec e6 b6 aa 
+#27 89 79 06 b5 24 a6 49 89 bd 48 cf ea ec 61 d1 
+#2c c0 b6 3d db 88 5d 2d ad b0 b3 58 c6 66 aa 93 
+#f5 a4 43 fb 91 fc 2a 3d c6 99 eb 46 15 9b 05 c5 
+#75 8c 9f 13 ed 28 44 09 4c c5 39 e5 82 e1 1d e3 
+#6c 67 33 a6 7b 51 25 ef 40 7b 32 9e f5 e9 22 ca 
+#57 46 a5 ff c6 7b 65 0b 4a e3 66 10 fc a0 cd 7b"""^cert:hex ;
+#          ] .
+
+
+#old cert modulus:
+#"84554e39b67f5e3912068773655d855d222fa2c05cd9784693f8919aa46a61be703069c5f3266eebc21d6bb429ee47fac347b012eb7d#a8b1e4b02f7680e39767b0086f1fd48b9a420de3e70df9c2504c87006e7722ab6df210dec768dae454e65b31752379d7032dd22696465#62593d8b5c621860a0f929ad64b9dce1d6cb12f"^cert:hex ;
+
+
+
+
+
+
+##### Things I am involved in -- DOAP
+
+card:i is doap:developer of <http://www.w3.org/2000/10/swap/data#Cwm>,
+    <http://dig.csail.mit.edu/2005/ajar/ajaw/data#Tabulator>.
+
+
+# BBC Catalogue links:   # Clumsy .. need to give people URIs. Now offline :-(
+# card:i foaf:homepage <http://open.bbc.co.uk/catalogue/infax/contributor/169456>;
+#	s:seeAlso <http://open.bbc.co.uk/catalogue/xml/contributor/169456>.
+
+
+#  Advogato is geek social netorking site (2008)
+card:i owl:sameAs <http://www.advogato.org/person/timbl/foaf.rdf#me>.
+
+##### Identi.ca identity
+card:i owl:sameAs <http://identi.ca/user/45563>.
+
+#  The (2006/11) DBLP database
+card:i owl:sameAs <http://www4.wiwiss.fu-berlin.de/dblp/resource/person/100007>.
+
+# Bizer et al's  RDF mashup of Amazon
+card:i owl:sameAs <http://www4.wiwiss.fu-berlin.de/bookmashup/persons/Tim+Berners-Lee>.
+
+<http://www4.wiwiss.fu-berlin.de/booksMeshup/books/006251587X> dc:title
+"Weaving the Web: The Original Design and Ultimate Destiny of the World Wide Web";
+    dc:creator card:i.
+
+# More from Chris Bizer: the dbpedia scrape of Wikipedia
+#   @@@ Commented out temporaily as it was getting slow from redirecting each ontology term
+# <http://dbpedia.org/resource/Tim_Berners-Lee> owl:sameAs card:i.
+
+# MIT IAP course
+
+<http://dig.csail.mit.edu/2007/01/camp/data#course> foaf:maker card:i.
+
+# WWW2006 stuff:
+#  <#i>   owl:sameAs http://www.ecs.soton.ac.uk/~dt2/dlstuff/www2006_data#tim_berners-lee
+#	
+
+
+
+####### 2011  WW2011
+
+<http://www.w3.org/2011/Talks/0331-hyderabad-tbl/data#talk>
+    dct:title "Designing the Web for an Open Society";
+    foaf:maker card:i.
+
+<http://www.ecs.soton.ac.uk/~dt2/dlstuff/www2006_data#panel-panelk01>
+	s:label  "The Next Wave of the Web (Plenary Panel)";
+	:participant card:i.
+
+<http://wiki.ontoworld.org/index.php/_IRW2006>
+	:participant card:i.
+ 
+<http://wiki.ontoworld.org/index.php/_IRW2006> 
+    dc:title "Identity, Reference and the Web workshop 2006".
+    
+card:i foaf:weblog 
+<http://dig.csail.mit.edu/breadcrumbs/blog/4> .
+<http://dig.csail.mit.edu/breadcrumbs/blog/4>
+    rdfs:seeAlso <http://dig.csail.mit.edu/breadcrumbs/blog/feed/4>; # Sigh
+    dc:title "timbl's blog";
+#    is foaf:weblog of card:i;
+    foaf:maker card:i.
+    
+<../../DesignIssues/Overview.html>   #  Has RDFA in it
+    dc:title "Design Issues for the World Wide Web";
+    foaf:maker card:i.
+    
+#ends
+

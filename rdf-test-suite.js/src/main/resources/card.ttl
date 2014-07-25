@@ -1,0 +1,116 @@
+#Processed by Id: cwm.py,v 1.197 2007/12/13 15:38:39 syosi Exp 
+        #    using base file:///devel/WWW/People/Berners-Lee/card.n3
+             @prefix : <http://xmlns.com/foaf/0.1/> .
+    @prefix B: <http://www.w3.org/People/Berners-Lee/> .
+    @prefix Be: <./> .
+    @prefix blog: <http://dig.csail.mit.edu/breadcrumbs/blog/> .
+    @prefix card: <http://www.w3.org/People/Berners-Lee/card#> .
+    @prefix cc: <http://creativecommons.org/ns#> .
+    @prefix cert: <http://www.w3.org/ns/auth/cert#> .
+    @prefix con: <http://www.w3.org/2000/10/swap/pim/contact#> .
+    @prefix dc: <http://purl.org/dc/elements/1.1/> .
+    @prefix dct: <http://purl.org/dc/terms/> .
+    @prefix doap: <http://usefulinc.com/ns/doap#> .
+    @prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+    @prefix owl: <http://www.w3.org/2002/07/owl#> .
+    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    @prefix s: <http://www.w3.org/2000/01/rdf-schema#> .
+    @prefix w3c: <http://www.w3.org/data#> .
+    @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+    
+    <../../DesignIssues/Overview.html>     dc:title "Design Issues for the World Wide Web";
+         :maker card:i .
+    
+    <>     rdf:type :PersonalProfileDocument;
+         cc:license <http://creativecommons.org/licenses/by-nc/3.0/>;
+         dc:title "Tim Berners-Lee's FOAF file";
+         :maker card:i;
+         :primaryTopic card:i .
+    
+    <#i>     cert:key  [
+             rdf:type cert:RSAPublicKey;
+             cert:exponent 65537;
+             cert:modulus "d7a0e91eedddcc905d5eccd1e412ab0c5bdbe118fa99b7132d915452f0b09af5ebc0096ca1dbdeec32723f5ddd2b05564e2ce67effba8e86778e114a02a3907c2e6c6b28cf16fee77d0ef0c44d2e3ccd3e0b6e8cfdd197e3aa86ec199980729af4451f7999bce55eb34bd5a5350470463700f7308e372bdb6e075e0bb8a8dba93686fa4ae51317a44382bb09d09294c1685b1097ffd59c446ae567faece6b6aa27897906b524a64989bd48cfeaec61d12cc0b63ddb885d2dadb0b358c666aa93f5a443fb91fc2a3dc699eb46159b05c5758c9f13ed2844094cc539e582e11de36c6733a67b5125ef407b329ef5e922ca5746a5ffc67b650b4ae36610fca0cd7b"^^xsd:hexBinary ] .
+    
+    <http://dig.csail.mit.edu/2005/ajar/ajaw/data#Tabulator>     doap:developer card:i .
+    
+    <http://dig.csail.mit.edu/2007/01/camp/data#course>     :maker card:i .
+    
+    <http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf>     rdf:type :PersonalProfileDocument;
+         cc:license <http://creativecommons.org/licenses/by-nc/3.0/>;
+         dc:title "Tim Berners-Lee's editable FOAF file";
+         :maker card:i;
+         :primaryTopic card:i .
+
+# there is a bug in sesame when parsing blog:4    
+#    blog:4     dc:title "timbl's blog";
+    <http://dig.csail.mit.edu/breadcrumbs/blog/4>     dc:title "timbl's blog";
+         s:seeAlso <http://dig.csail.mit.edu/breadcrumbs/blog/feed/4>;
+         :maker card:i .
+    
+    <http://dig.csail.mit.edu/data#DIG>     :member card:i .
+    
+    <http://wiki.ontoworld.org/index.php/_IRW2006>     dc:title "Identity, Reference and the Web workshop 2006";
+         con:participant card:i .
+    
+    <http://www.ecs.soton.ac.uk/~dt2/dlstuff/www2006_data#panel-panelk01>     s:label "The Next Wave of the Web (Plenary Panel)";
+         con:participant card:i .
+    
+    <http://www.w3.org/2000/10/swap/data#Cwm>     doap:developer card:i .
+    
+    <http://www.w3.org/2011/Talks/0331-hyderabad-tbl/data#talk>     dct:title "Designing the Web for an Open Society";
+         :maker card:i .
+    
+    card:i     rdf:type con:Male,
+                :Person;
+         s:label "Tim Berners-Lee";
+         s:seeAlso <http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf>,
+                <http://www.w3.org/2007/11/Talks/search/query?date=All+past+and+future+talks&event=None&activity=None&name=Tim+Berners-Lee&country=None&language=None&office=None&rdfOnly=yes&submit=Submit>;
+         con:assistant card:amy;
+         con:homePage Be:;
+         con:office  [
+             con:address  [
+                 con:city "Cambridge";
+                 con:country "USA";
+                 con:postalCode "02139";
+                 con:street "32 Vassar Street";
+                 con:street2 "MIT CSAIL Room 32-G524" ];
+             con:phone <tel:+1-617-253-5702>;
+             geo:location  [
+                 geo:lat "42.361860";
+                 geo:long "-71.091840" ] ];
+         con:preferredURI "http://www.w3.org/People/Berners-Lee/card#i";
+         con:publicHomePage Be:;
+         owl:sameAs <http://graph.facebook.com/512908782#>,
+                <http://identi.ca/user/45563>,
+                <http://www.advogato.org/person/timbl/foaf.rdf#me>,
+                <http://www4.wiwiss.fu-berlin.de/bookmashup/persons/Tim+Berners-Lee>,
+                <http://www4.wiwiss.fu-berlin.de/dblp/resource/person/100007>;
+         :account <http://en.wikipedia.org/wiki/User:Timbl>,
+                <http://identi.ca/timbl>,
+                <http://twitter.com/timberners_lee>;
+         :based_near  [
+             geo:lat "42.361860";
+             geo:long "-71.091840" ];
+         :family_name "Berners-Lee";
+         :givenname "Timothy";
+         :homepage B:;
+         :img <http://www.w3.org/Press/Stock/Berners-Lee/2001-europaeum-eighth.jpg>;
+         :mbox <mailto:timbl@w3.org>;
+         :mbox_sha1sum "965c47c5a70db7407210cef6e4e6f5374a525c5c";
+         :name "Timothy Berners-Lee";
+         :nick "TimBL",
+                "timbl";
+         :openid B:;
+         :phone <tel:+1-(617)-253-5702>;
+         :title "Sir";
+# same bug again
+#         :weblog blog:4;
+         :weblog <http://dig.csail.mit.edu/breadcrumbs/blog/4>;
+         :workplaceHomepage <http://www.w3.org/> .
+    
+    w3c:W3C     :member card:i .
+    
+    <http://www4.wiwiss.fu-berlin.de/booksMeshup/books/006251587X>     dc:creator card:i;
+         dc:title "Weaving the Web: The Original Design and Ultimate Destiny of the World Wide Web" .
+     
