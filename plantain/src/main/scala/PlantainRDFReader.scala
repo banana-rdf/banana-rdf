@@ -1,12 +1,13 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, InputStream}
 import scala.util.Try
 import akka.http.model.Uri
 import org.openrdf.rio._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
+import scala.concurrent.Future
 
 object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
 
@@ -36,6 +37,13 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
 
   }
 
+  /**
+   * todo: this is the wrong way around. The reader taking an inputstream should
+   * call the reader taking a string or better a StringReader ( but does not exist yet in scala-js)
+   * @param is
+   * @param base
+   * @return
+   */
   def read(is: InputStream, base: String): Try[Plantain#Graph] = Try {
     val sink = new Sink
     val parser = new TurtleParser
@@ -49,4 +57,13 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
     read(is, "http://example.com/")
   }
 
+  /**
+   * Hack
+   * @param is
+   * @param base
+   * @return
+   */
+  override def read(is: String, base: String): Future[Plantain#Graph] = {
+     Future.fromTry(read(new ByteArrayInputStream(is.getBytes("UTF-8")),base))
+  }
 }

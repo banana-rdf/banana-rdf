@@ -22,6 +22,7 @@ object SesameSolutionsWriter {
         sWriter.endQueryResult()
       }
 
+      override def write(obj: Sesame#Solutions, base: String) = ???
     }
 
   implicit val solutionsWriterJson = SesameSolutionsWriter[SparqlAnswerJson]

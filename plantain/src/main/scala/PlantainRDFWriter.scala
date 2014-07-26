@@ -82,4 +82,5 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
 
   }
 
+  override def write(obj: Plantain#Graph, base: String) = ???
 }

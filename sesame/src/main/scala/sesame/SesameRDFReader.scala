@@ -6,6 +6,7 @@ import org.openrdf.model.impl.{ LinkedHashModel, StatementImpl, LiteralImpl }
 import java.io._
 import java.util.LinkedList
 import scala.util._
+import scala.concurrent.Future
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
 
@@ -41,6 +42,9 @@ class SesameTurtleReader(implicit Ops: SesameOps) extends RDFReader[Sesame, Turt
     new LinkedHashModel(triples)
   }
 
+  override def read(is: String, base: String) =
+    Future.fromTry(read(new ByteArrayInputStream(is.getBytes("UTF-8")),base))
+
 }
 
 class SesameRDFXMLReader(implicit Ops: SesameOps) extends RDFReader[Sesame, RDFXML] {
@@ -60,4 +64,7 @@ class SesameRDFXMLReader(implicit Ops: SesameOps) extends RDFReader[Sesame, RDFX
     new LinkedHashModel(triples)
   }
 
+  override def read(is: String, base: String) = {
+      Future.fromTry(read(new ByteArrayInputStream(is.getBytes("UTF-8")),base))
+  }
 }

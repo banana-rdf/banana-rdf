@@ -11,6 +11,8 @@ trait Writer[-O, +T] {
 
   def syntax: Syntax[T]
 
+  def write(obj: O, outputstream: OutputStream, base: String): Try[Unit]
+
   def write(obj: O, base: String): Try[String]
 
   def asString(obj: O, base: String): Try[String] = write(obj, base)

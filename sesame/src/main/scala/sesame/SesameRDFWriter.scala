@@ -18,6 +18,7 @@ class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T],
     sWriter.endRDF()
   }
 
+  override def write(obj: Sesame#Graph, base: String) = ???
 }
 
 class SesameRDFWriterHelper(implicit ops: SesameOps) {

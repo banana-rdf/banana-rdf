@@ -29,6 +29,7 @@ object BooleanWriter {
         |}
         | """.stripMargin.format(bool)
 
+    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
   }
 
   /**
@@ -45,6 +46,7 @@ object BooleanWriter {
         |  <boolean>%s</boolean>
         |</sparql> """.stripMargin.format(bool) // "
 
+    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
   }
 
   implicit val selector: WriterSelector[Boolean] =

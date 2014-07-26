@@ -3,7 +3,7 @@ package org.w3.banana.rdfstorew
 import org.w3.banana.{Syntax, Turtle, RDFWriterSelector, RDFWriter}
 
 import scala.util.Try
-
+import java.io.OutputStream
 
 
 object RDFStoreTurtleWriter extends RDFWriter[RDFStore, Turtle] {
@@ -15,4 +15,5 @@ object RDFStoreTurtleWriter extends RDFWriter[RDFStore, Turtle] {
     graph.graph.toNT().asInstanceOf[String]
   }
 
+  override def write(obj: RDFStore#Graph, outputstream: OutputStream, base: String) = ???
 }

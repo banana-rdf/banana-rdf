@@ -19,6 +19,8 @@ object JenaRDFWriter {
       val relativeGraph = graph.relativize(URI(base))
       RDFDataMgr.write(os, relativeGraph, lang)
     }
+
+    override def write(obj: Jena#Graph, base: String) = ???
   }
 
   implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = makeRDFWriter[RDFXML](Lang.RDFXML)
