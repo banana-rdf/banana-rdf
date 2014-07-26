@@ -20,19 +20,18 @@ class TripleSink(ops: JenaOps) extends StreamRDF {
   def quad(quad: com.hp.hpl.jena.sparql.core.Quad): Unit = ()
   def start(): Unit = ()
   def triple(triple: JenaTriple): Unit = {
-    def isPlainLiteral(node: JenaNode): Boolean =
-      node.isLiteral && // it's really a literal
-        node.getLiteralDatatypeURI == null && // not intended to be a typed literal
-        node.getLiteralLanguage.isEmpty // and not a lang literal either
+    def isXsdString(node: JenaNode): Boolean =
+      node.isLiteral &&
+      node.getLiteralDatatypeURI == "http://www.w3.org/2001/XMLSchema#string"
     val o = triple.getObject
     val t =
-      // if o is a plain literal
-      if (isPlainLiteral(o))
-        // then replace the object by a clean typed literal with an xsd:string
+      // if o is a xsd:string literal
+      if (isXsdString(o))
+        // then replace the object by a clean "plain" literal without the xsd:string
         new JenaTriple(
           triple.getSubject,
           triple.getPredicate,
-          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, ops.__xsdString))
+          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, null))
       else
         // otherwise everything is fine
         triple
@@ -56,7 +55,9 @@ object JenaRDFReader {
 
   implicit def turtleReader(ops: JenaOps): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
 
-  implicit val selector: ReaderSelector[Jena] =
+  implicit def n3Reader(ops: JenaOps): RDFReader[Jena, N3] = makeRDFReader[N3](ops, Lang.N3)
+
+  implicit val selector: ReaderSelector[Jena] = 
     ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
 
 }

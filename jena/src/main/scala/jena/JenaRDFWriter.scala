@@ -25,6 +25,8 @@ object JenaRDFWriter {
 
   implicit val turtleWriter: RDFWriter[Jena, Turtle] = makeRDFWriter[Turtle](Lang.TURTLE)
 
+  implicit val n3Writer: RDFWriter[Jena, N3] = makeRDFWriter[N3](Lang.N3)
+
   val selector: RDFWriterSelector[Jena] =
     RDFWriterSelector[Jena, RDFXML] combineWith RDFWriterSelector[Jena, Turtle]
 

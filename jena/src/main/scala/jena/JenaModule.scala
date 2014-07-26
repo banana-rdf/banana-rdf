@@ -37,11 +37,15 @@ trait JenaModule
 
   implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader(Ops)
 
+  implicit val N3Reader: RDFReader[Jena, N3] = JenaRDFReader.n3Reader(Ops)
+
   implicit val ReaderSelector: ReaderSelector[Jena] = JenaRDFReader.selector
 
   implicit val RDFXMLWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
 
   implicit val TurtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
+
+  implicit val N3Writer: RDFWriter[Jena, N3] = JenaRDFWriter.n3Writer
 
   implicit val WriterSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector
 
