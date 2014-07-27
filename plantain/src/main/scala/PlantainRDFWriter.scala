@@ -1,7 +1,7 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import java.io.OutputStream
+import java.io.{ByteArrayOutputStream, OutputStreamWriter, OutputStream}
 import scala.util.Try
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
@@ -82,5 +82,13 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
 
   }
 
-  override def write(obj: Plantain#Graph, base: String) = ???
+  override
+  def write(graph: Plantain#Graph, base: String): Try[String] = Try {
+    val result = new ByteArrayOutputStream()
+    //todo: clearly this trasformation into a byte array and then back into a character string,
+    //shows that working at the byte level is wrong.
+    val writer = new Writer(graph,result,base)
+    writer.write()
+    new String(result.toByteArray,"UTF-8")
+  }
 }

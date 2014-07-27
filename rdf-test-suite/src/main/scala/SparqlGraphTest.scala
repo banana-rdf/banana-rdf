@@ -4,7 +4,7 @@ import org.w3.banana.diesel._
 import org.w3.banana.syntax._
 import org.scalatest._
 import java.io._
-/*
+
 class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
     implicit ops: RDFOps[Rdf],
     reader: RDFReader[Rdf, RDFXML],
@@ -178,4 +178,3 @@ CONSTRUCT {
   }
 
 }
-*/

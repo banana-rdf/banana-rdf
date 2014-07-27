@@ -7,7 +7,7 @@ import scala.concurrent._
 import scala.concurrent.util._
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.io.FileInputStream
-/*
+
 class SparqlEngineTest[Rdf <: RDF](
   store: RDFStore[Rdf])(
     implicit reader: RDFReader[Rdf, RDFXML],
@@ -229,4 +229,3 @@ class SparqlEngineTest[Rdf <: RDF](
   //    result must contain(URI("http://github.com/w3c/banana-rdf"))
   //  }
 }
-*/

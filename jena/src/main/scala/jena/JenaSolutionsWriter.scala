@@ -19,6 +19,11 @@ object JenaSolutionsWriter {
           jenaSparqlSyntax.formatter.format(os, answers)
         }
 
+      override def write(answers: Jena#Solutions, base: String): Try[String] = Try {
+        val result = new ByteArrayOutputStream()
+        jenaSparqlSyntax.formatter.format(result, answers)
+        answers.toString
+      }
     }
 
   implicit val solutionsWriterJson: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =

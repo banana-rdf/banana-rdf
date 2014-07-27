@@ -7,6 +7,7 @@ import com.hp.hpl.jena.graph.{ Triple => JenaTriple, Node => JenaNode, _ }
 import scala.util._
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
+import scala.concurrent.Future
 
 class TripleSink(ops: JenaOps) extends StreamRDF {
 
@@ -50,6 +51,10 @@ object JenaRDFReader {
       RDFDataMgr.parse(sink, is, base, lang)
       sink.graph
     }
+
+    //todo: change api to make Writer the default implementation
+    override def read(is: String, base: String) =
+      Future.fromTry(read(new ByteArrayInputStream(is.getBytes("UTF-8")),base))
   }
 
   implicit def rdfxmlReader(ops: JenaOps): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
