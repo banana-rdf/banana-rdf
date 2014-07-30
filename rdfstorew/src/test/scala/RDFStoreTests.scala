@@ -21,3 +21,6 @@ object UriSyntaxJasmineTest extends UriSyntaxJasmineTest[RDFStore]
 object TurtleTestJasmineSuite extends TurtleTestJasmineSuite[RDFStore]
 
 object GraphStoreJasmineTest extends GraphStoreJasmineTest[RDFStore](RDFStoreW(Map()))
+
+
+object SparqlEngineJasmineTest extends SparqlEngineJasmineTest[RDFStore](RDFStoreW(Map()))

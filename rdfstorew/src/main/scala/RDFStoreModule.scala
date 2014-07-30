@@ -13,6 +13,8 @@ trait RDFStoreModule
 
   implicit val Ops: RDFStoreOps = new RDFStoreOps
 
+  implicit val SparqlOps: SparqlOps[RDFStore] = RDFSparqlOps
+
   implicit val RecordBinder: binder.RecordBinder[RDFStore] = binder.RecordBinder[RDFStore]
 
   implicit val TurtleReader: RDFReader[RDFStore, Turtle] = new RDFStoreTurtleReader

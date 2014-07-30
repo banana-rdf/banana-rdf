@@ -22,8 +22,7 @@ class RDFStoreW(store: js.Dynamic) extends RDFStoreInterface[RDFStore] {
   def executeQuery(sparql: String) : Future[Any] = {
     val promise = Promise[Any]
 
-    store.applyDynamic("execute")(sparql, {(success:Boolean, res:js.Array[js.Object]) =>
-      res.forEach({ (o:js.Object) => global.console.log(o) })
+    store.applyDynamic("execute")(sparql, {(success:Boolean, res:js.Any) =>
       if(success) {
         promise.success(res)
       } else {
@@ -184,32 +183,33 @@ class RDFStoreW(store: js.Dynamic) extends RDFStoreInterface[RDFStore] {
           deleted
         }
         case Select(query, bindings, k) => {
-          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
-            solutions => execute(k(solutions.asInstanceOf[RDFStore#Solutions]))
+          executeQuery(bindQuery(query,bindings)) map {
+            solutions =>
+              solutions.asInstanceOf[js.Array[js.Dynamic]].map[SPARQLSolutionTuple] {
+                (o:js.Dynamic) => new SPARQLSolutionTuple(o.asInstanceOf[js.Dictionary[js.Any]])
+              }.toArray
           }
-
-          executed
         }
         case Construct(query, bindings, k) => {
-          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
-            g => execute(k(new RDFStoreGraph(g.asInstanceOf[js.Dynamic])))
+          executeQuery(bindQuery(query,bindings)) map {
+            g => {
+              new RDFStoreGraph(g.asInstanceOf[js.Dynamic])
+            }
           }
-
-          executed
         }
         case Ask(query, bindings, k) => {
-          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
-            b => execute(k(b.asInstanceOf[Boolean]))
+          executeQuery(bindQuery(query,bindings)) map {
+            b => {
+              b.asInstanceOf[Boolean]
+            }
           }
-
-          executed
         }
         case org.w3.banana.Update(query, bindings, k) => {
-          val executed:Future[A] = executeQuery(bindQuery(query,bindings)) flatMap {
-            b => execute(k)
+          executeQuery(bindQuery(query,bindings)) map {
+            b => {
+              b
+            }
           }
-
-          executed
         }
       },
       a => a

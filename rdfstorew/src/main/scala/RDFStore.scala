@@ -11,6 +11,21 @@ case class PlainNode(node: RDFStore#Node) extends JsNodeMatch
 
 case object JsANY extends JsNodeMatch
 
+trait SPARQLSolution {
+
+}
+
+class SPARQLSolutionTuple(obj:js.Dictionary[js.Any]) extends  SPARQLSolution{
+  val varNames:Array[String] = {
+    var names:List[String] = List[String]()
+    for(prop <- js.Object.keys(obj)) {
+      names = names.::(prop)
+    }
+    names.toArray[String]
+  }
+
+  def apply(s:String) = obj.get(s)
+}
 
 trait RDFStore extends RDF {
   // types related to the RDF datamodel
@@ -34,10 +49,10 @@ trait RDFStore extends RDF {
   type AskQuery = String
   type UpdateQuery = String
 
-  type Solution = Any
+  type Solution = SPARQLSolution
 
   // instead of TupleQueryResult so that it's eager instead of lazy
-  type Solutions = Array[Any]
+  type Solutions = Array[SPARQLSolution]
 }
 
 /*

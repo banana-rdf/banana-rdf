@@ -18,7 +18,7 @@ class RDFStoreRDFNode(node:js.Dynamic) {
     }
   }
 
-  override def toString:js.String = node.toString().asInstanceOf[js.String]
+  override def toString:js.String = node.toString()
 
   def toNT:js.String = node.toNT().asInstanceOf[js.String]
 
@@ -36,6 +36,7 @@ class RDFStoreLiteral(node:js.Dynamic) extends  RDFStoreRDFNode(node) {
   val nominalValue:js.String = if(node.nominalValue.isInstanceOf[js.String]) { node.nominalValue.asInstanceOf[js.String] } else { null }
   val datatype:js.String = if (node.datatype.isInstanceOf[js.String]) { node.datatype.asInstanceOf[js.String] } else { null }
   val language:js.String = if(node.language.isInstanceOf[js.String]) { node.language.asInstanceOf[js.String] } else { null }
+
 }
 
 
@@ -87,7 +88,7 @@ class RDFStoreTriple(node:js.Dynamic) {
       false
   }
 
-  override def toString:js.String = node.toString().asInstanceOf[js.String]
+  override def toString:js.String = node.toString()
 }
 
 class RDFStoreGraph(node:js.Dynamic) {
