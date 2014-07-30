@@ -19,6 +19,10 @@ trait SparqlEngine[Rdf <: RDF] extends Any {
 
   def executeAsk(query: Rdf#AskQuery): Future[Boolean] = executeAsk(query, Map.empty)
 
+  def executeUpdate(query: Rdf#UpdateQuery, bindings:Map[String, Rdf#Node]): Future[Unit]
+
+  def executeUpdate(query: Rdf#UpdateQuery): Future[Unit] = executeUpdate(query, Map.empty)
+
 }
 
 object SparqlEngine {
@@ -33,6 +37,9 @@ object SparqlEngine {
 
     def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Future[Boolean] =
       store.execute(Command.ask(query, bindings))
+
+    def executeUpdate(query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): Future[Unit] =
+      store.execute(Command.update(query,bindings))
 
   }
 
