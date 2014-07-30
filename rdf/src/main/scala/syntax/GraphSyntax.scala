@@ -14,6 +14,8 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
 
   def union(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Rdf#Graph = ops.union(graph :: otherGraph :: Nil)
 
+  def +(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]) = ops.union(Seq(graph, ops.Graph(Set(triple))))
+
   def diff(other: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Rdf#Graph = ops.diff(graph, other)
 
   def isIsomorphicWith(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Boolean = ops.isomorphism(graph, otherGraph)

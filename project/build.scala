@@ -175,10 +175,11 @@ object BananaRdfBuild extends Build {
   )
 
   lazy val patch = Project(
-    id = "patch",
-    base = file("patch"),
+    id = "ldpatch",
+    base = file("ldpatch"),
     settings = buildSettings ++ testDeps ++ Seq(
-      publishMavenStyle := true
+      publishMavenStyle := true,
+      libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0"
     )
   ) dependsOn (rdf, jena, rdfTestSuite % "test")
 
