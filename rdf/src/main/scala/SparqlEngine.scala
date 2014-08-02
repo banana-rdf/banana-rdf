@@ -19,15 +19,17 @@ trait SparqlEngine[Rdf <: RDF] extends Any {
 
   def executeAsk(query: Rdf#AskQuery): Future[Boolean] = executeAsk(query, Map.empty)
 
+}
+
+trait SparqlUpdateEngine[Rdf <: RDF] extends Any {
   def executeUpdate(query: Rdf#UpdateQuery, bindings:Map[String, Rdf#Node]): Future[Unit]
 
   def executeUpdate(query: Rdf#UpdateQuery): Future[Unit] = executeUpdate(query, Map.empty)
-
 }
 
 object SparqlEngine {
 
-  def apply[Rdf <: RDF](store: RDFStore[Rdf]): SparqlEngine[Rdf] = new SparqlEngine[Rdf] {
+  def apply[Rdf <: RDF](store: RDFStore[Rdf]): SparqlEngine[Rdf] = new SparqlEngine[Rdf] with SparqlUpdateEngine[Rdf] {
 
     def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Solutions] =
       store.execute(Command.select(query, bindings))

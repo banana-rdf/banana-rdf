@@ -1,13 +1,11 @@
 import bintray.Plugin._
 import bintray.Keys._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
-import sbt.ExclusionRule
 import sbt.Keys._
 import sbt._
 
+import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
-import scala.Some
-import ScalaJSKeys._
 
 object BuildSettings {
 
@@ -52,6 +50,12 @@ object BuildSettings {
           <name>Henry Story</name>
           <url>http://bblfish.net/</url>
         </developer>
+        <developer>
+          <id>antoniogarrote</id>
+          <name>Antonio Garrote</name>
+          <url>https://github.com/antoniogarrote/</url>
+        </developer>
+
       </developers>
       <scm>
         <url>git@github.com:w3c/banana-rdf.git</url>
