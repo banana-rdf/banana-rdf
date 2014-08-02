@@ -9,7 +9,7 @@ trait Plantain extends RDF {
   type Graph = model.Graph
   type Triple = model.Triple
   type Node = model.Node
-  type URI = model.LazyURI
+  type URI = model.URI
   type BNode = model.BNode
   type Literal = model.Literal
   type Lang = String

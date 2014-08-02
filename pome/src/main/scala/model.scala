@@ -1,6 +1,6 @@
 package org.w3.banana.pome.model
 
-import akka.http.model.{IllegalUriException, Uri}
+import java.net.{URI=>jURI}
 
 object Graph {
 
@@ -8,7 +8,7 @@ object Graph {
 
 }
 
-case class Graph(spo: Map[Node, Map[LazyURI, Vector[Node]]], size: Int) {
+case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
 
   def triples: Iterable[Triple] =
     for {
@@ -22,7 +22,7 @@ case class Graph(spo: Map[Node, Map[LazyURI, Vector[Node]]], size: Int) {
 
   
 
-  def +(subject: Node, predicate: LazyURI, objectt: Node): Graph = {
+  def +(subject: Node, predicate: URI, objectt: Node): Graph = {
     spo.get(subject) match {
       case None => Graph(spo + (subject -> Map(predicate -> Vector(objectt))), size + 1)
       case Some(pos) => pos.get(predicate) match {
@@ -76,7 +76,7 @@ case class Graph(spo: Map[Node, Map[LazyURI, Vector[Node]]], size: Int) {
   def find(subject: NodeMatch, predicate: NodeMatch, objectt: NodeMatch): Iterable[Triple] =
     (subject, predicate, objectt) match {
       case (ANY, ANY, ANY) => triples
-      case (PlainNode(s), PlainNode(p@LazyURI(_)), PlainNode(o)) => {
+      case (PlainNode(s), PlainNode(p@URI(_)), PlainNode(o)) => {
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
@@ -89,7 +89,7 @@ case class Graph(spo: Map[Node, Map[LazyURI, Vector[Node]]], size: Int) {
           (p, os) <- spo.get(s) getOrElse Iterable.empty
           o <- os
         } yield Triple(s, p, o)
-      case (PlainNode(s), PlainNode(p@LazyURI(_)), ANY) => {
+      case (PlainNode(s), PlainNode(p@URI(_)), ANY) => {
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
@@ -121,59 +121,15 @@ case class Graph(spo: Map[Node, Map[LazyURI, Vector[Node]]], size: Int) {
 
 }
 
-case class Triple(subject: Node, predicate: LazyURI, objectt: Node)
+case class Triple(subject: Node, predicate: URI, objectt: Node)
 
 sealed trait Node
 
-/**
- * A lazy Uri that parses it only when needed
- * Use case: parsing Uris in JS is slow, so it is better to do it only when required.
- * Ideally one would request zipped, canonicalized n-triples and never parse the uris at all.
- */
-case class LazyURI(string: String) extends Node {
-  def this(uri: Uri) = {
-    this(uri.toString())
-    this.uri = uri
-  }
-  private var uri: Uri = null
-
-  @throws[IllegalUriException]("problem parsing uri")
-  def parsed: Uri = {
-    if (uri==null) uri = Uri(string)
-    uri
-  }
-}
-
-
-//
-//object LazyURI {
-//  def apply(string: String): LazyURI = new UnparsedUri(string)
-//  def apply(uri: Uri): LazyURI = new ParsedUri(uri)
-//  def unapply(uri: LazyURI): Option[String] = uri match {
-//    case u: UnparsedUri => Some(u.string)
-//    case p: ParsedUri => Some(p.string)
-//  }
-//}
-//
-//class UnparsedUri(val string: String) extends LazyURI {
-//  override lazy val parsed = Uri(string)
-//
-//  override def hashCode() = string.hashCode()
-//
-//  override def equals(obj: scala.Any) = super.equals(obj)
-//}
-//
-//class ParsedUri(val parsed: Uri) extends LazyURI {
-//  override lazy val string = parsed.toString
-//
-//  override def hashCode() = string.hashCode()
-//
-//  override def equals(obj: scala.Any) = super.equals(obj)
-//}
+case class URI(underlying: jURI) extends Node
 
 case class BNode(label: String) extends Node
 
-case class Literal(lexicalForm: String, datatype: LazyURI, langOpt: Option[String]) extends Node
+case class Literal(lexicalForm: String, datatype: URI, langOpt: Option[String]) extends Node
 
 sealed trait NodeMatch
 

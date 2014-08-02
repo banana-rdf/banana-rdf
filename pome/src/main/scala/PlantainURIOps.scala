@@ -2,42 +2,52 @@ package org.w3.banana.pome
 
 import org.w3.banana._
 import model._
+import java.net.{URI=>jURI}
+import akka.http.model.Uri.Path
 
 trait PlantainURIOps extends URIOps[Plantain] {
 
-  def getString(uri: Plantain#URI): String = uri.string.toString
+  def getString(uri: Plantain#URI): String = uri.underlying.toString
 
-  def withoutFragment(uri: Plantain#URI): Plantain#URI =  new LazyURI(uri.parsed.withoutFragment)
+  def withoutFragment(uri: Plantain#URI): Plantain#URI =  {
+    import uri.underlying._
+    URI(new jURI(getScheme,getUserInfo,getHost,getPort,getPath,getQuery,null))
+  }
 
-  def withFragment(uri: Plantain#URI, frag: String): Plantain#URI = new LazyURI(uri.parsed.withFragment(frag))
+  def withFragment(uri: Plantain#URI, frag: String): Plantain#URI = {
+    import uri.underlying._
+    URI(new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, frag))
+  }
 
-  def getFragment(uri: Plantain#URI): Option[String] = uri.parsed.fragment
+  def getFragment(uri: Plantain#URI): Option[String] = {
+    Option(uri.underlying.getFragment)
+  }
 
   def isPureFragment(uri: Plantain#URI): Boolean = {
-    val u = uri.parsed
-    u.scheme.isEmpty && u.authority.isEmpty && u.path.isEmpty && u.query.isEmpty && u.fragment.isDefined
+    import uri.underlying.{getFragment=>fragment,_}
+    getScheme == null &&
+      getUserInfo == null && getAuthority == null &&
+      (getPath == null || getPath == "" ) &&
+      getQuery == null && fragment != null
   }
 
   def resolve(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
-    new LazyURI(other.parsed.resolvedAgainst(uri.string))
+    URI(uri.underlying.resolve(other.underlying))
   }
 
   def appendSegment(uri: Plantain#URI, segment: String): Plantain#URI = {
-    val underlying = uri.parsed
-    val path = underlying.path
-    if (path.reverse.startsWithSlash)
-      new LazyURI(underlying.copy(path = path + segment))
-    else
-      new LazyURI(underlying.copy(path = path / segment))
+    val path = Path(uri.underlying.getPath)
+    val newPath = if (path.reverse.startsWithSlash) {
+      path + segment
+    } else {
+      path / segment
+    }
+    import uri.underlying.{getFragment=>fragment,_}
+    URI(new jURI(getScheme, getUserInfo, getHost, getPort, newPath.toString(), getQuery, fragment))
   }
 
   def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
-    // TODO should rely on a spray.http.Uri when https://github.com/spray/spray/issues/818 is addressed
-    // for implementation algorithm, see https://github.com/stain/cxf/blob/trunk/rt/frontend/jaxrs/src/main/java/org/apache/cxf/jaxrs/utils/HttpUtils.java
-//    import java.net.{ URI => jURI }
-//    val juri = new jURI(uri.string.toString).relativize(new jURI(other.string.toString))
-//    PlantainOps.makeUri(juri.toString)
-    ???
+    URI(uri.underlying.relativize(other.underlying))
   }
 
   def newChildUri(uri: Plantain#URI): Plantain#URI = {
@@ -45,7 +55,7 @@ trait PlantainURIOps extends URIOps[Plantain] {
     appendSegment(uri, segment)
   }
 
-  def lastSegment(uri: Plantain#URI): String =
-    uri.parsed.path.reverse.head.toString
-
+  def lastSegment(uri: Plantain#URI): String = {
+    Path(uri.underlying.getPath).reverse.head.toString
+  }
 }

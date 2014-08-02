@@ -1,7 +1,7 @@
 package org.w3.banana.pome
 
 import org.w3.banana._
-//import spray.http.Uri
+import java.net.{URI=>jURI}
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
@@ -32,9 +32,9 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
   // URI
 
-  def makeUri(uriStr: String): Plantain#URI = model.LazyURI(uriStr)
+  def makeUri(uriStr: String): Plantain#URI = model.URI(new jURI(uriStr))
 
-  def fromUri(node: Plantain#URI): String = node.string
+  def fromUri(node: Plantain#URI): String = node.underlying.toString
 
   // bnode
 
