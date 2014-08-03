@@ -1,34 +1,48 @@
-package org.w3.banana.util
+package org.w3.banana.jasmine.test
 
-
-import org.w3.banana.{RDF, RDFOps}
-
+import org.w3.banana._
+import org.w3.banana.syntax._
+import org.w3.banana.diesel._
+import org.w3.banana.binder._
+import org.w3.banana.util.GraphIsomporphism
+import scala.concurrent.ExecutionContext
+import scala.scalajs.concurrent.JSExecutionContext
+import scalaz.Scalaz._
+import scala.util._
 import scala.collection.immutable.ListMap
-import scala.scalajs.test.JasmineTest
-import scala.util.Success
+import java.io._
+import org.scalatest.EitherValues._
+import scala.concurrent.Future
+import org.w3.banana.{ RDFStore => RDFStoreInterface }
 
-abstract class IsomorphismTests[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) extends JasmineTest {
+import scala.scalajs.js
+import scala.scalajs.test.JasmineTest
+
+/**
+ * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
+ */
+abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends JasmineTest {
 
   import ops._
+  import syntax._
   import org.w3.banana.diesel._
 
   val graphIsomorphism = new GraphIsomporphism()(ops)
   import graphIsomorphism._
 
-
-  def foaf(tag: String) = URI("http://xmlns.com/foaf/0.1/"+tag)
+  def foaf(tag: String) = URI("http://xmlns.com/foaf/0.1/" + tag)
 
   val hjs = URI("http://bblfish.net/people/henry/card#me")
 
   val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
-  def alex(i: Int) = BNode("alex"+i)
-  def antonio(i: Int) = BNode("antonio"+i)
+  def alex(i: Int) = BNode("alex" + i)
+  def antonio(i: Int) = BNode("antonio" + i)
 
   val groundedGraph = (
     toPointedGraphW[Rdf](hjs)
-      -- foaf("knows") ->- timbl
-      -- foaf("name") ->- "Henry Story"
-    ).graph
+    -- foaf("knows") ->- timbl
+    -- foaf("name") ->- "Henry Story"
+  ).graph
 
   //  val bnodeGraph = (
   //      toPointedGraphW[Plantain](URI("#me"))
@@ -38,40 +52,37 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) extends J
   //        -- foaf("name") ->- "Alexandre Bertails"
   //    ).graph
 
+  def bnAlexRel1Graph(i: Int = 1) = Graph(Triple(alex(i), foaf("homePage"), URI("http://bertails.org/")))
 
-  def bnAlexRel1Graph(i: Int=1) = Graph(Triple(alex(i), foaf("homePage"), URI("http://bertails.org/")))
-
-  def bnAlexRel2Graph(i: Int=1) = Graph(
+  def bnAlexRel2Graph(i: Int = 1) = Graph(
     Triple(hjs, foaf("knows"), alex(i)),
     Triple(alex(i), foaf("name"), "Alexandre Bertails".toNode)
   )
 
+  def bnAntonioRel1Graph(i: Int = 1) = Graph(Triple(antonio(i), foaf("homePage"), URI("https://github.com/antoniogarrote/")))
 
-  def bnAntonioRel1Graph(i: Int=1) = Graph(Triple(antonio(i), foaf("homePage"), URI("https://github.com/antoniogarrote/")))
-
-  def bnAntonioRel2Graph(i: Int=1) = Graph(
+  def bnAntonioRel2Graph(i: Int = 1) = Graph(
     Triple(hjs, foaf("knows"), antonio(i)),
     Triple(antonio(i), foaf("name"), "Antonio Garrote".toNode)
   )
 
-  def xbn(i: Int) = BNode("x"+i)
+  def xbn(i: Int) = BNode("x" + i)
 
-  def bnKnowsBN(i:Int, j: Int) = Graph(
-    Triple(xbn(i),foaf("knows"),xbn(j))
+  def bnKnowsBN(i: Int, j: Int) = Graph(
+    Triple(xbn(i), foaf("knows"), xbn(j))
   )
 
-  def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i,j) union bnKnowsBN(j,i)
+  def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i, j) union bnKnowsBN(j, i)
 
-  def owlSameAs(node1: Rdf#Node,node2: Rdf#Node) =
-    Graph(Triple(node1,URI("http://www.w3.org/2002/07/owl#sameAs"),node2))
-
+  def owlSameAs(node1: Rdf#Node, node2: Rdf#Node) =
+    Graph(Triple(node1, URI("http://www.w3.org/2002/07/owl#sameAs"), node2))
 
   describe("test groundTripleFilter(graph)") {
 
     it("a completely grounded graph ( no blank nodes ) ") {
       val (grounded, nongrounded) = groundTripleFilter(groundedGraph)
       grounded.toIterable foreach {
-        triple => expect( groundedGraph.contains(triple) ).toEqual(true)
+        triple => expect(groundedGraph.contains(triple)).toEqual(true)
       }
       expect(nongrounded == emptyGraph).toEqual(true)
     }
@@ -142,42 +153,43 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) extends J
       val clz = bnodeClassify(bnGr)
       expect(clz.size).toEqual(1)
       expect(clz.head._2.size).toEqual(2) // 2 bnodes in this classification
-      expect(clz.head._1 == (new VerticeType(List((foaf("name"), 1)), List((foaf("knows"),1))))).toEqual(true)
+      expect(clz.head._1 == (new VerticeType(List((foaf("name"), 1)), List((foaf("knows"), 1))))).toEqual(true)
     }
-
 
   }
 
   describe("test bnode mapping solutions ") {
     it("two graphs with 1 relation and 1 bnode") {
-      val maps = bnodeMappingGenerator(bnAlexRel1Graph(1),bnAlexRel1Graph(2))
-      expect(maps == Success(ListMap(alex(1)->Set(alex(2))))).toEqual(true)
-      val answer = findAnswer(bnAlexRel1Graph(1),bnAlexRel1Graph(2))
-      expect(answer == Success(List(alex(1)->(alex(2))))).toEqual(true)
+      val maps = bnodeMappingGenerator(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
+      expect(maps == Success(ListMap(alex(1) -> Set(alex(2))))).toEqual(true)
+      val answer = findAnswer(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
+      expect(answer == Success(List(alex(1) -> (alex(2))))).toEqual(true)
     }
 
     it("two graphs with 2 relation and 1 bnode each") {
-      val maps = bnodeMappingGenerator(bnAlexRel2Graph(1),bnAlexRel2Graph(2))
-      expect(maps == Success(ListMap(alex(1)->Set(alex(2))))).toEqual(true)
-      val answer = findAnswer(bnAlexRel2Graph(1),bnAlexRel2Graph(2))
-      expect(answer == Success(List(alex(1)->(alex(2))))).toEqual(true)
+      val maps = bnodeMappingGenerator(bnAlexRel2Graph(1), bnAlexRel2Graph(2))
+      expect(maps == Success(ListMap(alex(1) -> Set(alex(2))))).toEqual(true)
+      val answer = findAnswer(bnAlexRel2Graph(1), bnAlexRel2Graph(2))
+      expect(answer == Success(List(alex(1) -> (alex(2))))).toEqual(true)
     }
 
     it("two graphs with 3 relations and 1 bnode each ") {
       val maps = bnodeMappingGenerator(
         bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
         bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
-      expect(maps == Success(ListMap(alex(1)->Set(alex(2))))).toEqual(true)
+      expect(maps == Success(ListMap(alex(1) -> Set(alex(2))))).toEqual(true)
       val answer = findAnswer(
         bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
         bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
-      expect(answer == Success(List(alex(1)->(alex(2))))).toEqual(true)
+      expect(answer == Success(List(alex(1) -> (alex(2))))).toEqual(true)
     }
 
     it("two graphs with 2 relations and 2 bnodes each") {
-      for (l <- findPossibleMappings(
-        bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
-        bnAlexRel1Graph(2) union bnAntonioRel1Graph(2))) {
+      for (
+        l <- findPossibleMappings(
+          bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
+          bnAlexRel1Graph(2) union bnAntonioRel1Graph(2))
+      ) {
         //with this system of categorisation the categories are very light
         // and they don't distinguish the literals
         //also the returned set covers symmetric results - this can also be optimised!
@@ -190,15 +202,15 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) extends J
       )
       expect(answer.isSuccess).toEqual(true)
       expect(answer.get.size).toEqual(2)
-      expect(answer.get.contains(alex(1)->alex(2))).toEqual(true)
-      expect(answer.get.contains(antonio(1)->antonio(2))).toEqual(true)
+      expect(answer.get.contains(alex(1) -> alex(2))).toEqual(true)
+      expect(answer.get.contains(antonio(1) -> antonio(2))).toEqual(true)
     }
 
     it("two graphs with 3 relations each. | But one category has 1 solution the other that has two. | The category with 1 solutions must be shown first") {
-      val g1 = bnAlexRel1Graph(1) union bnAntonioRel1Graph(1) union bnAlexRel2Graph(2)    union bnAlexRel1Graph(0) union bnAlexRel2Graph(0)
+      val g1 = bnAlexRel1Graph(1) union bnAntonioRel1Graph(1) union bnAlexRel2Graph(2) union bnAlexRel1Graph(0) union bnAlexRel2Graph(0)
       val g2 = bnAlexRel1Graph(3) union bnAntonioRel1Graph(3) union bnAntonioRel2Graph(4) union bnAlexRel1Graph(5) union bnAlexRel2Graph(5)
-      val answers = findPossibleMappings(g1,g2)
-      val answer= findAnswer(g1,g2)
+      val answers = findPossibleMappings(g1, g2)
+      val answer = findAnswer(g1, g2)
       expect(answer.isFailure).toEqual(true)
 
     }
@@ -276,17 +288,17 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) extends J
     }
 
     it("3 bnodes mapped") {
-      val knows3bn = bnKnowsBN(0,1) union bnKnowsBN(1,2) union bnKnowsBN(2,0)
+      val knows3bn = bnKnowsBN(0, 1) union bnKnowsBN(1, 2) union bnKnowsBN(2, 0)
 
       //three different isomorphic mappings
-      expect(mapVerify(knows3bn,knows3bn,Map(xbn(0)->xbn(0),xbn(1)->xbn(1),xbn(2)->xbn(2))) == Nil).toEqual(true)
-      expect(mapVerify(knows3bn,knows3bn,Map(xbn(0)->xbn(1),xbn(1)->xbn(2),xbn(2)->xbn(0))) == Nil).toEqual(true)
-      expect(mapVerify(knows3bn,knows3bn,Map(xbn(0)->xbn(2),xbn(1)->xbn(0),xbn(2)->xbn(1))) == Nil).toEqual(true)
+      expect(mapVerify(knows3bn, knows3bn, Map(xbn(0) -> xbn(0), xbn(1) -> xbn(1), xbn(2) -> xbn(2))) == Nil).toEqual(true)
+      expect(mapVerify(knows3bn, knows3bn, Map(xbn(0) -> xbn(1), xbn(1) -> xbn(2), xbn(2) -> xbn(0))) == Nil).toEqual(true)
+      expect(mapVerify(knows3bn, knows3bn, Map(xbn(0) -> xbn(2), xbn(1) -> xbn(0), xbn(2) -> xbn(1))) == Nil).toEqual(true)
 
-      val asymmetric = knows3bn union Graph(Triple(xbn(0),foaf("name"),Literal("Tim")))
-      expect(mapVerify(asymmetric,asymmetric,Map(xbn(0)->xbn(0),xbn(1)->xbn(1),xbn(2)->xbn(2))) == Nil).toEqual(true)
-      expect(mapVerify(asymmetric,asymmetric,Map(xbn(0)->xbn(1),xbn(1)->xbn(2),xbn(2)->xbn(0))).isEmpty).toEqual(false)
-      expect(mapVerify(asymmetric,asymmetric,Map(xbn(0)->xbn(2),xbn(1)->xbn(0),xbn(2)->xbn(1))).isEmpty).toEqual(false)
+      val asymmetric = knows3bn union Graph(Triple(xbn(0), foaf("name"), Literal("Tim")))
+      expect(mapVerify(asymmetric, asymmetric, Map(xbn(0) -> xbn(0), xbn(1) -> xbn(1), xbn(2) -> xbn(2))) == Nil).toEqual(true)
+      expect(mapVerify(asymmetric, asymmetric, Map(xbn(0) -> xbn(1), xbn(1) -> xbn(2), xbn(2) -> xbn(0))).isEmpty).toEqual(false)
+      expect(mapVerify(asymmetric, asymmetric, Map(xbn(0) -> xbn(2), xbn(1) -> xbn(0), xbn(2) -> xbn(1))).isEmpty).toEqual(false)
 
     }
   }
