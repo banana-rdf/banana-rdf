@@ -164,6 +164,8 @@ object BananaRdfBuild extends Build {
       jena,
       sesame,
       plantain,
+      pome,
+      rdfstorew,
       examples))
   
   lazy val rdf = Project(
@@ -235,11 +237,11 @@ object BananaRdfBuild extends Build {
   lazy val pome = Project(
     id = "banana-pome",
     base = file("pome"),
-    settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
+    settings =   buildSettings ++ testDeps ++ scalaJSSettings ++ Seq(
       resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
       libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1"
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf, rdfTestSuite % "test", rdfTestSuiteJS % "test")
 
   lazy val rdfstorew = Project(
     id = "banana-rdfstorew",

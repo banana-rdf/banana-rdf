@@ -1,4 +1,4 @@
-package org.w3.banana.rdfstorew
+package org.w3.banana.jasmine.test
 
 import org.w3.banana._
 import org.w3.banana.syntax._
@@ -16,6 +16,7 @@ import org.w3.banana.{RDFStore => RDFStoreInterface}
 
 import scala.scalajs.js
 import scala.scalajs.test.JasmineTest
+
 
 
 class PointedGraphJasmineTester[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
@@ -1136,7 +1137,7 @@ class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
       -- rdf("bar") ->- "bar"
     ).graph
 
-  describe("RDFSotre Banana Interface") {
+  describe("RDFStore Banana Interface") {
 
     it("getNamedGraph should retrieve the graph added with appendToGraph") {
       jasmine.Clock.useMock()

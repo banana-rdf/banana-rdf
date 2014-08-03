@@ -1,19 +1,19 @@
-package org.w3.banana.rdfstorew
+package org.w3.banana.util
 
 
-import org.w3.banana.RDFStore
-import org.w3.banana.rdfstorew.RDFStoreRDFNode
-import scala.scalajs.js
+import org.w3.banana.{RDF, RDFOps}
+
+import scala.collection.immutable.ListMap
 import scala.scalajs.test.JasmineTest
 import scala.util.Success
-import scala.collection.immutable.ListMap
 
-object IsomorphismTest extends JasmineTest {
+abstract class IsomorphismTests[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) extends JasmineTest {
 
-  import org.w3.banana.rdfstorew.RDFStore._
-  import Ops._
+  import ops._
   import org.w3.banana.diesel._
-  import org.w3.banana.rdfstorew.GraphEquivalence._
+
+  val graphIsomorphism = new GraphIsomporphism()(ops)
+  import graphIsomorphism._
 
 
   def foaf(tag: String) = URI("http://xmlns.com/foaf/0.1/"+tag)
@@ -25,7 +25,7 @@ object IsomorphismTest extends JasmineTest {
   def antonio(i: Int) = BNode("antonio"+i)
 
   val groundedGraph = (
-    toPointedGraphW[RDFStore](hjs)
+    toPointedGraphW[Rdf](hjs)
       -- foaf("knows") ->- timbl
       -- foaf("name") ->- "Henry Story"
     ).graph
@@ -62,7 +62,7 @@ object IsomorphismTest extends JasmineTest {
 
   def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i,j) union bnKnowsBN(j,i)
 
-  def owlSameAs(node1: RDFStoreRDFNode,node2: RDFStoreRDFNode) =
+  def owlSameAs(node1: Rdf#Node,node2: Rdf#Node) =
     Graph(Triple(node1,URI("http://www.w3.org/2002/07/owl#sameAs"),node2))
 
 
@@ -70,7 +70,9 @@ object IsomorphismTest extends JasmineTest {
 
     it("a completely grounded graph ( no blank nodes ) ") {
       val (grounded, nongrounded) = groundTripleFilter(groundedGraph)
-      expect(grounded == groundedGraph).toEqual(true)
+      grounded.toIterable foreach {
+        triple => expect( groundedGraph.contains(triple) ).toEqual(true)
+      }
       expect(nongrounded == emptyGraph).toEqual(true)
     }
 

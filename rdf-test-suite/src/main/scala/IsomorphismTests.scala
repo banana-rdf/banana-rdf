@@ -1,9 +1,8 @@
-package org.w3.banana.plantain
+package org.w3.banana.util
 
 
 import org.scalatest.{Matchers, WordSpec}
-import org.w3.banana.plantain.GraphEquivalence._
-import org.w3.banana.plantain.model.Node
+import org.w3.banana.{RDFOps, RDF}
 
 import scala.collection.immutable.ListMap
 import scala.util.Success
@@ -12,14 +11,16 @@ import scala.util.Success
  * Tests for the isomorphism functions
  * Created by Henry Story on 13/07/2014.
  */
-class IsomorphismTest extends WordSpec with Matchers {
+abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
+  extends WordSpec with Matchers {
 
-  import org.w3.banana.plantain.Plantain._
-  import Ops._
+  import ops._
   import org.w3.banana.diesel._
 
+  val graphIsomorphism = new GraphIsomporphism()(ops)
+  import graphIsomorphism._
 
-  def foaf(tag: String): Plantain#URI = URI("http://xmlns.com/foaf/0.1/"+tag)
+  def foaf(tag: String): Rdf#URI = URI("http://xmlns.com/foaf/0.1/"+tag)
 
   val hjs = URI("http://bblfish.net/people/henry/card#me")
   val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
@@ -27,21 +28,23 @@ class IsomorphismTest extends WordSpec with Matchers {
   def antonio(i: Int) = BNode("antonio"+i)
 
   val groundedGraph = (
-    toPointedGraphW[Plantain](hjs)
+    toPointedGraphW[Rdf](hjs)
       -- foaf("knows") ->- timbl
       -- foaf("name") ->- "Henry Story"
   ).graph
 
 //  val bnodeGraph = (
-//      toPointedGraphW[Plantain](URI("#me"))
-//        -- foaf("knows") ->- toPointedGraphW[Plantain](bnode("alex"))
+//      toPointedGraphW[Rdf](URI("#me"))
+//        -- foaf("knows") ->- toPointedGraphW[Rdf](bnode("alex"))
 //    ).graph union (
-//      toPointedGraphW[Plantain](bnode("alex"))
+//      toPointedGraphW[Rdf](bnode("alex"))
 //        -- foaf("name") ->- "Alexandre Bertails"
 //    ).graph
 
 
-  def bnAlexRel1Graph(i: Int=1) = Graph(Triple(alex(i), foaf("homePage"), URI("http://bertails.org/")))
+  def bnAlexRel1Graph(i: Int=1) = Graph(
+    Triple(alex(i), foaf("homePage"), URI("http://bertails.org/"))
+  )
 
   def bnAlexRel2Graph(i: Int=1) = Graph(
     Triple(hjs, foaf("knows"), alex(i)),
@@ -64,7 +67,7 @@ class IsomorphismTest extends WordSpec with Matchers {
 
   def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i,j) union bnKnowsBN(j,i)
 
-  def owlSameAs(node1: Node,node2: Node) =
+  def owlSameAs(node1: Rdf#Node,node2: Rdf#Node) =
     Graph(Triple(node1,URI("http://www.w3.org/2002/07/owl#sameAs"),node2))
 
 
@@ -72,20 +75,33 @@ class IsomorphismTest extends WordSpec with Matchers {
 
     "a completely grounded graph ( no blank nodes ) " in {
       val (grounded, nongrounded) = groundTripleFilter(groundedGraph)
-      grounded should equal(groundedGraph)
+      grounded.toIterable foreach {
+        triple => assert(groundedGraph.contains(triple))
+      }
       nongrounded should equal(emptyGraph)
     }
 
     "an ungrounded graph ( all statements contain a bnode )" in {
-      val (grounded, nongrounded) = groundTripleFilter(bnAlexRel2Graph())
-      grounded should equal(emptyGraph)
-      nongrounded should equal(nongrounded)
+      val rel2Graph = bnAlexRel2Graph()
+      val (grounded, nongrounded) = groundTripleFilter(rel2Graph)
+      grounded.size should equal(0)
+      nongrounded.size should equal(rel2Graph.size)
+      nongrounded.toIterable foreach {
+        triple => assert(rel2Graph.contains(triple))
+      }
     }
 
     "a graph with grounded and ungrounded statements " in {
-      val (grounded, nongrounded) = groundTripleFilter(groundedGraph.graph union bnAlexRel2Graph())
-      grounded should equal(groundedGraph)
-      nongrounded should equal(nongrounded)
+      val rel2Graph = bnAlexRel2Graph()
+      val (grounded, nongrounded) = groundTripleFilter(groundedGraph.graph union rel2Graph)
+      grounded.size should be(groundedGraph.size)
+      grounded.toIterable foreach {
+        triple => assert(groundedGraph.contains(triple))
+      }
+      nongrounded.size should be(rel2Graph.size)
+      nongrounded.toIterable foreach {
+        triple => assert(rel2Graph.contains(triple))
+      }
     }
 
   }

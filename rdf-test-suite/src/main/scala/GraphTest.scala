@@ -54,12 +54,14 @@ abstract class GraphTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
       isomorphism(foo, fooReference) should be(true)
       isomorphism(bar, barReference) should be(true)
       isomorphism(foo, bar) should be(false)
+      graphSize(result) should be (graphSize(foobar))
       isomorphism(foobar, result) should be(true)
     }
 
     "union of Nil must return an empty graph" in {
       val result: Rdf#Graph = union(Nil)
       isomorphism(result, emptyGraph) should be(true)
+      graphSize(result) should be (0)
     }
 
     "union of a single graph must return an isomorphic graph" in {
@@ -76,10 +78,12 @@ abstract class GraphTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     "removing one triple in a 2 triple graph must leave the other triple in the graph" in {
 
       val d = diff(foo1gr union bar1gr, foo1gr)
+      graphSize(d) should be ( graphSize(bar1gr))
       isomorphism(d, bar1gr) should be(true)
 
       val oneBNGraph = bnNameGr(1, "Henry") union bnNameGr(1, "Alexandre")
       val d2 = diff(oneBNGraph, bnNameGr(1, "Alexandre"))
+      graphSize(d2) should be ( 1 )
       isomorphism(d2, bnNameGr(1, "Henry")) should be(true)
 
       val twoBNGraph = bnNameGr(1, "Henry") union bnNameGr(2, "Alexandre")
@@ -90,6 +94,7 @@ abstract class GraphTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
     "removing a triple that is not present in a 2 triple graph must return the same graph" in {
       val d = diff(foo1gr union bar1gr, bnNameGr(1, "George"))
+      graphSize(d) should be( graphSize(foo1gr union bar1gr))
       isomorphism(d, foo1gr union bar1gr) should be(true)
 
       val oneBNGraph = bnNameGr(1, "Henry") union bnNameGr(1, "Alexandre")

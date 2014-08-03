@@ -1,10 +1,11 @@
 package org.w3.banana.rdfstorew
 
-import scala.scalajs.js
-import scala.scalajs.js.Dynamic.global
-import akka.http.model.{IllegalUriException, Uri}
+import akka.http.model.Uri
+import org.w3.banana.util.GraphIsomporphism
+import org.w3.banana.{RDFOps, URIOps}
+import java.net.{URI=>jURI}
 
-import org.w3.banana.{URIOps, RDFOps}
+import scala.scalajs.js
 
 trait JSUtils {
   def log(obj:RDFStoreRDFNode) = js.Dynamic.global.console.log(obj.jsNode)
@@ -57,7 +58,10 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
       rdfjs(underlying.copy(path = path / segment))
   }
 
-  def relativize(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = throw new Exception("RELATIVIZE NOT IMPLEMENTED")
+  def relativize(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = {
+    val result = new jURI(uri.nominalValue).relativize(new jURI(other.nominalValue))
+    (new RDFStoreOps()).makeUri(result.toString)
+  }
 
   def newChildUri(uri: RDFStore#URI): RDFStore#URI = {
     val segment = java.util.UUID.randomUUID().toString.replace("-", "")
@@ -136,7 +140,14 @@ class RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
     }
 
 
-  override def isomorphism(left: RDFStore#Graph, right: RDFStore#Graph): Boolean = GraphEquivalence.findAnswer(left,right).isSuccess
+  // graph isomorphism ( why does this have to be created anew every time? ie. why a def? )
+  def iso = new GraphIsomporphism()(new RDFStoreOps())
+
+  override def isomorphism(left: RDFStore#Graph, right: RDFStore#Graph): Boolean =
+    iso.findAnswer(left,right).isSuccess
+
+  def graphSize(g: RDFStore#Graph): Int = g.size
+
 
   override def find(graph: RDFStore#Graph, subject: RDFStore#NodeMatch, predicate: RDFStore#NodeMatch, objectt: RDFStore#NodeMatch): Iterator[RDFStore#Triple] = {
 

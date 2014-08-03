@@ -1,7 +1,8 @@
-package org.w3.banana.rdfstorew.test
+package org.w3.banana.jasmine.test
 
 
 import org.w3.banana.rdfstorew._
+import org.w3.banana.util.IsomorphismTests
 
 
 object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[RDFStore]
@@ -22,5 +23,7 @@ object TurtleTestJasmineSuite extends TurtleTestJasmineSuite[RDFStore]
 
 object GraphStoreJasmineTest extends GraphStoreJasmineTest[RDFStore](RDFStoreW(Map()))
 
-
 object SparqlEngineJasmineTest extends SparqlEngineJasmineTest[RDFStore](RDFStoreW(Map()))
+
+object StandardIsomorphismTest extends IsomorphismTests[RDFStore]
+

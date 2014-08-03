@@ -1,8 +1,6 @@
 package org.w3.banana.syntax
 
 import org.w3.banana._
-import org.w3.banana.binder._
-import scala.util.Try
 
 trait NodeSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
@@ -19,6 +17,10 @@ class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
     import ops._
     foldNode(node)(ops.resolve(baseUri, _), bn => bn, lit => lit)
   }
+
+  def isBNode(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url=>false, bn=>true,lit=>false)
+  def isLiteral(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url=>false, bn=>false,lit=>true)
+  def isURI(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url=>true, bn=>false,lit=>false)
 
   def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
     import ops._

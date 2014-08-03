@@ -9,7 +9,7 @@ object RDFOps {
 /**
  * A Module that gathers the types needed to define an RDF implementation
  * Closely based on
- *   http://dvcs.w3.org/hg/rdf/raw-file/default/rdf-concepts/index.html
+ *   http://www.w3.org/TR/rdf11-concepts/
  * But with the  notable exceptions:
  *   - we allow literals in subject position
  */
@@ -84,6 +84,9 @@ trait RDFOps[Rdf <: RDF]
 
   // graph isomorphism
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
+
+  // graph size
+  def graphSize(g: Rdf#Graph): Int
 
   //  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): syntax.SparqlSolutionSyntax[Rdf] = new syntax.SparqlSolutionSyntax[Rdf](solution)
   //

@@ -20,6 +20,12 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
 
   def isIsomorphicWith(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Boolean = ops.isomorphism(graph, otherGraph)
 
+  def contains(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]): Boolean = {
+    val (sub,rel,obj) = ops.fromTriple(triple)
+    import ops.toConcreteNodeMatch
+    ops.find(graph,sub,rel,obj).hasNext
+  }
+
   /**
    * returns a copy of the graph where uri are transformed through urifunc
    */
@@ -47,5 +53,7 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
     val instances = ops.getSubjects(graph, ops.rdf("type"), clazz): Iterable[Rdf#Node]
     new PointedGraphs(instances, graph)
   }
+
+  def size(implicit ops: RDFOps[Rdf]): Int = ops.graphSize(graph)
 
 }

@@ -3,6 +3,8 @@ package org.w3.banana.pome
 import org.w3.banana._
 import java.net.{URI=>jURI}
 
+import org.w3.banana.util.GraphIsomporphism
+
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
   // graph
@@ -88,7 +90,13 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
     def loop(g: Plantain#Graph, triples: Iterator[Plantain#Triple]): Plantain#Graph = {
       if (triples.hasNext) {
         val triple = triples.next()
-        loop(g.removeExistingTriple(triple), triples)
+        loop(
+          try {
+            g.removeExistingTriple(triple)
+          } catch {
+            case e: NoSuchElementException => g
+          },
+          triples)
       } else {
         g
       }
@@ -97,12 +105,13 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   }
 
   // graph isomorphism
+  val iso = new GraphIsomporphism()(PlantainOps)
 
-  // TODO: remove dependency on Sesame
-  // the definition for RDF Graph isomorphism can be found at http://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/#h3_graph-isomorphism
-  // here is an old paper discussing implementation details http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
-  def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = ???
+  def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
+    iso.findAnswer(left, right).isSuccess
+  }
 
+  def graphSize(g: Plantain#Graph): Int = g.size
 
 
 
