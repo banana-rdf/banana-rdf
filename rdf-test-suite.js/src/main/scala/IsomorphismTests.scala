@@ -30,7 +30,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
   val graphIsomorphism = new GraphIsomporphism()(ops)
   import graphIsomorphism._
 
-  def foaf(tag: String) = URI("http://xmlns.com/foaf/0.1/" + tag)
+  val foaf = FOAFPrefix[Rdf]
 
   val hjs = URI("http://bblfish.net/people/henry/card#me")
 
@@ -59,7 +59,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
     Triple(alex(i), foaf("name"), "Alexandre Bertails".toNode)
   )
 
-  def bnAntonioRel1Graph(i: Int = 1) = Graph(Triple(antonio(i), foaf("homePage"), URI("https://github.com/antoniogarrote/")))
+  def bnAntonioRel1Graph(i: Int = 1) = Graph(Triple(antonio(i), foaf("homepage"), URI("https://github.com/antoniogarrote/")))
 
   def bnAntonioRel2Graph(i: Int = 1) = Graph(
     Triple(hjs, foaf("knows"), antonio(i)),
@@ -107,12 +107,12 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       val clz = bnodeClassify(bnAlexRel1Graph())
       expect(clz.size).toEqual(1)
       expect(clz.head._2.size).toEqual(1) // only one bnode in this graph
-      expect(clz.head._1 == (new VerticeType(List((foaf("homePage"), 1)), List()))).toEqual(true)
+      expect(clz.head._1 == (new VerticeType(List((foaf("homepage"), 1)), List()))).toEqual(true)
 
       val clz2 = bnodeClassify(bnAntonioRel1Graph())
       expect(clz2.size).toEqual(1)
       expect(clz2.head._2.size).toEqual(1) // only one bnode in this graph
-      expect(clz2.head._1 == (new VerticeType(List((foaf("homePage"), 1)), List()))).toEqual(true)
+      expect(clz2.head._1 == (new VerticeType(List((foaf("homepage"), 1)), List()))).toEqual(true)
 
     }
 
@@ -132,12 +132,12 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       val clz = bnodeClassify(bnAlexRel1Graph() union bnAlexRel2Graph())
       expect(clz.size).toEqual(1)
       expect(clz.head._2.size).toEqual(1) // only one bnode in this classification
-      expect(clz.head._1 == (new VerticeType(List((foaf("name"), 1), (foaf("homePage"), 1)), List((foaf("knows"), 1))))).toEqual(true)
+      expect(clz.head._1 == (new VerticeType(List((foaf("name"), 1), (foaf("homepage"), 1)), List((foaf("knows"), 1))))).toEqual(true)
 
       val clz2 = bnodeClassify(bnAntonioRel1Graph() union bnAntonioRel2Graph())
       expect(clz2.size).toEqual(1)
       expect(clz2.head._2.size).toEqual(1) // only one bnode in this classification
-      expect(clz2.head._1 == (new VerticeType(List((foaf("name"), 1), (foaf("homePage"), 1)), List((foaf("knows"), 1))))).toEqual(true)
+      expect(clz2.head._1 == (new VerticeType(List((foaf("name"), 1), (foaf("homepage"), 1)), List((foaf("knows"), 1))))).toEqual(true)
     }
 
     it("two bnodes with each same type of relation") {
@@ -145,7 +145,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       val clz = bnodeClassify(bnGr)
       expect(clz.size).toEqual(1)
       expect(clz.head._2.size).toEqual(2) // 2 bnodes in this classification
-      expect(clz.head._1 == (new VerticeType(List((foaf("homePage"), 1)), List()))).toEqual(true)
+      expect(clz.head._1 == (new VerticeType(List((foaf("homepage"), 1)), List()))).toEqual(true)
     }
 
     it("two bnodes with each 2 relations of same type") {
@@ -159,6 +159,20 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
   }
 
   describe("test bnode mapping solutions ") {
+    it("two grounded graphs with one relation") {
+      val g1 = (hjs -- foaf.name ->- "Henry Story").graph
+      val expected = Graph(Triple(hjs, foaf("name"), Literal("Henry Story")))
+      val answer = findAnswer(g1, expected)
+      expect(answer == Success(List())).toEqual(true)
+    }
+
+    it("two grounded graphs with 2 relations") {
+      val g1 = groundedGraph
+      val expected = groundedGraph
+      val answer = findAnswer(g1, expected)
+      expect(answer ==Success(List())).toBe(true)
+    }
+
     it("two graphs with 1 relation and 1 bnode") {
       val maps = bnodeMappingGenerator(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
       expect(maps == Success(ListMap(alex(1) -> Set(alex(2))))).toEqual(true)
@@ -301,6 +315,29 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       expect(mapVerify(asymmetric, asymmetric, Map(xbn(0) -> xbn(2), xbn(1) -> xbn(0), xbn(2) -> xbn(1))).isEmpty).toEqual(false)
 
     }
+  }
+
+   describe("isomorphism tests") {
+
+    it("a 1 triple ground graph")  {
+      val g1 = (hjs -- foaf.name ->- "Henry Story").graph
+      val expected = Graph(Triple(hjs,foaf.name,Literal("Henry Story")))
+      println(s"g1=$g1")
+      println(s"g2=$expected")
+      val fa = findAnswer(g1,expected)
+      println(s"fa=$fa")
+      expect(fa.isSuccess).toEqual(true)
+
+      val nonExpected = Graph(Triple(hjs,foaf.name,Literal("Henri Story")))
+      expect(findAnswer(g1,nonExpected).isSuccess).toEqual(true)
+    }
+
+    it("two grounded graphs with 2 relations") {
+      val g1 = groundedGraph
+      val expected = groundedGraph
+      expect(findAnswer(g1, expected).isSuccess).toEqual(true)
+    }
+
   }
 
 }

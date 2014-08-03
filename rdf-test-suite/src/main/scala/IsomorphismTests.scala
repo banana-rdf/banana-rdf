@@ -2,7 +2,7 @@ package org.w3.banana.util
 
 
 import org.scalatest.{Matchers, WordSpec}
-import org.w3.banana.{RDFOps, RDF}
+import org.w3.banana.{FOAFPrefix, RDFOps, RDF}
 
 import scala.collection.immutable.ListMap
 import scala.util.Success
@@ -17,52 +17,53 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
   import ops._
   import org.w3.banana.diesel._
 
+
   val graphIsomorphism = new GraphIsomporphism()(ops)
   import graphIsomorphism._
 
-  def foaf(tag: String): Rdf#URI = URI("http://xmlns.com/foaf/0.1/"+tag)
+  val foaf = FOAFPrefix[Rdf]
 
   val hjs = URI("http://bblfish.net/people/henry/card#me")
   val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
   def alex(i: Int) = BNode("alex"+i)
   def antonio(i: Int) = BNode("antonio"+i)
 
-  val groundedGraph = (
+  def groundedGraph = (
     toPointedGraphW[Rdf](hjs)
-      -- foaf("knows") ->- timbl
-      -- foaf("name") ->- "Henry Story"
+      -- foaf.knows ->- timbl
+      -- foaf.name ->- "Henry Story"
   ).graph
 
 //  val bnodeGraph = (
 //      toPointedGraphW[Rdf](URI("#me"))
-//        -- foaf("knows") ->- toPointedGraphW[Rdf](bnode("alex"))
+//        -- foaf.knows ->- toPointedGraphW[Rdf](bnode("alex"))
 //    ).graph union (
 //      toPointedGraphW[Rdf](bnode("alex"))
-//        -- foaf("name") ->- "Alexandre Bertails"
+//        -- foaf.name ->- "Alexandre Bertails"
 //    ).graph
 
 
   def bnAlexRel1Graph(i: Int=1) = Graph(
-    Triple(alex(i), foaf("homePage"), URI("http://bertails.org/"))
+    Triple(alex(i), foaf.homepage, URI("http://bertails.org/"))
   )
 
   def bnAlexRel2Graph(i: Int=1) = Graph(
-    Triple(hjs, foaf("knows"), alex(i)),
-    Triple(alex(i), foaf("name"), "Alexandre Bertails".toNode)
+    Triple(hjs, foaf.knows, alex(i)),
+    Triple(alex(i), foaf.name, "Alexandre Bertails".toNode)
   )
 
 
-  def bnAntonioRel1Graph(i: Int=1) = Graph(Triple(antonio(i), foaf("homePage"), URI("https://github.com/antoniogarrote/")))
+  def bnAntonioRel1Graph(i: Int=1) = Graph(Triple(antonio(i), foaf("homepage"), URI("https://github.com/antoniogarrote/")))
 
   def bnAntonioRel2Graph(i: Int=1) = Graph(
-    Triple(hjs, foaf("knows"), antonio(i)),
-    Triple(antonio(i), foaf("name"), "Antonio Garrote".toNode)
+    Triple(hjs, foaf.knows, antonio(i)),
+    Triple(antonio(i), foaf.name, "Antonio Garrote".toNode)
   )
 
   def xbn(i: Int) = BNode("x"+i)
 
   def bnKnowsBN(i:Int, j: Int) = Graph(
-    Triple(xbn(i),foaf("knows"),xbn(j))
+    Triple(xbn(i),foaf.knows,xbn(j))
   )
 
   def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i,j) union bnKnowsBN(j,i)
@@ -112,12 +113,12 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
       val clz = bnodeClassify(bnAlexRel1Graph())
       clz.size should be(1)
       clz.head._2.size should be(1) // only one bnode in this graph
-      clz.head._1 should be(new VerticeType(List((foaf("homePage"), 1)), List()))
+      clz.head._1 should be(new VerticeType(List((foaf.homepage, 1)), List()))
 
       val clz2 = bnodeClassify(bnAntonioRel1Graph())
       clz2.size should be(1)
       clz2.head._2.size should be(1) // only one bnode in this graph
-      clz2.head._1 should be(new VerticeType(List((foaf("homePage"), 1)), List()))
+      clz2.head._1 should be(new VerticeType(List((foaf.homepage, 1)), List()))
 
     }
 
@@ -125,24 +126,24 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
       val clz = bnodeClassify(bnAlexRel2Graph())
       clz.size should be(1)
       clz.head._2.size should be(1) // only one bnode in this classification
-      clz.head._1 should be(new VerticeType(List((foaf("name"), 1)), List((foaf("knows"), 1))))
+      clz.head._1 should be(new VerticeType(List((foaf.name, 1)), List((foaf.knows, 1))))
 
       val clz2 = bnodeClassify(bnAntonioRel2Graph())
       clz2.size should be(1)
       clz2.head._2.size should be(1) // only one bnode in this classification
-      clz2.head._1 should be(new VerticeType(List((foaf("name"), 1)), List((foaf("knows"), 1))))
+      clz2.head._1 should be(new VerticeType(List((foaf.name, 1)), List((foaf.knows, 1))))
     }
 
     "one bnode with 3 relations" in {
       val clz = bnodeClassify(bnAlexRel1Graph() union bnAlexRel2Graph())
       clz.size should be(1)
       clz.head._2.size should be(1) // only one bnode in this classification
-      clz.head._1 should be(new VerticeType(List((foaf("name"), 1), (foaf("homePage"), 1)), List((foaf("knows"), 1))))
+      clz.head._1 should be(new VerticeType(List((foaf.name, 1), (foaf.homepage, 1)), List((foaf.knows, 1))))
 
       val clz2 = bnodeClassify(bnAntonioRel1Graph() union bnAntonioRel2Graph())
       clz2.size should be(1)
       clz2.head._2.size should be(1) // only one bnode in this classification
-      clz2.head._1 should be(new VerticeType(List((foaf("name"), 1), (foaf("homePage"), 1)), List((foaf("knows"), 1))))
+      clz2.head._1 should be(new VerticeType(List((foaf.name, 1), (foaf.homepage, 1)), List((foaf.knows, 1))))
     }
 
     "two bnodes with each same type of relation" in {
@@ -150,7 +151,7 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
       val clz = bnodeClassify(bnGr)
       clz.size should be(1)
       clz.head._2.size should be(2) // 2 bnodes in this classification
-      clz.head._1 should be(new VerticeType(List((foaf("homePage"), 1)), List()))
+      clz.head._1 should be(new VerticeType(List((foaf("homepage"), 1)), List()))
     }
 
     "two bnodes with each 2 relations of same type" in {
@@ -165,58 +166,72 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
   }
 
   "test bnode mapping solutions " when {
-      "two graphs with 1 relation and 1 bnode" in {
-        val maps = bnodeMappingGenerator(bnAlexRel1Graph(1),bnAlexRel1Graph(2))
-        maps should equal(Success(ListMap(alex(1)->Set(alex(2)))))
-        val answer = findAnswer(bnAlexRel1Graph(1),bnAlexRel1Graph(2))
-        answer should equal(Success(List(alex(1)->(alex(2)))))
-      }
+    "two grounded graphs with one relation" in {
+      val g1 = (hjs -- foaf.name ->- "Henry Story").graph
+      val expected = Graph(Triple(hjs, foaf("name"), Literal("Henry Story")))
+      val answer = findAnswer(g1, expected)
+      answer should equal(Success(List()))
+    }
+
+    "two grounded graphs with 2 relations" in {
+      val g1 = groundedGraph
+      val expected = groundedGraph
+      val answer = findAnswer(g1, expected)
+      answer should equal(Success(List()))
+    }
+
+    "two graphs with 1 relation and 1 bnode" in {
+      val maps = bnodeMappingGenerator(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
+      maps should equal(Success(ListMap(alex(1) -> Set(alex(2)))))
+      val answer = findAnswer(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
+      answer should equal(Success(List(alex(1) -> (alex(2)))))
+    }
 
     "two graphs with 2 relation and 1 bnode each" in {
-      val maps = bnodeMappingGenerator(bnAlexRel2Graph(1),bnAlexRel2Graph(2))
-      maps should equal(Success(ListMap(alex(1)->Set(alex(2)))))
-      val answer = findAnswer(bnAlexRel2Graph(1),bnAlexRel2Graph(2))
-      answer should equal(Success(List(alex(1)->(alex(2)))))
+      val maps = bnodeMappingGenerator(bnAlexRel2Graph(1), bnAlexRel2Graph(2))
+      maps should equal(Success(ListMap(alex(1) -> Set(alex(2)))))
+      val answer = findAnswer(bnAlexRel2Graph(1), bnAlexRel2Graph(2))
+      answer should equal(Success(List(alex(1) -> (alex(2)))))
     }
 
     "two graphs with 3 relations and 1 bnode each " in {
       val maps = bnodeMappingGenerator(
         bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
         bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
-      maps should equal(Success(ListMap(alex(1)->Set(alex(2)))))
+      maps should equal(Success(ListMap(alex(1) -> Set(alex(2)))))
       val answer = findAnswer(
         bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
         bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
-      answer should equal(Success(List(alex(1)->(alex(2)))))
+      answer should equal(Success(List(alex(1) -> (alex(2)))))
     }
 
     "two graphs with 2 relations and 2 bnodes each" in {
       for (l <- findPossibleMappings(
         bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
         bnAlexRel1Graph(2) union bnAntonioRel1Graph(2))) {
-         //with this system of categorisation the categories are very light
+        //with this system of categorisation the categories are very light
         // and they don't distinguish the literals
         //also the returned set covers symmetric results - this can also be optimised!
-         l.size should be (4)
+        l.size should be(4)
       }
 
       val answer = findAnswer(
         bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
         bnAlexRel1Graph(2) union bnAntonioRel1Graph(2)
       )
-      answer.isSuccess should be (true)
-      answer.get.size should be (2)
-      answer.get should contain (alex(1)->alex(2))
-      answer.get should contain (antonio(1)->antonio(2))
+      answer.isSuccess should be(true)
+      answer.get.size should be(2)
+      answer.get should contain(alex(1) -> alex(2))
+      answer.get should contain(antonio(1) -> antonio(2))
     }
 
     """two graphs with 3 relations each.
       | But one category has 1 solution the other that has two.
       | The category with 1 solutions must be shown first""".stripMargin in {
-      val g1 = bnAlexRel1Graph(1) union bnAntonioRel1Graph(1) union bnAlexRel2Graph(2)    union bnAlexRel1Graph(0) union bnAlexRel2Graph(0)
+      val g1 = bnAlexRel1Graph(1) union bnAntonioRel1Graph(1) union bnAlexRel2Graph(2) union bnAlexRel1Graph(0) union bnAlexRel2Graph(0)
       val g2 = bnAlexRel1Graph(3) union bnAntonioRel1Graph(3) union bnAntonioRel2Graph(4) union bnAlexRel1Graph(5) union bnAlexRel2Graph(5)
-      val answers = findPossibleMappings(g1,g2)
-      val answer= findAnswer(g1,g2)
+      val answers = findPossibleMappings(g1, g2)
+      val answer = findAnswer(g1, g2)
       answer.isFailure should be(true)
 
     }
@@ -309,5 +324,24 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
        mapVerify(asymmetric,asymmetric,Map(xbn(0)->xbn(2),xbn(1)->xbn(0),xbn(2)->xbn(1))) should not be empty
 
     }
+  }
+
+  "isomorphism tests" when {
+
+    "a 1 triple ground graph" in {
+      val g1 = (hjs -- foaf.name ->- "Henry Story").graph
+      val expected = Graph(Triple(hjs,foaf.name,Literal("Henry Story")))
+      findAnswer(g1,expected).isSuccess should be(true)
+
+      val nonExpected = Graph(Triple(hjs,foaf.name,Literal("Henri Story")))
+      findAnswer(g1,nonExpected).isSuccess should be(false)
+    }
+
+    "two grounded graphs with 2 relations" in {
+      val g1 = groundedGraph
+      val expected = groundedGraph
+      findAnswer(g1, expected).isSuccess should be(true)
+    }
+
   }
 }

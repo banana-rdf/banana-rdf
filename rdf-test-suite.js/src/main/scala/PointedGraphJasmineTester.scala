@@ -1,6 +1,6 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
+import org.w3.banana.{RDFStore => RDFStoreInterface, _}
 
 import scala.scalajs.test.JasmineTest
 
@@ -38,6 +38,7 @@ abstract class PointedGraphJasmineTester[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]
       expect(pg1.equals(pg2)).toEqual(false)
     }
 
+    //todo: this test does appear in the rdf-test-suite, and is not required by the spec of PointedGraph
     it("with bnode pointers") {
       val bnode = BNode()
       val graph = Graph(Triple(bnode, rdf.first, Literal.tagged("Henry", Lang("en"))))

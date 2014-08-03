@@ -3,7 +3,7 @@ package org.w3.banana.pome.test.jasmine
 
 import org.w3.banana.jasmine.test._
 import org.w3.banana.pome.Plantain
-import org.w3.banana.util.IsomorphismTests
+
 
 
 object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[Plantain]
@@ -26,5 +26,5 @@ object UriSyntaxJasmineTest extends UriSyntaxJasmineTest[Plantain]
 
 //object SparqlEngineJasmineTest extends SparqlEngineJasmineTest[RDFStore](PlantainOps)
 
-object StandardIsomorphismTest extends IsomorphismTests[Plantain]
+object StandardIsomorphismTest extends IsomorphismTests[Plantain]()
 
