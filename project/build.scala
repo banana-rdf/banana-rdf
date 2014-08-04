@@ -242,7 +242,7 @@ object BananaRdfBuild extends Build {
     settings =   buildSettings ++ testDeps ++ scalaJSSettings ++ Seq(
       resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
       libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1",
-      libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0-RC1"
+      libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0"
     )
   ) dependsOn (rdf, rdfTestSuite % "test", rdfTestSuiteJS % "test")
 
