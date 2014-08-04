@@ -322,16 +322,12 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
     it("a 1 triple ground graph")  {
       val g1 = (hjs -- foaf.name ->- "Henry Story").graph
       val expected = Graph(Triple(hjs,foaf.name,Literal("Henry Story")))
-      println(s"g1=$g1")
-      println(s"g2=$expected")
       val fa = findAnswer(g1,expected)
-      println(s"fa=$fa")
       val success: Boolean = fa.isSuccess
-      println(s"fa.isSuccess=${success}")
       expect(success).toEqual(true)
 
       val nonExpected = Graph(Triple(hjs,foaf.name,Literal("Henri Story")))
-      expect(findAnswer(g1,nonExpected).isSuccess).toEqual(true)
+      expect(findAnswer(g1,nonExpected).isSuccess).toEqual(false)
     }
 
     it("two grounded graphs with 2 relations") {
