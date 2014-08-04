@@ -168,9 +168,8 @@ abstract class DieselGraphConstructJasmineTest[Rdf <: RDF]()(implicit ops: RDFOp
       val expectedGraph =
         Graph(
           Triple(bnode("betehess"), foaf.name, Literal("Alexandre", xsd.string)),
-          Triple(bnode("betehess"), foaf.age, Literal("29", xsd.int)),
+          Triple(bnode("betehess"), foaf.age, Literal("29", xsd.integer)),
           Triple(bnode("betehess"), foaf.height, Literal("1.8", xsd.double)))
-
       expect(g isIsomorphicWith expectedGraph).toEqual(true)
     }
 

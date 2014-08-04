@@ -133,6 +133,15 @@ case class URI(underlying: jURI) extends Node
 
 case class BNode(label: String) extends Node
 
+//JavaScript is Single Threaded so there is no need to synchronise
+object BNode {
+  private var i: Long = 0
+  def generate: BNode = {
+    i += 1
+    BNode(""+i)
+  }
+}
+
 case class Literal(lexicalForm: String, datatype: URI, langOpt: Option[String]) extends Node
 
 sealed trait NodeMatch

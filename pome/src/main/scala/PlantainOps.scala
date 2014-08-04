@@ -40,7 +40,9 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
   // bnode
 
-  def makeBNode(): Plantain#BNode = model.BNode(java.util.UUID.randomUUID().toString)
+  def makeBNode(): Plantain#BNode = {
+    model.BNode.generate
+  }
 
   def makeBNodeLabel(label: String): Plantain#BNode = model.BNode(label)
 
