@@ -326,7 +326,9 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       println(s"g2=$expected")
       val fa = findAnswer(g1,expected)
       println(s"fa=$fa")
-      expect(fa.isSuccess).toEqual(true)
+      val success: Boolean = fa.isSuccess
+      println(s"fa.isSuccess=${success}")
+      expect(success).toEqual(true)
 
       val nonExpected = Graph(Triple(hjs,foaf.name,Literal("Henri Story")))
       expect(findAnswer(g1,nonExpected).isSuccess).toEqual(true)
@@ -335,6 +337,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
     it("two grounded graphs with 2 relations") {
       val g1 = groundedGraph
       val expected = groundedGraph
+
       expect(findAnswer(g1, expected).isSuccess).toEqual(true)
     }
 
