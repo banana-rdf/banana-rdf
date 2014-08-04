@@ -46,7 +46,6 @@ class LinkHeaderParser[Rdf<:RDF](implicit ops: RDFOps[Rdf]) extends JavaTokenPar
       val obj = URI(uriStr)
       var anchor=URI("")
       val trpls = for (av <- attVals.flatten) yield {
-        System.out.println(av)
         av match {
           case Rel(rel,rev) =>      TripleBuilder(rel,obj,rev)
           case Anchor(a)=> { anchor = a ; null }

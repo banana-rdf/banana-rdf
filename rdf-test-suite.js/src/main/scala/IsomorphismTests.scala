@@ -52,24 +52,24 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
   //        -- foaf("name") ->- "Alexandre Bertails"
   //    ).graph
 
-  def bnAlexRel1Graph(i: Int = 1) = Graph(Triple(alex(i), foaf("homePage"), URI("http://bertails.org/")))
+  def bnAlexRel1Graph(i: Int = 1) = Graph(Triple(alex(i), foaf.homepage, URI("http://bertails.org/")))
 
   def bnAlexRel2Graph(i: Int = 1) = Graph(
-    Triple(hjs, foaf("knows"), alex(i)),
-    Triple(alex(i), foaf("name"), "Alexandre Bertails".toNode)
+    Triple(hjs, foaf.knows, alex(i)),
+    Triple(alex(i), foaf.name, "Alexandre Bertails".toNode)
   )
 
-  def bnAntonioRel1Graph(i: Int = 1) = Graph(Triple(antonio(i), foaf("homepage"), URI("https://github.com/antoniogarrote/")))
+  def bnAntonioRel1Graph(i: Int = 1) = Graph(Triple(antonio(i), foaf.homepage, URI("https://github.com/antoniogarrote/")))
 
   def bnAntonioRel2Graph(i: Int = 1) = Graph(
-    Triple(hjs, foaf("knows"), antonio(i)),
-    Triple(antonio(i), foaf("name"), "Antonio Garrote".toNode)
+    Triple(hjs, foaf.knows, antonio(i)),
+    Triple(antonio(i), foaf.name, "Antonio Garrote".toNode)
   )
 
   def xbn(i: Int) = BNode("x" + i)
 
   def bnKnowsBN(i: Int, j: Int) = Graph(
-    Triple(xbn(i), foaf("knows"), xbn(j))
+    Triple(xbn(i), foaf.knows, xbn(j))
   )
 
   def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i, j) union bnKnowsBN(j, i)
@@ -323,8 +323,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       val g1 = (hjs -- foaf.name ->- "Henry Story").graph
       val expected = Graph(Triple(hjs,foaf.name,Literal("Henry Story")))
       val fa = findAnswer(g1,expected)
-      val success: Boolean = fa.isSuccess
-      expect(success).toEqual(true)
+      expect( fa.isSuccess ).toEqual(true)
 
       val nonExpected = Graph(Triple(hjs,foaf.name,Literal("Henri Story")))
       expect(findAnswer(g1,nonExpected).isSuccess).toEqual(false)

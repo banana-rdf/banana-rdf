@@ -153,7 +153,6 @@ abstract class DieselGraphConstructJasmineTest[Rdf <: RDF]()(implicit ops: RDFOp
         Graph(
           Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
         )
-      println(s"g=${g.graph} expectedGraph=$expectedGraph")
       expect(g.graph isIsomorphicWith expectedGraph).toEqual(true)
     }
 
