@@ -260,7 +260,7 @@ abstract class DieselGraphConstructJasmineTest[Rdf <: RDF]()(implicit ops: RDFOp
       val expectedGraph =
         Graph(
           Triple(bnode("a"), foaf.name, Literal("Alexandre", xsd.string)),
-          Triple(bnode("a"), foaf.age, Literal("29", xsd.int)),
+          Triple(bnode("a"), foaf.age, Literal("29", xsd.integer)),
           Triple(bnode("h"), foaf.name, Literal("Henry", xsd.string)),
           Triple(bnode("h"), foaf.height, Literal("1.92", xsd.double))
         )
@@ -278,7 +278,7 @@ abstract class DieselGraphConstructJasmineTest[Rdf <: RDF]()(implicit ops: RDFOp
       )
 
       val expectedGraph = Graph(Set(
-        Triple(bnode("betehess"), foaf.name, Literal("1", xsd.int)),
+        Triple(bnode("betehess"), foaf.name, Literal("1", xsd.integer)),
         Triple(bnode("betehess"), foaf.name, Literal("blah")),
         Triple(bnode("betehess"), foaf.name, bnode("foo")),
         Triple(bnode("foo"), foaf.homepage, URI("http://example.com"))

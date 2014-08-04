@@ -48,7 +48,7 @@ abstract class CommonBindersJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
     it("serializing and deserializing an Integer") {
       val pg123 = 123.toPG
-      expect(pg123.pointer == Literal("123", xsd.int)).toEqual(true)
+      expect(pg123.pointer == Literal("123", xsd.integer)).toEqual(true)
       expect(pg123.graph == Graph.empty).toEqual(true)
       expect(pg123.toPG.as[Int] == Success(123)).toEqual(true)
     }
@@ -58,11 +58,11 @@ abstract class CommonBindersJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
       val bn2 = BNode()
       val bn3 = BNode()
       val constructedListGr = Graph(
-        Triple(bn1, rdf.first, Literal("1", xsd.int)),
+        Triple(bn1, rdf.first, Literal("1", xsd.integer)),
         Triple(bn1, rdf.rest, bn2),
-        Triple(bn2, rdf.first, Literal("2", xsd.int)),
+        Triple(bn2, rdf.first, Literal("2", xsd.integer)),
         Triple(bn2, rdf.rest, bn3),
-        Triple(bn3, rdf.first, Literal("3", xsd.int)),
+        Triple(bn3, rdf.first, Literal("3", xsd.integer)),
         Triple(bn3, rdf.rest, rdf.nil)
       )
       val binder = PGBinder[Rdf, List[Int]]
