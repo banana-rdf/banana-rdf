@@ -12,7 +12,8 @@ are that it is small and that
 The fruit bunch develops at an angle while the rachis points vertically down. The fruit apex is often bottlenecked.
 ```
 
-=== compiling ===
+compiling
+---------
 
 To compile run in sbt
 
@@ -32,11 +33,11 @@ to produce a large binary. And later optimise it with
 > fullOptJS
 ```
 
-Though this will require knowing the entry point of the code ( so that the optimisations can be built
-from there ).
+though this will require knowing the entry point of the code ( so that the optimisations 
+can be calculated from there ).
 
-=== testing ===
-
+testing
+-------
 
 As with another framework you can run in sbt the command
 
