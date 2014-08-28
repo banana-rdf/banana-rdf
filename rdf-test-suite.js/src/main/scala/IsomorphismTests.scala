@@ -4,7 +4,7 @@ import org.w3.banana._
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.w3.banana.binder._
-import org.w3.banana.util.GraphIsomporphism
+import org.w3.banana.util.GraphIsomorphism
 import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext
 import scalaz.Scalaz._
@@ -27,7 +27,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
   import syntax._
   import org.w3.banana.diesel._
 
-  val graphIsomorphism = new GraphIsomporphism()(ops)
+  val graphIsomorphism = new GraphIsomorphism()(ops)
   import graphIsomorphism._
 
   val foaf = FOAFPrefix[Rdf]

@@ -30,7 +30,7 @@ import scala.util.{Success, Failure, Try}
  *
  *  Each optimisation makes thinking about the code harder though.
  */
-class GraphIsomporphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
+class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
 
   import ops._
 

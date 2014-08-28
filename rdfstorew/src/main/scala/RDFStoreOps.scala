@@ -1,7 +1,7 @@
 package org.w3.banana.rdfstorew
 
 import akka.http.model.Uri
-import org.w3.banana.util.GraphIsomporphism
+import org.w3.banana.util.GraphIsomorphism
 import org.w3.banana.{RDFOps, URIOps}
 import java.net.{URI=>jURI}
 
@@ -141,7 +141,7 @@ class RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
 
 
   // graph isomorphism ( why does this have to be created anew every time? ie. why a def? )
-  def iso = new GraphIsomporphism()(new RDFStoreOps())
+  def iso = new GraphIsomorphism()(new RDFStoreOps())
 
   override def isomorphism(left: RDFStore#Graph, right: RDFStore#Graph): Boolean =
     iso.findAnswer(left,right).isSuccess

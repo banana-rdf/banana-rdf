@@ -4,7 +4,7 @@ import java.util.NoSuchElementException
 
 import akka.http.model.Uri
 import org.w3.banana._
-import org.w3.banana.util.GraphIsomporphism
+import org.w3.banana.util.GraphIsomorphism
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
@@ -106,7 +106,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   }
 
   // graph isomorphism
-  val iso = new GraphIsomporphism()(PlantainOps)
+  val iso = new GraphIsomorphism()(PlantainOps)
 
  def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
    iso.findAnswer(left, right).isSuccess

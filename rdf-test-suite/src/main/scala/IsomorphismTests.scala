@@ -18,7 +18,7 @@ abstract class IsomorphismTests[Rdf<:RDF]()(implicit val ops: RDFOps[Rdf])
   import org.w3.banana.diesel._
 
 
-  val graphIsomorphism = new GraphIsomporphism()(ops)
+  val graphIsomorphism = new GraphIsomorphism()(ops)
   import graphIsomorphism._
 
   val foaf = FOAFPrefix[Rdf]
