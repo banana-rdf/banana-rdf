@@ -15,6 +15,7 @@ object BuildSettings {
     organization := "org.w3",
     version      := "0.6-SNAPSHOT",
     scalaVersion := "2.11.2",
+    crossScalaVersions := Seq("2.11.2", "2.10.4"),
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
