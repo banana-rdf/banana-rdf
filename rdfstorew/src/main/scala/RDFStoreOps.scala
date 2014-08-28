@@ -1,6 +1,5 @@
 package org.w3.banana.rdfstorew
 
-import akka.http.model.Uri
 import org.w3.banana.util.GraphIsomorphism
 import org.w3.banana.{RDFOps, URIOps}
 import java.net.{URI=>jURI}
@@ -21,41 +20,41 @@ trait JSUtils {
 
 trait RDFStoreURIOps extends URIOps[RDFStore] {
 
-  def akka(uri:RDFStore#URI) : Uri = Uri(uri.valueOf)
+  private def java(uri:RDFStore#URI) : jURI = new jURI(uri.valueOf)
 
-  def rdfjs(uri:Uri) : RDFStore#URI = {
+  def rdfjs(uri: jURI) : RDFStore#URI = {
     (new RDFStoreOps()).makeUri(uri.toString)
   }
 
-  def getString(uri: RDFStore#URI): String = akka(uri).toString
+  def getString(uri: RDFStore#URI): String = java(uri).toString
 
   def withoutFragment(uri: RDFStore#URI): RDFStore#URI =  {
     (new RDFStoreOps()).makeUri(uri.valueOf.split("#")(0))
   }
 
   def withFragment(uri: RDFStore#URI, frag: String): RDFStore#URI = {
-    rdfjs(akka(uri).withFragment(frag))
+    val u = java(uri)
+    import u._
+    rdfjs(new jURI(getScheme,getUserInfo,getHost,getPort,getPath,getQuery,null))
   }
 
-  def getFragment(uri: RDFStore#URI): Option[String] = akka(uri).fragment
+  def getFragment(uri: RDFStore#URI): Option[String] = Option(java(uri).getFragment)
 
   def isPureFragment(uri: RDFStore#URI): Boolean = {
-    val u = akka(uri)
-    u.scheme.isEmpty && u.authority.isEmpty && u.path.isEmpty && u.query.isEmpty && u.fragment.isDefined
+    val u = java(uri)
+    import u.{getFragment=>fragment,_}
+    getScheme == null &&
+      getUserInfo == null && getAuthority == null &&
+      (getPath == null || getPath == "" ) &&
+      getQuery == null && fragment != null
+
   }
 
-
-
   def resolve(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI =
-    rdfjs(akka(other).resolvedAgainst(akka(uri).toString))
+    rdfjs(java(uri).resolve(java(other)))
 
   def appendSegment(uri: RDFStore#URI, segment: String): RDFStore#URI = {
-    val underlying = akka(uri)
-    val path = underlying.path
-    if (path.reverse.startsWithSlash)
-      rdfjs(underlying.copy(path = path + segment))
-    else
-      rdfjs(underlying.copy(path = path / segment))
+    rdfjs(java(uri).resolve(segment))
   }
 
   def relativize(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = {
@@ -64,12 +63,16 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
   }
 
   def newChildUri(uri: RDFStore#URI): RDFStore#URI = {
-    val segment = java.util.UUID.randomUUID().toString.replace("-", "")
-    appendSegment(uri, segment)
+    def s4():String = Math.floor((1 + Math.random()) * 0x10000).toString().substring(1)
+
+    appendSegment(uri, s4())
   }
 
-  def lastSegment(uri: RDFStore#URI): String = akka(uri).path.reverse.head.toString
-
+  def lastSegment(uri: RDFStore#URI): String = {
+    val path = java(uri).getPath
+    val i = path.lastIndexOf('/')
+    path.substring(i+1,path.length)
+  }
 }
 
 class RDFStoreOps extends RDFOps[RDFStore] with RDFStoreURIOps with JSUtils {
