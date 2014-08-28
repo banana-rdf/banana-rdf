@@ -1,6 +1,6 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
+import org.w3.banana.{RDFStore => RDFStoreInterface, _}
 
 import scala.scalajs.test.JasmineTest
 
@@ -31,7 +31,7 @@ abstract class UriSyntaxJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
       expect(uriNoFrag.fragment == None).toEqual(true)
     }
 
-    it("isPureGragment should should say if a URI is a pure fragment") {
+    it("isPureFragment should should say if a URI is a pure fragment") {
       expect(URI("http://example.com/foo").isPureFragment).toEqual(false)
       expect(URI("http://example.com/foo#bar").isPureFragment).toEqual(false)
       expect(URI("#bar").isPureFragment).toEqual(true)

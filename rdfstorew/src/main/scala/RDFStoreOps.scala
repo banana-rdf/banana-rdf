@@ -35,7 +35,7 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
   def withFragment(uri: RDFStore#URI, frag: String): RDFStore#URI = {
     val u = java(uri)
     import u._
-    rdfjs(new jURI(getScheme,getUserInfo,getHost,getPort,getPath,getQuery,null))
+    rdfjs(new jURI(getScheme,getUserInfo,getHost,getPort,getPath,getQuery,frag))
   }
 
   def getFragment(uri: RDFStore#URI): Option[String] = Option(java(uri).getFragment)
@@ -54,8 +54,14 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
     rdfjs(java(uri).resolve(java(other)))
 
   def appendSegment(uri: RDFStore#URI, segment: String): RDFStore#URI = {
-    rdfjs(java(uri).resolve(segment))
-  }
+    val u = java(uri)
+    val path = u.getPath
+    val newpath = if (path.endsWith("/")) path + segment else path + "/" + segment
+    import u._
+    val res = rdfjs(new jURI(getScheme,getUserInfo,getHost,getPort,newpath,getQuery,null))
+    println(s"appendSegment($uri,$segment)=$res")
+    res
+   }
 
   def relativize(uri: RDFStore#URI, other: RDFStore#URI): RDFStore#URI = {
     val result = new jURI(uri.nominalValue).relativize(new jURI(other.nominalValue))

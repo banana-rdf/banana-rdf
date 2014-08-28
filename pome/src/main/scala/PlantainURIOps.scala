@@ -36,7 +36,13 @@ trait PlantainURIOps extends URIOps[Plantain] {
   }
 
   def appendSegment(uri: Plantain#URI, segment: String): Plantain#URI = {
-    new URI(uri.underlying.resolve(segment))
+    val u = uri.underlying
+    val path = u.getPath
+    val newpath = if (path.endsWith("/")) path + segment else path + "/" + segment
+    import u._
+    val res = new jURI(getScheme,getUserInfo,getHost,getPort,newpath,getQuery,null)
+    println(s"appendSegment($uri,$segment)=$res")
+    URI(res)
   }
 
   def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
