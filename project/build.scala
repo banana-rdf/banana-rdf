@@ -172,7 +172,7 @@ object BananaRdfBuild extends Build {
   lazy val rdf = Project(
     id = "banana-rdf",
     base = file("rdf"),
-    settings = scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
+    settings = buildSettings ++ testDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
