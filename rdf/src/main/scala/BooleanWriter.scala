@@ -7,7 +7,7 @@ trait BooleanWriter[T] extends Writer[Boolean, T] {
 
   def format(bool: Boolean): String
 
-  def write(bool: Boolean, base: String): Try[String] = Try {
+  def asString(bool: Boolean, base: String): Try[String] = Try {
     format(bool)
   }
 

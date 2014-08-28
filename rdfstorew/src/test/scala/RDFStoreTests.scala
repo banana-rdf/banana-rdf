@@ -3,7 +3,6 @@ package org.w3.banana.rdfstorew.test
 
 import org.w3.banana.jasmine.test._
 import org.w3.banana.rdfstorew._
-import org.w3.banana.util.IsomorphismTests
 
 
 object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[RDFStore]

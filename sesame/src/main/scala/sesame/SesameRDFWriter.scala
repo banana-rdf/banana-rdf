@@ -1,10 +1,12 @@
 package org.w3.banana.sesame
 
+import java.io.{Writer => jWriter, _}
+
+import org.openrdf.rio.rdfxml.{RDFXMLWriter => SRdfXmlWriter}
+import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
+import org.openrdf.rio.{RDFWriter => sRDFWriter}
 import org.w3.banana._
-import java.io.{ Writer => jWriter, _ }
-import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
-import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
-import org.openrdf.rio.{ RDFWriter => sRDFWriter }
+
 import scala.util._
 
 class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T], _syntax: Syntax[T]) extends RDFWriter[Sesame, T] {
@@ -18,7 +20,7 @@ class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T],
     sWriter.endRDF()
   }
 
-  override def write(graph: Sesame#Graph, base: String): Try[String] = Try {
+  def asString(graph: Sesame#Graph, base: String): Try[String] = Try {
     val result = new StringWriter()
     val sWriter = sesameSyntax.rdfWriter(result, base)
     sWriter.startRDF()
@@ -29,8 +31,6 @@ class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T],
 }
 
 class SesameRDFWriterHelper(implicit ops: SesameOps) {
-
-  import ops._
 
   val rdfxmlWriter: RDFWriter[Sesame, RDFXML] = new SesameRDFWriter[RDFXML](ops)
 
