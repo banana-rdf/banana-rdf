@@ -1,13 +1,11 @@
 import bintray.Plugin._
 import bintray.Keys._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
-import sbt.ExclusionRule
 import sbt.Keys._
-import sbt._
+import sbt.{ExclusionRule, _}
 
 import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
-import scala.Some
 
 object BuildSettings {
 
@@ -241,7 +239,6 @@ object BananaRdfBuild extends Build {
     base = file("pome"),
     settings =   buildSettings ++ testDeps ++ scalaJSSettings ++ Seq(
       resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
-      libraryDependencies += "net.bblfish" %%% "akka-urijs" % "0.1",
       libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0"
     )
   ) dependsOn (rdf, rdfTestSuite % "test", rdfTestSuiteJS % "test")

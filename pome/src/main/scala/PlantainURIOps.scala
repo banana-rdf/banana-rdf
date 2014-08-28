@@ -3,7 +3,7 @@ package org.w3.banana.pome
 import org.w3.banana._
 import model._
 import java.net.{URI=>jURI}
-import akka.http.model.Uri.Path
+
 
 trait PlantainURIOps extends URIOps[Plantain] {
 
@@ -36,14 +36,7 @@ trait PlantainURIOps extends URIOps[Plantain] {
   }
 
   def appendSegment(uri: Plantain#URI, segment: String): Plantain#URI = {
-    val path = Path(uri.underlying.getPath)
-    val newPath = if (path.reverse.startsWithSlash) {
-      path + segment
-    } else {
-      path / segment
-    }
-    import uri.underlying.{getFragment=>fragment,_}
-    URI(new jURI(getScheme, getUserInfo, getHost, getPort, newPath.toString(), getQuery, fragment))
+    new URI(uri.underlying.resolve(segment))
   }
 
   def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
@@ -56,6 +49,8 @@ trait PlantainURIOps extends URIOps[Plantain] {
   }
 
   def lastSegment(uri: Plantain#URI): String = {
-    Path(uri.underlying.getPath).reverse.head.toString
+    val path = uri.underlying.getPath
+    val i = path.lastIndexOf('/')
+    path.substring(i+1,path.length)
   }
 }
