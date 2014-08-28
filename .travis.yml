@@ -1,5 +1,7 @@
 # doc: http://about.travis-ci.org/docs/user/languages/scala/
 language: scala
+env:
+  export SBT_OPTS="-XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256M -XX:ReservedCodeCacheSize=128m"
 jdk:
   # see https://github.com/travis-ci/travis-cookbooks/issues/35
   - oraclejdk7
