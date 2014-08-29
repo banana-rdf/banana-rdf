@@ -160,6 +160,7 @@ object BananaRdfBuild extends Build {
   
   val pub = TaskKey[Unit]("pub")
 
+  //todo: add a way so that it is easy to get the whole to compile
   lazy val banana = Project(
     id = "banana",
     base = file("."),
@@ -169,14 +170,14 @@ object BananaRdfBuild extends Build {
     aggregate = Seq(
       rdf_jvm,
       rdf_common_jvm,
-      rdf_js,
-      rdf_common_js,
+//      rdf_js,
+//      rdf_common_js,
       rdfTestSuite,
       jena,
       sesame,
       plantain,
-      pome,
-      rdfstorew,
+//      pome,
+//      rdfstorew,
       examples))
   
   lazy val rdf_jvm = Project(
