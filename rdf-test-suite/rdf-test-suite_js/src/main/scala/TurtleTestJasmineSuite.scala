@@ -206,6 +206,7 @@ abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
 
     it("works with relative uris") {
       val turtleString = writer.asString(referenceGraph, rdfCore).get
+      println("turtleString="+turtleString)
       jasmine.Clock.useMock()
       val g: Array[Rdf#Graph] = asyncTest[Rdf](turtleString, foo)
       jasmine.Clock.tick(10)

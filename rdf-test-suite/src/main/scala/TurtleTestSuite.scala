@@ -67,7 +67,10 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
     val bar = for {
       turtleString <- Future.successful(writer.asString(referenceGraph, rdfCore))
       computedFooGraph <- reader.read(turtleString.get, foo)
-    } yield computedFooGraph
+    } yield {
+      println("turtleString="+turtleString.get)
+      computedFooGraph
+    }
     val g: Rdf#Graph = Await.result(bar, Duration(1, SECONDS))
     assert(fooGraph isIsomorphicWith g)
   }
