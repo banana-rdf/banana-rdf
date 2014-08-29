@@ -4,14 +4,22 @@ import org.w3.banana._
 import scala.util._
 import org.joda.time.DateTime
 
-
-trait FromLiteralJvm[Rdf <: RDF, +T] {
+//todo: why does one need this redefined here? (It does not compile if this trait is not duplicated...
+trait FromLiteral[Rdf <: RDF, +T] {
   def fromLiteral(literal: Rdf#Literal): Try[T]
 }
 
-object FromLiteralJvm {
+//todo: why does one need this redefined here? (It does not compile if this trait is not duplicated...
+trait ToLiteral[Rdf <: RDF, -T] {
+  def toLiteral(t: T): Rdf#Literal
+}
 
-  implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteralJvm[Rdf, DateTime] {
+
+object ToLiteral extends ToLiteralCore
+
+object FromLiteral extends FromLiteralCore {
+
+  implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, DateTime] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[DateTime] = {
       val Literal(lexicalForm, datatype, _) = literal

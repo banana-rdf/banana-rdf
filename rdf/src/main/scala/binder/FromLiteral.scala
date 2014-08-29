@@ -3,13 +3,12 @@ package org.w3.banana.binder
 import org.w3.banana._
 import scala.util._
 import java.math.BigInteger
-//import org.joda.time.DateTime
 
 trait FromLiteral[Rdf <: RDF, +T] {
   def fromLiteral(literal: Rdf#Literal): Try[T]
 }
 
-object FromLiteral {
+trait FromLiteralCore {
 
   implicit def LiteralFromLiteral[Rdf <: RDF] = new FromLiteral[Rdf, Rdf#Literal] {
     def fromLiteral(literal: Rdf#Literal): Success[Rdf#Literal] = Success(literal)
@@ -25,27 +24,6 @@ object FromLiteral {
         Failure(FailedConversion(s"${literal} is not an xsd:string"))
     }
   }
-
-  /* @InTheNow will find a better way to do this
-  import scalajs.js
-
-  implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {
-    import ops._
-    def fromLiteral(literal: Rdf#Literal): Try[js.Date] = {
-      val Literal(lexicalForm, datatype, _) = literal
-      if (datatype == xsd.dateTime) {
-        try {
-          val parsed:js.Date = js.Dynamic.global.moment(lexicalForm).toDate().asInstanceOf[js.Date]
-          Success(parsed)
-        } catch {
-          case _: IllegalArgumentException => Failure(FailedConversion(s"${literal} is an xsd.datetime but is not an acceptable js Date"))
-        }
-      } else {
-        Failure(FailedConversion(s"${literal} is not an xsd:datetime"))
-      }
-    }
-  }
-   */
 
   implicit def BooleanFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Boolean] {
     import ops._
