@@ -1,8 +1,7 @@
 package org.w3.banana.rdfstorew
 
 import org.w3.banana._
-import org.w3.banana.binder._
-import scala.util._
+
 import scala.scalajs.js
 
 sealed trait JsNodeMatch
@@ -15,16 +14,16 @@ trait SPARQLSolution {
 
 }
 
-class SPARQLSolutionTuple(obj:js.Dictionary[js.Any]) extends  SPARQLSolution{
-  val varNames:Array[String] = {
-    var names:List[String] = List[String]()
-    for(prop <- js.Object.keys(obj)) {
+class SPARQLSolutionTuple(obj: js.Dictionary[js.Any]) extends SPARQLSolution {
+  val varNames: Array[String] = {
+    var names: List[String] = List[String]()
+    for (prop <- js.Object.keys(obj)) {
       names = names.::(prop)
     }
     names.toArray[String]
   }
 
-  def apply(s:String) = obj.get(s)
+  def apply(s: String) = obj.get(s)
 }
 
 trait RDFStore extends RDF {
@@ -77,9 +76,8 @@ trait AdditionalBindings {
 }
 */
 
-
 object FromLiteralJS {
-/*
+  /*
   implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[js.Date] = {

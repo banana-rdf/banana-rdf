@@ -24,7 +24,7 @@ object FromLiteral {
     }
   }
 
-/* @InTheNow will find a better way to do this
+  /* @InTheNow will find a better way to do this
   import scalajs.js
 
   implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {

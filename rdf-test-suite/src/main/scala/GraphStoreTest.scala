@@ -76,6 +76,4 @@ class GraphStoreTest[Rdf <: RDF](
     r.getOrFail()
   }
 
-
-
 }

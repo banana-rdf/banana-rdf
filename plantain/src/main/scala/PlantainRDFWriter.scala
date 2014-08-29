@@ -1,10 +1,10 @@
 package org.w3.banana.plantain
 
-import java.io.{ByteArrayOutputStream, OutputStream}
+import java.io.{ ByteArrayOutputStream, OutputStream }
 
 import org.openrdf.model.impl._
 import org.openrdf.rio.turtle._
-import org.openrdf.{model => sesame}
+import org.openrdf.{ model => sesame }
 import org.w3.banana._
 
 import scala.util.Try
@@ -88,8 +88,8 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
     val result = new ByteArrayOutputStream()
     //todo: clearly this trasformation into a byte array and then back into a character string,
     //shows that working at the byte level is wrong.
-    val writer = new Writer(graph,result,base)
+    val writer = new Writer(graph, result, base)
     writer.write()
-    new String(result.toByteArray,"UTF-8")
+    new String(result.toByteArray, "UTF-8")
   }
 }

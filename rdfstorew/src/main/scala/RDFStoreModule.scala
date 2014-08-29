@@ -3,11 +3,11 @@ package org.w3.banana.rdfstorew
 import org.w3.banana._
 
 trait RDFStoreModule
-  extends RDFModule
-  with RDFOpsModule
-  with RecordBinderModule
-  with TurtleReaderModule
-  with TurtleWriterModule {
+    extends RDFModule
+    with RDFOpsModule
+    with RecordBinderModule
+    with TurtleReaderModule
+    with TurtleWriterModule {
 
   type Rdf = RDFStore
 

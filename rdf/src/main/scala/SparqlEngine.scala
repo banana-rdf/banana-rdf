@@ -22,7 +22,7 @@ trait SparqlEngine[Rdf <: RDF] extends Any {
 }
 
 trait SparqlUpdateEngine[Rdf <: RDF] extends Any {
-  def executeUpdate(query: Rdf#UpdateQuery, bindings:Map[String, Rdf#Node]): Future[Unit]
+  def executeUpdate(query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): Future[Unit]
 
   def executeUpdate(query: Rdf#UpdateQuery): Future[Unit] = executeUpdate(query, Map.empty)
 }

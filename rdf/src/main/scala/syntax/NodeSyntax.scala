@@ -18,9 +18,9 @@ class NodeW[Rdf <: RDF](val node: Rdf#Node) extends AnyVal {
     foldNode(node)(ops.resolve(baseUri, _), bn => bn, lit => lit)
   }
 
-  def isBNode(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url=>false, bn=>true,lit=>false)
-  def isLiteral(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url=>false, bn=>false,lit=>true)
-  def isURI(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url=>true, bn=>false,lit=>false)
+  def isBNode(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url => false, bn => true, lit => false)
+  def isLiteral(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url => false, bn => false, lit => true)
+  def isURI(implicit ops: RDFOps[Rdf]): Boolean = ops.foldNode(node)(url => true, bn => false, lit => false)
 
   def relativize(baseUri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
     import ops._

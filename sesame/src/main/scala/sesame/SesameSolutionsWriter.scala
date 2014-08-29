@@ -26,8 +26,8 @@ object SesameSolutionsWriter {
         //todo: this is very ugly, as it goes through the lossy outputstream in order to then recode
         //todo: a string, even though it does not really know what the required encoding is
         val out = new ByteArrayOutputStream()
-        write(answers,out,base)
-        new String(out.toByteArray,"UTF-8")
+        write(answers, out, base)
+        new String(out.toByteArray, "UTF-8")
       }
     }
 

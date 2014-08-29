@@ -1,11 +1,8 @@
 package org.w3.banana
 
-import org.w3.banana.syntax._
-
-import scalaz._
+import scalaz.Free._
 import scalaz.Scalaz._
-import Id._
-import Free._
+import scalaz._
 
 sealed trait RW
 case object READ extends RW
@@ -23,7 +20,6 @@ object Command {
   }
 
   def GET[Rdf <: RDF](hyperlinks: Iterable[Rdf#URI])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Set[LinkedDataResource[Rdf]]] = {
-    import ops._
     implicit val functor: Functor[({ type l[+x] = Command[Rdf, x] })#l] = Command.ldcFunctor[Rdf]
     implicit val applicative: Applicative[({ type f[+y] = Free[({ type l[+x] = Command[Rdf, x] })#l, y] })#f] =
       Free.freeMonad[({ type l[+x] = Command[Rdf, x] })#l]
@@ -75,12 +71,8 @@ object Command {
   def create[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Create(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
-
-
   def append[Rdf <: RDF](uri: Rdf#URI, triples: Iterable[Rdf#Triple]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Append(uri, triples, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
-
-
 
   def remove[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Remove(uri, tripleMatches, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
@@ -88,7 +80,6 @@ object Command {
   def delete[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Delete(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
   }
-
 
   def patch[Rdf <: RDF](uri: Rdf#URI, deleteTripleMatches: Iterable[TripleMatch[Rdf]], insertTriples: Iterable[Rdf#Triple]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     for {

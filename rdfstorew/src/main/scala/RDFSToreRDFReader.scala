@@ -12,18 +12,19 @@ class RDFStoreTurtleReader(implicit Ops: RDFStoreOps) extends RDFReader[RDFStore
   val syntax = Syntax[Turtle]
 
   override def read(text: String, base: String): Future[RDFStore#Graph] = {
-    val store:RDFStoreW = RDFStoreW(Map())
-    store.load("text/turtle",text,base) flatMap {
+    val store: RDFStoreW = RDFStoreW(Map())
+    store.load("text/turtle", text, base) flatMap {
       _ =>
         store.toGraph(base)
     }
   }
 
-  /** legacy: if one passes an input stream at this layer one
-    * would need to know the encoding too. This function is badly designed.
-    * @param is
-    * @param base
-    * @return
-    */
+  /**
+   * legacy: if one passes an input stream at this layer one
+   * would need to know the encoding too. This function is badly designed.
+   * @param is
+   * @param base
+   * @return
+   */
   override def read(is: InputStream, base: String) = ???
 }

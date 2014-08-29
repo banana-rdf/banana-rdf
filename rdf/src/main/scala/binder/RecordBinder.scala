@@ -1,8 +1,8 @@
 package org.w3.banana.binder
 
 import org.w3.banana._
-import org.w3.banana.syntax._
 import org.w3.banana.diesel._
+
 import scala.util._
 
 object RecordBinder {
@@ -77,7 +77,7 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
   }
 
   def newUri(prefix: String): Rdf#URI = {
-    def s4():String = Math.floor((1 + Math.random()) * 0x10000).toString().substring(1)
+    def s4(): String = Math.floor((1 + Math.random()) * 0x10000).toString().substring(1)
     URI(s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4())
   }
 

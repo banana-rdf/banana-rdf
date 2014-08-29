@@ -1,15 +1,13 @@
 package org.w3.banana.rdfstorew
 
-import org.w3.banana.{SparqlOps, VarNotFound}
+import org.w3.banana.{ SparqlOps, VarNotFound }
 
-import scala.util.{Failure, Try, Success}
+import scala.util.{ Failure, Try, Success }
 
 import scalajs.js
 
-
 object RDFSparqlOps extends SparqlOps[RDFStore] {
   def SelectQuery(query: String): RDFStore#SelectQuery = query
-
 
   def ConstructQuery(query: String): RDFStore#ConstructQuery = query
 
@@ -20,8 +18,8 @@ object RDFSparqlOps extends SparqlOps[RDFStore] {
   def Query(query: String): Try[RDFStore#Query] = Success(query)
 
   def fold[T](query: RDFStore#Query)(select: (RDFStore#SelectQuery) => T,
-                                   construct: (RDFStore#ConstructQuery) => T,
-                                   ask: RDFStore#AskQuery => T) =
+    construct: (RDFStore#ConstructQuery) => T,
+    ask: RDFStore#AskQuery => T) =
     query match {
       case qs: RDFStore#SelectQuery => select(qs)
       case qc: RDFStore#ConstructQuery => construct(qc)
@@ -30,15 +28,15 @@ object RDFSparqlOps extends SparqlOps[RDFStore] {
 
   def getNode(solution: RDFStore#Solution, v: String): Try[RDFStore#Node] = {
     solution match {
-      case s:SPARQLSolutionTuple => {
+      case s: SPARQLSolutionTuple => {
         var node = s(v)
         if (node == null)
           Failure(VarNotFound("var " + v + " not found in BindingSet " + solution.toString))
         else {
           val namedNode = node.asInstanceOf[js.Dynamic].selectDynamic("token").asInstanceOf[String] match {
             case "literal" => {
-              val datatype:RDFStoreNamedNode = {
-                if(node.asInstanceOf[js.Dynamic].selectDynamic("type").isInstanceOf[Unit] ||
+              val datatype: RDFStoreNamedNode = {
+                if (node.asInstanceOf[js.Dynamic].selectDynamic("type").isInstanceOf[Unit] ||
                   node.asInstanceOf[js.Dynamic].selectDynamic("type") == null) {
                   null
                 } else {
@@ -46,8 +44,8 @@ object RDFSparqlOps extends SparqlOps[RDFStore] {
                 }
               }
 
-              val lang:String = {
-                if(node.asInstanceOf[js.Dynamic].selectDynamic("lang").isInstanceOf[Unit] ||
+              val lang: String = {
+                if (node.asInstanceOf[js.Dynamic].selectDynamic("lang").isInstanceOf[Unit] ||
                   node.asInstanceOf[js.Dynamic].selectDynamic("lang") == null) {
                   null
                 } else {
@@ -55,7 +53,7 @@ object RDFSparqlOps extends SparqlOps[RDFStore] {
                 }
               }
 
-              if(lang != null){
+              if (lang != null) {
                 RDFStore.Ops.makeLangTaggedLiteral(
                   node.asInstanceOf[js.Dynamic].selectDynamic("value").asInstanceOf[String],
                   lang
@@ -70,10 +68,10 @@ object RDFSparqlOps extends SparqlOps[RDFStore] {
             case "blank" => {
               RDFStore.Ops.makeBNodeLabel(node.asInstanceOf[js.Dynamic].selectDynamic("value").asInstanceOf[String])
             }
-            case "uri"  => {
+            case "uri" => {
               RDFStore.Ops.makeUri(node.asInstanceOf[js.Dynamic].selectDynamic("value").asInstanceOf[String])
             }
-            case _ => throw new Exception("Unknown solution type:'"+node.asInstanceOf[js.Dynamic].selectDynamic("token")+"'")
+            case _ => throw new Exception("Unknown solution type:'" + node.asInstanceOf[js.Dynamic].selectDynamic("token") + "'")
           }
           Success(namedNode)
         }
@@ -84,7 +82,7 @@ object RDFSparqlOps extends SparqlOps[RDFStore] {
 
   def varnames(solution: RDFStore#Solution): Set[String] = {
     var s = Set[String]()
-    for(key <- js.Object.keys(solution.asInstanceOf[js.Dictionary[Any]]).iterator) { s = s + key }
+    for (key <- js.Object.keys(solution.asInstanceOf[js.Dictionary[Any]]).iterator) { s = s + key }
     s
   }
 

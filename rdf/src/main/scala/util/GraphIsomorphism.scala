@@ -1,11 +1,11 @@
 package org.w3.banana.util
 
-import org.w3.banana.{RDFOps, RDF}
+import org.w3.banana.{ RDFOps, RDF }
 
 import scala.collection.immutable.ListMap
 import scala.collection.mutable
 import scala.util.control.NoStackTrace
-import scala.util.{Success, Failure, Try}
+import scala.util.{ Success, Failure, Try }
 
 /**
  * Methods to establish Graph Equivalences
@@ -30,7 +30,7 @@ import scala.util.{Success, Failure, Try}
  *
  *  Each optimisation makes thinking about the code harder though.
  */
-class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
+class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
 
   import ops._
 
@@ -61,7 +61,7 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
    * @return a ListMap mapping BNode from graph g1 to a smaller set of Bnodes from graph g2 which
    *         they should corresond to
    */
-  def bnodeMappingGenerator(g1: Rdf#Graph, g2: Rdf#Graph): Try[ListMap[Rdf#BNode,mutable.Set[Rdf#BNode]]] = Try {
+  def bnodeMappingGenerator(g1: Rdf#Graph, g2: Rdf#Graph): Try[ListMap[Rdf#BNode, mutable.Set[Rdf#BNode]]] = Try {
     if (g1.size != g2.size)
       throw MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}")
     val (grnd1, nongrnd1) = groundTripleFilter(g1)
@@ -73,7 +73,7 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
     val clz2 = bnodeClassify(g2)
     if (clz1.size != clz2.size)
       throw ClassificationException("the two graphs don't have the same number of classes.", clz1, clz2)
-    val mappingOpts: mutable.Map[Rdf#BNode,mutable.Set[Rdf#BNode]] = mutable.HashMap[Rdf#BNode,mutable.Set[Rdf#BNode]]()
+    val mappingOpts: mutable.Map[Rdf#BNode, mutable.Set[Rdf#BNode]] = mutable.HashMap[Rdf#BNode, mutable.Set[Rdf#BNode]]()
     for {
       (vt, bnds1) <- clz1 // .sortBy { case (vt, bn) => bn.size }
       bnds2 <- clz2.get(vt)
@@ -82,11 +82,11 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
         throw ClassificationException(s"the two graphs don't have the same number of bindings for type $vt", clz1, clz2)
       for (bnd <- bnds1) {
         mappingOpts.get(bnd).orElse(Some(mutable.Set.empty[Rdf#BNode])).map { bnset =>
-          mappingOpts.put(bnd,bnset ++= bnds2)
+          mappingOpts.put(bnd, bnset ++= bnds2)
         }
       }
     }
-    ListMap(mappingOpts.toList.sortBy(_._2.size):_*)
+    ListMap(mappingOpts.toList.sortBy(_._2.size): _*)
   }
 
   /**
@@ -95,13 +95,13 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
    * @param g2
    * @return A list of possible bnode mappings or a reason for the error
    */
-  def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[List[(Rdf#BNode,Rdf#BNode)]]] =  {
+  def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[List[(Rdf#BNode, Rdf#BNode)]]] = {
     bnodeMappingGenerator(g1, g2) map { listMap =>
       val keys = listMap.keys.toList
-      def tree(keys: List[Rdf#BNode]): List[List[(Rdf#BNode,Rdf#BNode)]] = {
+      def tree(keys: List[Rdf#BNode]): List[List[(Rdf#BNode, Rdf#BNode)]] = {
         keys match {
-          case head::tail =>  listMap(keys.head).toList.flatMap{ mappedBN =>
-            tree(tail).map((head,mappedBN)::_)
+          case head :: tail => listMap(keys.head).toList.flatMap { mappedBN =>
+            tree(tail).map((head, mappedBN) :: _)
           }
           case Nil => List(List())
         }
@@ -110,13 +110,13 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
     }
   }
 
-  def findAnswer(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[(Rdf#BNode,Rdf#BNode)]] = {
-    findPossibleMappings(g1,g2).flatMap{possibleAnswers =>
-      val verifyAnswers= possibleAnswers.map(answer=>
-        answer->mapVerify(g1,g2,Map(answer:_*))
+  def findAnswer(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[(Rdf#BNode, Rdf#BNode)]] = {
+    findPossibleMappings(g1, g2).flatMap { possibleAnswers =>
+      val verifyAnswers = possibleAnswers.map(answer =>
+        answer -> mapVerify(g1, g2, Map(answer: _*))
       )
-      val answerOpt = verifyAnswers.find{case (_,err)=>err==Nil}
-      answerOpt.map(a =>Success(a._1)).getOrElse(Failure(NoMappingException(verifyAnswers)))
+      val answerOpt = verifyAnswers.find { case (_, err) => err == Nil }
+      answerOpt.map(a => Success(a._1)).getOrElse(Failure(NoMappingException(verifyAnswers)))
     }
   }
 
@@ -129,7 +129,7 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
    *
    */
   def mapVerify(graph1: Rdf#Graph, graph2: Rdf#Graph, bnodeBijection: Map[Rdf#BNode, Rdf#BNode]): List[MappingException] = {
-    def bnmap(node: Rdf#Node): Rdf#Node = node.fold(uri=>uri, bnode => bnodeBijection(bnode), lit=>lit )
+    def bnmap(node: Rdf#Node): Rdf#Node = node.fold(uri => uri, bnode => bnodeBijection(bnode), lit => lit)
     // verify that both graphs are the same size
     if (graph1.size != graph2.size)
       return List(MappingException(s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"))
@@ -191,10 +191,10 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
   }
 
   case class VerticeType(forwardRels: mutable.Map[Rdf#URI, Int] = mutable.HashMap().withDefaultValue(0),
-                         backwardRels: mutable.Map[Rdf#URI, Int] = mutable.HashMap().withDefaultValue(0)) {
+      backwardRels: mutable.Map[Rdf#URI, Int] = mutable.HashMap().withDefaultValue(0)) {
 
     def this(forward: List[(Rdf#URI, Int)],
-             backward: List[(Rdf#URI, Int)]) = this(mutable.HashMap(forward: _*), mutable.HashMap(backward: _*))
+      backward: List[(Rdf#URI, Int)]) = this(mutable.HashMap(forward: _*), mutable.HashMap(backward: _*))
 
     def setForwardRel(rel: Rdf#URI, obj: Rdf#Node) {
       forwardRels.put(rel, forwardRels(rel) + 1)
@@ -213,14 +213,14 @@ class GraphIsomorphism[Rdf<:RDF]()(implicit ops: RDFOps[Rdf]) {
     override def toString() = s"MappingException($msg)"
   }
 
-  case class NoMappingException(val reasons: List[(List[(Rdf#BNode,Rdf#BNode)],List[MappingError])]) extends MappingError {
+  case class NoMappingException(val reasons: List[(List[(Rdf#BNode, Rdf#BNode)], List[MappingError])]) extends MappingError {
     def msg = "No mapping found"
     override def toString() = s"NoMappingException($reasons)"
   }
 
   case class ClassificationException(msg: String,
-                                     clz1: Map[VerticeType, Set[Rdf#BNode]],
-                                     clz2: Map[VerticeType, Set[Rdf#BNode]]) extends MappingError {
+      clz1: Map[VerticeType, Set[Rdf#BNode]],
+      clz2: Map[VerticeType, Set[Rdf#BNode]]) extends MappingError {
     override def toString() = s"ClassificationException($msg,$clz1,$clz2)"
   }
 

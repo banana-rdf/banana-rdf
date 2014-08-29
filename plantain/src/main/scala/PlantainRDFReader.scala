@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import org.openrdf.rio._
 import org.openrdf.rio.turtle._
-import org.openrdf.{model => sesame}
+import org.openrdf.{ model => sesame }
 import org.w3.banana._
 
 import scala.util.Try
@@ -56,6 +56,5 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
     val is = new java.io.FileInputStream("/home/betehess/projects/banana-rdf/rdf-test-suite/src/main/resources/card.ttl")
     read(is, "http://example.com/")
   }
-
 
 }

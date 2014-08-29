@@ -1,8 +1,8 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-import com.hp.hpl.jena.graph.{Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _}
-import com.hp.hpl.jena.rdf.model.{Literal => JenaLiteral, Seq => _, _}
+import com.hp.hpl.jena.datatypes.{ BaseDatatype, RDFDatatype, TypeMapper }
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _ }
+import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, Seq => _, _ }
 import org.w3.banana._
 
 import scala.collection.JavaConverters._
@@ -161,6 +161,6 @@ class JenaOps extends RDFOps[Jena] with DefaultURIOps[Jena] {
   def isomorphism(left: Jena#Graph, right: Jena#Graph): Boolean =
     left isIsomorphicWith right
 
-  def graphSize(g: Jena#Graph): Int  = g.size()
+  def graphSize(g: Jena#Graph): Int = g.size()
 
 }

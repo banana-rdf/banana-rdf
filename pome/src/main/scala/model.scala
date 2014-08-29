@@ -1,6 +1,6 @@
 package org.w3.banana.pome.model
 
-import java.net.{URI=>jURI}
+import java.net.{ URI => jURI }
 
 object Graph {
 
@@ -19,8 +19,6 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
 
   def +(triple: Triple): Graph =
     this.+(triple.subject, triple.predicate, triple.objectt)
-
-  
 
   def +(subject: Node, predicate: URI, objectt: Node): Graph = {
     spo.get(subject) match {
@@ -44,7 +42,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
 
   @throws[java.util.NoSuchElementException]("if a triple does not exist")
   def removeExistingTriple(triple: Triple): Graph = {
-    import triple.{objectt, predicate, subject}
+    import triple.{ objectt, predicate, subject }
     val pos = spo(subject)
     val os = pos(predicate)
     if (os.size == 1) { // then it must contains only $objectt
@@ -64,7 +62,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
 
   def -(s: NodeMatch, p: NodeMatch, o: NodeMatch): Graph = {
     val matchedTriples: Iterable[Triple] = find(s, p, o)
-    val newGraph = matchedTriples.foldLeft(this){ _.removeExistingTriple(_) }
+    val newGraph = matchedTriples.foldLeft(this) { _.removeExistingTriple(_) }
     newGraph
   }
 
@@ -74,13 +72,13 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
         (this, other)
       else
         (other, this)
-    secondGraph.triples.foldLeft(firstGraph){ _ + _ }
+    secondGraph.triples.foldLeft(firstGraph) { _ + _ }
   }
 
   def find(subject: NodeMatch, predicate: NodeMatch, objectt: NodeMatch): Iterable[Triple] =
     (subject, predicate, objectt) match {
       case (ANY, ANY, ANY) => triples
-      case (PlainNode(s), PlainNode(p@URI(_)), PlainNode(o)) => {
+      case (PlainNode(s), PlainNode(p @ URI(_)), PlainNode(o)) => {
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
@@ -93,7 +91,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
           (p, os) <- spo.get(s) getOrElse Iterable.empty
           o <- os
         } yield Triple(s, p, o)
-      case (PlainNode(s), PlainNode(p@URI(_)), ANY) => {
+      case (PlainNode(s), PlainNode(p @ URI(_)), ANY) => {
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
@@ -138,7 +136,7 @@ object BNode {
   private var i: Long = 0
   def generate: BNode = {
     i += 1
-    BNode(""+i)
+    BNode("" + i)
   }
 }
 

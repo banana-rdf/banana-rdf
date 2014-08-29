@@ -4,7 +4,7 @@ import java.io._
 import java.util.LinkedList
 
 import org.openrdf.model._
-import org.openrdf.model.impl.{LinkedHashModel, LiteralImpl, StatementImpl}
+import org.openrdf.model.impl.{ LinkedHashModel, LiteralImpl, StatementImpl }
 import org.w3.banana._
 
 import scala.util._
@@ -40,7 +40,6 @@ class SesameTurtleReader(implicit Ops: SesameOps) extends RDFReader[Sesame, Turt
     turtleParser.parse(is, base)
     new LinkedHashModel(triples)
   }
-
 
 }
 

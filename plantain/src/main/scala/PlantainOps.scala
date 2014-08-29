@@ -108,11 +108,10 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   // graph isomorphism
   val iso = new GraphIsomorphism()(PlantainOps)
 
- def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
-   iso.findAnswer(left, right).isSuccess
- }
+  def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
+    iso.findAnswer(left, right).isSuccess
+  }
 
   def graphSize(g: Plantain#Graph): Int = g.size
-
 
 }

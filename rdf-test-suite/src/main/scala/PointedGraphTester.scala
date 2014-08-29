@@ -2,7 +2,6 @@ package org.w3.banana
 
 import org.scalatest.{ Matchers, WordSpec }
 
-
 /**
  *  see org.w3.banana.binder.CommonBindersTest for more tests
  */

@@ -1,19 +1,16 @@
 package org.w3.banana
 
-import org.w3.banana.syntax._
-import org.w3.banana.diesel._
-import org.scalatest._
 import java.io._
-import org.scalatest.EitherValues._
-import scala.concurrent.{Await, Future}
+
+import org.scalatest._
+
 import scala.concurrent.duration._
+import scala.concurrent.{ Await, Future }
 
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle])
     extends WordSpec with Matchers {
 
   import ops._
-
-  import org.scalatest.matchers.{ BeMatcher, MatchResult }
 
   def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriplesDoc = prefix("ntriples/")
@@ -50,7 +47,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    val graph = Await.result(reader.read(turtleString, rdfCore),Duration(1,SECONDS))
+    val graph = Await.result(reader.read(turtleString, rdfCore), Duration(1, SECONDS))
     assert(referenceGraph isIsomorphicWith graph)
 
   }
@@ -58,7 +55,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
   "write simple graph as TURTLE string" in {
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
-    val graph = Await.result(reader.read(turtleString, rdfCore),Duration(1,SECONDS))
+    val graph = Await.result(reader.read(turtleString, rdfCore), Duration(1, SECONDS))
     println(referenceGraph)
     println("***")
     println(graph)
@@ -71,7 +68,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
       turtleString <- Future.successful(writer.asString(referenceGraph, rdfCore))
       computedFooGraph <- reader.read(turtleString.get, foo)
     } yield computedFooGraph
-    val g: Rdf#Graph = Await.result(bar,Duration(1,SECONDS))
+    val g: Rdf#Graph = Await.result(bar, Duration(1, SECONDS))
     assert(fooGraph isIsomorphicWith g)
   }
 
