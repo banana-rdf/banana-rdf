@@ -1,17 +1,16 @@
 package org.w3.banana
 
-import org.w3.banana.syntax._
-import org.w3.banana.diesel._
-import org.scalatest._
 import java.io._
-import org.scalatest.EitherValues._
+
+import org.scalatest._
+
+import scala.concurrent.duration._
+import scala.concurrent.{ Await, Future }
 
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle])
     extends WordSpec with Matchers {
 
   import ops._
-
-  import org.scalatest.matchers.{ BeMatcher, MatchResult }
 
   def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriplesDoc = prefix("ntriples/")
@@ -48,7 +47,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    val graph = reader.read(turtleString, rdfCore).get
+    val graph = Await.result(reader.read(turtleString, rdfCore), Duration(1, SECONDS))
     assert(referenceGraph isIsomorphicWith graph)
 
   }
@@ -56,7 +55,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
   "write simple graph as TURTLE string" in {
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
-    val graph = reader.read(turtleString, rdfCore).get
+    val graph = Await.result(reader.read(turtleString, rdfCore), Duration(1, SECONDS))
     println(referenceGraph)
     println("***")
     println(graph)
@@ -64,11 +63,15 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
   }
 
   "works with relative uris" in {
+    import scala.concurrent.ExecutionContext.Implicits.global
     val bar = for {
-      turtleString <- writer.asString(referenceGraph, rdfCore)
-      computedFooGraph <- reader.read(turtleString, foo)
-    } yield computedFooGraph
-    val g: Rdf#Graph = bar.get
+      turtleString <- Future.successful(writer.asString(referenceGraph, rdfCore))
+      computedFooGraph <- reader.read(turtleString.get, foo)
+    } yield {
+      println("turtleString=" + turtleString.get)
+      computedFooGraph
+    }
+    val g: Rdf#Graph = Await.result(bar, Duration(1, SECONDS))
     assert(fooGraph isIsomorphicWith g)
   }
 

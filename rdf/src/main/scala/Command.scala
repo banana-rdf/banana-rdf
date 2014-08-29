@@ -1,11 +1,8 @@
 package org.w3.banana
 
-import org.w3.banana.syntax._
-
-import scalaz._
+import scalaz.Free._
 import scalaz.Scalaz._
-import Id._
-import Free._
+import scalaz._
 
 sealed trait RW
 case object READ extends RW
@@ -23,7 +20,6 @@ object Command {
   }
 
   def GET[Rdf <: RDF](hyperlinks: Iterable[Rdf#URI])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Set[LinkedDataResource[Rdf]]] = {
-    import ops._
     implicit val functor: Functor[({ type l[+x] = Command[Rdf, x] })#l] = Command.ldcFunctor[Rdf]
     implicit val applicative: Applicative[({ type f[+y] = Free[({ type l[+x] = Command[Rdf, x] })#l, y] })#f] =
       Free.freeMonad[({ type l[+x] = Command[Rdf, x] })#l]
@@ -81,8 +77,9 @@ object Command {
   def remove[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Remove(uri, tripleMatches, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
-  def delete[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
+  def delete[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Delete(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
+  }
 
   def patch[Rdf <: RDF](uri: Rdf#URI, deleteTripleMatches: Iterable[TripleMatch[Rdf]], insertTriples: Iterable[Rdf#Triple]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     for {
@@ -117,11 +114,10 @@ object Command {
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](
       Update(query,
         bindings,
-        Return[({ type l[+x] = Command[Rdf, x] })#l, Unit]()))
+        Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
   implicit def ldcFunctor[Rdf <: RDF]: Functor[({ type l[+x] = Command[Rdf, x] })#l] =
     new Functor[({ type l[+ x] = Command[Rdf, x] })#l] {
-
       def map[A, B](command: Command[Rdf, A])(f: A => B): Command[Rdf, B] =
         command match {
           case Create(uri, a) => Create(uri, f(a))

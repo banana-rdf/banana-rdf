@@ -1,12 +1,14 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
 import java.io._
-import com.hp.hpl.jena.rdf.model.{ RDFReader => _, _ }
-import com.hp.hpl.jena.graph.{ Triple => JenaTriple, Node => JenaNode, _ }
-import scala.util._
+
+import com.hp.hpl.jena.graph.{ Node => JenaNode, Triple => JenaTriple, _ }
+import com.hp.hpl.jena.rdf.model.{ RDFReader => _ }
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
+import org.w3.banana._
+
+import scala.util._
 
 class TripleSink(ops: JenaOps) extends StreamRDF {
 
@@ -49,6 +51,7 @@ object JenaRDFReader {
       RDFDataMgr.parse(sink, is, base, lang)
       sink.graph
     }
+
   }
 
   implicit def rdfxmlReader(ops: JenaOps): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)

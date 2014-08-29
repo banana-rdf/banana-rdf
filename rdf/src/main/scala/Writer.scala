@@ -1,6 +1,7 @@
 package org.w3.banana
 
-import java.io.{ OutputStream, ByteArrayOutputStream }
+import java.io.OutputStream
+
 import scala.util.Try
 
 /**
@@ -11,12 +12,10 @@ trait Writer[-O, +T] {
 
   def syntax: Syntax[T]
 
+  //todo: add a method that takes a writer
+
+  //todo: this method needs an encoding
   def write(obj: O, outputstream: OutputStream, base: String): Try[Unit]
 
-  def asString(obj: O, base: String): Try[String] = Try {
-    val baos = new ByteArrayOutputStream
-    write(obj, baos, base)
-    new String(baos.toByteArray(), "UTF-8")
-  }
-
+  def asString(obj: O, base: String): Try[String]
 }

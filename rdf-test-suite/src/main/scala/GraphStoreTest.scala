@@ -76,24 +76,4 @@ class GraphStoreTest[Rdf <: RDF](
     r.getOrFail()
   }
 
-  "patchGraph should delete and insert triples as expected" in {
-    val u = URI("http://example.com/graph")
-    val r = for {
-      _ <- graphStore.removeGraph(u)
-      _ <- graphStore.appendToGraph(u, foo)
-      _ <- graphStore.patchGraph(u,
-        (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable,
-        (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
-      rGraph <- graphStore.getGraph(u)
-    } yield {
-      val expected = (
-        URI("http://example.com/foo")
-        -- rdf("bar") ->- "bar"
-        -- rdf("baz") ->- "baz"
-      ).graph
-      assert(rGraph isIsomorphicWith expected)
-    }
-    r.getOrFail()
-  }
-
 }

@@ -1,10 +1,12 @@
 package org.w3.banana.sesame
 
-import org.w3.banana._
-import org.openrdf.model._
-import org.openrdf.model.impl.{ LinkedHashModel, StatementImpl, LiteralImpl }
 import java.io._
 import java.util.LinkedList
+
+import org.openrdf.model._
+import org.openrdf.model.impl.{ LinkedHashModel, LiteralImpl, StatementImpl }
+import org.w3.banana._
+
 import scala.util._
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
@@ -26,8 +28,6 @@ trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
 
 class SesameTurtleReader(implicit Ops: SesameOps) extends RDFReader[Sesame, Turtle] {
 
-  import Ops._
-
   val syntax = Syntax[Turtle]
 
   def read(is: InputStream, base: String): Try[Sesame#Graph] = Try {
@@ -44,8 +44,6 @@ class SesameTurtleReader(implicit Ops: SesameOps) extends RDFReader[Sesame, Turt
 }
 
 class SesameRDFXMLReader(implicit Ops: SesameOps) extends RDFReader[Sesame, RDFXML] {
-
-  import Ops._
 
   val syntax = Syntax[RDFXML]
 
