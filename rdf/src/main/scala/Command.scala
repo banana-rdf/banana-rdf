@@ -123,7 +123,7 @@ object Command {
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](
       Update(query,
         bindings,
-        Return[({ type l[+x] = Command[Rdf, x] })#l, Unit]()))
+        Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
   implicit def ldcFunctor[Rdf <: RDF]: Functor[({ type l[+x] = Command[Rdf, x] })#l] =
     new Functor[({ type l[+ x] = Command[Rdf, x] })#l] {
