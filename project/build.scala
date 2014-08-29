@@ -181,7 +181,7 @@ object BananaRdfBuild extends Build {
   
   lazy val rdf_jvm = Project(
     id = "banana-rdf",
-    base = file("rdf"),
+    base = file("rdf/rdf_jvm"),
     settings = buildSettings ++ testDeps ++ Seq(
       target := target.value / "jvm",
       publishMavenStyle := true
@@ -196,14 +196,14 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
-      target := target.value / "common_jvm",
+      target := target.value / "jvm",
       publishMavenStyle := true
     )
   )
 
   lazy val rdf_js = Project(
     id = "banana-rdf_js",
-    base = file("rdf"),
+    base = file("rdf/rdf_js"),
     settings = buildSettings ++ testDeps ++ scalaJsDeps ++ Seq(
       target := target.value / "js",
       publishMavenStyle := true
@@ -218,7 +218,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += jodaTime,    //Will not work --- pure java
       libraryDependencies += jodaConvert, //Will not work --- pure java
       //target :=  "rdf/target",
-      target := target.value / "common_js",
+      target := target.value / "js",
       publishMavenStyle := true
     )
   )
