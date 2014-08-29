@@ -22,7 +22,7 @@ class TripleSink(ops: JenaOps) extends StreamRDF {
   def triple(triple: JenaTriple): Unit = {
     def isXsdString(node: JenaNode): Boolean =
       node.isLiteral &&
-      node.getLiteralDatatypeURI == "http://www.w3.org/2001/XMLSchema#string"
+        node.getLiteralDatatypeURI == "http://www.w3.org/2001/XMLSchema#string"
     val o = triple.getObject
     val t =
       // if o is a xsd:string literal
@@ -57,7 +57,7 @@ object JenaRDFReader {
 
   implicit def n3Reader(ops: JenaOps): RDFReader[Jena, N3] = makeRDFReader[N3](ops, Lang.N3)
 
-  implicit val selector: ReaderSelector[Jena] = 
+  implicit val selector: ReaderSelector[Jena] =
     ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
 
 }
