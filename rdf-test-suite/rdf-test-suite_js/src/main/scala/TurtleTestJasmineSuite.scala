@@ -1,6 +1,6 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
+import org.w3.banana.{RDFStore => RDFStoreInterface, _}
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.test.JasmineTest
@@ -11,11 +11,10 @@ import scala.scalajs.test.JasmineTest
 abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Turtle],
   writer: RDFWriter[Rdf, Turtle])
-    extends JasmineTest {
+  extends JasmineTest {
 
   import ops._
 
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriplesDoc = prefix("ntriples/")
@@ -27,8 +26,7 @@ abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
     Graph(
       Triple(ntriplesDoc, creator, dave),
       Triple(ntriplesDoc, creator, art),
-      Triple(ntriplesDoc, publisher, w3org)
-    )
+      Triple(ntriplesDoc, publisher, w3org))
   }
 
   val rdfCore = "http://www.w3.org/2001/sw/RDFCore/"
@@ -170,6 +168,8 @@ abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
 
     graphs.asInstanceOf[Array[Rdf#Graph]]
   }
+
+  import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
   describe("TURTLE parser") {
 
