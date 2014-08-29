@@ -111,8 +111,9 @@ object FromLiteral {
     }
   }
 
+ 
 /*
-
+ 
   implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, DateTime] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[DateTime] = {

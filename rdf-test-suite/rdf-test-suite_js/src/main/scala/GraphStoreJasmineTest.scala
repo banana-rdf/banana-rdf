@@ -26,7 +26,7 @@ abstract class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
 
   import ops._
   import syntax._
-  import scala.concurrent.ExecutionContext.Implicits.global
+  import JSExecutionContext.Implicits.queue
 
   val foaf = FOAFPrefix[Rdf]
 
