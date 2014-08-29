@@ -44,6 +44,17 @@ object ToLiteral {
       def toLiteral(d: Double): Rdf#Literal = Literal(d.toString, xsd.double)
     }
 
+  /* @InTheNow will find a better way to do this
+  import scalajs.js
+  implicit def JSDateToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+    new ToLiteral[Rdf, js.Date] {
+      import ops._
+      def toLiteral(dateTime: js.Date): Rdf#Literal = {
+        val isoString:String = js.Dynamic.global.moment(dateTime).toISOString().asInstanceOf[String]
+        Literal(isoString, xsd.dateTime)
+      }
+    }
+*/
   import org.joda.time.DateTime
 
   implicit def DateTimeToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =

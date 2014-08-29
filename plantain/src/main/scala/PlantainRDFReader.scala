@@ -1,12 +1,13 @@
 package org.w3.banana.plantain
 
-import org.w3.banana._
 import java.io.InputStream
-import scala.util.Try
-import spray.http.Uri
+
 import org.openrdf.rio._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
+import org.w3.banana._
+
+import scala.util.Try
 
 object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
 
@@ -36,6 +37,13 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
 
   }
 
+  /**
+   * todo: this is the wrong way around. The reader taking an inputstream should
+   * call the reader taking a string or better a StringReader ( but does not exist yet in scala-js)
+   * @param is
+   * @param base
+   * @return
+   */
   def read(is: InputStream, base: String): Try[Plantain#Graph] = Try {
     val sink = new Sink
     val parser = new TurtleParser
