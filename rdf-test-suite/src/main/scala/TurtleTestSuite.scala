@@ -68,7 +68,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
       turtleString <- Future.successful(writer.asString(referenceGraph, rdfCore))
       computedFooGraph <- reader.read(turtleString.get, foo)
     } yield {
-      println("turtleString="+turtleString.get)
+      println("turtleString=" + turtleString.get)
       computedFooGraph
     }
     val g: Rdf#Graph = Await.result(bar, Duration(1, SECONDS))
