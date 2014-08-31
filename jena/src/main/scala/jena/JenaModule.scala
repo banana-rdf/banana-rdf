@@ -1,5 +1,6 @@
 package org.w3.banana.jena
 
+import com.hp.hpl.jena.query.Dataset
 import org.w3.banana._
 
 trait JenaModule
@@ -29,9 +30,12 @@ trait JenaModule
 
   implicit val SparqlOps: SparqlOps[Jena] = new JenaSparqlOps(JenaUtil)
 
-  implicit val SparqlGraph: SparqlGraph[Jena] = new JenaSparqlGraph(Ops)
+  implicit val SparqlGraph: SparqlEngine[Jena, Jena#Graph] = new JenaGraphSparqlEngine(Ops)
 
-  implicit val SparqlHttp: SparqlHttp[Jena] = new JenaSparqlHttp(Ops)
+  import java.net.URL
+  val SparqlHttp: SparqlEngine[Jena, URL] = new JenaSparqlHttpEngine(Ops)
+
+  implicit val RDFStore: RDFStore[Jena, Dataset] = new JenaDatasetStore(true)
 
   implicit val RDFXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader(Ops)
 

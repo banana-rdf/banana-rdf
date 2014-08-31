@@ -8,21 +8,26 @@ import scala.concurrent.util._
 import scala.concurrent.ExecutionContext.Implicits.global
 import java.io.FileInputStream
 
-class SparqlEngineTest[Rdf <: RDF](
-  store: RDFStore[Rdf])(
-    implicit reader: RDFReader[Rdf, RDFXML],
-    ops: RDFOps[Rdf],
-    sparqlOps: SparqlOps[Rdf])
+class SparqlEngineTest[Rdf <: RDF, A](
+  store: A)(
+  implicit reader: RDFReader[Rdf, RDFXML],
+  ops: RDFOps[Rdf],
+  sparqlOps: SparqlOps[Rdf],
+  graphStore: GraphStore[Rdf, A],
+  sparqlEngine: SparqlEngine[Rdf, A],
+  lifecycle: Lifecycle[Rdf, A]
+)
     extends WordSpec with Matchers with BeforeAndAfterAll {
 
   import ops._
   import sparqlOps._
-
-  val sparqlEngine = SparqlEngine[Rdf](store)
+  import graphStore.graphStoreSyntax._
+  import sparqlEngine.sparqlEngineSyntax._
+  import lifecycle.lifecycleSyntax._
 
   override def afterAll(): Unit = {
     super.afterAll()
-    store.shutdown()
+    store.stop()
   }
 
   val foaf = FOAFPrefix(ops)
@@ -48,16 +53,14 @@ class SparqlEngineTest[Rdf <: RDF](
   ).graph
 
   override def beforeAll(): Unit = {
-
-    val init = store.execute {
+    store.start()
+    val init =
       for {
-        _ <- Command.append(URI("http://example.com/graph1"), graph1.toIterable)
-        _ <- Command.append(URI("http://example.com/graph2"), graph2.toIterable)
-        _ <- Command.append(URI("http://example.com/graph"), graph.toIterable)
+        _ <- store.appendToGraph(URI("http://example.com/graph1"), graph1)
+        _ <- store.appendToGraph(URI("http://example.com/graph2"), graph2)
+        _ <- store.appendToGraph(URI("http://example.com/graph"), graph)
       } yield ()
-    }
     init.getOrFail()
-
   }
 
   "new-tr.rdf must have Alexandre Bertails as an editor" in {
@@ -74,7 +77,7 @@ class SparqlEngineTest[Rdf <: RDF](
                            |  }
                            |}""".stripMargin)
 
-    val names: Future[Iterable[String]] = sparqlEngine.executeSelect(query).map(_.toIterable.map {
+    val names: Future[Iterable[String]] = store.executeSelect(query).map(_.toIterable.map {
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
 
@@ -100,7 +103,7 @@ class SparqlEngineTest[Rdf <: RDF](
       "thing" -> URI("http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/"),
       "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
 
-    val names: Future[Iterable[String]] = sparqlEngine.executeSelect(query, bindings).map(_.toIterable.map {
+    val names: Future[Iterable[String]] = store.executeSelect(query, bindings).map(_.toIterable.map {
       row => row("name").flatMap(_.as[String]) getOrElse sys.error("")
     })
 
@@ -121,7 +124,7 @@ class SparqlEngineTest[Rdf <: RDF](
                               |  }
                               |}""".stripMargin)
 
-    val clonedGraph = sparqlEngine.executeConstruct(query).getOrFail()
+    val clonedGraph = store.executeConstruct(query).getOrFail()
 
     assert(clonedGraph isIsomorphicWith graph)
   }
@@ -141,7 +144,7 @@ class SparqlEngineTest[Rdf <: RDF](
                         |  }
                         |}""".stripMargin)
 
-    val alexIsThere = sparqlEngine.executeAsk(query).getOrFail()
+    val alexIsThere = store.executeAsk(query).getOrFail()
 
     alexIsThere should be(true)
 
@@ -167,7 +170,7 @@ class SparqlEngineTest[Rdf <: RDF](
       "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"),
       "name" -> "Alexandre Bertails".toNode)
 
-    val alexIsThere = sparqlEngine.executeAsk(query, bindings).getOrFail()
+    val alexIsThere = store.executeAsk(query, bindings).getOrFail()
 
     alexIsThere should be(true)
 
@@ -183,7 +186,7 @@ class SparqlEngineTest[Rdf <: RDF](
                         |  }
                         |}""".stripMargin)
 
-    val alexKnowsHenry = sparqlEngine.executeAsk(query).getOrFail()
+    val alexKnowsHenry = store.executeAsk(query).getOrFail()
 
     alexKnowsHenry should be(true)
 
@@ -207,8 +210,8 @@ class SparqlEngineTest[Rdf <: RDF](
   //      """.stripMargin
   //    )
   //
-  //    sparqlEngine.executeUpdate(query).getOrFail()
-  //    val result = sparqlEngine.executeSelect(SelectQuery(
+  //    store.executeUpdate(query).getOrFail()
+  //    val result = store.executeSelect(SelectQuery(
   //      """
   //        |prefix foaf: <http://xmlns.com/foaf/0.1/>
   //        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
