@@ -14,10 +14,9 @@ trait GraphStore[Rdf <: RDF, A] {
     */
   def appendToGraph(a: A, uri: Rdf#URI, graph: Rdf#Graph): Future[Unit]
 
-  /** To the graph at `uri`, removes the matching triples from `delete`,
-    * then adds the ones in `insert`.
+  /** To the graph at `uri`, removes the matching triples
     */
-  def patchGraph(a: A, uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph): Future[Unit]
+  def removeTriples(a: A, uri: Rdf#URI, triples: Iterable[TripleMatch[Rdf]]): Future[Unit]
 
   /** Gets the graph at `uri`. */
   def getGraph(a: A, uri: Rdf#URI): Future[Rdf#Graph]

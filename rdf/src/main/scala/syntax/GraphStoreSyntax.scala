@@ -13,8 +13,8 @@ final class GraphStoreW[Rdf <: RDF, A](val a: A) extends AnyVal {
   def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph)(implicit graphStore: GraphStore[Rdf, A]) =
     graphStore.appendToGraph(a, uri, graph)
 
-  def patchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph)(implicit graphStore: GraphStore[Rdf, A]) =
-    graphStore.patchGraph(a, uri, delete, insert)
+  def removeTriples(uri: Rdf#URI, triples: Iterable[TripleMatch[Rdf]])(implicit graphStore: GraphStore[Rdf, A]) =
+    graphStore.removeTriples(a, uri, triples)
 
   def getGraph(uri: Rdf#URI)(implicit graphStore: GraphStore[Rdf, A]) =
     graphStore.getGraph(a, uri)

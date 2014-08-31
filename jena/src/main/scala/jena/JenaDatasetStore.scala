@@ -74,13 +74,10 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
     }
   }
 
-  def patchGraph(dataset: Dataset, uri: Jena#URI, delete: Iterable[TripleMatch[Jena]], insert: Jena#Graph): Future[Unit] = Future {
+  def removeTriples(dataset: Dataset, uri: Jena#URI, triples: Iterable[TripleMatch[Jena]]): Future[Unit] = Future {
     val dg = dataset.asDatasetGraph
-    delete.foreach { case (s, p, o) =>
+    triples.foreach { case (s, p, o) =>
       dg.deleteAny(uri, s, p, o)
-    }
-    ops.graphToIterable(insert).foreach { case ops.Triple(s, p, o) =>
-        dg.add(uri, s, p, o)
     }
   }
 

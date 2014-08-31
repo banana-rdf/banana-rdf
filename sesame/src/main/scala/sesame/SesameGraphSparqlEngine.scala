@@ -14,31 +14,27 @@ import org.openrdf.query.impl._
 import org.openrdf.sail.memory.MemoryStore
 import scala.concurrent.Future
 
-object SesameSparqlGraph extends SesameSparqlGraph
+class SesameGraphSparqlEngine extends SparqlEngine[Sesame, Sesame#Graph] {
 
-trait SesameSparqlGraph extends SparqlGraph[Sesame] {
+  val store = new SesameStore
 
-  def apply(graph: Sesame#Graph): SparqlEngine[Sesame] = new SparqlEngine[Sesame] {
-
-    val repository = {
-      val store = new MemoryStore
-      val sail = new SailRepository(store)
-      sail.initialize()
-      withConnection(sail) { conn =>
-        conn.add(graph)
-      }
-      sail
+  def asConn(graph: Sesame#Graph) = {
+    val store = new MemoryStore
+    val sail = new SailRepository(store)
+    sail.initialize()
+    withConnection(sail) { conn =>
+      conn.add(graph)
     }
-
-    def executeSelect(query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Future[Sesame#Solutions] =
-      withConnection(repository) { conn => SesameStore.executeSelect(conn, query, bindings) }
-
-    def executeConstruct(query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Future[Sesame#Graph] =
-      withConnection(repository) { conn => SesameStore.executeConstruct(conn, query, bindings) }
-
-    def executeAsk(query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Future[Boolean] =
-      withConnection(repository) { conn => SesameStore.executeAsk(conn, query, bindings) }
-
+    sail.getConnection()
   }
 
+  def executeSelect(graph: Sesame#Graph, query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Future[Sesame#Solutions] =
+    store.executeSelect(asConn(graph), query, bindings)
+
+    def executeConstruct(graph: Sesame#Graph, query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Future[Sesame#Graph] =
+    store.executeConstruct(asConn(graph), query, bindings)
+
+    def executeAsk(graph: Sesame#Graph, query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Future[Boolean] =
+      store.executeAsk(asConn(graph), query, bindings)
+    
 }

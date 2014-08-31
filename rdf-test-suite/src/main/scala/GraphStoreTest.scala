@@ -78,14 +78,13 @@ class GraphStoreTest[Rdf <: RDF, A](
     r.getOrFail()
   }
 
-  "patchGraph should delete and insert triples as expected" in {
+  "delete/insert triples" in {
     val u = URI("http://example.com/graph")
     val r = for {
       _ <- store.removeGraph(u)
       _ <- store.appendToGraph(u, foo)
-      _ <- store.patchGraph(u,
-        (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable,
-        (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+      _ <- store.removeTriples(u, (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable)
+      _ <- store.appendToGraph(u, (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
       rGraph <- store.getGraph(u)
     } yield {
       val expected = (

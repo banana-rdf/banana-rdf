@@ -26,7 +26,7 @@ trait SparqlOpsModule extends RDFModule {
 
 trait SparqlGraphModule extends RDFModule {
 
-  implicit val SparqlGraph: SparqlEngine[Rdf, Rdf#Graph]
+  implicit val sparqlGraph: SparqlEngine[Rdf, Rdf#Graph]
 
 }
 
@@ -34,7 +34,7 @@ trait SparqlHttpModule extends RDFModule {
 
   import java.net.URL
 
-  implicit val SparqlHttp: SparqlEngine[Rdf, URL]
+  implicit val sparqlHttp: SparqlEngine[Rdf, URL]
 
 }
 

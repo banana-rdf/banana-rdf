@@ -30,12 +30,12 @@ trait JenaModule
 
   implicit val SparqlOps: SparqlOps[Jena] = new JenaSparqlOps(JenaUtil)
 
-  implicit val SparqlGraph: SparqlEngine[Jena, Jena#Graph] = new JenaGraphSparqlEngine(Ops)
+  implicit val sparqlGraph: SparqlEngine[Jena, Jena#Graph] = new JenaGraphSparqlEngine(Ops)
 
   import java.net.URL
-  val SparqlHttp: SparqlEngine[Jena, URL] = new JenaSparqlHttpEngine(Ops)
+  val sparqlHttp: SparqlEngine[Jena, URL] = new JenaSparqlHttpEngine(Ops)
 
-  implicit val RDFStore: RDFStore[Jena, Dataset] = new JenaDatasetStore(true)
+  implicit val rdfStore: RDFStore[Jena, Dataset] = new JenaDatasetStore(true)
 
   implicit val RDFXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader(Ops)
 
