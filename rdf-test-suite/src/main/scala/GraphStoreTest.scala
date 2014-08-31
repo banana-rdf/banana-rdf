@@ -10,8 +10,8 @@ import scalaz.Scalaz._
 
 class GraphStoreTest[Rdf <: RDF](
   store: RDFStore[Rdf])(
-  implicit ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, RDFXML])
+    implicit ops: RDFOps[Rdf],
+    reader: RDFReader[Rdf, RDFXML])
     extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
   import ops._
@@ -72,26 +72,6 @@ class GraphStoreTest[Rdf <: RDF](
       rGraph <- graphStore.getGraph(u)
     } yield {
       assert(rGraph isIsomorphicWith union(List(graph, graph2)))
-    }
-    r.getOrFail()
-  }
-
-  "patchGraph should delete and insert triples as expected" in {
-    val u = URI("http://example.com/graph")
-    val r = for {
-      _ <- graphStore.removeGraph(u)
-      _ <- graphStore.appendToGraph(u, foo)
-      _ <- graphStore.patchGraph(u,
-        (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable,
-        (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
-      rGraph <- graphStore.getGraph(u)
-    } yield {
-      val expected = (
-        URI("http://example.com/foo")
-        -- rdf("bar") ->- "bar"
-        -- rdf("baz") ->- "baz"
-      ).graph
-      assert(rGraph isIsomorphicWith expected)
     }
     r.getOrFail()
   }

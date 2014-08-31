@@ -3,21 +3,21 @@ package org.w3.banana.jena
 import org.w3.banana._
 
 trait JenaModule
-extends RDFModule
-with RDFOpsModule
-with RecordBinderModule
-with SparqlGraphModule
-with SparqlHttpModule
-with RDFXMLReaderModule
-with TurtleReaderModule
-with ReaderSelectorModule
-with RDFXMLWriterModule
-with TurtleWriterModule
-with WriterSelectorModule
-with JsonSolutionsWriterModule
-with XmlSolutionsWriterModule
-with JsonQueryResultsReaderModule
-with XmlQueryResultsReaderModule {
+    extends RDFModule
+    with RDFOpsModule
+    with RecordBinderModule
+    with SparqlGraphModule
+    with SparqlHttpModule
+    with RDFXMLReaderModule
+    with TurtleReaderModule
+    with ReaderSelectorModule
+    with RDFXMLWriterModule
+    with TurtleWriterModule
+    with WriterSelectorModule
+    with JsonSolutionsWriterModule
+    with XmlSolutionsWriterModule
+    with JsonQueryResultsReaderModule
+    with XmlQueryResultsReaderModule {
 
   type Rdf = Jena
 
@@ -37,11 +37,15 @@ with XmlQueryResultsReaderModule {
 
   implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader(Ops)
 
+  implicit val N3Reader: RDFReader[Jena, N3] = JenaRDFReader.n3Reader(Ops)
+
   implicit val ReaderSelector: ReaderSelector[Jena] = JenaRDFReader.selector
 
   implicit val RDFXMLWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
 
   implicit val TurtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
+
+  implicit val N3Writer: RDFWriter[Jena, N3] = JenaRDFWriter.n3Writer
 
   implicit val WriterSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector
 

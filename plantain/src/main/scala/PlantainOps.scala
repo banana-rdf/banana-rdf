@@ -1,8 +1,10 @@
 package org.w3.banana.plantain
 
+import java.util.NoSuchElementException
+
+import akka.http.model.Uri
 import org.w3.banana._
-import model._
-import spray.http.Uri
+import org.w3.banana.util.GraphIsomorphism
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
@@ -11,7 +13,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   val emptyGraph: Plantain#Graph = model.Graph(Map.empty, 0)
 
   def makeGraph(triples: Iterable[Plantain#Triple]): Plantain#Graph =
-    triples.foldLeft(emptyGraph){ _ + _ }
+    triples.foldLeft(emptyGraph) { _ + _ }
 
   def graphToIterable(graph: Plantain#Graph): Iterable[Plantain#Triple] = graph.triples
 
@@ -26,9 +28,9 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   // node
 
   def foldNode[T](node: Plantain#Node)(funURI: Plantain#URI => T, funBNode: Plantain#BNode => T, funLiteral: Plantain#Literal => T): T = node match {
-    case uri@URI(_) => funURI(uri)
-    case bnode@BNode(_) => funBNode(bnode)
-    case literal@Literal(_, _, _) => funLiteral(literal)
+    case uri @ URI(_) => funURI(uri)
+    case bnode @ BNode(_) => funBNode(bnode)
+    case literal @ Literal(_, _, _) => funLiteral(literal)
   }
 
   // URI
@@ -82,14 +84,20 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   // graph union
 
   def union(graphs: Seq[Plantain#Graph]): Plantain#Graph =
-    graphs.foldLeft(Graph.empty){ _ union _ }
+    graphs.foldLeft(Graph.empty) { _ union _ }
 
   def diff(g1: Plantain#Graph, g2: Plantain#Graph): Plantain#Graph = {
     @annotation.tailrec
     def loop(g: Plantain#Graph, triples: Iterator[Plantain#Triple]): Plantain#Graph = {
       if (triples.hasNext) {
         val triple = triples.next()
-        loop(g.removeExistingTriple(triple), triples)
+        loop(
+          try {
+            g.removeExistingTriple(triple)
+          } catch {
+            case e: NoSuchElementException => g
+          },
+          triples)
       } else {
         g
       }
@@ -98,50 +106,12 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   }
 
   // graph isomorphism
+  val iso = new GraphIsomorphism()(PlantainOps)
 
-  // TODO: remove dependency on Sesame
-  // the definition for RDF Graph isomorphism can be found at http://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/#h3_graph-isomorphism
-  // here is an old paper discussing implementation details http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
   def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
-    // as long as Sesame is in scope, let's just rely on it for the complex stuff
-    import org.openrdf.{ model => sesame }
-    import org.openrdf.model.impl._
-    import org.openrdf.model.util.ModelUtil
-    def statement(s: model.Node, p: model.URI, o: model.Node): sesame.Statement = {
-      val subject: sesame.Resource = s match {
-        case model.URI(uri) => new URIImpl(uri.toString)
-        case model.BNode(label)             => new BNodeImpl(label)
-        case literal@model.Literal(_, _, _) => throw new IllegalArgumentException(s"$literal was in subject position")
-      }
-      val predicate: sesame.URI = p match {
-        case model.URI(uri) => new URIImpl(uri.toString)
-      }
-      val objectt: sesame.Value = o match {
-        case model.URI(uri) => new URIImpl(uri.toString)
-        case model.BNode(label)                               => new BNodeImpl(label)
-        case model.Literal(lexicalForm, model.URI(uri), None) => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
-        case model.Literal(lexicalForm, _, Some(lang))        => new LiteralImpl(lexicalForm, lang)
-      }
-      new StatementImpl(subject, predicate, objectt)
-    }
-    def graph(g: Plantain#Graph): sesame.Graph = {
-      val graph = new LinkedHashModel
-      @annotation.tailrec
-      def loop(triples: Iterator[Plantain#Triple]): Unit = {
-        if (triples.hasNext) {
-          val Triple(s, p, o) = triples.next()
-          graph.add(statement(s, p, o))
-          loop(triples)
-        } else {
-          ()
-        }
-      }
-      loop(g.triples.iterator)
-      graph
-    }
-    ModelUtil.equals(graph(left), graph(right))
+    iso.findAnswer(left, right).isSuccess
   }
 
-
+  def graphSize(g: Plantain#Graph): Int = g.size
 
 }

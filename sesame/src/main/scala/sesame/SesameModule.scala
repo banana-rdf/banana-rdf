@@ -3,21 +3,21 @@ package org.w3.banana.sesame
 import org.w3.banana._
 
 trait SesameModule
-extends RDFModule
-with RDFOpsModule
-with RecordBinderModule
-with SparqlGraphModule
-// with SparqlHttpModule
-with RDFXMLReaderModule
-with TurtleReaderModule
-// with ReaderSelectorModule
-with RDFXMLWriterModule
-with TurtleWriterModule
-// with WriterSelectorModule
-with JsonSolutionsWriterModule
-with XmlSolutionsWriterModule
-with JsonQueryResultsReaderModule
-with XmlQueryResultsReaderModule {
+    extends RDFModule
+    with RDFOpsModule
+    with RecordBinderModule
+    with SparqlGraphModule
+    // with SparqlHttpModule
+    with RDFXMLReaderModule
+    with TurtleReaderModule
+    // with ReaderSelectorModule
+    with RDFXMLWriterModule
+    with TurtleWriterModule
+    // with WriterSelectorModule
+    with JsonSolutionsWriterModule
+    with XmlSolutionsWriterModule
+    with JsonQueryResultsReaderModule
+    with XmlQueryResultsReaderModule {
 
   type Rdf = Sesame
 

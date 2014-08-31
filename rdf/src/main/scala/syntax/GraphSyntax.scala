@@ -14,13 +14,21 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
 
   def union(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Rdf#Graph = ops.union(graph :: otherGraph :: Nil)
 
+  def +(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]) = ops.union(Seq(graph, ops.Graph(Set(triple))))
+
   def diff(other: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Rdf#Graph = ops.diff(graph, other)
 
   def isIsomorphicWith(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Boolean = ops.isomorphism(graph, otherGraph)
 
+  def contains(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]): Boolean = {
+    val (sub, rel, obj) = ops.fromTriple(triple)
+    import ops.toConcreteNodeMatch
+    ops.find(graph, sub, rel, obj).hasNext
+  }
+
   /**
-    * returns a copy of the graph where uri are transformed through urifunc
-    */
+   * returns a copy of the graph where uri are transformed through urifunc
+   */
   def copy(urifunc: Rdf#URI => Rdf#URI)(implicit ops: RDFOps[Rdf]): Rdf#Graph = {
     def nodefunc(node: Rdf#Node) = ops.foldNode(node)(urifunc, bn => bn, lit => lit)
     var triples = Set[Rdf#Triple]()
@@ -45,5 +53,7 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
     val instances = ops.getSubjects(graph, ops.rdf("type"), clazz): Iterable[Rdf#Node]
     new PointedGraphs(instances, graph)
   }
+
+  def size(implicit ops: RDFOps[Rdf]): Int = ops.graphSize(graph)
 
 }

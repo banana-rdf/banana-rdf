@@ -1,9 +1,9 @@
 package org.w3.banana.syntax
 
-import org.w3.banana._
-import org.w3.banana.diesel._
-import org.scalatest._
 import java.net.URL
+
+import org.scalatest._
+import org.w3.banana._
 
 abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers {
 
@@ -26,7 +26,7 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
     uriNoFrag.fragment should be(None)
   }
 
-  "isPureGragment should should say if a URI is a pure fragment" in {
+  "isPureFragment should should say if a URI is a pure fragment" in {
     URI("http://example.com/foo").isPureFragment should be(false)
     URI("http://example.com/foo#bar").isPureFragment should be(false)
     URI("#bar").isPureFragment should be(true)
@@ -67,14 +67,11 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
   }
 
   "transforming java URIs and URLs to Rdf#URI" in {
-    import syntax.URIW
     val card = "http://bblfish.net/people/henry/card"
     val uri: Rdf#URI = URI(card)
 
     new URL(card).toUri should be(uri)
     new java.net.URI(card).toUri should be(uri)
   }
-
-
 
 }

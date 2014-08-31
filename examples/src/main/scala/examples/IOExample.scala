@@ -7,10 +7,10 @@ import java.io.File
 /* declare your dependencies as a trait with all the modules you need
  */
 trait IOExampleDependencies
-extends RDFModule
-with RDFOpsModule
-with TurtleReaderModule
-with RDFXMLWriterModule
+  extends RDFModule
+  with RDFOpsModule
+  with TurtleReaderModule
+  with RDFXMLWriterModule
 
 /* Here is an example doing some IO. Read below to see what's
  * happening.
@@ -36,7 +36,7 @@ trait IOExample extends IOExampleDependencies {
     val from = new java.net.URL(timblCard).openStream()
     // reading from a stream can fail so in real life, you would have to deal with the Try[Rdf#Graph]
     val graph: Rdf#Graph = TurtleReader.read(from, base = timblCard) getOrElse sys.error("couldn't read TimBL's card")
-    
+
     /* prints TimBL's card to a file as RDF/XML */
 
     val tmpFile = new File(Properties.tmpDir, "card.ttl")

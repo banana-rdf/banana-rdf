@@ -75,5 +75,4 @@ object Syntax {
     val mimeTypes = NonEmptyList(MimeType("text/plain"))
   }
 
-
 }

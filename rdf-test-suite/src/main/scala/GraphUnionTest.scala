@@ -11,34 +11,34 @@ abstract class GraphUnionTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
   val foo = (
     URI("http://example.com/foo")
-      -- rdf("foo") ->- "foo"
-      -- rdf("bar") ->- "bar"
-    ).graph
+    -- rdf("foo") ->- "foo"
+    -- rdf("bar") ->- "bar"
+  ).graph
 
   val fooReference = (
     URI("http://example.com/foo")
-      -- rdf("foo") ->- "foo"
-      -- rdf("bar") ->- "bar"
-    ).graph
+    -- rdf("foo") ->- "foo"
+    -- rdf("bar") ->- "bar"
+  ).graph
 
   val bar = (
     URI("http://example.com/foo")
-      -- rdf("bar") ->- "bar"
-      -- rdf("baz") ->- "baz"
-    ).graph
+    -- rdf("bar") ->- "bar"
+    -- rdf("baz") ->- "baz"
+  ).graph
 
   val barReference = (
     URI("http://example.com/foo")
-      -- rdf("bar") ->- "bar"
-      -- rdf("baz") ->- "baz"
-    ).graph
+    -- rdf("bar") ->- "bar"
+    -- rdf("baz") ->- "baz"
+  ).graph
 
   val foobar = (
     URI("http://example.com/foo")
-      -- rdf("foo") ->- "foo"
-      -- rdf("bar") ->- "bar"
-      -- rdf("baz") ->- "baz"
-    ).graph
+    -- rdf("foo") ->- "foo"
+    -- rdf("bar") ->- "bar"
+    -- rdf("baz") ->- "baz"
+  ).graph
 
   "union must compute the union of two graphs, and should not touch the graphs" in {
     val result = union(foo :: bar :: Nil)

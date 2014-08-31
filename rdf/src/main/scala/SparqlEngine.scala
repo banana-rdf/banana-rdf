@@ -21,20 +21,29 @@ trait SparqlEngine[Rdf <: RDF] extends Any {
 
 }
 
+trait SparqlUpdateEngine[Rdf <: RDF] extends Any {
+  def executeUpdate(query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): Future[Unit]
+
+  def executeUpdate(query: Rdf#UpdateQuery): Future[Unit] = executeUpdate(query, Map.empty)
+}
+
 object SparqlEngine {
 
-  def apply[Rdf <: RDF](store: RDFStore[Rdf]): SparqlEngine[Rdf] = new SparqlEngine[Rdf] {
+  def apply[Rdf <: RDF](store: RDFStore[Rdf]): SparqlEngine[Rdf] with SparqlUpdateEngine[Rdf] =
+    new SparqlEngine[Rdf] with SparqlUpdateEngine[Rdf] {
+      def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Solutions] =
+        store.execute(Command.select(query, bindings))
 
-    def executeSelect(query: Rdf#SelectQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Solutions] =
-      store.execute(Command.select(query, bindings))
+      def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Graph] =
+        store.execute(Command.construct(query, bindings))
 
-    def executeConstruct(query: Rdf#ConstructQuery, bindings: Map[String, Rdf#Node]): Future[Rdf#Graph] =
-      store.execute(Command.construct(query, bindings))
+      def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Future[Boolean] =
+        store.execute(Command.ask(query, bindings))
 
-    def executeAsk(query: Rdf#AskQuery, bindings: Map[String, Rdf#Node]): Future[Boolean] =
-      store.execute(Command.ask(query, bindings))
+      def executeUpdate(query: Rdf#UpdateQuery, bindings: Map[String, Rdf#Node]): Future[Unit] =
+        store.execute(Command.update(query, bindings))
 
-  }
+    }
 
 }
 

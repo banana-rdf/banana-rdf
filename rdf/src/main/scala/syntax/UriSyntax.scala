@@ -10,7 +10,7 @@ trait URISyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
 
 }
 
-class URIW[Rdf <: RDF] (val uri: Rdf#URI) extends AnyVal {
+class URIW[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal {
 
   def getString(implicit ops: URIOps[Rdf]): String = ops.getString(uri)
 

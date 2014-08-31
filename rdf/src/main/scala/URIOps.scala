@@ -33,8 +33,6 @@ trait URIOps[Rdf <: RDF] {
 
 }
 
-
-
 trait DefaultURIOps[Rdf <: RDF] extends URIOps[Rdf] { ops: RDFOps[Rdf] =>
 
   import java.net.{ URI => jURI }
@@ -48,7 +46,7 @@ trait DefaultURIOps[Rdf <: RDF] extends URIOps[Rdf] { ops: RDFOps[Rdf] =>
     val uriNoFrag = new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, null)
     ops.makeUri(uriNoFrag.toString)
   }
-  
+
   def withFragment(uri: Rdf#URI, frag: String): Rdf#URI = {
     val uriString = ops.fromUri(uri)
     val juri = new jURI(uriString)
@@ -66,7 +64,7 @@ trait DefaultURIOps[Rdf <: RDF] extends URIOps[Rdf] { ops: RDFOps[Rdf] =>
   def isPureFragment(uri: Rdf#URI): Boolean = {
     val uriString = ops.fromUri(uri)
     val juri = new jURI(uriString)
-      (juri.getScheme == null || juri.getScheme.isEmpty) && (juri.getSchemeSpecificPart == null || juri.getSchemeSpecificPart.isEmpty)
+    (juri.getScheme == null || juri.getScheme.isEmpty) && (juri.getSchemeSpecificPart == null || juri.getSchemeSpecificPart.isEmpty)
   }
 
   def resolve(uri: Rdf#URI, against: Rdf#URI): Rdf#URI = {

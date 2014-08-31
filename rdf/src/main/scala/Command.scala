@@ -1,11 +1,8 @@
 package org.w3.banana
 
-import org.w3.banana.syntax._
-
-import scalaz._
+import scalaz.Free._
 import scalaz.Scalaz._
-import Id._
-import Free._
+import scalaz._
 
 sealed trait RW
 case object READ extends RW
@@ -13,8 +10,8 @@ case object WRITE extends RW
 
 object Command {
 
-  def GET[Rdf <: RDF](hyperlink: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, LinkedDataResource[Rdf]] = {
-    import ops._    
+  def GET[Rdf <: RDF](hyperlink: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, LinkedDataResource[Rdf]] = {
+    import ops._
     val docUri = hyperlink.fragmentLess
     Command.get(docUri) map { graph =>
       val pointed = PointedGraph(hyperlink, graph)
@@ -22,15 +19,14 @@ object Command {
     }
   }
 
-  def GET[Rdf <: RDF](hyperlinks: Iterable[Rdf#URI])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Set[LinkedDataResource[Rdf]]] = {
-    import ops._
-    implicit val functor: Functor[({type l[+x] = Command[Rdf, x]})#l] = Command.ldcFunctor[Rdf]
-    implicit val applicative: Applicative[({type f[+y] = Free[({type l[+x] = Command[Rdf, x]})#l, y]})#f] =
-      Free.freeMonad[({type l[+x] = Command[Rdf, x]})#l]
-    hyperlinks.map{ hyperlink => GET(hyperlink) }.toList.sequence[({type f[+y] = Free[({type l[+x] = Command[Rdf, x]})#l, y]})#f, LinkedDataResource[Rdf]].map(_.toSet)
+  def GET[Rdf <: RDF](hyperlinks: Iterable[Rdf#URI])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Set[LinkedDataResource[Rdf]]] = {
+    implicit val functor: Functor[({ type l[+x] = Command[Rdf, x] })#l] = Command.ldcFunctor[Rdf]
+    implicit val applicative: Applicative[({ type f[+y] = Free[({ type l[+x] = Command[Rdf, x] })#l, y] })#f] =
+      Free.freeMonad[({ type l[+x] = Command[Rdf, x] })#l]
+    hyperlinks.map { hyperlink => GET(hyperlink) }.toList.sequence[({ type f[+y] = Free[({ type l[+x] = Command[Rdf, x] })#l, y] })#f, LinkedDataResource[Rdf]].map(_.toSet)
   }
 
-  def POST[Rdf <: RDF](uri: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def POST[Rdf <: RDF](uri: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     import ops._
     val docUri = uri.fragmentLess
     Command.append(docUri, graphToIterable(pointed.graph.resolveAgainst(docUri)))
@@ -42,14 +38,14 @@ object Command {
     foldNodeMatch[Rdf#NodeMatch](nodeMatch)(ANY, node => node.resolveAgainst(docUri))
   }
 
-  def PATCH[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]] /*, TODO insertTriples: Iterable[Rdf#Triple]*/)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def PATCH[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]] /*, TODO insertTriples: Iterable[Rdf#Triple]*/ )(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     import ops._
     val docUri = uri.fragmentLess
     val deletePattern = tripleMatches map { case (s, p, o) => (resolveAgainst(s, docUri), resolveAgainst(p, docUri), resolveAgainst(o, docUri)) }
     Command.patch(docUri, deletePattern, List.empty)
   }
 
-  def POSTToCollection[Rdf <: RDF](collection: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Rdf#URI] = {
+  def POSTToCollection[Rdf <: RDF](collection: Rdf#URI, pointed: PointedGraph[Rdf])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Rdf#URI] = {
     import ops._
     import org.w3.banana.binder._
     val AsURI = implicitly[PGBinder[Rdf, Rdf#URI]]
@@ -61,11 +57,11 @@ object Command {
     POST(docUri, pointed) map { _ => docUri.withFragment(fragment.toString) }
   }
 
-  def DELETE[Rdf <: RDF](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def DELETE[Rdf <: RDF](uri: Rdf#URI)(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     Command.delete(uri)
   }
 
-  def PUT[Rdf <: RDF](ldr: LinkedDataResource[Rdf])(implicit ops: RDFOps[Rdf]): Free[({type l[+x] = Command[Rdf, x]})#l, Unit] = {
+  def PUT[Rdf <: RDF](ldr: LinkedDataResource[Rdf])(implicit ops: RDFOps[Rdf]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     for {
       _ <- DELETE(ldr.location)
       _ <- POST(ldr.location, ldr.resource)
@@ -81,8 +77,9 @@ object Command {
   def remove[Rdf <: RDF](uri: Rdf#URI, tripleMatches: Iterable[TripleMatch[Rdf]]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Remove(uri, tripleMatches, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
-  def delete[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
+  def delete[Rdf <: RDF](uri: Rdf#URI): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] = {
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](Delete(uri, Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
+  }
 
   def patch[Rdf <: RDF](uri: Rdf#URI, deleteTripleMatches: Iterable[TripleMatch[Rdf]], insertTriples: Iterable[Rdf#Triple]): Free[({ type l[+x] = Command[Rdf, x] })#l, Unit] =
     for {
@@ -117,11 +114,10 @@ object Command {
     Suspend[({ type l[+x] = Command[Rdf, x] })#l, Unit](
       Update(query,
         bindings,
-        Return[({ type l[+x] = Command[Rdf, x] })#l, Unit]()))
+        Return[({ type l[+x] = Command[Rdf, x] })#l, Unit](())))
 
   implicit def ldcFunctor[Rdf <: RDF]: Functor[({ type l[+x] = Command[Rdf, x] })#l] =
     new Functor[({ type l[+ x] = Command[Rdf, x] })#l] {
-
       def map[A, B](command: Command[Rdf, A])(f: A => B): Command[Rdf, B] =
         command match {
           case Create(uri, a) => Create(uri, f(a))

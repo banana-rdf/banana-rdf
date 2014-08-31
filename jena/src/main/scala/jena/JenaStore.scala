@@ -1,17 +1,15 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
 import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
-import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 import com.hp.hpl.jena.sparql.modify.GraphStoreBasic
-import com.hp.hpl.jena.datatypes.{ TypeMapper, RDFDatatype }
-import scala.collection.JavaConverters._
-import scala.concurrent.{ ops => _, _ }
+import org.slf4j.LoggerFactory
+import org.w3.banana._
+
+import scala.concurrent._
 import scala.util.Try
 import scalaz.Free
-import org.slf4j.{ Logger, LoggerFactory }
 
 object JenaStore {
 
