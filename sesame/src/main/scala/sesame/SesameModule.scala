@@ -22,36 +22,36 @@ trait SesameModule
 
   type Rdf = Sesame
 
-  implicit val Ops: SesameOps = new SesameOps
+  implicit val ops: SesameOps = new SesameOps
 
-  implicit val RecordBinder: binder.RecordBinder[Sesame] = binder.RecordBinder[Sesame]
+  implicit val recordBinder: binder.RecordBinder[Sesame] = binder.RecordBinder[Sesame]
 
-  implicit val SparqlOps: SparqlOps[Sesame] = SesameSparqlOps
+  implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 
   implicit val sparqlGraph: SparqlEngine[Sesame, Sesame#Graph] = new SesameGraphSparqlEngine
 
   implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] = new SesameStore
 
-  implicit val RDFXMLReader: RDFReader[Sesame, RDFXML] = new SesameRDFXMLReader
+  implicit val rdfXMLReader: RDFReader[Sesame, RDFXML] = new SesameRDFXMLReader
 
-  implicit val TurtleReader: RDFReader[Sesame, Turtle] = new SesameTurtleReader
+  implicit val turtleReader: RDFReader[Sesame, Turtle] = new SesameTurtleReader
 
-  val SesameRDFWriterHelper = new SesameRDFWriterHelper
+  implicit val sesameRDFWriterHelper = new SesameRDFWriterHelper
 
-  implicit val RDFXMLWriter: RDFWriter[Sesame, RDFXML] = SesameRDFWriterHelper.rdfxmlWriter
+  implicit val rdfXMLWriter: RDFWriter[Sesame, RDFXML] = sesameRDFWriterHelper.rdfxmlWriter
 
-  implicit val TurtleWriter: RDFWriter[Sesame, Turtle] = SesameRDFWriterHelper.turtleWriter
+  implicit val turtleWriter: RDFWriter[Sesame, Turtle] = sesameRDFWriterHelper.turtleWriter
 
-  implicit val JsonSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
+  implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
     SesameSolutionsWriter.solutionsWriterJson
 
-  implicit val XmlSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] =
+  implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] =
     SesameSolutionsWriter.solutionsWriterXml
 
-  implicit val JsonQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
+  implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
     SesameQueryResultsReader.queryResultsReaderJson
 
-  implicit val XmlQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerXml] =
+  implicit val xmlQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerXml] =
     SesameQueryResultsReader.queryResultsReaderXml
 
 }

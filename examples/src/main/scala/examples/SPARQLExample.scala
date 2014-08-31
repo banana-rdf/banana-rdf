@@ -25,8 +25,8 @@ trait SPARQLExampleDependencies
  */
 trait SPARQLExample extends SPARQLExampleDependencies { self =>
 
-  import Ops._
-  import SparqlOps._
+  import ops._
+  import sparqlOps._
   import sparqlHttp.sparqlEngineSyntax._
 
   def main(args: Array[String]): Unit = {

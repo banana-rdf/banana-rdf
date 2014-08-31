@@ -7,7 +7,7 @@ import com.hp.hpl.jena.query._
 import scala.concurrent.Future
 import org.w3.banana.util._
 
-class JenaGraphSparqlEngine(ops: RDFOps[Jena])
+class JenaGraphSparqlEngine(implicit ops: RDFOps[Jena])
     extends SparqlEngine[Jena, Jena#Graph] {
 
   val querySolution = new util.QuerySolution(ops)

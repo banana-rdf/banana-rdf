@@ -10,7 +10,7 @@ import com.hp.hpl.jena.update.UpdateFactory
 import scala.collection.JavaConverters._
 import scala.util._
 
-class JenaSparqlOps(JenaUtil: JenaUtil) extends SparqlOps[Jena] {
+class JenaSparqlOps(implicit jenaUtil: JenaUtil) extends SparqlOps[Jena] {
 
   def SelectQuery(query: String): Jena#SelectQuery = QueryFactory.create(query)
 
@@ -38,7 +38,7 @@ class JenaSparqlOps(JenaUtil: JenaUtil) extends SparqlOps[Jena] {
     if (node == null)
       Failure(VarNotFound("var " + v + " not found in QuerySolution " + solution.toString))
     else
-      Success(JenaUtil.toNode(node))
+      Success(jenaUtil.toNode(node))
   }
 
   def varnames(solution: Jena#Solution): Set[String] = solution.varNames.asScala.toSet

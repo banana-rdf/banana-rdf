@@ -8,7 +8,7 @@ import org.w3.banana._
 import org.w3.banana.util.ImmediateFuture.immediate
 import scala.concurrent.Future
 
-class JenaSparqlHttpEngine(ops: RDFOps[Jena]) extends SparqlEngine[Jena, URL] {
+class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena]) extends SparqlEngine[Jena, URL] {
 
   val querySolution = new util.QuerySolution(ops)
 
