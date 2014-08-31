@@ -1,9 +1,10 @@
 package org.w3.banana.sesame
 
-import org.w3.banana._
 import org.openrdf.model._
 import org.openrdf.model.impl._
 import org.openrdf.model.util._
+import org.w3.banana._
+
 import scala.collection.JavaConverters._
 
 class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
@@ -165,4 +166,7 @@ class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
     val rightNoContext = right.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava
     ModelUtil.equals(leftNoContext, rightNoContext)
   }
+
+  def graphSize(g: Sesame#Graph): Int = g.size()
+
 }

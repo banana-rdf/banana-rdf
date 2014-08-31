@@ -6,10 +6,10 @@ import com.hp.hpl.jena.rdf.model._
 import com.hp.hpl.jena.sparql.core.DatasetGraph
 import org.w3.banana._
 import scala.collection.JavaConverters._
-import scala.concurrent.{ops => _, _}
+import scala.concurrent._
 import scala.util.Try
 
-class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil) extends RDFStore[Jena, Dataset] {
+class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil) extends RDFStore[Jena, Dataset] /* with SparqlUpdate[Jena, Dataset] */ {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 

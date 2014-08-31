@@ -7,8 +7,8 @@ trait BooleanWriter[T] extends Writer[Boolean, T] {
 
   def format(bool: Boolean): String
 
-  def write(bool: Boolean, os: OutputStream, base: String): Try[Unit] = Try {
-    os.write(format(bool).getBytes("UTF-8"))
+  def asString(bool: Boolean, base: String): Try[String] = Try {
+    format(bool)
   }
 
 }
@@ -29,6 +29,7 @@ object BooleanWriter {
         |}
         | """.stripMargin.format(bool)
 
+    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
   }
 
   /**
@@ -45,6 +46,7 @@ object BooleanWriter {
         |  <boolean>%s</boolean>
         |</sparql> """.stripMargin.format(bool) // "
 
+    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
   }
 
   implicit val selector: WriterSelector[Boolean] =

@@ -1,11 +1,11 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
-import java.io.{ Writer => jWriter }
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import scala.util._
-import java.io._
+import java.io.{ Writer => jWriter, _ }
+
 import org.apache.jena.riot._
+import org.w3.banana._
+
+import scala.util._
 
 /**
  * Create an RDF Writer using Jena's serialisers
@@ -15,9 +15,17 @@ object JenaRDFWriter {
   def makeRDFWriter[S](lang: Lang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
     val syntax = _syntax
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
-      import Jena.Ops._
+      import org.w3.banana.jena.Jena.Ops._
       val relativeGraph = graph.relativize(URI(base))
       RDFDataMgr.write(os, relativeGraph, lang)
+    }
+
+    def asString(graph: Jena#Graph, base: String): Try[String] = Try {
+      val result = new StringWriter()
+      import org.w3.banana.jena.Jena.Ops._
+      val relativeGraph = graph.relativize(URI(base))
+      RDFDataMgr.write(result, relativeGraph, lang)
+      result.toString()
     }
   }
 

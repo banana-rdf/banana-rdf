@@ -1,7 +1,6 @@
 package org.w3.banana.plantain.model
 
-import org.w3.banana._
-import spray.http.Uri
+import akka.http.model.Uri
 
 object Graph {
 

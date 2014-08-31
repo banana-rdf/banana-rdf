@@ -1,0 +1,3397 @@
+
+<!-- Processed by Id: cwm.py,v 1.158 2004/07/23 18:54:17 syosi Exp -->
+<!--     using base file:/home/denis/W3C/WWW/2002/01/tr-automation/-->
+
+
+<rdf:RDF xmlns="http://www.w3.org/2001/02pd/rec54#"
+    xmlns:contact="http://www.w3.org/2000/10/swap/pim/contact#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:doc="http://www.w3.org/2000/10/swap/pim/doc#"
+    xmlns:mat="http://www.w3.org/2002/05/matrix/vocab#"
+    xmlns:org="http://www.w3.org/2001/04/roadmap/org#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rec="http://www.w3.org/2001/02pd/rec54#">
+
+    <CR rdf:about="http://www.w3.org/TR/2011/CR-media-frags-20111201/">
+        <dc:date>2011-12-01</dc:date>
+        <dc:title>Media Fragments URI 1.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-media-frags-20110317/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/media-frags/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Raphaël Troncy</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Erik Mannens</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Silvia Pfeiffer</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Davy Van Deursen</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2011-12-08</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/WebVideo/Fragments/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2011/CR-mediaont-api-1.0-20111122/">
+        <dc:date>2011-11-22</dc:date>
+        <dc:title>API for Media Resources 1.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-mediaont-api-1.0-20110712/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/mediaont-api-1.0/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Florian Stegmaier</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>WonSuk Lee</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Chris Poppe</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Werner Bailer</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2011-12-31</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/WebVideo/Annotations/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2008/WebVideo/Annotations/drafts/API/implementation-report.html"/>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2011/CR-progress-events-20110922/">
+        <dc:date>2011-09-22</dc:date>
+        <dc:title>Progress Events</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-progress-events-20110809/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/progress-events"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anne van Kesteren</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:annevk@opera.com"/>
+        </editor>
+        <implementationFeedbackDue>2011-12-22</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2011/CR-touch-events-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>Touch Events version 1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-touch-events-20111027/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/touch-events/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Matt Brubeck</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Sangwhan Moon</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Schepers</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2012-03-15</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/webevents/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2011/CR-websockets-20111208/">
+        <dc:date>2011-12-08</dc:date>
+        <dc:title>The WebSocket API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-websockets-20110929/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/websockets/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <implementationFeedbackDue>2012-03-08</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2011/CR-webstorage-20111208/">
+        <dc:date>2011-12-08</dc:date>
+        <dc:title>Web Storage</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-webstorage-20111025/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webstorage/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <implementationFeedbackDue>2012-03-08</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2011/CR-widgets-apis-20111213/">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Widget Interface</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-widgets-apis-20110607/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets-apis/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Caceres</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2012-01-13</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://dev.w3.org/2006/waf/widgets-api/imp-report/"/>
+    </CR>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2011/NOTE-hcls-orb-20111020/">
+        <dc:date>2011-10-20</dc:date>
+        <dc:title>Ontology of Rhetorical Blocks (ORB)</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/hcls-orb/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Paolo Ciccarese</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:paolo.ciccarese@gmail.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tudor Groza</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:tudor.groza@uq.edu.au"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/hcls/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2011/NOTE-hnreq-20111201/">
+        <dc:date>2011-12-01</dc:date>
+        <dc:title>Requirements for Home Networking Scenarios</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/hnreq/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Giuseppe Pascale</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2009/dap/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/webtv/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2011/NOTE-widgets-reqs-20110927/">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Requirement For Standardizing Widgets</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-widgets-reqs-20101026/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets-reqs/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Caceres</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-mediaont-10-20111129/">
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>Ontology for Media Resources 1.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-mediaont-10-20110707/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/mediaont-10/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>WonSuk Lee</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Werner Bailer</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tobias Bürger</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Pierre-Antoine Champin</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Véronique Malaisé</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Thierry Michel</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Felix Sasaki</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Joakim Söderberg</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Florian Stegmaier</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Strassner</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-12-31</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/WebVideo/Annotations/"/>
+        </org:deliveredBy>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-soapjms-20111208/">
+        <dc:date>2011-12-08</dc:date>
+        <dc:title>SOAP over Java Message Service 1.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-soapjms-20101026/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/soapjms/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Phil Adams</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Peter Easton</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Eric Johnson</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Roland Merrick</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Mark Phillips</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2012-01-13</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/soapjms/"/>
+        </org:deliveredBy>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-widgets-access-20111213/">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Widget Access Request Policy</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/CR-widgets-access-20100420/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets-access/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Caceres</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2012-01-17</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://dev.w3.org/2006/waf/widgets-access/imp-report/"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-ws-enumeration-20110927">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web Services Enumeration (WS-Enumeration)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-ws-enumeration-20110428"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-enumeration"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-11-04</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-ws-event-descriptions-20110927">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web Services Event Descriptions (WS-EventDescriptions)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-ws-event-descriptions-20110428"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-event-descriptions"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-11-04</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-ws-eventing-20110927">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web Services Eventing (WS-Eventing)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-ws-eventing-20110428"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-eventing"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-11-04</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-ws-fragment-20110927">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web Services Fragment (WS-Fragment)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-ws-fragment-20110428"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-fragment"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-11-04</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-ws-metadata-exchange-20110927">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web Services Metadata Exchange (WS-MetadataExchange)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-ws-metadata-exchange-20110428"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-metadata-exchange"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-11-04</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-ws-soap-assertions-20110927">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web Services SOAP Assertions (WS-SOAPAssertions)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-ws-soap-assertions-20110428"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-soap-assertions"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-11-04</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2011/PR-ws-transfer-20110927">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web Services Transfer (WS-Transfer)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-ws-transfer-20110428"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-transfer"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2011-11-04</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+    </PR>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-css3-namespace-20110929/">
+        <dc:date>2011-09-29</dc:date>
+        <dc:title>CSS Namespaces Module</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-css3-namespace-20110811/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-namespace/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anne van Kesteren</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/Style/2011/REC-css3-color-20110607-errata.html"/>
+        <mat:hasImplReport rdf:resource="/Style/CSS/Test/CSS3/Namespace/20090210/reports/implement-report.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=css3-namespace"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-css3-selectors-20110929/">
+        <dc:date>2011-09-29</dc:date>
+        <dc:title>Selectors Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2009/PR-css3-selectors-20091215/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-selectors/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tantek Çelik</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Daniel Glazman</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Peter Linss</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Williams</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/Style/2011/REC-css3-selectors-20110929-errata.html"/>
+        <mat:hasImplReport rdf:resource="/Style/CSS/Test/CSS3/Selectors/20091025/reports/CR-ImpReport.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=css3-selectors"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-widgets-20110927/">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Widget Packaging and XML Configuration</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-widgets-20110811/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Caceres</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://dev.w3.org/2006/waf/widgets/errata.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=widgets"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-ws-enumeration-20111213">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Web Services Enumeration (WS-Enumeration)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-ws-enumeration-20110927"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-enumeration"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/ra/errata/ws-enumeration-20111213-errata"/>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=ws-enumeration"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-ws-event-descriptions-20111213">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Web Services Event Descriptions (WS-EventDescriptions)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-ws-event-descriptions-20110927"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-event-descriptions"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/ra/errata/ws-event-descriptions-20111213-errata"/>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=ws-event-descriptions"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-ws-eventing-20111213">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Web Services Eventing (WS-Eventing)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-ws-eventing-20110927"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-eventing"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/ra/errata/ws-eventing-20111213-errata"/>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=ws-eventing"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-ws-fragment-20111213">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Web Services Fragment (WS-Fragment)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-ws-fragment-20110927"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-fragment"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/ra/errata/ws-fragment-20111213-errata"/>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=ws-fragment"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-ws-metadata-exchange-20111213">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Web Services Metadata Exchange (WS-MetadataExchange)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-ws-metadata-exchange-20110927"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-metadata-exchange"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/ra/errata/ws-metadata-exchange-20111213-errata"/>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=ws-metadata-exchange"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-ws-soap-assertions-20111213">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Web Services SOAP Assertions (WS-SOAPAssertions)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-ws-soap-assertions-20110927"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-soap-assertions"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/ra/errata/ws-soap-assertions-20111213-errata"/>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=ws-soap-assertions"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2011/REC-ws-transfer-20111213">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>Web Services Transfer (WS-Transfer)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-ws-transfer-20110927"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/ws-transfer"/>
+        <cites rdf:resource="http://www.w3.org/2002/ws/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Davis</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Katy Warr</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Wu Chou</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/ra/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/ra/errata/ws-transfer-20111213-errata"/>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/ws/ra/test/testResults.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=ws-transfer"/>
+    </REC>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-CSP-20111129/">
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>Content Security Policy</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/CSP/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Brandon Sterne</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:bsterne@mozilla.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Adam Barth</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:w3c@adambarth.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/webappsec/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-FileAPI-20111020/">
+        <dc:date>2011-10-20</dc:date>
+        <dc:title>File API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-FileAPI-20101026/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/FileAPI/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Arun Ranganathan</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:arun@mozilla.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jonas Sicking</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jonas@sicking.cc"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-IndexedDB-20111206/">
+        <dc:date>2011-12-06</dc:date>
+        <dc:title>Indexed Database API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-IndexedDB-20110419/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/IndexedDB/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Nikunj Mehta</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:nikunj@o-micron.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jonas Sicking</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jonas@sicking.cc"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Eliot Graff</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:eliotgra@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Andrei Popescu</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:andreip@google.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jeremy Orlow</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jorlow@google.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-WebIDL-20110927/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Web IDL</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-WebIDL-20110712/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/WebIDL/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Cameron McCormack</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cam@mcc.id.au"/>
+        </editor>
+        <lastCallFeedBackDue>2011-10-18</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-audioproc-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>Audio Processing API</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/audioproc/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity.html"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Robert O'Callahan</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:robert@ocallahan.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Chris Rogers</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:crogers@google.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/audio/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-battery-status-20111129/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>Battery Status API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-battery-status-20110915/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/battery-status/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anssi Kostiainen</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2011-12-20</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2009/dap/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-2d-transforms-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>CSS 2D Transforms</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2009/WD-css3-2d-transforms-20091201/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-2d-transforms/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Simon Fraser</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Dean Jackson</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>David Hyatt</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Chris Marrin</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Edward O'Connor</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-exclusions-20111213/">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>CSS Exclusions and Shapes Module Level 3</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-exclusions/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Vincent Hardy</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:vhardy@adobe.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Rossen Atanassov</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ratan@microsoft.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-flexbox-20111129/">
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>CSS Flexible Box Layout Module</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-flexbox-20110322/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-flexbox/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tab Atkins Jr.</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Alex Mogilevsky</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:alexmog@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>L. David Baron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:dbaron@dbaron.org"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-fonts-20111004/">
+        <dc:date>2011-10-04</dc:date>
+        <dc:title>CSS Fonts Module Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-fonts-20110324/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-fonts/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Daggett</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jdaggett@mozilla.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-gcpm-20111129/">
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>CSS Generated Content for Paged Media Module</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-css3-gcpm-20100608/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-gcpm/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Håkon Wium Lie</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:howcome@opera.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-images-20111206/">
+        <dc:date>2011-12-06</dc:date>
+        <dc:title>CSS Image Values and Replaced Content Module Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-images-20110908/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-images/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tab Atkins Jr.</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-layout-20111129/">
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>CSS Template Layout Module</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-css3-layout-20100429/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-layout/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Bert Bos</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:bert@w3.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>César Acebal</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-css3-regions-20111129/">
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>CSS Regions Module Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-regions-20110609/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-regions/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Vincent Hardy</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:vhardy@adobe.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Alex Mogilevsky</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:alexmog@microsoft.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-eventsource-20111020/">
+        <dc:date>2011-10-20</dc:date>
+        <dc:title>Server-Sent Events</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-eventsource-20110310/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/eventsource/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-geolocation-API-v2-20111201/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-01</dc:date>
+        <dc:title>Geolocation API Specification Level 2</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/geolocation-API-v2/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Andrei Popescu</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Steve Block</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-01-15</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/geolocation/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-jlreq-20111129/">
+        <dc:date>2011-11-29</dc:date>
+        <dc:title>Requirements for Japanese Text Layout</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2009/NOTE-jlreq-20090604/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/jlreq/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Yasuhiro Anan</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Hiroyuki Chiba</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Junsaburo Edamoto</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Richard Ishida</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Keiichiro Ishino</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tatsuo Kobayashi</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Toshi Kobayashi</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Kenzou Onozawa</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Felix Sasaki</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Hiroyuki Chiba</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Junsaburo Edamoto</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Richard Ishida</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Keiichiro Ishino</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Seiichi Kato</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tatsuo Kobayashi</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Toshi Kobayashi</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Kenzou Onozawa</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Felix Sasaki</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Hajime Shiozawa</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/International/core/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/XSL/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-media-frags-recipes-20111201/">
+        <dc:date>2011-12-01</dc:date>
+        <dc:title>Protocol for Media Fragments 1.0 Resolution in HTTP</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/media-frags-recipes/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Raphaël Troncy</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Erik Mannens</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Silvia Pfeiffer</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Davy Van Deursen</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/WebVideo/Fragments/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-orientation-event-20111201/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-01</dc:date>
+        <dc:title>DeviceOrientation Event Specification</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-orientation-event-20110628/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/orientation-event/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Steve Block</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Andrei Popescu</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-01-15</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/geolocation/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-prov-dm-20111018/">
+        <dc:date>2011-10-18</dc:date>
+        <dc:title>The PROV Data Model and Abstract Syntax Notation</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/prov-dm/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Luc Moreau</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Paolo Missier</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/prov/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-prov-dm-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>The PROV Data Model and Abstract Syntax Notation</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-prov-dm-20111018/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/prov-dm/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Luc Moreau</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Paolo Missier</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/prov/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-prov-o-20111213/">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>The PROV Ontology: Model and Formal Semantics</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/prov-o/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Satya Sahoo</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Deborah McGuinness</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/prov/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-rdfa-core-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>RDFa Core 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-rdfa-core-20110331/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdfa-core/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ben Adida</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ben@adida.net"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Mark Birbeck</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:mark.birbeck@webBackplane.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shane McCarron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:shane@aptest.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ivan Herman</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ivan@w3.org"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-rdfa-lite-20111208/">
+        <dc:date>2011-12-08</dc:date>
+        <dc:title>RDFa Lite 1.1</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdfa-lite/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Manu Sporny</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-rdfa-primer-20111208/">
+        <dc:date>2011-12-08</dc:date>
+        <dc:title>RDFa 1.1 Primer</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-rdfa-primer-20110419/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdfa-primer/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ben Adida</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ivan Herman</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Manu Sporny</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-selectors4-20110929/">
+        <dc:date>2011-09-29</dc:date>
+        <dc:title>Selectors Level 4</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/selectors4/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-sparql11-federated-query-20111117/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-11-17</dc:date>
+        <dc:title>SPARQL 1.1 Federated Query</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-sparql11-federated-query-20100601/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/sparql11-federated-query/"/>
+        <cites rdf:resource="http://www.w3.org/2001/sw/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Eric Prud'hommeaux</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:eric@w3.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Carlos Buil-Aranda</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cbuil@delicias.dia.fi.upm.es"/>
+        </editor>
+        <lastCallFeedBackDue>2011-12-31</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/DataAccess/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-sparql11-overview-20111117/">
+        <dc:date>2011-11-17</dc:date>
+        <dc:title>SPARQL 1.1 Overview</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/sparql11-overview/"/>
+        <cites rdf:resource="http://www.w3.org/2001/sw/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>The W3C SPARQL Working Group</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:public-rdf-dawg-comments@w3.org"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/DataAccess/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-streamproc-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>MediaStream Processing API</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/streamproc/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Robert O'Callahan</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:robert@ocallahan.org"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/audio/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-touch-events-20111027/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-10-27</dc:date>
+        <dc:title>Touch Events version 1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-touch-events-20110913/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/touch-events/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Matt Brubeck</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Sangwhan Moon</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Doug Schepers</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2011-11-17</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/webevents/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-tracking-compliance-20111114/">
+        <dc:date>2011-11-14</dc:date>
+        <dc:title>Tracking Compliance and Scope</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/tracking-compliance/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Justin Brookman</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Sean Harvey</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Erica Newland</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Heather West</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/tracking-protection/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-tracking-dnt-20111114/">
+        <dc:date>2011-11-14</dc:date>
+        <dc:title>Tracking Preference Expression (DNT)</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/tracking-dnt/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Roy T. Fielding</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/tracking-protection/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-vibration-20111117/">
+        <dc:date>2011-11-17</dc:date>
+        <dc:title>Vibration API</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/vibration/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anssi Kostiainen</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2009/dap/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-webaudio-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>Web Audio API</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webaudio/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Chris Rogers</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:crogers@google.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/audio/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-webmessaging-20111020/">
+        <dc:date>2011-10-20</dc:date>
+        <dc:title>HTML5 Web Messaging</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-webmessaging-20110317/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webmessaging/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-webrtc-20111027/">
+        <dc:date>2011-10-27</dc:date>
+        <dc:title>WebRTC 1.0: Real-time Communication Between Browsers</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webrtc/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Adam Bergkvist</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Daniel C. Burnett</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Cullen Jennings</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anant Narayanan</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/04/webrtc/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-websockets-20110929/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-09-29</dc:date>
+        <dc:title>The WebSocket API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-websockets-20110419/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/websockets/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <lastCallFeedBackDue>2011-10-21</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-webstorage-20111025/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-10-25</dc:date>
+        <dc:title>Web Storage</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-webstorage-20110901/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webstorage/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <lastCallFeedBackDue>2011-11-15</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-widgets-uri-20110927/">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Widget URI scheme</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2009/WD-widgets-uri-20091008/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets-uri/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Caceres</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-xhtml-rdfa-20111215/">
+        <dc:date>2011-12-15</dc:date>
+        <dc:title>XHTML+RDFa 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xhtml-rdfa-20110331/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xhtml-rdfa/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shane McCarron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:shane@aptest.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-xpath-30-20111213/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XML Path Language (XPath) 3.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xpath-30-20110614/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xpath-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jonathan Robie</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jonathan.robie@ibiblio.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Don Chamberlin</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:dchamber@us.ibm.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Dyck</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jmdyck@ibiblio.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Snelson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:john.snelson@marklogic.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-10</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/XSL/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-xpath-datamodel-30-20111213/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XQuery and XPath Data Model 3.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xpath-datamodel-30-20110614/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xpath-datamodel-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Norman Walsh</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:Norman.Walsh@marklogic.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anders Berglund</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Snelson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:john.snelson@marklogic.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-10</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/XSL/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-xpath-full-text-30-20111213/">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XQuery and XPath Full Text 3.0</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xpath-full-text-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Mary Holstege</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/XSL/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-xpath-functions-30-20111213/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XPath and XQuery Functions and Operators 3.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xpath-functions-30-20110614/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xpath-functions-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Kay</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-02-10</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/XSL/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-xquery-30-20111213/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XQuery 3.0: An XML Query Language</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xquery-30-20110614/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xquery-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jonathan Robie</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jonathan.robie@ibiblio.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Don Chamberlin</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:dchamber@us.ibm.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Dyck</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jmdyck@ibiblio.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Snelson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:john.snelson@marklogic.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-10</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-xquery-update-30-20111213/">
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XQuery Update Facility 3.0</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xquery-update-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Snelson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:john.snelson@marklogic.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jim Melton</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jim.melton@oracle.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-xqueryx-30-20111213/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XQueryX 3.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xqueryx-30-20110614/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xqueryx-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jim Melton</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jim.melton@oracle.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-10</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2011/WD-xslfo20-20110927/">
+        <dc:date>2011-09-27</dc:date>
+        <dc:title>Extensible Stylesheet Language (XSL) Version 2.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-xslfo20-20101216/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xslfo20/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Dave Pawson</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/XPPL/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2011/WD-xslt-xquery-serialization-30-20111213/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2011-12-13</dc:date>
+        <dc:title>XSLT and XQuery Serialization 3.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xslt-xquery-serialization-30-20110614/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xslt-xquery-serialization-30/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Henry Zongaro</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-02-10</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Query/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/XSL/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-css3-speech-20120320/">
+        <dc:date>2012-03-20</dc:date>
+        <dc:title>CSS Speech Module</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-speech-20110818/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-speech/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Daniel Weck</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:dweck@daisy.org"/>
+        </editor>
+        <implementationFeedbackDue>2012-09-20</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-mmi-arch-20120112/">
+        <dc:date>2012-01-12</dc:date>
+        <dc:title>Multimodal Architecture and Interfaces</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-mmi-arch-20110906/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/mmi-arch/"/>
+        <cites rdf:resource="http://www.w3.org/2002/mmi/Activity.html"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jim Barnett</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2012-02-29</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/mmi/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2002/mmi/2012/mmi-arch-irp/Overview.html"/>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-navigation-timing-20120117/">
+        <dc:date>2012-01-17</dc:date>
+        <dc:title>Navigation Timing</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-navigation-timing-20110602/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/navigation-timing/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Zhiheng Wang</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:zhihengw@google.com"/>
+        </editor>
+        <implementationFeedbackDue>2012-01-30</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/webperf/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2011/03/navigation-timing-report"/>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-navigation-timing-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>Navigation Timing</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/CR-navigation-timing-20120117/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/navigation-timing/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Zhiheng Wang</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:zhihengw@google.com"/>
+        </editor>
+        <implementationFeedbackDue>2012-03-20</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/webperf/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2011/03/navigation-timing-report"/>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-r2rml-20120223/">
+        <dc:date>2012-02-23</dc:date>
+        <dc:title>R2RML: RDB to RDF Mapping Language</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-r2rml-20110920/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/r2rml/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Souripriya Das</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Seema Sundara</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Richard Cyganiak</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2012-04-30</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/rdb2rdf/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2001/sw/rdb2rdf/wiki/Implementations"/>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-rdb-direct-mapping-20120223/">
+        <dc:date>2012-02-23</dc:date>
+        <dc:title>A Direct Mapping of Relational Data to RDF</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-rdb-direct-mapping-20110920/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdb-direct-mapping/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcelo Arenas</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:marenas@ing.puc.cl"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Alexandre Bertails</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:bertails@w3.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Eric Prud'hommeaux</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:eric@w3.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Juan Sequeda</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jsequeda@cs.utexas.edu"/>
+        </editor>
+        <implementationFeedbackDue>2012-04-30</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/rdb2rdf/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2001/sw/rdb2rdf/wiki/Implementations"/>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-rdfa-core-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>RDFa Core 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/WD-rdfa-core-20120131/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdfa-core/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ben Adida</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ben@adida.net"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Mark Birbeck</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:mark.birbeck@webBackplane.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shane McCarron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:shane@aptest.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ivan Herman</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ivan@w3.org"/>
+        </editor>
+        <implementationFeedbackDue>2012-04-30</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-rdfa-lite-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>RDFa Lite 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/WD-rdfa-lite-20120131/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdfa-lite/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Manu Sporny</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2012-04-30</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-xhtml-rdfa-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>XHTML+RDFa 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/WD-xhtml-rdfa-20120131/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xhtml-rdfa/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shane McCarron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:shane@aptest.com"/>
+        </editor>
+        <implementationFeedbackDue>2012-04-30</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2010/02/rdfa/wiki/CR-ImplementationReport"/>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-xml-c14n2-20120124/">
+        <dc:date>2012-01-24</dc:date>
+        <dc:title>Canonical XML Version 2.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xml-c14n2-20110421/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xml-c14n2/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Boyer</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Glenn Marcy</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Pratik Datta</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+        </editor>
+        <implementationFeedbackDue>2012-04-12</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-xmldsig-core2-20120124/">
+        <dc:date>2012-01-24</dc:date>
+        <dc:title>XML Signature Syntax and Processing Version 2.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xmldsig-core2-20110421/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmldsig-core2/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Donald Eastlake</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:d3e3e3@gmail.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Joseph Reagle</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:reagle@mit.edu"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>David Solo</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:dsolo@alum.mit.edu"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Thomas Roessler</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:tlr@w3.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Kelvin Yiu</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:kelviny@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Pratik Datta</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:pratik.datta@oracle.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Scott Cantor</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cantor.2@osu.edu"/>
+        </editor>
+        <implementationFeedbackDue>2012-04-12</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-xmldsig-xpath-20120124/">
+        <dc:date>2012-01-24</dc:date>
+        <dc:title>XML Signature Streaming Profile of XPath 1.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xmldsig-xpath-20110421/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmldsig-xpath/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Pratik Datta</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:pratik.datta@oracle.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Meiko Jensen</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:Meiko.Jensen@ruhr-uni-bochum.de"/>
+        </editor>
+        <implementationFeedbackDue>2012-04-12</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-xmlenc-core1-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>XML Encryption Syntax and Processing Version 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/WD-xmlenc-core1-20120105/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlenc-core1/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Donald Eastlake</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:d3e3e3@gmail.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Joseph Reagle</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:reagle@mit.edu"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Thomas Roessler</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:tlr@w3.org"/>
+        </editor>
+        <implementationFeedbackDue>2012-04-20</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <CR rdf:about="http://www.w3.org/TR/2012/CR-xmlenc-transform20-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>XML Encryption 1.1 CipherReference Processing using 2.0 Transforms</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/WD-xmlenc-transform20-20120105/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlenc-transform20/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <implementationFeedbackDue>2012-04-20</implementationFeedbackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </CR>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-UNDERSTANDING-WCAG20-20120103/">
+        <dc:date>2012-01-03</dc:date>
+        <dc:title>Understanding WCAG 2.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/NOTE-UNDERSTANDING-WCAG20-20101014/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/UNDERSTANDING-WCAG20/"/>
+        <cites rdf:resource="http://www.w3.org/WAI/Technical/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Cooper</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Loretta Guarino Reid</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Gregg Vanderheiden</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/WAI/GL/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-WCAG20-TECHS-20120103/">
+        <dc:date>2012-01-03</dc:date>
+        <dc:title>Techniques for WCAG 2.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/NOTE-WCAG20-TECHS-20101014/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/WCAG20-TECHS/"/>
+        <cites rdf:resource="http://www.w3.org/WAI/Technical/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Cooper</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Loretta Guarino Reid</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Gregg Vanderheiden</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/WAI/GL/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-XMLHttpRequest1-20120117/">
+        <dc:date>2012-01-17</dc:date>
+        <dc:title>XMLHttpRequest</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/CR-XMLHttpRequest-20100803/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/XMLHttpRequest1/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anne van Kesteren</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:annevk@opera.com"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-hash-in-uri-20120209/">
+        <dc:date>2012-02-09</dc:date>
+        <dc:title>Usage Patterns For Client-Side URI parameters</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2009/WD-hash-in-uri-20090415/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/hash-in-uri/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>T. V. Raman</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:raman@google.com"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/tag/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-html-data-guide-20120308/">
+        <dc:date>2012-03-08</dc:date>
+        <dc:title>HTML Data Guide</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/WD-html-data-guide-20120112/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/html-data-guide/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jeni Tennison</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/interest/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-html-xml-tf-report-20120209/">
+        <dc:date>2012-02-09</dc:date>
+        <dc:title>HTML/XML Task Force Report</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/html-xml-tf-report/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Norman Walsh</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:norman.walsh@marklogic.com"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/tag/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-media-capture-api-20120322/">
+        <dc:date>2012-03-22</dc:date>
+        <dc:title>The Media Capture API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-media-capture-api-20100928/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/media-capture-api/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Dzung D Tran</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ilkka Oksanen</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ingmar Kliche</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2009/dap/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-microdata-rdf-20120308/">
+        <dc:date>2012-03-08</dc:date>
+        <dc:title>Microdata to RDF</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2012/WD-microdata-rdf-20120112/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/microdata-rdf/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Gregg Kellogg</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/interest/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-mmi-interop-20120124/">
+        <dc:date>2012-01-24</dc:date>
+        <dc:title>MMI interoperability test report</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/mmi-interop/"/>
+        <cites rdf:resource="http://www.w3.org/2002/mmi/Activity.html"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ingmar Kliche</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/mmi/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-widgets-uri-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>Widget URI scheme</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-widgets-uri-20110927/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets-uri/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Cáceres</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-xinclude-11-requirements-20120214/">
+        <dc:date>2012-02-14</dc:date>
+        <dc:title>XInclude 1.1 Requirement and Use Cases</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xinclude-11-requirements/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Norman Walsh</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:norman.walsh@marklogic.com"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Core/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <NOTE rdf:about="http://www.w3.org/TR/2012/NOTE-xmlsec-rngschema-20120124/">
+        <dc:date>2012-01-24</dc:date>
+        <dc:title>XML Security RELAX NG Schemas</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xmlsec-rngschema-20110830/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlsec-rngschema/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Makoto Murata</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </NOTE>
+
+    <PR rdf:about="http://www.w3.org/TR/2012/PR-media-frags-20120315/">
+        <dc:date>2012-03-15</dc:date>
+        <dc:title>Media Fragments URI 1.0 (basic)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-media-frags-20111201/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/media-frags/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Raphaël Troncy</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Erik Mannens</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Silvia Pfeiffer</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Davy Van Deursen</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2012-04-26</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/WebVideo/Fragments/"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="http://www.w3.org/2008/WebVideo/Fragments/WD-media-fragments-impl/"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2012/PR-xmlschema11-1-20120119/">
+        <dc:date>2012-01-19</dc:date>
+        <dc:title>W3C XML Schema Definition Language (XSD) 1.1 Part 1: Structures</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-xmlschema11-1-20110721/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlschema11-1/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shudi Gao</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:sandygao@ca.ibm.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>C. M. Sperberg-McQueen</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cmsmcq@blackmesatech.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Henry S. Thompson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ht@inf.ed.ac.uk"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Henry S. Thompson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ht@inf.ed.ac.uk"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Noah Mendelsohn</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:nrm@arcanedomain.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>David Beech</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:davidbeech@earthlink.net"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Murray Maloney</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:murray@muzmo.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2012-02-20</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Schema"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="https://lists.w3.org/Archives/Member/w3c-archive/2012Jan/0144.html"/>
+    </PR>
+
+    <PR rdf:about="http://www.w3.org/TR/2012/PR-xmlschema11-2-20120119/">
+        <dc:date>2012-01-19</dc:date>
+        <dc:title>W3C XML Schema Definition Language (XSD) 1.1 Part 2: Datatypes</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-xmlschema11-2-20110721/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlschema11-2/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>David Peterson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:davep@iit.edu"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shudi Gao</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:sandygao@ca.ibm.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ashokmalhotra@alum.mit.edu"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>C. M. Sperberg-McQueen</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cmsmcq@blackmesatech.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Henry S. Thompson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ht@inf.ed.ac.uk"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Paul V. Biron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:paul@sparrow-hawk.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ashok Malhotra</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ashokmalhotra@alum.mit.edu"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <prReviewsDue>2012-02-20</prReviewsDue>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Schema"/>
+        </org:deliveredBy>
+        <mat:hasImplReport rdf:resource="https://lists.w3.org/Archives/Member/w3c-archive/2012Jan/0144.html"/>
+    </PR>
+
+    <REC rdf:about="http://www.w3.org/TR/2012/REC-mediaont-10-20120209/">
+        <dc:date>2012-02-09</dc:date>
+        <dc:title>Ontology for Media Resources 1.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-mediaont-10-20111129/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/mediaont-10/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>WonSuk Lee</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Werner Bailer</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tobias Bürger</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Pierre-Antoine Champin</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jean-Pierre Evain</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Véronique Malaisé</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Thierry Michel</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Felix Sasaki</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Joakim Söderberg</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Florian Stegmaier</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>John Strassner</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/WebVideo/Annotations/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2012/01/mediaont-10-errata.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=mediaont-10"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2012/REC-soapjms-20120216/">
+        <dc:date>2012-02-16</dc:date>
+        <dc:title>SOAP over Java Message Service 1.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-soapjms-20111208/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/soapjms/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Phil Adams</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Peter Easton</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Eric Johnson</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Roland Merrick</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Mark Phillips</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/ws/soapjms/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://www.w3.org/2002/ws/soapjms/errata/soapjms-20120216-errata"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=soapjms"/>
+    </REC>
+
+    <REC rdf:about="http://www.w3.org/TR/2012/REC-widgets-access-20120207/">
+        <dc:date>2012-02-07</dc:date>
+        <dc:title>Widget Access Request Policy</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/PR-widgets-access-20111213/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets-access/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Cáceres</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Robin Berjon</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+        <mat:hasErrata rdf:resource="http://dev.w3.org/2006/waf/widgets-access/errata.html"/>
+        <mat:hasTranslations rdf:resource="http://www.w3.org/2003/03/Translations/byTechnology?technology=widgets-access"/>
+    </REC>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-WebIDL-20120207/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-02-07</dc:date>
+        <dc:title>Web IDL</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-WebIDL-20110927/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/WebIDL/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Cameron McCormack</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cam@mcc.id.au"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-28</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-WebIDL-Java-20120207/">
+        <dc:date>2012-02-07</dc:date>
+        <dc:title>Java language binding for Web IDL</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/WebIDL-Java/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Cameron McCormack</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cam@mcc.id.au"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-XMLHttpRequest-20120117/">
+        <dc:date>2012-01-17</dc:date>
+        <dc:title>XMLHttpRequest Level 2</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-XMLHttpRequest2-20110816/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/XMLHttpRequest/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anne van Kesteren</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:annevk@opera.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-animation-timing-20120221/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-02-21</dc:date>
+        <dc:title>Timing control for script-based animations</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-animation-timing-20110602/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/animation-timing/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>James Robinson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jamesr@chromium.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Cameron McCormack</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:cam@mcc.id.au"/>
+        </editor>
+        <lastCallFeedBackDue>2012-03-20</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/webperf/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-capture-scenarios-20120306/">
+        <dc:date>2012-03-06</dc:date>
+        <dc:title>MediaStream Capture Scenarios</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/capture-scenarios/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Travis Leithead</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:travis.leithead@microsoft.com?subject=MediaStream%20Capture%20Scenarios%20Feedback"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2009/dap/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/04/webrtc/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-clipboard-apis-20120223/">
+        <dc:date>2012-02-23</dc:date>
+        <dc:title>Clipboard API and events</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-clipboard-apis-20110412/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/clipboard-apis/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Hallvord R. M. Steen</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:hallvord@opera.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-css3-background-20120214/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-02-14</dc:date>
+        <dc:title>CSS Backgrounds and Borders Module Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-css3-background-20110215/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-background/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Bert Bos</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:bert@w3.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Brad Kemper</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:brad.kemper@gmail.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-03-06</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-css3-break-20120228/">
+        <dc:date>2012-02-28</dc:date>
+        <dc:title>CSS Fragmentation Module Level 3</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-break/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Rossen Atanassov</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ratan@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-css3-flexbox-20120322/">
+        <dc:date>2012-03-22</dc:date>
+        <dc:title>CSS Flexible Box Layout Module</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-flexbox-20111129/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-flexbox/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tab Atkins Jr.</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Alex Mogilevsky</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:alexmog@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>L. David Baron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:dbaron@dbaron.org"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-css3-grid-layout-20120322/">
+        <dc:date>2012-03-22</dc:date>
+        <dc:title>CSS Grid Layout</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-grid-layout-20110407/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-grid-layout/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Alex Mogilevsky</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:alexmog@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Phil Cupp</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:pcupp@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Markus Mielke</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:mmielke@microsoft.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Daniel Glazman</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:daniel.glazman@disruptive-innovations.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-css3-images-20120112/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-12</dc:date>
+        <dc:title>CSS Image Values and Replaced Content Module Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-images-20111206/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-images/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tab Atkins Jr.</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-02-07</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-css3-positioning-20120207/">
+        <dc:date>2012-02-07</dc:date>
+        <dc:title>CSS Positioned Layout Module Level 3</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-positioning/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Arron Eicholz</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-css3-text-20120119/">
+        <dc:date>2012-01-19</dc:date>
+        <dc:title>CSS Text Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-text-20110901/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-text/"/>
+        <cites rdf:resource="http://www.w3.org/International/Activity"/>
+        <cites rdf:resource="http://www.w3.org/Style/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Koji Ishii</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:kojiishi@gluesoft.co.jp"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-css3-transforms-20120228/">
+        <dc:date>2012-02-28</dc:date>
+        <dc:title>CSS Transforms</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-transforms/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Simon Fraser</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Dean Jackson</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>David Hyatt</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Chris Marrin</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Edward O'Connor</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Dirk Schulze</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Aryeh Gregor</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Graphics/SVG/WG/"/>
+        </org:deliveredBy>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-css3-ui-20120117/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-17</dc:date>
+        <dc:title>CSS Basic User Interface Module Level 3 (CSS3 UI)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2004/CR-css3-ui-20040511/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-ui/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tantek Çelik</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:tantek@cs.stanford.edu"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-14</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-css3-values-20120308/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-03-08</dc:date>
+        <dc:title>CSS Values and Units Module Level 3</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-css3-values-20110906/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/css3-values/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Håkon Wium Lie</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:howcome@opera.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Tab Atkins</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elika J. Etemad</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-03-29</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Style/CSS/members"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-dom-20120105/">
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>DOM4</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-dom-20110915/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/dom/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anne van Kesteren</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:annevk@opera.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Aryeh Gregor</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ayg@aryeh.name"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ms2ger</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ms2ger@gmail.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-emma11-20120209/">
+        <dc:date>2012-02-09</dc:date>
+        <dc:title>EMMA: Extensible MultiModal Annotation markup language Version 1.1</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/emma11/"/>
+        <cites rdf:resource="http://www.w3.org/2002/mmi/Activity.html"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Johnston</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2002/mmi/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-hr-time-20120313/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>High Resolution Time</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/hr-time/"/>
+        <cites rdf:resource="http://www.w3.org/2006/rwc/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jatinder Mann</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jmann@microsoft.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-04-10</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/webperf/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-html-data-guide-20120112/">
+        <dc:date>2012-01-12</dc:date>
+        <dc:title>HTML Data Guide</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/html-data-guide/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jeni Tennison</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/interest/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-media-accessibility-reqs-20120103/">
+        <dc:date>2012-01-03</dc:date>
+        <dc:title>Media Accessibility User Requirements</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/media-accessibility-reqs/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shane McCarron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:shane@aptest.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Cooper</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/WAI/PF/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-microdata-rdf-20120112/">
+        <dc:date>2012-01-12</dc:date>
+        <dc:title>Microdata to RDF</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/microdata-rdf/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Gregg Kellogg</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/interest/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-prov-aq-20120110/">
+        <dc:date>2012-01-10</dc:date>
+        <dc:title>PROV-AQ: Provenance Access and Query</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/prov-aq/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Graham Klyne</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Paul Groth</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/prov/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-prov-dm-20120202/">
+        <dc:date>2012-02-02</dc:date>
+        <dc:title>The PROV Data Model and Abstract Syntax Notation</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-prov-dm-20111215/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/prov-dm/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Luc Moreau</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Paolo Missier</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/prov/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-prov-primer-20120110/">
+        <dc:date>2012-01-10</dc:date>
+        <dc:title>PROV Model Primer</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/prov-primer/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Yolanda Gil</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Simon Miles</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/prov/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-rdfa-core-20120131/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-31</dc:date>
+        <dc:title>RDFa Core 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-rdfa-core-20111215/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdfa-core/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ben Adida</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ben@adida.net"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Mark Birbeck</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:mark.birbeck@webBackplane.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shane McCarron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:shane@aptest.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ivan Herman</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ivan@w3.org"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-21</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-rdfa-lite-20120131/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-31</dc:date>
+        <dc:title>RDFa Lite 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-rdfa-lite-20111208/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/rdfa-lite/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Manu Sporny</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-02-21</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-scxml-20120216/">
+        <dc:date>2012-02-16</dc:date>
+        <dc:title>State Chart XML (SCXML): State Machine Notation for Control Abstraction</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-scxml-20110426/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/scxml/"/>
+        <cites rdf:resource="http://www.w3.org/Voice/Activity.html"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jim Barnett</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Rahul Akolkar</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>RJ Auburn</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Bodell</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Daniel C. Burnett</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Jerry Carter</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Scott McGlashan</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Torbjörn Lager</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Mark Helbing</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Rafah Hosn</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>T.V. Raman</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Klaus Reifenrath</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>No'am Rosenthal</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/Voice/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-sparql11-entailment-20120105/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>SPARQL 1.1 Entailment Regimes</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-sparql11-entailment-20110512/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/sparql11-entailment/"/>
+        <cites rdf:resource="http://www.w3.org/2001/sw/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Birte Glimm</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Chimezie Ogbuji</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-02-06</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/DataAccess/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-sparql11-protocol-20120105/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>SPARQL 1.1 Protocol</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-sparql11-protocol-20100126/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/sparql11-protocol/"/>
+        <cites rdf:resource="http://www.w3.org/2001/sw/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Lee Feigenbaum</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:lee@thefigtrees.net"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Gregory Todd Williams</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:greg@evilfunhouse.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Kendall Grant Clark</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:kendall@clarkparsia.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Elias Torres</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:eliast@us.ibm.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-06</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/DataAccess/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-sparql11-query-20120105/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>SPARQL 1.1 Query Language</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-sparql11-query-20110512/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/sparql11-query/"/>
+        <cites rdf:resource="http://www.w3.org/2001/sw/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Steve Harris</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Andy Seaborne</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-02-06</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/DataAccess/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-sparql11-service-description-20120105/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>SPARQL 1.1 Service Description</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-sparql11-service-description-20110512/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/sparql11-service-description/"/>
+        <cites rdf:resource="http://www.w3.org/2001/sw/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Gregory Todd Williams</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:greg@evilfunhouse.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-06</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/DataAccess/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-sparql11-update-20120105/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>SPARQL 1.1 Update</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-sparql11-update-20110512/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/sparql11-update/"/>
+        <cites rdf:resource="http://www.w3.org/2001/sw/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Paul Gearon</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:pgearon@revelytix.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Alexandre Passant</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:alexandre.passant@deri.org"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Axel Polleres</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:axel.polleres@deri.org"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-06</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2001/sw/DataAccess/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-tracking-compliance-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>Tracking Compliance and Scope</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-tracking-compliance-20111114/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/tracking-compliance/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Justin Brookman</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Sean Harvey</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Erica Newland</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Heather West</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/tracking-protection/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-tracking-dnt-20120313/">
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>Tracking Preference Expression (DNT)</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-tracking-dnt-20111114/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/tracking-dnt/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Roy T. Fielding</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>David Singer</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/tracking-protection/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-vibration-20120202/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-02-02</dc:date>
+        <dc:title>Vibration API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-vibration-20111117/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/vibration/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anssi Kostiainen</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-03-01</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2009/dap/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-wai-aria-implementation-20120110/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-10</dc:date>
+        <dc:title>WAI-ARIA 1.0 User Agent Implementation Guide</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-wai-aria-implementation-20100916/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/wai-aria-implementation/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Andi Snow-Weaver</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Michael Cooper</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-02-17</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/WAI/PF/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-webaudio-20120315/">
+        <dc:date>2012-03-15</dc:date>
+        <dc:title>Web Audio API</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-webaudio-20111215/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webaudio/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Chris Rogers</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:crogers@google.com"/>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/audio/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-webmessaging-20120313/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>HTML5 Web Messaging</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-webmessaging-20111020/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webmessaging/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <lastCallFeedBackDue>2012-04-03</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-webrtc-20120209/">
+        <dc:date>2012-02-09</dc:date>
+        <dc:title>WebRTC 1.0: Real-time Communication Between Browsers</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-webrtc-20111027/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/webrtc/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Adam Bergkvist</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Daniel C. Burnett</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Cullen Jennings</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Anant Narayanan</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2011/04/webrtc/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-widgets-updates-20120322/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-03-22</dc:date>
+        <dc:title>Widget Updates</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2010/WD-widgets-updates-20100928/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/widgets-updates/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Marcos Cáceres</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Richard Tibbett</contact:fullName>
+        </editor>
+        <lastCallFeedBackDue>2012-04-19</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-workers-20120313/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-03-13</dc:date>
+        <dc:title>Web Workers</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-workers-20110901/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/workers/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Ian Hickson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ian@hixie.ch"/>
+        </editor>
+        <lastCallFeedBackDue>2012-04-03</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/webapps/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-xhtml-rdfa-20120131/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-31</dc:date>
+        <dc:title>XHTML+RDFa 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xhtml-rdfa-20111215/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xhtml-rdfa/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Shane McCarron</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:shane@aptest.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-21</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2010/02/rdfa/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-xml-c14n2-testcases-20120105/">
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>Test cases for Canonical XML 2.0</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xml-c14n2-testcases/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Pratik Datta</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:pratik.datta@oracle.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-xml-proc-profiles-20120124/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-24</dc:date>
+        <dc:title>XML processor profiles</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xml-proc-profiles-20110412/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xml-proc-profiles/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Henry S. Thompson</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:ht@inf.ed.ac.uk"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Norman Walsh</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:norman.walsh@marklogic.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>James Fuller</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:jim.fuller@webcomposite.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-29</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/Processing/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-xmlenc-core1-20120105/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>XML Encryption Syntax and Processing Version 1.1</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/CR-xmlenc-core1-20110303/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlenc-core1/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Donald Eastlake</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:d3e3e3@gmail.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Joseph Reagle</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:reagle@mit.edu"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Thomas Roessler</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:tlr@w3.org"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-16</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-xmlenc-core1-testcases-20120105/">
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>Test cases for XML Encryption 1.1</dc:title>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlenc-core1-testcases/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Pratik Datta</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:pratik.datta@oracle.com"/>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <LastCall rdf:about="http://www.w3.org/TR/2012/WD-xmlenc-transform20-20120105/">
+        <rdf:type rdf:resource="http://www.w3.org/2001/02pd/rec54#WD"/>
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>XML Encryption 1.1 CipherReference Processing using 2.0 Transforms</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xmlenc-transform20-20110707/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlenc-transform20/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+            <contact:mailbox rdf:resource="mailto:frederick.hirsch@nokia.com"/>
+        </editor>
+        <lastCallFeedBackDue>2012-02-16</lastCallFeedBackDue>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </LastCall>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-xmlsec-algorithms-20120105/">
+        <dc:date>2012-01-05</dc:date>
+        <dc:title>XML Security Algorithm Cross-Reference</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xmlsec-algorithms-20110421/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xmlsec-algorithms/"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Frederick Hirsch</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Thomas Roessler</contact:fullName>
+        </editor>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Kelvin Yiu</contact:fullName>
+        </editor>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/2008/xmlsec/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <WD rdf:about="http://www.w3.org/TR/2012/WD-xslfo20-20120117/">
+        <dc:date>2012-01-17</dc:date>
+        <dc:title>Extensible Stylesheet Language (XSL) Version 2.0</dc:title>
+        <doc:obsoletes rdf:resource="http://www.w3.org/TR/2011/WD-xslfo20-20110927/"/>
+        <doc:versionOf rdf:resource="http://www.w3.org/TR/xslfo20/"/>
+        <cites rdf:resource="http://www.w3.org/XML/Activity"/>
+        <editor rdf:parseType="Resource">
+            <contact:fullName>Dave Pawson</contact:fullName>
+        </editor>
+        <patentRules rdf:resource="http://www.w3.org/Consortium/Patent-Policy-20040205/"/>
+        <org:deliveredBy rdf:parseType="Resource">
+            <contact:homePage rdf:resource="http://www.w3.org/XML/XPPL/"/>
+        </org:deliveredBy>
+    </WD>
+
+    <rdf:Description rdf:about="http://www.w3.org/TR/XMLHttpRequest/">
+        <supersedes rdf:resource="http://www.w3.org/TR/XMLHttpRequest1/"/>
+        <supersedes rdf:resource="http://www.w3.org/TR/XMLHttpRequest2/"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://www.w3.org/TR/css3-background/">
+        <supersedes rdf:resource="http://www.w3.org/TR/css3-border"/>
+    </rdf:Description>
+</rdf:RDF>

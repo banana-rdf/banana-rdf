@@ -1,19 +1,21 @@
-import sbt._
-import sbt.Keys._
-import scalariform.formatter.preferences._
-import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
-
 import bintray.Plugin._
 import bintray.Keys._
+import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
+import sbt.Keys._
+import sbt.{ExclusionRule, _}
+
+import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
+import scala.scalajs.sbtplugin.ScalaJSPlugin._
 
 object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ bintrayPublishSettings ++ Seq (
+  val buildSettings = Defaults.defaultSettings ++ publicationSettings ++ defaultScalariformSettings  ++ Seq (
     organization := "org.w3",
-    version      := "0.6",
-    scalaVersion := "2.10.4",
+    version      := "0.7-SNAPSHOT",
+    scalaVersion := "2.11.2",
+    crossScalaVersions := Seq("2.11.2", "2.10.4"),
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
     fork := false,
     parallelExecution in Test := false,
@@ -25,14 +27,8 @@ object BuildSettings {
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    publishArtifact in Test := false,
-//    publishTo := {
-//      val nexus = "https://oss.sonatype.org/"
-//      if (version.value.trim.endsWith("SNAPSHOT"))
-//        Some("snapshots" at nexus + "content/repositories/snapshots")
-//      else
-//        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-//    },
+    description := "RDF framework for Scala",
+    startYear := Some(2012),
     pomIncludeRepository := { _ => false },
     pomExtra := (
       <url>https://github.com/w3c/banana-rdf</url>
@@ -47,17 +43,46 @@ object BuildSettings {
           <name>Henry Story</name>
           <url>http://bblfish.net/</url>
         </developer>
+        <developer>
+          <id>antoniogarrote</id>
+          <name>Antonio Garrote</name>
+          <url>https://github.com/antoniogarrote/</url>
+        </developer>
+
       </developers>
       <scm>
         <url>git@github.com:w3c/banana-rdf.git</url>
         <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
       </scm>
     ),
-    // bintray
-    repository in bintray := "banana-rdf",
-    bintrayOrganization in bintray := None,
     licenses += ("W3C", url("http://opensource.org/licenses/W3C"))
   )
+
+  //sbt -Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
+  //sbt -Dbanana.publish=bintray
+  def publicationSettings =
+    (Option(System.getProperty("banana.publish")) match {
+      case Some("bintray") => Seq(
+        // bintray
+        repository in bintray := "banana-rdf",
+        bintrayOrganization in bintray := None
+      ) ++ bintrayPublishSettings
+      case opt: Option[String] => {
+        Seq(
+          publishTo <<= version { (v: String) =>
+            val nexus = "https://oss.sonatype.org/"
+            val other = opt.map(_.split(":"))
+            if (v.trim.endsWith("SNAPSHOT")) {
+              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "snapshots"))
+              repo.orElse(Some("snapshots" at nexus + "content/repositories/snapshots"))
+            } else {
+              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "resolver"))
+              repo.orElse(Some("releases" at nexus + "service/local/staging/deploy/maven2"))
+            }
+          }
+        )
+      }
+    }) ++ Seq( publishArtifact in Test := false)
 
   val jenaTestWIPFilter = Seq (
     testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
@@ -72,18 +97,22 @@ object BuildSettings {
 object BananaRdfBuild extends Build {
 
   import BuildSettings._
-  
+
+  // rdfstorew settings
+  skip in ScalaJSKeys.packageJSDependencies := false
+
+
   val scalaActors = "org.scala-lang" % "scala-actors" % "2.10.2"
 
-  val akka = "com.typesafe.akka" %% "akka-actor" % "2.2.0"
-  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.2.0"
+  val akka = "com.typesafe.akka" %% "akka-actor" % "2.3.4"
+  val akkaTransactor = "com.typesafe.akka" %% "akka-transactor" % "2.3.4"
 
+  
 //  val scalaStm = "org.scala-tools" %% "scala-stm" % "0.7"
 
   val asyncHttpClient = "com.ning" % "async-http-client" % "1.7.12"
 
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.4"
-
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
 
@@ -91,7 +120,7 @@ object BananaRdfBuild extends Build {
     libraryDependencies += jodaTime % "provided",
     libraryDependencies += jodaConvert % "provided")
 
-  val scalatest = "org.scalatest" %% "scalatest" % "2.0"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.2.0"
   
   val testsuiteDeps =
     Seq(
@@ -99,10 +128,12 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest
     )
 
-  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.2.1"
-  val playDeps = "com.typesafe.play" %% "play" % "2.2.1"
+  val iterateeDeps = "com.typesafe.play" %% "play-iteratees" % "2.3.0"
+  val playDeps = "com.typesafe.play" %% "play" % "2.3.0"
 
-  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.9" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+  val reactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT" excludeAll(ExclusionRule(organization = "io.netty"), ExclusionRule(organization = "play"))
+  val reactiveMongoDeps = Seq(
+        resolvers += "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/" )
 
   val testDeps =
     Seq(
@@ -135,30 +166,75 @@ object BananaRdfBuild extends Build {
       libraryDependencies += "org.openrdf.sesame" % "sesame-sail-nativerdf" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion)
 
+  val scalaJsDeps = scalaJSSettings ++ 
+    Seq(
+      resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/"
+    )
+
+  val scalaz_js = "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6"
+  
   val pub = TaskKey[Unit]("pub")
 
+  //todo: add a way so that it is easy to get the whole to compile
   lazy val banana = Project(
     id = "banana",
     base = file("."),
     settings = buildSettings ++ Unidoc.settings ++ Seq(
       pub := (),
-      pub <<= pub.dependsOn(publish in rdf, publish in jena, publish in sesame)),
+      pub <<= pub.dependsOn(publish in rdf_jvm, publish in jena, publish in sesame)),
     aggregate = Seq(
-      rdf,
+      rdf_jvm,
+      rdf_common_jvm,
+//      rdf_js,
+//      rdf_common_js,
       rdfTestSuite,
       jena,
       sesame,
       plantain,
+//      pome,
+//      rdfstorew,
       examples))
   
-  lazy val rdf = Project(
+  lazy val rdf_jvm = Project(
     id = "banana-rdf",
+    base = file("rdf/rdf_jvm"),
+    settings = buildSettings ++ testDeps ++ Seq(
+      target := target.value / "jvm",
+      publishMavenStyle := true
+    )
+  ).dependsOn(rdf_common_jvm  % "compile->compile;test->test")
+
+  lazy val rdf_common_jvm = Project(
+    id = "banana-rdf_common_jvm",
     base = file("rdf"),
     settings = buildSettings ++ testDeps ++ Seq(
-      libraryDependencies += akka,
+      //libraryDependencies += akka,
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
+      target := target.value / "jvm",
+      publishMavenStyle := true
+    )
+  )
+
+  lazy val rdf_js = Project(
+    id = "banana-rdf_js",
+    base = file("rdf/rdf_js"),
+    settings = buildSettings ++ testDeps ++ scalaJsDeps ++ Seq(
+      target := target.value / "js",
+      publishMavenStyle := true
+    )
+  ).dependsOn(rdf_common_js % "compile->compile;test->test")
+
+  lazy val rdf_common_js = Project(
+    id = "banana-rdf_common_js",
+    base = file("rdf"),
+    settings = buildSettings ++ testDeps ++ scalaJsDeps ++ Seq(
+      libraryDependencies += scalaz_js,
+      libraryDependencies += jodaTime,    //Will not work --- pure java
+      libraryDependencies += jodaConvert, //Will not work --- pure java
+      //target :=  "rdf/target",
+      target := target.value / "js",
       publishMavenStyle := true
     )
   )
@@ -170,7 +246,7 @@ object BananaRdfBuild extends Build {
       publishMavenStyle := true,
       libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0"
     )
-  ) dependsOn (rdf, jena, rdfTestSuite % "test")
+  ) dependsOn (rdf_jvm, jena, rdfTestSuite % "test")
 
   lazy val rdfTestSuite = Project(
     id = "banana-rdf-test-suite",
@@ -180,7 +256,16 @@ object BananaRdfBuild extends Build {
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert
     )
-  ) dependsOn (rdf)
+  ) dependsOn (rdf_jvm)
+
+  lazy val rdfTestSuiteJS = Project(
+    id = "banana-scalajs-rdf-test-suite",
+    base = file("rdf-test-suite/rdf-test-suite_js"),
+    settings = buildSettings ++  scalaJSSettings ++ Seq(
+      libraryDependencies += scalatest,
+      libraryDependencies += "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
+    )
+  ) dependsOn (rdf_js)
 
   lazy val jena = Project(
     id = "banana-jena",
@@ -188,7 +273,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ jenaTestWIPFilter ++ jenaDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf_jvm, rdfTestSuite % "test")
   
   lazy val sesame = Project(
     id = "banana-sesame",
@@ -196,17 +281,40 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ sesameTestWIPFilter ++ sesameDeps ++ testDeps ++ Seq(
       libraryDependencies += akka
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf_jvm, rdfTestSuite % "test")
 
   lazy val plantain = Project(
     id = "banana-plantain",
     base = file("plantain"),
     settings = buildSettings ++ testDeps ++  Seq(
-//      libraryDependencies += "org.semarglproject" % "semargl-rdf" % "0.6.1",
+      //      libraryDependencies += "org.semarglproject" % "semargl-rdf" % "0.6.1",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion,
-      libraryDependencies += "io.spray" % "spray-http" % "1.3.1"
+      libraryDependencies += "com.typesafe.akka" %% "akka-http-core-experimental" % "0.4"
     )
-  ) dependsOn (rdf, rdfTestSuite % "test")
+  ) dependsOn (rdf_jvm, rdfTestSuite % "test")
+
+  lazy val pome = Project(
+    id = "banana-pome",
+    base = file("pome"),
+    settings =   buildSettings ++ testDeps ++ scalaJSSettings ++ Seq(
+      resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
+      libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0"
+    )
+  ) dependsOn (rdf_js, rdfTestSuite % "test", rdfTestSuiteJS % "test")
+
+  lazy val rdfstorew = Project(
+    id = "banana-rdfstorew",
+    base = file("rdfstorew"),
+    //settings =  buildSettings ++  testDeps ++ scalaJSSettings ++ Seq(
+    settings =  buildSettings ++ scalaJsDeps ++ Seq(
+    //settings =  scalaJSSettings ++ buildSettings ++ testDeps ++ Seq(
+      jsDependencies += ProvidedJS / "rdf_store.js",
+      jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
+      //resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
+      libraryDependencies += scalaz_js,
+      skip in packageJSDependencies := false
+    )
+  ) dependsOn (rdf_js, rdfTestSuiteJS % "test")
 
   lazy val examples = Project(
     id = "examples",
@@ -219,7 +327,7 @@ object BananaRdfBuild extends Build {
   lazy val experimental = Project(
     id = "experimental",
     base = file("experimental"),
-    settings = buildSettings ++ testDeps ++ sesameCoreDeps ++ Seq(
+    settings = buildSettings ++ testDeps ++ reactiveMongoDeps ++ sesameCoreDeps ++ Seq(
       libraryDependencies += akka,
       libraryDependencies += akkaTransactor,
       libraryDependencies += iterateeDeps,
