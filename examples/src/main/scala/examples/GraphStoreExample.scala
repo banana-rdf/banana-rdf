@@ -4,10 +4,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.w3.banana.Command
 import org.w3.banana.FOAFPrefix
+import org.w3.banana.XSDPrefix
 import org.w3.banana.RDFStore
+//import org.apache.log4j.Logger
 
 /* Here is an example storing in a local RDF store:
- * - triples computed
+ * - triples locally added or removed
  * - triples read from Internet
  * 
  * See general explanations in IOExample.scala.
@@ -21,32 +23,52 @@ trait GraphStoreExample extends IOExampleDependencies {
 
   import Ops._
 
-  /*abstract*/ def makeRDFStore( file:String ) : RDFStore[Rdf]
-  
+  /*abstract*/ def makeRDFStore(file: String): RDFStore[Rdf]
+
   def main(args: Array[String]): Unit = {
 
     /* reads TimBL's card in Turtle */
 
     val timblCard = "http://www.w3.org/People/Berners-Lee/card.ttl"
     val from = (new java.net.URL(timblCard)).openStream()
-    // reading from a stream can fail so in real life, you would have to deal with the Try[Rdf#Graph]
-    val graph: Rdf#Graph = TurtleReader.read(from, base = timblCard) getOrElse sys.error("couldn't read TimBL's card")
+    val graph = TurtleReader.read(from, base = timblCard) getOrElse sys.error("couldn't read TimBL's card")
 
     val jmvCard = "http://jmvanel.free.fr/jmv.rdf"
     val foaf = FOAFPrefix(Ops)
-    val triples = List( makeTriple(
-        makeUri(timblCard + "#i"),
+    val xsd = XSDPrefix(Ops)
+    val timsURI = makeUri(timblCard + "#i")
+    val triples = List(makeTriple(
+        timsURI,
         foaf.knows,
-        makeUri(jmvCard + "#me") ))
+        makeUri(jmvCard + "#me")))
 
-    val store = makeRDFStore( "tmpGraphStoreDir" )
+    val store = makeRDFStore("tmpGraphStoreDir")
+    val sirTim = makeTriple(
+        makeUri("http://www.w3.org/People/Berners-Lee/card#i"),
+        foaf.title,
+        makeLiteral("Sir", xsd.string))
+    val graphURI = makeUri("urn:foafs")
+
     val init = store.execute {
-      Command.append(makeUri("urn:foafs"), graph.toIterable)
-      Command.append(makeUri("urn:foafs"), triples)
+      for {
+        _ <- Command.append(graphURI, graph.toIterable)
+        _ <- Command.append(graphURI, triples)
+        _ <- Command.remove(graphURI, Seq(sirTim))
+      } yield ()
     }
-    init onSuccess{ case _ => println("Successfully stored triples in store") }
-  }
 
+    init onSuccess {
+      case _ =>
+        println("Successfully stored triples in store")
+        store.getGraph(graphURI).onSuccess {
+          case gr =>
+            val graphAsString = RDFXMLWriter.asString(gr, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
+            println("Tim's FOAF with 2 modifications:\n" + graphAsString)
+            store.shutdown
+            println("Successfully shutdown store")
+        }
+    }
+  }
 }
 
 import org.w3.banana.jena.JenaModule
