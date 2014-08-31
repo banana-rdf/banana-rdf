@@ -17,7 +17,7 @@ trait RDFOps[Rdf <: RDF]
     extends URIOps[Rdf]
     with RDFDSL[Rdf]
     with CommonPrefixes[Rdf]
-    with syntax.Syntax[Rdf] {
+    with syntax.RDFSyntax[Rdf] {
 
   // graph
 

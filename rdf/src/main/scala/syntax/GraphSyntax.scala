@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait GraphSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait GraphSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def graphW(graph: Rdf#Graph) = new GraphW[Rdf](graph)
 
