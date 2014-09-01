@@ -118,7 +118,7 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
       for (po <- pos.toIterable.flatten) {
         val (p, pg) = po
         triples += ops.makeTriple(subject, p, pg.pointer)
-        triples ++= ops.graphToIterable(pg.graph)
+        triples ++= ops.getTriples(pg.graph)
       }
       PointedGraph(subject, ops.makeGraph(triples))
     }

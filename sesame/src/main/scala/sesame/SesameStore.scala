@@ -62,7 +62,8 @@ class SesameStore extends RDFStore[Sesame, RepositoryConnection] {
   /* GraphStore */
 
   def appendToGraph(conn: RepositoryConnection, uri: Sesame#URI, graph: Sesame#Graph): Future[Unit] = Future {
-    val triples = RDFOps[Sesame].graphToIterable(graph).asJava
+    import Sesame.ops._
+    val triples = graph.triples.to[Iterable].asJava
     conn.add(triples, uri)
   }
 

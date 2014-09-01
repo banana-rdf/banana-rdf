@@ -44,7 +44,7 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
   def groundTripleFilter(graph: Rdf#Graph): (Rdf#Graph, Rdf#Graph) = {
     var ground = Graph.empty
     var nonGround = Graph.empty
-    for (triple <- graph.toIterable) {
+    for (triple <- graph.triples) {
       triple match {
         case Triple(s, r, o) if s.isBNode || o.isBNode => nonGround = nonGround + triple
         case _ => ground = ground + triple
@@ -139,7 +139,7 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
       return List(MappingException(s"bnodeBijection is not a bijection: some keys map to more than one value"))
 
     try {
-      for (Triple(sub, rel, obj) <- graph1.toIterable) {
+      for (Triple(sub, rel, obj) <- graph1.triples) {
         try {
           val mapped = makeTriple(bnmap(sub), rel, bnmap(obj))
           if (!graph2.contains(mapped)) throw MappingException(s"could not find map($sub,$rel,$obj)=$mapped in graph2")
@@ -165,7 +165,7 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
    */
   def bnodeClassify(graph: Rdf#Graph): Map[VerticeType, Set[Rdf#BNode]] = {
     val bnodeClass = mutable.HashMap[Rdf#BNode, VerticeType]()
-    for (Triple(subj, rel, obj) <- graph.toIterable) {
+    for (Triple(subj, rel, obj) <- graph.triples) {
       if (subj.isBNode) {
         val bn = subj.asInstanceOf[Rdf#BNode]
         bnodeClass.get(bn) orElse {

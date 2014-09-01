@@ -69,7 +69,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
 
   def appendToGraph(dataset: Dataset, uri: Jena#URI, graph: Jena#Graph): Future[Unit] = Future {
     val dg = dataset.asDatasetGraph
-    ops.graphToIterable(graph).foreach { case ops.Triple(s, p, o) =>
+    ops.getTriples(graph).foreach { case ops.Triple(s, p, o) =>
         dg.add(uri, s, p, o)
     }
   }

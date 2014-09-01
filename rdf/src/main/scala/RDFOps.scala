@@ -25,7 +25,7 @@ trait RDFOps[Rdf <: RDF]
 
   def makeGraph(it: Iterable[Rdf#Triple]): Rdf#Graph
 
-  def graphToIterable(graph: Rdf#Graph): Iterable[Rdf#Triple]
+  def getTriples(graph: Rdf#Graph): Iterable[Rdf#Triple]
 
   // triple
 

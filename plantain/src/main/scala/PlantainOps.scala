@@ -15,7 +15,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   def makeGraph(triples: Iterable[Plantain#Triple]): Plantain#Graph =
     triples.foldLeft(emptyGraph) { _ + _ }
 
-  def graphToIterable(graph: Plantain#Graph): Iterable[Plantain#Triple] = graph.triples
+  def getTriples(graph: Plantain#Graph): Iterable[Plantain#Triple] = graph.triples
 
   // triple
 

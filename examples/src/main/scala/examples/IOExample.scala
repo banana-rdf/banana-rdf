@@ -47,7 +47,7 @@ trait IOExample extends IOExampleDependencies {
 
     /* prints 10 triples to stdout */
 
-    val graph10Triples = Graph(graph.toIterable.take(10).toSet)
+    val graph10Triples = Graph(graph.triples.take(10).toSet)
     val graphAsString = rdfXMLWriter.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsString)
   }
