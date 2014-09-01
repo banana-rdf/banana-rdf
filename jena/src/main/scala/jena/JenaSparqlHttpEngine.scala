@@ -5,10 +5,9 @@ import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.rdf.model._
 import java.net.URL
 import org.w3.banana._
-import org.w3.banana.util.ImmediateFuture.immediate
-import scala.concurrent.Future
+import scala.concurrent._
 
-class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena]) extends SparqlEngine[Jena, URL] {
+class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena], ec: ExecutionContext) extends SparqlEngine[Jena, URL] {
 
   val querySolution = new util.QuerySolution(ops)
 
@@ -19,15 +18,15 @@ class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena]) extends SparqlEngine[Jena
     qe
   }
 
-  def executeAsk(endpoint: URL, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] = immediate {
+  def executeAsk(endpoint: URL, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] = Future {
     qexec(endpoint, query, bindings).execAsk()
   }
 
-  def executeConstruct(endpoint: URL, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = immediate {
+  def executeConstruct(endpoint: URL, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = Future {
     qexec(endpoint, query, bindings).execConstruct().getGraph()
   }
 
-  def executeSelect(endpoint: URL, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = immediate {
+  def executeSelect(endpoint: URL, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = Future {
     qexec(endpoint, query, bindings).execSelect()
   }
 

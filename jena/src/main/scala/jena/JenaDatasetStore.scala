@@ -9,9 +9,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent._
 import scala.util.Try
 
-class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil) extends RDFStore[Jena, Dataset] /* with SparqlUpdate[Jena, Dataset] */ {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
+class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil, ec: ExecutionContext) extends RDFStore[Jena, Dataset] /* with SparqlUpdate[Jena, Dataset] */ {
 
   /* Transactor */
 
