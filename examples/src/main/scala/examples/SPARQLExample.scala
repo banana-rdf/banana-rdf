@@ -37,14 +37,14 @@ trait SPARQLExample extends SPARQLExampleDependencies { self =>
 
     /* creates a Sparql Select query */
 
-    val query = SelectQuery("""
+    val query = parseSelect("""
 PREFIX ont: <http://dbpedia.org/ontology/>
 SELECT DISTINCT ?language WHERE {
  ?language a ont:ProgrammingLanguage .
  ?language ont:influencedBy ?other .
  ?other ont:influencedBy ?language .
 } LIMIT 100
-""")
+""").get
 
     /* executes the query */
 
@@ -52,13 +52,13 @@ SELECT DISTINCT ?language WHERE {
 
     /* iterate through the solutions */
 
-    val languages: Iterable[Rdf#URI] = answers.toIterable map { row =>
+    val languages: Iterator[Rdf#URI] = answers.iterator map { row =>
       /* row is an Rdf#Solution, we can get an Rdf#Node from the variable name */
       /* both the #Rdf#Node projection and the transformation to Rdf#URI can fail in the Try type, hense the flatMap */
-      row("language").flatMap(_.as[Rdf#URI]) getOrElse sys.error("die")
+      row("language").get.as[Rdf#URI].get
     }
 
-    println(languages.toList)
+    println(languages.to[List])
   }
 
 }
