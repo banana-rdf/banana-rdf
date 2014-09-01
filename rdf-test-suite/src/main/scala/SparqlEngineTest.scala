@@ -9,59 +9,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import java.io.FileInputStream
 
 class SparqlEngineTest[Rdf <: RDF, A](
-  store: A)(
-  implicit reader: RDFReader[Rdf, RDFXML],
-  ops: RDFOps[Rdf],
-  sparqlOps: SparqlOps[Rdf],
-  graphStore: GraphStore[Rdf, A],
-  sparqlEngine: SparqlEngine[Rdf, A],
-  lifecycle: Lifecycle[Rdf, A]
+  val store: A)(
+  implicit val reader: RDFReader[Rdf, RDFXML],
+  val ops: RDFOps[Rdf],
+  val sparqlOps: SparqlOps[Rdf],
+  val graphStore: GraphStore[Rdf, A],
+  val sparqlEngine: SparqlEngine[Rdf, A],
+  val lifecycle: Lifecycle[Rdf, A]
 )
-    extends WordSpec with Matchers with BeforeAndAfterAll with TryValues {
+    extends WordSpec with SparqlEngineTesterTrait[Rdf,A] with  Matchers with BeforeAndAfterAll with TryValues {
 
   import ops._
   import sparqlOps._
   import graphStore.graphStoreSyntax._
   import sparqlEngine.sparqlEngineSyntax._
   import lifecycle.lifecycleSyntax._
-
-  override def afterAll(): Unit = {
-    super.afterAll()
-    store.stop()
-  }
-
-  val foaf = FOAFPrefix(ops)
-
-  val resource = new FileInputStream("rdf-test-suite/src/main/resources/new-tr.rdf")
-
-  val graph = reader.read(resource, "http://example.com") getOrElse sys.error("ouch")
-
-  val graph1: Rdf#Graph = (
-    bnode("betehess")
-    -- foaf.name ->- "Alexandre".lang("fr")
-    -- foaf.title ->- "Mr"
-  ).graph
-
-  val graph2: Rdf#Graph = (
-    bnode("betehess")
-    -- foaf.name ->- "Alexandre".lang("fr")
-    -- foaf.knows ->- (
-      URI("http://bblfish.net/#hjs")
-      -- foaf.name ->- "Henry Story"
-      -- foaf.currentProject ->- URI("http://webid.info/")
-    )
-  ).graph
-
-  override def beforeAll(): Unit = {
-    store.start()
-    val init =
-      for {
-        _ <- store.appendToGraph(URI("http://example.com/graph1"), graph1)
-        _ <- store.appendToGraph(URI("http://example.com/graph2"), graph2)
-        _ <- store.appendToGraph(URI("http://example.com/graph"), graph)
-      } yield ()
-    init.getOrFail()
-  }
 
   "new-tr.rdf must have Alexandre Bertails as an editor" in {
 
@@ -194,43 +156,4 @@ class SparqlEngineTest[Rdf <: RDF, A](
 
   }
 
-  //  "Henry Story must have banana-rdf as current-project" in {
-  //    val query = UpdateQuery(
-  //      """
-  //        |prefix foaf: <http://xmlns.com/foaf/0.1/>
-  //        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-  //        |
-  //        |INSERT {
-  //        | GRAPH <http://example.com/graph2> {
-  //        |   ?author foaf:currentProject <http://github.com/w3c/banana-rdf>
-  //        | }
-  //        |} WHERE {
-  //        | GRAPH <http://example.com/graph2> {
-  //        |   ?author foaf:name "Henry Story"^^xsd:string
-  //        | }
-  //        |}
-  //      """.stripMargin
-  //    )
-  //
-  //    store.executeUpdate(query).getOrFail()
-  //    val result = store.executeSelect(SelectQuery(
-  //      """
-  //        |prefix foaf: <http://xmlns.com/foaf/0.1/>
-  //        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-  //        |
-  //        |SELECT ?currentProject
-  //        |WHERE {
-  //        | GRAPH <http://example.com/graph2> {
-  //        |   ?author foaf:name "Henry Story"^^xsd:string .
-  //        |   ?author foaf:currentProject ?currentProject
-  //        | }
-  //        |}
-  //      """.stripMargin)
-  //    ).map(_.toIterable.map(
-  //      row => row("currentProject").flatMap(_.as[Rdf#URI]) getOrElse sys.error("")
-  //    )).getOrFail()
-  //
-  //    result must have size (2)
-  //    result must contain(URI("http://github.com/w3c/banana-rdf"))
-  //  }
 }
