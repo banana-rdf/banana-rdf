@@ -1,5 +1,6 @@
 package org.w3.banana.sesame
 
+import org.openrdf.repository.RepositoryConnection
 import org.w3.banana._
 
 trait SesameModule
@@ -27,7 +28,9 @@ trait SesameModule
 
   implicit val SparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 
-  implicit val SparqlGraph: SparqlGraph[Sesame] = SesameSparqlGraph
+  implicit val sparqlGraph: SparqlEngine[Sesame, Sesame#Graph] = new SesameGraphSparqlEngine
+
+  implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] = new SesameStore
 
   implicit val RDFXMLReader: RDFReader[Sesame, RDFXML] = new SesameRDFXMLReader
 

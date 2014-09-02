@@ -27,12 +27,13 @@ trait SPARQLExample extends SPARQLExampleDependencies { self =>
 
   import Ops._
   import SparqlOps._
+  import sparqlHttp.sparqlEngineSyntax._
 
   def main(args: Array[String]): Unit = {
 
     /* gets a SparqlEngine out of a Sparql endpoint */
 
-    val client = SparqlHttp(new URL("http://dbpedia.org/sparql/"))
+    val endpoint = new URL("http://dbpedia.org/sparql/")
 
     /* creates a Sparql Select query */
 
@@ -47,7 +48,7 @@ SELECT DISTINCT ?language WHERE {
 
     /* executes the query */
 
-    val answers: Rdf#Solutions = client.executeSelect(query).getOrFail()
+    val answers: Rdf#Solutions = endpoint.executeSelect(query).getOrFail()
 
     /* iterate through the solutions */
 
