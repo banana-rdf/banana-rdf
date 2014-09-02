@@ -13,7 +13,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  *           be run on the same thread. If you want to use a different execution context
  *           you must specify it explicitly.
  */
-class SesameGraphSparqlEngine(ec: ExecutionContext = sameThreadExecutionContext) extends SparqlEngine[Sesame, Sesame#Graph] {
+class SesameGraphSparqlEngine(ec: ExecutionContext) extends SparqlEngine[Sesame, Sesame#Graph] {
 
   val store = new SesameStore()(ec)
 
@@ -36,4 +36,8 @@ class SesameGraphSparqlEngine(ec: ExecutionContext = sameThreadExecutionContext)
   def executeAsk(graph: Sesame#Graph, query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Future[Boolean] =
     store.executeAsk(asConn(graph), query, bindings)
 
+}
+
+object SesameGraphSparqlEngine {
+  def apply() = new SesameGraphSparqlEngine(sameThreadExecutionContext)
 }

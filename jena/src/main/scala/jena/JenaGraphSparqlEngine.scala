@@ -14,7 +14,7 @@ import scala.concurrent.{ ExecutionContext, Future }
  *           you must specify it explicitly. (it makes most sense usually to run this on the same thread, as the
  *           data is local ).
  */
-class JenaGraphSparqlEngine(ec: ExecutionContext = sameThreadExecutionContext)(implicit ops: RDFOps[Jena])
+class JenaGraphSparqlEngine(ec: ExecutionContext)(implicit ops: RDFOps[Jena])
     extends SparqlEngine[Jena, Jena#Graph] {
   implicit val eci = ec //make ec implicit only inside the body
   val querySolution = new util.QuerySolution(ops)
@@ -43,6 +43,10 @@ class JenaGraphSparqlEngine(ec: ExecutionContext = sameThreadExecutionContext)(i
       qexec(graph, query, bindings).execAsk()
     }
 
+}
+
+object JenaGraphSparqlEngine {
+  def apply(implicit ops: RDFOps[Jena]) = new JenaGraphSparqlEngine(sameThreadExecutionContext)
 }
 
 /**
