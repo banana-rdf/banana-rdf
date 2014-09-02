@@ -1,17 +1,17 @@
 package org.w3.banana.sesame
 
+import org.openrdf.model._
+import org.openrdf.model.impl._
+import org.openrdf.query._
+import org.openrdf.repository.{RepositoryConnection, RepositoryResult}
 import org.w3.banana._
+
 import scala.collection.JavaConverters._
 import scala.concurrent._
 import scala.util.Try
-import org.openrdf.model._
-import org.openrdf.model.impl._
-import org.openrdf.repository.{ Repository, RepositoryConnection, RepositoryResult }
-import org.openrdf.query._
 
-class SesameStore extends RDFStore[Sesame, RepositoryConnection] {
-
-  import scala.concurrent.ExecutionContext.Implicits.global
+class SesameStore(implicit ec: ExecutionContext)
+  extends RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame,RepositoryConnection]  {
 
   /* Transactor */
 
@@ -52,8 +52,7 @@ class SesameStore extends RDFStore[Sesame, RepositoryConnection] {
     result
   }
 
-  /** TODO shouldn't be here... */
-  def executeUpdate(conn: RepositoryConnection, query: Sesame#UpdateQuery, bindings: Map[String, Sesame#Node]): Unit = {
+  def executeUpdate(conn: RepositoryConnection, query: Sesame#UpdateQuery, bindings: Map[String, Sesame#Node]): Future[Unit] = Future {
     val updateQuery = conn.prepareUpdate(QueryLanguage.SPARQL, query.query)
     bindings foreach { case (name, value) => updateQuery.setBinding(name, value) }
     updateQuery.execute()
@@ -62,7 +61,7 @@ class SesameStore extends RDFStore[Sesame, RepositoryConnection] {
   /* GraphStore */
 
   def appendToGraph(conn: RepositoryConnection, uri: Sesame#URI, graph: Sesame#Graph): Future[Unit] = Future {
-    import Sesame.ops._
+    import org.w3.banana.sesame.Sesame.ops._
     val triples = graph.triples.to[Iterable].asJava
     conn.add(triples, uri)
   }
