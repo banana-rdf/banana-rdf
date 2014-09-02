@@ -70,7 +70,7 @@ and just want to simplify the gouvernance of this opensource project.
 
 Before contributing please make sure to add a symbolic link from 
 the `.git/hooks/` directory of your clone to the [bin/pre-commit](bin/pre-commit)
-shell script. This will ensure that all your commit is formatted in a 
+shell script. This will ensure that all your commits are formatted in a 
 consistent way.
 
 Licence
