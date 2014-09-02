@@ -29,7 +29,7 @@ trait SesameModule
 
   implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 
-  implicit val sparqlGraph: SparqlEngine[Sesame, Sesame#Graph] = new SesameGraphSparqlEngine
+  implicit val sparqlGraph: SparqlEngine[Sesame, Sesame#Graph] = SesameGraphSparqlEngine()
 
   implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame, RepositoryConnection] = new SesameStore
 

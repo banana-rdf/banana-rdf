@@ -31,7 +31,7 @@ trait JenaModule
 
   implicit val sparqlOps: SparqlOps[Jena] = new JenaSparqlOps
 
-  implicit val sparqlGraph: SparqlEngine[Jena, Jena#Graph] = new JenaGraphSparqlEngine
+  implicit val sparqlGraph: SparqlEngine[Jena, Jena#Graph] = JenaGraphSparqlEngine(ops)
 
   import java.net.URL
   implicit val sparqlHttp: SparqlEngine[Jena, URL] = new JenaSparqlHttpEngine
