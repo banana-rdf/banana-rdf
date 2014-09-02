@@ -1,5 +1,7 @@
 #!/bin/sh
 # found http://blog.trondbjerkestrand.no/post/85120068477/sbt-and-git-pre-commit-hooks
+# if you are in a hurry you can use git commit -n to skip the hook.
+
 #if test $(sbt compile | grep -c -E "Reformatted|Failed") != 0
 if test $(sbt ";scalariformFormat;test:scalariformFormat" | grep -c -E "Reformatted|Failed") != 0
 then
