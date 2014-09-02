@@ -19,7 +19,6 @@ sbt-launch*.jar
 .settings
 .idea
 .idea_modules
-bin
 .ensime*
 *.egp
 
