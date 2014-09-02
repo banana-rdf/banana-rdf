@@ -36,7 +36,7 @@ trait JenaModule
   import java.net.URL
   implicit val sparqlHttp: SparqlEngine[Jena, URL] = new JenaSparqlHttpEngine
 
-  implicit val rdfStore: RDFStore[Jena, Dataset] = new JenaDatasetStore(true)
+  implicit val rdfStore: RDFStore[Jena, Dataset] with SparqlUpdate[Jena,Dataset] = new JenaDatasetStore(true)
 
   implicit val rdfXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader()
 
