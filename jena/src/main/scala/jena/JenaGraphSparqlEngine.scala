@@ -1,15 +1,23 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
-import com.hp.hpl.jena.rdf.model._
+import com.hp.hpl.jena.graph.{Graph => JenaGraph}
 import com.hp.hpl.jena.query._
-import scala.concurrent.Future
-import org.w3.banana.util._
+import com.hp.hpl.jena.rdf.model._
+import org.w3.banana._
 
-class JenaGraphSparqlEngine(implicit ops: RDFOps[Jena])
+import scala.concurrent.{ExecutionContext, Future}
+
+/**
+ * Treat a Graph as a Sparql Engine
+ * @param ec execution context to use. If not specified this will
+ *           be run on the same thread. If you want to use a different execution context
+ *           you must specify it explicitly. (it makes most sense usually to run this on the same thread, as the
+ *           data is local ).
+ */
+class JenaGraphSparqlEngine(ec: ExecutionContext=sameThreadExecutionContext)
+                           (implicit ops: RDFOps[Jena])
     extends SparqlEngine[Jena, Jena#Graph] {
-
+  implicit val eci = ec //make ec implicit only inside the body
   val querySolution = new util.QuerySolution(ops)
 
   def qexec(graph: Jena#Graph, query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
@@ -20,16 +28,19 @@ class JenaGraphSparqlEngine(implicit ops: RDFOps[Jena])
       QueryExecutionFactory.create(query, model, querySolution.getMap(bindings))
   }
 
-  def executeSelect(graph: Jena#Graph, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = immediate {
+  def executeSelect(graph: Jena#Graph, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] =
+  Future {
     qexec(graph, query, bindings).execSelect()
   }
 
-  def executeConstruct(graph: Jena#Graph, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = immediate {
+  def executeConstruct(graph: Jena#Graph, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] =
+  Future {
     val result = qexec(graph, query, bindings).execConstruct()
     result.getGraph()
   }
 
-  def executeAsk(graph: Jena#Graph, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] = immediate {
+  def executeAsk(graph: Jena#Graph, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] =
+    Future {
     qexec(graph, query, bindings).execAsk()
   }
 

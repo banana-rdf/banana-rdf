@@ -1,22 +1,21 @@
 package org.w3.banana.sesame
 
-import org.w3.banana._
-import org.openrdf.model._
-import org.openrdf.model.impl._
-import SesameUtil.withConnection
 import org.openrdf.repository.sail.SailRepository
-import org.openrdf.repository.RepositoryResult
-import scala.collection.JavaConversions._
-import info.aduna.iteration.CloseableIteration
-import org.openrdf.sail.SailException
-import org.openrdf.query._
-import org.openrdf.query.impl._
 import org.openrdf.sail.memory.MemoryStore
-import scala.concurrent.Future
+import org.w3.banana._
+import org.w3.banana.sesame.SesameUtil.withConnection
 
-class SesameGraphSparqlEngine extends SparqlEngine[Sesame, Sesame#Graph] {
+import scala.concurrent.{ExecutionContext, Future}
 
-  val store = new SesameStore
+/**
+ * Treat a Graph as a Sparql Engine
+ * @param ec execution context to use. If not specified this will
+ *           be run on the same thread. If you want to use a different execution context
+ *           you must specify it explicitly.
+ */
+class SesameGraphSparqlEngine(ec: ExecutionContext=sameThreadExecutionContext) extends SparqlEngine[Sesame, Sesame#Graph] {
+
+  val store = new SesameStore()(ec)
 
   def asConn(graph: Sesame#Graph) = {
     val store = new MemoryStore
@@ -31,10 +30,10 @@ class SesameGraphSparqlEngine extends SparqlEngine[Sesame, Sesame#Graph] {
   def executeSelect(graph: Sesame#Graph, query: Sesame#SelectQuery, bindings: Map[String, Sesame#Node]): Future[Sesame#Solutions] =
     store.executeSelect(asConn(graph), query, bindings)
 
-    def executeConstruct(graph: Sesame#Graph, query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Future[Sesame#Graph] =
+  def executeConstruct(graph: Sesame#Graph, query: Sesame#ConstructQuery, bindings: Map[String, Sesame#Node]): Future[Sesame#Graph] =
     store.executeConstruct(asConn(graph), query, bindings)
 
-    def executeAsk(graph: Sesame#Graph, query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Future[Boolean] =
+  def executeAsk(graph: Sesame#Graph, query: Sesame#AskQuery, bindings: Map[String, Sesame#Node]): Future[Boolean] =
       store.executeAsk(asConn(graph), query, bindings)
     
 }
