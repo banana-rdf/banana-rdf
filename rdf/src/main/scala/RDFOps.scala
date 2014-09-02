@@ -17,7 +17,7 @@ trait RDFOps[Rdf <: RDF]
     extends URIOps[Rdf]
     with RDFDSL[Rdf]
     with CommonPrefixes[Rdf]
-    with syntax.Syntax[Rdf] {
+    with syntax.RDFSyntax[Rdf] {
 
   // graph
 
@@ -25,7 +25,7 @@ trait RDFOps[Rdf <: RDF]
 
   def makeGraph(it: Iterable[Rdf#Triple]): Rdf#Graph
 
-  def graphToIterable(graph: Rdf#Graph): Iterable[Rdf#Triple]
+  def getTriples(graph: Rdf#Graph): Iterable[Rdf#Triple]
 
   // triple
 

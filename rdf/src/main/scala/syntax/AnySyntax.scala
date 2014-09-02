@@ -3,7 +3,7 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import org.w3.banana.binder._
 
-trait AnySyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait AnySyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def anyW[T](t: T): AnyW[Rdf, T] = new AnyW[Rdf, T](t)
 

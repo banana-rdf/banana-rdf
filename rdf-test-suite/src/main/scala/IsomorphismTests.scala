@@ -71,8 +71,8 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
 
     "a completely grounded graph ( no blank nodes ) " in {
       val (grounded, nongrounded) = groundTripleFilter(groundedGraph)
-      grounded.toIterable foreach {
-        triple => assert(groundedGraph.contains(triple))
+      grounded.triples foreach { triple =>
+        assert(groundedGraph.contains(triple))
       }
       nongrounded should equal(emptyGraph)
     }
@@ -82,8 +82,8 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
       val (grounded, nongrounded) = groundTripleFilter(rel2Graph)
       grounded.size should equal(0)
       nongrounded.size should equal(rel2Graph.size)
-      nongrounded.toIterable foreach {
-        triple => assert(rel2Graph.contains(triple))
+      nongrounded.triples foreach { triple =>
+        assert(rel2Graph.contains(triple))
       }
     }
 
@@ -91,12 +91,12 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
       val rel2Graph = bnAlexRel2Graph()
       val (grounded, nongrounded) = groundTripleFilter(groundedGraph.graph union rel2Graph)
       grounded.size should be(groundedGraph.size)
-      grounded.toIterable foreach {
-        triple => assert(groundedGraph.contains(triple))
+      grounded.triples foreach { triple =>
+        assert(groundedGraph.contains(triple))
       }
       nongrounded.size should be(rel2Graph.size)
-      nongrounded.toIterable foreach {
-        triple => assert(rel2Graph.contains(triple))
+      nongrounded.triples foreach { triple =>
+        assert(rel2Graph.contains(triple))
       }
     }
 

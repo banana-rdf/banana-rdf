@@ -5,33 +5,39 @@ import org.openrdf.query.parser.sparql.SPARQLParserFactory
 import org.openrdf.query.parser.{ ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery }
 import scala.collection.JavaConverters._
 import scala.util._
+import SparqlOps.withPrefixes
 
 object SesameSparqlOps extends SparqlOps[Sesame] {
 
   private val p = new SPARQLParserFactory().getParser()
 
-  def SelectQuery(query: String): Sesame#SelectQuery =
-    p.parseQuery(query, "http://todo.example/").asInstanceOf[ParsedTupleQuery]
+  def parseSelect(query: String, prefixes: Seq[Prefix[Sesame]]): Try[Sesame#SelectQuery] = Try {
+    p.parseQuery(withPrefixes(query, prefixes), "http://todo.example/").asInstanceOf[ParsedTupleQuery]
+  }
 
-  def ConstructQuery(query: String): Sesame#ConstructQuery =
-    p.parseQuery(query, "http://todo.example/").asInstanceOf[ParsedGraphQuery]
+  def parseConstruct(query: String, prefixes: Seq[Prefix[Sesame]]): Try[Sesame#ConstructQuery] = Try {
+    p.parseQuery(withPrefixes(query, prefixes), "http://todo.example/").asInstanceOf[ParsedGraphQuery]
+  }
 
-  def AskQuery(query: String): Sesame#AskQuery =
-    p.parseQuery(query, "http://todo.example/").asInstanceOf[ParsedBooleanQuery]
+  def parseAsk(query: String, prefixes: Seq[Prefix[Sesame]]): Try[Sesame#AskQuery] = Try {
+    p.parseQuery(withPrefixes(query, prefixes), "http://todo.example/").asInstanceOf[ParsedBooleanQuery]
+  }
 
   //FIXME
-  def UpdateQuery(query: String): Sesame#UpdateQuery = {
-    p.parseUpdate(query, "http://todo.example/")
+  def parseUpdate(query: String, prefixes: Seq[Prefix[Sesame]]): Try[Sesame#UpdateQuery] = Try {
+    p.parseUpdate(withPrefixes(query, prefixes), "http://todo.example/")
     SesameParseUpdate(query)
   }
 
-  def Query(query: String): Try[Sesame#Query] = Try {
-    p.parseQuery(query, "http://todo.example/")
+  def parseQuery(query: String, prefixes: Seq[Prefix[Sesame]]): Try[Sesame#Query] = Try {
+    p.parseQuery(withPrefixes(query, prefixes), "http://todo.example/")
   }
 
-  def fold[T](query: Sesame#Query)(select: (Sesame#SelectQuery) => T,
-    construct: (Sesame#ConstructQuery) => T,
-    ask: Sesame#AskQuery => T) =
+  def fold[T](
+    query: Sesame#Query)(
+      select: (Sesame#SelectQuery) => T,
+      construct: (Sesame#ConstructQuery) => T,
+      ask: Sesame#AskQuery => T) =
     query match {
       case qs: Sesame#SelectQuery => select(qs)
       case qc: Sesame#ConstructQuery => construct(qc)
@@ -48,6 +54,6 @@ object SesameSparqlOps extends SparqlOps[Sesame] {
 
   def varnames(solution: Sesame#Solution): Set[String] = solution.getBindingNames.asScala.toSet
 
-  def solutionIterator(solutions: Sesame#Solutions): Iterable[Sesame#Solution] = solutions
+  def solutionIterator(solutions: Sesame#Solutions): Iterator[Sesame#Solution] = solutions.iterator
 
 }

@@ -8,11 +8,10 @@ import scalaz.Scalaz._
 
 class GraphStoreTest[Rdf <: RDF, A](
   store: A)(
-  implicit val ops: RDFOps[Rdf],
-  val reader: RDFReader[Rdf, RDFXML],
-  val graphStore: GraphStore[Rdf, A],
-  val lifecycle: Lifecycle[Rdf, A]
-)
+    implicit val ops: RDFOps[Rdf],
+    val reader: RDFReader[Rdf, RDFXML],
+    val graphStore: GraphStore[Rdf, A],
+    val lifecycle: Lifecycle[Rdf, A])
     extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
   import ops._
@@ -83,7 +82,7 @@ class GraphStoreTest[Rdf <: RDF, A](
     val r = for {
       _ <- store.removeGraph(u)
       _ <- store.appendToGraph(u, foo)
-      _ <- store.removeTriples(u, (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable)
+      _ <- store.removeTriples(u, (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.triples.to[Iterable])
       _ <- store.appendToGraph(u, (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
       rGraph <- store.getGraph(u)
     } yield {

@@ -6,7 +6,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory._
 import com.hp.hpl.jena.util.iterator._
 import com.hp.hpl.jena.graph.{ Factory, Node => JenaNode }
 
-class JenaUtil(jenaOps: RDFOps[Jena]) {
+class JenaUtil(implicit jenaOps: RDFOps[Jena]) {
 
   import jenaOps._
 

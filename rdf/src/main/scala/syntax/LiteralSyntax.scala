@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait LiteralSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait LiteralSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def literalW(literal: Rdf#Literal) =
     new LiteralW[Rdf](literal)

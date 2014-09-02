@@ -28,7 +28,7 @@ object ToPG {
         val newBNode = bnode()
         val pointed = to.toPG(a)
         triples += Triple(newBNode, rdf.first, pointed.pointer)
-        triples ++= pointed.graph.toIterable
+        triples ++= pointed.graph.triples
         triples += Triple(newBNode, rdf.rest, current)
         current = newBNode
       }

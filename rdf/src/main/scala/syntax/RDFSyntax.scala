@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait Syntax[Rdf <: RDF]
+trait RDFSyntax[Rdf <: RDF]
   extends GraphSyntax[Rdf]
   with TripleMatchSyntax[Rdf]
   with TripleSyntax[Rdf]

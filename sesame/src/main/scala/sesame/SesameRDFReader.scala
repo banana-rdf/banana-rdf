@@ -26,7 +26,7 @@ trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
 
 }
 
-class SesameTurtleReader(implicit Ops: SesameOps) extends RDFReader[Sesame, Turtle] {
+class SesameTurtleReader(implicit ops: SesameOps) extends RDFReader[Sesame, Turtle] {
 
   val syntax = Syntax[Turtle]
 
@@ -34,7 +34,7 @@ class SesameTurtleReader(implicit Ops: SesameOps) extends RDFReader[Sesame, Turt
     val turtleParser = new org.openrdf.rio.turtle.TurtleParser()
     val triples = new LinkedList[Statement]
     val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix {
-      val ops: SesameOps = Ops
+      val ops: SesameOps = SesameTurtleReader.this.ops
     }
     turtleParser.setRDFHandler(collector)
     turtleParser.parse(is, base)
@@ -43,7 +43,7 @@ class SesameTurtleReader(implicit Ops: SesameOps) extends RDFReader[Sesame, Turt
 
 }
 
-class SesameRDFXMLReader(implicit Ops: SesameOps) extends RDFReader[Sesame, RDFXML] {
+class SesameRDFXMLReader(implicit ops: SesameOps) extends RDFReader[Sesame, RDFXML] {
 
   val syntax = Syntax[RDFXML]
 
@@ -51,7 +51,7 @@ class SesameRDFXMLReader(implicit Ops: SesameOps) extends RDFReader[Sesame, RDFX
     val parser = new org.openrdf.rio.rdfxml.RDFXMLParser
     val triples = new LinkedList[Statement]
     val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix {
-      val ops: SesameOps = Ops
+      val ops: SesameOps = SesameRDFXMLReader.this.ops
     }
     parser.setRDFHandler(collector)
     parser.parse(is, base)

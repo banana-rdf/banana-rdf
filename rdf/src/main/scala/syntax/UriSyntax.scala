@@ -4,7 +4,7 @@ import org.w3.banana._
 import java.net.{ URI => jURI }
 
 /** all syntax enhancement are directly derived from URIOps */
-trait URISyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait URISyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def uriW(uri: Rdf#URI): URIW[Rdf] = new URIW[Rdf](uri)
 

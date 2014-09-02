@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait StringSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait StringSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def stringW(s: String) = new StringW[Rdf](s)
 

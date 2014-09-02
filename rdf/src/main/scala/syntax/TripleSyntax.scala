@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait TripleSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait TripleSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def tripleSyntax(triple: Rdf#Triple) = new TripleW[Rdf](triple)
 

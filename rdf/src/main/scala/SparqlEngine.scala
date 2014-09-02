@@ -1,12 +1,13 @@
- package org.w3.banana
+package org.w3.banana
 
 import scala.concurrent.Future
 
-/** A typeclass for SPARQL engines.
-  * 
-  * The supported queries are: Select, Ask, and Construct. No support
-  * for SPARQL Update here.
-  */
+/**
+ * A typeclass for SPARQL engines.
+ *
+ * The supported queries are: Select, Ask, and Construct. No support
+ * for SPARQL Update here.
+ */
 trait SparqlEngine[Rdf <: RDF, A] {
 
   /** Executes a Select query. */
