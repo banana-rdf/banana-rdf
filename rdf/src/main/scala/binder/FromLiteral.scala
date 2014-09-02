@@ -89,8 +89,7 @@ trait FromLiteralCore {
     }
   }
 
- 
-/*
+  /*
  
   implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, DateTime] {
     import ops._

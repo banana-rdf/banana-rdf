@@ -8,6 +8,6 @@ class JenaSparqlEngineTest extends SparqlEngineTest({
   DatasetFactory.createMem()
 })
 
-class JenaSparqlUpdateEngineTest extends SparqlEngineTest({
+class JenaSparqlUpdateEngineTest extends SparqlUpdateEngineTest({
   DatasetFactory.createMem()
 })

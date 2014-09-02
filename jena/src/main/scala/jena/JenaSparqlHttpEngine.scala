@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import java.net.URL
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph}
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.update.UpdateExecutionFactory
 import org.w3.banana._
@@ -10,7 +10,7 @@ import org.w3.banana._
 import scala.concurrent._
 
 class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena], ec: ExecutionContext)
-  extends SparqlEngine[Jena, URL] with SparqlUpdate[Jena,URL] {
+    extends SparqlEngine[Jena, URL] with SparqlUpdate[Jena, URL] {
 
   val querySolution = new util.QuerySolution(ops)
 
@@ -21,20 +21,20 @@ class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena], ec: ExecutionContext)
     qe
   }
 
-  def executeAsk(endpoint: URL, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] = 
+  def executeAsk(endpoint: URL, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] =
     Future {
-    qexec(endpoint, query, bindings).execAsk()
-  }
+      qexec(endpoint, query, bindings).execAsk()
+    }
 
-  def executeConstruct(endpoint: URL, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = 
+  def executeConstruct(endpoint: URL, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] =
     Future {
-    qexec(endpoint, query, bindings).execConstruct().getGraph()
-  }
+      qexec(endpoint, query, bindings).execConstruct().getGraph()
+    }
 
-  def executeSelect(endpoint: URL, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = 
+  def executeSelect(endpoint: URL, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] =
     Future {
-    qexec(endpoint, query, bindings).execSelect()
-  }
+      qexec(endpoint, query, bindings).execSelect()
+    }
 
   def executeUpdate(endpoint: URL, query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Future[Unit] =
     Future {

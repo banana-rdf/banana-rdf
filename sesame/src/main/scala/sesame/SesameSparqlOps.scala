@@ -35,13 +35,13 @@ object SesameSparqlOps extends SparqlOps[Sesame] {
 
   def fold[T](
     query: Sesame#Query)(
-    select: (Sesame#SelectQuery) => T,
-    construct: (Sesame#ConstructQuery) => T,
-    ask: Sesame#AskQuery => T) =
+      select: (Sesame#SelectQuery) => T,
+      construct: (Sesame#ConstructQuery) => T,
+      ask: Sesame#AskQuery => T) =
     query match {
-      case qs: Sesame#SelectQuery    => select(qs)
+      case qs: Sesame#SelectQuery => select(qs)
       case qc: Sesame#ConstructQuery => construct(qc)
-      case qa: Sesame#AskQuery       => ask(qa)
+      case qa: Sesame#AskQuery => ask(qa)
     }
 
   def getNode(solution: Sesame#Solution, v: String): Try[Sesame#Node] = {

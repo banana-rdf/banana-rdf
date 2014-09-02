@@ -10,14 +10,13 @@ import java.io.FileInputStream
 
 class SparqlEngineTest[Rdf <: RDF, A](
   val store: A)(
-  implicit val reader: RDFReader[Rdf, RDFXML],
-  val ops: RDFOps[Rdf],
-  val sparqlOps: SparqlOps[Rdf],
-  val graphStore: GraphStore[Rdf, A],
-  val sparqlEngine: SparqlEngine[Rdf, A],
-  val lifecycle: Lifecycle[Rdf, A]
-)
-    extends WordSpec with SparqlEngineTesterTrait[Rdf,A] with  Matchers with BeforeAndAfterAll with TryValues {
+    implicit val reader: RDFReader[Rdf, RDFXML],
+    val ops: RDFOps[Rdf],
+    val sparqlOps: SparqlOps[Rdf],
+    val graphStore: GraphStore[Rdf, A],
+    val sparqlEngine: SparqlEngine[Rdf, A],
+    val lifecycle: Lifecycle[Rdf, A])
+    extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
 
   import ops._
   import sparqlOps._
@@ -69,7 +68,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
     val names: Iterable[String] =
       store.executeSelect(query, bindings).getOrFail().iterator.to[Iterable].map {
         row => row("name").success.value.as[String].success.value
-    }
+      }
 
     names should have size (4)
 

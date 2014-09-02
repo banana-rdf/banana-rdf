@@ -1,9 +1,9 @@
 package org.w3.banana
 
 trait RDFStore[Rdf <: RDF, A]
-    extends SparqlEngine[Rdf, A]
-    with GraphStore[Rdf, A]
-    with Transactor[Rdf, A]
+  extends SparqlEngine[Rdf, A]
+  with GraphStore[Rdf, A]
+  with Transactor[Rdf, A]
 
 object RDFStore {
 

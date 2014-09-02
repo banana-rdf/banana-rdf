@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * Created by hjs on 01/09/2014.
  */
 trait SparqlEngineTesterTrait[Rdf <: RDF, A]
-  extends BeforeAndAfterAll { self: Suite =>
+    extends BeforeAndAfterAll { self: Suite =>
   val store: A
   val reader: RDFReader[Rdf, RDFXML]
   implicit val ops: RDFOps[Rdf]

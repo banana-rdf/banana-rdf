@@ -1,17 +1,20 @@
 package org.w3.banana
 
-/** A typeclass for stores that requires to be started or stopped
-  */
+/**
+ * A typeclass for stores that requires to be started or stopped
+ */
 trait Lifecycle[Rdf <: RDF, A] {
 
-  /** To the graph at `uri`, appends the content of `graph`. If there was
-    * no previous graph, this would create it.
-    */
+  /**
+   * To the graph at `uri`, appends the content of `graph`. If there was
+   * no previous graph, this would create it.
+   */
   def start(a: A): Unit
 
-  /** To the graph at `uri`, removes the matching triples from `delete`,
-    * then adds the ones in `insert`.
-    */
+  /**
+   * To the graph at `uri`, removes the matching triples from `delete`,
+   * then adds the ones in `insert`.
+   */
   def stop(a: A): Unit
 
   val lifecycleSyntax = new syntax.LifecycleSyntax[Rdf, A]

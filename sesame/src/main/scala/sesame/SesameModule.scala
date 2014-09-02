@@ -2,6 +2,7 @@ package org.w3.banana.sesame
 
 import org.openrdf.repository.RepositoryConnection
 import org.w3.banana._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SesameModule
     extends RDFModule
@@ -28,9 +29,9 @@ trait SesameModule
 
   implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
 
-  implicit val sparqlGraph: SparqlEngine[Sesame, Sesame#Graph] = new SesameGraphSparqlEngine
+  implicit val sparqlGraph: SparqlEngine[Sesame, Sesame#Graph] = SesameGraphSparqlEngine()
 
-  implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] = new SesameStore
+  implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame, RepositoryConnection] = new SesameStore
 
   implicit val rdfXMLReader: RDFReader[Sesame, RDFXML] = new SesameRDFXMLReader
 

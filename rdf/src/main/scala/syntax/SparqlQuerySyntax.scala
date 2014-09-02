@@ -30,6 +30,6 @@ class SparqlQueryW[Rdf <: RDF](val query: Rdf#Query) extends AnyVal {
     select: Rdf#SelectQuery => T,
     construct: Rdf#ConstructQuery => T,
     ask: Rdf#AskQuery => T)(
-    implicit sparqlOps: SparqlOps[Rdf]): T = sparqlOps.fold(query)(select, construct, ask)
+      implicit sparqlOps: SparqlOps[Rdf]): T = sparqlOps.fold(query)(select, construct, ask)
 
 }

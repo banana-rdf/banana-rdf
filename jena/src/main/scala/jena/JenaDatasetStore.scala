@@ -1,30 +1,32 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph, Node => JenaNode}
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
 import com.hp.hpl.jena.query._
-import com.hp.hpl.jena.rdf.model._
-import com.hp.hpl.jena.sparql.core.DatasetGraph
+import com.hp.hpl.jena.update.UpdateAction
 import org.w3.banana._
-import scala.collection.JavaConverters._
+
 import scala.concurrent._
 import scala.util.Try
 
-class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil, ec: ExecutionContext) extends RDFStore[Jena, Dataset] /* with SparqlUpdate[Jena, Dataset] */ {
+class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil, ec: ExecutionContext) extends RDFStore[Jena, Dataset] with SparqlUpdate[Jena, Dataset] {
 
   /* Transactor */
 
   def r[T](dataset: Dataset, body: => T): Try[T] = Try {
     dataset.begin(ReadWrite.READ)
-    val result = body
-    dataset.end()
-    result
+    try {
+      val result = body
+      result
+    } finally dataset.end()
   }
 
   def rw[T](dataset: Dataset, body: => T): Try[T] = Try {
     dataset.begin(ReadWrite.WRITE)
-    val result = body
-    dataset.commit()
-    result
+    try {
+      val result = body
+      dataset.commit()
+      result
+    } finally dataset.end()
   }
 
   /* SparqlEngine */
@@ -63,19 +65,28 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
     result
   }
 
+  def executeUpdate(dataset: Dataset, query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) = Future {
+    if (bindings.isEmpty)
+      UpdateAction.execute(query, dataset)
+    else
+      throw new NotImplementedError("todo: how does one (can one?) set the bindings in a dataset in Jena?")
+  }
+
   /* GraphStore */
 
   def appendToGraph(dataset: Dataset, uri: Jena#URI, graph: Jena#Graph): Future[Unit] = Future {
     val dg = dataset.asDatasetGraph
-    ops.getTriples(graph).foreach { case ops.Triple(s, p, o) =>
+    ops.getTriples(graph).foreach {
+      case ops.Triple(s, p, o) =>
         dg.add(uri, s, p, o)
     }
   }
 
   def removeTriples(dataset: Dataset, uri: Jena#URI, triples: Iterable[TripleMatch[Jena]]): Future[Unit] = Future {
     val dg = dataset.asDatasetGraph
-    triples.foreach { case (s, p, o) =>
-      dg.deleteAny(uri, s, p, o)
+    triples.foreach {
+      case (s, p, o) =>
+        dg.deleteAny(uri, s, p, o)
     }
   }
 

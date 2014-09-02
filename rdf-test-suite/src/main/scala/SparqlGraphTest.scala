@@ -6,12 +6,12 @@ import org.scalatest._
 import java.io._
 
 class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
-    implicit ops: RDFOps[Rdf],
-    reader: RDFReader[Rdf, RDFXML],
-    sparqlOperations: SparqlOps[Rdf],
-    sparqlGraph: SparqlEngine[Rdf, Rdf#Graph],
-    sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
-    sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType])
+  implicit ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, RDFXML],
+  sparqlOperations: SparqlOps[Rdf],
+  sparqlGraph: SparqlEngine[Rdf, Rdf#Graph],
+  sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
+  sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType])
     extends WordSpec with Matchers with Inside with TryValues {
 
   import ops._
@@ -95,9 +95,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
 
     val simple: PointedGraph[Rdf] = (
       bnode("thing") -- URI("http://www.w3.org/2001/02pd/rec54#editor") ->- (bnode("i")
-        -- foaf.name ->- "Henry".lang("en")
-      )
-    )
+        -- foaf.name ->- "Henry".lang("en")))
 
     val yesQuery = parseAsk("ASK { ?thing <http://xmlns.com/foaf/0.1/name> ?name }").success.value
     val noQuery = parseAsk("ASK { ?thing <http://xmlns.com/foaf/0.1/knows> ?name }").success.value
@@ -145,24 +143,22 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
   "a Sparql query constructor must accept Prefix objects" in {
 
     val query1 = parseConstruct("""
-prefix : <http://www.w3.org/2001/02pd/rec54#>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
-
-CONSTRUCT {
-  ?thing :editor ?ed .
-  ?ed contact:fullName ?name .
-}  WHERE {
-  ?thing :editor ?ed .
-  ?ed contact:fullName ?name
-}
-""").success.value
+          |prefix : <http://www.w3.org/2001/02pd/rec54#>
+          |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+          |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
+          |
+          |CONSTRUCT {
+          |  ?thing :editor ?ed .
+          |  ?ed contact:fullName ?name .
+          |}  WHERE {
+          |  ?thing :editor ?ed .
+          |  ?ed contact:fullName ?name
+          |}
+          |""".stripMargin).success.value
 
     val base = Prefix[Rdf]("", "http://www.w3.org/2001/02pd/rec54#")
     val rdf = RDFPrefix[Rdf]
     val contact = Prefix[Rdf]("contact", "http://www.w3.org/2000/10/swap/pim/contact#")
-
-
 
     val query2 = parseConstruct("""
                                |CONSTRUCT {

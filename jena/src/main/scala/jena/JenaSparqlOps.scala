@@ -41,13 +41,13 @@ class JenaSparqlOps(implicit jenaUtil: JenaUtil) extends SparqlOps[Jena] {
 
   def fold[T](
     query: Jena#Query)(
-    select: Jena#SelectQuery => T,
-    construct: Jena#ConstructQuery => T,
-    ask: Jena#AskQuery => T) =
+      select: Jena#SelectQuery => T,
+      construct: Jena#ConstructQuery => T,
+      ask: Jena#AskQuery => T) =
     query.getQueryType match {
-      case JenaQuery.QueryTypeSelect    => select(query)
+      case JenaQuery.QueryTypeSelect => select(query)
       case JenaQuery.QueryTypeConstruct => construct(query)
-      case JenaQuery.QueryTypeAsk       => ask(query)
+      case JenaQuery.QueryTypeAsk => ask(query)
     }
 
   def getNode(solution: Jena#Solution, v: String): Try[Jena#Node] = {
