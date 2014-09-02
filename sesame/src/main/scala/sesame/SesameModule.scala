@@ -31,7 +31,7 @@ trait SesameModule
 
   implicit val sparqlGraph: SparqlEngine[Sesame, Sesame#Graph] = new SesameGraphSparqlEngine
 
-  implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame,RepositoryConnection] = new SesameStore
+  implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame, RepositoryConnection] = new SesameStore
 
   implicit val rdfXMLReader: RDFReader[Sesame, RDFXML] = new SesameRDFXMLReader
 

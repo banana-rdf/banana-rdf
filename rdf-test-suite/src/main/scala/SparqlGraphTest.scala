@@ -12,7 +12,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
   sparqlGraph: SparqlEngine[Rdf, Rdf#Graph],
   sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
   sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType])
-  extends WordSpec with Matchers with Inside with TryValues {
+    extends WordSpec with Matchers with Inside with TryValues {
 
   import ops._
   import sparqlOperations._

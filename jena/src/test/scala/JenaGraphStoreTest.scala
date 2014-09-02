@@ -17,7 +17,7 @@ abstract class JenaGraphStoreTest(dataset: Dataset) extends GraphStoreTest[Jena,
 
   "adding a named graph should not pollute the default graph" in {
     dataset.appendToGraph(makeUri("http://example.com/foo"), graph).getOrFail()
-    assert( defaultGraph.size == 0)
+    assert(defaultGraph.size == 0)
   }
 
 }
@@ -31,7 +31,4 @@ class JenaTDBGraphStoreTest extends JenaGraphStoreTest({
   dataset.getContext().set(TDB.symUnionDefaultGraph, false)
   dataset
 })
-
-
-
 

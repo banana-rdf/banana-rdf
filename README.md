@@ -68,10 +68,14 @@ ownership of your contribution to the [World Wide Web
 Consortium](http://www.w3.org). They are a _nonprofit organization_
 and just want to simplify the gouvernance of this opensource project.
 
-Before contributing please make sure to add a symbolic link from 
-the `.git/hooks/` directory of your clone to the [bin/pre-commit](bin/pre-commit)
-shell script. This will ensure that all your commits are formatted in a 
-consistent way.
+Before contributing please make sure to copy the [bin/pre-commit](bin/pre-commit)
+shell script to the `.git/hooks/` directory of your clone.  This will ensure that all 
+your commits are formatted in a consistent way before you push, making it easier
+to see the real diffs in a project. On Unix you can do this with the command
+
+```
+$ cp bin/pre-commit .git/hooks/
+```
 
 Licence
 -------

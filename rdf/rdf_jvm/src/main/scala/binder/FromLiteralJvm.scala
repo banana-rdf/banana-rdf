@@ -14,7 +14,6 @@ trait ToLiteral[Rdf <: RDF, -T] {
   def toLiteral(t: T): Rdf#Literal
 }
 
-
 object ToLiteral extends ToLiteralCore
 
 object FromLiteral extends FromLiteralCore {

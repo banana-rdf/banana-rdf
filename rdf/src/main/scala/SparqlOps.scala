@@ -31,15 +31,16 @@ trait SparqlOps[Rdf <: RDF] extends syntax.SparqlSyntax[Rdf] {
 
   def parseUpdate(query: String, prefixes: Seq[Prefix[Rdf]]): Try[Rdf#UpdateQuery]
 
-  /** A general query constructor.
-    * 
-    * When this is used it is usually because the query type is not
-    * known in advance, ( as when a query is received over the
-    * internet). As a result the response is a validation, as the
-    * query may not have been tested for validity.
-    * 
-    * @param query a Sparql query
-    * @return A validation containing the Query
+  /**
+   * A general query constructor.
+   *
+   * When this is used it is usually because the query type is not
+   * known in advance, ( as when a query is received over the
+   * internet). As a result the response is a validation, as the
+   * query may not have been tested for validity.
+   *
+   * @param query a Sparql query
+   * @return A validation containing the Query
    */
   def parseQuery(query: String, prefixes: Seq[Prefix[Rdf]]): Try[Rdf#Query]
 
@@ -62,25 +63,25 @@ trait SparqlOps[Rdf <: RDF] extends syntax.SparqlSyntax[Rdf] {
 
   // TODO move all that stuff: there should be only function definitions here
 
-//
-//  def SelectQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#SelectQuery = {
-//    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
-//    SelectQuery(completeQuery)
-//  }
-//
-//  def ConstructQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#ConstructQuery = {
-//    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
-//    ConstructQuery(completeQuery)
-//  }
-//
-//  def AskQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#AskQuery = {
-//    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
-//    AskQuery(completeQuery)
-//  }
-//
-//  def UpdateQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#UpdateQuery = {
-//    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
-//    UpdateQuery(completeQuery)
-//  }
+  //
+  //  def SelectQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#SelectQuery = {
+  //    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
+  //    SelectQuery(completeQuery)
+  //  }
+  //
+  //  def ConstructQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#ConstructQuery = {
+  //    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
+  //    ConstructQuery(completeQuery)
+  //  }
+  //
+  //  def AskQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#AskQuery = {
+  //    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
+  //    AskQuery(completeQuery)
+  //  }
+  //
+  //  def UpdateQuery(query: String, prefix: Prefix[Rdf], prefixes: Prefix[Rdf]*): Rdf#UpdateQuery = {
+  //    val completeQuery = buildQuery(query, prefix +: prefixes.toSeq)
+  //    UpdateQuery(completeQuery)
+  //  }
 
 }

@@ -17,10 +17,10 @@ import org.w3.banana._
  *   run-main org.w3.banana.examples.GraphExampleWithSesame
  */
 abstract class GraphStoreExample[Rdf <: RDF, Store](
-  implicit ops: RDFOps[Rdf],
-  turtleReader: RDFReader[Rdf, Turtle],
-  rdfXMLWriter: RDFWriter[Rdf, RDFXML],
-  rdfStore: RDFStore[Rdf, Store]) {
+    implicit ops: RDFOps[Rdf],
+    turtleReader: RDFReader[Rdf, Turtle],
+    rdfXMLWriter: RDFWriter[Rdf, RDFXML],
+    rdfStore: RDFStore[Rdf, Store]) {
 
   import ops._
   import rdfStore.graphStoreSyntax._
@@ -47,7 +47,7 @@ abstract class GraphStoreExample[Rdf <: RDF, Store](
     val script =
       for {
         _ <- store
-        .appendToGraph(makeUri("urn:foafs"), graph)
+          .appendToGraph(makeUri("urn:foafs"), graph)
         _ <- store.appendToGraph(makeUri("urn:foafs"), Graph(triples))
       } yield {
         println("Successfully stored triples in store")
@@ -56,7 +56,6 @@ abstract class GraphStoreExample[Rdf <: RDF, Store](
   }
 
 }
-
 
 import org.w3.banana.jena._
 import com.hp.hpl.jena.query.Dataset

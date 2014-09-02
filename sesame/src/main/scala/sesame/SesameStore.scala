@@ -3,7 +3,7 @@ package org.w3.banana.sesame
 import org.openrdf.model._
 import org.openrdf.model.impl._
 import org.openrdf.query._
-import org.openrdf.repository.{RepositoryConnection, RepositoryResult}
+import org.openrdf.repository.{ RepositoryConnection, RepositoryResult }
 import org.w3.banana._
 
 import scala.collection.JavaConverters._
@@ -11,7 +11,7 @@ import scala.concurrent._
 import scala.util.Try
 
 class SesameStore(implicit ec: ExecutionContext)
-  extends RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame,RepositoryConnection]  {
+    extends RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame, RepositoryConnection] {
 
   /* Transactor */
 
@@ -67,8 +67,9 @@ class SesameStore(implicit ec: ExecutionContext)
   }
 
   def removeTriples(conn: RepositoryConnection, uri: Sesame#URI, tripleMatches: Iterable[TripleMatch[Sesame]]): Future[Unit] = Future {
-    val ts = tripleMatches.map { case (s, p, o) =>
-      new StatementImpl(s.asInstanceOf[Resource], p.asInstanceOf[URI], o)
+    val ts = tripleMatches.map {
+      case (s, p, o) =>
+        new StatementImpl(s.asInstanceOf[Resource], p.asInstanceOf[URI], o)
     }
     conn.remove(ts.asJava, uri)
   }

@@ -1,11 +1,11 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph}
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.rdf.model._
 import org.w3.banana._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * Treat a Graph as a Sparql Engine
@@ -14,8 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
  *           you must specify it explicitly. (it makes most sense usually to run this on the same thread, as the
  *           data is local ).
  */
-class JenaGraphSparqlEngine(ec: ExecutionContext=sameThreadExecutionContext)
-                           (implicit ops: RDFOps[Jena])
+class JenaGraphSparqlEngine(ec: ExecutionContext = sameThreadExecutionContext)(implicit ops: RDFOps[Jena])
     extends SparqlEngine[Jena, Jena#Graph] {
   implicit val eci = ec //make ec implicit only inside the body
   val querySolution = new util.QuerySolution(ops)
@@ -29,20 +28,20 @@ class JenaGraphSparqlEngine(ec: ExecutionContext=sameThreadExecutionContext)
   }
 
   def executeSelect(graph: Jena#Graph, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] =
-  Future {
-    qexec(graph, query, bindings).execSelect()
-  }
+    Future {
+      qexec(graph, query, bindings).execSelect()
+    }
 
   def executeConstruct(graph: Jena#Graph, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] =
-  Future {
-    val result = qexec(graph, query, bindings).execConstruct()
-    result.getGraph()
-  }
+    Future {
+      val result = qexec(graph, query, bindings).execConstruct()
+      result.getGraph()
+    }
 
   def executeAsk(graph: Jena#Graph, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] =
     Future {
-    qexec(graph, query, bindings).execAsk()
-  }
+      qexec(graph, query, bindings).execAsk()
+    }
 
 }
 

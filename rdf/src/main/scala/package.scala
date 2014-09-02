@@ -30,9 +30,8 @@ package object banana
    */
   def sameThreadExecutionContext = new ExecutionContext {
     def reportFailure(t: Throwable) { t.printStackTrace() }
-    def execute(runnable: Runnable) {runnable.run()}
+    def execute(runnable: Runnable) { runnable.run() }
   }
-
 
   implicit class TryW[T](t: Try[T]) {
     def asFuture: Future[T] = t match {

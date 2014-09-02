@@ -1,6 +1,6 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph, Node => JenaNode}
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.update.UpdateAction
 import org.w3.banana._
@@ -8,7 +8,7 @@ import org.w3.banana._
 import scala.concurrent._
 import scala.util.Try
 
-class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil, ec: ExecutionContext) extends RDFStore[Jena, Dataset]  with SparqlUpdate[Jena, Dataset]  {
+class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil, ec: ExecutionContext) extends RDFStore[Jena, Dataset] with SparqlUpdate[Jena, Dataset] {
 
   /* Transactor */
 
@@ -72,20 +72,21 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
       throw new NotImplementedError("todo: how does one (can one?) set the bindings in a dataset in Jena?")
   }
 
-
   /* GraphStore */
 
   def appendToGraph(dataset: Dataset, uri: Jena#URI, graph: Jena#Graph): Future[Unit] = Future {
     val dg = dataset.asDatasetGraph
-    ops.getTriples(graph).foreach { case ops.Triple(s, p, o) =>
+    ops.getTriples(graph).foreach {
+      case ops.Triple(s, p, o) =>
         dg.add(uri, s, p, o)
     }
   }
 
   def removeTriples(dataset: Dataset, uri: Jena#URI, triples: Iterable[TripleMatch[Jena]]): Future[Unit] = Future {
     val dg = dataset.asDatasetGraph
-    triples.foreach { case (s, p, o) =>
-      dg.deleteAny(uri, s, p, o)
+    triples.foreach {
+      case (s, p, o) =>
+        dg.deleteAny(uri, s, p, o)
     }
   }
 
