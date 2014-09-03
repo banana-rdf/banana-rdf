@@ -239,12 +239,18 @@ object BananaRdfBuild extends Build {
     )
   )
 
-  lazy val patch = Project(
+  lazy val ldpatch = Project(
     id = "ldpatch",
     base = file("ldpatch"),
     settings = buildSettings ++ testDeps ++ Seq(
       publishMavenStyle := true,
-      libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0"
+      libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0",
+      // this will be needed until parboiled 2.0.1 gets released
+      // see https://github.com/sirthias/parboiled2/issues/84#
+      libraryDependencies <++= scalaVersion {
+        case "2.11.2" => Seq("org.scala-lang" % "scala-reflect" % "2.11.2")
+        case _ => Seq.empty
+      }
     )
   ) dependsOn (rdf_jvm, jena, rdfTestSuite % "test")
 
