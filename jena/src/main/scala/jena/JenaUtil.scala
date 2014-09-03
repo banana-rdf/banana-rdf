@@ -1,10 +1,8 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
-import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
-import com.hp.hpl.jena.rdf.model.ResourceFactory._
-import com.hp.hpl.jena.util.iterator._
 import com.hp.hpl.jena.graph.{ Factory, Node => JenaNode }
+import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
+import org.w3.banana._
 
 class JenaUtil(implicit jenaOps: RDFOps[Jena]) {
 

@@ -2,6 +2,7 @@ package org.w3.banana
 
 import org.w3.banana.binder._
 import org.w3.banana.diesel._
+
 import scala.util._
 
 class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Graph) extends Iterable[PointedGraph[Rdf]] {
@@ -14,7 +15,7 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
 
   def /(p: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraphs[Rdf] = {
     val ns: Iterable[Rdf#Node] = this flatMap { pointed: PointedGraph[Rdf] =>
-      import pointed.{ pointer }
+      import pointed.pointer
       ops.getObjects(graph, pointer, p)
     }
     new PointedGraphs[Rdf](ns, graph)

@@ -1,9 +1,10 @@
 package org.w3.banana.sesame
 
 import java.io.OutputStream
+
+import org.openrdf.query.resultio.TupleQueryResultWriter
 import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
-import org.openrdf.query.resultio.TupleQueryResultWriter
 import org.w3.banana._
 
 /**

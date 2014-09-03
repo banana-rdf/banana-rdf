@@ -1,9 +1,9 @@
 package org.w3.banana.jena
 
+import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _ }
+import com.hp.hpl.jena.query.{ QuerySolution, ResultSet, Query => JenaQuery }
+import com.hp.hpl.jena.update.UpdateRequest
 import org.w3.banana._
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Triple => JenaTriple, Node => JenaNode, _ }
-import com.hp.hpl.jena.query.{ Query => JenaQuery, QuerySolution, ResultSet }
-import com.hp.hpl.jena.update.{ UpdateRequest, UpdateAction }
 
 trait Jena extends RDF {
   // types related to the RDF datamodel

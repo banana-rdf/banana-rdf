@@ -1,11 +1,11 @@
 package org.w3.banana.util
 
-import org.w3.banana.{ RDFOps, RDF }
+import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
 import scala.collection.mutable
 import scala.util.control.NoStackTrace
-import scala.util.{ Success, Failure, Try }
+import scala.util.{ Failure, Success, Try }
 
 /**
  * Methods to establish Graph Equivalences

@@ -1,6 +1,7 @@
 package org.w3.banana
 
 import java.io._
+
 import scala.util._
 
 trait BooleanWriter[T] extends Writer[Boolean, T] {

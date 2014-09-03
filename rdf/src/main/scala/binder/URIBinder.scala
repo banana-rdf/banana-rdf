@@ -1,6 +1,7 @@
 package org.w3.banana.binder
 
 import org.w3.banana._
+
 import scala.util._
 
 trait URIBinder[Rdf <: RDF, T] extends FromURI[Rdf, T] with ToURI[Rdf, T]

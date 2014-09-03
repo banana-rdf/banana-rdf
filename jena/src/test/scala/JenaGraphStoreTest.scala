@@ -1,17 +1,14 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.query.Dataset
-import com.hp.hpl.jena.query.DatasetFactory
+import com.hp.hpl.jena.query.{Dataset, DatasetFactory}
+import com.hp.hpl.jena.tdb.{TDB, TDBFactory}
 import org.w3.banana._
-import com.hp.hpl.jena.sparql.core._
-import Jena._
-import com.hp.hpl.jena.tdb.{ TDB, TDBFactory }
-import concurrent.Future
+import org.w3.banana.jena.Jena._
 
 abstract class JenaGraphStoreTest(dataset: Dataset) extends GraphStoreTest[Jena, Dataset](dataset) {
 
-  import ops._
   import graphStore.graphStoreSyntax._
+  import ops._
 
   val defaultGraph: Jena#Graph = dataset.asDatasetGraph.getDefaultGraph
 
