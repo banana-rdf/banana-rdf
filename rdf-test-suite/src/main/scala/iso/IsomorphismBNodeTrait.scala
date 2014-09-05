@@ -1,4 +1,4 @@
-package org.w3.banana.util
+package org.w3.banana.iso
 
 import org.scalatest.Suite
 import org.w3.banana.{RDFPrefix, FOAFPrefix, RDF, RDFOps}

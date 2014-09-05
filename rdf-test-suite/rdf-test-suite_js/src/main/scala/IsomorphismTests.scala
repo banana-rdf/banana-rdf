@@ -4,7 +4,7 @@ import org.w3.banana._
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.w3.banana.binder._
-import org.w3.banana.util.GraphIsomorphism
+import org.w3.banana.iso.GraphIsomorphism
 import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext
 import scalaz.Scalaz._

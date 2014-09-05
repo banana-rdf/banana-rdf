@@ -1,8 +1,8 @@
-package org.w3.banana.plantain.util
+package org.w3.banana.plantain.iso
 
 import org.scalatest.{ Suite, Matchers, WordSpec }
 import org.w3.banana.{ RDF, RDFOps }
-import org.w3.banana.util.{ IsomorphismBNodeTrait, GraphIsomorphism }
+import org.w3.banana.iso.{ IsomorphismBNodeTrait, GraphIsomorphism }
 
 import scala.util.Success
 

@@ -1,7 +1,7 @@
-package org.w3.banana.rdf.util
+package org.w3.banana.rdf.iso
 
 import org.scalatest.{Suite, Matchers, WordSpec}
-import org.w3.banana.util.{IsomorphismBNodeTrait, SimpleMappingGenerator}
+import org.w3.banana.iso.{IsomorphismBNodeTrait, SimpleMappingGenerator}
 import org.w3.banana.{RDF, RDFOps}
 
 import scala.collection.immutable.ListMap
@@ -11,7 +11,7 @@ import scala.util.Success
  * Test the simple classification of Bnodes for the scala implementation of Isomorphism
  * Created by hjs on 04/09/2014.
  */
-class IsoSimpleClassifyTest[Rdf <: RDF](mappingGenerator: SimpleMappingGenerator[Rdf])(
+class SimpleClassifyTest[Rdf <: RDF](mappingGenerator: SimpleMappingGenerator[Rdf])(
   implicit val ops: RDFOps[Rdf])
   extends  WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers  { self: Suite =>
 

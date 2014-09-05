@@ -1,9 +1,9 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import org.w3.banana.plantain.util.GraphIsomorphismTest
-import org.w3.banana.rdf.util.IsoSimpleClassifyTest
-import org.w3.banana.util.{GraphIsomorphism, OpsIsomorphismTests, SimpleMappingGenerator}
+import org.w3.banana.plantain.iso.GraphIsomorphismTest
+import org.w3.banana.rdf.iso.SimpleClassifyTest
+import org.w3.banana.iso.{GraphIsomorphism, OpsIsomorphismTests, SimpleMappingGenerator}
 
 class PlantainTurtleTest extends TurtleTestSuite[Plantain]
 
@@ -28,7 +28,7 @@ import org.w3.banana.syntax._
 class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
 
 
-class PlantainIsoSimpleClassifyTest() extends IsoSimpleClassifyTest[Plantain](
+class PlantainSimpleClassifyTest() extends SimpleClassifyTest[Plantain](
   new SimpleMappingGenerator[Plantain]())
 
 class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain](new GraphIsomorphism[Plantain](new SimpleMappingGenerator))

@@ -3,7 +3,7 @@ package org.w3.banana.pome
 import org.w3.banana._
 import java.net.{ URI => jURI }
 
-import org.w3.banana.util.{SimpleMappingGenerator, GraphIsomorphism}
+import org.w3.banana.iso.{SimpleMappingGenerator, GraphIsomorphism}
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
