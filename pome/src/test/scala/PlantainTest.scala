@@ -1,7 +1,8 @@
 package org.w3.banana.pome
 
 import org.w3.banana._
-import org.w3.banana.util.IsomorphismTests
+import util.OpsIsomorphismTests
+import util.OpsIsomorphismTests
 
 //class PlantainTurtleTest extends TurtleTestSuite[Plantain]
 
@@ -25,6 +26,6 @@ import org.w3.banana.syntax._
 
 class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
 
-class PlantainStandardIsomorphismTest() extends IsomorphismTests[Plantain]
+class PlantainStandardOpsIsomorphismTest() extends OpsIsomorphismTests[Plantain]
 
 

@@ -3,7 +3,7 @@ package org.w3.banana.pome
 import org.w3.banana._
 import java.net.{ URI => jURI }
 
-import org.w3.banana.util.GraphIsomorphism
+import org.w3.banana.util.{SimpleMappingGenerator, GraphIsomorphism}
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
@@ -107,11 +107,11 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   }
 
   // graph isomorphism
-  val iso = new GraphIsomorphism()(PlantainOps)
+  val iso = new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain])
 
-  def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
+  def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean =
     iso.findAnswer(left, right).isSuccess
-  }
+
 
   def graphSize(g: Plantain#Graph): Int = g.size
 

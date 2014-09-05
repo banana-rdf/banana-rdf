@@ -13,7 +13,6 @@ import scala.util.{ Failure, Success, Try }
  * Following Jeremy J. Carroll's "Matching RDF Graphs" article
  *  http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
  *
- * ( Currently the first part of the algorithm p10 has been implemented )
  *
  * Also I found it useful to think in terms of the RDF category
  * as defined by Benjamin Braatz in "Formal Modelling and Application of Graph Transformations
@@ -21,16 +20,19 @@ import scala.util.{ Failure, Success, Try }
  *
  * http://www.researchgate.net/profile/Benjamin_Braatz/publication/40635984_Formal_Modelling_and_Application_of_Graph_Transformations_in_the_Resource_Description_Framework/file/d912f50d3189b51ef1.pdf
  *
- * As shown by Jeremy Carroll's paper this is only the first stage in the
- * optimisation. This code can be ameliorated in a number of ways:
+ * This code can be ameliorated in a number of ways:
  *
- *  - by increasing the sensitivity of categories as explained by Jeremy Caroll
  *  - by using lazy data structures
  *  - by optimising memory
  *
- *  Each optimisation makes thinking about the code harder though.
+ *
+ * @param mappingGen a mapping generator that knows to find for two graphs the possible mappings of bnodes between
+ *                   them. Better mapping generators will find less mappings for the same graphs, without missing out
+ *                   on correct ones.
+ * @param ops RDFOPs
+ * @tparam Rdf RDF implementation to work with
  */
-class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
+class GraphIsomorphism[Rdf <: RDF](mappingGen: MappingGenerator[Rdf])(implicit ops: RDFOps[Rdf]) {
 
   import ops._
 
@@ -53,41 +55,6 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
     (ground, nonGround)
   }
 
-  /**
-   * generate a list of possible bnode mappings, filtered by applying classification algorithm
-   * on the nodes by relating them to other edges
-   * @param g1
-   * @param g2
-   * @return a ListMap mapping BNode from graph g1 to a smaller set of Bnodes from graph g2 which
-   *         they should corresond to
-   */
-  def bnodeMappingGenerator(g1: Rdf#Graph, g2: Rdf#Graph): Try[ListMap[Rdf#BNode, mutable.Set[Rdf#BNode]]] = Try {
-    if (g1.size != g2.size)
-      throw MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}")
-    val (grnd1, nongrnd1) = groundTripleFilter(g1)
-    val (grnd2, nongrnd2) = groundTripleFilter(g2)
-    if (grnd1.size != grnd2.size)
-      throw MappingException("the two graphs don't have the same number of ground triples. " +
-        s"ground(g1).size=${grnd1.size} ground(g2).size=${grnd2.size}")
-    val clz1 = bnodeClassify(g1)
-    val clz2 = bnodeClassify(g2)
-    if (clz1.size != clz2.size)
-      throw ClassificationException("the two graphs don't have the same number of classes.", clz1, clz2)
-    val mappingOpts: mutable.Map[Rdf#BNode, mutable.Set[Rdf#BNode]] = mutable.HashMap[Rdf#BNode, mutable.Set[Rdf#BNode]]()
-    for {
-      (vt, bnds1) <- clz1 // .sortBy { case (vt, bn) => bn.size }
-      bnds2 <- clz2.get(vt)
-    } {
-      if (bnds2.size != bnds1.size)
-        throw ClassificationException(s"the two graphs don't have the same number of bindings for type $vt", clz1, clz2)
-      for (bnd <- bnds1) {
-        mappingOpts.get(bnd).orElse(Some(mutable.Set.empty[Rdf#BNode])).map { bnset =>
-          mappingOpts.put(bnd, bnset ++= bnds2)
-        }
-      }
-    }
-    ListMap(mappingOpts.toList.sortBy(_._2.size): _*)
-  }
 
   /**
    * Find possible bnode mappings
@@ -95,8 +62,18 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
    * @param g2
    * @return A list of possible bnode mappings or a reason for the error
    */
-  def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[List[(Rdf#BNode, Rdf#BNode)]]] = {
-    bnodeMappingGenerator(g1, g2) map { listMap =>
+  def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph):
+  Try[List[List[(Rdf#BNode, Rdf#BNode)]]] = {
+    if (g1.size != g2.size)
+      return Failure(MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}"))
+
+    val (grnd1, nongrnd1) = groundTripleFilter(g1)
+    val (grnd2, nongrnd2) = groundTripleFilter(g2)
+    if (grnd1.size != grnd2.size)
+      return Failure(MappingException("the two graphs don't have the same number of ground triples. " +
+        s"ground(g1).size=${grnd1.size} ground(g2).size=${grnd2.size}"))
+
+    mappingGen.bnodeMappingGenerator(nongrnd1, nongrnd2) map { listMap =>
       val keys = listMap.keys.toList
       def tree(keys: List[Rdf#BNode]): List[List[(Rdf#BNode, Rdf#BNode)]] = {
         keys match {
@@ -158,6 +135,76 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
     //do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
   }
 
+  case class NoMappingException(val reasons: List[(List[(Rdf#BNode, Rdf#BNode)], List[MappingError])]) extends MappingError {
+    def msg = "No mapping found"
+    override def toString() = s"NoMappingException($reasons)"
+  }
+
+
+}
+
+trait MappingError extends NoStackTrace {
+  def msg: String
+}
+
+case class MappingException(msg: String) extends MappingError {
+  override def toString() = s"MappingException($msg)"
+}
+
+/**
+ * Trait for implementations of BNode Mapping Generators.
+ * A good implementation should never leave out a correct mapping.
+ * Better implementations should return less mappings.
+ * But better implementations will also tend to be less easy to understand.
+ */
+trait MappingGenerator[Rdf<:RDF] {
+  /**
+   * generate a list of possible bnode mappings, filtered by applying classification algorithm
+   * on the nodes by relating them to other edges
+   * @param g1 first graph
+   * @param g2 second graph
+   * @return a ListMap mapping BNode from graph g1 to a smaller set of Bnodes from graph g2 which
+   *         they should corresond to
+   */
+  def bnodeMappingGenerator(g1: Rdf#Graph, g2: Rdf#Graph): Try[ListMap[Rdf#BNode, mutable.Set[Rdf#BNode]]]
+}
+
+/*
+ * The SimpleMappingGenerator implements only the first stage of Jeremy
+ * Carroll's optimisation strategy. It classifies nodes only by the arrows
+ * going in and out, but does not follow those further.
+ */
+class SimpleMappingGenerator[Rdf<:RDF](implicit ops: RDFOps[Rdf]) extends MappingGenerator[Rdf] {
+  import ops._
+  /**
+   * generate a list of possible bnode mappings, filtered by applying classification algorithm
+   * on the nodes by relating them to other edges
+   * @param g1
+   * @param g2
+   * @return a ListMap mapping BNode from graph g1 to a smaller set of Bnodes from graph g2 which
+   *         they should corresond to
+   */
+  def bnodeMappingGenerator(g1: Rdf#Graph, g2: Rdf#Graph): Try[ListMap[Rdf#BNode, mutable.Set[Rdf#BNode]]] = Try {
+    val clz1 = bnodeClassify(g1)
+    val clz2 = bnodeClassify(g2)
+    if (clz1.size != clz2.size)
+      throw ClassificationException("the two graphs don't have the same number of classes.", clz1, clz2)
+    val mappingOpts: mutable.Map[Rdf#BNode, mutable.Set[Rdf#BNode]] = mutable.HashMap[Rdf#BNode, mutable.Set[Rdf#BNode]]()
+    for {
+      (vt, bnds1) <- clz1 // .sortBy { case (vt, bn) => bn.size }
+      bnds2 <- clz2.get(vt)
+    } {
+      if (bnds2.size != bnds1.size)
+        throw ClassificationException(s"the two graphs don't have the same number of bindings for type $vt", clz1, clz2)
+      for (bnd <- bnds1) {
+        mappingOpts.get(bnd).orElse(Some(mutable.Set.empty[Rdf#BNode])).map { bnset =>
+          mappingOpts.put(bnd, bnset ++= bnds2)
+        }
+      }
+    }
+    ListMap(mappingOpts.toList.sortBy(_._2.size): _*)
+  }
+
   /**
    * This classification can be improved, but it is easier to debug while it is not so effective.
    * @param graph
@@ -190,11 +237,20 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
     bnodeClass.groupBy(_._2).mapValues(_.keys.toSet)
   }
 
+
+
+  case class ClassificationException(msg: String,
+                                     clz1: Map[VerticeType, Set[Rdf#BNode]],
+                                     clz2: Map[VerticeType, Set[Rdf#BNode]]) extends MappingError {
+    override def toString() = s"ClassificationException($msg,$clz1,$clz2)"
+  }
+
+
   case class VerticeType(forwardRels: mutable.Map[Rdf#URI, Int] = mutable.HashMap().withDefaultValue(0),
-      backwardRels: mutable.Map[Rdf#URI, Int] = mutable.HashMap().withDefaultValue(0)) {
+                         backwardRels: mutable.Map[Rdf#URI, Int] = mutable.HashMap().withDefaultValue(0)) {
 
     def this(forward: List[(Rdf#URI, Int)],
-      backward: List[(Rdf#URI, Int)]) = this(mutable.HashMap(forward: _*), mutable.HashMap(backward: _*))
+             backward: List[(Rdf#URI, Int)]) = this(mutable.HashMap(forward: _*), mutable.HashMap(backward: _*))
 
     def setForwardRel(rel: Rdf#URI, obj: Rdf#Node) {
       forwardRels.put(rel, forwardRels(rel) + 1)
@@ -205,24 +261,5 @@ class GraphIsomorphism[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
 
   }
 
-  trait MappingError extends NoStackTrace {
-    def msg: String
-  }
-
-  case class MappingException(msg: String) extends MappingError {
-    override def toString() = s"MappingException($msg)"
-  }
-
-  case class NoMappingException(val reasons: List[(List[(Rdf#BNode, Rdf#BNode)], List[MappingError])]) extends MappingError {
-    def msg = "No mapping found"
-    override def toString() = s"NoMappingException($reasons)"
-  }
-
-  case class ClassificationException(msg: String,
-      clz1: Map[VerticeType, Set[Rdf#BNode]],
-      clz2: Map[VerticeType, Set[Rdf#BNode]]) extends MappingError {
-    override def toString() = s"ClassificationException($msg,$clz1,$clz2)"
-  }
 
 }
-
