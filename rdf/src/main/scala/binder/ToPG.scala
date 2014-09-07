@@ -1,8 +1,8 @@
 package org.w3.banana.binder
 
 import org.w3.banana._
-import org.w3.banana.syntax._
 import org.w3.banana.diesel._
+
 import scala.util._
 
 trait ToPG[Rdf <: RDF, -T] {
@@ -54,14 +54,12 @@ object ToPG {
   }
 
   implicit def MapToPG[Rdf <: RDF, K, V](implicit ops: RDFOps[Rdf], kToPG: ToPG[Rdf, K], vToPG2: ToPG[Rdf, V]): ToPG[Rdf, Map[K, V]] = new ToPG[Rdf, Map[K, V]] {
-    import ops._
     val ListKVToPG = implicitly[ToPG[Rdf, List[(K, V)]]]
     def toPG(t: Map[K, V]): PointedGraph[Rdf] =
       ListKVToPG.toPG(t.toList)
   }
 
   implicit def OptionToPG[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], to: ToPG[Rdf, T]): ToPG[Rdf, Option[T]] = new ToPG[Rdf, Option[T]] {
-    import ops._
     val ListToPG = implicitly[ToPG[Rdf, List[T]]]
     def toPG(t: Option[T]): PointedGraph[Rdf] =
       ListToPG.toPG(t.toList)

@@ -1,8 +1,8 @@
 package org.w3
 
-import scala.util._
 import scala.concurrent._
 import scala.concurrent.duration._
+import scala.util._
 
 package object banana
     extends BananaRDFWriterSelector

@@ -1,7 +1,8 @@
 package org.w3.banana
 
-import scala.util._
 import java.io._
+
+import scala.util._
 
 /**
  * <ul>

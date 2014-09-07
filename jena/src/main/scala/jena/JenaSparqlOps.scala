@@ -1,15 +1,14 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
-
-import com.hp.hpl.jena.query.{ Query => JenaQuery, QueryException, QueryFactory }
 import com.hp.hpl.jena.graph.{ Node => JenaNode }
+import com.hp.hpl.jena.query.{ QueryFactory, Query => JenaQuery }
 import com.hp.hpl.jena.rdf.model.RDFNode
 import com.hp.hpl.jena.update.UpdateFactory
+import org.w3.banana.SparqlOps.withPrefixes
+import org.w3.banana._
 
 import scala.collection.JavaConverters._
 import scala.util._
-import SparqlOps.withPrefixes
 
 class JenaSparqlOps(implicit jenaUtil: JenaUtil) extends SparqlOps[Jena] {
 

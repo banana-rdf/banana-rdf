@@ -1,6 +1,7 @@
 package org.w3.banana.syntax
 
 import org.w3.banana._
+
 import scala.util._
 
 trait SparqlSolutionSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>

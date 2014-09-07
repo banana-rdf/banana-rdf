@@ -1,11 +1,12 @@
 package org.w3.banana.sesame
 
-import org.w3.banana._
 import org.openrdf.query.parser.sparql.SPARQLParserFactory
 import org.openrdf.query.parser.{ ParsedBooleanQuery, ParsedGraphQuery, ParsedTupleQuery }
+import org.w3.banana.SparqlOps.withPrefixes
+import org.w3.banana._
+
 import scala.collection.JavaConverters._
 import scala.util._
-import SparqlOps.withPrefixes
 
 object SesameSparqlOps extends SparqlOps[Sesame] {
 

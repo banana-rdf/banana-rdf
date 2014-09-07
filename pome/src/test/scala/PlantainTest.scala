@@ -1,7 +1,7 @@
 package org.w3.banana.pome
 
 import org.w3.banana._
-import org.w3.banana.util.IsomorphismTests
+import org.w3.banana.iso.IsomorphismTests
 
 //class PlantainTurtleTest extends TurtleTestSuite[Plantain]
 

@@ -1,10 +1,10 @@
 package org.w3.banana.sesame
 
 import java.io._
+
+import org.openrdf.query.resultio.{ QueryResultIO, QueryResultParseException }
 import org.w3.banana._
-import org.openrdf.query.resultio.{ QueryResultParseException, UnsupportedQueryResultFormatException, QueryResultIO }
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
-import org.openrdf.query.UnsupportedQueryLanguageException
+
 import scala.util._
 
 /**

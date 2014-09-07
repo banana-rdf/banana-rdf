@@ -1,7 +1,8 @@
 package org.w3.banana.syntax
 
-import org.w3.banana._
 import java.net.{ URI => jURI }
+
+import org.w3.banana._
 
 /** all syntax enhancement are directly derived from URIOps */
 trait URISyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>

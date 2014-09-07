@@ -1,7 +1,9 @@
 package org.w3.banana.jena
 
-import org.w3.banana._
 import java.io._
+
+import org.w3.banana._
+
 import scala.util._
 
 /**
