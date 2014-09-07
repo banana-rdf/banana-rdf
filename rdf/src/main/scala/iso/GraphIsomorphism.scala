@@ -3,10 +3,10 @@ package org.w3.banana.iso
 import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
-import scala.collection.{ mutable, immutable }
+import scala.collection.{ immutable, mutable }
 import scala.util.control.NoStackTrace
 import scala.util.{ Failure, Success, Try }
-import scalaz.Tree
+import scalaz.EphemeralStream
 
 /**
  * Methods to establish Graph Equivalences
@@ -57,44 +57,44 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
 
   }
 
-  /**
-   * create a tree out of lm where where each level consists of one key-value pair tree grafted onto each
-   * of the previous levels, with a fake root level (0,0).
-   * So Map(1->Set(1,2),2->Set(21,22)) will give a Tree with Root node (0,0) with children
-   * <pre>
-   * (1,1)--(2,21)
-   *   |----(2,22)
-   * (1,2)--(2,21)
-   *   |----(2,22)
-   *  </pre>
-   * each of the paths from the root to the leaves constitues one possible solution
-   */
-  def tree[T](lm: immutable.ListMap[T, Set[T]])(root: (T, T)): Tree[(T, T)] = {
-    def build(keys: List[T]): Stream[Tree[(T, T)]] = {
-      keys match {
-        case Nil => Stream()
-        case head :: tail => for (root <- lm(keys.head).toStream.map((keys.head -> _)))
-          yield Tree.node(root, build(keys.tail))
-      }
-    }
-    Tree.node(root, build(lm.keys.toList))
-  }
-
-  /**
-   * @param tree
-   * @tparam T
-   * @return all the paths from root to leaves for the given Tree
-   */
-  def branches[T](tree: Tree[T]): Stream[Stream[T]] =
-    tree.subForest match {
-      case Stream() => Stream(Stream(tree.rootLabel))
-      case children => for {
-        c <- children
-        branch <- branches(c)
-      } yield {
-        tree.rootLabel #:: branch
-      }
-    }
+  //  /**
+  //   * create a tree out of lm where where each level consists of one key-value pair tree grafted onto each
+  //   * of the previous levels, with a fake root level (0,0).
+  //   * So Map(1->Set(1,2),2->Set(21,22)) will give a Tree with Root node (0,0) with children
+  //   * <pre>
+  //   * (1,1)--(2,21)
+  //   *   |----(2,22)
+  //   * (1,2)--(2,21)
+  //   *   |----(2,22)
+  //   *  </pre>
+  //   * each of the paths from the root to the leaves constitues one possible solution
+  //   */
+  //  def tree[T](lm: immutable.ListMap[T, Set[T]])(root: (T, T)): Tree[(T, T)] = {
+  //    def build(keys: List[T]): Stream[Tree[(T, T)]] = {
+  //      keys match {
+  //        case Nil => Stream()
+  //        case head :: tail => for (root <- lm(keys.head).toStream.map((keys.head -> _)))
+  //          yield Tree.node(root, build(keys.tail))
+  //      }
+  //    }
+  //    Tree.node(root, build(lm.keys.toList))
+  //  }
+  //
+  //  /**
+  //   * @param tree
+  //   * @tparam T
+  //   * @return all the paths from root to leaves for the given Tree
+  //   */
+  //  def branches[T](tree: Tree[T]): Stream[Stream[T]] =
+  //    tree.subForest match {
+  //      case Stream() => Stream(Stream(tree.rootLabel))
+  //      case children => for {
+  //        c <- children
+  //        branch <- branches(c)
+  //      } yield {
+  //        tree.rootLabel #:: branch
+  //      }
+  //    }
 
   /**
    * Find possible bnode mappings
@@ -102,7 +102,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
    * @param g2
    * @return A list of possible bnode mappings or a reason for the error
    */
-  def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[Stream[Stream[(Rdf#BNode, Rdf#BNode)]]] = {
+  def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[EphemeralStream[List[(Rdf#BNode, Rdf#BNode)]]] = {
     if (g1.size != g2.size)
       return Failure(MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}"))
 
@@ -117,12 +117,55 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
     if (complexity > maxComplexity)
       return Failure(MappingException(s"Search space too big. maxComplexity is set to $maxComplexity but the search space is of size $complexity"))
 
-    bnodeMaps map { listMap =>
-      branches(tree[Rdf#BNode](listMap)(bnpair)).map(_.tail) //_tail: remove all the first elements
+    bnodeMaps map { nodeMapping =>
+
+      /**
+       * We want to go from a Map(1->Set(1,2),2->Set(21,22),3->Set(33,34))
+       * to a Tree of potential answers looking like this
+       * <pre>
+       * (1,1)--->(2,21)
+       * ..|        |-------> (3,33)
+       * ..|        |-------> (3,34)
+       * ..|----->(2,22)
+       * ..|        |-------> (3,33)
+       * ..|        |-------> (3,34)
+       * (1,2)--->(2,21)
+       * ..|        |-------> (3,33)
+       * ..|        |-------> (3,34)
+       * ..|----->(2,22)
+       * ..         |-------> (3,33)
+       * ..         |-------> (3,34)
+       * </pre>
+       * each of the paths from the root to the leaves constitutes one potential solution,
+       * eg: Stream((1,2),(2,21),(3,34))
+       *
+       * So the original Map constitutes the layers of the result, and we want to go from that to
+       * a lazy stream of paths. ( so we can stop as soon as we found one result )
+       */
+      /*
+       * First we map transform the map to a stream of answers for each tree level.
+       * The number of these levels is limited so we keep the datastructure as a List
+       *List(List((1,1),(1,2)),List((2,21),(2,22))
+       */
+      val streamOfTreeLevels =
+        nodeMapping.toList.map { case (key, values) => values.toList.map(v => (key, v)) }
+      /*
+       * then we use this to return a stream of branches
+       */
+      def branches(layers: List[List[(Rdf#BNode, Rdf#BNode)]]): EphemeralStream[List[(Rdf#BNode, Rdf#BNode)]] = {
+        layers match {
+          case topLayer :: nextLayers => for {
+            root <- EphemeralStream(topLayer: _*)
+            branch <- branches(nextLayers) //this could blow the stack, with enough layers
+          } yield {
+            root :: branch
+          }
+          case empty => EphemeralStream(List())
+        }
+      }
+      branches(streamOfTreeLevels)
     }
   }
-
-  val bnpair = (BNode(), BNode())
 
   def findAnswer(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[(Rdf#BNode, Rdf#BNode)]] = {
     findPossibleMappings(g1, g2).flatMap { possibleAnswers =>
@@ -134,7 +177,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
           //          println(s"===>$err = for answer ${s.toList}")
           err == Nil
       }
-      answerOpt.map(a => Success(a._1.toList)).getOrElse(Failure(NoMappingException(verifyAnswers)))
+      answerOpt.map(a => Success(a._1)).getOrElse(Failure(NoMappingException(verifyAnswers)))
     }
   }
 
@@ -146,7 +189,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
    * @return a list of exceptions in case of failure or an empty list in case of success
    *
    */
-  def mapVerify(graph1: Rdf#Graph, graph2: Rdf#Graph, mapping: Stream[(Rdf#BNode, Rdf#BNode)]): List[MappingException] = {
+  def mapVerify(graph1: Rdf#Graph, graph2: Rdf#Graph, mapping: List[(Rdf#BNode, Rdf#BNode)]): List[MappingException] = {
     // verify that both graphs are the same size
     if (graph1.size != graph2.size)
       return List(MappingException(s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"))
@@ -186,7 +229,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
     //do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
   }
 
-  case class NoMappingException(val reasons: Stream[(Stream[(Rdf#BNode, Rdf#BNode)], List[MappingError])]) extends MappingError {
+  case class NoMappingException(val reasons: EphemeralStream[(List[(Rdf#BNode, Rdf#BNode)], List[MappingException])]) extends MappingError {
     def msg = "No mapping found"
     override def toString() = s"NoMappingException($reasons)"
   }
