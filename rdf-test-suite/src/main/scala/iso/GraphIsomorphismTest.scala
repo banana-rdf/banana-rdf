@@ -1,7 +1,7 @@
 package org.w3.banana.plantain.iso
 
 import org.scalatest.{ Matchers, Suite, WordSpec }
-import org.w3.banana.iso.{ GraphIsomorphism, IsomorphismBNodeTrait, VT, VerticeTypeGenerator }
+import org.w3.banana.iso.{ GraphIsomorphism, IsomorphismBNodeTrait, VerticeCBuilder }
 import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
@@ -10,7 +10,7 @@ import scala.util.{ Failure, Success }
 /**
  * Tests for the pure Scala implementation of Graph Isomorphism
  */
-class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => GraphIsomorphism[Rdf])(
+class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) => GraphIsomorphism[Rdf])(
   implicit val ops: RDFOps[Rdf])
     extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
 
@@ -18,8 +18,8 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => 
   import org.w3.banana.diesel._
   import org.w3.banana.iso.MappingGenerator._
 
-  val countingIso = isoFactory(VT.counting)
-  val simpleHashIso = isoFactory(VT.simpleHash)
+  val countingIso = isoFactory(VerticeCBuilder.counting)
+  val simpleHashIso = isoFactory(VerticeCBuilder.simpleHash)
 
   "test groundTripleFilter(graph)" when {
     import countingIso._

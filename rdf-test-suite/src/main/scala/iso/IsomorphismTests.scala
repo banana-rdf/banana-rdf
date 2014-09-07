@@ -7,7 +7,7 @@ import org.w3.banana.{ RDF, RDFOps }
  * Generic Tests for  isomorphism functions that use whatever the Ops implementation chooses
  * Created by Henry Story on 13/07/2014.
  */
-abstract class OpsIsomorphismTests[Rdf <: RDF](
+abstract class IsomorphismTests[Rdf <: RDF](
   implicit val ops: RDFOps[Rdf])
     extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
 

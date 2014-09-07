@@ -30,7 +30,7 @@ class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
 class PlantainSimpleClassifyTest() extends SimpleClassifyTest[Plantain](
   new SimpleMappingGenerator[Plantain](_))
 
-class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain]((vtg: VerticeTypeGenerator[Plantain]) =>
+class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain]((vtg: () => VerticeCBuilder[Plantain]) =>
   new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain](vtg)))
 
-class PlantainIsoOpsTest() extends OpsIsomorphismTests[Plantain]
+class PlantainIsoTest() extends IsomorphismTests[Plantain]
