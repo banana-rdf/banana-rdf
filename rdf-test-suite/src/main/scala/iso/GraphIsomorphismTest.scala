@@ -1,11 +1,11 @@
 package org.w3.banana.plantain.iso
 
 import org.scalatest.{ Matchers, Suite, WordSpec }
-import org.w3.banana.iso.{ VT, VerticeTypeGenerator, GraphIsomorphism, IsomorphismBNodeTrait }
+import org.w3.banana.iso.{ GraphIsomorphism, IsomorphismBNodeTrait, VT, VerticeTypeGenerator }
 import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
-import scala.util.{ Success, Failure }
+import scala.util.{ Failure, Success }
 
 /**
  * Tests for the pure Scala implementation of Graph Isomorphism
@@ -18,9 +18,11 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => 
   import org.w3.banana.diesel._
   import org.w3.banana.iso.MappingGenerator._
 
+  val countingIso = isoFactory(VT.counting)
+  val simpleHashIso = isoFactory(VT.simpleHash)
+
   "test groundTripleFilter(graph)" when {
-    val graphIsomorphism = isoFactory(VT.counting)
-    import graphIsomorphism._
+    import countingIso._
 
     "a completely grounded graph ( no blank nodes ) " in {
       val (grounded, nongrounded) = groundTripleFilter(groundedGraph)
@@ -56,8 +58,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => 
   }
 
   "test bnode mapping solutions " when {
-    val graphIsomorphism = isoFactory(VT.counting)
-    import graphIsomorphism._
+    import countingIso._
 
     "two grounded graphs with one relation" in {
       val g1 = (hjs -- foaf.name ->- "Henry Story").graph
@@ -107,8 +108,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => 
   }
 
   "test bnode mapping" when {
-    val graphIsomorphism = isoFactory(VT.counting)
-    import graphIsomorphism._
+    import countingIso._
 
     "graphs mapped to themselves" in {
       val a1g = bnAlexRel1Graph(0)
@@ -225,8 +225,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => 
   }
 
   "isomorphism tests" when {
-    val graphIsomorphism = isoFactory(VT.counting)
-    import graphIsomorphism._
+    import countingIso._
 
     "a 1 triple ground graph" in {
       val g1 = (hjs -- foaf.name ->- "Henry Story").graph
@@ -260,49 +259,44 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => 
       val expected = list(5, "g")
       findAnswer(g, expected).isSuccess should be(true)
     }
+
+    "list of size 5 with simple hashIso" in {
+      import simpleHashIso._
+      val g = list(5, "h")
+      val expected = list(5, "g")
+      findAnswer(g, expected).isSuccess should be(true)
+    }
+
   }
 
   "tree of possibilities" when {
-    val graphIsomorphism = isoFactory(VT.counting)
-    import graphIsomorphism._
-    import graphIsomorphism.mappingGen._
-
-    import scalaz.Scalaz._
 
     //we use integers here to test as these are easier to work with and the code is generic anyway
     val lm = ListMap(1 -> Set(1))
 
-    //    "for a map with 1 node mapped to one node" in {
-    //      complexity(Success(lm)) should be(1)
-    //      val lmt = tree(lm)(0 -> 0)
-    //      branches(lmt).size should be(1)
-    //      println(lmt.drawTree) //useful for debugging
-    //    }
-    //
-    //    val lmX = lm ++ ListMap(2 -> Set(1))
-    //
-    //    "complexity calculation for bad maps" in {
-    //      println(s"ss complexity=" + complexity(Success(lmX)))
-    //      val lmt = tree(lmX)(0 -> 0)
-    //      complexity(Failure(new Error("xxx"))) should be(0)
-    //      complexity(Success(lmX)) should be(1) // the bad maps still count as a solution to look at
-    //      branches(lmt).size should be(1)
-    //      //      println(lmt.drawTree) //useful for debugging
-    //    }
-    //
-    //    "complexity calc for 3 bnodes size" in {
-    //      val lm3 = lm ++ ListMap(2 -> Set(22, 23)) ++ ListMap(3 -> Set(32, 33, 34))
-    //      println(s"complexity=" + complexity(Success(lm3)))
-    //      val lm3t = tree(lm3)(0 -> 0)
-    //      complexity(Success(lm3)) should be(6) // the bad maps still count as a solution to look at
-    //      branches(lm3t).size should be(6)
-    //      //      println(lm3t.drawTree)
-    //    }
+    "for a map with 1 node mapped to one node" in {
+      complexity(Success(lm)) should be(1)
+      branches(treeLevels(lm)).size should be(1)
+    }
+
+    val lmX = lm ++ ListMap(2 -> Set(1))
+
+    "complexity calculation for bad maps" in {
+      complexity(Failure(new Error("xxx"))) should be(0)
+      complexity(Success(lmX)) should be(1) // the bad maps still count as a solution to look at
+      branches(treeLevels(lmX)).size should be(1)
+    }
+
+    "complexity calc for 3 bnodes size" in {
+      val lm3 = ListMap(1 -> Set(2, 3)) ++ ListMap(2 -> Set(22, 23)) ++ ListMap(3 -> Set(32, 33, 34))
+      complexity(Success(lm3)) should be(12) // the bad maps still count as a solution to look at
+      val branchstream = branches(treeLevels(lm3))
+      //todo: how can one test that a stream is lazy?
+      branchstream.toList.size should be(12)
+    }
   }
 
   "larger graphs" when {
-    val countingIso = isoFactory(VT.counting)
-    val simpleHashIso = isoFactory(VT.simpleHash)
 
     val g1 = list(5, "i") union list(3, "j")
     val g2 = list(5, "g") union list(3, "h")

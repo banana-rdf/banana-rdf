@@ -12,7 +12,7 @@ import scalaz.EphemeralStream
  * Methods to establish Graph Equivalences
  *
  * Following Jeremy J. Carroll's "Matching RDF Graphs" article
- *  http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
+ * http://www.hpl.hp.com/techreports/2001/HPL-2001-293.pdf
  *
  *
  * Also I found it useful to think in terms of the RDF category
@@ -23,8 +23,8 @@ import scalaz.EphemeralStream
  *
  * This code can be ameliorated in a number of ways:
  *
- *  - by using lazy data structures
- *  - by optimising memory
+ * - by using lazy data structures
+ * - by optimising memory
  *
  *
  * @param mappingGen a mapping generator that knows to find for two graphs the possible mappings of bnodes between
@@ -57,45 +57,6 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
 
   }
 
-  //  /**
-  //   * create a tree out of lm where where each level consists of one key-value pair tree grafted onto each
-  //   * of the previous levels, with a fake root level (0,0).
-  //   * So Map(1->Set(1,2),2->Set(21,22)) will give a Tree with Root node (0,0) with children
-  //   * <pre>
-  //   * (1,1)--(2,21)
-  //   *   |----(2,22)
-  //   * (1,2)--(2,21)
-  //   *   |----(2,22)
-  //   *  </pre>
-  //   * each of the paths from the root to the leaves constitues one possible solution
-  //   */
-  //  def tree[T](lm: immutable.ListMap[T, Set[T]])(root: (T, T)): Tree[(T, T)] = {
-  //    def build(keys: List[T]): Stream[Tree[(T, T)]] = {
-  //      keys match {
-  //        case Nil => Stream()
-  //        case head :: tail => for (root <- lm(keys.head).toStream.map((keys.head -> _)))
-  //          yield Tree.node(root, build(keys.tail))
-  //      }
-  //    }
-  //    Tree.node(root, build(lm.keys.toList))
-  //  }
-  //
-  //  /**
-  //   * @param tree
-  //   * @tparam T
-  //   * @return all the paths from root to leaves for the given Tree
-  //   */
-  //  def branches[T](tree: Tree[T]): Stream[Stream[T]] =
-  //    tree.subForest match {
-  //      case Stream() => Stream(Stream(tree.rootLabel))
-  //      case children => for {
-  //        c <- children
-  //        branch <- branches(c)
-  //      } yield {
-  //        tree.rootLabel #:: branch
-  //      }
-  //    }
-
   /**
    * Find possible bnode mappings
    * @param g1
@@ -118,9 +79,9 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
       return Failure(MappingException(s"Search space too big. maxComplexity is set to $maxComplexity but the search space is of size $complexity"))
 
     bnodeMaps map { nodeMapping =>
-
+      import MappingGenerator._
       /**
-       * We want to go from a Map(1->Set(1,2),2->Set(21,22),3->Set(33,34))
+       *  We want to go from a Map(1->Set(1,2),2->Set(21,22),3->Set(33,34))
        * to a Tree of potential answers looking like this
        * <pre>
        * (1,1)--->(2,21)
@@ -137,33 +98,13 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
        * ..         |-------> (3,34)
        * </pre>
        * each of the paths from the root to the leaves constitutes one potential solution,
-       * eg: Stream((1,2),(2,21),(3,34))
+       * eg: List((1,2),(2,21),(3,34))
        *
        * So the original Map constitutes the layers of the result, and we want to go from that to
        * a lazy stream of paths. ( so we can stop as soon as we found one result )
+       *
        */
-      /*
-       * First we map transform the map to a stream of answers for each tree level.
-       * The number of these levels is limited so we keep the datastructure as a List
-       *List(List((1,1),(1,2)),List((2,21),(2,22))
-       */
-      val streamOfTreeLevels =
-        nodeMapping.toList.map { case (key, values) => values.toList.map(v => (key, v)) }
-      /*
-       * then we use this to return a stream of branches
-       */
-      def branches(layers: List[List[(Rdf#BNode, Rdf#BNode)]]): EphemeralStream[List[(Rdf#BNode, Rdf#BNode)]] = {
-        layers match {
-          case topLayer :: nextLayers => for {
-            root <- EphemeralStream(topLayer: _*)
-            branch <- branches(nextLayers) //this could blow the stack, with enough layers
-          } yield {
-            root :: branch
-          }
-          case empty => EphemeralStream(List())
-        }
-      }
-      branches(streamOfTreeLevels)
+      branches(treeLevels(nodeMapping))
     }
   }
 
@@ -231,6 +172,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
 
   case class NoMappingException(val reasons: EphemeralStream[(List[(Rdf#BNode, Rdf#BNode)], List[MappingException])]) extends MappingError {
     def msg = "No mapping found"
+
     override def toString() = s"NoMappingException($reasons)"
   }
 
@@ -278,6 +220,30 @@ object MappingGenerator {
       case Success(m) => m.values.foldLeft(1)((n, v) => n * v.size)
     }
   }
+
+  /** a function to take a list of layers, and turn it into a lazy stream of branches */
+  def branches[T](layers: List[List[T]]): EphemeralStream[List[T]] = {
+    layers.foldLeft(EphemeralStream(List[T]())) {
+      case (streamOfBranches, layer) =>
+        for (
+          mapping <- EphemeralStream(layer: _*);
+          branch <- streamOfBranches
+        ) yield {
+          mapping :: branch
+        }
+    }
+
+  }
+
+  /**
+   * transform a ListMap - order is important - into a List of layers of maps
+   * @param nodeMapping an ordered Map
+   * @tparam T
+   * @return a list of layers of maps.
+   */
+  def treeLevels[T](nodeMapping: ListMap[T, Set[T]]): List[List[(T, T)]] =
+    nodeMapping.toList.map { case (key, values) => values.toList.map(v => (key, v)) }
+
 }
 
 /*
@@ -292,7 +258,9 @@ object MappingGenerator {
  */
 class SimpleMappingGenerator[Rdf <: RDF](VT: VerticeTypeGenerator[Rdf])(implicit ops: RDFOps[Rdf])
     extends MappingGenerator[Rdf] {
+
   import ops._
+
   /**
    * generate a list of possible bnode mappings, filtered by applying classification algorithm
    * on the nodes by relating them to other edges
@@ -365,8 +333,11 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: VerticeTypeGenerator[Rdf])(implicit
 
 trait VerticeType[Rdf <: RDF] {
   def forwardRels: mutable.Map[Rdf#URI, Long]
+
   def backwardRels: mutable.Map[Rdf#URI, Long]
+
   def setForwardRel(rel: Rdf#URI, obj: Rdf#Node): Unit
+
   def setBackwardRel(rel: Rdf#URI, subj: Rdf#Node): Unit
 
 }
@@ -391,6 +362,7 @@ case class CountingVerticeType[Rdf <: RDF](
   def setForwardRel(rel: Rdf#URI, obj: Rdf#Node): Unit = {
     forwardRels.put(rel, forwardRels(rel) + 1)
   }
+
   def setBackwardRel(rel: Rdf#URI, subj: Rdf#Node): Unit = {
     backwardRels.put(rel, backwardRels(rel) + 1)
   }
@@ -408,6 +380,7 @@ case class SimpleHashVerticeType[Rdf <: RDF](
   val forwardRels: mutable.Map[Rdf#URI, Long],
   val backwardRels: mutable.Map[Rdf#URI, Long])(implicit ops: RDFOps[Rdf])
     extends VerticeType[Rdf] {
+
   import ops._
 
   val bnodeValue = 2017 // prime number
@@ -418,6 +391,7 @@ case class SimpleHashVerticeType[Rdf <: RDF](
     //todo: should this be an addition or also a modulus?  ( and below too )
     forwardRels.put(rel, forwardRels(rel) + hashOf(obj))
   }
+
   def setBackwardRel(rel: Rdf#URI, subj: Rdf#Node): Unit = {
     backwardRels.put(rel, backwardRels(rel) + hashOf(subj))
   }
@@ -443,10 +417,9 @@ object VT {
 
   def counting[Rdf <: RDF] = new VerticeTypeGenerator[Rdf] {
     override def apply(forwardRels: mutable.Map[Rdf#URI, Long] = mutable.HashMap[Rdf#URI, Long]().withDefaultValue(0),
-      backwardRels: mutable.Map[Rdf#URI, Long] = mutable.HashMap[Rdf#URI, Long]().withDefaultValue(0)) =
-      {
-        CountingVerticeType(forwardRels, backwardRels)
-      }
+      backwardRels: mutable.Map[Rdf#URI, Long] = mutable.HashMap[Rdf#URI, Long]().withDefaultValue(0)) = {
+      CountingVerticeType(forwardRels, backwardRels)
+    }
   }
 }
 
