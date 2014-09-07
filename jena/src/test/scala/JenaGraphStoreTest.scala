@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.query.{Dataset, DatasetFactory}
-import com.hp.hpl.jena.tdb.{TDB, TDBFactory}
+import com.hp.hpl.jena.query.{ Dataset, DatasetFactory }
+import com.hp.hpl.jena.tdb.{ TDB, TDBFactory }
 import org.w3.banana._
 import org.w3.banana.jena.Jena._
 

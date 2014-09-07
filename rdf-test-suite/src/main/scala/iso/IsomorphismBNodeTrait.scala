@@ -1,12 +1,12 @@
 package org.w3.banana.iso
 
 import org.scalatest.Suite
-import org.w3.banana.{RDFPrefix, FOAFPrefix, RDF, RDFOps}
+import org.w3.banana.{ RDFPrefix, FOAFPrefix, RDF, RDFOps }
 
 /**
  * Created by hjs on 04/09/2014.
  */
-trait IsomorphismBNodeTrait[Rdf<:RDF] { self: Suite =>
+trait IsomorphismBNodeTrait[Rdf <: RDF] { self: Suite =>
   implicit val ops: RDFOps[Rdf]
 
   import ops._
@@ -22,21 +22,21 @@ trait IsomorphismBNodeTrait[Rdf<:RDF] { self: Suite =>
 
   def groundedGraph = (
     toPointedGraphW[Rdf](hjs)
-      -- foaf.knows ->- timbl
-      -- foaf.name ->- "Henry Story").graph
-
+    -- foaf.knows ->- timbl
+    -- foaf.name ->- "Henry Story").graph
 
   def list(size: Int, bnprefix: String) = {
-    def bn(i: Int)= BNode(bnprefix+i)
+    def bn(i: Int) = BNode(bnprefix + i)
     (1 to size).foldRight(
-      Graph(Triple(bn(0),rdf.first,Literal("0",xsd.integer)),
-            Triple(bn(0),rdf.rest,rdf.nil)) ){ case(i,g) =>
-      g union (
-          bn(i) -- rdf.first ->- i
-            -- rdf.rest ->- bn(i-1)
-        ).graph
+      Graph(Triple(bn(0), rdf.first, Literal("0", xsd.integer)),
+        Triple(bn(0), rdf.rest, rdf.nil))) {
+        case (i, g) =>
+          g union (
+            bn(i) -- rdf.first ->- i
+            -- rdf.rest ->- bn(i - 1)
+          ).graph
 
-    }
+      }
   }
 
   //  val bnodeGraph = (

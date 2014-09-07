@@ -33,7 +33,7 @@ import scalaz.Tree
  * @param ops RDFOPs
  * @tparam Rdf RDF implementation to work with
  */
-class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxComplexity: Int=65536)(implicit ops: RDFOps[Rdf]) {
+class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxComplexity: Int = 65536)(implicit ops: RDFOps[Rdf]) {
 
   import ops._
 
@@ -96,7 +96,6 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
       }
     }
 
-
   /**
    * Find possible bnode mappings
    * @param g1
@@ -132,7 +131,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
       }
       val answerOpt = verifyAnswers.find {
         case (s, err) =>
-//          println(s"===>$err = for answer ${s.toList}")
+          //          println(s"===>$err = for answer ${s.toList}")
           err == Nil
       }
       answerOpt.map(a => Success(a._1.toList)).getOrElse(Failure(NoMappingException(verifyAnswers)))
@@ -249,7 +248,7 @@ object MappingGenerator {
  * @tparam Rdf
  */
 class SimpleMappingGenerator[Rdf <: RDF](VT: VerticeTypeGenerator[Rdf])(implicit ops: RDFOps[Rdf])
-  extends MappingGenerator[Rdf] {
+    extends MappingGenerator[Rdf] {
   import ops._
   /**
    * generate a list of possible bnode mappings, filtered by applying classification algorithm
@@ -314,8 +313,8 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: VerticeTypeGenerator[Rdf])(implicit
   }
 
   case class ClassificationException(msg: String,
-    clz1: Map[VerticeType[Rdf], Set[Rdf#BNode]],
-    clz2: Map[VerticeType[Rdf], Set[Rdf#BNode]]) extends MappingError {
+      clz1: Map[VerticeType[Rdf], Set[Rdf#BNode]],
+      clz2: Map[VerticeType[Rdf], Set[Rdf#BNode]]) extends MappingError {
     override def toString() = s"ClassificationException($msg,$clz1,$clz2)"
   }
 
@@ -344,7 +343,7 @@ trait VerticeType[Rdf <: RDF] {
 case class CountingVerticeType[Rdf <: RDF](
   val forwardRels: mutable.Map[Rdf#URI, Long],
   val backwardRels: mutable.Map[Rdf#URI, Long])
-  extends VerticeType[Rdf] {
+    extends VerticeType[Rdf] {
 
   def setForwardRel(rel: Rdf#URI, obj: Rdf#Node): Unit = {
     forwardRels.put(rel, forwardRels(rel) + 1)
@@ -365,7 +364,7 @@ case class CountingVerticeType[Rdf <: RDF](
 case class SimpleHashVerticeType[Rdf <: RDF](
   val forwardRels: mutable.Map[Rdf#URI, Long],
   val backwardRels: mutable.Map[Rdf#URI, Long])(implicit ops: RDFOps[Rdf])
-  extends VerticeType[Rdf] {
+    extends VerticeType[Rdf] {
   import ops._
 
   val bnodeValue = 2017 // prime number

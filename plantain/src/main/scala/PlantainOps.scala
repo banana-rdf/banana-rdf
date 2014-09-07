@@ -4,7 +4,7 @@ import java.util.NoSuchElementException
 
 import akka.http.model.Uri
 import org.w3.banana._
-import org.w3.banana.iso.{VT, SimpleMappingGenerator, GraphIsomorphism}
+import org.w3.banana.iso.{ VT, SimpleMappingGenerator, GraphIsomorphism }
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 

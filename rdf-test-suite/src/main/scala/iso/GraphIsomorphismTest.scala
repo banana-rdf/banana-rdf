@@ -12,7 +12,7 @@ import scala.util.{ Success, Failure }
  */
 class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => GraphIsomorphism[Rdf])(
   implicit val ops: RDFOps[Rdf])
-  extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
+    extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
 
   import ops._
   import org.w3.banana.diesel._
@@ -320,15 +320,14 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: VerticeTypeGenerator[Rdf] => 
     }
 
     "counting Iso is too slow, but fails gracefully without exploring all the possibilities" in {
-      countingIso.findAnswer(g1,g2).isSuccess should be (false)
+      countingIso.findAnswer(g1, g2).isSuccess should be(false)
     }
 
     "SimpleHash Iso has no trouble finding results" in {
-      val answer = simpleHashIso.findAnswer(g1,g2)
-      answer.isSuccess should be (true)
+      val answer = simpleHashIso.findAnswer(g1, g2)
+      answer.isSuccess should be(true)
     }
 
   }
-
 
 }

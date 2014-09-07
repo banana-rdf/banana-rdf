@@ -1,8 +1,8 @@
 package org.w3.banana.rdf.iso
 
-import org.scalatest.{Matchers, Suite, WordSpec}
-import org.w3.banana.iso.{IsomorphismBNodeTrait, SimpleMappingGenerator, VT, VerticeTypeGenerator}
-import org.w3.banana.{RDF, RDFOps}
+import org.scalatest.{ Matchers, WordSpec }
+import org.w3.banana.iso.{ IsomorphismBNodeTrait, SimpleMappingGenerator, VT, VerticeTypeGenerator }
+import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
 import scala.util.Success
@@ -13,7 +13,7 @@ import scala.util.Success
  */
 class SimpleClassifyTest[Rdf <: RDF](mappingGenerator: VerticeTypeGenerator[Rdf] => SimpleMappingGenerator[Rdf])(
   implicit val ops: RDFOps[Rdf])
-  extends  WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers  { self: Suite =>
+    extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers {
 
   import ops._
 
@@ -91,15 +91,15 @@ class SimpleClassifyTest[Rdf <: RDF](mappingGenerator: VerticeTypeGenerator[Rdf]
     "two graphs with 1 relation and 1 bnode" in {
       val maps = bnodeMappings(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
       maps should equal(Success(ListMap(alex(1) -> Set(alex(2)))))
-//      val answer = findAnswer(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
-//      answer should equal(Success(List(alex(1) -> (alex(2)))))
+      //      val answer = findAnswer(bnAlexRel1Graph(1), bnAlexRel1Graph(2))
+      //      answer should equal(Success(List(alex(1) -> (alex(2)))))
     }
 
     "two graphs with 2 relation and 1 bnode each" in {
       val maps = bnodeMappings(bnAlexRel2Graph(1), bnAlexRel2Graph(2))
       maps should equal(Success(ListMap(alex(1) -> Set(alex(2)))))
-//      val answer = findAnswer(bnAlexRel2Graph(1), bnAlexRel2Graph(2))
-//      answer should equal(Success(List(alex(1) -> (alex(2)))))
+      //      val answer = findAnswer(bnAlexRel2Graph(1), bnAlexRel2Graph(2))
+      //      answer should equal(Success(List(alex(1) -> (alex(2)))))
     }
 
     "two graphs with 3 relations and 1 bnode each " in {
@@ -107,10 +107,10 @@ class SimpleClassifyTest[Rdf <: RDF](mappingGenerator: VerticeTypeGenerator[Rdf]
         bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
         bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
       maps should equal(Success(ListMap(alex(1) -> Set(alex(2)))))
-//      val answer = findAnswer(
-//        bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
-//        bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
-//      answer should equal(Success(List(alex(1) -> (alex(2)))))
+      //      val answer = findAnswer(
+      //        bnAlexRel1Graph(1) union bnAlexRel2Graph(1),
+      //        bnAlexRel1Graph(2) union bnAlexRel2Graph(2))
+      //      answer should equal(Success(List(alex(1) -> (alex(2)))))
     }
 
   }

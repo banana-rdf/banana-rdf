@@ -1,7 +1,7 @@
 package org.w3.banana.iso
 
-import org.scalatest.{Matchers, Suite, WordSpec}
-import org.w3.banana.{RDF, RDFOps}
+import org.scalatest.{ Matchers, Suite, WordSpec }
+import org.w3.banana.{ RDF, RDFOps }
 
 /**
  * Generic Tests for  isomorphism functions that use whatever the Ops implementation chooses
@@ -9,11 +9,10 @@ import org.w3.banana.{RDF, RDFOps}
  */
 abstract class OpsIsomorphismTests[Rdf <: RDF](
   implicit val ops: RDFOps[Rdf])
-  extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
+    extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
 
   import ops._
   import org.w3.banana.diesel._
-
 
   "simple isomorphism tests" when {
 
