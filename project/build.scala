@@ -156,6 +156,7 @@ object BananaRdfBuild extends Build {
     Seq(
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion,
+      libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-api" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion,
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-rdfxml" % sesameVersion)
@@ -292,7 +293,7 @@ object BananaRdfBuild extends Build {
   lazy val plantain = Project(
     id = "banana-plantain",
     base = file("plantain"),
-    settings = buildSettings ++ testDeps ++  Seq(
+    settings = buildSettings ++ sesameDeps ++ testDeps   ++ Seq(
       //      libraryDependencies += "org.semarglproject" % "semargl-rdf" % "0.6.1",
       libraryDependencies += "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion,
       libraryDependencies += "com.typesafe.akka" %% "akka-http-core-experimental" % "0.4"

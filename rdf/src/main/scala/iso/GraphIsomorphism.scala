@@ -32,7 +32,7 @@ import scalaz.EphemeralStream
  * @param ops RDFOPs
  * @tparam Rdf RDF implementation to work with
  */
-class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxComplexity: Int = 65536)(implicit ops: RDFOps[Rdf]) {
+class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxComplexity: Int = 4194304)(implicit ops: RDFOps[Rdf]) {
 
   import ops._
 
