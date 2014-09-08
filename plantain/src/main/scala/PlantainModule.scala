@@ -7,7 +7,14 @@ trait PlantainModule
     with RDFOpsModule
     with RecordBinderModule
     with TurtleReaderModule
-    with TurtleWriterModule {
+    with TurtleWriterModule
+    with RDFXMLReaderModule
+    with SparqlOpsModule
+    with SparqlGraphModule
+    with XmlSolutionsWriterModule
+    with JsonSolutionsWriterModule
+    with XmlQueryResultsReaderModule
+    with JsonQueryResultsReaderModule {
 
   type Rdf = Plantain
 
@@ -18,5 +25,23 @@ trait PlantainModule
   implicit val turtleReader: RDFReader[Plantain, Turtle] = PlantainTurtleReader
 
   implicit val turtleWriter: RDFWriter[Plantain, Turtle] = PlantainTurtleWriter
+
+  implicit val rdfXMLReader: RDFReader[Plantain, RDFXML] = PlantainRDFXMLReader
+
+  implicit val sparqlOps: SparqlOps[Plantain] = PlantainSparqlOps
+
+  implicit val sparqlGraph: SparqlEngine[Plantain, Plantain#Graph] = PlantainGraphSparqlEngine()
+
+  implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Plantain, SparqlAnswerXml] =
+    PlantainSolutionsWriter.solutionsWriterXml
+
+  implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Plantain, SparqlAnswerJson] =
+    PlantainSolutionsWriter.solutionsWriterJson
+
+  implicit val xmlQueryResultsReader: SparqlQueryResultsReader[Plantain, SparqlAnswerXml] =
+    PlantainQueryResultsReader.queryResultsReaderXml
+
+  implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Plantain, SparqlAnswerJson] =
+    PlantainQueryResultsReader.queryResultsReaderJson
 
 }
