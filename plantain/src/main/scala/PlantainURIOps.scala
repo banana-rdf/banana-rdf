@@ -1,8 +1,7 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import model._
-import akka.http.model.Uri
+import org.w3.banana.plantain.model._
 
 trait PlantainURIOps extends URIOps[Plantain] {
 

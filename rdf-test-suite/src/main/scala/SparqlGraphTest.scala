@@ -1,5 +1,6 @@
 package org.w3.banana
 
+import akka.actor.Status.Success
 import org.w3.banana.diesel._
 import org.w3.banana.syntax._
 import org.scalatest._
@@ -160,14 +161,16 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
     val rdf = RDFPrefix[Rdf]
     val contact = Prefix[Rdf]("contact", "http://www.w3.org/2000/10/swap/pim/contact#")
 
-    val query2 = parseConstruct("""
+    val query2parsed = parseConstruct("""
                                |CONSTRUCT {
                                |  ?thing :editor ?ed .
                                |  ?ed contact:fullName ?name .
                                |}  WHERE {
                                |  ?thing :editor ?ed .
                                |  ?ed contact:fullName ?name
-                               |}""".stripMargin, Seq(base, rdf, contact)).success.value
+                               |}""".stripMargin, Seq(base, rdf, contact))
+    query2parsed should be('Success)
+    val query2 = query2parsed.success.value
 
     val contructed1 = graph.executeConstruct(query1).getOrFail()
     val constructed2 = graph.executeConstruct(query2).getOrFail()

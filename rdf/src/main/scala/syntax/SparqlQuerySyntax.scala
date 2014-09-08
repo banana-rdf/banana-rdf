@@ -1,6 +1,7 @@
 package org.w3.banana.syntax
 
 import org.w3.banana._
+
 import scala.util.Try
 
 trait SparqlQuerySyntax[Rdf <: RDF] { self: SparqlQuerySyntax[Rdf] =>

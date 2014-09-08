@@ -4,7 +4,7 @@ import org.w3.banana._
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.w3.banana.binder._
-import org.w3.banana.util.GraphIsomorphism
+import org.w3.banana.iso.GraphIsomorphism
 import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext
 import scalaz.Scalaz._
@@ -21,14 +21,13 @@ import scala.scalajs.test.JasmineTest
 /**
  * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
  */
-abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends JasmineTest {
+abstract class IsomorphismTests[Rdf <: RDF]()(
+  implicit ops: RDFOps[Rdf],
+  graphIsomorphism: GraphIsomorphism[Rdf]) extends JasmineTest {
 
   import ops._
   import syntax._
   import org.w3.banana.diesel._
-
-  val graphIsomorphism = new GraphIsomorphism()(ops)
-  import graphIsomorphism._
 
   val foaf = FOAFPrefix[Rdf]
 
@@ -41,8 +40,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
   val groundedGraph = (
     toPointedGraphW[Rdf](hjs)
     -- foaf("knows") ->- timbl
-    -- foaf("name") ->- "Henry Story"
-  ).graph
+    -- foaf("name") ->- "Henry Story").graph
 
   //  val bnodeGraph = (
   //      toPointedGraphW[Plantain](URI("#me"))
@@ -56,21 +54,18 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
 
   def bnAlexRel2Graph(i: Int = 1) = Graph(
     Triple(hjs, foaf.knows, alex(i)),
-    Triple(alex(i), foaf.name, "Alexandre Bertails".toNode)
-  )
+    Triple(alex(i), foaf.name, "Alexandre Bertails".toNode))
 
   def bnAntonioRel1Graph(i: Int = 1) = Graph(Triple(antonio(i), foaf.homepage, URI("https://github.com/antoniogarrote/")))
 
   def bnAntonioRel2Graph(i: Int = 1) = Graph(
     Triple(hjs, foaf.knows, antonio(i)),
-    Triple(antonio(i), foaf.name, "Antonio Garrote".toNode)
-  )
+    Triple(antonio(i), foaf.name, "Antonio Garrote".toNode))
 
   def xbn(i: Int) = BNode("x" + i)
 
   def bnKnowsBN(i: Int, j: Int) = Graph(
-    Triple(xbn(i), foaf.knows, xbn(j))
-  )
+    Triple(xbn(i), foaf.knows, xbn(j)))
 
   def symmetricGraph(i: Int, j: Int) = bnKnowsBN(i, j) union bnKnowsBN(j, i)
 
@@ -170,7 +165,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       val g1 = groundedGraph
       val expected = groundedGraph
       val answer = findAnswer(g1, expected)
-      expect(answer ==Success(List())).toBe(true)
+      expect(answer == Success(List())).toBe(true)
     }
 
     it("two graphs with 1 relation and 1 bnode") {
@@ -212,8 +207,7 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
 
       val answer = findAnswer(
         bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
-        bnAlexRel1Graph(2) union bnAntonioRel1Graph(2)
-      )
+        bnAlexRel1Graph(2) union bnAntonioRel1Graph(2))
       expect(answer.isSuccess).toEqual(true)
       expect(answer.get.size).toEqual(2)
       expect(answer.get.contains(alex(1) -> alex(2))).toEqual(true)
@@ -254,30 +248,26 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
       expect(mapVerify(
         r2g1,
         r2g2,
-        Map(alex(0) -> alex(1), antonio(0) -> antonio(1))
-      ) == Nil).toEqual(true)
+        Map(alex(0) -> alex(1), antonio(0) -> antonio(1))) == Nil).toEqual(true)
 
       //an incorrect mapping
       val v = mapVerify(
         r2g1,
         r2g2,
-        Map(alex(0) -> antonio(1), antonio(0) -> alex(1))
-      )
+        Map(alex(0) -> antonio(1), antonio(0) -> alex(1)))
       expect(v.isEmpty).toEqual(false)
 
       //reverse test
       expect(mapVerify(
         r2g2,
         r2g1,
-        Map(alex(1) -> alex(0), antonio(1) -> antonio(0))
-      ) == Nil).toEqual(true)
+        Map(alex(1) -> alex(0), antonio(1) -> antonio(0))) == Nil).toEqual(true)
 
       //an incorrect mapping
       val v2 = mapVerify(
         r2g2,
         r2g1,
-        Map(alex(1) -> antonio(0), antonio(1) -> alex(0))
-      )
+        Map(alex(1) -> antonio(0), antonio(1) -> alex(0)))
       expect(v2.isEmpty).toEqual(false)
 
     }
@@ -317,16 +307,16 @@ abstract class IsomorphismTests[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends
     }
   }
 
-   describe("isomorphism tests") {
+  describe("isomorphism tests") {
 
-    it("a 1 triple ground graph")  {
+    it("a 1 triple ground graph") {
       val g1 = (hjs -- foaf.name ->- "Henry Story").graph
-      val expected = Graph(Triple(hjs,foaf.name,Literal("Henry Story")))
-      val fa = findAnswer(g1,expected)
-      expect( fa.isSuccess ).toEqual(true)
+      val expected = Graph(Triple(hjs, foaf.name, Literal("Henry Story")))
+      val fa = findAnswer(g1, expected)
+      expect(fa.isSuccess).toEqual(true)
 
-      val nonExpected = Graph(Triple(hjs,foaf.name,Literal("Henri Story")))
-      expect(findAnswer(g1,nonExpected).isSuccess).toEqual(false)
+      val nonExpected = Graph(Triple(hjs, foaf.name, Literal("Henri Story")))
+      expect(findAnswer(g1, nonExpected).isSuccess).toEqual(false)
     }
 
     it("two grounded graphs with 2 relations") {
