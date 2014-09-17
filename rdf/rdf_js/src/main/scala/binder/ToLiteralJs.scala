@@ -1,7 +1,8 @@
 package org.w3.banana.binder
 
 import org.w3.banana._
-import scalajs.js
+
+import scala.scalajs.js
 
 //todo: why does one need this redefined here? (It does not compile if this trait is not duplicated...
 trait ToLiteral[Rdf <: RDF, -T] {

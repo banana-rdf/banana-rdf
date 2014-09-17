@@ -1,8 +1,8 @@
 package org.w3.banana.binder
 
 import org.w3.banana._
-import org.w3.banana.syntax._
 import org.w3.banana.diesel._
+
 import scala.util._
 
 trait FromPG[Rdf <: RDF, +T] {
@@ -26,7 +26,7 @@ object FromPG {
   implicit def ListFromPG[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], from: FromPG[Rdf, T]): FromPG[Rdf, List[T]] = new FromPG[Rdf, List[T]] {
     import ops._
     def fromPG(pointed: PointedGraph[Rdf]): Try[List[T]] = {
-      import pointed.{ pointer, graph }
+      import pointed.{ graph, pointer }
       var elems = List[T]()
       var current = pointer
       Try {
@@ -68,14 +68,12 @@ object FromPG {
   }
 
   implicit def MapFromPG[Rdf <: RDF, K, V](implicit ops: RDFOps[Rdf], kFromPG: FromPG[Rdf, K], vFromPG: FromPG[Rdf, V]): FromPG[Rdf, Map[K, V]] = new FromPG[Rdf, Map[K, V]] {
-    import ops._
     val ListKVFromPG = implicitly[FromPG[Rdf, List[(K, V)]]]
     def fromPG(pointed: PointedGraph[Rdf]): Try[Map[K, V]] =
       ListKVFromPG.fromPG(pointed) map { l => Map(l: _*) }
   }
 
   implicit def OptionFromPG[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], from: FromPG[Rdf, T]): FromPG[Rdf, Option[T]] = new FromPG[Rdf, Option[T]] {
-    import ops._
     val ListFromPG = implicitly[FromPG[Rdf, List[T]]]
     def fromPG(pointed: PointedGraph[Rdf]): Try[Option[T]] =
       ListFromPG.fromPG(pointed) map { _.headOption }

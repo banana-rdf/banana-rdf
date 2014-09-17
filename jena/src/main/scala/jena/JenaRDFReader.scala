@@ -10,7 +10,7 @@ import org.w3.banana._
 
 import scala.util._
 
-class TripleSink(ops: JenaOps) extends StreamRDF {
+class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 
   var triples: Set[Jena#Triple] = Set.empty
   var prefixes: Map[String, String] = Map.empty
@@ -47,18 +47,18 @@ object JenaRDFReader {
   def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax: Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
     val syntax = _syntax
     def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
-      val sink = new TripleSink(ops)
+      val sink = new TripleSink()(ops)
       RDFDataMgr.parse(sink, is, base, lang)
       sink.graph
     }
 
   }
 
-  implicit def rdfxmlReader(ops: JenaOps): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
+  implicit def rdfxmlReader()(implicit ops: JenaOps): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
 
-  implicit def turtleReader(ops: JenaOps): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
+  implicit def turtleReader()(implicit ops: JenaOps): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
 
-  implicit def n3Reader(ops: JenaOps): RDFReader[Jena, N3] = makeRDFReader[N3](ops, Lang.N3)
+  implicit def n3Reader()(implicit ops: JenaOps): RDFReader[Jena, N3] = makeRDFReader[N3](ops, Lang.N3)
 
   implicit val selector: ReaderSelector[Jena] =
     ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]

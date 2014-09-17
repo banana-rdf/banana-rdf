@@ -1,8 +1,10 @@
 package org.w3.banana.binder
 
-import org.w3.banana._
-import scala.util._
 import java.math.BigInteger
+
+import org.w3.banana._
+
+import scala.util._
 
 trait FromLiteral[Rdf <: RDF, +T] {
   def fromLiteral(literal: Rdf#Literal): Try[T]
@@ -89,8 +91,7 @@ trait FromLiteralCore {
     }
   }
 
- 
-/*
+  /*
  
   implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, DateTime] {
     import ops._

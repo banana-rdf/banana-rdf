@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 
-trait TripleMatchSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait TripleMatchSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def tripleMatchW(tripleMatch: TripleMatch[Rdf]) =
     new TripleMatchW[Rdf](tripleMatch)

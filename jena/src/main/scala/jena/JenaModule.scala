@@ -1,6 +1,9 @@
 package org.w3.banana.jena
 
+import com.hp.hpl.jena.query.Dataset
 import org.w3.banana._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait JenaModule
     extends RDFModule
@@ -21,46 +24,49 @@ trait JenaModule
 
   type Rdf = Jena
 
-  implicit val Ops: JenaOps = new JenaOps
+  implicit val ops: JenaOps = new JenaOps
 
-  implicit val JenaUtil: JenaUtil = new JenaUtil(Ops)
+  implicit val jenaUtil: JenaUtil = new JenaUtil
 
-  implicit val RecordBinder: binder.RecordBinder[Jena] = binder.RecordBinder[Jena]
+  implicit val recordBinder: binder.RecordBinder[Jena] = binder.RecordBinder[Jena]
 
-  implicit val SparqlOps: SparqlOps[Jena] = new JenaSparqlOps(JenaUtil)
+  implicit val sparqlOps: SparqlOps[Jena] = new JenaSparqlOps
 
-  implicit val SparqlGraph: SparqlGraph[Jena] = new JenaSparqlGraph(Ops)
+  implicit val sparqlGraph: SparqlEngine[Jena, Jena#Graph] = JenaGraphSparqlEngine(ops)
 
-  implicit val SparqlHttp: SparqlHttp[Jena] = new JenaSparqlHttp(Ops)
+  import java.net.URL
+  implicit val sparqlHttp: SparqlEngine[Jena, URL] = new JenaSparqlHttpEngine
 
-  implicit val RDFXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader(Ops)
+  implicit val rdfStore: RDFStore[Jena, Dataset] with SparqlUpdate[Jena, Dataset] = new JenaDatasetStore(true)
 
-  implicit val TurtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader(Ops)
+  implicit val rdfXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader()
 
-  implicit val N3Reader: RDFReader[Jena, N3] = JenaRDFReader.n3Reader(Ops)
+  implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader()
 
-  implicit val ReaderSelector: ReaderSelector[Jena] = JenaRDFReader.selector
+  implicit val n3Reader: RDFReader[Jena, N3] = JenaRDFReader.n3Reader()
 
-  implicit val RDFXMLWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
+  implicit val readerSelector: ReaderSelector[Jena] = JenaRDFReader.selector
 
-  implicit val TurtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
+  implicit val rdfXMLWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
 
-  implicit val N3Writer: RDFWriter[Jena, N3] = JenaRDFWriter.n3Writer
+  implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
 
-  implicit val WriterSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector
+  implicit val n3Writer: RDFWriter[Jena, N3] = JenaRDFWriter.n3Writer
 
-  implicit val JsonSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
+  implicit val writerSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector
+
+  implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter.solutionsWriterJson
 
-  implicit val XmlSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerXml] =
+  implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerXml] =
     JenaSolutionsWriter.solutionsWriterXml
 
-  implicit val SparqlSolutionsWriterSelector: SparqlSolutionsWriterSelector[Jena] = JenaSolutionsWriter.solutionsWriterSelector
+  implicit val sparqlSolutionsWriterSelector: SparqlSolutionsWriterSelector[Jena] = JenaSolutionsWriter.solutionsWriterSelector
 
-  implicit val JsonQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
+  implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
     JenaQueryResultsReader.queryResultsReaderJson
 
-  implicit val XmlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerXml] =
+  implicit val xmlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerXml] =
     JenaQueryResultsReader.queryResultsReaderXml
 
 }

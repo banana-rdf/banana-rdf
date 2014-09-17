@@ -21,7 +21,7 @@ class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
     graph
   }
 
-  def graphToIterable(graph: Sesame#Graph): Iterable[Sesame#Triple] = graph.asScala
+  def getTriples(graph: Sesame#Graph): Iterable[Sesame#Triple] = graph.asScala
 
   // triple
 
@@ -141,14 +141,14 @@ class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
       case Seq(x) => x
       case _ =>
         val graph = new LinkedHashModel
-        graphs.foreach(g => graphToIterable(g) foreach { t => graph add t })
+        graphs.foreach(g => getTriples(g) foreach { triple => graph.add(triple) })
         graph
     }
   }
 
   def diff(g1: Sesame#Graph, g2: Sesame#Graph): Sesame#Graph = {
     val graph = new LinkedHashModel
-    graphToIterable(g1) foreach { triple =>
+    getTriples(g1) foreach { triple =>
       if (!g2.contains(triple)) graph add triple
     }
     graph

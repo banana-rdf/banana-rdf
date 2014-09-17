@@ -16,7 +16,7 @@ class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T],
   def write(graph: Sesame#Graph, os: OutputStream, base: String): Try[Unit] = Try {
     val sWriter = sesameSyntax.rdfWriter(os, base)
     sWriter.startRDF()
-    ops.graphToIterable(graph) foreach sWriter.handleStatement
+    ops.getTriples(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
   }
 
@@ -24,7 +24,7 @@ class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T],
     val result = new StringWriter()
     val sWriter = sesameSyntax.rdfWriter(result, base)
     sWriter.startRDF()
-    ops.graphToIterable(graph) foreach sWriter.handleStatement
+    ops.getTriples(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
     result.toString
   }

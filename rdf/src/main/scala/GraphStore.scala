@@ -3,36 +3,30 @@ package org.w3.banana
 import scala.concurrent.Future
 
 /**
- * to manipulate named graphs
+ * A typeclass for graph stores supporting manipulations of [RDF Datasets](http://www.w3.org/TR/rdf11-concepts/#h2_section-dataset).
+ *
+ * With this interface, one can only manipulate named graphs (no
+ * default graph) through their names (only as URIs, no bnode).
  */
-trait GraphStore[Rdf <: RDF] {
+trait GraphStore[Rdf <: RDF, A] {
 
-  def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): Future[Unit]
+  /**
+   * To the graph at `uri`, appends the content of `graph`. If there was
+   * no previous graph, this would create it.
+   */
+  def appendToGraph(a: A, uri: Rdf#URI, graph: Rdf#Graph): Future[Unit]
 
-  def patchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph): Future[Unit]
+  /**
+   * To the graph at `uri`, removes the matching triples
+   */
+  def removeTriples(a: A, uri: Rdf#URI, triples: Iterable[TripleMatch[Rdf]]): Future[Unit]
 
-  def getGraph(uri: Rdf#URI): Future[Rdf#Graph]
+  /** Gets the graph at `uri`. */
+  def getGraph(a: A, uri: Rdf#URI): Future[Rdf#Graph]
 
-  def removeGraph(uri: Rdf#URI): Future[Unit]
+  /** Removes the graph at `uri`. */
+  def removeGraph(a: A, uri: Rdf#URI): Future[Unit]
 
-}
-
-object GraphStore {
-
-  def apply[Rdf <: RDF](store: RDFStore[Rdf])(implicit ops: RDFOps[Rdf]): GraphStore[Rdf] = new GraphStore[Rdf] {
-
-    def appendToGraph(uri: Rdf#URI, graph: Rdf#Graph): Future[Unit] =
-      store.execute(Command.append(uri, ops.graphToIterable(graph)))
-
-    def patchGraph(uri: Rdf#URI, delete: Iterable[TripleMatch[Rdf]], insert: Rdf#Graph): Future[Unit] =
-      store.execute(Command.patch(uri, delete, ops.graphToIterable(insert)))
-
-    def getGraph(uri: Rdf#URI): Future[Rdf#Graph] =
-      store.execute(Command.get(uri))
-
-    def removeGraph(uri: Rdf#URI): Future[Unit] =
-      store.execute(Command.delete(uri))
-
-  }
+  val graphStoreSyntax = new syntax.GraphStoreSyntax[Rdf, A]
 
 }

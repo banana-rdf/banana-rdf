@@ -8,96 +8,98 @@ trait RDFModule {
 
 trait RDFOpsModule extends RDFModule {
 
-  implicit val Ops: RDFOps[Rdf]
+  implicit val ops: RDFOps[Rdf]
 
 }
 
 trait RecordBinderModule extends RDFModule {
 
-  implicit val RecordBinder: binder.RecordBinder[Rdf]
+  implicit val recordBinder: binder.RecordBinder[Rdf]
 
 }
 
 trait SparqlOpsModule extends RDFModule {
 
-  implicit val SparqlOps: SparqlOps[Rdf]
+  implicit val sparqlOps: SparqlOps[Rdf]
 
 }
 
 trait SparqlGraphModule extends RDFModule {
 
-  implicit val SparqlGraph: SparqlGraph[Rdf]
+  implicit val sparqlGraph: SparqlEngine[Rdf, Rdf#Graph]
 
 }
 
 trait SparqlHttpModule extends RDFModule {
 
-  implicit val SparqlHttp: SparqlHttp[Rdf]
+  import java.net.URL
+
+  implicit val sparqlHttp: SparqlEngine[Rdf, URL]
 
 }
 
 trait RDFXMLReaderModule extends RDFModule {
 
-  implicit val RDFXMLReader: RDFReader[Rdf, RDFXML]
+  implicit val rdfXMLReader: RDFReader[Rdf, RDFXML]
 
 }
 
 trait TurtleReaderModule extends RDFModule {
 
-  implicit val TurtleReader: RDFReader[Rdf, Turtle]
+  implicit val turtleReader: RDFReader[Rdf, Turtle]
 
 }
 
 trait ReaderSelectorModule extends RDFModule {
 
-  implicit val ReaderSelector: ReaderSelector[Rdf]
+  implicit val readerSelector: ReaderSelector[Rdf]
 
 }
 
 trait RDFXMLWriterModule extends RDFModule {
 
-  implicit val RDFXMLWriter: RDFWriter[Rdf, RDFXML]
+  implicit val rdfXMLWriter: RDFWriter[Rdf, RDFXML]
 
 }
 
 trait TurtleWriterModule extends RDFModule {
 
-  implicit val TurtleWriter: RDFWriter[Rdf, Turtle]
+  implicit val turtleWriter: RDFWriter[Rdf, Turtle]
 
 }
 
 trait WriterSelectorModule extends RDFModule {
 
-  implicit val WriterSelector: RDFWriterSelector[Rdf]
+  implicit val writerSelector: RDFWriterSelector[Rdf]
 
 }
 
 trait JsonSolutionsWriterModule extends RDFModule {
 
-  implicit val JsonSolutionsWriter: SparqlSolutionsWriter[Rdf, SparqlAnswerJson]
+  implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Rdf, SparqlAnswerJson]
 
 }
 
 trait XmlSolutionsWriterModule extends RDFModule {
 
-  implicit val XmlSolutionsWriter: SparqlSolutionsWriter[Rdf, SparqlAnswerXml]
+  implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Rdf, SparqlAnswerXml]
 
 }
 
 trait SparqlSolutionsWriterSelectorModule extends RDFModule {
 
-  implicit val SparqlSolutionsWriterSelector: SparqlSolutionsWriterSelector[Rdf]
+  implicit val sparqlSolutionsWriterSelector: SparqlSolutionsWriterSelector[Rdf]
 
 }
 
 trait JsonQueryResultsReaderModule extends RDFModule {
 
-  implicit val JsonQueryResultsReader: SparqlQueryResultsReader[Rdf, SparqlAnswerJson]
+  implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Rdf, SparqlAnswerJson]
 
 }
 
 trait XmlQueryResultsReaderModule extends RDFModule {
 
-  implicit val XmlQueryResultsReader: SparqlQueryResultsReader[Rdf, SparqlAnswerXml]
+  implicit val xmlQueryResultsReader: SparqlQueryResultsReader[Rdf, SparqlAnswerXml]
 
 }

@@ -40,7 +40,6 @@ trait PlantainURIOps extends URIOps[Plantain] {
     val newpath = if (path.endsWith("/")) path + segment else path + "/" + segment
     import u._
     val res = new jURI(getScheme, getUserInfo, getHost, getPort, newpath, getQuery, null)
-    println(s"appendSegment($uri,$segment)=$res")
     URI(res)
   }
 

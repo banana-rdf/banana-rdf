@@ -21,8 +21,8 @@ class JenaOps extends RDFOps[Jena] with DefaultURIOps[Jena] {
     graph
   }
 
-  def graphToIterable(graph: Jena#Graph): Iterable[Jena#Triple] =
-    graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.toIterable
+  def getTriples(graph: Jena#Graph): Iterable[Jena#Triple] =
+    graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.to[Iterable]
 
   // triple
 

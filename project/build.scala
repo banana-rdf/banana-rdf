@@ -11,9 +11,9 @@ object BuildSettings {
 
   val logger = ConsoleLogger()
 
-  val buildSettings = Defaults.defaultSettings ++ defaultScalariformSettings ++ bintrayPublishSettings ++ Seq (
+  val buildSettings = Defaults.defaultSettings ++ publicationSettings ++ defaultScalariformSettings  ++ Seq (
     organization := "org.w3",
-    version      := "0.6-SNAPSHOT",
+    version      := "0.7-SNAPSHOT",
     scalaVersion := "2.11.2",
     crossScalaVersions := Seq("2.11.2", "2.10.4"),
     javacOptions ++= Seq("-source","1.7", "-target","1.7"),
@@ -27,14 +27,6 @@ object BuildSettings {
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    publishArtifact in Test := false,
-//    publishTo := {
-//      val nexus = "https://oss.sonatype.org/"
-//      if (version.value.trim.endsWith("SNAPSHOT"))
-//        Some("snapshots" at nexus + "content/repositories/snapshots")
-//      else
-//        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-//    },
     description := "RDF framework for Scala",
     startYear := Some(2012),
     pomIncludeRepository := { _ => false },
@@ -63,11 +55,34 @@ object BuildSettings {
         <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
       </scm>
     ),
-    // bintray
-    repository in bintray := "banana-rdf",
-    bintrayOrganization in bintray := None,
     licenses += ("W3C", url("http://opensource.org/licenses/W3C"))
   )
+
+  //sbt -Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
+  //sbt -Dbanana.publish=bintray
+  def publicationSettings =
+    (Option(System.getProperty("banana.publish")) match {
+      case Some("bintray") => Seq(
+        // bintray
+        repository in bintray := "banana-rdf",
+        bintrayOrganization in bintray := None
+      ) ++ bintrayPublishSettings
+      case opt: Option[String] => {
+        Seq(
+          publishTo <<= version { (v: String) =>
+            val nexus = "https://oss.sonatype.org/"
+            val other = opt.map(_.split(":"))
+            if (v.trim.endsWith("SNAPSHOT")) {
+              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "snapshots"))
+              repo.orElse(Some("snapshots" at nexus + "content/repositories/snapshots"))
+            } else {
+              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "resolver"))
+              repo.orElse(Some("releases" at nexus + "service/local/staging/deploy/maven2"))
+            }
+          }
+        )
+      }
+    }) ++ Seq( publishArtifact in Test := false)
 
   val jenaTestWIPFilter = Seq (
     testOptions in Test += Tests.Argument("-l", "org.w3.banana.jenaWIP")
@@ -224,12 +239,18 @@ object BananaRdfBuild extends Build {
     )
   )
 
-  lazy val patch = Project(
+  lazy val ldpatch = Project(
     id = "ldpatch",
     base = file("ldpatch"),
     settings = buildSettings ++ testDeps ++ Seq(
       publishMavenStyle := true,
-      libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0"
+      libraryDependencies += "org.parboiled" %% "parboiled" % "2.0.0",
+      // this will be needed until parboiled 2.0.1 gets released
+      // see https://github.com/sirthias/parboiled2/issues/84#
+      libraryDependencies <++= scalaVersion {
+        case "2.11.2" => Seq("org.scala-lang" % "scala-reflect" % "2.11.2")
+        case _ => Seq.empty
+      }
     )
   ) dependsOn (rdf_jvm, jena, rdfTestSuite % "test")
 

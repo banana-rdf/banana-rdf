@@ -15,14 +15,14 @@ object JenaRDFWriter {
   def makeRDFWriter[S](lang: Lang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
     val syntax = _syntax
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
-      import org.w3.banana.jena.Jena.Ops._
+      import org.w3.banana.jena.Jena.ops._
       val relativeGraph = graph.relativize(URI(base))
       RDFDataMgr.write(os, relativeGraph, lang)
     }
 
     def asString(graph: Jena#Graph, base: String): Try[String] = Try {
       val result = new StringWriter()
-      import org.w3.banana.jena.Jena.Ops._
+      import org.w3.banana.jena.Jena.ops._
       val relativeGraph = graph.relativize(URI(base))
       RDFDataMgr.write(result, relativeGraph, lang)
       result.toString()

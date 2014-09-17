@@ -4,7 +4,7 @@ import java.util.NoSuchElementException
 
 import akka.http.model.Uri
 import org.w3.banana._
-import org.w3.banana.util.GraphIsomorphism
+import org.w3.banana.iso.{ VerticeCBuilder, SimpleMappingGenerator, GraphIsomorphism }
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
@@ -15,7 +15,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   def makeGraph(triples: Iterable[Plantain#Triple]): Plantain#Graph =
     triples.foldLeft(emptyGraph) { _ + _ }
 
-  def graphToIterable(graph: Plantain#Graph): Iterable[Plantain#Triple] = graph.triples
+  def getTriples(graph: Plantain#Graph): Iterable[Plantain#Triple] = graph.triples
 
   // triple
 
@@ -106,7 +106,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
   }
 
   // graph isomorphism
-  val iso = new GraphIsomorphism()(PlantainOps)
+  private lazy val iso = new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain](VerticeCBuilder.simpleHash))
 
   def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
     iso.findAnswer(left, right).isSuccess

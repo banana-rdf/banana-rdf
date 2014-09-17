@@ -1,27 +1,28 @@
 package org.w3.banana
 
-import org.w3.banana.syntax._
-import org.w3.banana.diesel._
 import org.scalatest._
+import org.w3.banana.diesel._
+import org.w3.banana.syntax._
 import scala.concurrent._
-import scala.concurrent.util._
-import scalaz._
 import scalaz.Scalaz._
 
-class GraphStoreTest[Rdf <: RDF](
-  store: RDFStore[Rdf])(
-    implicit ops: RDFOps[Rdf],
-    reader: RDFReader[Rdf, RDFXML])
+class GraphStoreTest[Rdf <: RDF, A](
+  store: A)(
+    implicit val ops: RDFOps[Rdf],
+    val reader: RDFReader[Rdf, RDFXML],
+    val graphStore: GraphStore[Rdf, A],
+    val lifecycle: Lifecycle[Rdf, A])
     extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
   import ops._
+  import graphStore.graphStoreSyntax._
+  import lifecycle.lifecycleSyntax._
 
   val foaf = FOAFPrefix[Rdf]
 
-  val graphStore = GraphStore[Rdf](store)
-
   override def afterAll(): Unit = {
-    store.shutdown()
+    super.afterAll()
+    store.stop()
   }
 
   val graph: Rdf#Graph = (
@@ -50,12 +51,12 @@ class GraphStoreTest[Rdf <: RDF](
     val u1 = URI("http://example.com/graph")
     val u2 = URI("http://example.com/graph2")
     val r = for {
-      _ <- graphStore.removeGraph(u1)
-      _ <- graphStore.removeGraph(u2)
-      _ <- graphStore.appendToGraph(u1, graph)
-      _ <- graphStore.appendToGraph(u2, graph2)
-      rGraph <- graphStore.getGraph(u1)
-      rGraph2 <- graphStore.getGraph(u2)
+      _ <- store.removeGraph(u1)
+      _ <- store.removeGraph(u2)
+      _ <- store.appendToGraph(u1, graph)
+      _ <- store.appendToGraph(u2, graph2)
+      rGraph <- store.getGraph(u1)
+      rGraph2 <- store.getGraph(u2)
     } yield {
       assert(rGraph isIsomorphicWith graph)
       assert(rGraph2 isIsomorphicWith graph2)
@@ -66,12 +67,31 @@ class GraphStoreTest[Rdf <: RDF](
   "appendToGraph should be equivalent to graph union" in {
     val u = URI("http://example.com/graph")
     val r = for {
-      _ <- graphStore.removeGraph(u)
-      _ <- graphStore.appendToGraph(u, graph)
-      _ <- graphStore.appendToGraph(u, graph2)
-      rGraph <- graphStore.getGraph(u)
+      _ <- store.removeGraph(u)
+      _ <- store.appendToGraph(u, graph)
+      _ <- store.appendToGraph(u, graph2)
+      rGraph <- store.getGraph(u)
     } yield {
       assert(rGraph isIsomorphicWith union(List(graph, graph2)))
+    }
+    r.getOrFail()
+  }
+
+  "delete/insert triples" in {
+    val u = URI("http://example.com/graph")
+    val r = for {
+      _ <- store.removeGraph(u)
+      _ <- store.appendToGraph(u, foo)
+      _ <- store.removeTriples(u, (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.triples.to[Iterable])
+      _ <- store.appendToGraph(u, (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+      rGraph <- store.getGraph(u)
+    } yield {
+      val expected = (
+        URI("http://example.com/foo")
+        -- rdf("bar") ->- "bar"
+        -- rdf("baz") ->- "baz"
+      ).graph
+      assert(rGraph isIsomorphicWith expected)
     }
     r.getOrFail()
   }

@@ -39,7 +39,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
     val file = new File("rdf-test-suite/src/main/resources/card.ttl")
     val fis = new FileInputStream(file)
     val graph = reader.read(fis, file.toURI.toString).get
-    graph.toIterable.size should equal(77)
+    graph.size should equal(77)
   }
 
   "read simple TURTLE String" in {
@@ -56,9 +56,6 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
     val graph = Await.result(reader.read(turtleString, rdfCore), Duration(1, SECONDS))
-    println(referenceGraph)
-    println("***")
-    println(graph)
     assert(referenceGraph isIsomorphicWith graph)
   }
 
@@ -68,7 +65,6 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
       turtleString <- Future.successful(writer.asString(referenceGraph, rdfCore))
       computedFooGraph <- reader.read(turtleString.get, foo)
     } yield {
-      println("turtleString=" + turtleString.get)
       computedFooGraph
     }
     val g: Rdf#Graph = Await.result(bar, Duration(1, SECONDS))

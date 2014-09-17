@@ -1,6 +1,7 @@
 package org.w3.banana.binder
 
 import org.w3.banana._
+
 import scala.util._
 
 trait NodeBinder[Rdf <: RDF, T] extends FromNode[Rdf, T] with ToNode[Rdf, T]

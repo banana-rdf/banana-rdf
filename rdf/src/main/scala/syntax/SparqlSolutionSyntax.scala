@@ -1,9 +1,10 @@
 package org.w3.banana.syntax
 
 import org.w3.banana._
+
 import scala.util._
 
-trait SparqlSolutionSyntax[Rdf <: RDF] { self: Syntax[Rdf] =>
+trait SparqlSolutionSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
   implicit def sparqlSolutionSyntax(solution: Rdf#Solution) = new SparqlSolutionSyntaxW[Rdf](solution)
 
