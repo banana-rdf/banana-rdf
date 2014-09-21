@@ -11,9 +11,9 @@ trait PlantainModule
 
   type Rdf = Plantain
 
-  implicit val Ops: RDFOps[Plantain] = PlantainOps
+  implicit val ops: RDFOps[Plantain] = PlantainOps
 
-  implicit val RecordBinder: binder.RecordBinder[Plantain] = binder.RecordBinder[Plantain]
+  implicit val recordBinder: binder.RecordBinder[Plantain] = binder.RecordBinder[Plantain]
 
   //  implicit val TurtleReader: RDFReader[Plantain, Turtle] = PlantainTurtleReader
 
