@@ -54,14 +54,15 @@ trait ToLiteralCore {
         Literal(isoString, xsd.dateTime)
       }
     }
-*/
-  import org.joda.time.DateTime
+
+ import org.joda.time.DateTime
 
   implicit def DateTimeToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
     new ToLiteral[Rdf, DateTime] {
       import ops._
       def toLiteral(dateTime: DateTime): Rdf#Literal = Literal(dateTime.toString, xsd.dateTime)
     }
+  */
 
   implicit def ByteArrayToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
     new ToLiteral[Rdf, Array[Byte]] {

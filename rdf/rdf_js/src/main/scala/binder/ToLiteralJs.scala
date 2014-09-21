@@ -16,7 +16,7 @@ object ToLiteral extends ToLiteralCore {
     new ToLiteral[Rdf, js.Date] {
       import ops._
       def toLiteral(dateTime: js.Date): Rdf#Literal = {
-        val isoString:String = js.Dynamic.global.moment(dateTime).toISOString().asInstanceOf[String]
+        val isoString:String =  dateTime.toISOString() //.asInstanceOf[String]
         Literal(isoString, xsd.dateTime)
       }
     }
