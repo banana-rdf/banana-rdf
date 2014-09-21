@@ -9,14 +9,13 @@ trait ToLiteral[Rdf <: RDF, -T] {
   def toLiteral(t: T): Rdf#Literal
 }
 
-
 object ToLiteral extends ToLiteralCore {
- 
+
   implicit def JSDateToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
     new ToLiteral[Rdf, js.Date] {
       import ops._
       def toLiteral(dateTime: js.Date): Rdf#Literal = {
-        val isoString:String =  dateTime.toISOString() //.asInstanceOf[String]
+        val isoString: String = dateTime.toISOString() //.asInstanceOf[String]
         Literal(isoString, xsd.dateTime)
       }
     }

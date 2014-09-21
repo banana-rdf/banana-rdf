@@ -3,8 +3,7 @@ package org.w3.banana.pome
 import org.w3.banana._
 import java.net.{ URI => jURI }
 
-import org.w3.banana.iso.{VerticeCBuilder, SimpleMappingGenerator, GraphIsomorphism}
-
+import org.w3.banana.iso.{ VerticeCBuilder, SimpleMappingGenerator, GraphIsomorphism }
 
 object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
@@ -112,7 +111,6 @@ object PlantainOps extends RDFOps[Plantain] with PlantainURIOps {
 
   def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean =
     iso.findAnswer(left, right).isSuccess
-
 
   def graphSize(g: Plantain#Graph): Int = g.size
 

@@ -26,7 +26,7 @@ abstract class CommonBindersJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   import syntax._
 
   describe("common binders") {
-    
+
     it("serializing and deserialiazing JS DateTime") {
       val dateTime = new js.Date()
       expect(dateTime.toPG.as[js.Date].get) toEqual dateTime

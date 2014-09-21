@@ -5,7 +5,7 @@ import org.w3.banana.iso._
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.w3.banana.binder._
-import org.w3.banana.iso.{VerticeCBuilder, GraphIsomorphism}
+import org.w3.banana.iso.{ VerticeCBuilder, GraphIsomorphism }
 import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext
 import scalaz.Scalaz._
@@ -13,7 +13,7 @@ import scala.util._
 import scala.collection.immutable.ListMap
 import java.io._
 import scala.concurrent.Future
-import org.w3.banana.{RDFStore => RDFStoreInterface}
+import org.w3.banana.{ RDFStore => RDFStoreInterface }
 
 import scala.scalajs.js
 import scala.scalajs.test.JasmineTest
@@ -22,11 +22,11 @@ import scala.scalajs.test.JasmineTest
  * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
  */
 abstract class IsomorphismTests[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) => GraphIsomorphism[Rdf],
-                                            mappingGenerator: (() => VerticeCBuilder[Rdf]) => SimpleMappingGenerator[Rdf])(
-                                             implicit ops: RDFOps[Rdf])
-//,
-//graphIsomorphism: GraphIsomorphism[Rdf])
-  extends JasmineTest {
+  mappingGenerator: (() => VerticeCBuilder[Rdf]) => SimpleMappingGenerator[Rdf])(
+    implicit ops: RDFOps[Rdf])
+    //,
+    //graphIsomorphism: GraphIsomorphism[Rdf])
+    extends JasmineTest {
 
   import ops._
   import org.w3.banana.diesel._
@@ -48,8 +48,8 @@ abstract class IsomorphismTests[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[R
 
   val groundedGraph = (
     toPointedGraphW[Rdf](hjs)
-      -- foaf("knows") ->- timbl
-      -- foaf("name") ->- "Henry Story").graph
+    -- foaf("knows") ->- timbl
+    -- foaf("name") ->- "Henry Story").graph
 
   //  val bnodeGraph = (
   //      toPointedGraphW[Plantain](URI("#me"))

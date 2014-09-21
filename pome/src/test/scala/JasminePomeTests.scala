@@ -1,12 +1,10 @@
 package org.w3.banana.pome.test.jasmine
 
-
-import org.w3.banana.iso.{IsomorphismTests, GraphIsomorphism, VerticeCBuilder, SimpleMappingGenerator}
+import org.w3.banana.iso.{ IsomorphismTests, GraphIsomorphism, VerticeCBuilder, SimpleMappingGenerator }
 import org.w3.banana.jasmine.test._
 import org.w3.banana.plantain.iso.GraphIsomorphismTest
 import org.w3.banana.pome.Plantain
 import org.w3.banana.rdf.iso.SimpleClassifyTest
-
 
 object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[Plantain]
 

@@ -6,7 +6,7 @@ import org.w3.banana.diesel._
 import org.w3.banana.binder._
 import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext
-import scala.util.{Success, Failure, Try}
+import scala.util.{ Success, Failure, Try }
 
 //import scalaz.Scalaz._
 //import scala.util._
@@ -23,11 +23,11 @@ import scala.scalajs.test.JasmineTest
  */
 abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
   val store: A)(
-  implicit reader: RDFReader[Rdf, Turtle],
-  ops: RDFOps[Rdf],
-  sparqlOps: SparqlOps[Rdf], val graphStore: GraphStore[Rdf, A],
-  val sparqlEngine: SparqlEngine[Rdf, A],
-  val lifecycle: Lifecycle[Rdf, A])
+    implicit reader: RDFReader[Rdf, Turtle],
+    ops: RDFOps[Rdf],
+    sparqlOps: SparqlOps[Rdf], val graphStore: GraphStore[Rdf, A],
+    val sparqlEngine: SparqlEngine[Rdf, A],
+    val lifecycle: Lifecycle[Rdf, A])
     extends JasmineTest {
 
   import ops._
@@ -77,7 +77,7 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
       store.appendToGraph(URI("http://example.com/graph2"), graph2)
       jasmine.Clock.tick(10)
 
-      val query = parseSelect( """
+      val query = parseSelect("""
                                  |prefix : <http://www.w3.org/2001/02pd/rec54#>
                                  |prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                                  |prefix contact: <http://www.w3.org/2000/10/swap/pim/contact#>
@@ -177,15 +177,15 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
           }
      */
     }
-}
+  }
   abstract class SparqlUpdateEngineJasmineTest[Rdf <: RDF, A](
-                                                         val store: A)(
-                                                         implicit reader: RDFReader[Rdf, Turtle],
-                                                         ops: RDFOps[Rdf],
-                                                         sparqlOps: SparqlOps[Rdf], val graphStore: GraphStore[Rdf, A],
-                                                         val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
-                                                         val lifecycle: Lifecycle[Rdf, A])
-    extends JasmineTest {
+    val store: A)(
+      implicit reader: RDFReader[Rdf, Turtle],
+      ops: RDFOps[Rdf],
+      sparqlOps: SparqlOps[Rdf], val graphStore: GraphStore[Rdf, A],
+      val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
+      val lifecycle: Lifecycle[Rdf, A])
+      extends JasmineTest {
     import ops._
     import sparqlOps._
     import graphStore.graphStoreSyntax._

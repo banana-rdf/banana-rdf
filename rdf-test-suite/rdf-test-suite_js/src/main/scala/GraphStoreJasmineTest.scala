@@ -19,7 +19,7 @@ import scala.scalajs.test.JasmineTest
 /**
  * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
  */
-abstract class GraphStoreJasmineTest[Rdf <: RDF, A](store:A)(
+abstract class GraphStoreJasmineTest[Rdf <: RDF, A](store: A)(
   implicit ops: RDFOps[Rdf],
   val reader: RDFReader[Rdf, RDFXML],
   val graphStore: GraphStore[Rdf, A],

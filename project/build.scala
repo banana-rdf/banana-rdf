@@ -141,7 +141,9 @@ object BananaRdfBuild extends Build {
   val testDeps =
     Seq(
 //      libraryDependencies += scalaActors % "test",
-      libraryDependencies += scalatest % "test"
+      resolvers += "JohnsonUSM repository" at "http://johnsonusm.com:8020/nexus/content/repositories/releases/",
+      libraryDependencies += scalatest % "test",
+      libraryDependencies += "com.github.inthenow" %% "jasmine_jvm" % "0.2.0" % "test"
     )
   
   val jenaDeps =
@@ -171,7 +173,9 @@ object BananaRdfBuild extends Build {
 
   val scalaJsDeps = //scalaJSSettings ++
     Seq(
-      resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/"
+      resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
+      resolvers += "JohnsonUSM repository" at "http://johnsonusm.com:8020/nexus/content/repositories/releases/",
+      libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.0" % "test"
     ) ++  scalajsJsSettings
 
   val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6")

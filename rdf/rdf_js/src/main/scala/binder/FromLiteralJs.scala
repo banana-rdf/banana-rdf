@@ -9,8 +9,6 @@ trait FromLiteral[Rdf <: RDF, +T] {
   def fromLiteral(literal: Rdf#Literal): Try[T]
 }
 
-
-
 object FromLiteral extends FromLiteralCore {
 
   implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {
@@ -19,7 +17,7 @@ object FromLiteral extends FromLiteralCore {
       val Literal(lexicalForm, datatype, _) = literal
       if (datatype == xsd.dateTime) {
         try {
-          val parsed:js.Date =  new js.Date(lexicalForm)
+          val parsed: js.Date = new js.Date(lexicalForm)
           Success(parsed)
         } catch {
           case _: IllegalArgumentException => Failure(FailedConversion(s"${literal} is an xsd.datetime but is not an acceptable js Date"))

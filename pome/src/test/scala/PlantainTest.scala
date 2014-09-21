@@ -27,4 +27,3 @@ class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
 
 class PlantainStandardIsomorphismTest() extends IsomorphismTests[Plantain]
 
-
