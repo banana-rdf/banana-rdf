@@ -191,8 +191,11 @@ object BananaRdfBuild extends Build {
       jena,
       sesame,
       plantain,
+<<<<<<< HEAD
 //      pome,
 //      rdfstorew,
+=======
+>>>>>>> upstream/master
       examples))
   
   lazy val rdf_jvm = Project(
