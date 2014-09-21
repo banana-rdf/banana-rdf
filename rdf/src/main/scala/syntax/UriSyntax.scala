@@ -25,8 +25,6 @@ class URIW[Rdf <: RDF](val uri: Rdf#URI) extends AnyVal {
 
   def /(segment: String)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.appendSegment(uri, segment)
 
-  def newChildUri()(implicit ops: URIOps[Rdf]): Rdf#URI = ops.newChildUri(uri)
-
   def resolve(other: Rdf#URI)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.resolve(uri, other)
 
   def relativize(other: Rdf#URI)(implicit ops: URIOps[Rdf]): Rdf#URI = ops.relativize(uri, other)

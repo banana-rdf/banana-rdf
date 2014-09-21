@@ -41,11 +41,6 @@ trait PlantainURIOps extends URIOps[Plantain] {
     PlantainOps.makeUri(juri.toString)
   }
 
-  def newChildUri(uri: Plantain#URI): Plantain#URI = {
-    val segment = java.util.UUID.randomUUID().toString.replace("-", "")
-    appendSegment(uri, segment)
-  }
-
   def lastSegment(uri: Plantain#URI): String =
     uri.underlying.path.reverse.head.toString
 

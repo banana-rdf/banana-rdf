@@ -71,12 +71,6 @@ trait RDFStoreURIOps extends URIOps[RDFStore] {
     (new RDFStoreOps()).makeUri(result.toString)
   }
 
-  def newChildUri(uri: RDFStore#URI): RDFStore#URI = {
-    def s4(): String = Math.floor((1 + Math.random()) * 0x10000).toString().substring(1)
-
-    appendSegment(uri, s4())
-  }
-
   def lastSegment(uri: RDFStore#URI): String = {
     val path = java(uri).getPath
     val i = path.lastIndexOf('/')

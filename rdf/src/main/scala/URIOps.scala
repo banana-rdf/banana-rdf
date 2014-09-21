@@ -25,9 +25,6 @@ trait URIOps[Rdf <: RDF] {
   /** */
   def relativize(uri: Rdf#URI, other: Rdf#URI): Rdf#URI
 
-  /** appends a randomly generated pathname to `uri` */
-  def newChildUri(uri: Rdf#URI): Rdf#URI
-
   /** */
   def lastSegment(uri: Rdf#URI): String
 
@@ -83,10 +80,6 @@ trait DefaultURIOps[Rdf <: RDF] extends URIOps[Rdf] { ops: RDFOps[Rdf] =>
   def relativize(uri: Rdf#URI, other: Rdf#URI): Rdf#URI = {
     val juri = new jURI(uri.toString).relativize(new jURI(other.toString))
     ops.makeUri(juri.toString)
-  }
-
-  def newChildUri(uri: Rdf#URI): Rdf#URI = {
-    appendSegment(uri, java.util.UUID.randomUUID().toString.replace("-", ""))
   }
 
   def lastSegment(uri: Rdf#URI): String = {
