@@ -44,6 +44,7 @@ abstract class UriSyntaxJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
     it("resolve should resolve the uri against the passed string") {
       expect(URI("http://example.com/foo").resolve(URI("bar")) == URI("http://example.com/bar")).toEqual(true)
+      expect(URI("http://example.com/foo").resolve(URI(".")) == URI("http://example.com/")).toEqual(true)
       expect(URI("http://example.com/foo/").resolve(URI("bar")) == URI("http://example.com/foo/bar")).toEqual(true)
     }
 

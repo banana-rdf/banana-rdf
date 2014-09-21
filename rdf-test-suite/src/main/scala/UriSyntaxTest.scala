@@ -39,7 +39,9 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
 
   "resolve should resolve the uri against the passed string" in {
     URI("http://example.com/foo").resolve(URI("bar")) should be(URI("http://example.com/bar"))
+    URI("http://example.com/foo").resolve(URI(".")) should be(URI("http://example.com/"))
     URI("http://example.com/foo/").resolve(URI("bar")) should be(URI("http://example.com/foo/bar"))
+    URI("http://example.com/foo/").resolve(URI(".")) should be(URI("http://example.com/foo/"))
   }
 
   "resolveAgainst should work like resolve, just the other way around" in {
