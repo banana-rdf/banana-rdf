@@ -2,6 +2,7 @@ package org.w3.banana.plantain
 
 import java.io.{ ByteArrayOutputStream, OutputStream }
 
+import akka.http.model.Uri
 import org.openrdf.model.impl._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
@@ -35,7 +36,7 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
       }
     }
 
-    def statement(s: model.Node, p: model.URI, o: model.Node): sesame.Statement = {
+    def statement(s: model.Node, p: model.URI[Uri], o: model.Node): sesame.Statement = {
       val subject: sesame.Resource = s match {
         case Uri(uri) => new MyUri(uri)
         case model.BNode(label) => new BNodeImpl(label)

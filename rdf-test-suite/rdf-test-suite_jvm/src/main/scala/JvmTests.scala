@@ -1,6 +1,6 @@
-package org.w3.banana.test
+package org.w3.banana
 
-import jasmine.JasmineSpec
+import com.github.inthenow.jasmine.scalatest.JasmineSpec
 
-abstract GraphUnionJvmTest[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
+abstract class GraphUnionJvmTest[Rdf <: RDF]()(implicit val ops: RDFOps[Rdf])
   extends JasmineSpec with GraphUnionBaseTest[Rdf]

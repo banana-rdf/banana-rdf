@@ -1,6 +1,6 @@
-package org.w3.banana.test
+package org.w3.banana
 
-import jasmine.JSpec
+import com.github.inthenow.jasmine.JSpec
 
 
 

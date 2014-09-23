@@ -1,9 +1,10 @@
 package org.w3.banana.plantain
 
-import org.w3.banana._
+import org.w3.banana.iso._
 import org.w3.banana.plantain.iso.GraphIsomorphismTest
 import org.w3.banana.rdf.iso.SimpleClassifyTest
-import org.w3.banana.iso._
+import org.w3.banana.{ GraphTest, PointedGraphTester, TurtleTestSuite }
+import PlantainOps._
 
 class PlantainTurtleTest extends TurtleTestSuite[Plantain]
 

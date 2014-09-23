@@ -6,6 +6,7 @@ import org.openrdf.rio._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
 import org.w3.banana._
+import akka.http.model.Uri
 
 import scala.util.Try
 
@@ -13,7 +14,7 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
 
   val syntax: Syntax[Turtle] = Syntax.Turtle
 
-  class Sink(var graph: model.Graph = model.Graph.empty, var prefixes: Map[String, String] = Map.empty) extends RDFHandler {
+  class Sink(var graph: model.Graph[Uri] = PlantainOps.emptyGraph, var prefixes: Map[String, String] = Map.empty) extends RDFHandler {
 
     def startRDF(): Unit = ()
     def endRDF(): Unit = ()
@@ -22,14 +23,14 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
     def handleStatement(statement: org.openrdf.model.Statement): Unit = {
       val s: model.Node = statement.getSubject match {
         case bnode: sesame.BNode => model.BNode(bnode.getID)
-        case uri: sesame.URI => model.URI(uri.toString)
+        case uri: sesame.URI => model.URI(Uri(uri.toString))
       }
-      val p: model.URI = statement.getPredicate match {
-        case uri: sesame.URI => model.URI(uri.toString)
+      val p: model.URI[Uri] = statement.getPredicate match {
+        case uri: sesame.URI => model.URI(Uri(uri.toString))
       }
       val o: model.Node = statement.getObject match {
         case bnode: sesame.BNode => model.BNode(bnode.getID)
-        case uri: sesame.URI => model.URI(uri.toString)
+        case uri: sesame.URI => model.URI(Uri(uri.toString))
         case literal: sesame.Literal => model.Literal(literal.stringValue, model.URI(literal.getDatatype.stringValue), Option(literal.getLanguage))
       }
       this.graph = this.graph + (s, p, o)
