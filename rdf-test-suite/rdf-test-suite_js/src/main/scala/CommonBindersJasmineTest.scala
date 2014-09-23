@@ -10,7 +10,6 @@ import scalaz.Scalaz._
 import scala.util._
 import scala.collection.immutable.ListMap
 import java.io._
-import org.scalatest.EitherValues._
 import scala.concurrent.Future
 import org.w3.banana.{ RDFStore => RDFStoreInterface }
 
@@ -27,10 +26,10 @@ abstract class CommonBindersJasmineTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
   import syntax._
 
   describe("common binders") {
-    
+
     it("serializing and deserialiazing JS DateTime") {
       val dateTime = new js.Date()
-      expect(dateTime.toPG.as[js.Date].get.getTime() == Success(dateTime).get.getTime()).toEqual(true)
+      expect(dateTime.toPG.as[js.Date].get) toEqual dateTime
     }
 
     it("serializing and deserialiazing a Boolean") {

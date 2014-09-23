@@ -2,7 +2,6 @@ package org.w3.banana.binder
 
 import org.joda.time.DateTime
 import org.w3.banana._
-
 import scala.util._
 
 //todo: why does one need this redefined here? (It does not compile if this trait is not duplicated...
@@ -15,7 +14,14 @@ trait ToLiteral[Rdf <: RDF, -T] {
   def toLiteral(t: T): Rdf#Literal
 }
 
-object ToLiteral extends ToLiteralCore
+object ToLiteral extends ToLiteralCore {
+  implicit def DateTimeToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+    new ToLiteral[Rdf, DateTime] {
+      import ops._
+      def toLiteral(dateTime: DateTime): Rdf#Literal = Literal(dateTime.toString, xsd.dateTime)
+    }
+
+}
 
 object FromLiteral extends FromLiteralCore {
 

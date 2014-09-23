@@ -10,7 +10,6 @@ import scalaz.Scalaz._
 import scala.util._
 import scala.collection.immutable.ListMap
 import java.io._
-import org.scalatest.EitherValues._
 import scala.concurrent.Future
 import org.w3.banana.{ RDFStore => RDFStoreInterface }
 
