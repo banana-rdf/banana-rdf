@@ -182,8 +182,7 @@ object BananaRdfBuild extends Build {
 
   val sjsDeps = //scalaJSSettings ++
     Seq(
-      resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(Resolver.ivyStylePatterns),
-      resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/"
+      resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(Resolver.ivyStylePatterns)
     ) ++ scalajsJsSettings
 
   val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6")
@@ -384,7 +383,6 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ sjsDeps ++ sjsTestDeps ++ scalaz_js ++ Seq(
       jsDependencies += ProvidedJS / "rdf_store.js",
       jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
-      //resolvers += "bblfish.net" at "http://bblfish.net/work/repo/releases/",
       skip in packageJSDependencies := false
     )
   ).enablePlugins(SbtScalajs)
