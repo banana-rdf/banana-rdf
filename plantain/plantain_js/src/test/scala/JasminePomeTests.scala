@@ -35,3 +35,4 @@ class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain]((vtg: () => Ve
   new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain](vtg)))
 
 class PlantainIsoTest() extends IsomorphismTests[Plantain]
+
