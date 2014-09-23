@@ -1,26 +1,18 @@
 package org.w3.banana.plantain.model
 
-import akka.http.model.Uri
+case class Graph[U](spo: Map[Node, Map[URI[U], Vector[Node]]], size: Int) {
 
-object Graph {
-
-  val empty = Graph(Map.empty, 0)
-
-}
-
-case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
-
-  def triples: Iterable[Triple] =
+  def triples: Iterable[Triple[U]] =
     for {
       (s, pos) <- spo
       (p, os) <- pos
       o <- os
     } yield Triple(s, p, o)
 
-  def +(triple: Triple): Graph =
+  def +(triple: Triple[U]): Graph[U] =
     this.+(triple.subject, triple.predicate, triple.objectt)
 
-  def +(subject: Node, predicate: URI, objectt: Node): Graph = {
+  def +(subject: Node, predicate: URI[U], objectt: Node): Graph[U] = {
     spo.get(subject) match {
       case None => Graph(spo + (subject -> Map(predicate -> Vector(objectt))), size + 1)
       case Some(pos) => pos.get(predicate) match {
@@ -41,7 +33,7 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
   }
 
   @throws[java.util.NoSuchElementException]("if a triple does not exist")
-  def removeExistingTriple(triple: Triple): Graph = {
+  def removeExistingTriple(triple: Triple[U]): Graph[U] = {
     import triple.{ objectt, predicate, subject }
     val pos = spo(subject)
     val os = pos(predicate)
@@ -49,24 +41,24 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
       if (!os.contains(objectt)) throw new NoSuchElementException(s"$objectt not found")
       val newPos = pos - predicate
       if (newPos.isEmpty) // then it was actually the only spo!
-        Graph(spo - subject, size - 1)
+        Graph[U](spo - subject, size - 1)
       else
-        Graph(spo + (subject -> newPos), size - 1)
+        Graph[U](spo + (subject -> newPos), size - 1)
     } else {
       val newos = os filterNot { _ == objectt }
       if (newos.size == os.size) throw new NoSuchElementException(s"$objectt not found")
       val newPos = pos + (predicate -> newos)
-      Graph(spo + (subject -> newPos), size - 1)
+      Graph[U](spo + (subject -> newPos), size - 1)
     }
   }
 
-  def -(s: NodeMatch, p: NodeMatch, o: NodeMatch): Graph = {
-    val matchedTriples: Iterable[Triple] = find(s, p, o)
+  def -(s: NodeMatch, p: NodeMatch, o: NodeMatch): Graph[U] = {
+    val matchedTriples: Iterable[Triple[U]] = find(s, p, o)
     val newGraph = matchedTriples.foldLeft(this) { _.removeExistingTriple(_) }
     newGraph
   }
 
-  def union(other: Graph): Graph = {
+  def union(other: Graph[U]): Graph[U] = {
     val (firstGraph, secondGraph) =
       if (this.size > other.size)
         (this, other)
@@ -75,10 +67,10 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
     secondGraph.triples.foldLeft(firstGraph) { _ + _ }
   }
 
-  def find(subject: NodeMatch, predicate: NodeMatch, objectt: NodeMatch): Iterable[Triple] =
+  def find(subject: NodeMatch, predicate: NodeMatch, objectt: NodeMatch): Iterable[Triple[U]] =
     (subject, predicate, objectt) match {
       case (ANY, ANY, ANY) => triples
-      case (PlainNode(s), PlainNode(p @ URI(_)), PlainNode(o)) => {
+      case (PlainNode(s), PlainNode(p: URI[U]), PlainNode(o)) => {
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
@@ -91,12 +83,12 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
           (p, os) <- spo.get(s) getOrElse Iterable.empty
           o <- os
         } yield Triple(s, p, o)
-      case (PlainNode(s), PlainNode(p @ URI(_)), ANY) => {
+      case (PlainNode(s), PlainNode(p: URI[U]), ANY) => {
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
         } yield {
-          os map { Triple(s, p, _) }
+          os map { Triple[U](s, p, _) }
         }
         opt getOrElse Iterable.empty
       }
@@ -123,15 +115,15 @@ case class Graph(spo: Map[Node, Map[URI, Vector[Node]]], size: Int) {
 
 }
 
-case class Triple(subject: Node, predicate: URI, objectt: Node)
+case class Triple[U](subject: Node, predicate: URI[U], objectt: Node)
 
 sealed trait Node
 
-case class URI(underlying: Uri) extends Node
+case class URI[U](underlying: U) extends Node
 
 case class BNode(label: String) extends Node
 
-case class Literal(lexicalForm: String, datatype: URI, langOpt: Option[String]) extends Node
+case class Literal[U](lexicalForm: String, datatype: URI[U], langOpt: Option[String]) extends Node
 
 sealed trait NodeMatch
 

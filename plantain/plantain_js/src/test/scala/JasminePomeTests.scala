@@ -3,35 +3,35 @@ package org.w3.banana.pome.test.jasmine
 import org.w3.banana.iso.{ IsomorphismTests, GraphIsomorphism, VerticeCBuilder, SimpleMappingGenerator }
 import org.w3.banana.jasmine.test._
 import org.w3.banana.plantain.iso.GraphIsomorphismTest
-import org.w3.banana.pome.Plantain
+import org.w3.banana.pome.Pome
 import org.w3.banana.rdf.iso.SimpleClassifyTest
 
-object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[Plantain]
+object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[Pome]
 
-object GraphUnionJasmineTest extends GraphUnionJasmineTest[Plantain]
+object GraphUnionJasmineTest extends GraphUnionJasmineTest[Pome]
 
-object DieselGraphConstructJasmineTest extends DieselGraphConstructJasmineTest[Plantain]
+object DieselGraphConstructJasmineTest extends DieselGraphConstructJasmineTest[Pome]
 
-object RDFStoreWDieselGraphExplorationJasmineTest extends DieselGraphExplorationJasmineTest[Plantain]
+object RDFStoreWDieselGraphExplorationJasmineTest extends DieselGraphExplorationJasmineTest[Pome]
 
-object CommonBindersJasmineTest extends CommonBindersJasmineTest[Plantain]
+object CommonBindersJasmineTest extends CommonBindersJasmineTest[Pome]
 
-object RecordBinderJasmineTest extends RecordBinderJasmineTest[Plantain]
+object RecordBinderJasmineTest extends RecordBinderJasmineTest[Pome]
 
-object UriSyntaxJasmineTest extends UriSyntaxJasmineTest[Plantain]
+object UriSyntaxJasmineTest extends UriSyntaxJasmineTest[Pome]
 
-//object TurtleTestJasmineSuite extends TurtleTestJasmineSuite[Plantain]
+//object TurtleTestJasmineSuite extends TurtleTestJasmineSuite[Pome]
 
 //object GraphStoreJasmineTest extends GraphStoreJasmineTest[RDFStore](new RDFStore)
 
-//object SparqlEngineJasmineTest extends SparqlEngineJasmineTest[RDFStore](PlantainOps)
+//object SparqlEngineJasmineTest extends SparqlEngineJasmineTest[RDFStore](PomeOps)
 
-//object StandardIsomorphismTest extends IsomorphismTests[Plantain]
+//object StandardIsomorphismTest extends IsomorphismTests[Pome]
 
-class PlantainSimpleClassifyTest() extends SimpleClassifyTest[Plantain](
-  new SimpleMappingGenerator[Plantain](_))
+class PomeSimpleClassifyTest() extends SimpleClassifyTest[Pome](
+  new SimpleMappingGenerator[Pome](_))
 
-class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain]((vtg: () => VerticeCBuilder[Plantain]) =>
-  new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain](vtg)))
+class PomeIsoGraphTest extends GraphIsomorphismTest[Pome]((vtg: () => VerticeCBuilder[Pome]) =>
+  new GraphIsomorphism[Pome](new SimpleMappingGenerator[Pome](vtg)))
 
-class PlantainIsoTest() extends IsomorphismTests[Plantain]
+class PomeIsoTest() extends IsomorphismTests[Pome]
