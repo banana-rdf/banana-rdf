@@ -25,7 +25,7 @@ sealed trait PathElement[+Rdf <: RDF]
   case class StepForward[Rdf <: RDF](predicate: Rdf#URI) extends Step[Rdf]
   case class StepBackward[Rdf <: RDF](predicate: Rdf#URI) extends Step[Rdf]
   case class StepAt(index: Int) extends Step[Nothing]
- sealed class Constraint[+Rdf <: RDF] extends PathElement[Rdf]
+ sealed trait Constraint[+Rdf <: RDF] extends PathElement[Rdf]
   case class Filter[Rdf <: RDF](path: Path[Rdf], valueOpt: Option[VarOrConcrete[Rdf]]) extends Constraint[Rdf]
   case object UnicityConstraint extends Constraint[Nothing]
 

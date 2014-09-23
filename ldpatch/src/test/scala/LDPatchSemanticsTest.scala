@@ -1,6 +1,6 @@
 package org.w3.banana.ldpatch
 
-import org.w3.banana.{ Delete => _, _ }
+import org.w3.banana._
 import org.scalatest.{ Filter => _, _ }
 import java.io._
 import scala.util.{ Try, Success, Failure }
@@ -16,7 +16,7 @@ abstract class LDPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], rea
 
   val g = new Grammar[Rdf] { implicit val ops = self.ops }
 
-  def s = new Semantics[Rdf] { implicit val ops = self.ops }
+  val s = new Semantics[Rdf] { implicit val ops = self.ops }
 
   def newParser(input: String) =
     new g.grammar.PEGPatchParser(
@@ -54,7 +54,7 @@ _:b2 a schema:Event ;
   schema:name "TED 2009" ;
   schema:startDate "2009-02-04" ;
   schema:url <http://conferences.ted.com/TED2009/> .
-""", "http://example.com/timbl").success.value
+""", "http://example.com/timbl").getOrFail()
 
   "Path semantics" in {
 
@@ -210,7 +210,7 @@ _:b2 a schema:Event ;
     schema:name "Long Beach, California";
     schema:geo [ schema:latitude "33.7817" ; schema:longitude "-118.2054" ]
   ] .
-""", "http://example.com/timbl").success.value
+""", "http://example.com/timbl").getOrFail()
 
     val ldpatch = newFreshParser(patch).LDPatch.run().success.value
 
