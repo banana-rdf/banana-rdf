@@ -81,7 +81,7 @@ _:b2 a schema:Event ;
 
   "UpdateList semantics" in {
 
-    val ul = newParser("""UpdateList <#> ex:preferredLanguages 1>2 ( "fr-CH" ) .""").UpdateList.run().success.value
+    val ul = newParser("""UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .""").UpdateList.run().success.value
 
     import org.w3.banana.diesel._
 
@@ -114,49 +114,49 @@ _:b2 a schema:Event ;
 
     // substitution
 
-    testUpdate(List(1, 2), """UpdateList <http://example.com/#> ex:numbers 1>2 ( 42 ) .""", List(1, 42))
+    testUpdate(List(1, 2), """UpdateList <http://example.com/#> ex:numbers 1..2 ( 42 ) .""", List(1, 42))
 
-    testUpdate(List(1, 2), """UpdateList <http://example.com/#> ex:numbers 1>2 ( 42 2868 ) .""", List(1, 42, 2868))
+    testUpdate(List(1, 2), """UpdateList <http://example.com/#> ex:numbers 1..2 ( 42 2868 ) .""", List(1, 42, 2868))
 
-    testUpdate(List(1, 2, 3), """UpdateList <http://example.com/#> ex:numbers 1>2 ( 42 2868 ) .""", List(1, 42, 2868, 3))
+    testUpdate(List(1, 2, 3), """UpdateList <http://example.com/#> ex:numbers 1..2 ( 42 2868 ) .""", List(1, 42, 2868, 3))
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 1>3 ( 42 2868 ) .""", List(1, 42, 2868, 4))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 1..3 ( 42 2868 ) .""", List(1, 42, 2868, 4))
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 0>4 ( ) .""", List())
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 0..4 ( ) .""", List())
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 4>5 ( 42 ) .""", List(1, 2, 3, 4, 42))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 4..5 ( 42 ) .""", List(1, 2, 3, 4, 42))
 
     // append
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers > ( 42 2868 ) .""", List(1, 2, 3, 4, 42, 2868))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers .. ( 42 2868 ) .""", List(1, 2, 3, 4, 42, 2868))
 
-    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers > ( 42 2868 ) .""", List(42, 2868))
+    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers .. ( 42 2868 ) .""", List(42, 2868))
 
-    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers > ( ) .""", List())
+    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers .. ( ) .""", List())
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers > ( ) .""", List(1, 2, 3, 4))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers .. ( ) .""", List(1, 2, 3, 4))
 
     // insert at
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2>2 ( 42 2868 ) .""", List(1, 2, 42, 2868, 3, 4))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2..2 ( 42 2868 ) .""", List(1, 2, 42, 2868, 3, 4))
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 0>0 ( 42 2868 ) .""", List(42, 2868, 1, 2, 3, 4))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 0..0 ( 42 2868 ) .""", List(42, 2868, 1, 2, 3, 4))
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2>2 ( ) .""", List(1, 2, 3, 4))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2..2 ( ) .""", List(1, 2, 3, 4))
 
     // replace everything after
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2> ( 42 2868 ) .""", List(1, 2, 42, 2868))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2.. ( 42 2868 ) .""", List(1, 2, 42, 2868))
 
-    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers 0> ( 42 2868 ) .""", List(42, 2868))
+    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers 0.. ( 42 2868 ) .""", List(42, 2868))
 
-    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers 2> ( 42 2868 ) .""", List(42, 2868))
+    testUpdate(List(), """UpdateList <http://example.com/#> ex:numbers 2.. ( 42 2868 ) .""", List(42, 2868))
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 4> ( 42 2868 ) .""", List(1, 2, 3, 4, 42, 2868))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 4.. ( 42 2868 ) .""", List(1, 2, 3, 4, 42, 2868))
 
     // weird cases
 
-    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2>1 ( 42 2868 ) .""", List(1, 2, 42, 2868, 3, 4))
+    testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2..1 ( 42 2868 ) .""", List(1, 2, 42, 2868, 3, 4))
 
   }
 
@@ -172,12 +172,12 @@ _:b2 a schema:Event ;
 Delete <#> profile:first_name "Tim" .
 Add    <#> profile:first_name "Timothy" .
 
-UpdateList <#> ex:preferredLanguages 1>2 ( "fr-CH" ) .
+UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
 
 Bind ?event <#> /schema:attendee[/schema:url = <https://www.w3.org/2012/ldp/wiki/F2F5>]  .
 Add ?event rdf:type schema:Event .
 
-Bind ?ted <http://conferences.ted.com/TED2009/> /-schema:url! .
+Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
 Delete ?ted schema:startDate "2009-02-04".
 Add ?ted schema:location _:loc .
 Add _:loc schema:name "Long Beach, California" .

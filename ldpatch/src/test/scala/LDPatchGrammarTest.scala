@@ -109,7 +109,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   }
 
   "parse Path" in {
-    newParser("""/foaf:name/-foaf:name/<http://example.com/foo>""").Path.run().success.value should be(
+    newParser("""/foaf:name/^foaf:name/<http://example.com/foo>""").Path.run().success.value should be(
       Path(Seq(
         StepForward(URI("http://xmlns.com/foaf/name")),
         StepBackward(URI("http://xmlns.com/foaf/name")),
@@ -129,7 +129,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
       ))
     )
 
-    newParser("""[/<http://example.com/foo>/-foaf:name]/foaf:friend""").Path.run().success.value should be(
+    newParser("""[/<http://example.com/foo>/^foaf:name]/foaf:friend""").Path.run().success.value should be(
       Path(Seq(
         Filter(
           Path(Seq(
@@ -176,7 +176,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
       )
     )
 
-    newParser("""Bind ?foo <http://example.com/blah> /foaf:name/-foaf:name/<http://example.com/foo> .""").Bind.run().success.value should be(
+    newParser("""Bind ?foo <http://example.com/blah> /foaf:name/^foaf:name/<http://example.com/foo> .""").Bind.run().success.value should be(
       Bind(
         Var("foo"),
         Concrete(URI("http://example.com/blah")),
@@ -212,14 +212,14 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   }
 
   "parse Slice" in {
-    newParser("""42>2868""").Slice.run().success.value should be(Range(42, 2868))
-    newParser("""42>""").Slice.run().success.value should be(EverythingAfter(42))
-    newParser(""">2868""").Slice.run().success.value should be(Range(0, 2868))
-    newParser(""">""").Slice.run().success.value should be(End)
+    newParser("""42..2868""").Slice.run().success.value should be(Range(42, 2868))
+    newParser("""42..""").Slice.run().success.value should be(EverythingAfter(42))
+    newParser("""..2868""").Slice.run().success.value should be(Range(0, 2868))
+    newParser("""..""").Slice.run().success.value should be(End)
   }
 
   "parse UpdateList" in {
-    newParser("""UpdateList ?alex foaf:prefLang 0> ( "fr" "en" ) .""").UpdateList.run().success.value should be(
+    newParser("""UpdateList ?alex foaf:prefLang 0.. ( "fr" "en" ) .""").UpdateList.run().success.value should be(
       UpdateList(Var("alex"), URI("http://xmlns.com/foaf/prefLang"), EverythingAfter(0), Seq(Concrete(Literal("fr")), Concrete(Literal("en"))))
     )
   }
@@ -242,7 +242,7 @@ Bind ?alex
      <http://champin.net/#pa> /foaf:knows
         [/foaf:holdsAccount/foaf:accountName="bertails"] .
 
-UpdateList ?alex v:prefLang 0> ( "fr" "en" ) .
+UpdateList ?alex v:prefLang 0.. ( "fr" "en" ) .
 """
     newFreshParser(patch).LDPatch.run().success.value should be(
       model.LDPatch(Seq(
@@ -281,12 +281,12 @@ UpdateList ?alex v:prefLang 0> ( "fr" "en" ) .
 Delete <#> profile:first_name "Tim" .
 Add    <#> profile:first_name "Timothy" .
 
-UpdateList <#> ex:preferredLanguages 1>2 ( "fr-CH" ) .
+UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
 
 Bind ?event <#> /schema:attendee[/schema:url = <http://conferences.ted.com/TED2009/>]  .
 Add ?event rdf:type schema:Event .
 
-Bind ?ted <http://conferences.ted.com/TED2009/> /-schema:url! .
+Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
 Delete ?ted schema:startDate "2009-02-04".
 Add ?ted schema:location _:loc .
 Add _:loc schema:name "Long Beach, California" .
