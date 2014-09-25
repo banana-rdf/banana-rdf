@@ -31,7 +31,7 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
       val o: model.Node = statement.getObject match {
         case bnode: sesame.BNode => model.BNode(bnode.getID)
         case uri: sesame.URI => model.URI(Uri(uri.toString))
-        case literal: sesame.Literal => model.Literal(literal.stringValue, model.URI(literal.getDatatype.stringValue), Option(literal.getLanguage))
+        case literal: sesame.Literal => model.Literal(literal.stringValue, model.URI(Uri(literal.getDatatype.stringValue)), Option(literal.getLanguage))
       }
       this.graph = this.graph + (s, p, o)
     }
