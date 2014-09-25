@@ -1,5 +1,5 @@
 package org.w3.banana.pome
-
+/*
 import org.w3.banana._
 import org.w3.banana.iso.IsomorphismTests
 
@@ -27,3 +27,4 @@ class PlantainUriSyntaxTest extends UriSyntaxTest[Pome]
 
 class PlantainStandardIsomorphismTest() extends IsomorphismTests[Pome]
 
+*/
