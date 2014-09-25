@@ -41,7 +41,7 @@ trait PlantainOps[U, Rdf <: Plantain[U]] extends RDFOps[Rdf] {
 
   // bnode
 
-  def makeBNode(): Rdf#BNode = model.BNode(java.util.UUID.randomUUID().toString)
+  def makeBNode(): Rdf#BNode
 
   def makeBNodeLabel(label: String): Rdf#BNode = model.BNode(label)
 

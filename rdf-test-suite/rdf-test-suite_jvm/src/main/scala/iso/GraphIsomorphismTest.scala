@@ -74,6 +74,20 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
       answer should equal(Success(List()))
     }
 
+    "two grounded graphs with 4 relations" in {
+      val g1 = Graph(Triple(hjs, foaf.lastName, Literal("Story")),
+        Triple(hjs, foaf.interest, Literal("philosophy")),
+        Triple(hjs, foaf.interest, Literal("category theory"))) union groundedGraph
+
+      val expected = groundedGraph +
+        Triple(hjs, foaf.interest, Literal("philosophy")) +
+        Triple(hjs, foaf.lastName, Literal("Story")) +
+        Triple(hjs, foaf.interest, Literal("category theory"))
+
+      val answer = findAnswer(g1, expected)
+      answer should equal(Success(List()))
+    }
+
     "two graphs with 2 relations and 2 bnodes each" in {
       for (
         l <- findPossibleMappings(
