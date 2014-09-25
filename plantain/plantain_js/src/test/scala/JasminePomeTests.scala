@@ -1,11 +1,11 @@
 package org.w3.banana.pome.test.jasmine
 
 import org.w3.banana.GraphUnionJasmineTest
-import org.w3.banana.iso.{ IsomorphismTests, GraphIsomorphism, VerticeCBuilder, SimpleMappingGenerator }
+///import org.w3.banana.iso.{ IsomorphismTests, GraphIsomorphism, VerticeCBuilder, SimpleMappingGenerator }
 import org.w3.banana.jasmine.test._
-import org.w3.banana.plantain.iso.GraphIsomorphismTest
+//import org.w3.banana.plantain.iso.GraphIsomorphismTest
 import org.w3.banana.pome.Pome
-import org.w3.banana.rdf.iso.SimpleClassifyTest
+///import org.w3.banana.rdf.iso.SimpleClassifyTest
 
 object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[Pome]
 
@@ -29,11 +29,14 @@ object UriSyntaxJasmineTest extends UriSyntaxJasmineTest[Pome]
 
 //object StandardIsomorphismTest extends IsomorphismTests[Pome]
 
+/* Todo:
 class PomeSimpleClassifyTest() extends SimpleClassifyTest[Pome](
   new SimpleMappingGenerator[Pome](_))
 
 class PomeIsoGraphTest extends GraphIsomorphismTest[Pome]((vtg: () => VerticeCBuilder[Pome]) =>
   new GraphIsomorphism[Pome](new SimpleMappingGenerator[Pome](vtg)))
 
+
 class PomeIsoTest() extends IsomorphismTests[Pome]
 
+*/
