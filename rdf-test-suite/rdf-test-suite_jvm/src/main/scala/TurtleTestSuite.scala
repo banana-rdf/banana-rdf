@@ -38,8 +38,10 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
   "read TURTLE version of timbl's card" in {
     val file = new File("rdf-test-suite/rdf-test-suite_jvm/src/main/resources/card.ttl")
     val fis = new FileInputStream(file)
-    val graph = reader.read(fis, file.toURI.toString).get
-    graph.size should equal(77)
+    try {
+      val graph = reader.read(fis, file.toURI.toString).get
+      graph.size should equal(77)
+    } finally { fis.close() }
   }
 
   "read simple TURTLE String" in {
