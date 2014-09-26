@@ -4,12 +4,16 @@ import org.w3.banana._
 import scala.scalajs.js
 import scala.util._
 
-//todo: why does one need this redefined here? (It does not compile if this trait is not duplicated...
-trait FromLiteral[Rdf <: RDF, +T] {
-  def fromLiteral(literal: Rdf#Literal): Try[T]
-}
+object JsDateBinders {
 
-object FromLiteral extends FromLiteralCore {
+  implicit def JSDateToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+    new ToLiteral[Rdf, js.Date] {
+      import ops._
+      def toLiteral(dateTime: js.Date): Rdf#Literal = {
+        val isoString: String = dateTime.toISOString() //.asInstanceOf[String]
+        Literal(isoString, xsd.dateTime)
+      }
+    }
 
   implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {
     import ops._
@@ -27,4 +31,5 @@ object FromLiteral extends FromLiteralCore {
       }
     }
   }
+
 }

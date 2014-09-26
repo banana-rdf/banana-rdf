@@ -1,9 +1,7 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana._
-import org.w3.banana.syntax._
-import org.w3.banana.diesel._
-import org.w3.banana.binder._
+import org.w3.banana._, syntax._, diesel._, binder._
+import org.w3.banana.binder.JsDateBinders._
 import scala.concurrent.ExecutionContext
 import scala.scalajs.concurrent.JSExecutionContext
 import scalaz.Scalaz._

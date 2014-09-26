@@ -6,7 +6,7 @@ trait ToLiteral[Rdf <: RDF, -T] {
   def toLiteral(t: T): Rdf#Literal
 }
 
-trait ToLiteralCore {
+object ToLiteral {
 
   implicit def LiteralToLiteral[Rdf <: RDF] = new ToLiteral[Rdf, Rdf#Literal] {
     def toLiteral(t: Rdf#Literal): Rdf#Literal = t

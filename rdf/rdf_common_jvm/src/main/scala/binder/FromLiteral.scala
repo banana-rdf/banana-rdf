@@ -10,7 +10,7 @@ trait FromLiteral[Rdf <: RDF, +T] {
   def fromLiteral(literal: Rdf#Literal): Try[T]
 }
 
-trait FromLiteralCore {
+object FromLiteral {
 
   implicit def LiteralFromLiteral[Rdf <: RDF] = new FromLiteral[Rdf, Rdf#Literal] {
     def fromLiteral(literal: Rdf#Literal): Success[Rdf#Literal] = Success(literal)

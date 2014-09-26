@@ -1,8 +1,7 @@
 package org.w3.banana.binder
 
-import org.w3.banana._
-import org.w3.banana.syntax._
-import org.w3.banana.diesel._
+import org.w3.banana._, syntax._, diesel._
+import org.w3.banana.binder.JodaTimeBinders._
 import org.scalatest._
 import org.joda.time.DateTime
 import scala.util._
