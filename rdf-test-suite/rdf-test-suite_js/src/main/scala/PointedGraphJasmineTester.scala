@@ -1,6 +1,6 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana.{RDFStore => RDFStoreInterface, _}
+import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
 
 import scala.scalajs.test.JasmineTest
 
