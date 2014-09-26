@@ -9,7 +9,7 @@ import org.w3.banana.syntax._
 import org.w3.banana.diesel._
 import org.w3.banana.binder._
 import scala.concurrent.ExecutionContext
-import scala.scalajs.concurrent.JSExecutionContext
+//import scala.scalajs.concurrent.JSExecutionContext
 import scalaz.Scalaz._
 import scala.util._
 import scala.collection.immutable.ListMap
@@ -17,8 +17,8 @@ import java.io._
 import scala.concurrent.Future
 import org.w3.banana.{ RDFStore => RDFStoreInterface }
 
-import scala.scalajs.js
-import scala.scalajs.test.JasmineTest
+//import scala.scalajs.js
+//import scala.scalajs.test.JasmineTest
 
 
 /**
