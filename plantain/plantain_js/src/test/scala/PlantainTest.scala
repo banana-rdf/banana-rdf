@@ -1,31 +1,31 @@
 
-//package org.w3.banana.pome
+//package org.w3.banana.plantain
 //
 //import org.w3.banana._
 //import org.w3.banana.iso.IsomorphismTests
 //
-////class PlantainTurtleTest extends TurtleTestSuite[Pome]
+////class PlantainTurtleTest extends TurtleTestSuite[Plantain]
 //
-//class PlantainGraphUnionTest extends GraphUnionTest[Pome]
+//class PlantainGraphUnionTest extends GraphUnionTest[Plantain]
 //
-//class PlantainPointedGraphTest extends PointedGraphTester[Pome]
+//class PlantainPointedGraphTest extends PointedGraphTester[Plantain]
 //
 //import org.w3.banana.diesel._
 //
-//class PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Pome]
+//class PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantain]
 //
-//class PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Pome]
+//class PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
 //
 //import org.w3.banana.binder._
 //
-//class PlantainCommonBindersTest extends CommonBindersTest[Pome]
+//class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
 //
-//class PlantainRecordBinderTest extends RecordBinderTest[Pome]
+//class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
 //
 //import org.w3.banana.syntax._
 //
-//class PlantainUriSyntaxTest extends UriSyntaxTest[Pome]
+//class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
 //
-//class PlantainStandardIsomorphismTest() extends IsomorphismTests[Pome]
+//class PlantainStandardIsomorphismTest() extends IsomorphismTests[Plantain]
 //
 

@@ -1,29 +1,29 @@
-package org.w3.banana.pome
+package org.w3.banana.plantain
 
 import java.net.{ URI => jURI }
 
 import org.w3.banana._
 import org.w3.banana.plantain.model.URI
 
-trait PomeURIOps extends URIOps[Pome] {
+trait PlantainURIOps extends URIOps[Plantain] {
 
-  def getString(uri: Pome#URI): String = uri.underlying.toString
+  def getString(uri: Plantain#URI): String = uri.underlying.toString
 
-  def withoutFragment(uri: Pome#URI): Pome#URI = {
+  def withoutFragment(uri: Plantain#URI): Plantain#URI = {
     import uri.underlying._
     URI(new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, null))
   }
 
-  def withFragment(uri: Pome#URI, frag: String): Pome#URI = {
+  def withFragment(uri: Plantain#URI, frag: String): Plantain#URI = {
     import uri.underlying._
     URI(new jURI(getScheme, getUserInfo, getHost, getPort, getPath, getQuery, frag))
   }
 
-  def getFragment(uri: Pome#URI): Option[String] = {
+  def getFragment(uri: Plantain#URI): Option[String] = {
     Option(uri.underlying.getFragment)
   }
 
-  def isPureFragment(uri: Pome#URI): Boolean = {
+  def isPureFragment(uri: Plantain#URI): Boolean = {
     import uri.underlying.{ getFragment => fragment, _ }
     getScheme == null &&
       getUserInfo == null && getAuthority == null &&
@@ -31,11 +31,11 @@ trait PomeURIOps extends URIOps[Pome] {
       getQuery == null && fragment != null
   }
 
-  def resolve(uri: Pome#URI, other: Pome#URI): Pome#URI = {
+  def resolve(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
     URI(uri.underlying.resolve(other.underlying))
   }
 
-  def appendSegment(uri: Pome#URI, segment: String): Pome#URI = {
+  def appendSegment(uri: Plantain#URI, segment: String): Plantain#URI = {
     val u = uri.underlying
     val path = u.getPath
     val newpath = if (path.endsWith("/")) path + segment else path + "/" + segment
@@ -44,11 +44,11 @@ trait PomeURIOps extends URIOps[Pome] {
     URI(res)
   }
 
-  def relativize(uri: Pome#URI, other: Pome#URI): Pome#URI = {
+  def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
     URI(uri.underlying.relativize(other.underlying))
   }
 
-  def lastSegment(uri: Pome#URI): String = {
+  def lastSegment(uri: Plantain#URI): String = {
     val path = uri.underlying.getPath
     val i = path.lastIndexOf('/')
     path.substring(i + 1, path.length)
