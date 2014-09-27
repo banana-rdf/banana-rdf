@@ -1,6 +1,8 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana.{RDFStore => RDFStoreInterface, _}
+import java.io.{ FileInputStream, File }
+
+import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
 
 import scala.concurrent.ExecutionContext
 import scala.scalajs.test.JasmineTest
@@ -11,10 +13,9 @@ import scala.scalajs.test.JasmineTest
 abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Turtle],
   writer: RDFWriter[Rdf, Turtle])
-  extends JasmineTest {
+    extends JasmineTest {
 
   import ops._
-
 
   def graphBuilder(prefix: Prefix[Rdf]) = {
     val ntriplesDoc = prefix("ntriples/")
@@ -174,10 +175,16 @@ abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
   describe("TURTLE parser") {
 
     it("read TURTLE version of timbl's card") {
+      val file = new File("rdf-test-suite/src/main/resources/card.ttl")
+      val fis = new FileInputStream(file)
+      val graph = reader.read(fis, file.toURI.toString).get
+      expect(graph.size) toEqual 77
+      /*
       jasmine.Clock.useMock()
       val g: Array[Rdf#Graph] = asyncTest[Rdf](card_ttl, "http://test.com/card.ttl")
       jasmine.Clock.tick(10)
       expect(g(0).toIterable.size == 77).toEqual(true)
+      */
     }
 
     it("read simple TURTLE String") {
@@ -206,7 +213,7 @@ abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
 
     it("works with relative uris") {
       val turtleString = writer.asString(referenceGraph, rdfCore).get
-      println("turtleString="+turtleString)
+      println("turtleString=" + turtleString)
       jasmine.Clock.useMock()
       val g: Array[Rdf#Graph] = asyncTest[Rdf](turtleString, foo)
       jasmine.Clock.tick(10)

@@ -1,7 +1,20 @@
 # doc: http://about.travis-ci.org/docs/user/languages/scala/
+#
+# Java flags reasoning, also see https://weblogs.java.net/blog/kcpeppe/archive/2013/12/11/case-study-jvm-hotspot-flags
+#
+# -XX:+CMSClassUnloadingEnabled - effectively adds GC to Perm space.
+# -XX:+UseConcMarkSweepGC       - must be enabled for CMSClassUnloadingEnabled to work
+# -XX:MaxPermSize=300M          - In Java 8, this setting is non-mutable and set at 300M - let's be prepared. Also, for Java 7, 
+#                                 fixing the actual size is not recommended - see above article 
+# 
+# SBT Concurrency: 
+# By default, SBT runs tasks concurrently and sets the limit of parrallel tasks by looking at the number of cores available.
+# Note however, that each tasks uses more memory as well, so machines with more cores will need to allocate more memory to SBT.
+# On Travis, there is currently 2 cores and so the default SBT java settings are adequate. The rule seems to be: No. cores / 4 
+#
 language: scala
 env:
-  export SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:PermSize=256M -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=128m"
+  export SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=300M -XX:ReservedCodeCacheSize=128m"
 jdk:
   # see https://github.com/travis-ci/travis-cookbooks/issues/35
   - oraclejdk7

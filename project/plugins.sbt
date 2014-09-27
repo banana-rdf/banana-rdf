@@ -7,4 +7,10 @@ resolvers += Resolver.url(
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.1.1")
 
-addSbtPlugin("org.scala-lang.modules.scalajs" % "scalajs-sbt-plugin" % "0.5.3")
+//addSbtPlugin("org.scala-lang.modules.scalajs" % "scalajs-sbt-plugin" % "0.5.3")
+
+//resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(Resolver.ivyStylePatterns)
+
+resolvers += "JohnsonUSM repository" at "http://johnsonusm.com:8020/nexus/content/repositories/releases/"
+
+addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.5.5.0")

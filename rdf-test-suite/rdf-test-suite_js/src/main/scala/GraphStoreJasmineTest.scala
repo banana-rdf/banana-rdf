@@ -10,7 +10,6 @@ import scalaz.Scalaz._
 import scala.util._
 import scala.collection.immutable.ListMap
 import java.io._
-import org.scalatest.EitherValues._
 import scala.concurrent.Future
 import org.w3.banana.{ RDFStore => RDFStoreInterface }
 
@@ -20,17 +19,21 @@ import scala.scalajs.test.JasmineTest
 /**
  * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
  */
-abstract class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
-  implicit ops: RDFOps[Rdf])
+abstract class GraphStoreJasmineTest[Rdf <: RDF, A](store: A)(
+  implicit ops: RDFOps[Rdf],
+  val reader: RDFReader[Rdf, RDFXML],
+  val graphStore: GraphStore[Rdf, A],
+  val lifecycle: Lifecycle[Rdf, A])
     extends JasmineTest {
 
   import ops._
-  import syntax._
+  import graphStore.graphStoreSyntax._
+  import lifecycle.lifecycleSyntax._
   import JSExecutionContext.Implicits.queue
 
   val foaf = FOAFPrefix[Rdf]
 
-  val graphStore = GraphStore[Rdf](store)
+  // val graphStore = GraphStore[Rdf](store)
 
   val graph: Rdf#Graph = (
     bnode("betehess")
@@ -62,17 +65,17 @@ abstract class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
       val u1 = URI("http://example.com/graph")
       val u2 = URI("http://example.com/graph2")
 
-      graphStore.removeGraph(u1)
+      store.removeGraph(u1)
       jasmine.Clock.tick(10)
-      graphStore.removeGraph(u2)
+      store.removeGraph(u2)
       jasmine.Clock.tick(10)
-      graphStore.appendToGraph(u1, graph)
+      store.appendToGraph(u1, graph)
       jasmine.Clock.tick(10)
-      val rGraph = graphStore.getGraph(u1)
+      val rGraph = store.getGraph(u1)
       jasmine.Clock.tick(10)
-      graphStore.appendToGraph(u2, graph2)
+      store.appendToGraph(u2, graph2)
       jasmine.Clock.tick(10)
-      val rGraph2 = graphStore.getGraph(u2)
+      val rGraph2 = store.getGraph(u2)
       jasmine.Clock.tick(10)
 
       rGraph.onSuccess {
@@ -85,12 +88,12 @@ abstract class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
       }
 
       val r = for {
-        _ <- graphStore.removeGraph(u1)
-        _ <- graphStore.removeGraph(u2)
-        _ <- graphStore.appendToGraph(u1, graph)
-        _ <- graphStore.appendToGraph(u2, graph2)
-        rGraph <- graphStore.getGraph(u1)
-        rGraph2 <- graphStore.getGraph(u2)
+        _ <- store.removeGraph(u1)
+        _ <- store.removeGraph(u2)
+        _ <- store.appendToGraph(u1, graph)
+        _ <- store.appendToGraph(u2, graph2)
+        rGraph <- store.getGraph(u1)
+        rGraph2 <- store.getGraph(u2)
       } yield {
         expect(rGraph isIsomorphicWith graph).toEqual(false)
         expect(rGraph2 isIsomorphicWith graph2).toEqual(true)
@@ -105,19 +108,19 @@ abstract class GraphStoreJasmineTest[Rdf <: RDF](store: RDFStoreInterface[Rdf])(
     }
 
     it("patchGraph should delete and insert triples as expected") {
-      var graphStore = GraphStore[Rdf](store)
       jasmine.Clock.useMock()
       val u = URI("http://example.com/graph")
 
-      graphStore.removeGraph(u)
+      store.removeGraph(u)
       jasmine.Clock.tick(10)
-      graphStore.appendToGraph(u, foo)
+      store.appendToGraph(u, foo)
       jasmine.Clock.tick(10)
-      graphStore.patchGraph(u,
-        (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.toIterable,
-        (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+
+      store.removeTriples(u, (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.triples.to[Iterable])
+      store.appendToGraph(u, (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
+
       jasmine.Clock.tick(10)
-      val rGraph = graphStore.getGraph(u)
+      val rGraph = store.getGraph(u)
       jasmine.Clock.tick(10)
       val expected = (
         URI("http://example.com/foo")
