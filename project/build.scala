@@ -103,10 +103,25 @@ object BananaRdfBuild extends Build {
     resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(Resolver.ivyStylePatterns)
     ) ++ scalajsJsSettings
 
+  /** `banana_jvm`, a jvm only meta project. */
+  lazy val banana_jvm = Project(
+    id = "banana_jvm",
+    base = file("."),
+    settings = buildSettings ++ Unidoc.settings,
+    aggregate = Seq(
+      rdf_jvm,
+      rdfTestSuite_jvm,
+      jena,
+      sesame,
+      plantain_jvm,
+      examples
+    )
+  )
+
   /** `banana`, the root project. */
   lazy val banana = Project(
     id = "banana",
-    base = file("."),
+    base = file(".banana"),
     settings = buildSettings ++ Unidoc.settings,
     aggregate = Seq(
       rdf,
