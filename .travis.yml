@@ -10,7 +10,8 @@
 # SBT Concurrency: 
 # By default, SBT runs tasks concurrently and sets the limit of parrallel tasks by looking at the number of cores available.
 # Note however, that each tasks uses more memory as well, so machines with more cores will need to allocate more memory to SBT.
-# On Travis, there is currently 2 cores and so the default SBT java settings are adequate. The rule seems to be: No. cores / 4 
+# On Travis, there is currently 2 cores and so the default SBT java settings are adequate. The rule seems to be to set
+# the flag -XmxN, where N = No. cores / 4 - eg with 8 cores(4 real, with hyperthreadin 8) - -Xmx2048 
 #
 language: scala
 env:

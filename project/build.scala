@@ -119,6 +119,33 @@ object BananaRdfBuild extends Build {
     )
   )
 
+  /** `banana_js`, a js only meta project. */
+  lazy val banana_js = Project(
+    id = "banana_js",
+    base = file(".banana_js"),
+    settings = buildSettings ++ Unidoc.settings,
+    aggregate = Seq(
+      rdf_js,
+      rdfTestSuite_js,
+      plantain_js
+    )
+  )
+
+  /** `banana_jvm`, a jvm only meta project. */
+  lazy val banana_jvm = Project(
+    id = "banana_jvm",
+    base = file(".banana_jvm"),
+    settings = buildSettings ++ Unidoc.settings,
+    aggregate = Seq(
+      rdf_jvm,
+      rdfTestSuite_jvm,
+      jena,
+      sesame,
+      plantain_jvm,
+      examples
+    )
+  )
+  
   /** A virtual module for gathering experimental ones. */
   lazy val experimental = Project(
     id = "experimental",
