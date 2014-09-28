@@ -47,7 +47,7 @@ ORM techniques, this does not rely on annotation or reflection.
 
 Until we write thorough documentation, the best place to understand
 what you can do is to go through the [test
-suite](https://github.com/w3c/banana-rdf/tree/master/rdf-test-suite/src/main/scala).
+suite](https://github.com/w3c/banana-rdf/tree/master/rdf-test-suite).
 
 How to start geeking
 --------------------
@@ -59,6 +59,15 @@ $ git clone git@github.com:w3c/banana-rdf.git
 $ cd banana-rdf
 $ ./sbt
 ```
+
+It's also easy to just build specific target platforms:
+    
+``` bash
+$ sbt +banana_js/test    # for javascript only 
+$ sbt +banana_jvm/test   # for jvm only
+```
+
+( note: scala-js compilation uses more memory. see [travis.yml](.travis.yml) )
 
 Contributions
 -------------
