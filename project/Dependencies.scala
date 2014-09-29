@@ -50,8 +50,8 @@ object Dependencies {
 
   val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6")
 
-  val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.3")
+  val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.4")
 
-  val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.3" % "test")
+  val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.4" % "test")
 
 }
