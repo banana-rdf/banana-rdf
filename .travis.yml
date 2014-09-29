@@ -8,13 +8,14 @@
 #                                 fixing the actual size is not recommended - see above article 
 # 
 # SBT Concurrency: 
-# By default, SBT runs tasks concurrently and sets the limit of parrallel tasks by looking at the number of cores available.
+# By default, SBT runs tasks concurrently and sets the limit of parallel tasks by looking at the number of cores available.
 # Note however, that each tasks uses more memory as well, so machines with more cores will need to allocate more memory to SBT.
-# On Travis, there is currently 2 cores and so the default SBT java settings are adequate. The rule seems to be: No. cores / 4 
+# On Travis, there is currently 2 cores and so the default SBT java settings are adequate. The rule seems to be to set
+# the flag -XmxN, where N = No. cores / 4 - eg with 8 cores(4 real, with hyper threading 8) - -Xmx2048m
 #
 language: scala
 env:
-  export SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=300M -XX:ReservedCodeCacheSize=128m"
+  export SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=300M -XX:ReservedCodeCacheSize=128m -Xmx2G"
 jdk:
   # see https://github.com/travis-ci/travis-cookbooks/issues/35
   - oraclejdk7

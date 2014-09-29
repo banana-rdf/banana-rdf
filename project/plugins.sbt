@@ -13,4 +13,4 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.1.1")
 
 resolvers += "JohnsonUSM repository" at "http://johnsonusm.com:8020/nexus/content/repositories/releases/"
 
-addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.5.5.0")
+addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.5.5.1")
