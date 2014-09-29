@@ -1,7 +1,7 @@
 package org.w3.banana.ldpatch
 
 import org.w3.banana._
-import scala.util.Try
+import scala.util.{ Try, Success, Failure }
 import org.w3.banana.ldpatch.{ model => m }
 
 trait Grammar[Rdf <: RDF] {
@@ -16,6 +16,15 @@ trait Grammar[Rdf <: RDF] {
     import CharPredicate._
 
     def between(low: Char, high: Char): CharPredicate = CharPredicate.from(c => c >= low && c <= high)
+
+    def parseLDPatch(input: ParserInput, baseURI: Rdf#URI): Try[m.LDPatch[Rdf]] = {
+      val parser = new PEGPatchParser(input, baseURI, prefixes = Map.empty)
+      parser.LDPatch.run() match {
+	case success @ Success(_) => success
+	case Failure(error: ParseError) => Failure(new RuntimeException(parser.formatError(error)))
+	case failure @ Failure(_) => failure
+      }
+    }
 
     class PEGPatchParser(
       val input: ParserInput,
@@ -118,10 +127,10 @@ trait Grammar[Rdf <: RDF] {
         zeroOrMore(Step | Constraint).separatedBy(WS0) ~> ((pathElems: Seq[m.PathElement[Rdf]]) => m.Path(pathElems))
       )
 
-      // Step ::= '/' ( '-' iri | iri | INDEX )
+      // Step ::= '/' ( '^' iri | iri | INDEX )
       def Step: Rule1[m.Step[Rdf]] = rule (
         '/' ~ (
-            '-' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(uri))
+            '^' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(uri))
           | iri ~> ((uri: Rdf#URI) => m.StepForward(uri))
           | INDEX ~> (m.StepAt(_: Int))
         )
@@ -133,9 +142,9 @@ trait Grammar[Rdf <: RDF] {
         | '!' ~ push(m.UnicityConstraint)
       )
 
-      // Slice ::= INDEX? '>' INDEX?
+      // Slice ::= INDEX? '..' INDEX?
       def Slice: Rule1[m.Slice] = rule (
-        optional(INDEX) ~ '>' ~ optional(INDEX) ~> ((leftOpt: Option[Int], rightOpt: Option[Int]) => (leftOpt, rightOpt) match {
+        optional(INDEX) ~ ".." ~ optional(INDEX) ~> ((leftOpt: Option[Int], rightOpt: Option[Int]) => (leftOpt, rightOpt) match {
           case (Some(left), Some(right)) => m.Range(left, right)
           case (Some(index), None)       => m.EverythingAfter(index)
           case (None, Some(index))       => m.Range(0, index)
