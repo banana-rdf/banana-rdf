@@ -36,7 +36,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
   val fooGraph = graphBuilder(fooPrefix)
 
   "read TURTLE version of timbl's card" in {
-    val file = new File("rdf-test-suite/rdf-test-suite_jvm/src/main/resources/card.ttl")
+    val file = new File("rdf-test-suite/jvm/src/main/resources/card.ttl")
     val fis = new FileInputStream(file)
     try {
       val graph = reader.read(fis, file.toURI.toString).get

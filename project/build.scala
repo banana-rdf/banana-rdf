@@ -158,7 +158,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdf_jvm = Project(
     id = "rdf_jvm",
-    base = file("rdf/rdf_jvm"),
+    base = file("rdf/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       aggregate in Test := false,
       publishMavenStyle := true
@@ -167,7 +167,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdf_common_jvm = Project(
     id = "rdf_common_jvm",
-    base = file("rdf/rdf_common_jvm"),
+    base = file("rdf/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
@@ -178,7 +178,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdf_js = Project(
     id = "rdf_js",
-    base = file("rdf/rdf_js"),
+    base = file("rdf/js"),
     settings = buildSettings ++ sjsDeps ++ Seq(
       aggregate in Test := false,
       publishMavenStyle := true
@@ -188,7 +188,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdf_common_js = Project(
     id = "rdf_common_js",
-    base = file("rdf/.rdf_common_js"),
+    base = file("rdf/.common_js"),
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(rdf_common_jvm) ++ Seq(
       publishMavenStyle := true
     )
@@ -233,7 +233,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdfTestSuite_jvm = Project(
     id = "rdf-test-suite_jvm",
-    base = file("rdf-test-suite/rdf-test-suite_jvm"),
+    base = file("rdf-test-suite/jvm"),
     settings = buildSettings ++ Seq(
       aggregate in Test := false
     )
@@ -241,7 +241,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdfTestSuite_js = Project(
     id = "rdf-test-suite_js",
-    base = file("rdf-test-suite/rdf-test-suite_js"),
+    base = file("rdf-test-suite/js"),
     settings = buildSettings ++ Seq(
       aggregate in Test := false
     )
@@ -251,7 +251,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdfTestSuite_common_jvm = Project(
     id = "rdf-test-suite_common_jvm",
-    base = file("rdf-test-suite/rdf-test-suite_common_jvm"),
+    base = file("rdf-test-suite/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       resolvers += johnsonRepo,
       libraryDependencies += scalatest,
@@ -263,7 +263,7 @@ object BananaRdfBuild extends Build {
 
   lazy val rdfTestSuite_common_js = Project(
     id = "rdf-test-suite_common_js",
-    base = file("rdf-test-suite/.rdf-test-suite_common_js"),
+    base = file("rdf-test-suite/.common_js"),
     settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common_jvm) ++ Seq(
       resolvers += johnsonRepo,
       libraryDependencies += scalajsJasmine
@@ -313,7 +313,7 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_jvm = Project(
     id = "plantain_jvm",
-    base = file("plantain/plantain_jvm"),
+    base = file("plantain/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       publishMavenStyle := true
     )
@@ -322,7 +322,7 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_common_jvm = Project(
     id = "plantain_common_jvm",
-    base = file("plantain/plantain_common_jvm"),
+    base = file("plantain/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       libraryDependencies += sesameRioTurtle,
       libraryDependencies += akkaHttpCore,
@@ -332,8 +332,8 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_js = Project(
     id = "plantain_js",
-    base = file("plantain/plantain_js"),
-    settings = buildSettings ++ testAutoOpt ++ Seq(
+    base = file("plantain/js"),
+    settings = buildSettings ++ Seq(
       publishMavenStyle := true
     )
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test")
@@ -341,8 +341,8 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_common_js = Project(
     id = "plantain_common_js",
-    base = file("plantain/.plantain_common_js"),
-    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ testAutoOpt ++ linkedSources(plantain_common_jvm) ++ Seq(
+    base = file("plantain/.common_js"),
+    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(plantain_common_jvm) ++ Seq(
       resolvers += johnsonRepo,
       publishMavenStyle := true
     ) ++ jasmine_jsTest

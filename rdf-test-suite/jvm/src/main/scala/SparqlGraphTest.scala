@@ -20,7 +20,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
 
   val foaf = FOAFPrefix[Rdf]
 
-  val resource = new FileInputStream("rdf-test-suite/rdf-test-suite_jvm/src/main/resources/new-tr.rdf")
+  val resource = new FileInputStream("rdf-test-suite/jvm/src/main/resources/new-tr.rdf")
 
   val graph = reader.read(resource, "http://foo.com").success.value
 
