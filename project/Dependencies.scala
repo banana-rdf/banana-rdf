@@ -42,7 +42,7 @@ object Dependencies {
 
   val parboiled2 = "org.parboiled" %% "parboiled" % "2.0.0"
 
-  val jasmine_jvm = "com.github.inthenow" %% "jasmine_jvm" % "0.2.3"
+  val jasmine_jvm = "com.github.inthenow" %% "jasmine_jvm" % "0.2.5"
 
   val scalajsJasmine = "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
 
@@ -50,8 +50,8 @@ object Dependencies {
 
   val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6")
 
-  val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.4")
+  val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.5")
 
-  val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.4" % "test")
+  val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.5" % "test")
 
 }
