@@ -15,4 +15,3 @@ resolvers += "JohnsonUSM repository" at "http://johnsonusm.com:8020/nexus/conten
 
 addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.5.6")
 
-addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.4.0")

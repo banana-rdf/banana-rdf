@@ -114,7 +114,7 @@ object BananaRdfBuild extends Build {
   /** `banana_js`, a js only meta project. */
   lazy val banana_js = Project(
     id = "banana_js",
-    base = file(".banana_js"),
+    base = file("banana.js"),
     settings = buildSettings ++ Unidoc.settings ++ Seq(
       aggregate in Test in rdf_js := false,
       aggregate in Test in rdfTestSuite_js := false
@@ -125,7 +125,7 @@ object BananaRdfBuild extends Build {
   /** `banana_jvm`, a jvm only meta project. */
   lazy val banana_jvm = Project(
     id = "banana_jvm",
-    base = file(".banana_jvm"),
+    base = file("banana.jvm"),
     settings = buildSettings ++ Unidoc.settings ++ Seq (
       aggregate in Test in rdf_jvm := false,
       aggregate in Test in rdfTestSuite_jvm := false
@@ -165,10 +165,16 @@ object BananaRdfBuild extends Build {
     )
   ).dependsOn(rdf_common_jvm).aggregate(rdf_common_jvm)
 
+  lazy val rdf_common = Project(
+    id = "rdf_common",
+    base = file("rdf/common"),
+    settings = buildSettings
+  )
+
   lazy val rdf_common_jvm = Project(
     id = "rdf_common_jvm",
-    base = file("rdf/common"),
-    settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+    base = file("rdf/common.jvm"),
+    settings = buildSettings ++ scalajsJvmSettings ++ linkedSources(rdf_common) ++ Seq(
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
@@ -188,8 +194,8 @@ object BananaRdfBuild extends Build {
 
   lazy val rdf_common_js = Project(
     id = "rdf_common_js",
-    base = file("rdf/.common_js"),
-    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(rdf_common_jvm) ++ Seq(
+    base = file("rdf/common.js"),
+    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(rdf_common) ++ Seq(
       publishMavenStyle := true
     )
   ).enablePlugins(SbtScalajs)
@@ -249,10 +255,18 @@ object BananaRdfBuild extends Build {
     .dependsOn(rdf_js, rdfTestSuite_common_js)
     .aggregate(rdfTestSuite_common_js)
 
+  lazy val rdfTestSuite_common = Project(
+    id = "rdf-test-suite_common",
+    base = file("rdf-test-suite/common"),
+    settings = buildSettings ++ Seq(
+      resolvers += johnsonRepo
+    )
+  ).dependsOn(rdf_jvm)
+
   lazy val rdfTestSuite_common_jvm = Project(
     id = "rdf-test-suite_common_jvm",
-    base = file("rdf-test-suite/common"),
-    settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+    base = file("rdf-test-suite/common.jvm"),
+    settings = buildSettings ++ scalajsJvmSettings ++ linkedSources(rdfTestSuite_common) ++ Seq(
       resolvers += johnsonRepo,
       libraryDependencies += scalatest,
       libraryDependencies += jasmine_jvm,
@@ -263,8 +277,8 @@ object BananaRdfBuild extends Build {
 
   lazy val rdfTestSuite_common_js = Project(
     id = "rdf-test-suite_common_js",
-    base = file("rdf-test-suite/.common_js"),
-    settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common_jvm) ++ Seq(
+    base = file("rdf-test-suite/common.js"),
+    settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common) ++ Seq(
       resolvers += johnsonRepo,
       libraryDependencies += scalajsJasmine
     ) ++ jasmine_js
@@ -320,10 +334,16 @@ object BananaRdfBuild extends Build {
   ).dependsOn(rdf_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test")
     .aggregate(plantain_common_jvm)
 
+  lazy val plantain_common = Project(
+    id = "plantain_common",
+    base = file("plantain/common"),
+    settings = buildSettings
+  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test")
+
   lazy val plantain_common_jvm = Project(
     id = "plantain_common_jvm",
-    base = file("plantain/common"),
-    settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+    base = file("plantain/common.jvm"),
+    settings = buildSettings ++ scalajsJvmSettings ++ linkedSources(plantain_common) ++ Seq(
       libraryDependencies += sesameRioTurtle,
       libraryDependencies += akkaHttpCore,
       publishMavenStyle := true
@@ -341,8 +361,8 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_common_js = Project(
     id = "plantain_common_js",
-    base = file("plantain/.common_js"),
-    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(plantain_common_jvm) ++ Seq(
+    base = file("plantain/common.js"),
+    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(plantain_common) ++ Seq(
       resolvers += johnsonRepo,
       publishMavenStyle := true
     ) ++ jasmine_jsTest
