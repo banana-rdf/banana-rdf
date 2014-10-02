@@ -4,12 +4,19 @@ import scalaz.NonEmptyList
 
 /* some well-known mime-types so that we can refer to them in banana-rdf */
 
-trait N3
-trait Turtle
-trait RDFXML
+trait RDFSerializationFormat
+
+trait N3 extends RDFSerializationFormat
+trait Turtle extends RDFSerializationFormat
+trait RDFXML extends RDFSerializationFormat
 trait RDFaXHTML
 trait SparqlAnswerJson
 trait SparqlAnswerXml
+
+sealed trait JSONLD extends RDFSerializationFormat
+trait JSONLD_COMPACTED extends JSONLD
+trait JSONLD_EXPANDED extends JSONLD
+trait JSONLD_FLATTENED extends JSONLD
 
 /**
  * typeclass for a Syntax
@@ -39,39 +46,52 @@ object Syntax {
   def apply[T](implicit syntax: Syntax[T]): Syntax[T] = syntax
 
   implicit val RDFQueryLang: Syntax[RDF#Query] = new Syntax[RDF#Query] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application/sparql-query"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "sparql-query"))
   }
 
   implicit val N3: Syntax[N3] = new Syntax[N3] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("text/n3"), MimeType("text/rdf+n3"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("text", "n3"), MimeType("text", "rdf+n3"))
   }
 
   implicit val Turtle: Syntax[Turtle] = new Syntax[Turtle] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("text/turtle"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("text", "turtle"))
   }
 
   implicit val RDFXML: Syntax[RDFXML] = new Syntax[RDFXML] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application/rdf+xml"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "rdf+xml"))
+  }
+
+  implicit val JSONLD_COMPACTED: Syntax[JSONLD_COMPACTED] = new Syntax[JSONLD_COMPACTED] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#compacted")))
+  }
+  implicit val JSONLD_EXPANDED: Syntax[JSONLD_EXPANDED] = new Syntax[JSONLD_EXPANDED] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#expanded")))
+  }
+  implicit val JSONLD_FLATTENED: Syntax[JSONLD_FLATTENED] = new Syntax[JSONLD_FLATTENED] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#flattened")))
+  }
+  implicit val JSON_LD: Syntax[JSONLD] = new Syntax[JSONLD] {
+    override def mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json"))
   }
 
   implicit val RDFaXHTML: Syntax[RDFaXHTML] = new Syntax[RDFaXHTML] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("text/html"), MimeType("application/xhtml+xml"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("text", "html"), MimeType("application", "xhtml+xml"))
   }
 
   implicit val SparqlAnswerJson = new Syntax[SparqlAnswerJson] {
-    val mimeTypes = NonEmptyList(MimeType("application/sparql-results+json"))
+    val mimeTypes = NonEmptyList(MimeType("application", "sparql-results+json"))
   }
 
   implicit val SparqlAnswerXml = new Syntax[SparqlAnswerXml] {
-    val mimeTypes = NonEmptyList(MimeType("application/sparql-results+xml"))
+    val mimeTypes = NonEmptyList(MimeType("application", "sparql-results+xml"))
   }
 
   implicit val SparqlUpdate = new Syntax[RDF#UpdateQuery] {
-    val mimeTypes = NonEmptyList(MimeType("application/sparql-update"))
+    val mimeTypes = NonEmptyList(MimeType("application", "sparql-update"))
   }
 
   implicit val textPlain = new Syntax[String] {
-    val mimeTypes = NonEmptyList(MimeType("text/plain"))
+    val mimeTypes = NonEmptyList(MimeType("text", "plain"))
   }
 
 }

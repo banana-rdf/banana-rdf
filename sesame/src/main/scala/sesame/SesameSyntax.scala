@@ -2,8 +2,10 @@ package org.w3.banana.sesame
 
 import java.io.{ OutputStream, Writer }
 
+import com.github.jsonldjava.sesame.SesameJSONLDWriter
 import org.openrdf.model.URI
 import org.openrdf.rio.RDFWriter
+import org.openrdf.rio.helpers.{ JSONLDSettings, JSONLDMode }
 import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
 import org.w3.banana._
@@ -40,6 +42,28 @@ object SesameSyntax {
 
     def rdfWriter(wr: Writer, base: String) = new STurtleWriter(wr) {
       override def writeURI(uri: URI): Unit = write(uri, writer, base)
+    }
+  }
+
+  implicit val JSONLD_COMPACT: SesameSyntax[JSONLD_COMPACTED] = jsonldSyntax(JSONLDMode.COMPACT)
+
+  implicit val JSONLD_EXPANDED: SesameSyntax[JSONLD_EXPANDED] = jsonldSyntax(JSONLDMode.EXPAND)
+
+  implicit val JSONLD_FLATTENED: SesameSyntax[JSONLD_FLATTENED] = jsonldSyntax(JSONLDMode.FLATTEN)
+
+  private def jsonldSyntax[T <: JSONLD](mode: JSONLDMode) = {
+    new SesameSyntax[T] {
+      def rdfWriter(os: OutputStream, base: String) =
+        {
+          val writer = new SesameJSONLDWriter(os)
+          writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, mode);
+          writer
+        }
+      def rdfWriter(wr: Writer, base: String) = {
+        val writer = new SesameJSONLDWriter(wr)
+        writer.getWriterConfig().set(JSONLDSettings.JSONLD_MODE, mode);
+        writer
+      }
     }
   }
 

@@ -1,8 +1,6 @@
 import sbt.Keys._
-import sbt.{ExclusionRule, _}
-import com.inthenow.sbt.scalajs.SbtScalajs
-import com.inthenow.sbt.scalajs.SbtScalajs._
-import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
+import sbt._
+
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 
 object Dependencies {
@@ -37,6 +35,8 @@ object Dependencies {
   val sesameSailMemory = "org.openrdf.sesame" % "sesame-sail-memory" % sesameVersion
   val sesameSailNativeRdf = "org.openrdf.sesame" % "sesame-sail-nativerdf" % sesameVersion
   val sesameRepositorySail = "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion
+
+  val jsonldJava = "com.github.jsonld-java" % "jsonld-java-sesame" % "0.5.1-SNAPSHOT"
 
   // other
 

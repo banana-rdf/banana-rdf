@@ -1,41 +1,42 @@
 package org.w3.banana
 
 object MimeType {
+  val paramRegex = """([^=]+)="?([^"]*)"?""".r
 
   /**
-   * clean a mime header.
-   * This is a  separate function, as many http libraries calculate it for the user
-   * @param mimeValue the value in an HTTP Accept or Content-Type header
-   * @return the normalised mime string
+   * a mime type
+   * @param mime the string should be in "type/subtype(;param=value)*" format
    */
-  def extract(mimeValue: String) = normalize(mimeValue.split(";")(0))
-
-  /**
-   * given a mime header this normalises it  to lower case and removes all extra white spaces
-   * @param mime a plain mime strong, eg: text/html
-   * @return normalised (lowercased and without white spaces) version of the mime
-   */
-  def normalize(mime: String) = mime.trim.toLowerCase
+  def apply(mime: String): Option[MimeType] = {
+    val chunks = mime.split(";")
+    val tpe = chunks(0).split("/")
+    if (tpe.size != 2) None
+    else {
+      val params = chunks.drop(1).map { paramStr =>
+        val paramRegex(name, value) = paramStr
+        (name.toLowerCase, value)
+      }
+      val paramMap = Map(params: _*) - "charset"
+      Some(MimeType(tpe(0), tpe(1), paramMap))
+    }
+  }
 
 }
 
 /**
- * a mime type
- * @param mime the string should be in "tpe/subtype" format, but this is not checked
+ * mainType/subType with optional parameters
  */
-case class MimeType(mime: String) {
-  lazy val Array(tpe, subType) = {
-    val res = mime.split("/")
-    if (res.size != 2) Array("broken", "mime")
-    else res
+case class MimeType(val mainType: String, val subType: String, val params: Map[String, String] = Map()) {
+  lazy val mime = {
+    s"$mainType/$subType" + params.toSeq.map { case (k, v) => s"""$k="$v"""" }.mkString(";", ";", "")
   }
 }
 
-object ImageJpegMime extends MimeType("image/jpeg")
-object ImageGifMime extends MimeType("image/gif")
-object ImagePngMime extends MimeType("image/png")
-object RdfTurtleMime extends MimeType("text/turtle")
-object TextHtmlMime extends MimeType("text/html")
+object ImageJpegMime extends MimeType("image", "jpeg")
+object ImageGifMime extends MimeType("image", "gif")
+object ImagePngMime extends MimeType("image", "png")
+object RdfTurtleMime extends MimeType("text", "turtle")
+object TextHtmlMime extends MimeType("text", "html")
 
 trait MimeExtensions {
   def extension(mime: MimeType): Option[String]
@@ -63,15 +64,12 @@ object WellKnownMimeExtensions extends MimeExtensions {
 }
 
 object MediaRange {
-  def apply(range: String) = {
-    if (range == "*/*") AnyMedia
-    else {
-      val res = range.split("/")
-      if (res.size != 2) NoMedia
-      else if ("*" == res(0)) AnyMedia
-      else {
-        new MediaRange(res(0), res(1))
-      }
+  def apply(range: String): MediaRange = {
+    if (range == "*/*") return AnyMedia
+    MimeType(range) match {
+      case None => NoMedia
+      case Some(MimeType("*", "*", _)) => AnyMedia
+      case Some(MimeType(main, sub, p)) => new MediaRange(main, sub, p)
     }
   }
 }
@@ -84,7 +82,7 @@ object NoMedia extends MediaRange("-", "-") {
   override def matches(mime: MimeType) = false
 }
 
-class MediaRange protected (val range: String, val subRange: String) {
-  def matches(mime: MimeType) =
-    (range == mime.tpe) && ((subRange == "*") || (subRange == mime.subType))
+case class MediaRange protected (val range: String, val subRange: String, val params: Map[String, String] = Map()) {
+  def matches(mime: MimeType): Boolean =
+    (range == mime.mainType) && ((subRange == "*") || (subRange == mime.subType)) && params == mime.params
 }
