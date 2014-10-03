@@ -5,8 +5,7 @@ import scala.concurrent.duration._
 import scala.util._
 
 package object banana
-    extends BananaRDFWriterSelector
-    with BananaSparqlSolutionWriterSelector {
+    extends BananaSparqlSolutionWriterSelector {
 
   type TripleMatch[Rdf <: RDF] = (Rdf#NodeMatch, Rdf#NodeMatch, Rdf#NodeMatch)
 

@@ -50,6 +50,30 @@ trait TurtleReaderModule extends RDFModule {
 
 }
 
+/**
+ * CurrentJsonLDReader contains all three reader types. If needed these could be split out.
+ */
+trait JsonLDReaderModule extends RDFModule {
+
+  implicit val jsonldCompactReader: RDFReader[Rdf, JsonLdCompacted]
+
+  implicit val jsonldExpandedReader: RDFReader[Rdf, JsonLdExpanded]
+
+  implicit val jsonldFlattenedReader: RDFReader[Rdf, JsonLdFlattened]
+
+}
+
+/**
+ * CurrentJsonLDReader contains all three writer types. If needed these could be split out.
+ */
+trait JsonLDWriterModule extends RDFModule {
+  implicit val jsonldCompactedWriter: RDFWriter[Rdf, JsonLdCompacted]
+
+  implicit val jsonldExpandedWriter: RDFWriter[Rdf, JsonLdExpanded]
+
+  implicit val jsonldFlattenedWriter: RDFWriter[Rdf, JsonLdFlattened]
+}
+
 trait ReaderSelectorModule extends RDFModule {
 
   implicit val readerSelector: ReaderSelector[Rdf]

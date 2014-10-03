@@ -39,4 +39,4 @@ class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain]((vtg: () => Ve
 
 class PlantainIsoTest() extends IsomorphismTests[Plantain]
 
-*/
+*/ 

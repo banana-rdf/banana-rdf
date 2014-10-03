@@ -13,10 +13,12 @@ trait SesameModule
     // with SparqlHttpModule
     with RDFXMLReaderModule
     with TurtleReaderModule
-    // with ReaderSelectorModule
+    with JsonLDReaderModule
+    with ReaderSelectorModule
     with RDFXMLWriterModule
     with TurtleWriterModule
-    // with WriterSelectorModule
+    with JsonLDWriterModule
+    with WriterSelectorModule
     with JsonSolutionsWriterModule
     with XmlSolutionsWriterModule
     with JsonQueryResultsReaderModule
@@ -38,17 +40,35 @@ trait SesameModule
 
   implicit val turtleReader: RDFReader[Sesame, Turtle] = new SesameTurtleReader
 
+  implicit val jsonldCompactReader: RDFReader[Sesame, JsonLdCompacted] = new SesameJSONLDCompactedReader
+
+  implicit val jsonldExpandedReader: RDFReader[Sesame, JsonLdExpanded] = new SesameJSONLDExpandedReader
+
+  implicit val jsonldFlattenedReader: RDFReader[Sesame, JsonLdFlattened] = new SesameJSONLDFlattenedReader
+
   implicit val sesameRDFWriterHelper = new SesameRDFWriterHelper
 
   implicit val rdfXMLWriter: RDFWriter[Sesame, RDFXML] = sesameRDFWriterHelper.rdfxmlWriter
 
   implicit val turtleWriter: RDFWriter[Sesame, Turtle] = sesameRDFWriterHelper.turtleWriter
 
+  implicit val jsonldCompactedWriter: RDFWriter[Sesame, JsonLdCompacted] = sesameRDFWriterHelper.jsonldCompactedWriter
+
+  implicit val jsonldExpandedWriter: RDFWriter[Sesame, JsonLdExpanded] = sesameRDFWriterHelper.jsonldExpandedWriter
+
+  implicit val jsonldFlattenedWriter: RDFWriter[Sesame, JsonLdFlattened] = sesameRDFWriterHelper.jsonldFlattenedWriter
+
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
     SesameSolutionsWriter.solutionsWriterJson
 
   implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] =
     SesameSolutionsWriter.solutionsWriterXml
+
+  implicit val readerSelector: ReaderSelector[Sesame] = ReaderSelector[Sesame, Turtle] combineWith
+    ReaderSelector[Sesame, RDFXML] combineWith ReaderSelector[Sesame, JsonLdCompacted] combineWith
+    ReaderSelector[Sesame, JsonLdExpanded] combineWith ReaderSelector[Sesame, JsonLdFlattened]
+
+  implicit val writerSelector: RDFWriterSelector[Sesame] = sesameRDFWriterHelper.selector
 
   implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
     SesameQueryResultsReader.queryResultsReaderJson
