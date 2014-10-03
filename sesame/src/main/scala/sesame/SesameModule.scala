@@ -36,15 +36,15 @@ trait SesameModule
 
   implicit val rdfStore: RDFStore[Sesame, RepositoryConnection] with SparqlUpdate[Sesame, RepositoryConnection] = new SesameStore
 
-  implicit val rdfXMLReader: RDFReader[Sesame, RDFXML] = SesameRDFXMLReader
+  implicit val rdfXMLReader: RDFReader[Sesame, RDFXML] = new SesameRDFXMLReader
 
-  implicit val turtleReader: RDFReader[Sesame, Turtle] = SesameTurtleReader
+  implicit val turtleReader: RDFReader[Sesame, Turtle] = new SesameTurtleReader
 
-  implicit val jsonldCompactReader: RDFReader[Sesame, JsonLdCompacted] = SesameJSONLDCompactedReader
+  implicit val jsonldCompactReader: RDFReader[Sesame, JsonLdCompacted] = new SesameJSONLDCompactedReader
 
-  implicit val jsonldExpandedReader: RDFReader[Sesame, JsonLdExpanded] = SesameJSONLDExpandedReader
+  implicit val jsonldExpandedReader: RDFReader[Sesame, JsonLdExpanded] = new SesameJSONLDExpandedReader
 
-  implicit val jsonldFlattenedReader: RDFReader[Sesame, JsonLdFlattened] = SesameJSONLDFlattenedReader
+  implicit val jsonldFlattenedReader: RDFReader[Sesame, JsonLdFlattened] = new SesameJSONLDFlattenedReader
 
   implicit val sesameRDFWriterHelper = new SesameRDFWriterHelper
 
