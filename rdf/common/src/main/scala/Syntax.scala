@@ -4,19 +4,17 @@ import scalaz.NonEmptyList
 
 /* some well-known mime-types so that we can refer to them in banana-rdf */
 
-trait RDFSerializationFormat
-
-trait N3 extends RDFSerializationFormat
-trait Turtle extends RDFSerializationFormat
-trait RDFXML extends RDFSerializationFormat
+trait N3
+trait Turtle
+trait RDFXML
 trait RDFaXHTML
 trait SparqlAnswerJson
 trait SparqlAnswerXml
 
-sealed trait JsonLD extends RDFSerializationFormat
-trait JsonLdCompacted extends JsonLD
-trait JsonLdExpanded extends JsonLD
-trait JsonLdFlattened extends JsonLD
+trait JsonLd
+trait JsonLdCompacted
+trait JsonLdExpanded
+trait JsonLdFlattened
 
 /**
  * typeclass for a Syntax
@@ -61,17 +59,26 @@ object Syntax {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "rdf+xml"))
   }
 
-  implicit val JsonLDCompacted: Syntax[JsonLdCompacted] = new Syntax[JsonLdCompacted] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#compacted")))
+  implicit val JsonLdCompacted: Syntax[JsonLdCompacted] = new Syntax[JsonLdCompacted] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(
+      MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#compacted"))
+    )
   }
-  implicit val JsonLDExpanded: Syntax[JsonLdExpanded] = new Syntax[JsonLdExpanded] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#expanded")))
+
+  implicit val JsonLdExpanded: Syntax[JsonLdExpanded] = new Syntax[JsonLdExpanded] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(
+      MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#expanded"))
+    )
   }
-  implicit val JsonLDFlattened: Syntax[JsonLdFlattened] = new Syntax[JsonLdFlattened] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#flattened")))
+
+  implicit val JsonLdFlattened: Syntax[JsonLdFlattened] = new Syntax[JsonLdFlattened] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(
+      MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#flattened"))
+    )
   }
-  implicit val JSON_LD: Syntax[JsonLD] = new Syntax[JsonLD] {
-    override def mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json"))
+
+  implicit val JSON_LD: Syntax[JsonLd] = new Syntax[JsonLd] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json"))
   }
 
   implicit val RDFaXHTML: Syntax[RDFaXHTML] = new Syntax[RDFaXHTML] {

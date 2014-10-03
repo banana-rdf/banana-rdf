@@ -26,9 +26,12 @@ trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
 
 }
 
-trait AbstractSesameReader[T <: RDFSerializationFormat] extends RDFReader[Sesame, T] {
-  implicit val ops: RDFOps[Sesame]
+abstract class AbstractSesameReader[T] extends RDFReader[Sesame, T] {
+
+  implicit def ops: RDFOps[Sesame]
+
   def getParser(): org.openrdf.rio.RDFParser
+
   def read(in: InputStream, base: String): Try[Sesame#Graph] = Try {
     val parser = getParser()
     val triples = new LinkedList[Statement]
@@ -39,12 +42,14 @@ trait AbstractSesameReader[T <: RDFSerializationFormat] extends RDFReader[Sesame
     parser.parse(in, base)
     new LinkedHashModel(triples)
   }
+
 }
 
 class SesameTurtleReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[Turtle] {
   val syntax = Syntax[Turtle]
   def getParser() = new org.openrdf.rio.turtle.TurtleParser
 }
+
 class SesameRDFXMLReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[RDFXML] {
   val syntax = Syntax[RDFXML]
   def getParser() = new org.openrdf.rio.rdfxml.RDFXMLParser
@@ -54,25 +59,29 @@ class SesameRDFXMLReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesam
  * Note: an issue with the com.github.jsonldjava is apparently that it
  * loads the whole JSON file into memory, which is memory consumptive
  */
-trait AbstractSesameJSONLDReader[T <: JsonLD] extends AbstractSesameReader[T] {
+trait AbstractSesameJSONLDReader[T] extends AbstractSesameReader[T] {
+
   def jsonldProfile: JSONLDMode
+
   def getParser() = {
     val parser = new SesameJSONLDParser
     parser.getParserConfig.set(JSONLDSettings.JSONLD_MODE, jsonldProfile)
     parser
   }
+
 }
 
 class SesameJSONLDCompactedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdCompacted] {
   val syntax = Syntax[JsonLdCompacted]
-  def jsonldProfile = JSONLDMode.COMPACT
-}
-class SesameJSONLDExpandedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdExpanded] {
-  val syntax = Syntax[JsonLdExpanded]
-  def jsonldProfile = JSONLDMode.EXPAND
-}
-class SesameJSONLDFlattenedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdFlattened] {
-  val syntax = Syntax[JsonLdFlattened]
-  def jsonldProfile = JSONLDMode.FLATTEN
+  val jsonldProfile = JSONLDMode.COMPACT
 }
 
+class SesameJSONLDExpandedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdExpanded] {
+  val syntax = Syntax[JsonLdExpanded]
+  val jsonldProfile = JSONLDMode.EXPAND
+}
+
+class SesameJSONLDFlattenedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdFlattened] {
+  val syntax = Syntax[JsonLdFlattened]
+  val jsonldProfile = JSONLDMode.FLATTEN
+}

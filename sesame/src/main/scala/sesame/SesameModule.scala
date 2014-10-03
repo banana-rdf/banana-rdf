@@ -64,11 +64,11 @@ trait SesameModule
   implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] =
     SesameSolutionsWriter.solutionsWriterXml
 
-  implicit val readerSelector: ReaderSelector[Rdf] = ReaderSelector[Sesame, Turtle] combineWith
+  implicit val readerSelector: ReaderSelector[Sesame] = ReaderSelector[Sesame, Turtle] combineWith
     ReaderSelector[Sesame, RDFXML] combineWith ReaderSelector[Sesame, JsonLdCompacted] combineWith
     ReaderSelector[Sesame, JsonLdExpanded] combineWith ReaderSelector[Sesame, JsonLdFlattened]
 
-  implicit val writerSelector: RDFWriterSelector[Rdf] = sesameRDFWriterHelper.selector
+  implicit val writerSelector: RDFWriterSelector[Sesame] = sesameRDFWriterHelper.selector
 
   implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
     SesameQueryResultsReader.queryResultsReaderJson
