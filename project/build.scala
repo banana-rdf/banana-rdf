@@ -92,6 +92,10 @@ object BuildSettings {
 
 }
 
+// avoid creating superfluous scala/java source directories.
+// @see http://www.scala-sbt.org/release/docs/Classpaths.html
+// @see https://stackoverflow.com/a/7456491/1009693
+// @see https://groups.google.com/d/msg/simple-build-tool/aJwjxFH8EkE/D78tudfEfPAJ
 object BananaRdfBuild extends Build {
 
   import BuildSettings._
@@ -107,7 +111,10 @@ object BananaRdfBuild extends Build {
   lazy val banana = Project(
     id = "banana",
     base = file("."),
-    settings = buildSettings ++ Unidoc.settings
+    settings = buildSettings ++ Unidoc.settings ++ Seq(
+      unmanagedSourceDirectories in Compile := Nil,
+      unmanagedSourceDirectories in Test := Nil
+    )
   ).dependsOn(banana_js, banana_jvm)
    .aggregate(banana_js, banana_jvm)
 
@@ -116,6 +123,8 @@ object BananaRdfBuild extends Build {
     id = "banana_js",
     base = file(".banana_js"),
     settings = buildSettings ++ Unidoc.settings ++ Seq(
+      unmanagedSourceDirectories in Compile := Nil,
+      unmanagedSourceDirectories in Test := Nil,
       aggregate in Test in rdf_js := false,
       aggregate in Test in rdfTestSuite_js := false
     )
@@ -127,6 +136,8 @@ object BananaRdfBuild extends Build {
     id = "banana_jvm",
     base = file(".banana_jvm"),
     settings = buildSettings ++ Unidoc.settings ++ Seq (
+      unmanagedSourceDirectories in Compile := Nil,
+      unmanagedSourceDirectories in Test := Nil,
       aggregate in Test in rdf_jvm := false,
       aggregate in Test in rdfTestSuite_jvm := false
     )
@@ -137,7 +148,10 @@ object BananaRdfBuild extends Build {
   lazy val experimental = Project(
     id = "experimental",
     base = file(".experimental"),
-    settings = buildSettings ++ Unidoc.settings,
+    settings = buildSettings ++ Unidoc.settings ++ Seq(
+      unmanagedSourceDirectories in Compile := Nil,
+      unmanagedSourceDirectories in Test := Nil
+    ),
     aggregate = Seq(ldpatch)
   )
 
@@ -150,6 +164,8 @@ object BananaRdfBuild extends Build {
     base = file("rdf"),
     settings = buildSettings ++
       Seq(
+        unmanagedSourceDirectories in Compile := Nil,
+        unmanagedSourceDirectories in Test := Nil,
         aggregate in Test := false,
         publishMavenStyle := true
       )
@@ -160,6 +176,8 @@ object BananaRdfBuild extends Build {
     id = "rdf_jvm",
     base = file("rdf/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test := Nil,
       aggregate in Test := false,
       publishMavenStyle := true
     )
@@ -169,6 +187,8 @@ object BananaRdfBuild extends Build {
     id = "rdf_common_jvm",
     base = file("rdf/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test := Nil,
       libraryDependencies += scalaz,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
@@ -180,6 +200,8 @@ object BananaRdfBuild extends Build {
     id = "rdf_js",
     base = file("rdf/js"),
     settings = buildSettings ++ sjsDeps ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test := Nil,
       aggregate in Test := false,
       publishMavenStyle := true
     )
@@ -190,6 +212,7 @@ object BananaRdfBuild extends Build {
     id = "rdf_common_js",
     base = file("rdf/.common_js"),
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(rdf_common_jvm) ++ Seq(
+      unmanagedSourceDirectories in Test := Nil,
       publishMavenStyle := true
     )
   ).enablePlugins(SbtScalajs)
@@ -203,6 +226,8 @@ object BananaRdfBuild extends Build {
     id = "ldpatch",
     base = file("ldpatch"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test <<= (scalaSource in Test)(Seq(_)),
       publishMavenStyle := true,
       libraryDependencies += parboiled2,
       // this will be needed until parboiled 2.0.1 gets released
@@ -225,6 +250,8 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite",
     base = file("rdf-test-suite"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Compile := Nil,
+      unmanagedSourceDirectories in Test := Nil,
       aggregate in Test := false,
       publishMavenStyle := true
     )
@@ -235,6 +262,8 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite_jvm",
     base = file("rdf-test-suite/jvm"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Test <<= (scalaSource in Compile)(Seq(_)),
+      resourceDirectory in Test := baseDirectory.value / "src/main/resources",
       aggregate in Test := false
     )
   ).dependsOn(rdf_jvm, rdfTestSuite_common_jvm).aggregate(rdfTestSuite_common_jvm)
@@ -243,6 +272,8 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite_js",
     base = file("rdf-test-suite/js"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Test <<= (scalaSource in Compile)(Seq(_)),
+      resourceDirectory in Test := baseDirectory.value / "src/main/resources",
       aggregate in Test := false
     )
   ).enablePlugins(SbtScalajs)
@@ -253,6 +284,8 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite_common_jvm",
     base = file("rdf-test-suite/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test := Nil,
       resolvers += johnsonRepo,
       libraryDependencies += scalatest,
       libraryDependencies += jasmine_jvm,
@@ -265,6 +298,7 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite_common_js",
     base = file("rdf-test-suite/.common_js"),
     settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common_jvm) ++ Seq(
+      unmanagedSourceDirectories in Test := Nil,
       resolvers += johnsonRepo,
       libraryDependencies += scalajsJasmine
     ) ++ jasmine_js
@@ -275,6 +309,7 @@ object BananaRdfBuild extends Build {
     id = "jena",
     base = file("jena"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Test <<= (scalaSource in Test)(Seq(_)),
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
       libraryDependencies += jenaLibs,
       libraryDependencies += logback,
@@ -287,6 +322,8 @@ object BananaRdfBuild extends Build {
     id = "sesame",
     base = file("sesame"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test <<= (scalaSource in Test)(Seq(_)),
       libraryDependencies += sesameQueryAlgebra,
       libraryDependencies += sesameQueryParser,
       libraryDependencies += sesameQueryResult,
@@ -307,6 +344,8 @@ object BananaRdfBuild extends Build {
     id = "plantain",
     base = file("plantain"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Compile := Nil,
+      unmanagedSourceDirectories in Test := Nil,
       publishMavenStyle := true
     )
   ).dependsOn(rdfTestSuite, plantain_jvm, plantain_common_jvm, plantain_js, plantain_common_js)
@@ -316,6 +355,8 @@ object BananaRdfBuild extends Build {
     id = "plantain_jvm",
     base = file("plantain/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test <<= (scalaSource in Test)(Seq(_)),
       publishMavenStyle := true
     )
   ).dependsOn(rdf_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test")
@@ -325,6 +366,8 @@ object BananaRdfBuild extends Build {
     id = "plantain_common_jvm",
     base = file("plantain/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test := Nil,
       libraryDependencies += sesameRioTurtle,
       libraryDependencies += akkaHttpCore,
       publishMavenStyle := true
@@ -335,6 +378,8 @@ object BananaRdfBuild extends Build {
     id = "plantain_js",
     base = file("plantain/js"),
     settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test <<= (scalaSource in Test)(Seq(_)),
       publishMavenStyle := true
     )
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test")
@@ -344,6 +389,7 @@ object BananaRdfBuild extends Build {
     id = "plantain_common_js",
     base = file("plantain/.common_js"),
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(plantain_common_jvm) ++ Seq(
+      unmanagedSourceDirectories in Test := Nil,
       resolvers += johnsonRepo,
       publishMavenStyle := true
     ) ++ jasmine_jsTest
@@ -356,6 +402,8 @@ object BananaRdfBuild extends Build {
     id = "rdfstorew",
     base = file("rdfstorew"),
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ Seq(
+      unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
+      unmanagedSourceDirectories in Test <<= (scalaSource in Test)(Seq(_)),
       resolvers += johnsonRepo,
       jsDependencies += ProvidedJS / "rdf_store.js",
       jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
@@ -368,7 +416,10 @@ object BananaRdfBuild extends Build {
   lazy val examples = Project(
     id = "examples",
     base = file("examples"),
-    settings = buildSettings
+    settings = buildSettings ++ Seq(
+      unmanagedSourceDirectories in Compile := Nil,
+      unmanagedSourceDirectories in Test := Nil
+    )
   ) dependsOn(sesame, jena)
 
 }
