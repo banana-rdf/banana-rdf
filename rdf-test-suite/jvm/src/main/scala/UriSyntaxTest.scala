@@ -58,6 +58,11 @@ abstract class UriSyntaxTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends Wo
     URI("http://example.com/foo").relativize(URI("http://example.com/foo#bar")) should be(URI("#bar"))
     (URI("http://example.com/foo"): Rdf#Node).relativize(URI("http://example.com/foo#bar")) should be(URI("#bar"))
     URI("http://example.com/foo#bar").relativizeAgainst(URI("http://example.com/foo")) should be(URI("#bar"))
+
+    URI("http://example.com/ldpc").relativize(URI("http://example.com/ldpc/")) should be(URI(""))
+    URI("http://example.com/ldpc").relativize(URI("http://example.com/ldpc")) should be(URI(""))
+    URI("http://example.com/ldpc").relativize(URI("http://example.com/ldpc/entry")) should be(URI("entry"))
+
   }
 
   "should be able to create and work with relative URIs" in {
