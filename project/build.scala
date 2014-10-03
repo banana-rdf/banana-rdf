@@ -294,7 +294,8 @@ object BananaRdfBuild extends Build {
       libraryDependencies += sesameRioRdfxml,
       libraryDependencies += sesameSailMemory,
       libraryDependencies += sesameSailNativeRdf,
-      libraryDependencies += sesameRepositorySail
+      libraryDependencies += sesameRepositorySail,
+      libraryDependencies += jsonldJava
     )
   ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test")
 

@@ -2,8 +2,6 @@ package org.w3.banana
 
 import com.github.inthenow.jasmine.JSpec
 
-
-
 import org.w3.banana._
 import org.w3.banana.syntax._
 import org.w3.banana.diesel._
@@ -20,21 +18,16 @@ import org.w3.banana.{ RDFStore => RDFStoreInterface }
 //import scala.scalajs.js
 //import scala.scalajs.test.JasmineTest
 
-
 /**
  * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
  */
-
 
 abstract trait GraphUnionBaseTest[Rdf <: RDF] extends JSpec {
 
   implicit val ops: RDFOps[Rdf]
 
-
   import ops._
   import syntax._
-
-
 
   val foo = (
     URI("http://example.com/foo")
