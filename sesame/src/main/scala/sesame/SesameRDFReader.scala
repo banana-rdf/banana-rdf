@@ -28,9 +28,9 @@ trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
 
 trait AbstractSesameReader[T <: RDFSerializationFormat] extends RDFReader[Sesame, T] {
   implicit val ops: RDFOps[Sesame]
-  def getParser: org.openrdf.rio.RDFParser
+  def getParser(): org.openrdf.rio.RDFParser
   def read(in: InputStream, base: String): Try[Sesame#Graph] = Try {
-    val parser = getParser
+    val parser = getParser()
     val triples = new LinkedList[Statement]
     val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix {
       val ops = AbstractSesameReader.this.ops
