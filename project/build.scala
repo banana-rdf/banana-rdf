@@ -96,6 +96,7 @@ object BuildSettings {
 // @see http://www.scala-sbt.org/release/docs/Classpaths.html
 // @see https://stackoverflow.com/a/7456491/1009693
 // @see https://groups.google.com/d/msg/simple-build-tool/aJwjxFH8EkE/D78tudfEfPAJ
+
 object BananaRdfBuild extends Build {
 
   import BuildSettings._
