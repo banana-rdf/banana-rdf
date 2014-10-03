@@ -13,10 +13,10 @@ trait RDFaXHTML
 trait SparqlAnswerJson
 trait SparqlAnswerXml
 
-sealed trait JSONLD extends RDFSerializationFormat
-trait JSONLD_COMPACTED extends JSONLD
-trait JSONLD_EXPANDED extends JSONLD
-trait JSONLD_FLATTENED extends JSONLD
+sealed trait JsonLD extends RDFSerializationFormat
+trait JsonLdCompacted extends JsonLD
+trait JsonLdExpanded extends JsonLD
+trait JsonLdFlattened extends JsonLD
 
 /**
  * typeclass for a Syntax
@@ -61,16 +61,16 @@ object Syntax {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "rdf+xml"))
   }
 
-  implicit val JSONLD_COMPACTED: Syntax[JSONLD_COMPACTED] = new Syntax[JSONLD_COMPACTED] {
+  implicit val JsonLDCompacted: Syntax[JsonLdCompacted] = new Syntax[JsonLdCompacted] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#compacted")))
   }
-  implicit val JSONLD_EXPANDED: Syntax[JSONLD_EXPANDED] = new Syntax[JSONLD_EXPANDED] {
+  implicit val JsonLDExpanded: Syntax[JsonLdExpanded] = new Syntax[JsonLdExpanded] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#expanded")))
   }
-  implicit val JSONLD_FLATTENED: Syntax[JSONLD_FLATTENED] = new Syntax[JSONLD_FLATTENED] {
+  implicit val JsonLDFlattened: Syntax[JsonLdFlattened] = new Syntax[JsonLdFlattened] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json", Map("profile" -> "http://www.w3.org/ns/json-ld#flattened")))
   }
-  implicit val JSON_LD: Syntax[JSONLD] = new Syntax[JSONLD] {
+  implicit val JSON_LD: Syntax[JsonLD] = new Syntax[JsonLD] {
     override def mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json"))
   }
 

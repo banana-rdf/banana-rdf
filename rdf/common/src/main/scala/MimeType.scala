@@ -7,28 +7,32 @@ object MimeType {
    * a mime type
    * @param mime the string should be in "type/subtype(;param=value)*" format
    */
-  def apply(mime: String): Option[MimeType] = {
+  def parse(mime: String): Option[MimeType] = {
     val chunks = mime.split(";")
-    val tpe = chunks(0).split("/")
-    if (tpe.size != 2) None
-    else {
-      val params = chunks.drop(1).map { paramStr =>
-        val paramRegex(name, value) = paramStr
-        (name.toLowerCase, value)
+    chunks(0).split("/") match {
+      case Array(tp, subTp) => {
+        val params = chunks.drop(1).map { paramStr =>
+          val paramRegex(name, value) = paramStr
+          (name.toLowerCase, value)
+        }
+        val paramMap = Map(params: _*) - "charset"
+        Some(MimeType(tp, subTp, paramMap))
       }
-      val paramMap = Map(params: _*) - "charset"
-      Some(MimeType(tpe(0), tpe(1), paramMap))
+      case _ => None
     }
   }
-
 }
 
 /**
  * mainType/subType with optional parameters
  */
-case class MimeType(val mainType: String, val subType: String, val params: Map[String, String] = Map()) {
+case class MimeType(mainType: String, subType: String, params: Map[String, String] = Map()) {
+  // lazy:  only calculate the string value once
   lazy val mime = {
-    s"$mainType/$subType" + params.toSeq.map { case (k, v) => s"""$k="$v"""" }.mkString(";", ";", "")
+    s"$mainType/$subType" +
+      params.toSeq.map {
+        case (k, v) => s"""$k="$v""""
+      }.mkString(";", ";", "")
   }
 }
 
@@ -65,8 +69,8 @@ object WellKnownMimeExtensions extends MimeExtensions {
 
 object MediaRange {
   def apply(range: String): MediaRange = {
-    if (range == "*/*") return AnyMedia
-    MimeType(range) match {
+    if (range == "*/*") AnyMedia
+    else MimeType.parse(range) match {
       case None => NoMedia
       case Some(MimeType("*", "*", _)) => AnyMedia
       case Some(MimeType(main, sub, p)) => new MediaRange(main, sub, p)
@@ -82,7 +86,7 @@ object NoMedia extends MediaRange("-", "-") {
   override def matches(mime: MimeType) = false
 }
 
-case class MediaRange protected (val range: String, val subRange: String, val params: Map[String, String] = Map()) {
+case class MediaRange protected (range: String, subRange: String, params: Map[String, String] = Map()) {
   def matches(mime: MimeType): Boolean =
     (range == mime.mainType) && ((subRange == "*") || (subRange == mime.subType)) && params == mime.params
 }

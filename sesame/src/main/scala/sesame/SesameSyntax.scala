@@ -45,13 +45,13 @@ object SesameSyntax {
     }
   }
 
-  implicit val JSONLD_COMPACT: SesameSyntax[JSONLD_COMPACTED] = jsonldSyntax(JSONLDMode.COMPACT)
+  implicit val JSONLD_COMPACT: SesameSyntax[JsonLdCompacted] = jsonldSyntax(JSONLDMode.COMPACT)
 
-  implicit val JSONLD_EXPANDED: SesameSyntax[JSONLD_EXPANDED] = jsonldSyntax(JSONLDMode.EXPAND)
+  implicit val JSONLD_EXPANDED: SesameSyntax[JsonLdExpanded] = jsonldSyntax(JSONLDMode.EXPAND)
 
-  implicit val JSONLD_FLATTENED: SesameSyntax[JSONLD_FLATTENED] = jsonldSyntax(JSONLDMode.FLATTEN)
+  implicit val JSONLD_FLATTENED: SesameSyntax[JsonLdFlattened] = jsonldSyntax(JSONLDMode.FLATTEN)
 
-  private def jsonldSyntax[T <: JSONLD](mode: JSONLDMode) = {
+  private def jsonldSyntax[T <: JsonLD](mode: JSONLDMode) = {
     new SesameSyntax[T] {
       def rdfWriter(os: OutputStream, base: String) =
         {

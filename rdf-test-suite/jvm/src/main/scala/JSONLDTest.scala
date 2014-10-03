@@ -3,13 +3,12 @@ import java.io._
 
 import org.scalatest._
 
-abstract class JSONLDTest[Rdf <: RDF](readerSelector: ReaderSelector[Rdf], writerSelector: RDFWriterSelector[Rdf])(implicit ops: RDFOps[Rdf])
+class JSONLDTest[Rdf <: RDF](readerSelector: ReaderSelector[Rdf], writerSelector: RDFWriterSelector[Rdf])(implicit ops: RDFOps[Rdf],
+  turtleReader: RDFReader[Rdf, Turtle],
+  turtleWriter: RDFWriter[Rdf, Turtle],
+  jsonldReader: RDFReader[Rdf, JsonLdCompacted],
+  jsonldWriter: RDFWriter[Rdf, JsonLdCompacted])
     extends WordSpec with Matchers {
-
-  val turtleReader: RDFReader[Rdf, Turtle]
-  val turtleWriter: RDFWriter[Rdf, Turtle]
-  val jsonldReader: RDFReader[Rdf, JSONLD_COMPACTED]
-  val jsonldWriter: RDFWriter[Rdf, JSONLD_COMPACTED]
 
   import ops._
 
@@ -40,7 +39,7 @@ abstract class JSONLDTest[Rdf <: RDF](readerSelector: ReaderSelector[Rdf], write
     mr.params.size should be(1)
     mr.params("profile") should be("http://www.w3.org/ns/json-ld#compacted")
 
-    val matches = mr.matches(Syntax.JSONLD_COMPACTED.mimeTypes.head)
+    val matches = mr.matches(Syntax.JsonLDCompacted.mimeTypes.head)
     matches should be(true)
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
@@ -59,7 +58,7 @@ abstract class JSONLDTest[Rdf <: RDF](readerSelector: ReaderSelector[Rdf], write
     mr.params.size should be(1)
     mr.params("profile") should be("http://www.w3.org/ns/json-ld#expanded")
 
-    val matches = mr.matches(Syntax.JSONLD_EXPANDED.mimeTypes.head)
+    val matches = mr.matches(Syntax.JsonLDExpanded.mimeTypes.head)
     matches should be(true)
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
@@ -77,7 +76,7 @@ abstract class JSONLDTest[Rdf <: RDF](readerSelector: ReaderSelector[Rdf], write
     mr.params.size should be(1)
     mr.params("profile") should be("http://www.w3.org/ns/json-ld#flattened")
 
-    val matches = mr.matches(Syntax.JSONLD_FLATTENED.mimeTypes.head)
+    val matches = mr.matches(Syntax.JsonLDFlattened.mimeTypes.head)
     matches should be(true)
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get

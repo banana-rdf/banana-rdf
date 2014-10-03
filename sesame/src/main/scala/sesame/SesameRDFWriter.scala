@@ -36,15 +36,15 @@ class SesameRDFWriterHelper(implicit ops: SesameOps) {
 
   implicit val turtleWriter: RDFWriter[Sesame, Turtle] = new SesameRDFWriter[Turtle](ops)
 
-  implicit val jsonldCompactedWriter: RDFWriter[Sesame, JSONLD_COMPACTED] = new SesameRDFWriter[JSONLD_COMPACTED](ops)
+  implicit val jsonldCompactedWriter: RDFWriter[Sesame, JsonLdCompacted] = new SesameRDFWriter[JsonLdCompacted](ops)
 
-  implicit val jsonldExpandedWriter: RDFWriter[Sesame, JSONLD_EXPANDED] = new SesameRDFWriter[JSONLD_EXPANDED](ops)
+  implicit val jsonldExpandedWriter: RDFWriter[Sesame, JsonLdExpanded] = new SesameRDFWriter[JsonLdExpanded](ops)
 
-  implicit val jsonldFlattenedWriter: RDFWriter[Sesame, JSONLD_FLATTENED] = new SesameRDFWriter[JSONLD_FLATTENED](ops)
+  implicit val jsonldFlattenedWriter: RDFWriter[Sesame, JsonLdFlattened] = new SesameRDFWriter[JsonLdFlattened](ops)
 
   val selector: RDFWriterSelector[Sesame] =
     RDFWriterSelector[Sesame, RDFXML] combineWith RDFWriterSelector[Sesame, Turtle] combineWith
-      RDFWriterSelector[Sesame, JSONLD_COMPACTED] combineWith RDFWriterSelector[Sesame, JSONLD_EXPANDED] combineWith
-      RDFWriterSelector[Sesame, JSONLD_FLATTENED]
+      RDFWriterSelector[Sesame, JsonLdCompacted] combineWith RDFWriterSelector[Sesame, JsonLdExpanded] combineWith
+      RDFWriterSelector[Sesame, JsonLdFlattened]
 
 }
