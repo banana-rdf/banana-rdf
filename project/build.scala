@@ -4,7 +4,7 @@ import com.inthenow.sbt.scalajs.SbtScalajs
 import com.inthenow.sbt.scalajs.SbtScalajs._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 import sbt.Keys._
-import sbt.{ExclusionRule, _}
+import sbt._
 
 import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
@@ -357,6 +357,8 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
       unmanagedSourceDirectories in Test <<= (scalaSource in Test)(Seq(_)),
+      libraryDependencies += akkaHttpCore,
+      libraryDependencies +=  sesameRioTurtle,
       publishMavenStyle := true
     )
   ).dependsOn(rdf_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test")
@@ -368,8 +370,6 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
       unmanagedSourceDirectories in Test := Nil,
-      libraryDependencies += sesameRioTurtle,
-      libraryDependencies += akkaHttpCore,
       publishMavenStyle := true
     )
   ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test")
