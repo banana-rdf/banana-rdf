@@ -3,14 +3,12 @@ package org.w3.banana
 import java.io._
 import org.scalatest._
 
-class JsonLdTest[Rdf <: RDF](implicit
-  ops: RDFOps[Rdf],
-  writerSelector: RDFWriterSelector[Rdf],
-  turtleReader: RDFReader[Rdf, Turtle],
-  turtleWriter: RDFWriter[Rdf, Turtle],
-  jsonldReader: RDFReader[Rdf, JsonLdCompacted],
-  jsonldWriter: RDFWriter[Rdf, JsonLdCompacted]
-) extends WordSpec with Matchers {
+class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
+    writerSelector: RDFWriterSelector[Rdf],
+    turtleReader: RDFReader[Rdf, Turtle],
+    turtleWriter: RDFWriter[Rdf, Turtle],
+    jsonldReader: RDFReader[Rdf, JsonLdCompacted],
+    jsonldWriter: RDFWriter[Rdf, JsonLdCompacted]) extends WordSpec with Matchers {
 
   import ops._
 
