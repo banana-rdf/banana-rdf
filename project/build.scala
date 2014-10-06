@@ -213,7 +213,7 @@ object BananaRdfBuild extends Build {
       },
       libraryDependencies += scalatest % "test"
     )
-  ) dependsOn(rdf_jvm, jena, rdfTestSuite_jvm % "test")
+  ) dependsOn(rdf_jvm, jena, rdfTestSuite_jvm % "test-internal->compile")
 
   /* RDF Test Suite */
 
@@ -282,7 +282,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += logback,
       libraryDependencies += aalto
     )
-  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test")
+  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `sesame`, an RDF implementation for Sesame. */
   lazy val sesame = Project(
@@ -299,7 +299,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += sesameRepositorySail,
       libraryDependencies += jsonldJava
     )
-  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test")
+  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `plantain`, a cross-compiled Scala implementation for RDF.
     *
@@ -320,9 +320,10 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       libraryDependencies += akkaHttpCore,
       libraryDependencies +=  sesameRioTurtle,
+      libraryDependencies += jsonldJava,
       publishMavenStyle := true
     )
-  ).dependsOn(rdf_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test")
+  ).dependsOn(rdf_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test-internal->compile")
     .aggregate(plantain_common_jvm)
 
   lazy val plantain_common_jvm = Project(
@@ -331,7 +332,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       publishMavenStyle := true
     )
-  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test")
+  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   lazy val plantain_js = Project(
     id = "plantain_js",
@@ -339,7 +340,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ Seq(
       publishMavenStyle := true
     )
-  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test")
+  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
     .aggregate(plantain_common_js)
 
   lazy val plantain_common_js = Project(
@@ -349,7 +350,7 @@ object BananaRdfBuild extends Build {
       resolvers += johnsonRepo,
       publishMavenStyle := true
     ) ++ jasmine_jsTest
-  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test")
+  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile")
 
   /** `rdfstorew`, a js only module binding rdfstore-js into banana-rdf
     * abstractions.
@@ -364,7 +365,7 @@ object BananaRdfBuild extends Build {
       skip in packageJSDependencies := false
     ) ++ jasmine_js
   ).enablePlugins(SbtScalajs)
-    .dependsOn(rdf_js, rdf_common_js, rdfTestSuite_js % "test->test")
+    .dependsOn(rdf_js, rdf_common_js, rdfTestSuite_js % "test-internal->compile")
 
   /** `examples`, a bunch of working examples using banana-rdf abstractions. */
   lazy val examples = Project(
