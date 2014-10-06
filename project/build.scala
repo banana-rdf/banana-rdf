@@ -375,4 +375,3 @@ object BananaRdfBuild extends Build {
   ) dependsOn(sesame, jena)
 
 }
-
