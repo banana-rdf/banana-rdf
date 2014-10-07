@@ -25,5 +25,14 @@ scala:
 branches:
   only:
     - master
+matrix:
+  include:
+    - oraclejdk7
+      script: sbt ++$TRAVIS_SCALA_VERSION test
+    - oraclejdk7
+      script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
+  allow_failures: 
+    - oraclejdk7
+      script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
 #script:
 #  - ./sbt test
