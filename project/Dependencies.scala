@@ -4,27 +4,76 @@ import sbt._
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
 
 object Dependencies {
+  // Note: %%% can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting...
 
+  /**
+    * scalaz
+    * @see http://scalaz.org
+    * @see http://repo1.maven.org/maven2/org/scalaz/
+    */
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
 
+  /**
+   * scalaz for scalajs
+   * @see http://scalaz.org
+   * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
+   */
+  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6")
+
+  /**
+   * joda-Time
+   * @see http://joda-time.sourceforge.net
+   * @see http://repo1.maven.org/maven2/joda-time/joda-time/
+   */
   val jodaTime = "joda-time" % "joda-time" % "2.1"
 
+  /**
+   * joda-convert
+   * @see http://joda-convert.sourceforge.net
+   * @see http://repo1.maven.org/maven2/org/joda/joda-convert
+   */
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
 
+  /**
+   * scalatest
+   * @see http://www.scalatest.org
+   * @see http://repo1.maven.org/maven2/org/scalatest
+   */
   val scalatest = "org.scalatest" %% "scalatest" % "2.2.0"
 
+  /**
+   * Akka Http Core
+   * @see http://akka.io
+   * @see http://repo1.maven.org/maven2/com/typesafe/akka
+   */
   val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "0.4"
 
-  // jena
-
+  /**
+   * jena
+   * @see https://jena.apache.org/
+   * @see http://repo1.maven.org/maven2/org/apache/jena
+   */
   val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "2.11.2"
 
+  /**
+   * logback for jena
+   * @see http://logging.apache.org/log4j/1.2/
+   * @see http://repo1.maven.org/maven2/log4j/log4j/
+   */
   val logback = "log4j" % "log4j" % "1.2.16" % "provided"
 
+  /**
+   * Aalto
+   * @see http://wiki.fasterxml.com/AaltoHome
+   * @see http://repo1.maven.org/maven2/com/fasterxml/aalto-xml
+   */
   val aalto = "com.fasterxml" % "aalto-xml" % "0.9.7"
 
-  // sesame
-
+  /**
+   * sesame
+   * @see http://www.openrdf.org/
+   * @see http://repo1.maven.org/maven2/org/openrdf/sesame/
+   */
   val sesameVersion = "2.8.0-beta1"
   
   val sesameQueryAlgebra = "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion
@@ -36,22 +85,34 @@ object Dependencies {
   val sesameSailNativeRdf = "org.openrdf.sesame" % "sesame-sail-nativerdf" % sesameVersion
   val sesameRepositorySail = "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion
 
+  /**
+   * jsonld-java
+   * @see https://github.com/jsonld-java/jsonld-java
+   * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-sesame
+   */
   val jsonldJava = "com.github.jsonld-java" % "jsonld-java-sesame" % "0.5.1-SNAPSHOT"
 
-  // other
-
+  /**
+   * parboiled
+   * @see http://parboiled.org
+   * @see http://repo1.maven.org/maven2/org/parboiled/
+   */
   val parboiled2 = "org.parboiled" %% "parboiled" % "2.0.0"
 
+  /**
+   * Jasmine js and jvm
+   * @see https://github.com/InTheNow
+   * @see http://johnsonusm.com:8020/nexus/content/repositories/releases/com/github/inthenow/
+   */
   val jasmine_jvm = "com.github.inthenow" %% "jasmine_jvm" % "0.2.5"
-
-  val scalajsJasmine = "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
-
-  // %%% can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting...
-
-  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6")
-
   val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.5")
-
   val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.5" % "test")
+
+  /**
+   * scalajs-jasmine-test-framework
+   * @see http://scala-js.org
+   * @see http://dl.bintray.com/content/scala-js/scala-js-releases/org.scala-lang.modules.scalajs/scalajs-jasmine-test-framework_2.11
+   */
+  val scalajsJasmine = "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
 
 }
