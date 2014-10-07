@@ -27,10 +27,8 @@ branches:
     - master
 matrix:
   include:
-    - jdk: oraclejdk7
-      script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
+    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
   allow_failures: 
-    - jdk: oraclejdk7
-      script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
+    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
 #script:
 #  - ./sbt test
