@@ -57,7 +57,7 @@ You only need a recent version of Java, that's all:
 ``` bash
 $ git clone git@github.com:w3c/banana-rdf.git
 $ cd banana-rdf
-$ ./sbt
+$ sbt
 ```
 
 It's also easy to just build specific target platforms:
@@ -102,13 +102,13 @@ In `~/.sbt/0.13/plugins/build.sbt`
 To generate eclipse project files, just run the command:
 
 ``` bash
-$ ./sbt eclipse
+$ sbt eclipse
 ```
 
 IntelliJ IDEA
 -------------
 
-IntelliJ IDEA works with just one glaobl change:
+IntelliJ IDEA works with just one global change:
 
 In `~/.sbt/0.13/plugins/build.sbt`
 
@@ -119,7 +119,7 @@ In `~/.sbt/0.13/plugins/build.sbt`
 To generate IntelliJ project files, just run the command:
 
 ``` bash
-$ ./sbt gen-idea
+$ sbt gen-idea
 ```
 
 Contributions
@@ -128,7 +128,7 @@ Contributions
 All contributions are welcome. By contributing, you accept to give the
 ownership of your contribution to the [World Wide Web
 Consortium](http://www.w3.org). They are a _nonprofit organization_
-and just want to simplify the gouvernance of this opensource project.
+and just want to simplify the governance of this opensource project.
 
 Before contributing please make sure to copy the [bin/pre-commit](bin/pre-commit)
 shell script to the `.git/hooks/` directory of your clone.  This will ensure that all 
