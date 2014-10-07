@@ -34,11 +34,6 @@ matrix:
       jdk:    oraclejdk7
       scala:  2.10.4      
   allow_failures: 
-   - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-      jdk:    oraclejdk7
-      scala:  2.11.2
-    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-      jdk:    oraclejdk7
-      scala:  2.10.4    
+   - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test 
 #script:
 #  - ./sbt test
