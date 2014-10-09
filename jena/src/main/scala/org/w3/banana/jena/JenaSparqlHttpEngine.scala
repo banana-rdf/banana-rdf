@@ -36,9 +36,9 @@ class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena], ec: ExecutionContext)
       qexec(endpoint, query, bindings).execSelect()
     }
 
-  def executeUpdate(endpoint: URL, query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Future[Unit] =
+  def executeUpdate(endpoint: URL, query: Jena#UpdateQuery, bindings: Map[String, Jena#Node] = Map()): Future[Unit] =
     Future {
-      val ue = UpdateExecutionFactory.createRemote(query, endpoint.toString)
+      val ue = UpdateExecutionFactory.createRemoteForm(query, endpoint.toString)
       // not sure how to set the bindings on ue
       //      if (bindings.nonEmpty)
       //        ue.
