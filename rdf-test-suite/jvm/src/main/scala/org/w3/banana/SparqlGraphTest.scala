@@ -1,9 +1,10 @@
 package org.w3.banana
 
-import org.w3.banana.diesel._
-import org.w3.banana.syntax._
-import org.scalatest._
 import java.io._
+
+import org.scalatest._
+import org.w3.banana.diesel._
+import org.w3.banana.io.{ SparqlQueryResultsReader, _ }
 
 class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
   implicit ops: RDFOps[Rdf],
@@ -15,8 +16,8 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
     extends WordSpec with Matchers with Inside with TryValues {
 
   import ops._
-  import sparqlOperations._
   import sparqlGraph.sparqlEngineSyntax._
+  import sparqlOperations._
 
   val foaf = FOAFPrefix[Rdf]
 

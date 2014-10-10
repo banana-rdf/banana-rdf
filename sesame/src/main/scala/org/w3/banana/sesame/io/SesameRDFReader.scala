@@ -1,4 +1,4 @@
-package org.w3.banana.sesame
+package org.w3.banana.sesame.io
 
 import java.io._
 import java.util.LinkedList
@@ -6,8 +6,10 @@ import java.util.LinkedList
 import com.github.jsonldjava.sesame.SesameJSONLDParser
 import org.openrdf.model._
 import org.openrdf.model.impl.{ LinkedHashModel, LiteralImpl, StatementImpl }
-import org.openrdf.rio.helpers.{ JSONLDSettings, JSONLDMode }
+import org.openrdf.rio.helpers.{ JSONLDMode, JSONLDSettings }
 import org.w3.banana._
+import org.w3.banana.sesame.Sesame
+import org.w3.banana.io._
 
 import scala.util._
 

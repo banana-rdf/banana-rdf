@@ -2,6 +2,7 @@ package org.w3.banana
 
 import java.io._
 import org.scalatest._
+import org.w3.banana.io._
 
 class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
     writerSelector: RDFWriterSelector[Rdf],
@@ -44,7 +45,7 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
     val jsonldWriter = writerSelector(mr).get
-    jsonldWriter.syntax.mime should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#compacted"""")
+    jsonldWriter.syntax.standardMimeType should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#compacted"""")
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
     assert(referenceGraph isIsomorphicWith jsonldGraph)
@@ -63,7 +64,7 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
     val jsonldWriter = writerSelector(mr).get
-    jsonldWriter.syntax.mime should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#expanded"""")
+    jsonldWriter.syntax.standardMimeType should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#expanded"""")
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
     assert(referenceGraph isIsomorphicWith jsonldGraph)
@@ -81,7 +82,7 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
     val jsonldWriter = writerSelector(mr).get
-    jsonldWriter.syntax.mime should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#flattened"""")
+    jsonldWriter.syntax.standardMimeType should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#flattened"""")
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
     assert(referenceGraph isIsomorphicWith jsonldGraph)

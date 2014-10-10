@@ -1,21 +1,15 @@
 package org.w3.banana.jasmine.test
 
 import org.w3.banana._
-import org.w3.banana.syntax._
 import org.w3.banana.diesel._
-import org.w3.banana.binder._
-import scala.concurrent.ExecutionContext
-import scala.scalajs.concurrent.JSExecutionContext
-import scala.util.{ Success, Failure, Try }
 
 //import scalaz.Scalaz._
 //import scala.util._
-import scala.collection.immutable.ListMap
 import java.io._
-import scala.concurrent.Future
+
+import org.w3.banana.io._
 import org.w3.banana.{ RDFStore => RDFStoreInterface }
 
-import scala.scalajs.js
 import scala.scalajs.test.JasmineTest
 
 /**
@@ -32,11 +26,10 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
 
   import ops._
   //import syntax._
-  import sparqlOps._
   import graphStore.graphStoreSyntax._
-  import sparqlEngine.sparqlEngineSyntax._
   import lifecycle.lifecycleSyntax._
-  import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+  import sparqlEngine.sparqlEngineSyntax._
+  import sparqlOps._
 
   val foaf = FOAFPrefix(ops)
 
@@ -187,12 +180,10 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
       val lifecycle: Lifecycle[Rdf, A])
       extends JasmineTest {
     import ops._
-    import sparqlOps._
-    import graphStore.graphStoreSyntax._
-    import sparqlUpdateEngine.sparqlUpdateSyntax._
-    import sparqlUpdateEngine.sparqlEngineSyntax._
-    import lifecycle.lifecycleSyntax._
     import org.w3.banana.diesel._
+    import sparqlOps._
+    import sparqlUpdateEngine.sparqlEngineSyntax._
+    import sparqlUpdateEngine.sparqlUpdateSyntax._
 
     it("Henry Story must have banana-rdf as current-project") {
       jasmine.Clock.useMock()

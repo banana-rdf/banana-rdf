@@ -1,8 +1,10 @@
-package org.w3.banana.sesame
+package org.w3.banana.sesame.io
 
 import java.io._
 
 import org.w3.banana._
+import org.w3.banana.sesame.Sesame
+import org.w3.banana.io._
 
 import scala.util._
 

@@ -1,4 +1,5 @@
 package org.w3.banana
+package io
 
 object MimeType {
   val paramRegex = """([^=]+)="?([^"]*)"?""".r

@@ -5,6 +5,8 @@ import org.openrdf.sail.memory.MemoryStore
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.w3.banana._
 
+import org.w3.banana.io._
+
 /* Here is an example storing in a local RDF store:
  * - triples computed
  * - triples read from Internet

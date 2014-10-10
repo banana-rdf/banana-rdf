@@ -2,6 +2,9 @@ package org.w3.banana.jena
 
 import com.hp.hpl.jena.query.Dataset
 import org.w3.banana._
+import org.w3.banana.io.SparqlQueryResultsReader
+import org.w3.banana.jena.io.{ JenaSolutionsWriter, JenaRDFWriter, JenaRDFReader, JenaQueryResultsReader }
+import org.w3.banana.io._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

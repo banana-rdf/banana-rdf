@@ -1,14 +1,14 @@
-package org.w3.banana.sesame
+package org.w3.banana.sesame.io
 
 import java.io.{ OutputStream, Writer }
 
 import com.github.jsonldjava.sesame.SesameJSONLDWriter
 import org.openrdf.model.URI
 import org.openrdf.rio.RDFWriter
-import org.openrdf.rio.helpers.{ JSONLDSettings, JSONLDMode }
+import org.openrdf.rio.helpers.{ JSONLDMode, JSONLDSettings }
 import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
-import org.w3.banana._
+import org.w3.banana.io._
 
 /**typeclass that reflects a Jena String that can be used to construct a BlockingReader */
 trait SesameSyntax[T] {

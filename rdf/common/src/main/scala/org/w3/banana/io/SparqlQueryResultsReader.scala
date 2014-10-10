@@ -1,6 +1,8 @@
-package org.w3.banana
+package org.w3.banana.io
 
 import java.io._
+
+import org.w3.banana.RDF
 
 import scala.util._
 

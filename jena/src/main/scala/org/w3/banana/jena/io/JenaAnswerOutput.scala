@@ -1,7 +1,7 @@
-package org.w3.banana.jena
+package org.w3.banana.jena.io
 
 import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, OutputFormatter, XMLOutput }
-import org.w3.banana._
+import org.w3.banana.io._
 
 /**
  * typeclass for serialising special

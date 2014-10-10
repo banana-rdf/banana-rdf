@@ -4,7 +4,7 @@ import java.io.FileInputStream
 
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import scala.concurrent.ExecutionContext.Implicits.global
-
+import io._
 /**
  * Created by hjs on 01/09/2014.
  */

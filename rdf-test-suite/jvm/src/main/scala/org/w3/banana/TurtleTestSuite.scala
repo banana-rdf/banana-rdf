@@ -6,6 +6,7 @@ import org.scalatest._
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, Future }
+import org.w3.banana.io._
 
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle])
     extends WordSpec with Matchers {

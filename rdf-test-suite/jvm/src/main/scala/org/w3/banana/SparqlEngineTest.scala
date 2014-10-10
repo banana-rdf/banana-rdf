@@ -1,12 +1,8 @@
 package org.w3.banana
 
-import org.w3.banana.syntax._
-import org.w3.banana.diesel._
 import org.scalatest._
-import scala.concurrent._
-import scala.concurrent.util._
-import scala.concurrent.ExecutionContext.Implicits.global
-import java.io.FileInputStream
+import org.w3.banana.diesel._
+import org.w3.banana.io._
 
 class SparqlEngineTest[Rdf <: RDF, A](
   val store: A)(
@@ -19,10 +15,8 @@ class SparqlEngineTest[Rdf <: RDF, A](
     extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
 
   import ops._
-  import sparqlOps._
-  import graphStore.graphStoreSyntax._
   import sparqlEngine.sparqlEngineSyntax._
-  import lifecycle.lifecycleSyntax._
+  import sparqlOps._
 
   "new-tr.rdf must have Alexandre Bertails as an editor" in {
 

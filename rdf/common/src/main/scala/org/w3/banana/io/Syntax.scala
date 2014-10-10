@@ -1,4 +1,5 @@
 package org.w3.banana
+package io
 
 import scalaz.NonEmptyList
 
@@ -33,7 +34,8 @@ trait Syntax[+T] {
    * The default mime type to use for this syntax. Usually published at the IETF in their
    * <a href="http://www.iana.org/assignments/media-types/index.html">mime type registry</a>.
    */
-  lazy val mime = mimeTypes.head.mime
+  lazy val standardMimeType = mimeTypes.head.mime
+
 }
 
 /**

@@ -1,6 +1,8 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
+import org.w3.banana.plantain.io.{ PlantainTurtleWriter, PlantainTurtleReader }
+import org.w3.banana.io._
 
 trait PlantainModule
     extends RDFModule

@@ -12,6 +12,7 @@ import scala.collection.immutable.ListMap
 import java.io._
 import scala.concurrent.Future
 import org.w3.banana.{ RDFStore => RDFStoreInterface }
+import org.w3.banana.io._
 
 import scala.scalajs.js
 import scala.scalajs.test.JasmineTest

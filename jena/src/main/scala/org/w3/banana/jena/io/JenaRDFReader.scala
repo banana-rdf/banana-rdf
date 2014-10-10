@@ -1,4 +1,4 @@
-package org.w3.banana.jena
+package org.w3.banana.jena.io
 
 import java.io._
 
@@ -6,7 +6,8 @@ import com.hp.hpl.jena.graph.{ Node => JenaNode, Triple => JenaTriple, _ }
 import com.hp.hpl.jena.rdf.model.{ RDFReader => _ }
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
-import org.w3.banana._
+import org.w3.banana.io._
+import org.w3.banana.jena.{ Jena, JenaOps }
 
 import scala.util._
 

@@ -1,4 +1,6 @@
-package org.w3.banana
+package org.w3.banana.io
+
+import org.w3.banana._
 
 trait BananaSparqlSolutionWriterSelector {
 

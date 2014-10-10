@@ -1,12 +1,14 @@
+
 package org.w3.banana.plantain
+package io
 
 import java.io.InputStream
 
+import akka.http.model.Uri
 import org.openrdf.rio._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
-import org.w3.banana._
-import akka.http.model.Uri
+import org.w3.banana.io._
 
 import scala.util.Try
 

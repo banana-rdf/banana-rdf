@@ -1,7 +1,8 @@
 package org.w3.banana.jasmine.test
 
-import java.io.{ FileInputStream, File }
+import java.io.{ File, FileInputStream }
 
+import org.w3.banana.io._
 import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
 
 import scala.concurrent.ExecutionContext

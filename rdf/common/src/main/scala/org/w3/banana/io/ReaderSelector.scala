@@ -1,4 +1,5 @@
 package org.w3.banana
+package io
 
 /**
  * typeclass for a selector of RDFReader based on the provided mimetype

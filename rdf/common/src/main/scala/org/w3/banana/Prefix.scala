@@ -95,10 +95,10 @@ class XSDPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("xsd", "http
 
   // http://www.w3.org/TR/owl-rdf-based-semantics
   // Table 3.3 Datatypes of the OWL 2 RDF-Based Semantics 
-  
+
   // http://www.w3.org/TR/owl2-syntax/
   // Table 3 Reserved VOcabulary of OWL 2 with Special Treatment
-  
+
   val anyURI = apply("anyURI")
   val base64Binary = apply("base64Binary")
   val boolean = apply("boolean")
@@ -398,10 +398,10 @@ object OWLPrefix {
 }
 
 class OWLPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("owl", "http://www.w3.org/2002/07/owl#")(ops) {
-  
+
   // http://www.w3.org/TR/owl2-rdf-based-semantics/
   // table 3.2: OWL 2 RDF-Based Vocabulary
-  
+
   val AllDifferent = apply("AllDifferent")
   val AllDisjointClasses = apply("AllDisjointClasses")
   val AllDisjointProperties = apply("AllDisjointProperties")

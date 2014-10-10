@@ -1,9 +1,11 @@
-package org.w3.banana.sesame
+package org.w3.banana.sesame.io
 
 import java.io._
 
 import org.openrdf.query.resultio.{ QueryResultIO, QueryResultParseException }
-import org.w3.banana._
+import org.w3.banana.io.SparqlQueryResultsReader
+import org.w3.banana.sesame.{ BindingsAccumulator, Sesame }
+import org.w3.banana.io._
 
 import scala.util._
 

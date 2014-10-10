@@ -1,4 +1,4 @@
-package org.w3.banana.sesame
+package org.w3.banana.sesame.io
 
 import java.io.{ Writer => jWriter, _ }
 
@@ -6,6 +6,8 @@ import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
 import org.openrdf.rio.{ RDFWriter => sRDFWriter }
 import org.w3.banana._
+import org.w3.banana.io._
+import org.w3.banana.sesame.{ Sesame, SesameOps }
 
 import scala.util._
 

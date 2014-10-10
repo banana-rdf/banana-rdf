@@ -1,7 +1,7 @@
-package org.w3.banana.sesame
+package org.w3.banana.sesame.io
 
 import org.openrdf.query.resultio.{ BooleanQueryResultFormat, TupleQueryResultFormat }
-import org.w3.banana._
+import org.w3.banana.io._
 
 /**
  * typeclass for serialising special

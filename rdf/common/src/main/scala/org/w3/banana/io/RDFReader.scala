@@ -1,10 +1,10 @@
 package org.w3.banana
+package io
 
 import java.io._
 
 import scala.concurrent.Future
 import scala.util._
-
 
 trait RDFReader[Rdf <: RDF, +S] {
 

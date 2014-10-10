@@ -1,9 +1,12 @@
-package org.w3.banana.jena
+package org.w3.banana.jena.io
 
 import java.io.{ InputStream, Reader }
 
 import org.w3.banana._
+import org.w3.banana.io.SparqlQueryResultsReader
+import org.w3.banana.jena.Jena
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import org.w3.banana.io._
 
 import scala.util._
 

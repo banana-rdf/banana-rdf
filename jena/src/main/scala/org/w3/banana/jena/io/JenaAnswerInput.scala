@@ -1,9 +1,9 @@
-package org.w3.banana.jena
+package org.w3.banana.jena.io
 
 import java.io.InputStream
+import org.w3.banana.io._
 
 import com.hp.hpl.jena.sparql.resultset.{ JSONInput, SPARQLResult, XMLInput }
-import org.w3.banana._
 
 /**
  * typeclass for serialising special

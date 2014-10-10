@@ -1,11 +1,11 @@
-package org.w3.banana.sesame
+package org.w3.banana.sesame.io
 
 import java.io.OutputStream
 
 import org.openrdf.query.resultio.TupleQueryResultWriter
 import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
-import org.w3.banana._
+import org.w3.banana.io._
 
 /**
  * Sparql Output Syntaxes for Sesame, dependent on a SyntaxType for type classes

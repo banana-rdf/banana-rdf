@@ -1,4 +1,5 @@
 package org.w3.banana
+package io
 
 trait WriterSelector[O] extends (MediaRange => Option[Writer[O, Any]]) { self =>
 

@@ -1,4 +1,4 @@
-package org.w3.banana.plantain
+package org.w3.banana.plantain.io
 
 import java.io.{ ByteArrayOutputStream, OutputStream }
 
@@ -6,7 +6,9 @@ import akka.http.model.Uri
 import org.openrdf.model.impl._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
-import org.w3.banana._
+import org.w3.banana.plantain.{ Plantain }
+import org.w3.banana.plantain.model
+import org.w3.banana.io._
 
 import scala.util.Try
 
