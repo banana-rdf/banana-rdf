@@ -45,7 +45,7 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
     val jsonldWriter = writerSelector(mr).get
-    jsonldWriter.syntax.standardMimeType should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#compacted"""")
+    Syntax[JsonLdCompacted] should be(Syntax.JsonLdCompacted)
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
     assert(referenceGraph isIsomorphicWith jsonldGraph)
@@ -64,7 +64,7 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
     val jsonldWriter = writerSelector(mr).get
-    jsonldWriter.syntax.standardMimeType should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#expanded"""")
+    Syntax[JsonLdExpanded].standardMimeType should be(Syntax.JsonLdExpanded.standardMimeType)
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
     assert(referenceGraph isIsomorphicWith jsonldGraph)
@@ -82,7 +82,7 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
     val jsonldWriter = writerSelector(mr).get
-    jsonldWriter.syntax.standardMimeType should be("""application/ld+json;profile="http://www.w3.org/ns/json-ld#flattened"""")
+    Syntax[JsonLdFlattened].standardMimeType should be(Syntax.JsonLdFlattened.standardMimeType)
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
     assert(referenceGraph isIsomorphicWith jsonldGraph)

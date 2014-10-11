@@ -1,6 +1,6 @@
 package org.w3.banana.jena.io
 
-import java.io.{ Writer => jWriter, _ }
+import java.io.{Writer => jWriter, _}
 
 import org.apache.jena.riot._
 import org.w3.banana._
@@ -15,7 +15,6 @@ import scala.util._
 object JenaRDFWriter {
 
   def makeRDFWriter[S](lang: Lang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
-    val syntax = _syntax
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
       import org.w3.banana.jena.Jena.ops._
       val relativeGraph = graph.relativize(URI(base))

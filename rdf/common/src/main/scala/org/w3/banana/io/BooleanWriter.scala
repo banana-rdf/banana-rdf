@@ -22,8 +22,6 @@ object BooleanWriter {
    */
   implicit val Json = new BooleanWriter[SparqlAnswerJson] {
 
-    val syntax = Syntax[SparqlAnswerJson]
-
     def format(bool: Boolean): String =
       """{
         |  "head": {},
@@ -38,8 +36,6 @@ object BooleanWriter {
    * <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">Sparql Query Results XML Format</a>
    */
   implicit val booleanWriterXml = new BooleanWriter[SparqlAnswerXml] {
-
-    val syntax = Syntax[SparqlAnswerXml]
 
     def format(bool: Boolean): String =
       """<?xml version="1.0"?>

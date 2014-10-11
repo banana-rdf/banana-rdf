@@ -48,12 +48,10 @@ abstract class AbstractSesameReader[T] extends RDFReader[Sesame, T] {
 }
 
 class SesameTurtleReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[Turtle] {
-  val syntax = Syntax[Turtle]
   def getParser() = new org.openrdf.rio.turtle.TurtleParser
 }
 
 class SesameRDFXMLReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[RDFXML] {
-  val syntax = Syntax[RDFXML]
   def getParser() = new org.openrdf.rio.rdfxml.RDFXMLParser
 }
 
@@ -74,16 +72,13 @@ trait AbstractSesameJSONLDReader[T] extends AbstractSesameReader[T] {
 }
 
 class SesameJSONLDCompactedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdCompacted] {
-  val syntax = Syntax[JsonLdCompacted]
   val jsonldProfile = JSONLDMode.COMPACT
 }
 
 class SesameJSONLDExpandedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdExpanded] {
-  val syntax = Syntax[JsonLdExpanded]
   val jsonldProfile = JSONLDMode.EXPAND
 }
 
 class SesameJSONLDFlattenedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdFlattened] {
-  val syntax = Syntax[JsonLdFlattened]
   val jsonldProfile = JSONLDMode.FLATTEN
 }

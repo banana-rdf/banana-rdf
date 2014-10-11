@@ -14,8 +14,6 @@ import scala.util.Try
 
 object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
 
-  val syntax: Syntax[Turtle] = Syntax.Turtle
-
   class Sink(var graph: model.Graph[Uri] = PlantainOps.emptyGraph, var prefixes: Map[String, String] = Map.empty) extends RDFHandler {
 
     def startRDF(): Unit = ()

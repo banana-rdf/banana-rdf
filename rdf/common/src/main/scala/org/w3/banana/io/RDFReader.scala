@@ -8,8 +8,6 @@ import scala.util._
 
 trait RDFReader[Rdf <: RDF, +S] {
 
-  def syntax: Syntax[S]
-
   /**
    * legacy: if one passes an input stream at this layer one
    * would need to know the encoding too. This function is badly designed.

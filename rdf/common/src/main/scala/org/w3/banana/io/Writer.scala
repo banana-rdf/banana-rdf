@@ -11,8 +11,6 @@ import scala.util.Try
  */
 trait Writer[-O, +T] {
 
-  def syntax: Syntax[T]
-
   //todo: add a method that takes a writer
 
   //todo: this method needs an encoding

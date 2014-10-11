@@ -21,7 +21,7 @@ trait JsonLdFlattened
  * typeclass for a Syntax
  * It must say the mime-types that are associated to it
  */
-trait Syntax[+T] {
+trait SyntaxMime[+T, MimeType] {
 
   /**
    * the mime-types for this syntax
@@ -34,9 +34,12 @@ trait Syntax[+T] {
    * The default mime type to use for this syntax. Usually published at the IETF in their
    * <a href="http://www.iana.org/assignments/media-types/index.html">mime type registry</a>.
    */
-  lazy val standardMimeType = mimeTypes.head.mime
+  def standardMimeType: MimeType = mimeTypes.head
 
 }
+
+trait Syntax[+T] extends SyntaxMime[T,MimeType]
+
 
 /**
  * some Syntax instances for the well-known mime-types
