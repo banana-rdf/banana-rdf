@@ -5,3 +5,5 @@ import org.w3.banana.diesel._
 class JenaDieselGraphConstructTest extends DieselGraphConstructTest[Jena]
 
 class JenaDieselGraphExplorationTest extends DieselGraphExplorationTest[Jena]
+
+class JenaDieselOntologyGraphConstructTest extends DieselOntologyGraphConstructTest[Jena]

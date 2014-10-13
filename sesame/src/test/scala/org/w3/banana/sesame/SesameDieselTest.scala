@@ -5,3 +5,5 @@ import org.w3.banana.diesel._
 class SesameDieselGraphConstructTest extends DieselGraphConstructTest[Sesame]
 
 class SesameDieselGraphExplorationTest extends DieselGraphExplorationTest[Sesame]
+
+class SesameDieselOntologyGraphConstructTest extends DieselOntologyGraphConstructTest[Sesame]
