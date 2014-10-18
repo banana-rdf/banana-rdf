@@ -3,9 +3,6 @@ package org.w3.banana
 import java.io._
 
 import org.scalatest._
-
-import scala.concurrent.duration._
-import scala.concurrent.{ Await, Future }
 import org.w3.banana.io._
 
 abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle])
@@ -50,7 +47,7 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    val graph = Await.result(reader.read(turtleString, rdfCore), Duration(1, SECONDS))
+    val graph = reader.read(new StringReader(turtleString), rdfCore).get
     assert(referenceGraph isIsomorphicWith graph)
 
   }
@@ -58,20 +55,18 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
   "write simple graph as TURTLE string" in {
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
-    val graph = Await.result(reader.read(turtleString, rdfCore), Duration(1, SECONDS))
+    val graph = reader.read(new StringReader(turtleString), rdfCore).get
     assert(referenceGraph isIsomorphicWith graph)
   }
 
   "works with relative uris" in {
-    import scala.concurrent.ExecutionContext.Implicits.global
     val bar = for {
-      turtleString <- Future.successful(writer.asString(referenceGraph, rdfCore))
-      computedFooGraph <- reader.read(turtleString.get, foo)
+      turtleString <- writer.asString(referenceGraph, rdfCore)
+      computedFooGraph <- reader.read(new StringReader(turtleString), foo)
     } yield {
       computedFooGraph
     }
-    val g: Rdf#Graph = Await.result(bar, Duration(1, SECONDS))
-    assert(fooGraph isIsomorphicWith g)
+    assert(fooGraph isIsomorphicWith bar.get)
   }
 
 }

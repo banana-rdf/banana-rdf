@@ -45,6 +45,19 @@ abstract class AbstractSesameReader[T] extends RDFReader[Sesame, T] {
     new LinkedHashModel(triples)
   }
 
+  def read(reader: Reader, base: String): Try[Sesame#Graph] = {
+    Try {
+      val parser = getParser()
+      val triples = new LinkedList[Statement]
+      val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix {
+        val ops = AbstractSesameReader.this.ops
+      }
+      parser.setRDFHandler(collector)
+      parser.parse(reader, base)
+      new LinkedHashModel(triples)
+    }
+  }
+
 }
 
 class SesameTurtleReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[Turtle] {

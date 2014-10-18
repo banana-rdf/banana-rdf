@@ -3,6 +3,7 @@ package org.w3.banana.rdfstorew
 import java.io.InputStream
 
 import org.w3.banana._
+import org.w3.banana.io._
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow

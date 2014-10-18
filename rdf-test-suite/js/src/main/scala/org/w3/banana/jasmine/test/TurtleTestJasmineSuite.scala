@@ -1,6 +1,6 @@
 package org.w3.banana.jasmine.test
 
-import java.io.{ File, FileInputStream }
+import java.io.{ File, FileInputStream, StringReader }
 
 import org.w3.banana.io._
 import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 import scala.scalajs.test.JasmineTest
 
 /**
- * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
+ * Ported by Antonio Garrote from rdf-test-suite in scala.tests to Jasmine Tests
  */
 abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Turtle],
@@ -162,7 +162,7 @@ abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
   def asyncTest[Rdf <: RDF](text: String, base: String)(implicit executor: ExecutionContext): Array[Rdf#Graph] = {
     val graphs: Array[Any] = new Array[Any](1)
 
-    reader.read(text, base).map {
+    reader.read(new StringReader(text), base).map {
       case g => {
         graphs(0) = g
       }

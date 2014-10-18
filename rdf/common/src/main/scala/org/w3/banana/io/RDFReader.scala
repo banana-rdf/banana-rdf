@@ -3,31 +3,29 @@ package io
 
 import java.io._
 
-import scala.concurrent.Future
 import scala.util._
 
+/**
+ * Blocking Reader for an implementeation of RDF and a Syntax S
+ */
 trait RDFReader[Rdf <: RDF, +S] {
 
   /**
-   * legacy: if one passes an input stream at this layer one
-   * would need to know the encoding too. This function is badly designed.
-   * @param is
+   * parse from the Input Stream and have the parser guess the encoding. If no encoding guessing
+   * is needed use the reader method that takes a Reader.  This guessing may be more or less successful.
+   * @param is InputStream
+   * @param base Url to use to resolve relative URLs  ( as String ) //todo: why not as a RDF#URI ?
+   * @return A Success[Graph] or a Failure
+   * //todo: it may be more appropriate to have an encoding guessing function
+   */
+  def read(is: InputStream, base: String): Try[Rdf#Graph]
+
+  /**
+   * Parse from the Reader. Readers have already made the encoding decision, so there is no decision left
+   * here to make
+   * @param reader
    * @param base
    * @return
    */
-  @deprecated
-  def read(is: InputStream, base: String): Try[Rdf#Graph]
-
-  //todo: this is for rdfstorew that uses a lot more callbacks than Jena or Sesame
-  //it would probably be better to have RDFReader[M: Monad, Rdf<: RDF, +S] and the return be M[Rdf#Graph]
-  def read(is: String, base: String): Future[Rdf#Graph] = {
-    //this would be the scala 2.11 version
-    // Future.fromTry(read(new ByteArrayInputStream(is.getBytes("UTF-8")),base))
-    read(new ByteArrayInputStream(is.getBytes("UTF-8")), base) match {
-      case Success(s) => Future.successful(s)
-      case Failure(f) => Future.failed(f)
-    }
-
-  }
-
+  def read(reader: Reader, base: String): Try[Rdf#Graph]
 }

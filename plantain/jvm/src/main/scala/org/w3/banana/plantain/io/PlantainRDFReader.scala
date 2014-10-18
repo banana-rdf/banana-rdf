@@ -2,7 +2,7 @@
 package org.w3.banana.plantain
 package io
 
-import java.io.InputStream
+import java.io.{ Reader, InputStream }
 
 import akka.http.model.Uri
 import org.openrdf.rio._
@@ -39,11 +39,10 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
   }
 
   /**
-   * todo: this is the wrong way around. The reader taking an inputstream should
-   * call the reader taking a string or better a StringReader ( but does not exist yet in scala-js)
-   * @param is
-   * @param base
-   * @return
+   *
+   * @param is InputStream
+   * @param base Url to use to resolve relative URLs  ( as String ) //todo: why not as a RDF#URI ?
+   * @return A Success[Graph] or a Failure
    */
   def read(is: InputStream, base: String): Try[Plantain#Graph] = Try {
     val sink = new Sink
@@ -53,9 +52,17 @@ object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
     sink.graph
   }
 
-  def main(args: Array[String]): Unit = {
-    val is = new java.io.FileInputStream("/home/betehess/projects/banana-rdf/rdf-test-suite/src/main/resources/card.ttl")
-    read(is, "http://example.com/")
+  /**
+   * Parse from the Reader. Readers have already made the encoding decision, so there is none left here to make
+   * @param reader
+   * @param base
+   * @return
+   */
+  override def read(reader: Reader, base: String): Try[Plantain#Graph] = Try {
+    val sink = new Sink
+    val parser = new TurtleParser
+    parser.setRDFHandler(sink)
+    parser.parse(reader, base)
+    sink.graph
   }
-
 }

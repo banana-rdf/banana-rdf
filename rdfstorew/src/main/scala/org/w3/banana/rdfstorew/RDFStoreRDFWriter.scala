@@ -2,7 +2,7 @@ package org.w3.banana.rdfstorew
 
 import java.io.OutputStream
 
-import org.w3.banana.{ RDFWriter, Syntax, Turtle }
+import org.w3.banana.io.{ RDFWriter, Syntax, Turtle }
 
 import scala.util.Try
 

@@ -1,6 +1,6 @@
 package org.w3.banana.jena.io
 
-import java.io.{Writer => jWriter, _}
+import java.io.{ Writer => jWriter, _ }
 
 import org.apache.jena.riot._
 import org.w3.banana._

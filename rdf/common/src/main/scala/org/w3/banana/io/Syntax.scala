@@ -38,8 +38,7 @@ trait SyntaxMime[+T, MimeType] {
 
 }
 
-trait Syntax[+T] extends SyntaxMime[T,MimeType]
-
+trait Syntax[+T] extends SyntaxMime[T, MimeType]
 
 /**
  * some Syntax instances for the well-known mime-types
