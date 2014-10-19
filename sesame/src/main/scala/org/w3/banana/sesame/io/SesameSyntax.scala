@@ -1,6 +1,7 @@
 package org.w3.banana.sesame.io
 
 import java.io.{ OutputStream, Writer }
+import java.net.{ URI => jURI }
 
 import com.github.jsonldjava.sesame.SesameJSONLDWriter
 import org.openrdf.model.URI
@@ -26,22 +27,20 @@ object SesameSyntax {
 
   implicit val Turtle: SesameSyntax[Turtle] = new SesameSyntax[Turtle] {
     // Sesame's parser does not handle relative URI, but let us override the behavior :-)
-    def write(uri: URI, writer: Writer, baseURI: String) = {
-      val uriString = uri.toString
-      val uriToWrite =
-        if (uriString startsWith baseURI)
-          uriString.substring(baseURI.length)
-        else
-          uriString
+    def write(uri: URI, writer: Writer, baseURI: jURI) = {
+      val juri = new jURI(uri.toString)
+      val uriToWrite = baseURI.relativize(juri)
       writer.write("<" + uriToWrite + ">")
     }
 
     def rdfWriter(os: OutputStream, base: String) = new STurtleWriter(os) {
-      override def writeURI(uri: URI): Unit = write(uri, writer, base)
+      val baseUri = new jURI(base)
+      override def writeURI(uri: URI): Unit = write(uri, writer, baseUri)
     }
 
     def rdfWriter(wr: Writer, base: String) = new STurtleWriter(wr) {
-      override def writeURI(uri: URI): Unit = write(uri, writer, base)
+      val baseUri = new jURI(base)
+      override def writeURI(uri: URI): Unit = write(uri, writer, baseUri)
     }
   }
 

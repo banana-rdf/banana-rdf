@@ -42,13 +42,21 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
     } finally { fis.close() }
   }
 
-  "read simple TURTLE String" in {
+  "simple TURTLE string containing only absolute URIs" should {
     val turtleString = """
 <http://www.w3.org/2001/sw/RDFCore/ntriples/> <http://purl.org/dc/elements/1.1/creator> "Dave Beckett", "Art Barstow" ;
                                               <http://purl.org/dc/elements/1.1/publisher> <http://www.w3.org/> .
  """
-    val graph = reader.read(new StringReader(turtleString), rdfCore).get
-    assert(referenceGraph isIsomorphicWith graph)
+
+    "parse using Readers (the base has no effect since all URIs are absolute)" in {
+      val graph = reader.read(new StringReader(turtleString), rdfCore).get
+      assert(referenceGraph isIsomorphicWith graph)
+    }
+
+    "parse using InputStream (the base has no effect since all URIs are absolute)" in {
+      val graph = reader.read(new ByteArrayInputStream(turtleString.getBytes("UTF-8")), rdfCore).get
+      assert(referenceGraph isIsomorphicWith graph)
+    }
 
   }
 
@@ -59,14 +67,31 @@ abstract class TurtleTestSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: 
     assert(referenceGraph isIsomorphicWith graph)
   }
 
-  "works with relative uris" in {
-    val bar = for {
-      turtleString <- writer.asString(referenceGraph, rdfCore)
-      computedFooGraph <- reader.read(new StringReader(turtleString), foo)
-    } yield {
-      computedFooGraph
+  "graphs with relative URIs" should {
+
+    "Moving the graph to a new base should transform all relative URLs" in {
+      val bar = for {
+        turtleStringWithRelativeURIs <- writer.asString(referenceGraph, rdfCore)
+        computedFooGraph <- reader.read(new StringReader(turtleStringWithRelativeURIs), foo)
+      } yield {
+        computedFooGraph
+      }
+      assert(fooGraph isIsomorphicWith bar.get)
     }
-    assert(fooGraph isIsomorphicWith bar.get)
+
+    "relativising a graph to a base requires URI.relativise function" in {
+      val rdfCoreSubstring = rdfCore.substring(0, rdfCore.length - 3)
+      val bar = for {
+        turtleStringWithRelativeURIs <- writer.asString(referenceGraph, rdfCoreSubstring)
+        computedFooGraph <- reader.read(new StringReader(turtleStringWithRelativeURIs), "http://neverused.example/")
+      } yield {
+        computedFooGraph
+      }
+      println(s"fooGraph=$fooGraph")
+      println(s"bar=$bar")
+      assert(referenceGraph isIsomorphicWith bar.get)
+
+    }
   }
 
 }

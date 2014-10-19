@@ -24,8 +24,8 @@ trait RDFReader[Rdf <: RDF, +S] {
    * Parse from the Reader. Readers have already made the encoding decision, so there is no decision left
    * here to make
    * @param reader
-   * @param base
-   * @return
+   * @param base URI for all relative URIs in reader //todo: should be a URI
+   * @return Success of a Graph or Failure
    */
   def read(reader: Reader, base: String): Try[Rdf#Graph]
 }
