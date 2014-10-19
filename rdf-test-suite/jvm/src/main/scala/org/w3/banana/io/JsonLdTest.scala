@@ -1,8 +1,9 @@
-package org.w3.banana
+package org.w3.banana.io
 
 import java.io._
+
 import org.scalatest._
-import org.w3.banana.io._
+import org.w3.banana._
 
 class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
     writerSelector: RDFWriterSelector[Rdf],

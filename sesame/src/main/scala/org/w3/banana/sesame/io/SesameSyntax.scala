@@ -4,12 +4,13 @@ import java.io.{ OutputStream, Writer }
 import java.net.{ URI => jURI }
 
 import com.github.jsonldjava.sesame.SesameJSONLDWriter
-import org.openrdf.model.URI
+import org.openrdf.model.{ Statement, URI => sURI }
 import org.openrdf.rio.RDFWriter
 import org.openrdf.rio.helpers.{ JSONLDMode, JSONLDSettings }
 import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
 import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
 import org.w3.banana.io._
+import org.w3.banana.sesame.Sesame
 
 /**typeclass that reflects a Jena String that can be used to construct a BlockingReader */
 trait SesameSyntax[T] {
@@ -20,14 +21,26 @@ trait SesameSyntax[T] {
 object SesameSyntax {
 
   implicit val RDFXML: SesameSyntax[RDFXML] = new SesameSyntax[RDFXML] {
-    def rdfWriter(os: OutputStream, base: String) = new SRdfXmlWriter(os)
+    import Sesame.ops._
+    // Sesame's parser does not handle relative URI, but let us override the behavior :-)
+    def rdfWriter(os: OutputStream, base: String) = new SRdfXmlWriter(os) {
+      val baseUri = URI(base)
+      override def handleStatement(st: Statement) = {
+        super.handleStatement(st.relativizeAgainst(baseUri))
+      }
+    }
 
-    def rdfWriter(wr: Writer, base: String) = new SRdfXmlWriter(wr)
+    def rdfWriter(wr: Writer, base: String) = new SRdfXmlWriter(wr) {
+      val baseUri = URI(base)
+      override def handleStatement(st: Statement) = {
+        super.handleStatement(st.relativizeAgainst(baseUri))
+      }
+    }
   }
 
   implicit val Turtle: SesameSyntax[Turtle] = new SesameSyntax[Turtle] {
     // Sesame's parser does not handle relative URI, but let us override the behavior :-)
-    def write(uri: URI, writer: Writer, baseURI: jURI) = {
+    def write(uri: sURI, writer: Writer, baseURI: jURI) = {
       val juri = new jURI(uri.toString)
       val uriToWrite = baseURI.relativize(juri)
       writer.write("<" + uriToWrite + ">")
@@ -35,16 +48,16 @@ object SesameSyntax {
 
     def rdfWriter(os: OutputStream, base: String) = new STurtleWriter(os) {
       val baseUri = new jURI(base)
-      override def writeURI(uri: URI): Unit = write(uri, writer, baseUri)
+      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
     }
 
     def rdfWriter(wr: Writer, base: String) = new STurtleWriter(wr) {
       val baseUri = new jURI(base)
-      override def writeURI(uri: URI): Unit = write(uri, writer, baseUri)
+      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
     }
   }
 
-  implicit val jsonLdCompated: SesameSyntax[JsonLdCompacted] = jsonldSyntax(JSONLDMode.COMPACT)
+  implicit val jsonLdCompacted: SesameSyntax[JsonLdCompacted] = jsonldSyntax(JSONLDMode.COMPACT)
 
   implicit val jsonLdExpanded: SesameSyntax[JsonLdExpanded] = jsonldSyntax(JSONLDMode.EXPAND)
 
