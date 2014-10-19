@@ -1,4 +1,4 @@
-package org.w3.banana.iso
+package org.w3.banana.isomorphism
 
 import org.w3.banana.{ RDF, RDFOps }
 
@@ -78,7 +78,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
       return Failure(MappingException(s"Search space too big. maxComplexity is set to $maxComplexity but the search space is of size $complexity"))
 
     bnodeMaps map { nodeMapping =>
-      import org.w3.banana.iso.MappingGenerator._
+      import org.w3.banana.isomorphism.MappingGenerator._
       /**
        *  We want to go from a Map(1->Set(1,2),2->Set(21,22),3->Set(33,34))
        * to a Tree of potential answers looking like this

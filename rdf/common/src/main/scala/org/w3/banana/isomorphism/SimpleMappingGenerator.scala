@@ -1,4 +1,4 @@
-package org.w3.banana.iso
+package org.w3.banana.isomorphism
 
 import org.w3.banana.{ RDFOps, RDF }
 

@@ -1,7 +1,7 @@
-package org.w3.banana.plantain.iso
+package org.w3.banana.isomorphism
 
 import org.scalatest.{ Matchers, Suite, WordSpec }
-import org.w3.banana.iso.{ GraphIsomorphism, IsomorphismBNodeTrait, VerticeCBuilder }
+import org.w3.banana.isomorphism.{ GraphIsomorphism, VerticeCBuilder }
 import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
@@ -16,7 +16,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
 
   import ops._
   import org.w3.banana.diesel._
-  import org.w3.banana.iso.MappingGenerator._
+  import org.w3.banana.isomorphism.MappingGenerator._
 
   val countingIso = isoFactory(VerticeCBuilder.counting)
   val simpleHashIso = isoFactory(VerticeCBuilder.simpleHash)

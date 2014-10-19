@@ -1,7 +1,7 @@
-package org.w3.banana.iso
+package org.w3.banana.isomorphism
 
 import org.scalatest.Suite
-import org.w3.banana.{ RDFPrefix, FOAFPrefix, RDF, RDFOps }
+import org.w3.banana.{ FOAFPrefix, RDF, RDFOps, RDFPrefix }
 
 /**
  * Created by hjs on 04/09/2014.

@@ -4,7 +4,7 @@ import java.util.NoSuchElementException
 import org.w3.banana.plantain.model
 
 import org.w3.banana._
-import org.w3.banana.iso.{ GraphIsomorphism, SimpleMappingGenerator, VerticeCBuilder }
+import org.w3.banana.isomorphism.{ GraphIsomorphism, SimpleMappingGenerator, VerticeCBuilder }
 import scala.language.existentials
 
 trait PlantainOps[U, Rdf <: Plantain[U]] extends RDFOps[Rdf] {
@@ -106,7 +106,7 @@ trait PlantainOps[U, Rdf <: Plantain[U]] extends RDFOps[Rdf] {
   }
 
   // graph isomorphism
-  private lazy val iso = new GraphIsomorphism[Rdf](new SimpleMappingGenerator[Rdf](VerticeCBuilder.simpleHash))
+  lazy val iso = new GraphIsomorphism[Rdf](new SimpleMappingGenerator[Rdf](VerticeCBuilder.simpleHash))
 
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean = {
     iso.findAnswer(left, right).isSuccess

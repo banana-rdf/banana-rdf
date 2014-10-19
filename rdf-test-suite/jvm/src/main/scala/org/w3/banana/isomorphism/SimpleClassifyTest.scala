@@ -1,7 +1,7 @@
-package org.w3.banana.rdf.iso
+package org.w3.banana.isomorphism
 
 import org.scalatest.{ Matchers, WordSpec }
-import org.w3.banana.iso._
+import org.w3.banana.isomorphism._
 import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
