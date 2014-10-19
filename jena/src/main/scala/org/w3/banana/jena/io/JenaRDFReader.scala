@@ -13,9 +13,8 @@ import scala.util._
 
 class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 
-  var triples: Set[Jena#Triple] = Set.empty
   var prefixes: Map[String, String] = Map.empty
-  def graph: Jena#Graph = ops.makeGraph(triples)
+  val graph: Jena#Graph = Factory.createDefaultGraph
 
   def base(base: String): Unit = ()
   def finish(): Unit = ()
@@ -38,17 +37,18 @@ class TripleSink(implicit ops: JenaOps) extends StreamRDF {
       else
         // otherwise everything is fine
         triple
-    triples += t
+    graph.add(t)
   }
   def tuple(tuple: org.apache.jena.atlas.lib.Tuple[JenaNode]): Unit = ()
 }
 
 object JenaRDFReader {
-
   def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax: Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
+    val factory = RDFParserRegistry.getFactory(lang)
     override def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink()(ops)
-      RDFDataMgr.parse(sink, is, base, lang)
+      factory.create(lang).read(is, base, null, sink, null)
+      //      RDFDataMgr.parse(sink, is, base, lang)
       sink.graph
     }
 

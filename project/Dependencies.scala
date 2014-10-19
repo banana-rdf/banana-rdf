@@ -53,7 +53,7 @@ object Dependencies {
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "2.11.2"
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "2.12.1"
 
   /**
    * logback for jena

@@ -1,7 +1,6 @@
 package org.w3.banana.isomorphism
 
 import org.scalatest.{ Matchers, Suite, WordSpec }
-import org.w3.banana.isomorphism.{ GraphIsomorphism, VerticeCBuilder }
 import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap

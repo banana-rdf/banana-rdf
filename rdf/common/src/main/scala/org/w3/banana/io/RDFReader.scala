@@ -6,7 +6,7 @@ import java.io._
 import scala.util._
 
 /**
- * Blocking Reader for an implementeation of RDF and a Syntax S
+ * Blocking Reader for an implementation of RDF and a Syntax S
  */
 trait RDFReader[Rdf <: RDF, +S] {
 

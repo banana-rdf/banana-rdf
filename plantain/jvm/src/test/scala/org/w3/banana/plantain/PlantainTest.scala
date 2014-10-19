@@ -3,7 +3,7 @@ package org.w3.banana.plantain
 import org.w3.banana._
 import org.w3.banana.io.TurtleTestSuite
 import org.w3.banana.isomorphism._
-import org.w3.banana.isomorphism.{GraphIsomorphismTest, IsomorphismTests, SimpleClassifyTest}
+import org.w3.banana.isomorphism.{ GraphIsomorphismTest, IsomorphismTests, SimpleClassifyTest }
 import org.w3.banana.plantain.PlantainOps._
 
 class PlantainTurtleTest extends TurtleTestSuite[Plantain]

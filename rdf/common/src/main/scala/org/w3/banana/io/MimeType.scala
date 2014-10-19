@@ -42,6 +42,7 @@ object ImageGifMime extends MimeType("image", "gif")
 object ImagePngMime extends MimeType("image", "png")
 object RdfTurtleMime extends MimeType("text", "turtle")
 object TextHtmlMime extends MimeType("text", "html")
+object RdfXMLMime extends MimeType("text", "html")
 
 trait MimeExtensions {
   def extension(mime: MimeType): Option[String]
@@ -50,11 +51,12 @@ trait MimeExtensions {
 
 object WellKnownMimeExtensions extends MimeExtensions {
   val mimeExt = collection.immutable.Map(
-    ImageJpegMime -> ".jpg",
-    ImageGifMime -> ".gif",
-    ImagePngMime -> ".png",
-    RdfTurtleMime -> ".ttl",
-    TextHtmlMime -> ".html"
+    ImageJpegMime -> "jpg",
+    ImageGifMime -> "gif",
+    ImagePngMime -> "png",
+    RdfTurtleMime -> "ttl",
+    RdfXMLMime -> "rdf",
+    TextHtmlMime -> "html"
   )
   val extMime = {
     val content = for {

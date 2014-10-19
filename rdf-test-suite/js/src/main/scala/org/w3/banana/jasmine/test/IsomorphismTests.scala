@@ -1,7 +1,7 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana.isomorphism.{GraphIsomorphism, VerticeCBuilder, _}
-import org.w3.banana.{RDFStore => RDFStoreInterface, _}
+import org.w3.banana.isomorphism.{ GraphIsomorphism, VerticeCBuilder, _ }
+import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
 
 import scala.collection.immutable.ListMap
 import scala.scalajs.test.JasmineTest

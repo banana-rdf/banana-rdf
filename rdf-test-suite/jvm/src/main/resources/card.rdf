@@ -1,0 +1,136 @@
+<rdf:RDF xmlns="http://xmlns.com/foaf/0.1/"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:cert="http://www.w3.org/ns/auth/cert#"
+    xmlns:con="http://www.w3.org/2000/10/swap/pim/contact#"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:dct="http://purl.org/dc/terms/"
+    xmlns:doap="http://usefulinc.com/ns/doap#"
+    xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:s="http://www.w3.org/2000/01/rdf-schema#">
+
+    <rdf:Description rdf:about="../../DesignIssues/Overview.html">
+        <dc:title>Design Issues for the World Wide Web</dc:title>
+        <maker rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <PersonalProfileDocument rdf:about="">
+        <cc:license rdf:resource="http://creativecommons.org/licenses/by-nc/3.0/"/>
+        <dc:title>Tim Berners-Lee's FOAF file</dc:title>
+        <maker rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+        <primaryTopic rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </PersonalProfileDocument>
+
+    <rdf:Description rdf:about="#i">
+        <cert:key rdf:parseType="Resource">
+            <rdf:type rdf:resource="http://www.w3.org/ns/auth/cert#RSAPublicKey"/>
+            <cert:exponent rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">65537</cert:exponent>
+            <cert:modulus rdf:datatype="http://www.w3.org/2001/XMLSchema#hexBinary">d7a0e91eedddcc905d5eccd1e412ab0c5bdbe118fa99b7132d915452f0b09af5ebc0096ca1dbdeec32723f5ddd2b05564e2ce67effba8e86778e114a02a3907c2e6c6b28cf16fee77d0ef0c44d2e3ccd3e0b6e8cfdd197e3aa86ec199980729af4451f7999bce55eb34bd5a5350470463700f7308e372bdb6e075e0bb8a8dba93686fa4ae51317a44382bb09d09294c1685b1097ffd59c446ae567faece6b6aa27897906b524a64989bd48cfeaec61d12cc0b63ddb885d2dadb0b358c666aa93f5a443fb91fc2a3dc699eb46159b05c5758c9f13ed2844094cc539e582e11de36c6733a67b5125ef407b329ef5e922ca5746a5ffc67b650b4ae36610fca0cd7b</cert:modulus>
+        </cert:key>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://dig.csail.mit.edu/2005/ajar/ajaw/data#Tabulator">
+        <doap:developer rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://dig.csail.mit.edu/2007/01/camp/data#course">
+        <maker rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <PersonalProfileDocument rdf:about="http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf">
+        <cc:license rdf:resource="http://creativecommons.org/licenses/by-nc/3.0/"/>
+        <dc:title>Tim Berners-Lee's editable FOAF file</dc:title>
+        <maker rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+        <primaryTopic rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </PersonalProfileDocument>
+
+    <rdf:Description rdf:about="http://dig.csail.mit.edu/breadcrumbs/blog/4">
+        <dc:title>timbl's blog</dc:title>
+        <s:seeAlso rdf:resource="http://dig.csail.mit.edu/breadcrumbs/blog/feed/4"/>
+        <maker rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://dig.csail.mit.edu/data#DIG">
+        <member rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://wiki.ontoworld.org/index.php/_IRW2006">
+        <dc:title>Identity, Reference and the Web workshop 2006</dc:title>
+        <con:participant rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://www.ecs.soton.ac.uk/~dt2/dlstuff/www2006_data#panel-panelk01">
+        <s:label>The Next Wave of the Web (Plenary Panel)</s:label>
+        <con:participant rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://www.w3.org/2000/10/swap/data#Cwm">
+        <doap:developer rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://www.w3.org/2011/Talks/0331-hyderabad-tbl/data#talk">
+        <dct:title>Designing the Web for an Open Society</dct:title>
+        <maker rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <con:Male rdf:about="http://www.w3.org/People/Berners-Lee/card#i">
+        <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+        <s:label>Tim Berners-Lee</s:label>
+        <s:seeAlso rdf:resource="http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf"/>
+        <s:seeAlso rdf:resource="http://www.w3.org/2007/11/Talks/search/query?date=All+past+and+future+talks&#38;event=None&#38;activity=None&#38;name=Tim+Berners-Lee&#38;country=None&#38;language=None&#38;office=None&#38;rdfOnly=yes&#38;submit=Submit"/>
+        <con:assistant rdf:resource="http://www.w3.org/People/Berners-Lee/card#amy"/>
+        <con:homePage rdf:resource="./"/>
+        <con:office rdf:parseType="Resource">
+            <con:address rdf:parseType="Resource">
+                <con:city>Cambridge</con:city>
+                <con:country>USA</con:country>
+                <con:postalCode>02139</con:postalCode>
+                <con:street>32 Vassar Street</con:street>
+                <con:street2>MIT CSAIL Room 32-G524</con:street2>
+            </con:address>
+            <con:phone rdf:resource="tel:+1-617-253-5702"/>
+            <geo:location rdf:parseType="Resource">
+                <geo:lat>42.361860</geo:lat>
+                <geo:long>-71.091840</geo:long>
+            </geo:location>
+        </con:office>
+        <con:preferredURI>http://www.w3.org/People/Berners-Lee/card#i</con:preferredURI>
+        <con:publicHomePage rdf:resource="./"/>
+        <owl:sameAs rdf:resource="http://graph.facebook.com/512908782#"/>
+        <owl:sameAs rdf:resource="http://identi.ca/user/45563"/>
+        <owl:sameAs rdf:resource="http://www.advogato.org/person/timbl/foaf.rdf#me"/>
+        <owl:sameAs rdf:resource="http://www4.wiwiss.fu-berlin.de/bookmashup/persons/Tim+Berners-Lee"/>
+        <owl:sameAs rdf:resource="http://www4.wiwiss.fu-berlin.de/dblp/resource/person/100007"/>
+        <account rdf:resource="http://en.wikipedia.org/wiki/User:Timbl"/>
+        <account rdf:resource="http://identi.ca/timbl"/>
+        <account rdf:resource="http://twitter.com/timberners_lee"/>
+        <based_near rdf:parseType="Resource">
+            <geo:lat>42.361860</geo:lat>
+            <geo:long>-71.091840</geo:long>
+        </based_near>
+        <family_name>Berners-Lee</family_name>
+        <givenname>Timothy</givenname>
+        <homepage rdf:resource="http://www.w3.org/People/Berners-Lee/"/>
+        <img rdf:resource="http://www.w3.org/Press/Stock/Berners-Lee/2001-europaeum-eighth.jpg"/>
+        <mbox rdf:resource="mailto:timbl@w3.org"/>
+        <mbox_sha1sum>965c47c5a70db7407210cef6e4e6f5374a525c5c</mbox_sha1sum>
+        <name>Timothy Berners-Lee</name>
+        <nick>TimBL</nick>
+        <nick>timbl</nick>
+        <openid rdf:resource="http://www.w3.org/People/Berners-Lee/"/>
+        <phone rdf:resource="tel:+1-(617)-253-5702"/>
+        <title>Sir</title>
+        <weblog rdf:resource="http://dig.csail.mit.edu/breadcrumbs/blog/4"/>
+        <workplaceHomepage rdf:resource="http://www.w3.org/"/>
+    </con:Male>
+
+    <rdf:Description rdf:about="http://www.w3.org/data#W3C">
+        <member rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+    </rdf:Description>
+
+    <rdf:Description rdf:about="http://www4.wiwiss.fu-berlin.de/booksMeshup/books/006251587X">
+        <dc:creator rdf:resource="http://www.w3.org/People/Berners-Lee/card#i"/>
+        <dc:title>Weaving the Web: The Original Design and Ultimate Destiny of the World Wide Web</dc:title>
+    </rdf:Description>
+</rdf:RDF>

@@ -29,6 +29,7 @@ object BuildSettings {
     resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
     resolvers += "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
+//  resolvers += "Apache snapshots" at "https://repository.apache.org/content/repositories/snapshots",
     description := "RDF framework for Scala",
     startYear := Some(2012),
     pomIncludeRepository := { _ => false},

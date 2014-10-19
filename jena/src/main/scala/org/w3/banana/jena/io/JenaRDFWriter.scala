@@ -1,11 +1,14 @@
-package org.w3.banana.jena.io
+package org.w3.banana.jena
+package io
 
 import java.io.{ Writer => jWriter, _ }
 
-import org.apache.jena.riot._
+import com.hp.hpl.jena.rdf.model.ModelFactory
+import com.hp.hpl.jena.rdf.model.impl.RDFWriterFImpl
+import com.hp.hpl.jena.rdfxml.xmloutput.impl.Abbreviated
+import org.apache.jena.riot.{ Lang => JenaLang, _ }
 import org.w3.banana._
 import org.w3.banana.io._
-import org.w3.banana.jena.Jena
 
 import scala.util._
 
@@ -13,28 +16,58 @@ import scala.util._
  * Create an RDF Writer using Jena's serialisers
  */
 object JenaRDFWriter {
+  final val writerFactory = new RDFWriterFImpl();
+  import org.w3.banana.jena.Jena.ops._
 
-  def makeRDFWriter[S](lang: Lang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
+  def makeRDFWriter[S](lang: JenaLang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
-      import org.w3.banana.jena.Jena.ops._
-      val relativeGraph = graph.relativize(URI(base))
-      RDFDataMgr.write(os, relativeGraph, lang)
+      val model = ModelFactory.createModelForGraph(graph)
+      writerFactory.getWriter(lang.getLabel).write(model, os, base)
     }
 
     def asString(graph: Jena#Graph, base: String): Try[String] = Try {
       val result = new StringWriter()
-      import org.w3.banana.jena.Jena.ops._
-      val relativeGraph = graph.relativize(URI(base))
-      RDFDataMgr.write(result, relativeGraph, lang)
+      val model = ModelFactory.createModelForGraph(graph)
+      writerFactory.getWriter(lang.getLabel).write(model, result, base)
       result.toString()
     }
   }
 
-  implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = makeRDFWriter[RDFXML](Lang.RDFXML)
+  implicit val rdfxmlWriter: RDFWriter[Jena, RDFXML] = new RDFWriter[Jena, RDFXML] {
+    def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
+      val writer = new Abbreviated()
+      writer.setProperty("relativeURIs", "same-document,relative")
+      val model = ModelFactory.createModelForGraph(graph)
+      writer.write(model, os, base)
+    }
 
-  implicit val turtleWriter: RDFWriter[Jena, Turtle] = makeRDFWriter[Turtle](Lang.TURTLE)
+    def asString(graph: Jena#Graph, base: String): Try[String] = Try {
+      val result = new StringWriter()
+      val writer = new Abbreviated()
+      writer.setProperty("relativeURIs", "same-document,relative")
+      val model = ModelFactory.createModelForGraph(graph)
+      writer.write(model, result, base)
+      result.toString()
+    }
+  }
 
-  implicit val n3Writer: RDFWriter[Jena, N3] = makeRDFWriter[N3](Lang.N3)
+  implicit val turtleWriter: RDFWriter[Jena, Turtle] = new RDFWriter[Jena, Turtle] {
+    // with the turtle writer we pass it  relative graph as that seems to stop the parser from adding the
+    // @base statement at the top!
+    def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
+      val relativeGraph = graph.relativize(URI(base))
+      RDFDataMgr.write(os, relativeGraph, JenaLang.TURTLE)
+    }
+
+    def asString(graph: Jena#Graph, base: String): Try[String] = Try {
+      val result = new StringWriter()
+      val relativeGraph = graph.relativize(URI(base))
+      RDFDataMgr.write(result, relativeGraph, JenaLang.TURTLE)
+      result.toString()
+    }
+  }
+
+  implicit val n3Writer: RDFWriter[Jena, N3] = makeRDFWriter[N3](RDFLanguages.N3)
 
   val selector: RDFWriterSelector[Jena] =
     RDFWriterSelector[Jena, RDFXML] combineWith RDFWriterSelector[Jena, Turtle]
