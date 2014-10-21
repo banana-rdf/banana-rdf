@@ -1,13 +1,13 @@
 package org.w3.banana
 
-import org.scalatest.{ TryValues, BeforeAndAfterAll, Matchers, WordSpec }
+import org.scalatest.{ BeforeAndAfterAll, Matchers, TryValues, WordSpec }
 
 /**
  * Sparql Update gets a special test as not all servers implement it.
  */
 class SparqlUpdateEngineTest[Rdf <: RDF, A](
   val store: A)(
-    implicit val reader: RDFReader[Rdf, RDFXML],
+    implicit val reader: io.RDFReader[Rdf, io.RDFXML],
     val ops: RDFOps[Rdf],
     val sparqlOps: SparqlOps[Rdf],
     val graphStore: GraphStore[Rdf, A],
@@ -15,12 +15,10 @@ class SparqlUpdateEngineTest[Rdf <: RDF, A](
     val lifecycle: Lifecycle[Rdf, A])
     extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
   import ops._
-  import sparqlOps._
-  import graphStore.graphStoreSyntax._
-  import sparqlUpdateEngine.sparqlUpdateSyntax._
-  import sparqlUpdateEngine.sparqlEngineSyntax._
-  import lifecycle.lifecycleSyntax._
   import org.w3.banana.diesel._
+  import sparqlOps._
+  import sparqlUpdateEngine.sparqlEngineSyntax._
+  import sparqlUpdateEngine.sparqlUpdateSyntax._
 
   "Henry Story must have banana-rdf as current-project" in {
     val updateQuery = parseUpdate(

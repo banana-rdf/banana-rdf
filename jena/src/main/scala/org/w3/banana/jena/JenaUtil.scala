@@ -3,6 +3,7 @@ package org.w3.banana.jena
 import com.hp.hpl.jena.graph.{ Factory, Node => JenaNode }
 import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, _ }
 import org.w3.banana._
+import org.w3.banana.jena.io.JenaRDFWriter
 
 class JenaUtil(implicit jenaOps: RDFOps[Jena]) {
 

@@ -1,22 +1,11 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana._
-import org.w3.banana.iso._
-import org.w3.banana.syntax._
-import org.w3.banana.diesel._
-import org.w3.banana.binder._
-import org.w3.banana.iso.{ VerticeCBuilder, GraphIsomorphism }
-import scala.concurrent.ExecutionContext
-import scala.scalajs.concurrent.JSExecutionContext
-import scalaz.Scalaz._
-import scala.util._
-import scala.collection.immutable.ListMap
-import java.io._
-import scala.concurrent.Future
-import org.w3.banana.{ RDFStore => RDFStoreInterface }
+import org.w3.banana.isomorphism.{ GraphIsomorphism, VerticeCBuilder, _ }
+import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
 
-import scala.scalajs.js
+import scala.collection.immutable.ListMap
 import scala.scalajs.test.JasmineTest
+import scala.util._
 
 /**
  * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
@@ -30,7 +19,6 @@ abstract class IsomorphismTests[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[R
 
   import ops._
   import org.w3.banana.diesel._
-  import org.w3.banana.iso.MappingGenerator._
 
   val countingIso = isoFactory(VerticeCBuilder.counting)
   val simpleHashIso = isoFactory(VerticeCBuilder.simpleHash)

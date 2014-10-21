@@ -2,9 +2,7 @@ package org.w3.banana
 
 import org.scalatest._
 import org.w3.banana.diesel._
-import org.w3.banana.syntax._
-import scala.concurrent._
-import scalaz.Scalaz._
+import org.w3.banana.io._
 
 class GraphStoreTest[Rdf <: RDF, A](
   store: A)(
@@ -14,9 +12,9 @@ class GraphStoreTest[Rdf <: RDF, A](
     val lifecycle: Lifecycle[Rdf, A])
     extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
-  import ops._
   import graphStore.graphStoreSyntax._
   import lifecycle.lifecycleSyntax._
+  import ops._
 
   val foaf = FOAFPrefix[Rdf]
 

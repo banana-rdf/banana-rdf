@@ -46,14 +46,14 @@ object Dependencies {
    * @see http://akka.io
    * @see http://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "0.4"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "0.9"
 
   /**
    * jena
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "2.11.2"
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "2.12.1"
 
   /**
    * logback for jena
@@ -74,7 +74,7 @@ object Dependencies {
    * @see http://www.openrdf.org/
    * @see http://repo1.maven.org/maven2/org/openrdf/sesame/
    */
-  val sesameVersion = "2.8.0-beta1"
+  val sesameVersion = "2.8.0-beta2"
   
   val sesameQueryAlgebra = "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion
   val sesameQueryParser = "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion

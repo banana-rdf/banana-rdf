@@ -1,6 +1,6 @@
 package org.w3.banana.rdfstorew
 
-import org.w3.banana.iso.GraphIsomorphism
+import org.w3.banana.isomorphism.GraphIsomorphism
 import org.w3.banana.{ RDFOps, URIOps }
 import java.net.{ URI => jURI }
 
