@@ -1,17 +1,16 @@
 package org.w3.banana.jena.io
 
+import com.hp.hpl.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
+import com.hp.hpl.jena.rdf.model.{RDFReader => _}
 import java.io._
-
-import com.hp.hpl.jena.graph.{ Node => JenaNode, Triple => JenaTriple, _ }
-import com.hp.hpl.jena.rdf.model.{ RDFReader => _ }
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
 import org.w3.banana.io._
-import org.w3.banana.jena.{ Jena, JenaOps }
-
+import org.w3.banana.jena.{Jena, JenaOps}
 import scala.util._
 
-class TripleSink(implicit ops: JenaOps) extends StreamRDF {
+/** A triple sink that accumulates triples in a graph. */
+final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 
   var prefixes: Map[String, String] = Map.empty
   val graph: Jena#Graph = Factory.createDefaultGraph
@@ -43,17 +42,20 @@ class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 }
 
 object JenaRDFReader {
-  def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax: Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
+
+  def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax:  Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
+
     val factory = RDFParserRegistry.getFactory(lang)
-    override def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
-      val sink = new TripleSink()(ops)
+
+    def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
+      val sink = new TripleSink
       factory.create(lang).read(is, base, null, sink, null)
       //      RDFDataMgr.parse(sink, is, base, lang)
       sink.graph
     }
 
-    override def read(reader: Reader, base: String) = Try {
-      val sink = new TripleSink()(ops)
+    def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
+      val sink = new TripleSink
       RDFDataMgr.parse(sink, reader, base, lang)
       sink.graph
     }

@@ -1,15 +1,12 @@
 package org.w3.banana.plantain.test.jasmine
 
 import org.w3.banana.GraphUnionJasmineTest
-///import org.w3.banana.iso.{ IsomorphismTests, GraphIsomorphism, VerticeCBuilder, SimpleMappingGenerator }
-import org.w3.banana.jasmine.test._
-//import org.w3.banana.plantain.iso.GraphIsomorphismTest
 import org.w3.banana.plantain.Plantain
-///import org.w3.banana.rdf.iso.SimpleClassifyTest
+import org.w3.banana.jasmine.test._
 
 object PointedGraphJasmineTesterRDFStore extends PointedGraphJasmineTester[Plantain]
 
-object GraphUnionJasmineTest extends GraphUnionJasmineTest[Plantain]
+object GraphUnionJasmin3Test extends GraphUnionJasmineTest[Plantain]
 
 object DieselGraphConstructJasmineTest extends DieselGraphConstructJasmineTest[Plantain]
 

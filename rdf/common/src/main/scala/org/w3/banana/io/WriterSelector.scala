@@ -14,7 +14,7 @@ trait WriterSelector[O] extends (MediaRange => Option[Writer[O, Any]]) { self =>
 
 object WriterSelector {
 
-  def apply[O, T](implicit syntax: Syntax[T], writer: Writer[O, T]): WriterSelector[O] =
+  def apply[O, T](implicit syntax:  Syntax[T], writer: Writer[O, T]): WriterSelector[O] =
     new WriterSelector[O] {
       def apply(range: MediaRange): Option[Writer[O, Any]] =
         syntax.mimeTypes.list.find(m => range.matches(m)).map(_ => writer)
