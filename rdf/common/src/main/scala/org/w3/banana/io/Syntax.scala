@@ -3,7 +3,7 @@ package io
 
 import scalaz.NonEmptyList
 
-/* some well-known mime-types so that we can refer to them in banana-rdf */
+/* Some well-known syntaxes so that we can refer to them in banana-rdf. */
 
 trait N3
 trait Turtle
@@ -17,38 +17,36 @@ trait JsonLdCompacted
 trait JsonLdExpanded
 trait JsonLdFlattened
 
-/**
- * typeclass for a Syntax
- * It must say the mime-types that are associated to it
- */
-trait SyntaxMime[+T, MimeType] {
+/** A syntax is defined by the Mime-Types associated with it. */
+trait Syntax[+T] {
 
-  /**
-   * the mime-types for this syntax
-   *
-   * Per convention, the first one is the default one
-   */
+  /** The mime-types for this syntax.
+    *
+    * Per convention, the first one is the default one.
+    */
   def mimeTypes: NonEmptyList[MimeType]
-
-  /**
-   * The default mime type to use for this syntax. Usually published at the IETF in their
-   * <a href="http://www.iana.org/assignments/media-types/index.html">mime type registry</a>.
-   */
-  def standardMimeType: MimeType = mimeTypes.head
 
 }
 
-trait Syntax[+T] extends SyntaxMime[T, MimeType]
 
-/**
- * some Syntax instances for the well-known mime-types
- */
 object Syntax {
+
+  /** Syntax enhancements for [[Syntax]]. */
+  implicit class SyntaxW[T](val syntaxMime: Syntax[T]) extends AnyVal {
+
+    /** The default mime type to use for this syntax. Usually published at the IETF in their
+      * <a href="http://www.iana.org/assignments/media-types/index.html">mime type registry</a>.
+      */
+    def defaultMimeType: MimeType = syntaxMime.mimeTypes.head
+
+  }
 
   def apply[T](implicit syntax: Syntax[T]): Syntax[T] = syntax
 
+  /* some [[Syntax]]es for the well-known mime-types. */
+
   implicit val RDFQueryLang: Syntax[RDF#Query] = new Syntax[RDF#Query] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "sparql-query"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType.SparqlQuery)
   }
 
   implicit val N3: Syntax[N3] = new Syntax[N3] {
@@ -56,11 +54,11 @@ object Syntax {
   }
 
   implicit val Turtle: Syntax[Turtle] = new Syntax[Turtle] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("text", "turtle"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType.RdfTurtle)
   }
 
   implicit val RDFXML: Syntax[RDFXML] = new Syntax[RDFXML] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "rdf+xml"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType.RdfXml)
   }
 
   implicit val JsonLdCompacted: Syntax[JsonLdCompacted] = new Syntax[JsonLdCompacted] {
@@ -81,7 +79,7 @@ object Syntax {
     )
   }
 
-  implicit val JSON_LD: Syntax[JsonLd] = new Syntax[JsonLd] {
+  implicit val JsonLd: Syntax[JsonLd] = new Syntax[JsonLd] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json"))
   }
 

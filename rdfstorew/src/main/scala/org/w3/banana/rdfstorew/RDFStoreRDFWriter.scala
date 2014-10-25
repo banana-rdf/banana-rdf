@@ -8,7 +8,7 @@ import scala.util.Try
 
 object RDFStoreTurtleWriter extends RDFWriter[RDFStore, Turtle] {
 
-  val syntax: Syntax[Turtle] = Syntax.Turtle
+  val syntax:  Syntax[Turtle] = Syntax.Turtle
 
   def asString(graph: RDFStore#Graph, base: String): Try[String] = Try {
     graph.graph.toNT().asInstanceOf[String]

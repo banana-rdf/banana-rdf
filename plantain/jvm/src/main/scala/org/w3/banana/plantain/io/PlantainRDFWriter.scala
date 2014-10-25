@@ -7,7 +7,7 @@ import akka.http.model.Uri
 import org.openrdf.model.impl._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }
-import org.w3.banana.plantain.{ Plantain }
+import org.w3.banana.plantain.Plantain
 import org.w3.banana.plantain.model
 import org.w3.banana.io._
 
@@ -55,14 +55,11 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
     def write(): Try[Unit] = Try {
       val writer = new TurtleWriter(outputstream)
       writer.startRDF()
-      graph.spo foreach {
-        case (s, pos) =>
-          pos foreach {
-            case (p, os) =>
-              os foreach { o =>
-                writer.handleStatement(statement(s, p, o))
-              }
+      graph.spo foreach { case (s, pos) =>
+        pos foreach { case (p, os) =>
+          os foreach { o => writer.handleStatement(statement(s, p, o))
           }
+        }
       }
       writer.endRDF()
     }
@@ -82,4 +79,5 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Turtle] {
     writer.write()
     new String(result.toByteArray, "UTF-8")
   }
+
 }

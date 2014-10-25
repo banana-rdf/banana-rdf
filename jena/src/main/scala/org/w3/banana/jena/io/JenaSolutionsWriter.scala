@@ -1,34 +1,26 @@
 package org.w3.banana.jena.io
 
 import java.io._
-
-import org.w3.banana._
-import org.w3.banana.jena.Jena
-import org.w3.banana.io._
-
+import org.w3.banana._, io._, jena._
 import scala.util._
 
-/**
- * Creates a Sparql writer for the given syntax
- */
 object JenaSolutionsWriter {
 
-  def apply[T](implicit jenaSparqlSyntax: JenaAnswerOutput[T], _syntax: Syntax[T]): SparqlSolutionsWriter[Jena, T] =
-    new SparqlSolutionsWriter[Jena, T] {
+  /** Creates a Sparql writer for the given syntax */
+  def apply[T](implicit jenaSparqlSyntax: JenaAnswerOutput[T], _syntax:  Syntax[T]): SparqlSolutionsWriter[Jena, T] = new SparqlSolutionsWriter[Jena, T] {
 
-      val syntax = _syntax
+    val syntax = _syntax
 
-      def write(answers: Jena#Solutions, os: OutputStream, base: String) =
-        Try {
-          jenaSparqlSyntax.formatter.format(os, answers)
-        }
-
-      def asString(answers: Jena#Solutions, base: String): Try[String] = Try {
-        val result = new ByteArrayOutputStream()
-        jenaSparqlSyntax.formatter.format(result, answers)
-        answers.toString
-      }
+    def write(answers: Jena#Solutions, os: OutputStream, base: String) = Try {
+      jenaSparqlSyntax.formatter.format(os, answers)
     }
+
+    def asString(answers: Jena#Solutions, base: String): Try[String] = Try {
+      val result = new ByteArrayOutputStream()
+      jenaSparqlSyntax.formatter.format(result, answers)
+      answers.toString
+    }
+  }
 
   implicit val solutionsWriterJson: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter[SparqlAnswerJson]

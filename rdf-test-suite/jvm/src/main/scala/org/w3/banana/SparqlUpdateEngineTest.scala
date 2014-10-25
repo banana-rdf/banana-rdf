@@ -6,14 +6,16 @@ import org.scalatest.{ BeforeAndAfterAll, Matchers, TryValues, WordSpec }
  * Sparql Update gets a special test as not all servers implement it.
  */
 class SparqlUpdateEngineTest[Rdf <: RDF, A](
-  val store: A)(
-    implicit val reader: io.RDFReader[Rdf, io.RDFXML],
-    val ops: RDFOps[Rdf],
-    val sparqlOps: SparqlOps[Rdf],
-    val graphStore: GraphStore[Rdf, A],
-    val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
-    val lifecycle: Lifecycle[Rdf, A])
-    extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
+  val store: A
+)(implicit
+  val reader: io.RDFReader[Rdf, io.RDFXML],
+  val ops: RDFOps[Rdf],
+  val sparqlOps: SparqlOps[Rdf],
+  val graphStore: GraphStore[Rdf, A],
+  val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
+  val lifecycle: Lifecycle[Rdf, A]
+) extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
+
   import ops._
   import org.w3.banana.diesel._
   import sparqlOps._
@@ -55,8 +57,8 @@ class SparqlUpdateEngineTest[Rdf <: RDF, A](
         """.stripMargin).success.value
 
     val projects = store.executeSelect(selectQuery).getOrFail().iterator.to[Iterable]
-    val result = projects.map(
-      row => row("currentProject").success.value.as[Rdf#URI].success.value
+    val result = projects.map(row =>
+      row("currentProject").success.value.as[Rdf#URI].success.value
     )
 
     result should have size (2)

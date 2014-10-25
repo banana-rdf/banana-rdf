@@ -11,7 +11,7 @@ import org.w3.banana.sesame.{ Sesame, SesameOps }
 
 import scala.util._
 
-class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T], _syntax: Syntax[T]) extends RDFWriter[Sesame, T] {
+class SesameRDFWriter[T](ops: SesameOps)(implicit sesameSyntax: SesameSyntax[T], _syntax:  Syntax[T]) extends RDFWriter[Sesame, T] {
 
   def write(graph: Sesame#Graph, os: OutputStream, base: String): Try[Unit] = Try {
     val sWriter = sesameSyntax.rdfWriter(os, base)

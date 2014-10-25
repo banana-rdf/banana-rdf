@@ -11,15 +11,15 @@ import org.w3.banana._
 import org.w3.banana.io._
 
 import scala.util._
+import org.w3.banana.jena.Jena.ops._
 
-/**
- * Create an RDF Writer using Jena's serialisers
- */
+/** Helpers to create Jena writers. */
 object JenaRDFWriter {
-  final val writerFactory = new RDFWriterFImpl();
-  import org.w3.banana.jena.Jena.ops._
 
-  def makeRDFWriter[S](lang: JenaLang)(implicit _syntax: Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
+  private [JenaRDFWriter] val writerFactory = new RDFWriterFImpl()
+
+  private [JenaRDFWriter] def makeRDFWriter[S](lang: JenaLang)(implicit _syntax:  Syntax[S]): RDFWriter[Jena, S] = new RDFWriter[Jena, S] {
+
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
       val model = ModelFactory.createModelForGraph(graph)
       writerFactory.getWriter(lang.getLabel).write(model, os, base)

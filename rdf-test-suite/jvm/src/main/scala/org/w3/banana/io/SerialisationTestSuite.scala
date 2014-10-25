@@ -5,12 +5,12 @@ import java.io._
 import org.scalatest._
 import org.w3.banana.{ Prefix, RDF, RDFOps }
 
-abstract class SerialisationTestSuite[Rdf <: RDF, S]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, S], writer: RDFWriter[Rdf, S], syntax: Syntax[S])
+abstract class SerialisationTestSuite[Rdf <: RDF, S](implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, S], writer: RDFWriter[Rdf, S], syntax:  Syntax[S])
     extends WordSpec with Matchers {
 
-  /**
-   * a simple serialisation for Syntax of the referenceGraph below
-   * To fill in for each Syntax
+  /* A simple serialisation for Syntax of the referenceGraph below.
+   * 
+   * To fill in for each Syntax.
    */
   def referenceGraphSerialisedForSyntax: String
 
@@ -39,7 +39,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, S]()(implicit ops: RDFOps[Rdf]
   val fooPrefix = Prefix("foo", foo)
   val fooGraph = graphBuilder(fooPrefix)
 
-  s"read ${syntax.standardMimeType} version of timbl's card" in {
+  s"read ${syntax.defaultMimeType} version of timbl's card" in {
     WellKnownMimeExtensions.extension(syntax.mimeTypes.head).map { ext =>
       val file = new File(s"rdf-test-suite/jvm/src/main/resources/card.$ext")
       val fis = new FileInputStream(file)
@@ -52,7 +52,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, S]()(implicit ops: RDFOps[Rdf]
     }
   }
 
-  s"simple ${syntax.standardMimeType} string containing only absolute URIs" should {
+  s"simple ${syntax.defaultMimeType} string containing only absolute URIs" should {
 
     "parse using Readers (the base has no effect since all URIs are absolute)" in {
       val graph = reader.read(new StringReader(referenceGraphSerialisedForSyntax), rdfCore).get
@@ -66,7 +66,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, S]()(implicit ops: RDFOps[Rdf]
 
   }
 
-  s"write simple graph as ${syntax.standardMimeType} string" in {
+  s"write simple graph as ${syntax.defaultMimeType} string" in {
     val turtleString = writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").get
     turtleString should not be ('empty)
     val graph = reader.read(new StringReader(turtleString), rdfCore).get
@@ -76,7 +76,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, S]()(implicit ops: RDFOps[Rdf]
   "graphs with relative URIs" should {
 
     ", when moved to a new base, have all relative URLs transformed" in {
-      println("referenceGraph=" + referenceGraph)
+      // println("referenceGraph=" + referenceGraph)
       val bar = for {
         relativeSerialisation <- writer.asString(referenceGraph, rdfCore)
         computedFooGraph <- reader.read(new StringReader(relativeSerialisation), foo)
@@ -97,11 +97,11 @@ abstract class SerialisationTestSuite[Rdf <: RDF, S]()(implicit ops: RDFOps[Rdf]
         relativeSerialisation <- writer.asString(referenceGraph, rdfCoreResource)
         computedFooGraph <- reader.read(new StringReader(relativeSerialisation), rdfCore)
       } yield {
-        println(s"withRelURIs=$relativeSerialisation")
+        // println(s"withRelURIs=$relativeSerialisation")
         computedFooGraph
       }
-      println(s"referenceGraph=$referenceGraph")
-      println(s"bar=$bar")
+      // println(s"referenceGraph=$referenceGraph")
+      // println(s"bar=$bar")
       assert(referenceGraph isIsomorphicWith bar.get)
     }
   }
