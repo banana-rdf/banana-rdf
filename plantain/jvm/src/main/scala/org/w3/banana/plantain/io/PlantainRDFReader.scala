@@ -9,7 +9,7 @@ import org.openrdf.{ model => sesame }
 import org.w3.banana.io._
 import scala.util.Try
 
-object PlantainTurtleReader extends RDFReader[Plantain, Turtle] {
+object PlantainTurtleReader extends RDFReader[Plantain, Try, Turtle] {
 
   final class Sink extends RDFHandler {
 

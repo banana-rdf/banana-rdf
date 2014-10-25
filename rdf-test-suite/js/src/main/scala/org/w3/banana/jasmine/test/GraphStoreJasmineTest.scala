@@ -13,7 +13,7 @@ import java.io._
 import scala.concurrent.Future
 import org.w3.banana.{ RDFStore => RDFStoreInterface }
 import org.w3.banana.io._
-
+import scala.util.Try
 import scala.scalajs.js
 import scala.scalajs.test.JasmineTest
 
@@ -22,7 +22,7 @@ import scala.scalajs.test.JasmineTest
  */
 abstract class GraphStoreJasmineTest[Rdf <: RDF, A](store: A)(
   implicit ops: RDFOps[Rdf],
-  val reader: RDFReader[Rdf, RDFXML],
+  val reader: RDFReader[Rdf, Try, RDFXML],
   val graphStore: GraphStore[Rdf, A],
   val lifecycle: Lifecycle[Rdf, A])
     extends JasmineTest {

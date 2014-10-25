@@ -5,25 +5,25 @@ import org.w3.banana._
 import org.w3.banana.io.SparqlQueryResultsReader
 import org.w3.banana.jena.io.{ JenaSolutionsWriter, JenaRDFWriter, JenaRDFReader, JenaQueryResultsReader }
 import org.w3.banana.io._
-
+import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait JenaModule
-    extends RDFModule
-    with RDFOpsModule
-    with RecordBinderModule
-    with SparqlGraphModule
-    with SparqlHttpModule
-    with RDFXMLReaderModule
-    with TurtleReaderModule
-    with ReaderSelectorModule
-    with RDFXMLWriterModule
-    with TurtleWriterModule
-    with WriterSelectorModule
-    with JsonSolutionsWriterModule
-    with XmlSolutionsWriterModule
-    with JsonQueryResultsReaderModule
-    with XmlQueryResultsReaderModule {
+extends RDFModule
+with RDFOpsModule
+with RecordBinderModule
+with SparqlGraphModule
+with SparqlHttpModule
+with RDFXMLReaderModule
+with TurtleReaderModule
+with ReaderSelectorModule
+with RDFXMLWriterModule
+with TurtleWriterModule
+with WriterSelectorModule
+with JsonSolutionsWriterModule
+with XmlSolutionsWriterModule
+with JsonQueryResultsReaderModule
+with XmlQueryResultsReaderModule {
 
   type Rdf = Jena
 
@@ -42,13 +42,13 @@ trait JenaModule
 
   implicit val rdfStore: RDFStore[Jena, Dataset] with SparqlUpdate[Jena, Dataset] = new JenaDatasetStore(true)
 
-  implicit val rdfXMLReader: RDFReader[Jena, RDFXML] = JenaRDFReader.rdfxmlReader()
+  implicit val rdfXMLReader: RDFReader[Jena, Try, RDFXML] = JenaRDFReader.rdfxmlReader()
 
-  implicit val turtleReader: RDFReader[Jena, Turtle] = JenaRDFReader.turtleReader()
+  implicit val turtleReader: RDFReader[Jena, Try, Turtle] = JenaRDFReader.turtleReader()
 
-  implicit val n3Reader: RDFReader[Jena, N3] = JenaRDFReader.n3Reader()
+  implicit val n3Reader: RDFReader[Jena, Try, N3] = JenaRDFReader.n3Reader()
 
-  implicit val readerSelector: ReaderSelector[Jena] = JenaRDFReader.selector
+  implicit val readerSelector: ReaderSelector[Jena, Try] = JenaRDFReader.selector
 
   implicit val rdfXMLWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
 

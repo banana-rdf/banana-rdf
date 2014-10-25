@@ -10,7 +10,6 @@ import org.openrdf.rio.helpers.{ JSONLDMode, JSONLDSettings }
 import org.w3.banana._
 import org.w3.banana.sesame.Sesame
 import org.w3.banana.io._
-
 import scala.util._
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
@@ -30,7 +29,7 @@ trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
 
 }
 
-abstract class AbstractSesameReader[T] extends RDFReader[Sesame, T] {
+abstract class AbstractSesameReader[T] extends RDFReader[Sesame, Try, T] {
 
   implicit def ops: RDFOps[Sesame]
 
