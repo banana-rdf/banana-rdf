@@ -1,14 +1,15 @@
 package org.w3.banana
 
 import org.scalatest.{ BeforeAndAfterAll, Matchers, TryValues, WordSpec }
+import org.w3.banana.io._
+import scala.util.Try
 
-/**
- * Sparql Update gets a special test as not all servers implement it.
+/* Sparql Update gets a special test as not all servers implement it. 
  */
 class SparqlUpdateEngineTest[Rdf <: RDF, A](
   val store: A
 )(implicit
-  val reader: io.RDFReader[Rdf, io.RDFXML],
+  val reader: RDFReader[Rdf, Try, RDFXML],
   val ops: RDFOps[Rdf],
   val sparqlOps: SparqlOps[Rdf],
   val graphStore: GraphStore[Rdf, A],

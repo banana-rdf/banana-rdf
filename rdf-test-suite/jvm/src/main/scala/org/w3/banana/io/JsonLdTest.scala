@@ -1,16 +1,16 @@
 package org.w3.banana.io
 
 import java.io._
-
 import org.scalatest._
 import org.w3.banana._
+import scala.util.Try
 
 class JsonLdTest[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
   writerSelector: RDFWriterSelector[Rdf],
-  turtleReader: RDFReader[Rdf, Turtle],
+  turtleReader: RDFReader[Rdf, Try, Turtle],
   turtleWriter: RDFWriter[Rdf, Turtle],
-  jsonldReader: RDFReader[Rdf, JsonLdCompacted],
+  jsonldReader: RDFReader[Rdf, Try, JsonLdCompacted],
   jsonldWriter: RDFWriter[Rdf, JsonLdCompacted]
 ) extends WordSpec with Matchers {
 

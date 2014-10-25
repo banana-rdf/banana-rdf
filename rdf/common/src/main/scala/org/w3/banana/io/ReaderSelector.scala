@@ -2,10 +2,10 @@ package org.w3.banana
 package io
 
 /** A selector for [[RDFReader]]s based on the provided mimetype. */
-trait ReaderSelector[Rdf <: RDF] extends (MimeType => Option[RDFReader[Rdf, Any]]) {
+trait ReaderSelector[Rdf <: RDF, M[_]] extends (MimeType => Option[RDFReader[Rdf, M, Any]]) {
 
-  def combineWith(otherSelector: ReaderSelector[Rdf]): ReaderSelector[Rdf] = new ReaderSelector[Rdf] {
-    def apply(mime: MimeType): Option[RDFReader[Rdf, Any]] = {
+  def combineWith(otherSelector: ReaderSelector[Rdf, M]): ReaderSelector[Rdf, M] = new ReaderSelector[Rdf, M] {
+    def apply(mime: MimeType): Option[RDFReader[Rdf, M, Any]] = {
       ReaderSelector.this(mime) orElse otherSelector(mime)
     }
   }
@@ -14,8 +14,11 @@ trait ReaderSelector[Rdf <: RDF] extends (MimeType => Option[RDFReader[Rdf, Any]
 
 object ReaderSelector {
 
-  def apply[Rdf <: RDF, S](implicit syntax:  Syntax[S], reader: RDFReader[Rdf, S]): ReaderSelector[Rdf] = new ReaderSelector[Rdf] {
-    def apply(mime: MimeType): Option[RDFReader[Rdf, Any]] =
+  def apply[Rdf <: RDF, M[_], S](implicit
+    syntax: Syntax[S],
+    reader: RDFReader[Rdf, M, S]
+  ): ReaderSelector[Rdf, M] = new ReaderSelector[Rdf, M] {
+    def apply(mime: MimeType): Option[RDFReader[Rdf, M, Any]] =
       if (syntax.mimeTypes.list contains mime) Some(reader)
       else  None
   }

@@ -5,15 +5,16 @@ import java.io._
 import org.scalatest._
 import org.w3.banana.diesel._
 import org.w3.banana.io.{ SparqlQueryResultsReader, _ }
+import scala.util.Try
 
-class SparqlGraphTest[Rdf <: RDF, SyntaxType]()(
-  implicit ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, RDFXML],
+class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, RDFXML],
   sparqlOperations: SparqlOps[Rdf],
   sparqlGraph: SparqlEngine[Rdf, Rdf#Graph],
   sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
-  sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType])
-    extends WordSpec with Matchers with Inside with TryValues {
+  sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]
+) extends WordSpec with Matchers with Inside with TryValues {
 
   import ops._
   import sparqlGraph.sparqlEngineSyntax._

@@ -5,13 +5,12 @@ import java.io.FileInputStream
 import org.scalatest.{ Suite, BeforeAndAfterAll }
 import scala.concurrent.ExecutionContext.Implicits.global
 import io._
-/**
- * Created by hjs on 01/09/2014.
- */
-trait SparqlEngineTesterTrait[Rdf <: RDF, A]
-    extends BeforeAndAfterAll { self: Suite =>
+import scala.util.Try
+
+// TODO
+trait SparqlEngineTesterTrait[Rdf <: RDF, A] extends BeforeAndAfterAll { self: Suite =>
   val store: A
-  val reader: RDFReader[Rdf, RDFXML]
+  val reader: RDFReader[Rdf, Try, RDFXML]
   implicit val ops: RDFOps[Rdf]
   implicit val graphStore: GraphStore[Rdf, A]
   val lifecycle: Lifecycle[Rdf, A]

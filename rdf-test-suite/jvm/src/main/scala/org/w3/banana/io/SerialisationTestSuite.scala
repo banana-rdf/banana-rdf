@@ -1,12 +1,16 @@
 package org.w3.banana.io
 
 import java.io._
-
 import org.scalatest._
 import org.w3.banana.{ Prefix, RDF, RDFOps }
+import scala.util.Try
 
-abstract class SerialisationTestSuite[Rdf <: RDF, S](implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, S], writer: RDFWriter[Rdf, S], syntax:  Syntax[S])
-    extends WordSpec with Matchers {
+abstract class SerialisationTestSuite[Rdf <: RDF, S](implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, S],
+  writer: RDFWriter[Rdf, S],
+  syntax: Syntax[S]
+) extends WordSpec with Matchers {
 
   /* A simple serialisation for Syntax of the referenceGraph below.
    * 

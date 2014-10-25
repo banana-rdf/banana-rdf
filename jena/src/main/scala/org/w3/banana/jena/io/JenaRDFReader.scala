@@ -43,7 +43,7 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 
 object JenaRDFReader {
 
-  def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax:  Syntax[S]): RDFReader[Jena, S] = new RDFReader[Jena, S] {
+  def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax:  Syntax[S]): RDFReader[Jena, Try, S] = new RDFReader[Jena, Try, S] {
 
     val factory = RDFParserRegistry.getFactory(lang)
 
@@ -61,13 +61,13 @@ object JenaRDFReader {
     }
   }
 
-  implicit def rdfxmlReader()(implicit ops: JenaOps): RDFReader[Jena, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
+  implicit def rdfxmlReader()(implicit ops: JenaOps): RDFReader[Jena, Try, RDFXML] = makeRDFReader[RDFXML](ops, Lang.RDFXML)
 
-  implicit def turtleReader()(implicit ops: JenaOps): RDFReader[Jena, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
+  implicit def turtleReader()(implicit ops: JenaOps): RDFReader[Jena, Try, Turtle] = makeRDFReader[Turtle](ops, Lang.TURTLE)
 
-  implicit def n3Reader()(implicit ops: JenaOps): RDFReader[Jena, N3] = makeRDFReader[N3](ops, Lang.N3)
+  implicit def n3Reader()(implicit ops: JenaOps): RDFReader[Jena, Try, N3] = makeRDFReader[N3](ops, Lang.N3)
 
-  implicit val selector: ReaderSelector[Jena] =
-    ReaderSelector[Jena, RDFXML] combineWith ReaderSelector[Jena, Turtle]
+  implicit val selector: ReaderSelector[Jena, Try] =
+    ReaderSelector[Jena, Try, RDFXML] combineWith ReaderSelector[Jena, Try, Turtle]
 
 }
