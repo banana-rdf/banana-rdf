@@ -2,6 +2,9 @@ package org.w3.banana.jena
 
 import org.w3.banana.io.{ RdfXMLTestSuite, TurtleTestSuite }
 
-class JenaTurtleTest extends TurtleTestSuite[Jena]
+import scala.util.Try
+import org.w3.banana.util.tryInstances._
 
-class JenaRdfXMLTest extends RdfXMLTestSuite[Jena]
+class JenaTurtleTest extends TurtleTestSuite[Jena, Try]
+
+class JenaRdfXMLTest extends RdfXMLTestSuite[Jena, Try]
