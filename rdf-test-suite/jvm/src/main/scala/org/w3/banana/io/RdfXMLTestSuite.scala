@@ -1,13 +1,13 @@
 package org.w3.banana.io
 
 import org.w3.banana.{ RDF, RDFOps }
-import scala.util.Try
+import scalaz._
 
-abstract class RdfXMLTestSuite[Rdf <: RDF](implicit
+abstract class RdfXMLTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
   ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, Try, RDFXML],
-  writer: RDFWriter[Rdf, Try, RDFXML]
-) extends SerialisationTestSuite[Rdf, RDFXML] {
+  reader: RDFReader[Rdf, M, RDFXML],
+  writer: RDFWriter[Rdf, M, RDFXML]
+) extends SerialisationTestSuite[Rdf, M, RDFXML] {
 
   val referenceGraphSerialisedForSyntax = """
   <rdf:RDF xmlns="http://purl.org/dc/elements/1.1/"
