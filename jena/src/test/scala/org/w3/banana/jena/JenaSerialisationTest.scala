@@ -1,7 +1,6 @@
 package org.w3.banana.jena
 
 import org.w3.banana.io.{ RdfXMLTestSuite, TurtleTestSuite }
-
 import scala.util.Try
 import org.w3.banana.util.tryInstances._
 

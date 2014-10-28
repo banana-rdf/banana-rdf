@@ -2,7 +2,7 @@ package org.w3.banana.io
 
 import java.io._
 import org.scalatest._
-import org.w3.banana._
+import org.w3.banana.{ Prefix, RDF, RDFOps }
 import scalaz._
 import scalaz.syntax._, monad._, comonad._
 
@@ -55,7 +55,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](im
       val file = new File(s"rdf-test-suite/jvm/src/main/resources/card.$ext")
       val fis = new FileInputStream(file)
       try {
-        val graph = Monad[M].map(reader.read(fis, file.toURI.toString))(x => x).copoint
+        val graph = reader.read(fis, file.toURI.toString).copoint
         graph.size should equal(77)
       } finally {
         fis.close()
