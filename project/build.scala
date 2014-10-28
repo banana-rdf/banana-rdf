@@ -98,7 +98,7 @@ object BananaRdfBuild extends Build {
   import BuildSettings._
   import Dependencies._
 
-  val johnsonRepo = "JohnsonUSM repository" at "http://johnsonusm.com:8020/nexus/content/repositories/releases/"
+  val sonatypeRepo = Resolver.sonatypeRepo("releases")
 
   val sjsDeps = Seq(
     resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(Resolver.ivyStylePatterns)
@@ -256,7 +256,7 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite_common_jvm",
     base = file("rdf-test-suite/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
-      resolvers += johnsonRepo,
+      resolvers += sonatypeRepo,
       libraryDependencies += scalatest,
       libraryDependencies += jasmine_jvm,
       libraryDependencies += jodaTime,
@@ -268,7 +268,7 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite_common_js",
     base = file("rdf-test-suite/.common_js"),
     settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common_jvm) ++ Seq(
-      resolvers += johnsonRepo,
+      resolvers += sonatypeRepo,
       libraryDependencies += scalajsJasmine
     ) ++ jasmine_js
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js)
@@ -348,7 +348,7 @@ object BananaRdfBuild extends Build {
     id = "plantain_common_js",
     base = file("plantain/.common_js"),
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(plantain_common_jvm) ++ Seq(
-      resolvers += johnsonRepo,
+      resolvers += sonatypeRepo,
       publishMavenStyle := true
     ) ++ jasmine_jsTest
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile")
@@ -360,7 +360,7 @@ object BananaRdfBuild extends Build {
     id = "rdfstorew",
     base = file("rdfstorew"),
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ Seq(
-      resolvers += johnsonRepo,
+      resolvers += sonatypeRepo,
       jsDependencies += ProvidedJS / "rdf_store.js",
       jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
       skip in packageJSDependencies := false
