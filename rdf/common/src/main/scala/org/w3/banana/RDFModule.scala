@@ -71,11 +71,11 @@ trait JsonLDReaderModule extends RDFModule {
  * these could be split out.
  */
 trait JsonLDWriterModule extends RDFModule {
-  implicit val jsonldCompactedWriter: RDFWriter[Rdf, JsonLdCompacted]
+  implicit val jsonldCompactedWriter: RDFWriter[Rdf, Try, JsonLdCompacted]
 
-  implicit val jsonldExpandedWriter: RDFWriter[Rdf, JsonLdExpanded]
+  implicit val jsonldExpandedWriter: RDFWriter[Rdf, Try, JsonLdExpanded]
 
-  implicit val jsonldFlattenedWriter: RDFWriter[Rdf, JsonLdFlattened]
+  implicit val jsonldFlattenedWriter: RDFWriter[Rdf, Try, JsonLdFlattened]
 }
 
 trait ReaderSelectorModule extends RDFModule {
@@ -86,19 +86,19 @@ trait ReaderSelectorModule extends RDFModule {
 
 trait RDFXMLWriterModule extends RDFModule {
 
-  implicit val rdfXMLWriter: RDFWriter[Rdf, RDFXML]
+  implicit val rdfXMLWriter: RDFWriter[Rdf, Try, RDFXML]
 
 }
 
 trait TurtleWriterModule extends RDFModule {
 
-  implicit val turtleWriter: RDFWriter[Rdf, Turtle]
+  implicit val turtleWriter: RDFWriter[Rdf, Try, Turtle]
 
 }
 
 trait WriterSelectorModule extends RDFModule {
 
-  implicit val writerSelector: RDFWriterSelector[Rdf]
+  implicit val writerSelector: RDFWriterSelector[Rdf, Try]
 
 }
 

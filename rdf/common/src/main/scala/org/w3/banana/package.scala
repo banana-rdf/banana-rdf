@@ -13,8 +13,6 @@ package object banana
 
   type SparqlSolutionsWriter[Rdf <: RDF, +T] = io.Writer[Rdf#Solutions, T]
 
-  type RDFWriterSelector[Rdf <: RDF] = io.WriterSelector[Rdf#Graph]
-
   type SparqlSolutionsWriterSelector[Rdf <: RDF] = io.WriterSelector[Rdf#Solutions]
 
   implicit class FutureW[T](f: Future[T]) {

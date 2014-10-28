@@ -7,11 +7,11 @@ import scala.util.Try
 
 class JsonLdTest[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
-  writerSelector: RDFWriterSelector[Rdf],
+  writerSelector: RDFWriterSelector[Rdf, Try],
   turtleReader: RDFReader[Rdf, Try, Turtle],
-  turtleWriter: RDFWriter[Rdf, Turtle],
+  turtleWriter: RDFWriter[Rdf, Try, Turtle],
   jsonldReader: RDFReader[Rdf, Try, JsonLdCompacted],
-  jsonldWriter: RDFWriter[Rdf, JsonLdCompacted]
+  jsonldWriter: RDFWriter[Rdf, Try, JsonLdCompacted]
 ) extends WordSpec with Matchers {
 
   import ops._

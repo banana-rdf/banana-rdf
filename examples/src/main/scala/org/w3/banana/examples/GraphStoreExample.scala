@@ -21,7 +21,7 @@ import scala.util.Try
 abstract class GraphStoreExample[Rdf <: RDF, Store](implicit
   ops: RDFOps[Rdf],
   turtleReader: RDFReader[Rdf, Try, Turtle],
-  rdfXMLWriter: RDFWriter[Rdf, RDFXML],
+  rdfXMLWriter: RDFWriter[Rdf, Try, RDFXML],
   rdfStore: RDFStore[Rdf, Store]
 ) {
 
@@ -44,7 +44,8 @@ abstract class GraphStoreExample[Rdf <: RDF, Store](implicit
     val triples = List(makeTriple(
       makeUri(timblCard + "#i"),
       foaf.knows,
-      makeUri(jmvCard + "#me")))
+      makeUri(jmvCard + "#me")
+    ))
 
     val store = makeRDFStore("tmpGraphStoreDir")
     val script =

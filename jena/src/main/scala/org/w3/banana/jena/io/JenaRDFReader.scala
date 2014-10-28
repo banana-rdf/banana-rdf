@@ -23,19 +23,21 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
   def triple(triple: JenaTriple): Unit = {
     def isXsdString(node: JenaNode): Boolean =
       node.isLiteral &&
-        node.getLiteralDatatypeURI == "http://www.w3.org/2001/XMLSchema#string"
+      node.getLiteralDatatypeURI == "http://www.w3.org/2001/XMLSchema#string"
     val o = triple.getObject
     val t =
       // if o is a xsd:string literal
-      if (isXsdString(o))
+      if (isXsdString(o)) {
         // then replace the object by a clean "plain" literal without the xsd:string
         new JenaTriple(
           triple.getSubject,
           triple.getPredicate,
-          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, null))
-      else
+          NodeFactory.createLiteral(o.getLiteralLexicalForm.toString, null, null)
+        )
+      } else {
         // otherwise everything is fine
         triple
+      }
     graph.add(t)
   }
   def tuple(tuple: org.apache.jena.atlas.lib.Tuple[JenaNode]): Unit = ()
