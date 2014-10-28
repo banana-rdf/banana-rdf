@@ -50,13 +50,13 @@ with XmlQueryResultsReaderModule {
 
   implicit val readerSelector: ReaderSelector[Jena, Try] = JenaRDFReader.selector
 
-  implicit val rdfXMLWriter: RDFWriter[Jena, RDFXML] = JenaRDFWriter.rdfxmlWriter
+  implicit val rdfXMLWriter: RDFWriter[Jena, Try, RDFXML] = JenaRDFWriter.rdfxmlWriter
 
-  implicit val turtleWriter: RDFWriter[Jena, Turtle] = JenaRDFWriter.turtleWriter
+  implicit val turtleWriter: RDFWriter[Jena, Try, Turtle] = JenaRDFWriter.turtleWriter
 
-  implicit val n3Writer: RDFWriter[Jena, N3] = JenaRDFWriter.n3Writer
+  implicit val n3Writer: RDFWriter[Jena, Try, N3] = JenaRDFWriter.n3Writer
 
-  implicit val writerSelector: RDFWriterSelector[Jena] = JenaRDFWriter.selector
+  implicit val writerSelector: RDFWriterSelector[Jena, Try] = JenaRDFWriter.selector
 
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter.solutionsWriterJson

@@ -20,6 +20,6 @@ with TurtleWriterModule {
 
   implicit val turtleReader: RDFReader[Plantain, Try, Turtle] = PlantainTurtleReader
 
-  implicit val turtleWriter: RDFWriter[Plantain, Turtle] = PlantainTurtleWriter
+  implicit val turtleWriter: RDFWriter[Plantain, Try, Turtle] = PlantainTurtleWriter
 
 }

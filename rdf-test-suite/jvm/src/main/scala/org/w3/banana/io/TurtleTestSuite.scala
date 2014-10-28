@@ -6,7 +6,7 @@ import scala.util.Try
 abstract class TurtleTestSuite[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Try, Turtle],
-  writer: RDFWriter[Rdf, Turtle]
+  writer: RDFWriter[Rdf, Try, Turtle]
 ) extends SerialisationTestSuite[Rdf, Turtle] {
 
   val referenceGraphSerialisedForSyntax = """

@@ -6,7 +6,7 @@ import scala.util.Try
 abstract class RdfXMLTestSuite[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Try, RDFXML],
-  writer: RDFWriter[Rdf, RDFXML]
+  writer: RDFWriter[Rdf, Try, RDFXML]
 ) extends SerialisationTestSuite[Rdf, RDFXML] {
 
   val referenceGraphSerialisedForSyntax = """

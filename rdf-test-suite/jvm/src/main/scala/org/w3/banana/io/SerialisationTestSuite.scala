@@ -8,7 +8,7 @@ import scala.util.Try
 abstract class SerialisationTestSuite[Rdf <: RDF, S](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Try, S],
-  writer: RDFWriter[Rdf, S],
+  writer: RDFWriter[Rdf, Try, S],
   syntax: Syntax[S]
 ) extends WordSpec with Matchers {
 

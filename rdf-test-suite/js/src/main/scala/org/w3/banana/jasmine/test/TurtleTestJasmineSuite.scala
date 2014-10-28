@@ -13,7 +13,7 @@ import scala.util.Try
 abstract class TurtleTestJasmineSuite[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Try, Turtle],
-  writer: RDFWriter[Rdf, Turtle]
+  writer: RDFWriter[Rdf, Try, Turtle]
 ) extends JasmineTest {
 
   import ops._
