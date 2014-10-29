@@ -90,7 +90,7 @@ object Dependencies {
    * @see https://github.com/jsonld-java/jsonld-java
    * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-sesame
    */
-  val jsonldJava = "com.github.jsonld-java" % "jsonld-java-sesame" % "0.5.1-SNAPSHOT"
+  val jsonldJava = "com.github.jsonld-java" % "jsonld-java-sesame" % "0.5.0"
 
   /**
    * parboiled
