@@ -1,20 +1,20 @@
 package org.w3.banana.jasmine.test
 
 import java.io.{ File, FileInputStream, StringReader }
-
+import org.w3.banana._
 import org.w3.banana.io._
-import org.w3.banana.{ RDFStore => RDFStoreInterface, _ }
-
 import scala.concurrent.ExecutionContext
 import scala.scalajs.test.JasmineTest
+import scala.util.Try
 
 /**
  * Ported by Antonio Garrote from rdf-test-suite in scala.tests to Jasmine Tests
  */
-abstract class TurtleTestJasmineSuite[Rdf <: RDF]()(implicit ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, Turtle],
-  writer: RDFWriter[Rdf, Turtle])
-    extends JasmineTest {
+abstract class TurtleTestJasmineSuite[Rdf <: RDF](implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, Turtle],
+  writer: RDFWriter[Rdf, Try, Turtle]
+) extends JasmineTest {
 
   import ops._
 

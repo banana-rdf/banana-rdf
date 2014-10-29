@@ -1,16 +1,22 @@
 package org.w3.banana.io
 
 import java.io._
-
 import org.scalatest._
 import org.w3.banana._
+import scalaz._
+import scalaz.syntax._, monad._, comonad._
 
-class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
-    writerSelector: RDFWriterSelector[Rdf],
-    turtleReader: RDFReader[Rdf, Turtle],
-    turtleWriter: RDFWriter[Rdf, Turtle],
-    jsonldReader: RDFReader[Rdf, JsonLdCompacted],
-    jsonldWriter: RDFWriter[Rdf, JsonLdCompacted]) extends WordSpec with Matchers {
+class JsonLdTest[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
+  ops: RDFOps[Rdf],
+  writerSelector: RDFWriterSelector[Rdf, M],
+  turtleReader: RDFReader[Rdf, M, Turtle],
+  turtleWriter: RDFWriter[Rdf, M, Turtle],
+  jsonldReader: RDFReader[Rdf, M, JsonLdCompacted],
+  jsonldWriter: RDFWriter[Rdf, M, JsonLdCompacted]
+) extends WordSpec with Matchers {
+
+  val M = Monad[M]
+  import M.functorSyntax._
 
   import ops._
 
@@ -27,9 +33,9 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
     """.stripMargin
 
   "handle typed literals correctly" in {
-    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
-    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
-    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
+    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").copoint
+    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").copoint
+    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").copoint
 
     assert(referenceGraph isIsomorphicWith jsonldGraph)
   }
@@ -41,14 +47,14 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
     mr.params.size should be(1)
     mr.params("profile") should be("http://www.w3.org/ns/json-ld#compacted")
 
-    val matches = mr.matches(Syntax.JsonLdCompacted.mimeTypes.head)
+    val matches = mr.matches(Syntax[JsonLdCompacted].mimeTypes.head)
     matches should be(true)
 
-    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
+    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").copoint
     val jsonldWriter = writerSelector(mr).get
-    Syntax[JsonLdCompacted] should be(Syntax.JsonLdCompacted)
-    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
-    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
+
+    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").copoint
+    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").copoint
     assert(referenceGraph isIsomorphicWith jsonldGraph)
 
   }
@@ -60,14 +66,13 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
     mr.params.size should be(1)
     mr.params("profile") should be("http://www.w3.org/ns/json-ld#expanded")
 
-    val matches = mr.matches(Syntax.JsonLdExpanded.mimeTypes.head)
+    val matches = mr.matches(Syntax[JsonLdExpanded].mimeTypes.head)
     matches should be(true)
 
-    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
+    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").copoint
     val jsonldWriter = writerSelector(mr).get
-    Syntax[JsonLdExpanded].standardMimeType should be(Syntax.JsonLdExpanded.standardMimeType)
-    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
-    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
+    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").copoint
+    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").copoint
     assert(referenceGraph isIsomorphicWith jsonldGraph)
   }
 
@@ -78,14 +83,13 @@ class JsonLdTest[Rdf <: RDF](implicit ops: RDFOps[Rdf],
     mr.params.size should be(1)
     mr.params("profile") should be("http://www.w3.org/ns/json-ld#flattened")
 
-    val matches = mr.matches(Syntax.JsonLdFlattened.mimeTypes.head)
+    val matches = mr.matches(Syntax[JsonLdFlattened].mimeTypes.head)
     matches should be(true)
 
-    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").get
+    val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").copoint
     val jsonldWriter = writerSelector(mr).get
-    Syntax[JsonLdFlattened].standardMimeType should be(Syntax.JsonLdFlattened.standardMimeType)
-    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").get
-    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").get
+    val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").copoint
+    val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").copoint
     assert(referenceGraph isIsomorphicWith jsonldGraph)
   }
 

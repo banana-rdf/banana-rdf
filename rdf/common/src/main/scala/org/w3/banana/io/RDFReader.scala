@@ -2,30 +2,18 @@ package org.w3.banana
 package io
 
 import java.io._
+import scala.util.Try
 
-import scala.util._
+/** RDF readers for a given syntax. */
+trait RDFReader[Rdf <: RDF, M[_], +S] {
 
-/**
- * Blocking Reader for an implementation of RDF and a Syntax S
- */
-trait RDFReader[Rdf <: RDF, +S] {
+  /** Tries parsing an RDF Graph from an [[InputStream]] and a base URI.
+    * 
+    * If the encoding for the input is known, prefer the [[Reader]]
+    * version of this function.
+    */
+  def read(is: InputStream, base: String): M[Rdf#Graph]
 
-  /**
-   * parse from the Input Stream and have the parser guess the encoding. If no encoding guessing
-   * is needed use the reader method that takes a Reader.  This guessing may be more or less successful.
-   * @param is InputStream
-   * @param base Url to use to resolve relative URLs  ( as String ) //todo: why not as a RDF#URI ?
-   * @return A Success[Graph] or a Failure
-   * //todo: it may be more appropriate to have an encoding guessing function
-   */
-  def read(is: InputStream, base: String): Try[Rdf#Graph]
-
-  /**
-   * Parse from the Reader. Readers have already made the encoding decision, so there is no decision left
-   * here to make
-   * @param reader
-   * @param base URI for all relative URIs in reader //todo: should be a URI
-   * @return Success of a Graph or Failure
-   */
-  def read(reader: Reader, base: String): Try[Rdf#Graph]
+  /** Tries parsing an RDF Graph from a [[Reader]] and a base URI. */
+  def read(reader: Reader, base: String): M[Rdf#Graph]
 }

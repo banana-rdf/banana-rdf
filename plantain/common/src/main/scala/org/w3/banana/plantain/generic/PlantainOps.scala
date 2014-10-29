@@ -8,6 +8,7 @@ import org.w3.banana.isomorphism.{ GraphIsomorphism, SimpleMappingGenerator, Ver
 import scala.language.existentials
 
 trait PlantainOps[U, Rdf <: Plantain[U]] extends RDFOps[Rdf] {
+
   implicit val ops: RDFOps[Rdf] = this
 
   // graph
@@ -106,7 +107,7 @@ trait PlantainOps[U, Rdf <: Plantain[U]] extends RDFOps[Rdf] {
   }
 
   // graph isomorphism
-  lazy val iso = new GraphIsomorphism[Rdf](new SimpleMappingGenerator[Rdf](VerticeCBuilder.simpleHash))
+  val iso = new GraphIsomorphism[Rdf](new SimpleMappingGenerator[Rdf](VerticeCBuilder.simpleHash))
 
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean = {
     iso.findAnswer(left, right).isSuccess

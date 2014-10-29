@@ -3,16 +3,18 @@ package org.w3.banana
 import org.scalatest._
 import org.w3.banana.diesel._
 import org.w3.banana.io._
+import scala.util.Try
 
 class SparqlEngineTest[Rdf <: RDF, A](
-  val store: A)(
-    implicit val reader: RDFReader[Rdf, RDFXML],
-    val ops: RDFOps[Rdf],
-    val sparqlOps: SparqlOps[Rdf],
-    val graphStore: GraphStore[Rdf, A],
-    val sparqlEngine: SparqlEngine[Rdf, A],
-    val lifecycle: Lifecycle[Rdf, A])
-    extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
+  val store: A
+)(implicit
+  val reader: RDFReader[Rdf, Try, RDFXML],
+  val ops: RDFOps[Rdf],
+  val sparqlOps: SparqlOps[Rdf],
+  val graphStore: GraphStore[Rdf, A],
+  val sparqlEngine: SparqlEngine[Rdf, A],
+  val lifecycle: Lifecycle[Rdf, A]
+) extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
 
   import ops._
   import sparqlEngine.sparqlEngineSyntax._

@@ -1,22 +1,18 @@
 package org.w3.banana.io
 
+import org.w3.banana._
 import java.io._
-
-import org.w3.banana.RDF
-
 import scala.util._
 
-/**
- * <ul>
- *   <li><a href="http://www.w3.org/TR/rdf-sparql-XMLres/">Sparql Query Results XML Format</a></li>
- *   <li><a href="http://www.w3.org/TR/rdf-sparql-json-res/">Sparql Query Results in JSON</a></li>
- * </ul>
- */
+/** See:
+  * - [http://www.w3.org/TR/rdf-sparql-XMLres/](Sparql Query Results XML Format)
+  * - [http://www.w3.org/TR/rdf-sparql-json-res/](Sparql Query Results in JSON)
+  */
 trait SparqlQueryResultsReader[Rdf <: RDF, +S] {
 
   def read(is: InputStream, base: String): Try[Either[Rdf#Solutions, Boolean]]
 
-  def read(reader: java.io.Reader, base: String): Try[Either[Rdf#Solutions, Boolean]]
+  def read(reader: Reader, base: String): Try[Either[Rdf#Solutions, Boolean]]
 
   def read(file: File, base: String): Try[Either[Rdf#Solutions, Boolean]] =
     for {

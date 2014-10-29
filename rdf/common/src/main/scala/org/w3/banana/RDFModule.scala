@@ -2,6 +2,7 @@ package org.w3.banana
 
 import org.w3.banana.io.SparqlQueryResultsReader
 import io._
+import scala.util.Try
 
 trait RDFModule {
 
@@ -43,61 +44,61 @@ trait SparqlHttpModule extends RDFModule {
 
 trait RDFXMLReaderModule extends RDFModule {
 
-  implicit val rdfXMLReader: RDFReader[Rdf, RDFXML]
+  implicit val rdfXMLReader: RDFReader[Rdf, Try, RDFXML]
 
 }
 
 trait TurtleReaderModule extends RDFModule {
 
-  implicit val turtleReader: RDFReader[Rdf, Turtle]
+  implicit val turtleReader: RDFReader[Rdf, Try, Turtle]
 
 }
 
-/**
- * CurrentJsonLDReader contains all three reader types. If needed these could be split out.
+/* CurrentJsonLDReader contains all three reader types. If needed
+ * these could be split out.
  */
 trait JsonLDReaderModule extends RDFModule {
 
-  implicit val jsonldCompactReader: RDFReader[Rdf, JsonLdCompacted]
+  implicit val jsonldCompactReader: RDFReader[Rdf, Try, JsonLdCompacted]
 
-  implicit val jsonldExpandedReader: RDFReader[Rdf, JsonLdExpanded]
+  implicit val jsonldExpandedReader: RDFReader[Rdf, Try, JsonLdExpanded]
 
-  implicit val jsonldFlattenedReader: RDFReader[Rdf, JsonLdFlattened]
+  implicit val jsonldFlattenedReader: RDFReader[Rdf, Try, JsonLdFlattened]
 
 }
 
-/**
- * CurrentJsonLDReader contains all three writer types. If needed these could be split out.
+/* CurrentJsonLDReader contains all three writer types. If needed
+ * these could be split out.
  */
 trait JsonLDWriterModule extends RDFModule {
-  implicit val jsonldCompactedWriter: RDFWriter[Rdf, JsonLdCompacted]
+  implicit val jsonldCompactedWriter: RDFWriter[Rdf, Try, JsonLdCompacted]
 
-  implicit val jsonldExpandedWriter: RDFWriter[Rdf, JsonLdExpanded]
+  implicit val jsonldExpandedWriter: RDFWriter[Rdf, Try, JsonLdExpanded]
 
-  implicit val jsonldFlattenedWriter: RDFWriter[Rdf, JsonLdFlattened]
+  implicit val jsonldFlattenedWriter: RDFWriter[Rdf, Try, JsonLdFlattened]
 }
 
 trait ReaderSelectorModule extends RDFModule {
 
-  implicit val readerSelector: ReaderSelector[Rdf]
+  implicit val readerSelector: ReaderSelector[Rdf, Try]
 
 }
 
 trait RDFXMLWriterModule extends RDFModule {
 
-  implicit val rdfXMLWriter: RDFWriter[Rdf, RDFXML]
+  implicit val rdfXMLWriter: RDFWriter[Rdf, Try, RDFXML]
 
 }
 
 trait TurtleWriterModule extends RDFModule {
 
-  implicit val turtleWriter: RDFWriter[Rdf, Turtle]
+  implicit val turtleWriter: RDFWriter[Rdf, Try, Turtle]
 
 }
 
 trait WriterSelectorModule extends RDFModule {
 
-  implicit val writerSelector: RDFWriterSelector[Rdf]
+  implicit val writerSelector: RDFWriterSelector[Rdf, Try]
 
 }
 

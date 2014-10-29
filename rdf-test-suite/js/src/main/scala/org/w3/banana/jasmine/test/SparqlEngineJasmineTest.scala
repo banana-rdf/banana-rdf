@@ -2,27 +2,24 @@ package org.w3.banana.jasmine.test
 
 import org.w3.banana._
 import org.w3.banana.diesel._
-
-//import scalaz.Scalaz._
-//import scala.util._
-import java.io._
-
 import org.w3.banana.io._
-import org.w3.banana.{ RDFStore => RDFStoreInterface }
-
+import scala.util.Try
+import java.io._
 import scala.scalajs.test.JasmineTest
 
 /**
  * Ported by Antonio Garrotte from rdf-test-suite in scala.tests to Jasmine Tests
  */
 abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
-  val store: A)(
-    implicit reader: RDFReader[Rdf, Turtle],
-    ops: RDFOps[Rdf],
-    sparqlOps: SparqlOps[Rdf], val graphStore: GraphStore[Rdf, A],
-    val sparqlEngine: SparqlEngine[Rdf, A],
-    val lifecycle: Lifecycle[Rdf, A])
-    extends JasmineTest {
+  val store: A
+)(implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, Turtle],
+  sparqlOps: SparqlOps[Rdf],
+  val graphStore: GraphStore[Rdf, A],
+  val sparqlEngine: SparqlEngine[Rdf, A],
+  val lifecycle: Lifecycle[Rdf, A]
+) extends JasmineTest {
 
   import ops._
   //import syntax._
@@ -171,14 +168,18 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
      */
     }
   }
+
+  // TODO @betehess
   abstract class SparqlUpdateEngineJasmineTest[Rdf <: RDF, A](
-    val store: A)(
-      implicit reader: RDFReader[Rdf, Turtle],
-      ops: RDFOps[Rdf],
-      sparqlOps: SparqlOps[Rdf], val graphStore: GraphStore[Rdf, A],
-      val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
-      val lifecycle: Lifecycle[Rdf, A])
-      extends JasmineTest {
+    val store: A
+  )(implicit
+    ops: RDFOps[Rdf],
+    reader: RDFReader[Rdf, Try, Turtle],
+    sparqlOps: SparqlOps[Rdf],
+    val graphStore: GraphStore[Rdf, A],
+    val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
+    val lifecycle: Lifecycle[Rdf, A]
+  ) extends JasmineTest {
     import ops._
     import org.w3.banana.diesel._
     import sparqlOps._

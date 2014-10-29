@@ -3,14 +3,16 @@ package org.w3.banana
 import org.scalatest._
 import org.w3.banana.diesel._
 import org.w3.banana.io._
+import scala.util.Try
 
 class GraphStoreTest[Rdf <: RDF, A](
-  store: A)(
-    implicit val ops: RDFOps[Rdf],
-    val reader: RDFReader[Rdf, RDFXML],
-    val graphStore: GraphStore[Rdf, A],
-    val lifecycle: Lifecycle[Rdf, A])
-    extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
+  store: A
+)(implicit
+  val ops: RDFOps[Rdf],
+  val reader: RDFReader[Rdf, Try, RDFXML],
+  val graphStore: GraphStore[Rdf, A],
+  val lifecycle: Lifecycle[Rdf, A]
+) extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
   import graphStore.graphStoreSyntax._
   import lifecycle.lifecycleSyntax._

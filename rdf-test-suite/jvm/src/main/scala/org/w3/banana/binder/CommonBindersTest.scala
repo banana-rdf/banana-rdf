@@ -6,8 +6,8 @@ import org.scalatest._
 import org.joda.time.DateTime
 import scala.util._
 
-abstract class CommonBindersTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
-    extends WordSpec with Matchers {
+abstract class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf])
+extends WordSpec with Matchers {
 
   import ops._
 
