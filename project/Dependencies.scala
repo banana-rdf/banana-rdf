@@ -102,11 +102,12 @@ object Dependencies {
   /**
    * Jasmine js and jvm
    * @see https://github.com/InTheNow
-   * @see http://johnsonusm.com:8020/nexus/content/repositories/releases/com/github/inthenow/
+   * @see https://oss.sonatype.org/content/repositories/releases/com/github/inthenow/
    */
-  val jasmine_jvm = "com.github.inthenow" %% "jasmine_jvm" % "0.2.5"
-  val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.5")
-  val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % "0.2.5" % "test")
+  val jasmine_version = "0.3.1"
+  val jasmine_jvm = "com.github.inthenow" %% "jasmine_jvm" % jasmine_version
+  val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % jasmine_version)
+  val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % jasmine_version % "test")
 
   /**
    * scalajs-jasmine-test-framework
