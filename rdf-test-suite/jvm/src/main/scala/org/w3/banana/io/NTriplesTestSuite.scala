@@ -495,7 +495,9 @@ class NTriplesTestSuite[Rdf <: RDF]()(
     "lantag_with_subtag" in {
       test( """<http://example.org/ex#a> <http://example.org/ex#b> "Cheers"@en-UK .""", 1){g=>
         val o = g.triples.head.objectt
-        o.fold(uri=>false,bn=>false,lit=>lit.lexicalForm=="Cheers" && lit.lang == Some(Lang("en-UK")))
+        o.fold(uri=>false,
+               bn=>false,
+               lit=> lit.lexicalForm=="Cheers" && lit.lang == Some(Lang("en-UK")))
       }
     }
     "minimal_whitespace" in {
