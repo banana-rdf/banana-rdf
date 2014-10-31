@@ -648,8 +648,6 @@ class NTriplesTestSuite[Rdf <: RDF]()(
         };
         val t2 = System.currentTimeMillis();
         println(s"time to parse $x triples was ${t2 - t1}. Found $failures failures. ")
-      }
-
   }
 
 
