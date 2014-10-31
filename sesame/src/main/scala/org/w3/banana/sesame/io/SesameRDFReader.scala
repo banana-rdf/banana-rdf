@@ -5,11 +5,11 @@ import java.util.LinkedList
 
 import com.github.jsonldjava.sesame.SesameJSONLDParser
 import org.openrdf.model._
-import org.openrdf.model.impl.{ LinkedHashModel, LiteralImpl, StatementImpl }
-import org.openrdf.rio.helpers.{ JSONLDMode, JSONLDSettings }
+import org.openrdf.model.impl.{LinkedHashModel, LiteralImpl, StatementImpl}
 import org.w3.banana._
-import org.w3.banana.sesame.Sesame
 import org.w3.banana.io._
+import org.w3.banana.sesame.Sesame
+
 import scala.util._
 
 trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
@@ -67,21 +67,11 @@ class SesameRDFXMLReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesam
   def getParser() = new org.openrdf.rio.rdfxml.RDFXMLParser
 }
 
-/* Note: an issue with the com.github.jsonldjava is apparently that it
+/**
+ * Note: an issue with the com.github.jsonldjava is apparently that it
  * loads the whole JSON file into memory, which is memory consumptive
  */
-abstract class AbstractSesameJSONLDReader[T](jsonldProfile: JSONLDMode) extends AbstractSesameReader[T] {
-
-  def getParser() = {
-    val parser = new SesameJSONLDParser
-    parser.getParserConfig.set(JSONLDSettings.JSONLD_MODE, jsonldProfile)
-    parser
-  }
-
+class SesameJSONLDReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[JsonLd] {
+  def getParser() = new SesameJSONLDParser
 }
 
-class SesameJSONLDCompactedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdCompacted](jsonldProfile = JSONLDMode.COMPACT)
-
-class SesameJSONLDExpandedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdExpanded](jsonldProfile = JSONLDMode.EXPAND)
-
-class SesameJSONLDFlattenedReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameJSONLDReader[JsonLdFlattened](jsonldProfile = JSONLDMode.FLATTEN)

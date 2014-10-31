@@ -6,11 +6,12 @@ import org.w3.banana.{ Prefix, RDF, RDFOps }
 import scalaz._
 import scalaz.syntax._, monad._, comonad._
 
-abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](implicit
+abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, Sout](implicit
   ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, M, S],
-  writer: RDFWriter[Rdf, M, S],
-  syntax: Syntax[S]
+  reader: RDFReader[Rdf, M, Sin],
+  writer: RDFWriter[Rdf, M, Sout],
+  syntaxIn: Syntax[Sin],
+  syntaxOut: Syntax[Sout]
 ) extends WordSpec with Matchers {
 
   // both Monad and Comonad are Functors, so they compete for the
@@ -19,7 +20,8 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](im
   val M = Monad[M]
   import M.functorSyntax._
 
-  /* A simple serialisation for Syntax of the referenceGraph below.
+  /*
+   * A simple serialisation for [SyntaxIn] of the [referenceGraph] below, with no relative urls
    * 
    * To fill in for each Syntax.
    */
@@ -50,8 +52,8 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](im
   val fooPrefix = Prefix("foo", foo)
   val fooGraph = graphBuilder(fooPrefix)
 
-  s"read ${syntax.defaultMimeType} version of timbl's card" in {
-    WellKnownMimeExtensions.extension(syntax.mimeTypes.head).map { ext =>
+  s"read ${syntaxIn.defaultMimeType} version of timbl's card" in {
+    WellKnownMimeExtensions.extension(syntaxIn.mimeTypes.head).map { ext =>
       val file = new File(s"rdf-test-suite/jvm/src/main/resources/card.$ext")
       val fis = new FileInputStream(file)
       try {
@@ -63,7 +65,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](im
     }
   }
 
-  s"simple ${syntax.defaultMimeType} string containing only absolute URIs" should {
+  s"simple ${syntaxIn.defaultMimeType} string containing only absolute URIs" should {
 
     "parse using Readers (the base has no effect since all URIs are absolute)" in {
       val graph = reader.read(new StringReader(referenceGraphSerialisedForSyntax), rdfCore).copoint
@@ -79,7 +81,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](im
 
   }
 
-  s"write simple graph as ${syntax.defaultMimeType} string" in {
+  s"write simple graph as ${syntaxOut.defaultMimeType} string" in {
     val turtleString =
       writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").copoint
     turtleString should not be ('empty)
@@ -90,7 +92,6 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](im
   "graphs with relative URIs" should {
 
     ", when moved to a new base, have all relative URLs transformed" in {
-
       val bar = for {
         relativeSerialisation <- writer.asString(referenceGraph, rdfCore)
         computedFooGraph <- reader.read(new StringReader(relativeSerialisation), foo)
@@ -102,7 +103,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, S](im
     }
 
     """not be created just by taking URIs in absolute graphs and cutting the characters leading up to the base.
-      It is more complext than that.
+      It is more complex than that.
     """ in {
       val rdfCoreResource = rdfCore + "imaginary"
       val bar = for {

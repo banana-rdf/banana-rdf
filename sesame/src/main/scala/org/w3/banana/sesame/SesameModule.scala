@@ -16,6 +16,7 @@ trait SesameModule
     // with SparqlHttpModule
     with RDFXMLReaderModule
     with TurtleReaderModule
+    with NTriplesReaderModule
     with JsonLDReaderModule
     with ReaderSelectorModule
     with RDFXMLWriterModule
@@ -43,11 +44,9 @@ trait SesameModule
 
   implicit val turtleReader: RDFReader[Sesame, Try, Turtle] = new SesameTurtleReader
 
-  implicit val jsonldCompactReader: RDFReader[Sesame, Try, JsonLdCompacted] = new SesameJSONLDCompactedReader
+  implicit val jsonldReader: RDFReader[Sesame, Try, JsonLd] = new SesameJSONLDReader
 
-  implicit val jsonldExpandedReader: RDFReader[Sesame, Try, JsonLdExpanded] = new SesameJSONLDExpandedReader
-
-  implicit val jsonldFlattenedReader: RDFReader[Sesame, Try, JsonLdFlattened] = new SesameJSONLDFlattenedReader
+  implicit val ntriplesReader: RDFReader[Sesame, Try, NTriples] = new NTriplesReader
 
   implicit val sesameRDFWriterHelper = new SesameRDFWriterHelper
 
@@ -70,9 +69,7 @@ trait SesameModule
   implicit val readerSelector: ReaderSelector[Sesame, Try] =
     ReaderSelector[Sesame, Try, Turtle] combineWith
     ReaderSelector[Sesame, Try, RDFXML] combineWith
-    ReaderSelector[Sesame, Try, JsonLdCompacted] combineWith
-    ReaderSelector[Sesame, Try, JsonLdExpanded] combineWith
-    ReaderSelector[Sesame, Try, JsonLdFlattened]
+    ReaderSelector[Sesame, Try, JsonLd]
 
   implicit val writerSelector: RDFWriterSelector[Sesame, Try] = sesameRDFWriterHelper.selector
 

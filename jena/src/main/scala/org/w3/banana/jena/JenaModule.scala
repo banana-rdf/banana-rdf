@@ -16,6 +16,7 @@ with SparqlGraphModule
 with SparqlHttpModule
 with RDFXMLReaderModule
 with TurtleReaderModule
+with NTriplesReaderModule
 with ReaderSelectorModule
 with RDFXMLWriterModule
 with TurtleWriterModule
@@ -45,6 +46,8 @@ with XmlQueryResultsReaderModule {
   implicit val rdfXMLReader: RDFReader[Jena, Try, RDFXML] = JenaRDFReader.rdfxmlReader()
 
   implicit val turtleReader: RDFReader[Jena, Try, Turtle] = JenaRDFReader.turtleReader()
+
+  implicit val ntriplesReader: RDFReader[Jena, Try, NTriples] = new NTriplesReader
 
   implicit val n3Reader: RDFReader[Jena, Try, N3] = JenaRDFReader.n3Reader()
 

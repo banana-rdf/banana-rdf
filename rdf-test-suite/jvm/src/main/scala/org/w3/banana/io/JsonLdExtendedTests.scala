@@ -1,23 +1,24 @@
 package org.w3.banana.io
 
 import java.io._
+
 import org.scalatest._
 import org.w3.banana._
-import scalaz._
-import scalaz.syntax._, monad._, comonad._
 
-class JsonLdTest[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
+import scalaz._
+import scalaz.syntax._
+import comonad._
+
+class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
   ops: RDFOps[Rdf],
   writerSelector: RDFWriterSelector[Rdf, M],
   turtleReader: RDFReader[Rdf, M, Turtle],
   turtleWriter: RDFWriter[Rdf, M, Turtle],
-  jsonldReader: RDFReader[Rdf, M, JsonLdCompacted],
+  jsonldReader: RDFReader[Rdf, M, JsonLd],
   jsonldWriter: RDFWriter[Rdf, M, JsonLdCompacted]
 ) extends WordSpec with Matchers {
 
   val M = Monad[M]
-  import M.functorSyntax._
-
   import ops._
 
   def strToInput(str: String) = new ByteArrayInputStream(str.getBytes("UTF8"))
@@ -47,12 +48,12 @@ class JsonLdTest[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
     mr.params.size should be(1)
     mr.params("profile") should be("http://www.w3.org/ns/json-ld#compacted")
 
-    val matches = mr.matches(Syntax[JsonLdCompacted].mimeTypes.head)
+    val matches = mr.matches(Syntax.JsonLdCompacted.mimeTypes.head)
     matches should be(true)
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").copoint
     val jsonldWriter = writerSelector(mr).get
-
+    Syntax[JsonLdCompacted] should be(Syntax.JsonLdCompacted)
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").copoint
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").copoint
     assert(referenceGraph isIsomorphicWith jsonldGraph)
