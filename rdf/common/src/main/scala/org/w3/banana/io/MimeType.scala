@@ -5,7 +5,7 @@ object MimeType {
 
   val paramRegex = """([^=]+)="?([^"]*)"?""".r
 
-  /** Extracts a [[MimeType]] from a [[String]] following the
+  /** Extracts a [[org.w3.banana.io.MimeType]] from a [[java.lang.String]] following the
     * "type/subtype(;param=value)*" format
     */
   def parse(mime: String): Option[MimeType] = {

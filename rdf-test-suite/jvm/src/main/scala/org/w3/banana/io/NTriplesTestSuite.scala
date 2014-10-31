@@ -27,8 +27,10 @@ class NTriplesTestSuite[Rdf <: RDF]()(
 
   def rd(nt: String): Try[Rdf#Graph] = reader.read(new StringReader(nt),"")
   def st(node: Rdf#Node) =
-    node.fold(uri=>s"<${uri.getString}>",bn=>s"_:${fromBNode(bn)}",
-    lit=>lit match {
+    node.fold(
+      uri => s"<${uri.getString}>",
+      bn => s"_:${fromBNode(bn)}",
+      _ match {
       case Literal(lexical,Literal.xsdString,None) => s""""$lexical""""
       case Literal(lexical,tp,None)=>s""""$lexical"^^<$tp>"""
       case Literal(lexical,Literal.xsdString,Some(lang)) => s""""$lexical"@$lang"""
@@ -36,7 +38,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
 
 
   def ntparser(ntstring: String, skip: Boolean=false) =
-    new NTriplesParser[Rdf](new LineNumberReader(new StringReader(ntstring)),skip)
+    new NTriplesParser[Rdf](new StringReader(ntstring),skip)
 
   "test that the parser can parse single components. Parser " should  {
 
@@ -206,11 +208,6 @@ class NTriplesTestSuite[Rdf <: RDF]()(
 
   }
 
-//  def parse(filename: String): Try[Rdf#Graph] = {
-//    val file = new File(s"rdf-test-suite/jvm/src/main/resources/ntriples/"+filename)
-//    val in = new LineNumberReader(new InputStreamReader(new FileInputStream(file),"UTF-8"))
-//    new NTriplesParser[Rdf](in).parse()
-//  }
 
   def ntparse(string: String): Try[Rdf#Graph] = ntparser(string).parse()
 
@@ -514,7 +511,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
 
   "w3c tests of type rdft:TestNTriplesNegativeSyntax" should {
 
-    def fail(s: String,erros: Int)(implicit test: List[Try[Rdf#Triple]] => Boolean = _ => true) = {
+    def fail(s: String,erros: Int, test: List[Try[Rdf#Triple]] => Boolean = _ => true) = {
       val parseIterator = ntparser(s,true).parseIterator()
       val resultList = parseIterator.toList
       assert(test(resultList))
@@ -627,27 +624,26 @@ class NTriplesTestSuite[Rdf <: RDF]()(
    * @param args
    */
   def main(args: Array[String]): Unit = {
-      import java.io._
-      val encoding = if (args.length > 2) args(1) else "UTF-8"
-      def f() = {
-        val ntp = new NTriplesParser[Rdf](
-          new LineNumberReader(
-            new InputStreamReader(
-              new FileInputStream(
-                new File(args(0))), encoding)),true);
-        val t1 = System.currentTimeMillis();
-        var x = 0;
-        val i = ntp.parseIterator();
-        var failures = 0
-        while (i.hasNext) {
-          val t = i.next; x = x + 1;
-          if (t.isFailure) {
-            println(s"\r\ntriple=$t")
-            failures = failures + 1
-          };
-        };
-        val t2 = System.currentTimeMillis();
-        println(s"time to parse $x triples was ${t2 - t1}. Found $failures failures. ")
+    import java.io._
+    val encoding = if (args.length > 2) args(1) else "UTF-8"
+    val ntp = new NTriplesParser[Rdf](
+        new InputStreamReader(
+          new FileInputStream(
+            new File(args(0))), encoding), true);
+    val t1 = System.currentTimeMillis();
+    var x = 0;
+    val i = ntp.parseIterator();
+    var failures = 0
+    while (i.hasNext) {
+      val t = i.next;
+      x = x + 1;
+      if (t.isFailure) {
+        println(s"\r\ntriple=$t")
+        failures = failures + 1
+      };
+    };
+    val t2 = System.currentTimeMillis();
+    println(s"time to parse $x triples was ${t2 - t1}. Found $failures failures. ")
   }
 
 

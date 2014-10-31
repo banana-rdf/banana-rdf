@@ -5,13 +5,14 @@ import org.w3.banana.{RDF, RDFOps}
 import scalaz._
 
 abstract class JsonLDTestSuite[Rdf <: RDF, M[+_]: Monad: Comonad, JsonLdOut](
-  implicit ops: RDFOps[Rdf],
+  implicit
+  ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, JsonLd],
   writer: RDFWriter[Rdf, M, JsonLdOut],
   syntaxOut: Syntax[JsonLdOut])
     extends SerialisationTestSuite[Rdf, M, JsonLd, JsonLdOut] {
 
-  def referenceGraphSerialisedForSyntax = """
+  val referenceGraphSerialisedForSyntax = """
   [
   {
     "@id": "http://www.w3.org/2001/sw/RDFCore/ntriples/",

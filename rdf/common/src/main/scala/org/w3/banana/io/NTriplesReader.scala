@@ -22,7 +22,7 @@ class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rd
    * @return A Success[Graph] or a Failure
    *         //todo: it may be more appropriate to have an encoding guessing function
    */
-  override def read(is: InputStream, base: String) = {
+  def read(is: InputStream, base: String) = {
     //guess completely randomly that the inputstream is in UTF-8
     read(new InputStreamReader(is),base)
   }
@@ -35,9 +35,8 @@ class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rd
    * @param base URI for all relative URIs in reader //todo: should be a URI
    * @return Success of a Graph or Failure
    */
-  override def read(reader: Reader, base: String): Try[Rdf#Graph] = {
-    val lnr = new LineNumberReader(reader)
-    new NTriplesParser[Rdf](lnr).parse()
+  def read(reader: Reader, base: String): Try[Rdf#Graph] = {
+    new NTriplesParser[Rdf](reader).parse()
   }
 }
 
@@ -110,15 +109,18 @@ object NTriplesParser {
  *  - it perhaps unnecessarily creates a Try for each Triple
  *  - it relied on throws
  *
- * @param reader
- * @param skipBrokenLines if a line does not parse, skip it and move to the next
- * @param ops
- * @tparam Rdf
+ * @param plainReader  will be wrapped in a LineNumberReader with default buffering
+ * @param skipBrokenLines  broken lines will be skipped, rather than halting the parsing, if true
+ * @param ops the Operations corresponding to the Rdf type
+ * @tparam Rdf a subtype of RDF
  */
-class NTriplesParser[Rdf <: RDF](reader: LineNumberReader, skipBrokenLines: Boolean = false)(implicit ops: RDFOps[Rdf]) {
+class NTriplesParser[Rdf <: RDF](plainReader: Reader,
+            skipBrokenLines: Boolean = false)
+                                (implicit ops: RDFOps[Rdf]) {
 
   import ops._
   import org.w3.banana.io.NTriplesParser._
+  val reader = new LineNumberReader(plainReader)
 
 import scala.collection.mutable
   import scala.collection.mutable.StringBuilder._
@@ -163,10 +165,10 @@ import scala.collection.mutable
     new Iterator[Try[Rdf#Triple]]() {
       var ended = false
 
-      override def hasNext = !ended
+      def hasNext = !ended
 
-      override def next() = {
-        var result = parseNextTriple()
+      def next() = {
+        val result = parseNextTriple()
         ended = result match {
           case Failure(ParseException(_,c,_)) => {
             if (c == -1) true   //EOF
@@ -192,7 +194,8 @@ import scala.collection.mutable
   private def parseComment(): Unit = {
     read() match {
       case -1 => Unit
-      case eol if eol == '\r' || eol == '\n' => Unit
+      case '\r' => Unit
+      case '\n' => Unit
       case _ => parseComment()
     }
   }
@@ -334,15 +337,15 @@ import scala.collection.mutable
     @tailrec
     def parseBnodeLabel(implicit uribuf: mutable.StringBuilder): Rdf#BNode =
       read() match {
-        case -1 => {
+        case -1 =>
           val label = uribuf.toString()
           if (label.endsWith(".")) {
             rewind.push('.')
             BNode(label.substring(0, label.length - 1))
           } else
             throw EOF("was parsing bnode")
-        }
-        case other => {
+
+        case other =>
           if (!pn_chars_dot(other)) {
             rewind.push(other)
             val label = uribuf.toString()
@@ -352,7 +355,7 @@ import scala.collection.mutable
             } else BNode(label)
           }
           else parseBnodeLabel(appendChar(other))
-        }
+
       }
 
     val nc = read()

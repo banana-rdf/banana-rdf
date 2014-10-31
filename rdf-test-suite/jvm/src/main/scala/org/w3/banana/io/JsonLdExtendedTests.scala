@@ -6,10 +6,9 @@ import org.scalatest._
 import org.w3.banana._
 
 import scalaz._
-import scalaz.syntax._
-import comonad._
+import scalaz.syntax._, comonad._
 
-class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
+class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Monad: Comonad](implicit
   ops: RDFOps[Rdf],
   writerSelector: RDFWriterSelector[Rdf, M],
   turtleReader: RDFReader[Rdf, M, Turtle],
@@ -53,7 +52,6 @@ class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
 
     val referenceGraph = turtleReader.read(strToInput(turtleGraph), "http://manu.sporny.org/i/public").copoint
     val jsonldWriter = writerSelector(mr).get
-    Syntax[JsonLdCompacted] should be(Syntax.JsonLdCompacted)
     val jsonld = jsonldWriter.asString(referenceGraph, "http://manu.sporny.org/i/public").copoint
     val jsonldGraph = jsonldReader.read(strToInput(jsonld), "http://manu.sporny.org/i/public").copoint
     assert(referenceGraph isIsomorphicWith jsonldGraph)

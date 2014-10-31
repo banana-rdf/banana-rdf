@@ -6,6 +6,11 @@ import org.w3.banana.{ Prefix, RDF, RDFOps }
 import scalaz._
 import scalaz.syntax._, monad._, comonad._
 
+
+/**
+ * Test Serialisations. Some serialisations have one parser and multiple serialisers, such
+ * as with json-ld, hence the distinction Sin and Sout
+ */
 abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, Sout](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, Sin],
