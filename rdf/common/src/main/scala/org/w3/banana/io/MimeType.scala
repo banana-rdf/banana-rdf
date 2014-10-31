@@ -26,6 +26,7 @@ object MimeType {
   val ImageGif = MimeType("image", "gif")
   val ImagePng = MimeType("image", "png")
   val RdfTurtle = MimeType("text", "turtle")
+  val NTriples = MimeType("application", "ntriples")
   val TextHtml = MimeType("text", "html")
   val RdfXml = MimeType("text", "rdf+xml")
   val SparqlQuery = MimeType("application", "sparql-query")

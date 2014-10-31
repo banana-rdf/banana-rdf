@@ -10,7 +10,8 @@ extends RDFModule
 with RDFOpsModule
 with RecordBinderModule
 with TurtleReaderModule
-with TurtleWriterModule {
+with TurtleWriterModule
+with NTriplesReaderModule {
 
   type Rdf = Plantain
 
@@ -21,5 +22,7 @@ with TurtleWriterModule {
   implicit val turtleReader: RDFReader[Plantain, Try, Turtle] = PlantainTurtleReader
 
   implicit val turtleWriter: RDFWriter[Plantain, Try, Turtle] = PlantainTurtleWriter
+
+  implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader
 
 }

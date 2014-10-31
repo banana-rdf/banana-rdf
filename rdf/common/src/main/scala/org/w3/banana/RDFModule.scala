@@ -54,16 +54,16 @@ trait TurtleReaderModule extends RDFModule {
 
 }
 
+trait NTriplesReaderModule extends RDFModule {
+  implicit val ntriplesReader: RDFReader[Rdf, Try, NTriples]
+}
+
 /* CurrentJsonLDReader contains all three reader types. If needed
  * these could be split out.
  */
 trait JsonLDReaderModule extends RDFModule {
 
-  implicit val jsonldCompactReader: RDFReader[Rdf, Try, JsonLdCompacted]
-
-  implicit val jsonldExpandedReader: RDFReader[Rdf, Try, JsonLdExpanded]
-
-  implicit val jsonldFlattenedReader: RDFReader[Rdf, Try, JsonLdFlattened]
+  implicit val jsonldReader: RDFReader[Rdf, Try, JsonLd]
 
 }
 
