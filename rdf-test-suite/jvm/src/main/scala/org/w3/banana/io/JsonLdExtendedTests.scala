@@ -8,7 +8,7 @@ import org.w3.banana._
 import scalaz._
 import scalaz.syntax._, comonad._
 
-class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Monad: Comonad](implicit
+class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Comonad](implicit
   ops: RDFOps[Rdf],
   writerSelector: RDFWriterSelector[Rdf, M],
   turtleReader: RDFReader[Rdf, M, Turtle],
@@ -17,7 +17,6 @@ class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Monad: Comonad](implicit
   jsonldWriter: RDFWriter[Rdf, M, JsonLdCompacted]
 ) extends WordSpec with Matchers {
 
-  val M = Monad[M]
   import ops._
 
   def strToInput(str: String) = new ByteArrayInputStream(str.getBytes("UTF8"))
