@@ -54,7 +54,6 @@ public class AsyncJenaParser {
      *
      * Note: if handler is also LexicalHandler it will pass on lexical events.
      *
-     * @param handler
      */
     public AsyncJenaParser(ContentHandler handler, AsyncXMLStreamReader streamReader) throws XMLStreamException {
         this.handler = handler;
@@ -87,7 +86,6 @@ public class AsyncJenaParser {
 
     /**
      * Handle the next event
-     * @param e
      * @return true if the end of the document has been reached. (ie, we are back at level 0)
      * @throws SAXException
      */

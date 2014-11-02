@@ -624,7 +624,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
   /**
    * Usefull method  for parsing large files to do speed tests
    * see: <a href="http://www.w3.org/wiki/DataSetRDFDumps">Data Set RDF Dumps</a>
-   * @param args
+   * @param args path_to_NTriplesFile [encoding]
    */
   def main(args: Array[String]): Unit = {
     import java.io._

@@ -23,9 +23,6 @@ class RDFStoreTurtleReader(implicit ops: RDFStoreOps) extends RDFReader[RDFStore
   /**
    * legacy: if one passes an input stream at this layer one
    * would need to know the encoding too. This function is badly designed.
-   * @param is
-   * @param base
-   * @return
    */
   override def read(is: InputStream, base: String) = ???
 }

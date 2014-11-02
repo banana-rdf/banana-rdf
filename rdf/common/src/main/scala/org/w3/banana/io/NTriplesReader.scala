@@ -22,7 +22,6 @@ class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rd
    * Java default encoding. For data found on the web, that is published by others, it is unusual that
    * they all would make the same default encoding choice as you.
    *
-   * @param is InputStream
    * @param base Url to use to resolve relative URLs  ( as String ) //todo: why not as a RDF#URI ?
    * @return A Success[Graph] or a Failure
    *         //todo: it may be more appropriate to have an encoding guessing function
@@ -35,7 +34,6 @@ class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rd
   /**
    * Parse from the Reader. Readers have already made the encoding decision, so there is no decision left
    * here to make
-   * @param reader
    * @param base URI for all relative URIs in reader //todo: should be a URI
    * @return Success of a Graph or Failure
    */
@@ -214,8 +212,6 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
 
   /**
    * The initial '<' has already been read
-   * @param iribuf
-   * @return
    */
   @tailrec
   private[io] final def parseIRI(iribuf: mutable.StringBuilder = newBuilder): Rdf#URI = {

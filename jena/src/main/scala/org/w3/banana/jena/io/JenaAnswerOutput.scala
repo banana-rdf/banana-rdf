@@ -5,7 +5,6 @@ import org.w3.banana.io._
 
 /**
  * typeclass for serialising special
- * @tparam T
  */
 trait JenaAnswerOutput[T] {
   def formatter: OutputFormatter

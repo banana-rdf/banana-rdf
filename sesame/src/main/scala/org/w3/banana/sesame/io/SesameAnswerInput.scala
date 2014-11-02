@@ -5,7 +5,6 @@ import org.w3.banana.io._
 
 /**
  * typeclass for serialising special
- * @tparam T
  */
 trait SesameAnswerInput[T] {
   def tupleFormat: TupleQueryResultFormat

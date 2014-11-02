@@ -29,7 +29,6 @@ import scalaz.EphemeralStream
  * @param mappingGen a mapping generator that knows to find for two graphs the possible mappings of bnodes between
  *                   them. Better mapping generators will find less mappings for the same graphs, without missing out
  *                   on correct ones.
- * @param ops RDFOPs
  * @tparam Rdf RDF implementation to work with
  */
 class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxComplexity: Int = 65536)(implicit ops: RDFOps[Rdf]) {
@@ -40,7 +39,6 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
    * filter a graphs into two subgraphs the first one containing no blank nodes
    * the other one containing only statements with blank nodes
    *
-   * @param graph
    * @return a pair of Ground graph and non ground graph
    */
   def groundTripleFilter(graph: Rdf#Graph): (Rdf#Graph, Rdf#Graph) = {
@@ -58,8 +56,6 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
 
   /**
    * Find possible bnode mappings
-   * @param g1
-   * @param g2
    * @return A list of possible bnode mappings or a reason for the error
    */
   def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[EphemeralStream[List[(Rdf#BNode, Rdf#BNode)]]] = {
@@ -123,8 +119,6 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
 
   /**
    * Verify that the bnode bijection allows one to map graph1 to graph2
-   * @param graph1
-   * @param graph2
    * @param mapping  the mappings to verify.
    * @return a list of exceptions in case of failure or an empty list in case of success
    *
