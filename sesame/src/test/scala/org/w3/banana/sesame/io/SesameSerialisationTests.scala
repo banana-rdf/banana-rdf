@@ -14,3 +14,5 @@ class SesameRdfXMLTests extends RdfXMLTestSuite[Sesame, Try]
 class SesameJsonLDCompactedTests extends JsonLDTestSuite[Sesame,Try,JsonLdCompacted]
 
 class SesameJsonLDExpandedTests extends JsonLDTestSuite[Sesame,Try,JsonLdExpanded]
+
+class SesameJsonLDFlattened extends JsonLDTestSuite[Sesame,Try,JsonLdExpanded]

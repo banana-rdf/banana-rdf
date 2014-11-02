@@ -86,11 +86,11 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
 
   }
 
-  s"write simple graph as ${syntaxOut.defaultMimeType} string" in {
-    val turtleString =
+  s"write ref graph as ${syntaxOut.defaultMimeType} string, read it & compare" in {
+    val soutString =
       writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").copoint
-    turtleString should not be ('empty)
-    val graph = reader.read(new StringReader(turtleString), rdfCore).copoint
+    soutString should not be ('empty)
+    val graph = reader.read(new StringReader(soutString), rdfCore).copoint
     assert(referenceGraph isIsomorphicWith graph)
   }
 
