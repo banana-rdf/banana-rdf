@@ -13,19 +13,23 @@ import scala.util.{Failure, Success, Try}
  * An NTriples Reader based on the NTriples parser
  */
 class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rdf, Try, NTriples] {
-
+   import NTriplesParser._
   /**
    * parse from the Input Stream and have the parser guess the encoding. If no encoding guessing
    * is needed use the reader method that takes a Reader.  This guessing may be more or less successful.
+   *
+   * Warning: the InputStream will be parsed into a character stream using the Operating System or
+   * Java default encoding. For data found on the web, that is published by others, it is unusual that
+   * they all would make the same default encoding choice as you.
+   *
    * @param is InputStream
    * @param base Url to use to resolve relative URLs  ( as String ) //todo: why not as a RDF#URI ?
    * @return A Success[Graph] or a Failure
    *         //todo: it may be more appropriate to have an encoding guessing function
    */
-  def read(is: InputStream, base: String) = {
-    //guess completely randomly that the inputstream is in UTF-8
+  def read(is: InputStream, base: String) =
     read(new InputStreamReader(is),base)
-  }
+
 
 
   /**
@@ -35,9 +39,9 @@ class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rd
    * @param base URI for all relative URIs in reader //todo: should be a URI
    * @return Success of a Graph or Failure
    */
-  def read(reader: Reader, base: String): Try[Rdf#Graph] = {
-    new NTriplesParser[Rdf](reader).parse()
-  }
+  def read(reader: Reader, base: String): Try[Rdf#Graph] =
+    toGraph(new NTriplesParser[Rdf](reader))
+
 }
 
 object NTriplesParser {
@@ -96,18 +100,37 @@ object NTriplesParser {
     result.toChar
   }
 
+  /**
+   *
+   * @return the parsed Graph if successful, otherwise a failure containing the error message
+   */
+  def toGraph[Rdf<:RDF](ntparser: NTriplesParser[Rdf]): Try[Rdf#Graph] = Try {
+    val filteredIterator = if (ntparser.skipBrokenLines) ntparser.filter(_.isSuccess)
+    else ntparser.takeWhile {
+      case Failure(ParseException(_, -1, _)) => false
+      case Failure(other) => throw other // we break on first failure
+      case Success(_) => true
+    }
+    ntparser.ops.makeGraph(filteredIterator.map(_.get).toIterable)
+  }
+
+
 }
 
 /**
- * parser for NTriples as specified at http://www.w3.org/TR/n-triples/
- * This parser tried to be fast and does not at all aim to be in a functional style, though from
- * the outside it can be used that way. ( why be functional when one uses java.io.* legacy Readers
- * and InputStreams that are blocking ? )
+ * Parser for NTriples as specified at http://www.w3.org/TR/n-triples/
+ * A Parser is constructed from a [[java.io.Reader]], and is an Iterator 
+ * of Try of [[org.w3.banana.RDF#Triples]]
+ * 
+ * This parser tries to be fast:
  *
- * The parser creates a minimum of objects:
- *  - it at most will go back a couple of characters on itself
- *  - it perhaps unnecessarily creates a Try for each Triple
- *  - it relied on throws
+ *  - it creates a minimum of objects, sticking as far as possible with chars and ints
+ *  - it at most will go back a couple of characters on itself ( this could be narrowed down )
+ *  - it relied on throws to avoid wrapping the overwhelming number of well parsed nodes (or even chars ) 
+ *    in Success objects
+ *
+ *  todo
+ *   - broken lines should be returned complete so that the user can edit them and to help debugging
  *
  * @param plainReader  will be wrapped in a LineNumberReader with default buffering
  * @param skipBrokenLines  broken lines will be skipped, rather than halting the parsing, if true
@@ -115,15 +138,40 @@ object NTriplesParser {
  * @tparam Rdf a subtype of RDF
  */
 class NTriplesParser[Rdf <: RDF](plainReader: Reader,
-            skipBrokenLines: Boolean = false)
-                                (implicit ops: RDFOps[Rdf]) {
+            val skipBrokenLines: Boolean = false)
+                                (implicit val ops: RDFOps[Rdf]) extends Iterator[Try[Rdf#Triple]] {
 
   import ops._
   import org.w3.banana.io.NTriplesParser._
   val reader = new LineNumberReader(plainReader)
 
-import scala.collection.mutable
+  import scala.collection.mutable
   import scala.collection.mutable.StringBuilder._
+
+  var ended = false
+
+  def hasNext = !ended
+
+  def next() = {
+    val result = parseNextTriple()
+    ended = result match {
+      case Failure(ParseException(_,c,_)) => {
+        if (c == -1) true   //EOF
+        else {
+          if (skipBrokenLines) {
+            if (c != '\n' && c != '\r') parseComment()
+            false
+          } else {
+            true
+          }
+        }
+      }
+      case Failure(_) => !skipBrokenLines
+      case _ => false
+    }
+    result
+  }
+
 
   private val rewind = mutable.Stack[Int]()
 
@@ -139,54 +187,7 @@ import scala.collection.mutable
       case x if x < 0 => throw EOF("premature end of stream")
       case c => action(c.toChar)
     }
-
-  /**
-   *
-   * @return the parsed Graph if successful, otherwise a failure containing the error message
-   */
-  def parse(): Try[Rdf#Graph] =
-    Try {
-      val it = if (skipBrokenLines) parseIterator().filter(_.isSuccess)
-      else parseIterator().takeWhile {
-        case Failure(ParseException(_,-1,_)) => false
-        case Failure(other) => throw other // we break on first failure
-        case Success(_) =>  true
-      }
-      makeGraph(it.map(_.get).toIterable)
-    }
-
-
-  /**
-   * Much more memory efficient way to parse a large file
-   * @return an iterable of Triples ( this probably will require skipping bad triples
-   *         ( where would one put the errors ? )
-   */
-  def parseIterator(): Iterator[Try[Rdf#Triple]] =
-    new Iterator[Try[Rdf#Triple]]() {
-      var ended = false
-
-      def hasNext = !ended
-
-      def next() = {
-        val result = parseNextTriple()
-        ended = result match {
-          case Failure(ParseException(_,c,_)) => {
-            if (c == -1) true   //EOF
-            else {
-              if (skipBrokenLines) {
-                if (c != '\n' && c != '\r') parseComment()
-                false
-              } else {
-                true
-              }
-            }
-          }
-          case Failure(_) => !skipBrokenLines
-          case _ => false
-        }
-        result
-      }
-    }
+  
 
 
 
@@ -425,8 +426,9 @@ import scala.collection.mutable
   private def Error(char: Int,msg: String) = ParseException(reader.getLineNumber(), char, msg)
   private def EOF(message: String)= ParseException(reader.getLineNumber,-1,message)
 
-
 }
+
+
 
 case class ParseException(line: Int, character: Int, message: String) extends Throwable with NoStackTrace {
   override def toString = character match {

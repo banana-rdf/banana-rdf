@@ -15,6 +15,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
   reader: RDFReader[Rdf, Try, NTriples]) extends WordSpec with Matchers {
 
   import ops._
+  import NTriplesParser.toGraph
 
   val foaf = FOAFPrefix[Rdf]
 
@@ -134,7 +135,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
 
     "not fail with one triple" in {
       val str = s"<$bblfish> <$typ> <${foafstr("Person")}> ."
-      val i = ntparser(str).parseIterator()
+      val i = ntparser(str)
       i.hasNext should be(true)
       i.next() should be(Success(Triple(URI(bblfish), rdf.`type`, foaf.Person)))
       val end = i.next()
@@ -145,7 +146,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
 
     "not fail when parsing a document with one triple" in {
       val str = s"""<$bblfish>     <${foafstr("name")}>      "$name"@de      ."""
-      val graphTry = ntparser(str).parse()
+      val graphTry = toGraph(ntparser(str))
       assert(graphTry.get isIsomorphicWith Graph(Triple(URI(bblfish), foaf.name, Literal.tagged(name, Lang("de")))))
     }
 
@@ -156,7 +157,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
            <$bblfish>     <${foafstr("knows")}>      _:anton      .  # and some whitespace
 
            """
-      val graphTry = ntparser(str).parse()
+      val graphTry = toGraph(ntparser(str))
       assert( graphTry.get isIsomorphicWith Graph(Triple(URI(bblfish), foaf.knows, BNode("anton"))))
     }
 
@@ -175,7 +176,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
         _:anton <${foafstr("name")}> "Anton".
         _:betehess <${foafstr("homepage")}> <http://bertails.org/> .
           """
-        val graphTry = ntparser(str).parse()
+        val graphTry = toGraph(ntparser(str))
         assert (graphTry.get isIsomorphicWith Graph(
           Triple(URI(bblfish), foaf.name, Literal.tagged(name, Lang("en"))),
           Triple(URI(bblfish), foaf.knows, BNode("anton")),
@@ -196,7 +197,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
         _:anton <${foafstr("name")}> "Anton"
         _:betehess <${foafstr("homepage")}> <http://bertails.org/> .
           """
-      val graphTry = ntparser(str,skip=true).parse()
+      val graphTry = toGraph(ntparser(str,skip=true))
       graphTry.get.size should be (3)
       assert (graphTry.get isIsomorphicWith Graph(
         Triple(URI(bblfish), foaf.name, Literal(name)),
@@ -209,7 +210,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
   }
 
 
-  def ntparse(string: String): Try[Rdf#Graph] = ntparser(string).parse()
+  def ntparse(string: String): Try[Rdf#Graph] = toGraph(ntparser(string))
 
 
 
@@ -514,7 +515,7 @@ class NTriplesTestSuite[Rdf <: RDF]()(
   "w3c tests of type rdft:TestNTriplesNegativeSyntax" should {
 
     def fail(s: String,erros: Int, test: List[Try[Rdf#Triple]] => Boolean = _ => true) = {
-      val parseIterator = ntparser(s,true).parseIterator()
+      val parseIterator = ntparser(s,true)
       val resultList = parseIterator.toList
       assert(test(resultList))
       assert(resultList.filter{
@@ -631,21 +632,20 @@ class NTriplesTestSuite[Rdf <: RDF]()(
     val ntp = new NTriplesParser[Rdf](
         new InputStreamReader(
           new FileInputStream(
-            new File(args(0))), encoding), true);
-    val t1 = System.currentTimeMillis();
-    var x = 0;
-    val i = ntp.parseIterator();
+            new File(args(0))), encoding), true)
+    val t1 = System.currentTimeMillis()
+    var x = 0
     var failures = 0
-    while (i.hasNext) {
-      val t = i.next;
-      x = x + 1;
+    while (ntp.hasNext) {
+      val t = ntp.next
+      x = x + 1
       if (t.isFailure) {
         println(s"\r\ntriple=$t")
         failures = failures + 1
-      };
-    };
-    val t2 = System.currentTimeMillis();
-    println(s"time to parse $x triples was ${t2 - t1}. Found $failures failures. ")
+      }
+    }
+    val t2 = System.currentTimeMillis()
+    println(s"time to parse $x triples was ${t2 - t1} milliseconds. Found $failures failures. ")
   }
 
 
