@@ -139,7 +139,9 @@ object NTriplesParser {
  */
 class NTriplesParser[Rdf <: RDF](plainReader: Reader,
             val skipBrokenLines: Boolean = false)
-                                (implicit val ops: RDFOps[Rdf]) extends Iterator[Try[Rdf#Triple]] {
+                                (implicit
+                                 val ops: RDFOps[Rdf])
+  extends Iterator[Try[Rdf#Triple]] {
 
   import ops._
   import org.w3.banana.io.NTriplesParser._
@@ -180,7 +182,7 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
     else rewind.pop()
   }
 
-  private def appendChar(c: Int)(implicit buf: StringBuilder) = buf.append(c.toChar)
+  private def appendChar(c: Int,buf: StringBuilder) = buf.append(c.toChar)
 
   private def tryRead[T](action: Char => T): T =
     read() match {
@@ -216,22 +218,22 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
    * @return
    */
   @tailrec
-  private[io] final def parseIRI(implicit iribuf: mutable.StringBuilder = new mutable.StringBuilder()): Rdf#URI = {
+  private[io] final def parseIRI(iribuf: mutable.StringBuilder = newBuilder): Rdf#URI = {
      read() match {
       case -1 => throw EOF("unexpected end of stream reading URI starting with '" + iribuf.toString() + "'")
       case '>' => URI(iribuf.toString())
-      case '\\' => parseIRI(appendChar(parseIRIQuotedChar()))
-      case c if IRI_char(c) => parseIRI(appendChar(c))
+      case '\\' => parseIRI(appendChar(parseIRIQuotedChar(),iribuf))
+      case c if IRI_char(c) => parseIRI(appendChar(c,iribuf))
       case err => throw Error(err,s"illegal character '$err' in IRI starting with >${iribuf.toString()}< ")
     }
   }
 
   @tailrec
-  private def readN(i: Int)(implicit buf: StringBuilder = newBuilder): String = {
+  private def readN(i: Int, buf: StringBuilder = newBuilder): String = {
     if (i <= 0) buf.toString
     else read() match {
       case -1 => throw EOF("reached end of stream while trying to readN chars")
-      case c => readN(i - 1)(appendChar(c))
+      case c => readN(i - 1, appendChar(c,buf))
     }
   }
 
@@ -262,16 +264,16 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
     }
 
 
-  private[io] def parsePlainLiteral(implicit uribuf: mutable.StringBuilder = newBuilder): String =
+  private[io] def parsePlainLiteral(uribuf: mutable.StringBuilder = newBuilder): String =
     read() match {
       case -1   => throw EOF("end of string Literal before end of quotation")
       case '"'  => uribuf.toString() //closing quote
-      case '\\' => parsePlainLiteral(appendChar(parseQuotedChar()))
+      case '\\' => parsePlainLiteral(appendChar(parseQuotedChar(),uribuf))
       case illegal if ( illegal == 0x22 || illegal == 0x5c || illegal == 0xA || illegal == 0xD) => {
         throw Error(illegal, "illegal character")
       }
       case c    => {
-        parsePlainLiteral(appendChar(c))
+        parsePlainLiteral(appendChar(c,uribuf))
       }
     }
 
@@ -288,13 +290,13 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
     }
   }
   private def parseLang(): Rdf#Lang = {
-    implicit val buf = newBuilder
+    val buf = newBuilder
     @tailrec
     def lang(): String = {
       read() match {
         case -1 => throw EOF(s"unexpected end of stream while trying to parse language tag. Reached '$buf'")
-        case '-' => { appendChar('-'); subsequentParts() }
-        case c if alpha(c.toChar) => { appendChar(c); lang()}
+        case '-' => { appendChar('-',buf); subsequentParts() }
+        case c if alpha(c.toChar) => { appendChar(c,buf); lang()}
         case other => { rewind.push(other); buf.toString() }
       }
     }
@@ -302,8 +304,8 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
     def subsequentParts(): String = {
       read() match {
         case -1 => throw EOF(s"unexpected end of stream while trying to parse language tag. Reached '$buf'")
-        case '-' => { appendChar('-'); subsequentParts() }
-        case c if alphaNum(c.toChar) =>  { appendChar(c); subsequentParts() }
+        case '-' => { appendChar('-',buf); subsequentParts() }
+        case c if alphaNum(c.toChar) =>  { appendChar(c,buf); subsequentParts() }
         case other => { rewind.push(other); buf.toString() }
       }
     }
@@ -336,7 +338,7 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
    */
   private[io] def parseBNode(): Rdf#BNode = {
     @tailrec
-    def parseBnodeLabel(implicit uribuf: mutable.StringBuilder): Rdf#BNode =
+    def parseBnodeLabel(uribuf: mutable.StringBuilder): Rdf#BNode =
       read() match {
         case -1 =>
           val label = uribuf.toString()
@@ -355,7 +357,7 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
               BNode(label.substring(0, label.length - 1))
             } else BNode(label)
           }
-          else parseBnodeLabel(appendChar(other))
+          else parseBnodeLabel(appendChar(other,uribuf))
 
       }
 
