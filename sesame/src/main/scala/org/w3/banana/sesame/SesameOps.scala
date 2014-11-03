@@ -1,5 +1,7 @@
 package org.w3.banana.sesame
 
+import java.util.Locale
+
 import org.openrdf.model._
 import org.openrdf.model.impl._
 import org.openrdf.model.util._
@@ -96,9 +98,14 @@ class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
   def fromLiteral(literal: Sesame#Literal): (String, Sesame#URI, Option[Sesame#Lang]) =
     (literal.getLabel, literal.getDatatype, Option(literal.getLanguage))
 
-  // lang
-
-  def makeLang(langString: String): Sesame#Lang = langString
+  /**
+    *  language tags are cases insensitive according to
+    * <a href="http://tools.ietf.org/html/bcp47#section-2.1.1">RFC 5646: Tags for Identifying Languages</a>
+    * which is referenced by <a href="http://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal">RDF11 Concepts</a>.
+    * Sesame does not take this into account, so canonicalise here to lower case. ( The NTriples Tests don't pass
+    * if the `.toLowerCase` transformation is removed .
+    */
+  def makeLang(langString: String): Sesame#Lang = langString.toLowerCase(Locale.ENGLISH)
 
   def fromLang(lang: Sesame#Lang): String = lang
 

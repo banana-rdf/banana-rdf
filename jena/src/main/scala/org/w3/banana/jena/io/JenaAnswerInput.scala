@@ -7,7 +7,6 @@ import com.hp.hpl.jena.sparql.resultset.{ JSONInput, SPARQLResult, XMLInput }
 
 /**
  * typeclass for serialising special
- * @tparam T
  */
 trait JenaAnswerInput[T] {
   def parse(in: InputStream): SPARQLResult

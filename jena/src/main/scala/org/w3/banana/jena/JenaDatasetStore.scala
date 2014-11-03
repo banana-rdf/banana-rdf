@@ -1,6 +1,6 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode }
+import com.hp.hpl.jena.graph.{Graph => JenaGraph, Node => JenaNode}
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.update.UpdateAction
 import org.w3.banana._

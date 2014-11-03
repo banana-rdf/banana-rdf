@@ -13,8 +13,6 @@ import scala.util.Try
  *
  * @param VT the classifier
  * @param maxComplexity the maximum number of solutions to look at, otherwise fails
- * @param ops
- * @tparam Rdf
  */
 class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implicit ops: RDFOps[Rdf])
     extends MappingGenerator[Rdf] {
@@ -24,8 +22,6 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implici
   /**
    * generate a list of possible bnode mappings, filtered by applying classification algorithm
    * on the nodes by relating them to other edges
-   * @param g1
-   * @param g2
    * @return a ListMap mapping BNode from graph g1 to a smaller set of Bnodes from graph g2 which
    *         they should corresond to
    */
@@ -53,7 +49,6 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implici
 
   /**
    * This classification can be improved, but it is easier to debug while it is not so effective.
-   * @param graph
    * @return a classification of bnodes by type, where nodes can only be matched by other nodes of the same type
    */
   def bnodeClassify(graph: Rdf#Graph): Map[VerticeClassification, Set[Rdf#BNode]] = {

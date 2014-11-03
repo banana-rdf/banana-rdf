@@ -32,8 +32,6 @@ trait MappingGenerator[Rdf <: RDF] {
 object MappingGenerator {
   /**
    * calculate the  size of the  tree of possibilities from the given mapping
-   * @param maps
-   * @tparam T
    */
   def complexity[T](maps: Try[Map[T, Set[T]]]) = {
     maps match {

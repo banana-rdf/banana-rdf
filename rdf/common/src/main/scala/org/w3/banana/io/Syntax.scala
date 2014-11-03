@@ -7,6 +7,7 @@ import scalaz.NonEmptyList
 
 trait N3
 trait Turtle
+trait NTriples
 trait RDFXML
 trait RDFaXHTML
 trait SparqlAnswerJson
@@ -56,6 +57,11 @@ object Syntax {
   implicit val Turtle: Syntax[Turtle] = new Syntax[Turtle] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType.RdfTurtle)
   }
+
+  implicit val NTriples: Syntax[NTriples] = new Syntax[NTriples] {
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType.NTriples)
+  }
+
 
   implicit val RDFXML: Syntax[RDFXML] = new Syntax[RDFXML] {
     val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType.RdfXml)

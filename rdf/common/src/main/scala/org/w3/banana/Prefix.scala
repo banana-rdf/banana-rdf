@@ -273,8 +273,6 @@ object IANALinkPrefix {
 /**
  * The Iana Link Relations are not linked data so these URLs are currently invented ones, and need
  * not reflect what may be used if ever such URIs are coined.
- * @param ops
- * @tparam Rdf
  */
 class IANALinkPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("link", "http://www.iana.org/assignments/link-relations/#")(ops) {
   val about = apply("about")

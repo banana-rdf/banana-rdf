@@ -24,7 +24,6 @@ trait VerticeClassification
  * A Vertice Classification Builder for a simple classification algorithm.
  * More advanced classification builders may need different methods
  *
- * @tparam Rdf
  */
 trait VerticeCBuilder[Rdf <: RDF] {
 
@@ -52,7 +51,6 @@ trait VerticeCBuilder[Rdf <: RDF] {
  * This is a case class as the case class, as that gives us the equals and hash methods.
  * One could use an immutable Map, but that may be more expensive.
  *
- * @tparam Rdf
  */
 class CountingVCBuilder[Rdf <: RDF]
     extends VerticeCBuilder[Rdf] {
@@ -77,7 +75,6 @@ case class CountingVC(forwardRels: Int,
 /**
  *
  * @param ops needed to calculate the hash of Nodes
- * @tparam Rdf
  */
 case class SimpleHashVCBuilder[Rdf <: RDF](implicit ops: RDFOps[Rdf])
     extends VerticeCBuilder[Rdf] {
