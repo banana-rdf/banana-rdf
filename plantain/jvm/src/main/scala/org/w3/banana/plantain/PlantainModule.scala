@@ -23,6 +23,6 @@ with NTriplesReaderModule {
 
   implicit val turtleWriter: RDFWriter[Plantain, Try, Turtle] = PlantainTurtleWriter
 
-  implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader
+  implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader[Plantain]
 
 }

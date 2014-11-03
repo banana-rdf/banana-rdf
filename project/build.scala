@@ -196,6 +196,57 @@ object BananaRdfBuild extends Build {
     )
   ).enablePlugins(SbtScalajs)
 
+  /**
+   * `ntriples`, blocking yet streaming parser
+   *
+   */
+  lazy val ntriples = Project(
+    id = "ntriples",
+    base = file("ntriples"),
+    settings = buildSettings ++
+      Seq(
+        aggregate in Test := false,
+        publishMavenStyle := true
+      )
+  ).dependsOn(ntriples_common_jvm, ntriples_jvm)
+    .aggregate(ntriples_jvm)
+
+  lazy val ntriples_jvm = Project(
+    id = "ntriples_jvm",
+    base = file("ntriples/jvm"),
+    settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      aggregate in Test := false,
+      publishMavenStyle := true
+    )
+  ).dependsOn(ntriples_common_jvm).aggregate(ntriples_common_jvm)
+
+  lazy val ntriples_common_jvm = Project(
+    id = "ntriples_common_jvm",
+    base = file("ntriples/common"),
+    settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      publishMavenStyle := true
+    )
+  ).dependsOn(rdf_jvm)
+
+//  not doing the js part yet
+//  lazy val ntriples_js = Project(
+//    id = "ntriples_js",
+//    base = file("ntriples/js"),
+//    settings = buildSettings ++ sjsDeps ++ Seq(
+//      aggregate in Test := false,
+//      publishMavenStyle := true
+//    )
+//  ).enablePlugins(SbtScalajs)
+//    .dependsOn(rdf_common_js).aggregate(rdf_common_js)
+//
+//  lazy val ntriples_common_js = Project(
+//    id = "ntriples_common_js",
+//    base = file("ntriples/.common_js"),
+//    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(rdf_common_jvm) ++ Seq(
+//      publishMavenStyle := true
+//    )
+//  ).enablePlugins(SbtScalajs)
+
 
   /** `ldpatch`, an implementation for LD Patch.
     *
@@ -263,7 +314,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert
     )
-  ).dependsOn(rdf_jvm)
+  ).dependsOn(rdf_jvm,ntriples_jvm)
 
   lazy val rdfTestSuite_common_js = Project(
     id = "rdf-test-suite_common_js",
@@ -284,7 +335,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += logback,
       libraryDependencies += aalto
     )
-  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
+  ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `sesame`, an RDF implementation for Sesame. */
   lazy val sesame = Project(
@@ -301,7 +352,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += sesameRepositorySail,
       libraryDependencies += jsonldJava
     )
-  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
+  ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `plantain`, a cross-compiled Scala implementation for RDF.
     *
@@ -325,7 +376,7 @@ object BananaRdfBuild extends Build {
       libraryDependencies += jsonldJava,
       publishMavenStyle := true
     )
-  ).dependsOn(rdf_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test-internal->compile")
+  ).dependsOn(rdf_jvm, ntriples_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test-internal->compile")
     .aggregate(plantain_common_jvm)
 
   lazy val plantain_common_jvm = Project(
