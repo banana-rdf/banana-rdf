@@ -122,6 +122,13 @@ To generate IntelliJ project files, just run the command:
 $ sbt gen-idea
 ```
 
+Code of Conduct
+---------------
+
+**Banana-RDF contributors all agree to follow the [W3C Code of Ethics and Professional Conduct](http://www.w3.org/Consortium/cepc/).**
+
+If you want to take action, feel free to contact Alexandre Bertails <alexandre@bertails.org>. You can also contact W3C Staff as explained in [W3C Procedures](http://www.w3.org/Consortium/pwe/#Procedures).
+
 Contributions
 -------------
 
