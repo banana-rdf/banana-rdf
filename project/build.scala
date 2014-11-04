@@ -312,7 +312,10 @@ object BananaRdfBuild extends Build {
       libraryDependencies += scalatest,
       libraryDependencies += jasmine_jvm,
       libraryDependencies += jodaTime,
-      libraryDependencies += jodaConvert
+      libraryDependencies += jodaConvert,
+      libraryDependencies += fuseki,
+      libraryDependencies += servlet,
+      libraryDependencies += httpComponents
     )
   ).dependsOn(rdf_jvm,ntriples_jvm)
 
