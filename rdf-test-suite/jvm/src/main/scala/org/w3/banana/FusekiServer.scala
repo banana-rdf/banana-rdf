@@ -7,9 +7,12 @@ import org.apache.jena.fuseki.EmbeddedFusekiServer
 /**
  * Embedded Fuseki Server
  *
- * Created by tulio.domingos
+ * @param dataset a TDB dataset obtained via TDBFactory.
+ * @param port the port where the server object will listen to. Default is 3030
+ * @param path dataset path. Default is "ds"
+ * @param dataFiles list of RDF file paths.
  */
-class FusekiServer(port:Int = 3030, dataset:Dataset, path:String = "ds", dataFiles:List[String] = List()) {
+class FusekiServer(dataset:Dataset, port:Int = 3030, path:String = "ds", dataFiles:List[String] = List()) {
 
   val tdb = dataset.asDatasetGraph
   val model = dataset.getDefaultModel

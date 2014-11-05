@@ -9,24 +9,23 @@ import org.w3.banana._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
- * Created by tulio.domingos
+ * Sparql update test on a Fuseki embedded server
  */
 class JenaFusekiSparqlTest extends  FlatSpec
   with Matchers with BeforeAndAfterAll with JenaModule{
 
   val data = "rdf-test-suite/jvm/src/main/resources/known-tr-editors.rdf"
 
-  var server: FusekiServer = _
+  val server: FusekiServer = new FusekiServer(dataset = TDBFactory.createDataset(), dataFiles = List(data))
 
   import ops._
   import sparqlHttp.sparqlEngineSyntax._
   import sparqlOps._
 
   /**
-   * Setup embedded Fuseki server
+   * Start Fuseki server
    */
-  override def beforeAll = {
-    server = new FusekiServer(dataset = TDBFactory.createDataset(), dataFiles = List(data))
+  override def beforeAll: Unit = {
     server.start
   }
 
@@ -79,7 +78,7 @@ class JenaFusekiSparqlTest extends  FlatSpec
   /**
    * Stop server
    */
-  override def afterAll = {
+  override def afterAll: Unit = {
     server.stop
   }
 }
