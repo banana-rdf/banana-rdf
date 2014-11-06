@@ -27,17 +27,13 @@ class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
 
   // triple
 
-  def makeTriple(s: Sesame#Node, p: Sesame#URI, o: Sesame#Node): Sesame#Triple = new StatementImpl(s.asInstanceOf[Resource], p, o)
+  def makeTriple(s: Sesame#Node, p: Sesame#URI, o: Sesame#Node): Sesame#Triple =
+    s match {
+      case res:Resource=>  new StatementImpl(res, p, o)
+      case _=> throw new RuntimeException("makeTriple: in Sesame subject " + p.toString + " must be a either URI or BlankNode")
+    }
 
-  def fromTriple(t: Sesame#Triple): (Sesame#Node, Sesame#URI, Sesame#Node) = {
-    val s = t.getSubject
-    val p = t.getPredicate
-    val o = t.getObject
-    if (p.isInstanceOf[Sesame#URI])
-      (s, p.asInstanceOf[Sesame#URI], o)
-    else
-      throw new RuntimeException("fromTriple: predicate " + p.toString + " must be a URI")
-  }
+  def fromTriple(t: Sesame#Triple): (Sesame#Node, Sesame#URI, Sesame#Node) =  (t.getSubject, t.getPredicate, t.getObject)
 
   // node
 
