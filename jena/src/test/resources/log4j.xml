@@ -8,7 +8,11 @@
     <layout class="org.apache.log4j.PatternLayout"> 
       <param name="ConversionPattern" value="%-5p %c{1} - %m%n"/> 
     </layout> 
-  </appender> 
+  </appender>
+
+  <logger name="org.eclipse">
+    <level value="info"/>
+  </logger>
 
   <root> 
     <priority value="debug" /> 

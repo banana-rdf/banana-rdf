@@ -116,4 +116,12 @@ object Dependencies {
    */
   val scalajsJasmine = "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
 
+  /**
+   * jena-fuseki
+   * @see http://jena.apache.org/documentation/serving_data
+   * @see http://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
+   */
+  val fuseki = "org.apache.jena" % "jena-fuseki" % "1.1.0" exclude ("org.eclipse.jetty.orbit", "javax.servlet") exclude ("org.apache.httpcomponents", "httpclient")
+  val servlet = "javax.servlet" % "javax.servlet-api" % "3.0.1"
+  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.3.2"
 }
