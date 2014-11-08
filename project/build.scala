@@ -15,7 +15,7 @@ object BuildSettings {
 
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    version := "0.7-SNAPSHOT",
+    version := "0.7",
     scalaVersion := "2.11.2",
     crossScalaVersions := Seq("2.11.2", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
