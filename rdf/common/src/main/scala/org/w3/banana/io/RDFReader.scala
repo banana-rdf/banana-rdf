@@ -6,6 +6,7 @@ import java.io._
 /** RDF readers for a given syntax. */
 trait RDFReader[Rdf <: RDF, M[_], +S] {
 
+
   /** Tries parsing an RDF Graph from an [[java.io.InputStream]] and a base URI.
     * 
     * If the encoding for the input is known, prefer the Reader

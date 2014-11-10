@@ -8,11 +8,8 @@ object JenaSolutionsWriter {
 
   /** Creates a Sparql writer for the given syntax */
   def apply[T](implicit
-    jenaSparqlSyntax: JenaAnswerOutput[T],
-    _syntax: Syntax[T]
+    jenaSparqlSyntax: JenaAnswerOutput[T]
   ): SparqlSolutionsWriter[Jena, T] = new SparqlSolutionsWriter[Jena, T] {
-
-    val syntax = _syntax
 
     def write(answers: Jena#Solutions, os: OutputStream, base: String) = Try {
       jenaSparqlSyntax.formatter.format(os, answers)

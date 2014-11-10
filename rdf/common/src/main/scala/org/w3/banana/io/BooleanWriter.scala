@@ -5,7 +5,7 @@ import java.io._
 
 import scala.util._
 
-trait BooleanWriter[T] extends Writer[Boolean, T] {
+trait BooleanWriter[T] extends Writer[Boolean, Try, T] {
 
   def format(bool: Boolean): String
 
@@ -30,6 +30,7 @@ object BooleanWriter {
         | """.stripMargin.format(bool)
 
     override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
+
   }
 
   /**

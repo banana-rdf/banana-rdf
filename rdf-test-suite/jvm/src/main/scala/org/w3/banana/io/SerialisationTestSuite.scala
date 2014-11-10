@@ -14,9 +14,9 @@ import scalaz.syntax._, monad._, comonad._
 abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, Sout](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, Sin],
+  readerSyn: Syntax[Sin],
   writer: RDFWriter[Rdf, M, Sout],
-  syntaxIn: Syntax[Sin],
-  syntaxOut: Syntax[Sout]
+  writerSyn: Syntax[Sout]
 ) extends WordSpec with Matchers {
 
   // both Monad and Comonad are Functors, so they compete for the
@@ -57,8 +57,8 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
   val fooPrefix = Prefix("foo", foo)
   val fooGraph = graphBuilder(fooPrefix)
 
-  s"read ${syntaxIn.defaultMimeType} version of timbl's card" in {
-    WellKnownMimeExtensions.extension(syntaxIn.mimeTypes.head).map { ext =>
+  s"read ${readerSyn.defaultMimeType} version of timbl's card" in {
+    WellKnownMimeExtensions.extension(readerSyn.mimeTypes.head).map { ext =>
       val file = new File(s"rdf-test-suite/jvm/src/main/resources/card.$ext")
       val fis = new FileInputStream(file)
       try {
@@ -70,7 +70,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
     }
   }
 
-  s"simple ${syntaxIn.defaultMimeType} string containing only absolute URIs" should {
+  s"simple ${readerSyn.defaultMimeType} string containing only absolute URIs" should {
 
     "parse using Readers (the base has no effect since all URIs are absolute)" in {
       val graph = reader.read(new StringReader(referenceGraphSerialisedForSyntax), rdfCore).copoint
@@ -86,7 +86,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
 
   }
 
-  s"write ref graph as ${syntaxOut.defaultMimeType} string, read it & compare" in {
+  s"write ref graph as ${writerSyn.defaultMimeType} string, read it & compare" in {
     val soutString =
       writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").copoint
     soutString should not be ('empty)
