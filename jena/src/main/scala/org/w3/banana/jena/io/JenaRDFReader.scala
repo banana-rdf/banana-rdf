@@ -46,6 +46,7 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 object JenaRDFReader {
 
   def makeRDFReader[S](ops: JenaOps, lang: Lang)(implicit _syntax:  Syntax[S]): RDFReader[Jena, Try, S] = new RDFReader[Jena, Try, S] {
+    val syntax = _syntax
 
     val factory = RDFParserRegistry.getFactory(lang)
 

@@ -60,10 +60,12 @@ abstract class AbstractSesameReader[T] extends RDFReader[Sesame, Try, T] {
 }
 
 class SesameTurtleReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[Turtle] {
+  val syntax = Syntax[Turtle]
   def getParser() = new org.openrdf.rio.turtle.TurtleParser
 }
 
 class SesameRDFXMLReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[RDFXML] {
+  val syntax = Syntax[RDFXML]
   def getParser() = new org.openrdf.rio.rdfxml.RDFXMLParser
 }
 
@@ -72,6 +74,7 @@ class SesameRDFXMLReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesam
  * loads the whole JSON file into memory, which is memory consumptive
  */
 class SesameJSONLDReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[JsonLd] {
+  val syntax = Syntax[JsonLd]
   def getParser() = new SesameJSONLDParser
 }
 
