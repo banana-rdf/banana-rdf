@@ -16,7 +16,7 @@ object BuildSettings {
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
     version := "0.8-SNAPSHOT",
-    scalaVersion := "2.11.2",
+    scalaVersion := "2.11.4",
     crossScalaVersions := Seq("2.11.2", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     fork := false,
@@ -75,7 +75,7 @@ object BuildSettings {
         repository in bintray := "banana-rdf",
         bintrayOrganization in bintray := None
       ) ++ bintrayPublishSettings
-      case opt: Option[String] => {
+      case opt: Option[String] =>
         Seq(
           publishTo <<= version { (v: String) =>
             val nexus = "https://oss.sonatype.org/"
@@ -89,7 +89,6 @@ object BuildSettings {
             }
           }
         )
-      }
     }) ++ Seq(publishArtifact in Test := false)
 
 }
@@ -109,7 +108,7 @@ object BananaRdfBuild extends Build {
   lazy val banana = Project(
     id = "banana",
     base = file("."),
-    settings = buildSettings ++ Unidoc.settings
+    settings = buildSettings ++ Unidoc.settings ++ Seq(name := "root")
   ).dependsOn(banana_js, banana_jvm)
    .aggregate(banana_js, banana_jvm)
 
@@ -118,6 +117,8 @@ object BananaRdfBuild extends Build {
     id = "banana_js",
     base = file(".banana_js"),
     settings = buildSettings ++ Unidoc.settings ++ Seq(
+      name := "banana", /*  to make sure that it is published as "banana_sjs0.5_2.11
+      but not "banana_js_sjs05_2.11"*/
       aggregate in Test in rdf_js := false,
       aggregate in Test in rdfTestSuite_js := false
     )
@@ -129,6 +130,7 @@ object BananaRdfBuild extends Build {
     id = "banana_jvm",
     base = file(".banana_jvm"),
     settings = buildSettings ++ Unidoc.settings ++ Seq (
+      name := "banana",
       aggregate in Test in rdf_jvm := false,
       aggregate in Test in rdfTestSuite_jvm := false
     )
@@ -162,6 +164,7 @@ object BananaRdfBuild extends Build {
     id = "rdf_jvm",
     base = file("rdf/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      name := "rdf",
       aggregate in Test := false,
       publishMavenStyle := true
     )
@@ -182,6 +185,7 @@ object BananaRdfBuild extends Build {
     id = "rdf_js",
     base = file("rdf/js"),
     settings = buildSettings ++ sjsDeps ++ Seq(
+      name := "rdf",
       aggregate in Test := false,
       publishMavenStyle := true
     )
@@ -215,6 +219,7 @@ object BananaRdfBuild extends Build {
     id = "ntriples_jvm",
     base = file("ntriples/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      name := "ntriples",
       aggregate in Test := false,
       publishMavenStyle := true
     )
@@ -374,6 +379,7 @@ object BananaRdfBuild extends Build {
     id = "plantain_jvm",
     base = file("plantain/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      name := "plantain",
       libraryDependencies += akkaHttpCore,
       libraryDependencies +=  sesameRioTurtle,
       libraryDependencies += jsonldJava,
@@ -394,6 +400,7 @@ object BananaRdfBuild extends Build {
     id = "plantain_js",
     base = file("plantain/js"),
     settings = buildSettings ++ Seq(
+      name := "plantain",
       publishMavenStyle := true
     )
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
