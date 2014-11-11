@@ -11,3 +11,5 @@ class JenaSparqlEngineTest extends SparqlEngineTest({
 class JenaSparqlUpdateEngineTest extends SparqlUpdateEngineTest({
   DatasetFactory.createMem()
 })
+
+class JenaFusekiSparqlTest extends FusekiSparqlTest[Jena]
