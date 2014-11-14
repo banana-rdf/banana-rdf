@@ -1,12 +1,17 @@
 package org.w3.banana.ldpatch
 
 import org.w3.banana._
+import org.w3.banana.io._
 import org.scalatest.{ Filter => _, _ }
 import java.io._
 import scala.util.{ Try, Success, Failure }
 import org.w3.banana.ldpatch.model._
 
-abstract class LDPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle]) extends WordSpec with /*Must*/Matchers with TryValues { self =>
+abstract class LDPatchSemanticsTest[Rdf <: RDF](implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, Turtle],
+  writer: RDFWriter[Rdf, Try, Turtle]
+) extends WordSpec with /*Must*/Matchers with TryValues { self =>
 
   import ops._
 
@@ -54,7 +59,7 @@ _:b2 a schema:Event ;
   schema:name "TED 2009" ;
   schema:startDate "2009-02-04" ;
   schema:url <http://conferences.ted.com/TED2009/> .
-""", "http://example.com/timbl").getOrFail()
+""", "http://example.com/timbl").get
 
   "Path semantics" in {
 
@@ -210,7 +215,7 @@ _:b2 a schema:Event ;
     schema:name "Long Beach, California";
     schema:geo [ schema:latitude "33.7817" ; schema:longitude "-118.2054" ]
   ] .
-""", "http://example.com/timbl").getOrFail()
+""", "http://example.com/timbl").get
 
     val ldpatch = newFreshParser(patch).LDPatch.run().success.value
 

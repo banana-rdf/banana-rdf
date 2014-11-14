@@ -1,22 +1,22 @@
 package org.w3.banana.ldpatch
 
 import org.w3.banana._
+import org.w3.banana.io._
 import org.scalatest.{ Filter => _, _ }
 import java.io._
 import scala.util.{ Try, Success, Failure }
 import org.w3.banana.ldpatch.model._
 
-abstract class OSLCCorePartialUpdate[Rdf <: RDF](
-  implicit
-    ops: RDFOps[Rdf],
-    reader: RDFReader[Rdf, Turtle]
+abstract class OSLCCorePartialUpdate[Rdf <: RDF](implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, Turtle]
 ) extends WordSpec with Matchers { self =>
 
   import ops._
 
   val baseURI = "http://example.com/"
 
-  def parseGraph(input: String): Rdf#Graph = reader.read(input, baseURI).getOrFail()
+  def parseGraph(input: String): Rdf#Graph = reader.read(input, baseURI).get
 
   val g = new Grammar[Rdf] { implicit val ops = self.ops }
 

@@ -3,7 +3,6 @@ package org.w3.banana.ldpatch;
 import org.w3.banana.*;
 import org.w3.banana.jena.Jena;
 import com.hp.hpl.jena.graph.*;
-import com.hp.hpl.jena.rdf.arp.*;
 import com.hp.hpl.jena.rdf.model.*;
 import org.w3.banana.ldpatch.model.LDPatch;
 import java.io.*;

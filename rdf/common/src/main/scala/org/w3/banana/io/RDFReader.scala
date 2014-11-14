@@ -19,3 +19,17 @@ trait RDFReader[Rdf <: RDF, M[_], +S] {
     **/
   def read(reader: Reader, base: String): M[Rdf#Graph]
 }
+
+
+object RDFReader {
+
+  implicit class RDFReaderW[Rdf <: RDF, M[_], S](val reader: RDFReader[Rdf, M, S]) extends AnyVal {
+
+    def read(input: String, base: String): M[Rdf#Graph] = {
+      val sr = new StringReader(input)
+      reader.read(sr, base)
+    }
+
+  }
+
+}

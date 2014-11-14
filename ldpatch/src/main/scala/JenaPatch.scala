@@ -3,6 +3,7 @@ package org.w3.banana.ldpatch
 import org.w3.banana._
 import org.w3.banana.jena._
 import java.io.InputStream
+import scala.io.Source
 
 object JenaPatch {
 
@@ -14,7 +15,7 @@ object JenaPatch {
     ldpatch.grammar.parseLDPatch(input, URI(baseURI)).get
 
   def fromInputStream(input: InputStream, baseURI: String): model.LDPatch[Jena] =
-    fromString(io.Source.fromInputStream(input).mkString, baseURI)
+    fromString(Source.fromInputStream(input).mkString, baseURI)
 
   def apply(patch: model.LDPatch[Jena], graph: Jena#Graph): Jena#Graph =
     ldpatch.semantics.LDPatch(patch, graph)
