@@ -7,4 +7,7 @@ resolvers += Resolver.url(
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.1.1")
 
-addSbtPlugin("org.scala-lang.modules.scalajs" % "scalajs-sbt-plugin" % "0.5.3")
+addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.55.0")
+
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
+

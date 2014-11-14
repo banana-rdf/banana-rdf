@@ -1,0 +1,476 @@
+[
+  {
+    "@id": "http://wiki.ontoworld.org/index.php/_IRW2006",
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "Identity, Reference and the Web workshop 2006"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#participant": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "http://dig.csail.mit.edu/2005/ajar/ajaw/data#Tabulator",
+    "http://usefulinc.com/ns/doap#developer": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "_:Nf10b374ef9724fc08ccd5e7df9827c52",
+    "http://www.w3.org/2000/10/swap/pim/contact#city": [
+      {
+        "@value": "Cambridge"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#country": [
+      {
+        "@value": "USA"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#postalCode": [
+      {
+        "@value": "02139"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#street": [
+      {
+        "@value": "32 Vassar Street"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#street2": [
+      {
+        "@value": "MIT CSAIL Room 32-G524"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/People/Berners-Lee/card#i",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/Person",
+      "http://www.w3.org/2000/10/swap/pim/contact#Male"
+    ],
+    "http://my-profile.eu/ns/webapp#uses": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#findMyLoc"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "Tim Berners-Lee"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+      {
+        "@id": "http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf"
+      },
+      {
+        "@id": "http://www.w3.org/2007/11/Talks/search/query?date=All+past+and+future+talks&event=None&activity=None&name=Tim+Berners-Lee&country=None&language=None&office=None&rdfOnly=yes&submit=Submit"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#assistant": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#amy"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#homePage": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#likes": [
+      {
+        "@id": "http://www.gutenberg.org/catalog/world/readfile?fk_files=2372108&pageno=11"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#office": [
+      {
+        "@id": "_:Nbdd197a3358c424884080079b72fb1f5"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#preferredURI": [
+      {
+        "@value": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#publicHomePage": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/"
+      }
+    ],
+    "http://www.w3.org/2002/07/owl#sameAs": [
+      {
+        "@id": "https://webid.mit.edu/timbl#"
+      },
+      {
+        "@id": "http://www4.wiwiss.fu-berlin.de/bookmashup/persons/Tim+Berners-Lee"
+      },
+      {
+        "@id": "http://www.advogato.org/person/timbl/foaf.rdf#me"
+      },
+      {
+        "@id": "http://www4.wiwiss.fu-berlin.de/dblp/resource/person/100007"
+      },
+      {
+        "@id": "http://graph.facebook.com/512908782#"
+      }
+    ],
+    "http://www.w3.org/ns/auth/cert#key": [
+      {
+        "@id": "_:N82bf2a1475bf4e3ea6631138686d151f"
+      }
+    ],
+    "http://www.w3.org/ns/pim/space#preferencesFile": [
+      {
+        "@id": "http://localhost/TimBL/Data/preferences.n3"
+      }
+    ],
+    "http://www.w3.org/ns/pim/space#storage": [
+      {
+        "@id": "https://timbl.rww.io/"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/account": [
+      {
+        "@id": "http://twitter.com/timberners_lee"
+      },
+      {
+        "@id": "http://en.wikipedia.org/wiki/User:Timbl"
+      },
+      {
+        "@id": "http://www.reddit.com/user/timbl/"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/based_near": [
+      {
+        "@id": "_:N58b520683f3f46e7b66433980d2266ee"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/family_name": [
+      {
+        "@value": "Berners-Lee"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/givenname": [
+      {
+        "@value": "Timothy"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/homepage": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/img": [
+      {
+        "@id": "http://www.w3.org/Press/Stock/Berners-Lee/2001-europaeum-eighth.jpg"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/mbox": [
+      {
+        "@id": "mailto:timbl@w3.org"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/mbox_sha1sum": [
+      {
+        "@value": "965c47c5a70db7407210cef6e4e6f5374a525c5c"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/name": [
+      {
+        "@value": "Timothy Berners-Lee"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/nick": [
+      {
+        "@value": "timbl"
+      },
+      {
+        "@value": "TimBL"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/openid": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/phone": [
+      {
+        "@id": "tel:+1-(617)-253-5702"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/title": [
+      {
+        "@value": "Sir"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/weblog": [
+      {
+        "@id": "http://dig.csail.mit.edu/breadcrumbs/blog/4"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/workplaceHomepage": [
+      {
+        "@id": "http://www.w3.org/"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/People/Berners-Lee/card#findMyLoc",
+    "http://my-profile.eu/ns/webapp#description": [
+      {
+        "@value": "Share your location with your friends."
+      }
+    ],
+    "http://my-profile.eu/ns/webapp#endpoint": [
+      {
+        "@id": "https://timbl.data.fm/test2/locator/location"
+      }
+    ],
+    "http://my-profile.eu/ns/webapp#name": [
+      {
+        "@value": "FindMyLoc"
+      }
+    ],
+    "http://my-profile.eu/ns/webapp#service": [
+      {
+        "@id": "https://findmyloc.rww.io/"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/data#W3C",
+    "http://xmlns.com/foaf/0.1/member": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.ecs.soton.ac.uk/~dt2/dlstuff/www2006_data#panel-panelk01",
+    "http://www.w3.org/2000/01/rdf-schema#label": [
+      {
+        "@value": "The Next Wave of the Web (Plenary Panel)"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#participant": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "http://www4.wiwiss.fu-berlin.de/booksMeshup/books/006251587X",
+    "http://purl.org/dc/elements/1.1/creator": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "Weaving the Web: The Original Design and Ultimate Destiny of the World Wide Web"
+      }
+    ]
+  },
+  {
+    "@id": "http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/PersonalProfileDocument"
+    ],
+    "http://creativecommons.org/ns#license": [
+      {
+        "@id": "http://creativecommons.org/licenses/by-nc/3.0/"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "Tim Berners-Lee's editable FOAF file"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/maker": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/primaryTopic": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "https://webid.mit.edu/timbl#",
+    "http://www.w3.org/ns/pim/space#storage": [
+      {
+        "@id": "https://timbl.rww.io/"
+      }
+    ]
+  },
+  {
+    "@id": "http://dig.csail.mit.edu/data#DIG",
+    "http://xmlns.com/foaf/0.1/member": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/2000/10/swap/data#Cwm",
+    "http://usefulinc.com/ns/doap#developer": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "_:N58b520683f3f46e7b66433980d2266ee",
+    "http://www.w3.org/2003/01/geo/wgs84_pos#lat": [
+      {
+        "@value": "42.361860"
+      }
+    ],
+    "http://www.w3.org/2003/01/geo/wgs84_pos#long": [
+      {
+        "@value": "-71.091840"
+      }
+    ]
+  },
+  {
+    "@id": "http://dig.csail.mit.edu/2007/01/camp/data#course",
+    "http://xmlns.com/foaf/0.1/maker": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/People/Berners-Lee/card",
+    "@type": [
+      "http://xmlns.com/foaf/0.1/PersonalProfileDocument"
+    ],
+    "http://creativecommons.org/ns#license": [
+      {
+        "@id": "http://creativecommons.org/licenses/by-nc/3.0/"
+      }
+    ],
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "Tim Berners-Lee's FOAF file"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/maker": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/primaryTopic": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "http://dig.csail.mit.edu/breadcrumbs/blog/4",
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "timbl's blog"
+      }
+    ],
+    "http://www.w3.org/2000/01/rdf-schema#seeAlso": [
+      {
+        "@id": "http://dig.csail.mit.edu/breadcrumbs/blog/feed/4"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/maker": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/DesignIssues/Overview.html",
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "Design Issues for the World Wide Web"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/maker": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "_:N2198ac4cc8434f11893d5e84eea98863",
+    "http://www.w3.org/2003/01/geo/wgs84_pos#lat": [
+      {
+        "@value": "42.361860"
+      }
+    ],
+    "http://www.w3.org/2003/01/geo/wgs84_pos#long": [
+      {
+        "@value": "-71.091840"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.w3.org/2011/Talks/0331-hyderabad-tbl/data#talk",
+    "http://purl.org/dc/terms/title": [
+      {
+        "@value": "Designing the Web for an Open Society"
+      }
+    ],
+    "http://xmlns.com/foaf/0.1/maker": [
+      {
+        "@id": "http://www.w3.org/People/Berners-Lee/card#i"
+      }
+    ]
+  },
+  {
+    "@id": "_:N82bf2a1475bf4e3ea6631138686d151f",
+    "@type": [
+      "http://www.w3.org/ns/auth/cert#RSAPublicKey"
+    ],
+    "http://www.w3.org/ns/auth/cert#exponent": [
+      {
+        "@value": 65537
+      }
+    ],
+    "http://www.w3.org/ns/auth/cert#modulus": [
+      {
+        "@type": "http://www.w3.org/2001/XMLSchema#hexBinary",
+        "@value": "e7414af709522144520617d3531e6099c69932dfd5ec7cc534583d72b71a7d6b202aaa686c74fcc7a5beecbd06a98b24081b36229f2126e448542952c40e02093b30c86035e2bee3d6d0aab38266a1bea863d151c38f53247b8beef61afddf4c57c59841639e691e60145308933d967c59e3c4f23635b2171a46b22e8a4714a44f09d4f825cb0b9b645aaf4c2695ea86f67d3ee721130730375e223b0fc0a36733eb792962e6ebbe79c76cd9e779bb0401eea9a1d4ce3769cb2f1a43331ed4275fef8df64dddd7cfd2ba559b92fcd149b9cb27bb40659ff4b5ce3abc7b30d7980cdc3f8ad8f312d164547509b182298547964a07aa7e99a68e2f797a5631b0f5"
+      }
+    ]
+  },
+  {
+    "@id": "http://www.gutenberg.org/catalog/world/readfile?fk_files=2372108&pageno=11",
+    "http://purl.org/dc/elements/1.1/title": [
+      {
+        "@value": "Moby Dick, or, the whale"
+      }
+    ]
+  },
+  {
+    "@id": "_:Nbdd197a3358c424884080079b72fb1f5",
+    "http://www.w3.org/2000/10/swap/pim/contact#address": [
+      {
+        "@id": "_:Nf10b374ef9724fc08ccd5e7df9827c52"
+      }
+    ],
+    "http://www.w3.org/2000/10/swap/pim/contact#phone": [
+      {
+        "@id": "tel:+1-617-253-5702"
+      }
+    ],
+    "http://www.w3.org/2003/01/geo/wgs84_pos#location": [
+      {
+        "@id": "_:N2198ac4cc8434f11893d5e84eea98863"
+      }
+    ]
+  }
+]
