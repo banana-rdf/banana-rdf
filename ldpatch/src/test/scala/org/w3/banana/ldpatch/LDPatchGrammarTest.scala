@@ -6,6 +6,9 @@ import java.io._
 import scala.util.{ Try, Success, Failure }
 import org.w3.banana.ldpatch.model._
 
+// TODO
+import org.parboiled2._
+
 abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers with TryValues { self =>
 
   import ops._
@@ -74,29 +77,71 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     newParser("""?name""").Var.run().success.value should be(Var("name"))
   }
 
-  "parse Add Object" in {
-    val parser = newParser("""Add _:betehess foaf:name "Alexandre Bertails" .""")
-    val parsedAdd = parser.Add.run().success.value
-    parsedAdd should be(
-      Add(
+  "parse triples" in {
+    val parser = newParser("""_:betehess foaf:name "Alexandre Bertails"""")
+//    parser.triples.run() match {
+//      case Failure(error: ParseError) =>
+//        println(parser.formatError(error))
+//    }
+    val parsedTriples = parser.triples.run().success.value
+    parsedTriples should be(
+      Vector(model.Triple(
         Concrete(parser.bnodeMap("betehess")),
         URI("http://xmlns.com/foaf/name"),
         Concrete(Literal("Alexandre Bertails"))
-      )
+      ))
+    )
+  }
+
+  "parse Add Object" in {
+    val parser = newParser("""Add { _:betehess foaf:name "Alexandre Bertails" } .""")
+    val parsedAdd = parser.Add.run().success.value
+    parsedAdd should be(
+      Add(Vector(model.Triple(
+        Concrete(parser.bnodeMap("betehess")),
+        URI("http://xmlns.com/foaf/name"),
+        Concrete(Literal("Alexandre Bertails"))
+      )))
     )
   }
 
   "parse Add List" in {
-    val parser = newParser("""Add _:betehess foaf:name ( "Alexandre Bertails" "Betehess" ).""")
+    val parser = newParser("""Add { _:betehess foaf:name "Alexandre Bertails", "Betehess" } .""")
     val parsedAdd = parser.Add.run().success.value
     parsedAdd should be(
-      AddList(
-        Concrete(parser.bnodeMap("betehess")),
-        URI("http://xmlns.com/foaf/name"),
-        Seq(Concrete(Literal("Alexandre Bertails")), Concrete(Literal("Betehess")))
-      )
+      Add(Vector(
+        model.Triple(
+          Concrete(parser.bnodeMap("betehess")),
+          URI("http://xmlns.com/foaf/name"),
+          Concrete(Literal("Alexandre Bertails"))
+        ),
+        model.Triple(
+          Concrete(parser.bnodeMap("betehess")),
+          URI("http://xmlns.com/foaf/name"),
+          Concrete(Literal("Betehess"))
+        )
+      ))
     )
   }
+
+//  "parse Add List" in {
+//    val parser = newParser("""Add { _:betehess foaf:name ( "Alexandre Bertails" "Betehess" ) } .""")
+//    val parsedAdd = parser.Add.run().success.value
+//    parsedAdd should be(
+//      Add(List(
+//        model.Triple(
+//          Concrete(parser.bnodeMap("betehess")),
+//          URI("http://xmlns.com/foaf/name"),
+//          Concrete(Literal("Alexandre Bertails"))
+//        ),
+//        model.Triple(
+//          Concrete(parser.bnodeMap("betehess")),
+//          URI("http://xmlns.com/foaf/name"),
+//          Concrete(Literal("Betehess"))
+//        )
+//      ))
+//    )
+//  }
 
   "parse Delete" in {
     newParser("""Delete ?betehess foaf:name "Alexandre Bertails" .""").Delete.run().success.value should be(
@@ -279,20 +324,56 @@ UpdateList ?alex v:prefLang 0.. ( "fr" "en" ) .
 @prefix ex: <http://example.org/vocab#> .
 
 Delete <#> profile:first_name "Tim" .
-Add    <#> profile:first_name "Timothy" .
+Add    { <#> profile:first_name "Timothy" } .
 
 UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
 
 Bind ?event <#> /schema:attendee[/schema:url = <http://conferences.ted.com/TED2009/>]  .
-Add ?event rdf:type schema:Event .
+Add { ?event rdf:type schema:Event } .
 
 Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
 Delete ?ted schema:startDate "2009-02-04".
-Add ?ted schema:location _:loc .
-Add _:loc schema:name "Long Beach, California" .
-Add _:loc schema:geo _:geo .
-Add _:geo schema:latitude "33.7817" .
-Add _:geo schema:longitude "-118.2054" .
+Add { ?ted schema:location _:loc } .
+Add { _:loc schema:name "Long Beach, California" } .
+Add { _:loc schema:geo _:geo } .
+Add { _:geo schema:latitude "33.7817" } .
+Add { _:geo schema:longitude "-118.2054" } .
+"""
+//    val parser = newFreshParser(patch)
+//    parser.LDPatch.run() match {
+//      case Failure(error: ParseError) =>
+//        println(parser.formatError(error))
+//    }
+
+    newFreshParser(patch).LDPatch.run() should be a ('Success)
+  }
+
+  "parse Example 2 from spec - v2" in {
+    val patch = """
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org> .
+@prefix profile: <http://ogp.me/ns/profile#> .
+@prefix ex: <http://example.org/vocab#> .
+
+Delete <#> profile:first_name "Tim" .
+Add    { <#> profile:first_name "Timothy" } .
+
+UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
+
+Bind ?event <#> /schema:attendee[/schema:url = <http://conferences.ted.com/TED2009/>]  .
+Add { ?event rdf:type schema:Event } .
+
+Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
+Delete ?ted schema:startDate "2009-02-04".
+Add {
+  ?ted schema:location [
+    schema:name "Long Beach, California" ;
+    schema:geo [
+      schema:latitude "33.7817" ;
+      schema:longitude "-118.2054"
+    ]
+  ]
+} .
 """
     newFreshParser(patch).LDPatch.run() should be a ('Success)
   }

@@ -12,11 +12,12 @@ case class LDPatch[Rdf <: RDF](statements: Seq[Statement[Rdf]])
 
 sealed trait Statement[Rdf <: RDF]
 
-case class Add[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[Rdf]) extends Statement[Rdf]
-case class AddList[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, list: Seq[VarOrConcrete[Rdf]]) extends Statement[Rdf]
+case class Add[Rdf <: RDF](triples: Vector[Triple[Rdf]]) extends Statement[Rdf]
 case class Delete[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[Rdf]) extends Statement[Rdf]
 case class Bind[Rdf <: RDF](varr: Var, startingNode: VarOrConcrete[Rdf], path: Path[Rdf]) extends Statement[Rdf]
 case class UpdateList[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, slice: Slice, list: Seq[VarOrConcrete[Rdf]]) extends Statement[Rdf]
+
+case class Triple[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[Rdf])
 
 case class Path[Rdf <: RDF](elems: Seq[PathElement[Rdf]])
 

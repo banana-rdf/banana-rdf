@@ -28,8 +28,7 @@ trait Semantics[Rdf <: RDF] {
     }
 
     def Statement(statement: m.Statement[Rdf], state: State): State = statement match {
-      case add@m.Add(_, _, _)          => Add(add, state)
-      case addList@m.AddList(_, _, _)  => AddList(addList, state)
+      case add@m.Add(_)                => Add(add, state)
       case delete@m.Delete(_, _, _)    => Delete(delete, state)
       case bind@m.Bind(_, _, _)        => Bind(bind, state)
       case ul@m.UpdateList(_, _, _, _) => UpdateList(ul, state)
@@ -37,26 +36,10 @@ trait Semantics[Rdf <: RDF] {
 
 
     def Add(add: m.Add[Rdf], state: State): State = {
-      val m.Add(s, p, o) = add
+      val m.Add(triples) = add
       val State(graph, varmap) = state
-      val groundTriple = Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap))
-      State(graph + groundTriple, varmap)
-    }
-
-    def AddList(addList: m.AddList[Rdf], state: State): State = {
-      val m.AddList(s, p, list) = addList
-      val State(graph, varmap) = state
-      @annotation.tailrec
-      def loop(s: m.VarOrConcrete[Rdf], p: Rdf#URI, list: Seq[m.VarOrConcrete[Rdf]], acc: Set[Rdf#Triple]): Set[Rdf#Triple] = list match {
-        case Seq() =>
-          acc + Triple(VarOrConcrete(s, varmap), p, rdf.nil)
-        case head +: rest =>
-          val bnode = BNode()
-          val newAcc = acc + Triple(VarOrConcrete(s, varmap), p, bnode) + Triple(bnode, rdf.first, VarOrConcrete(head, varmap))
-          loop(m.Concrete(bnode), rdf.rest, rest, newAcc)
-      }
-      val triples = loop(s, p, list, Set.empty)
-      State(graph union Graph(triples), varmap)
+      val groundTriples: Vector[Rdf#Triple] = triples.map { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
+      State(graph union Graph(groundTriples), varmap)
     }
 
     def UpdateList(updateList: m.UpdateList[Rdf], state: State): State = {
@@ -136,6 +119,7 @@ trait Semantics[Rdf <: RDF] {
       val m.Delete(s, p, o) = delete
       val State(graph, varmap) = state
       val groundTriple = Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap))
+      // TODO should be an error
       State(graph diff Graph(groundTriple), varmap)
     }
 

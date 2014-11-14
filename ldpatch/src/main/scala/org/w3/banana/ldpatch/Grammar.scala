@@ -3,6 +3,7 @@ package org.w3.banana.ldpatch
 import org.w3.banana._
 import scala.util.{ Try, Success, Failure }
 import org.w3.banana.ldpatch.{ model => m }
+import shapeless._
 
 trait Grammar[Rdf <: RDF] {
 
@@ -30,7 +31,8 @@ trait Grammar[Rdf <: RDF] {
       val input: ParserInput,
       baseURI: Rdf#URI,
       var prefixes: Map[String, Rdf#URI] = Map.empty,
-      var bnodeMap: Map[String, Rdf#BNode] = Map.empty
+      var bnodeMap: Map[String, Rdf#BNode] = Map.empty,
+      var graph: Vector[m.Triple[Rdf]] = Vector.empty
     ) extends Parser with StringBuilding {
 
 
@@ -71,13 +73,7 @@ trait Grammar[Rdf <: RDF] {
 
       // Add ::= ("Add" | "A") Subject Predicate ( Object | List ) "."
       def Add: Rule1[m.Statement[Rdf]] = rule (
-        ("Add" | 'A') ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ (
-            List ~> (Right(_))
-          | Object ~> (Left(_))
-        ) ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, objectOrList: Either[m.VarOrConcrete[Rdf], Seq[m.VarOrConcrete[Rdf]]]) => objectOrList match {
-          case Left(o)     => m.Add(s, p, o)
-          case Right(list) => m.AddList(s, p, list)
-        })
+        ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Add(triples) }
       )
 
       // Delete ::= ("Delete" | "D") Subject Predicate Object "."
@@ -87,7 +83,7 @@ trait Grammar[Rdf <: RDF] {
 
       // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice List "."
       def UpdateList: Rule1[m.UpdateList[Rdf]] = rule (
-        ("UpdateList" | "UL") ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Slice ~ WS1 ~ List ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.UpdateList(s, p, slice, list))
+        ("UpdateList" | "UL") ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Slice ~ WS1 ~ ListFoo ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.UpdateList(s, p, slice, list))
       )
 
       // Subject ::= iri | BlankNode | Var
@@ -118,7 +114,7 @@ trait Grammar[Rdf <: RDF] {
       )
 
       // List ::= '(' Object* ')'
-      def List: Rule1[Seq[m.VarOrConcrete[Rdf]]] = rule (
+      def ListFoo: Rule1[Seq[m.VarOrConcrete[Rdf]]] = rule (
         '(' ~ WS0 ~ zeroOrMore(Object).separatedBy(WS1) ~ WS0 ~ ')'
       )
 
@@ -174,12 +170,107 @@ trait Grammar[Rdf <: RDF] {
 
       // copied from Turtle
 
+      // triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
+
+      def reInitGraph(): Rule0 = rule (
+        run(this.graph = Vector.empty)
+      )
+
+      def triples: Rule1[Vector[m.Triple[Rdf]]] = rule (
+          reInitGraph() ~ (
+              subject ~ WS1 ~ predicateObjectList
+            | blankNodePropertyList ~ WS1 ~> (m.Concrete(_)) ~ predicateObjectList
+          ) ~> (() => push(graph))
+      )
+
+      // predicateObjectList ::= verb objectList (';' (verb objectList)?)*
+      def predicateObjectList: Rule[m.VarOrConcrete[Rdf] :: HNil, HNil] = rule (
+        verbObjectList ~ WS0 ~ zeroOrMore(';' ~ WS0 ~ optional(verbObjectList)) ~> ((subject: m.VarOrConcrete[Rdf]) => ())
+      )
+
+      // contraction of: verb objectList
+      def verbObjectList: Rule[m.VarOrConcrete[Rdf] :: HNil, m.VarOrConcrete[Rdf] :: HNil] = rule (
+        verb ~ WS1 ~ objectList ~> { (p: Rdf#URI) => () }
+      )
+
+      // verb ::= predicate | 'a'
+      def verb: Rule1[Rdf#URI] = rule (
+          predicate
+        | 'a' ~ push(rdf.`type`)
+      )
+
+      // predicate ::= iri
+      def predicate: Rule1[Rdf#URI] = rule (
+        iri
+      )
+
+
+      private var curSubject: m.VarOrConcrete[Rdf] = null
+      private var curPredicate: Rdf#URI = URI("http://example.com/fake")
+
+      // objectList ::= object (',' object)*
+      def objectList: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule {
+        // reads the current subject and predicate on the stack, and save them in the state
+        run((s: m.VarOrConcrete[Rdf], p: Rdf#URI) => { curSubject = s; curPredicate = p }) ~
+        // the real production rule
+        objectt ~ makeTriple ~ WS0 ~ zeroOrMore(',' ~ WS0 ~ objectt ~ WS0 ~ makeTriple) ~
+        // before leaving the rule, pushing the subject/predicate state back on the stack
+        push(curSubject) ~ push(curPredicate)
+      }
+
+      // assumes that the current subject/predicate state is set, then
+      // consumes the latest object on the stack, and produces a
+      // Triple as a side-effect
+      def makeTriple: Rule[m.VarOrConcrete[Rdf] :: HNil, HNil] = rule (
+        run((o: m.VarOrConcrete[Rdf]) => graph = graph :+ m.Triple(curSubject, curPredicate, o))
+      )
+
+      // subject ::= iri | BlankNode | collection | Var
+      def subject: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | BlankNode ~> (m.Concrete(_))
+        | collection ~> (m.Concrete(_))
+        | Var
+      )
+
+      // collection ::= '(' object* ')'
+      def collection: Rule1[Rdf#Node] = rule (
+        '('  ~ WS0 ~ zeroOrMore(objectt ~ WS0) ~ ')' ~> { os: Seq[m.VarOrConcrete[Rdf]] =>
+          if (os.isEmpty) {
+            rdf.nil
+          } else {
+            val bnodes: Seq[Rdf#BNode] = os.map { _ => BNode() }
+            val bnodesVar: Seq[m.VarOrConcrete[Rdf]] = bnodes.map(m.Concrete(_))
+            val firsts: Seq[m.Triple[Rdf]] = bnodesVar.zip(os).map{ case (bnode, o) => m.Triple(o, rdf.first, bnode) }
+            val rests: Seq[m.Triple[Rdf]] = bnodesVar.zip(bnodesVar.tail :+ m.Concrete(rdf.nil)).map { case (b1, b2) => m.Triple(b1, rdf.rest, b2) }
+            this.graph ++= firsts
+            this.graph ++= rests
+            bnodes.head
+          }
+        }
+      )
+
+      // object ::= iri | BlankNode | collection | blankNodePropertyList | literal
+      def objectt: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | BlankNode ~> (m.Concrete(_))
+        | collection ~> (m.Concrete(_))
+        | blankNodePropertyList ~> (m.Concrete(_))
+        | literal ~> (m.Concrete(_))
+        | Var
+      )
+
+      // blankNodePropertyList ::= '[' predicateObjectList ']'
+      def blankNodePropertyList: Rule1[Rdf#BNode] = rule (
+        '[' ~ WS0 ~ push{ val bnode = BNode() ; bnode :: m.Concrete(bnode) :: HNil } ~ predicateObjectList ~ WS0 ~ ']'
+      )
+
+
       // prefixID ::= "@prefix" PNAME_NS IRIREF "."
       def prefixID: Rule1[(String, Rdf#URI)] = rule {
         "@prefix" ~ WS1 ~ PNAME_NS ~ WS0 ~ IRIREF ~ WS0 ~ '.' ~> ((qname: String, iri: Rdf#URI) => (qname, iri))
       }
       
-      // TODO: check if it's literal or Literal
       // literal ::= RDFLiteral | NumericLiteral | BooleanLiteral
       def literal: Rule1[Rdf#Literal] = rule (
         RDFLiteral | NumericLiteral | BooleanLiteral
@@ -187,7 +278,7 @@ trait Grammar[Rdf <: RDF] {
 
       // NumericLiteral ::= INTEGER | DECIMAL | DOUBLE
       def NumericLiteral: Rule1[Rdf#Literal] = rule (
-          DOUBLE ~> ((lexicalForm: String) => Literal(lexicalForm, xsd.double))
+          DOUBLE  ~> ((lexicalForm: String) => Literal(lexicalForm, xsd.double))
         | DECIMAL ~> ((lexicalForm: String) => Literal(lexicalForm, xsd.decimal))
         | INTEGER ~> ((lexicalForm: String) => Literal(lexicalForm, xsd.integer))
       )

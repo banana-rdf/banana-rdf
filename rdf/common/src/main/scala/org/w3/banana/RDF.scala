@@ -4,7 +4,7 @@ trait RDF {
   // types related to the RDF datamodel
   type Graph
   type Triple
-  type Node
+  type Node <: AnyRef
   type URI <: Node
   type BNode <: Node
   type Literal <: Node

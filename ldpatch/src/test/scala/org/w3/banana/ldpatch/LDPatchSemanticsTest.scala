@@ -175,20 +175,24 @@ _:b2 a schema:Event ;
 @prefix ex: <http://example.org/vocab#> .
 
 Delete <#> profile:first_name "Tim" .
-Add    <#> profile:first_name "Timothy" .
+Add    { <#> profile:first_name "Timothy" } .
 
 UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
 
 Bind ?event <#> /schema:attendee[/schema:url = <https://www.w3.org/2012/ldp/wiki/F2F5>]  .
-Add ?event rdf:type schema:Event .
+Add { ?event rdf:type schema:Event } .
 
 Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
 Delete ?ted schema:startDate "2009-02-04".
-Add ?ted schema:location _:loc .
-Add _:loc schema:name "Long Beach, California" .
-Add _:loc schema:geo _:geo .
-Add _:geo schema:latitude "33.7817" .
-Add _:geo schema:longitude "-118.2054" .
+Add {
+  ?ted schema:location [
+    schema:name "Long Beach, California" ;
+    schema:geo [
+      schema:latitude "33.7817" ;
+      schema:longitude "-118.2054"
+    ]
+  ]
+} .
 """
 
     val expectedGraph = reader.read("""
