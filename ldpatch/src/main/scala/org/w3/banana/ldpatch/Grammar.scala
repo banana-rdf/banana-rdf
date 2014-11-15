@@ -83,22 +83,9 @@ trait Grammar[Rdf <: RDF] {
 
       // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice List "."
       def UpdateList: Rule1[m.UpdateList[Rdf]] = rule (
-        ("UpdateList" | "UL") ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Slice ~ WS1 ~ ListFoo ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.UpdateList(s, p, slice, list))
+        ("UpdateList" | "UL") ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ Slice ~ WS1 ~ ListFoo ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.UpdateList(s, p, slice, list))
       )
 
-      // Subject ::= iri | BlankNode | Var
-      def Subject: Rule1[m.VarOrConcrete[Rdf]] = rule (
-          iri ~> (m.Concrete(_))
-        | BlankNode ~> (m.Concrete(_))
-        | Var
-      )
-
-      // Predicate ::= iri
-      def Predicate: Rule1[Rdf#URI] = rule (
-        iri
-      )
-
-      // Object ::= iri | BlankNode | literal | Var
       def Object: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))
