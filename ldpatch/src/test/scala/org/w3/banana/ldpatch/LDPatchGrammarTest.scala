@@ -300,17 +300,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
   }
 
   "parse UpdateList" in {
-    val ul = newParser("""UpdateList ?alex foaf:prefLang 0.. ( "fr" "en" ) .""").updateList2.run().success.value
-    println(">> "+ul)
-
-// should be(
-//      UpdateList2(
-//        Var("alex"),
-//        URI("http://xmlns.com/foaf/prefLang"),
-//        EverythingAfter(0),
-//        Seq(Concrete(Literal("fr")), Concrete(Literal("en")))
-//      )
-//    )
+    newParser("""UpdateList ?alex foaf:prefLang 0.. ( "fr" "en" ) .""").updateList.run() should be('Success)
   }
 
   "parse Prologue" in {
@@ -333,30 +323,7 @@ Bind ?alex
 
 UpdateList ?alex v:prefLang 0.. ( "fr" "en" ) .
 """
-    newFreshParser(patch).LDPatch.run().success.value should be(
-      model.LDPatch(Seq(
-        Bind(
-          Var("alex"),
-          Concrete(URI("http://champin.net/#pa")),
-          Path(Seq(
-            StepForward(URI("http://xmlns.com/foaf/0.1/knows")),
-            Filter(
-              Path(Seq(
-                StepForward(URI("http://xmlns.com/foaf/0.1/holdsAccount")),
-                StepForward(URI("http://xmlns.com/foaf/0.1/accountName"))
-              )),
-              Some(Concrete(Literal("bertails")))
-            )
-          ))
-        ),
-        UpdateList(
-          Var("alex"),
-          URI("http://example.org/vocab#prefLang"),
-          EverythingAfter(0),
-          Seq(Concrete(Literal("fr")), Concrete(Literal("en")))
-        )
-      ))
-    )
+    newFreshParser(patch).LDPatch.run() should be('Success)
     
   }
 

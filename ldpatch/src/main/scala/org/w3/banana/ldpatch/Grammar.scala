@@ -86,16 +86,10 @@ trait Grammar[Rdf <: RDF] {
         ("Cut" | "C") ~ WS1 ~ (iri ~> (m.Concrete(_)) | Var) ~ WS0 ~ '.' ~> { (node: m.VarOrConcrete[Rdf]) => m.Cut(node) }
       )
 
-      // TODO collection
-      // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice List "."
-      def updateList: Rule1[m.UpdateList[Rdf]] = rule (
-        ("UpdateList" | "UL") ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ Slice ~ WS1 ~ ListFoo ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.UpdateList(s, p, slice, list))
-      )
-
       // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice collection "."
-      def updateList2: Rule1[m.UpdateList2[Rdf]] = rule (
+      def updateList: Rule1[m.UpdateList[Rdf]] = rule (
         ("UpdateList" | "UL") ~ reInitGraph ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ Slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
-          (s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, node: Rdf#Node) => m.UpdateList2(s, p, slice, node, graph)
+          (s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, node: Rdf#Node) => m.UpdateList(s, p, slice, node, graph)
         }
       )
 

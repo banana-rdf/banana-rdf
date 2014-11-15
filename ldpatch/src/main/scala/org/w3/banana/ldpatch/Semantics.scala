@@ -28,11 +28,11 @@ trait Semantics[Rdf <: RDF] {
     }
 
     def Statement(statement: m.Statement[Rdf], state: State): State = statement match {
-      case add@m.Add(_)                => Add(add, state)
-      case delete@m.Delete(_)          => Delete(delete, state)
-      case bind@m.Bind(_, _, _)        => Bind(bind, state)
-      case cut@m.Cut(_)                => Cut(cut, state)
-      case ul@m.UpdateList(_, _, _, _) => UpdateList(ul, state)
+      case add@m.Add(_)                   => Add(add, state)
+      case delete@m.Delete(_)             => Delete(delete, state)
+      case bind@m.Bind(_, _, _)           => Bind(bind, state)
+      case cut@m.Cut(_)                   => Cut(cut, state)
+      case ul@m.UpdateList(_, _, _, _, _) => UpdateList(ul, state)
     }
 
 
@@ -71,78 +71,7 @@ trait Semantics[Rdf <: RDF] {
     def UpdateList(updateList: m.UpdateList[Rdf], state: State): State = {
       val State(graph, varmap) = state
 
-      val m.UpdateList(s, p, slice, list) = updateList
-
-      val headList: Rdf#Node = ops.getObjects(graph, VarOrConcrete(s, varmap), p).to[List] match {
-        case Nil         => sys.error(s"[UpdateList] $s $p ?? did not match any triple")
-        case head :: Nil => head
-        case _           =>  sys.error(s"[UpdateList] $s $p ?? did not match a unique triple")
-      }
-
-      val groundList: Seq[Rdf#Node] = list.map(vc => VarOrConcrete(vc, varmap))
-
-      val groundS = VarOrConcrete(s, varmap)
-
-      val (left, right) = slice match {
-        case m.Range(leftIndex, rightIndex) => (Some(leftIndex), Some(rightIndex))
-        case m.EverythingAfter(index)       => (Some(index), None)
-        case m.End                          => (None, None)
-      }
-
-      @annotation.tailrec
-      def step1(s: Rdf#Node, p: Rdf#URI, cursor: Rdf#Node, steps: Option[Int]): (Rdf#Node, Rdf#URI, Rdf#Node) =
-        if (steps.exists(_ <= 0) || cursor == rdf.nil) {
-          (s, p, cursor)
-        } else {
-          ops.getObjects(graph, cursor, rdf.rest).to[List] match {
-            case Nil         => sys.error(s"[UpdateList/step1] out of rdf:list")
-            case next :: Nil =>
-              // val elem = ops.getObjects(graph, cursor, rdf.first).headOption.getOrElse(sys.error("[UpdateList/step1] no rdf:first"))
-              step1(cursor, rdf.rest, next, steps.map(_ - 1))
-            case _           => sys.error("[UpdateList/step1] malformed list: more than one element after bnode rdf:rest")
-          }
-        }
-
-      val (sLeft, pLeft, oLeft) = step1(groundS, p, headList, left)
-
-      @annotation.tailrec
-      def step2(cursor: Rdf#Node, triplesToRemove: List[Rdf#Triple], steps: Option[Int]): (Rdf#Node, List[Rdf#Triple]) =
-        if (steps.exists(_ <= 0) || cursor == rdf.nil) {
-          (cursor, triplesToRemove)
-        } else {
-          ops.getObjects(graph, cursor, rdf.rest).to[List] match {
-            case Nil         => sys.error(s"[UpdateList/step2] out of rdf:list")
-            case next :: Nil =>
-              val elem = ops.getObjects(graph, cursor, rdf.first).headOption.getOrElse(sys.error("[UpdateList/step2] no rdf:first"))
-              step2(next, Triple(cursor, rdf.first, elem) :: Triple(cursor, rdf.rest, next) :: triplesToRemove, steps.map(_ - 1))
-            case _           => sys.error("[UpdateList/step2] malformed list: more than one element after bnode rdf:rest")
-          }
-        }
-
-      val (headRestList, triplesToRemove) = step2(oLeft, List(Triple(sLeft, pLeft, oLeft)), right.flatMap(r => left.map(l => r - l)))
-
-      @annotation.tailrec
-      def step3(s: Rdf#Node, p: Rdf#URI, headRestList: Rdf#Node, triplesToAdd: List[Rdf#Triple], nodes: Seq[Rdf#Node]): List[Rdf#Triple] = nodes match {
-
-        case Seq() =>
-          Triple(s, p, headRestList) :: triplesToAdd
-            
-        case node +: restNodes =>
-          val bnode = BNode()
-          step3(bnode, rdf.rest, headRestList, Triple(s, p, bnode) :: Triple(bnode, rdf.first, node) :: triplesToAdd, restNodes)
-
-      }
-
-      val triplesToAdd = step3(sLeft, pLeft, headRestList, List.empty, groundList)
-
-      State(graph.diff(Graph(triplesToRemove)).union(Graph(triplesToAdd)), varmap)
-
-    }
-
-    def UpdateList2(updateList: m.UpdateList2[Rdf], state: State): State = {
-      val State(graph, varmap) = state
-
-      val m.UpdateList2(s, p, slice, headNewList, triples) = updateList
+      val m.UpdateList(s, p, slice, headNewList, triples) = updateList
 
       // the head of the existing list
       val groundS = VarOrConcrete(s, varmap)
@@ -192,15 +121,14 @@ trait Semantics[Rdf <: RDF] {
 
       val (headRestList, triplesToRemove) = step2(oLeft, List(Triple(sLeft, pLeft, oLeft)), right.flatMap(r => left.map(l => r - l)))
 
-      val g = Graph(groundTriples)
+      val collectionGraph = Graph(groundTriples)
 
       @annotation.tailrec
       def step3(s: Rdf#Node, p: Rdf#URI, cursor: Rdf#Node): (Rdf#Node, Rdf#URI) = {
-        println("cursor: " + cursor)
         if (cursor == rdf.nil) {
           (s, p)
         } else {
-          ops.getObjects(g, cursor, rdf.rest).to[List] match {
+          ops.getObjects(collectionGraph, cursor, rdf.rest).to[List] match {
             // TODO other cases
             case next :: Nil => step3(cursor, rdf.rest, next)
           }
@@ -210,21 +138,7 @@ trait Semantics[Rdf <: RDF] {
       val (sSlice, pSlice) = step3(sLeft, pLeft, headNewList)
 
       val newGraph =
-        graph union Graph(groundTriples :+ Triple(sLeft, pLeft, headNewList)) diff Graph(Triple(sSlice, pSlice, rdf.nil) :: triplesToRemove) union Graph(Triple(sSlice, pSlice, headRestList))
-
-      val r = """[-\w]*:[-\w]*:([-\w]*)""".r
-
-      implicit class S(val s: String) {
-        def clean: String = r.replaceAllIn(s, m => m group 1)
-      }
-
-      println("sLeft: " + sLeft.toString.clean)
-      println("pLeft: " + pLeft.toString.clean)
-      println("add triples from the new slice/collection: " + groundTriples.toString.clean)
-      println("connect left side with head of new list: " + Triple(sLeft, pLeft, headNewList).toString.clean)
-      println("remove last triple in the slice pointing to nil: " + Triple(sSlice, pSlice, rdf.nil).toString.clean)
-      println("remove triples from the slice: " + triplesToRemove.toString.clean)
-      println("connect end of slice to head of the rest of the first list: " + Triple(sSlice, pSlice, headRestList).toString.clean)
+        graph union collectionGraph union Graph(Triple(sLeft, pLeft, headNewList)) diff Graph(Triple(sSlice, pSlice, rdf.nil) :: triplesToRemove) union Graph(Triple(sSlice, pSlice, headRestList))
 
       State(newGraph, varmap)
 

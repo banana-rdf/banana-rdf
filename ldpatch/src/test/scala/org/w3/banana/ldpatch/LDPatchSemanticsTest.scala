@@ -86,15 +86,13 @@ _:b2 a schema:Event ;
 
   "UpdateList semantics" in {
 
-    val ul = newParser("""UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .""").updateList2.run().success.value
+    val ul = newParser("""UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .""").updateList.run().success.value
 
     import org.w3.banana.diesel._
 
-    val newGraph = s.semantics.UpdateList2(ul, s.semantics.State(graph)).graph
+    val newGraph = s.semantics.UpdateList(ul, s.semantics.State(graph)).graph
 
     val l = (PointedGraph(URI("http://example.com/timbl#"), newGraph) / ex("preferredLanguages")).as[List[String]].success.value
-
-    writer.write(newGraph, System.out, "http://example.com/timbl")
 
     l should be (List("en", "fr-CH"))
 
