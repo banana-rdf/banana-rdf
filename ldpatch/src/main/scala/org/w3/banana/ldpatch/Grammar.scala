@@ -143,7 +143,7 @@ trait Grammar[Rdf <: RDF] {
 
       // copied from SPARQL
 
-      // the VAR1 from SPARQL:   Var ::= '?' VARNAME
+      // Var ::= '?' VARNAME
       def Var: Rule1[m.Var] = rule (
         '?' ~ VARNAME
       )
@@ -408,6 +408,7 @@ trait Grammar[Rdf <: RDF] {
         )
       )
 
+      // WS ::= #x20 | #x9 | #xD | #xA
       def WS: Rule0 = rule { anyOf(" \t\r\n") }
 
       // ANON ::= '[' WS* ']'
