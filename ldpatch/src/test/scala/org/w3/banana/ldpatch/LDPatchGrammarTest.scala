@@ -8,15 +8,34 @@ import org.w3.banana.ldpatch.model._
 
 // TODO
 import org.parboiled2._
+import org.w3.banana.io._
 
-abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers with TryValues { self =>
+abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, Turtle],
+  writer: RDFWriter[Rdf, Try, Turtle]
+) extends WordSpec with Matchers with TryValues { self =>
 
   import ops._
+
+  /** transforms triples with vars into a regular RDF Graph (variables
+    * are transformed into bnode)
+    */
+  def makeGraph(triples: Vector[model.Triple[Rdf]]): Rdf#Graph = {
+    def makeNode(node: VarOrConcrete[Rdf]): Rdf#Node = node match {
+      case Concrete(node) => node
+      case Var(_) => BNode()
+    }
+    Graph(
+      triples.map { case model.Triple(s, p, o) => Triple(makeNode(s), p, makeNode(o)) }
+    )
+  }
+
 
   val g = new Grammar[Rdf] { implicit val ops = self.ops }
 
   def newParser(input: String) =
-    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo"), prefixes = Map("foaf" -> URI("http://xmlns.com/foaf/")))
+    new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo"), prefixes = Map("foaf" -> URI("http://xmlns.com/foaf/"), "schema" -> URI("http://schema.org/")))
 
   def newFreshParser(input: String) =
     new g.grammar.PEGPatchParser(input, baseURI = URI("http://example.com/foo"), prefixes = Map.empty)
@@ -93,9 +112,9 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     )
   }
 
-  "parse Add Object" in {
+  "parse Add" in {
     val parser = newParser("""Add { _:betehess foaf:name "Alexandre Bertails" } .""")
-    val parsedAdd = parser.Add.run().success.value
+    val parsedAdd = parser.add.run().success.value
     parsedAdd should be(
       Add(Vector(model.Triple(
         Concrete(parser.bnodeMap("betehess")),
@@ -105,9 +124,40 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     )
   }
 
+
+  "parse Complex Add" in {
+    val parser = newParser("""Add {
+  ?ted schema:location [
+    schema:name "Long Beach, California" ;
+    schema:geo [
+      schema:latitude "33.7817" ;
+      schema:longitude "-118.2054"
+    ]
+  ]
+} .""")
+
+    val parsedAdd = parser.add.run().success.value
+
+    val equivalentGraph = reader.read("""
+@prefix schema: <http://schema.org/> .
+[] schema:location [
+  schema:name "Long Beach, California" ;
+  schema:geo [
+    schema:latitude "33.7817" ;
+    schema:longitude "-118.2054"
+  ]
+]
+""", "http://example.com/timbl").get
+
+    val graph = makeGraph(parsedAdd.triples)
+
+    assert(equivalentGraph isIsomorphicWith graph)
+
+  }
+
   "parse Add List" in {
     val parser = newParser("""Add { _:betehess foaf:name "Alexandre Bertails", "Betehess" } .""")
-    val parsedAdd = parser.Add.run().success.value
+    val parsedAdd = parser.add.run().success.value
     parsedAdd should be(
       Add(Vector(
         model.Triple(
@@ -124,33 +174,19 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     )
   }
 
-//  "parse Add List" in {
-//    val parser = newParser("""Add { _:betehess foaf:name ( "Alexandre Bertails" "Betehess" ) } .""")
-//    val parsedAdd = parser.Add.run().success.value
-//    parsedAdd should be(
-//      Add(List(
-//        model.Triple(
-//          Concrete(parser.bnodeMap("betehess")),
-//          URI("http://xmlns.com/foaf/name"),
-//          Concrete(Literal("Alexandre Bertails"))
-//        ),
-//        model.Triple(
-//          Concrete(parser.bnodeMap("betehess")),
-//          URI("http://xmlns.com/foaf/name"),
-//          Concrete(Literal("Betehess"))
-//        )
-//      ))
-//    )
-//  }
-
   "parse Delete" in {
-    newParser("""Delete { ?betehess foaf:name "Alexandre Bertails" } .""").Delete.run().success.value should be(
+    newParser("""Delete { ?betehess foaf:name "Alexandre Bertails" } .""").delete.run().success.value should be(
       Delete(Vector(model.Triple(
         Var("betehess"),
         URI("http://xmlns.com/foaf/name"),
         Concrete(Literal("Alexandre Bertails"))
       )))
     )
+  }
+
+  "parse Cut" in {
+    newParser("""Cut ?betehess .""").cut.run().success.value should be(Cut(Var("betehess")))
+    newParser("""Cut <http://example.com/foo> .""").cut.run().success.value should be(Cut(Concrete(URI("http://example.com/foo"))))
   }
 
   "parse Path" in {
@@ -213,7 +249,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
 
   "parse Bind" in {
 
-    newParser("""Bind ?foo <http://example.com/blah> .""").Bind.run().success.value should be(
+    newParser("""Bind ?foo <http://example.com/blah> .""").bind.run().success.value should be(
       Bind(
         Var("foo"),
         Concrete(URI("http://example.com/blah")),
@@ -221,7 +257,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
       )
     )
 
-    newParser("""Bind ?foo <http://example.com/blah> /foaf:name/^foaf:name/<http://example.com/foo> .""").Bind.run().success.value should be(
+    newParser("""Bind ?foo <http://example.com/blah> /foaf:name/^foaf:name/<http://example.com/foo> .""").bind.run().success.value should be(
       Bind(
         Var("foo"),
         Concrete(URI("http://example.com/blah")),
@@ -236,7 +272,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
     val bind = """Bind ?alex
      <http://champin.net/#pa>/foaf:knows
         [/foaf:holdsAccount/foaf:accountName="bertails"] ."""
-    newParser(bind).Bind.run().success.value should be(
+    newParser(bind).bind.run().success.value should be(
       Bind(
         Var("alex"),
         Concrete(URI("http://champin.net/#pa")),
@@ -264,7 +300,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
   }
 
   "parse UpdateList" in {
-    newParser("""UpdateList ?alex foaf:prefLang 0.. ( "fr" "en" ) .""").UpdateList.run().success.value should be(
+    newParser("""UpdateList ?alex foaf:prefLang 0.. ( "fr" "en" ) .""").updateList.run().success.value should be(
       UpdateList(Var("alex"), URI("http://xmlns.com/foaf/prefLang"), EverythingAfter(0), Seq(Concrete(Literal("fr")), Concrete(Literal("en"))))
     )
   }

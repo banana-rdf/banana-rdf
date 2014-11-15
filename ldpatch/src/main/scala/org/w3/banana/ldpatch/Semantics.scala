@@ -31,6 +31,7 @@ trait Semantics[Rdf <: RDF] {
       case add@m.Add(_)                => Add(add, state)
       case delete@m.Delete(_)          => Delete(delete, state)
       case bind@m.Bind(_, _, _)        => Bind(bind, state)
+      case cut@m.Cut(_)                => Cut(cut, state)
       case ul@m.UpdateList(_, _, _, _) => UpdateList(ul, state)
     }
 
@@ -48,6 +49,23 @@ trait Semantics[Rdf <: RDF] {
       val groundTriples: Vector[Rdf#Triple] = triples.map { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
       // TODO should be an error
       State(graph diff Graph(groundTriples), varmap)
+    }
+
+    def Cut(cut: m.Cut[Rdf], state: State): State = {
+      val m.Cut(node) = cut
+      val State(graph, varmap) = state
+      val groundNode = VarOrConcrete(node, varmap)
+      val incomingArcs = ops.find(graph, ANY, ANY, groundNode)
+      @annotation.tailrec
+      def loop(nodes: Vector[Rdf#Node], graph: Rdf#Graph): Rdf#Graph = nodes match {
+        case Vector() => graph
+        case node +: rest =>
+          val outcomingArcs = ops.find(graph, node, ANY, ANY).toList
+          val newNodes = outcomingArcs.collect { case Triple(_, _, o) if o.fold(uri => true, bnode => true, literal => false) => o }
+          loop(rest ++ newNodes, graph diff Graph(outcomingArcs.toList))
+      }
+      val newGraph = loop(Vector(groundNode), graph diff Graph(incomingArcs.toList))
+      State(newGraph, varmap)
     }
 
     def UpdateList(updateList: m.UpdateList[Rdf], state: State): State = {

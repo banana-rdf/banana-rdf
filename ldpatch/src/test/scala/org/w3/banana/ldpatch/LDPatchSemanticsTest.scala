@@ -86,7 +86,7 @@ _:b2 a schema:Event ;
 
   "UpdateList semantics" in {
 
-    val ul = newParser("""UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .""").UpdateList.run().success.value
+    val ul = newParser("""UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .""").updateList.run().success.value
 
     import org.w3.banana.diesel._
 
@@ -105,7 +105,7 @@ _:b2 a schema:Event ;
 
     val graph: Rdf#Graph = (URI("http://example.com/#") -- ex("numbers") ->- initialList).graph
 
-    val ul = newParser(update).UpdateList.run().success.value
+    val ul = newParser(update).updateList.run().success.value
 
     val newGraph = s.semantics.UpdateList(ul, s.semantics.State(graph)).graph
 
@@ -166,6 +166,72 @@ _:b2 a schema:Event ;
   }
 
 
+
+  "cut TED event" in {
+
+    val patch = """
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix profile: <http://ogp.me/ns/profile#> .
+@prefix ex: <http://example.org/vocab#> .
+
+Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
+Cut ?ted .
+"""
+
+    val expectedGraph = reader.read("""
+@prefix schema: <http://schema.org/> .
+@prefix profile: <http://ogp.me/ns/profile#> .
+@prefix ex: <http://example.org/vocab#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+@prefix schema: <http://schema.org/> .
+@prefix profile: <http://ogp.me/ns/profile#> .
+@prefix ex: <http://example.org/vocab#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+<http://example.com/timbl#> a schema:Person ;
+  schema:alternateName "TimBL" ;
+  profile:first_name "Tim" ;
+  profile:last_name "Berners-Lee" ;
+  schema:workLocation [ schema:name "W3C/MIT" ] ;
+  schema:attendee _:b1 ;
+  ex:preferredLanguages ( "en" "fr" ).
+
+_:b1 schema:name "F2F5 - Linked Data Platform" ;
+  schema:url <https://www.w3.org/2012/ldp/wiki/F2F5> .
+""", "http://example.com/timbl").get
+
+    val ldpatch = newFreshParser(patch).LDPatch.run().success.value
+
+    val newGraph = s.semantics.LDPatch(ldpatch, graph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+  }
+
+
+  "cut whole graph" in {
+
+    val patch = """
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix schema: <http://schema.org/> .
+@prefix profile: <http://ogp.me/ns/profile#> .
+@prefix ex: <http://example.org/vocab#> .
+
+Cut <http://example.com/timbl#> .
+"""
+
+    val expectedGraph = Graph.empty
+
+    val ldpatch = newFreshParser(patch).LDPatch.run().success.value
+
+    val newGraph = s.semantics.LDPatch(ldpatch, graph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
+
+
   "full test" in {
 
     val patch = """
@@ -224,6 +290,8 @@ _:b2 a schema:Event ;
     val ldpatch = newFreshParser(patch).LDPatch.run().success.value
 
     val newGraph = s.semantics.LDPatch(ldpatch, graph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
 
   }
 

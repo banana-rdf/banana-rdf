@@ -63,29 +63,36 @@ trait Grammar[Rdf <: RDF] {
 
       // Statement ::= Bind | Add | Delete | UpdateList
       def Statement: Rule1[m.Statement[Rdf]] = rule (
-        Bind | Add | Delete | UpdateList
+        bind | add | delete | cut | updateList
       )
 
       // Bind ::= ("Bind" | "B") Var Value Path? "."
-      def Bind: Rule1[m.Bind[Rdf]] = rule (
+      def bind: Rule1[m.Bind[Rdf]] = rule (
         ("Bind" | 'B') ~ WS1 ~ Var ~ WS1 ~ Value ~ optional(WS0 ~ Path) ~ WS0 ~ '.' ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
       )
 
       // Add ::= ("Add" | "A") "{" triples "}" "."
-      def Add: Rule1[m.Statement[Rdf]] = rule (
+      def add: Rule1[m.Add[Rdf]] = rule (
         ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Add(triples) }
       )
 
       // Delete ::= ("Delete" | "D") "{" triples "}" "."
-      def Delete: Rule1[m.Delete[Rdf]] = rule (
+      def delete: Rule1[m.Delete[Rdf]] = rule (
         ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Delete(triples) }
       )
 
+      // Cut ::= ("Cut" | "C") (iri | Var) "."
+      def cut: Rule1[m.Cut[Rdf]] = rule (
+        ("Cut" | "C") ~ WS1 ~ (iri ~> (m.Concrete(_)) | Var) ~ WS0 ~ '.' ~> { (node: m.VarOrConcrete[Rdf]) => m.Cut(node) }
+      )
+
+      // TODO collection
       // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice List "."
-      def UpdateList: Rule1[m.UpdateList[Rdf]] = rule (
+      def updateList: Rule1[m.UpdateList[Rdf]] = rule (
         ("UpdateList" | "UL") ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ Slice ~ WS1 ~ ListFoo ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.UpdateList(s, p, slice, list))
       )
 
+      // TODO remove
       def Object: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))
@@ -159,14 +166,16 @@ trait Grammar[Rdf <: RDF] {
 
       // triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
 
-      def reInitGraph(): Rule0 = rule (
+      def reInitGraph: Rule0 = rule (
         run(this.graph = Vector.empty)
       )
 
+      // TODO simplify the second part of the 
       def triples: Rule1[Vector[m.Triple[Rdf]]] = rule (
-          reInitGraph() ~ (
+          reInitGraph ~ (
               subject ~ WS1 ~ predicateObjectList
-            | blankNodePropertyList ~ WS1 ~> (m.Concrete(_)) ~ predicateObjectList
+            | blankNodePropertyList ~> (m.Concrete(_)) ~ WS0 ~ optional(run((n: m.VarOrConcrete[Rdf]) => n :: n :: HNil) ~ predicateObjectList) ~> ((n: m.VarOrConcrete[Rdf]) => ())
+//            | blankNodePropertyList ~> (m.Concrete(_)) ~ WS0 ~ optional(run((n: m.VarOrConcrete[Rdf]) => push(n) ~ predicateObjectList ~ push(n)))
           ) ~> (() => push(graph))
       )
 
@@ -192,24 +201,23 @@ trait Grammar[Rdf <: RDF] {
       )
 
 
-      private var curSubject: m.VarOrConcrete[Rdf] = null
-      private var curPredicate: Rdf#URI = URI("http://example.com/fake")
+//      private var curSubject: m.VarOrConcrete[Rdf] = null
+//      private var curPredicate: Rdf#URI = URI("http://example.com/fake")
 
       // objectList ::= object (',' object)*
       def objectList: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule {
-        // reads the current subject and predicate on the stack, and save them in the state
-        run((s: m.VarOrConcrete[Rdf], p: Rdf#URI) => { curSubject = s; curPredicate = p }) ~
         // the real production rule
-        objectt ~ makeTriple ~ WS0 ~ zeroOrMore(',' ~ WS0 ~ objectt ~ WS0 ~ makeTriple) ~
-        // before leaving the rule, pushing the subject/predicate state back on the stack
-        push(curSubject) ~ push(curPredicate)
+        objectt ~ makeTriple ~ WS0 ~ zeroOrMore(',' ~ WS0 ~ objectt ~ WS0 ~ makeTriple)
       }
 
       // assumes that the current subject/predicate state is set, then
       // consumes the latest object on the stack, and produces a
       // Triple as a side-effect
-      def makeTriple: Rule[m.VarOrConcrete[Rdf] :: HNil, HNil] = rule (
-        run((o: m.VarOrConcrete[Rdf]) => graph = graph :+ m.Triple(curSubject, curPredicate, o))
+      def makeTriple: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: m.VarOrConcrete[Rdf] :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule (
+        run { (s: m.VarOrConcrete[Rdf], p: Rdf#URI, o: m.VarOrConcrete[Rdf]) =>
+          graph = graph :+ m.Triple(s, p, o)
+          push(s) ~ push(p)
+        }
       )
 
       // subject ::= iri | BlankNode | collection | Var
