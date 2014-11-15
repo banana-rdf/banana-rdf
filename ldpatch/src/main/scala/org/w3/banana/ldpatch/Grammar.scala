@@ -71,14 +71,14 @@ trait Grammar[Rdf <: RDF] {
         ("Bind" | 'B') ~ WS1 ~ Var ~ WS1 ~ Value ~ optional(WS0 ~ Path) ~ WS0 ~ '.' ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
       )
 
-      // Add ::= ("Add" | "A") Subject Predicate ( Object | List ) "."
+      // Add ::= ("Add" | "A") "{" triples "}" "."
       def Add: Rule1[m.Statement[Rdf]] = rule (
         ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Add(triples) }
       )
 
-      // Delete ::= ("Delete" | "D") Subject Predicate Object "."
+      // Delete ::= ("Delete" | "D") "{" triples "}" "."
       def Delete: Rule1[m.Delete[Rdf]] = rule (
-        ("Delete" | 'D') ~ WS1 ~ Subject ~ WS1 ~ Predicate ~ WS1 ~ Object ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, o: m.VarOrConcrete[Rdf]) => m.Delete(s, p, o))
+        ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Delete(triples) }
       )
 
       // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice List "."

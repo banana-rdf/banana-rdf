@@ -174,7 +174,7 @@ _:b2 a schema:Event ;
 @prefix profile: <http://ogp.me/ns/profile#> .
 @prefix ex: <http://example.org/vocab#> .
 
-Delete <#> profile:first_name "Tim" .
+Delete { <#> profile:first_name "Tim" } .
 Add    { <#> profile:first_name "Timothy" } .
 
 UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
@@ -183,7 +183,7 @@ Bind ?event <#> /schema:attendee[/schema:url = <https://www.w3.org/2012/ldp/wiki
 Add { ?event rdf:type schema:Event } .
 
 Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
-Delete ?ted schema:startDate "2009-02-04".
+Delete { ?ted schema:startDate "2009-02-04" } .
 Add {
   ?ted schema:location [
     schema:name "Long Beach, California" ;

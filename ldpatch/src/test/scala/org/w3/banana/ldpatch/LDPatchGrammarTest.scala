@@ -144,12 +144,12 @@ abstract class LDPatchGrammarTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) exten
 //  }
 
   "parse Delete" in {
-    newParser("""Delete ?betehess foaf:name "Alexandre Bertails" .""").Delete.run().success.value should be(
-      Delete(
+    newParser("""Delete { ?betehess foaf:name "Alexandre Bertails" } .""").Delete.run().success.value should be(
+      Delete(Vector(model.Triple(
         Var("betehess"),
         URI("http://xmlns.com/foaf/name"),
         Concrete(Literal("Alexandre Bertails"))
-      )
+      )))
     )
   }
 
@@ -323,7 +323,7 @@ UpdateList ?alex v:prefLang 0.. ( "fr" "en" ) .
 @prefix profile: <http://ogp.me/ns/profile#> .
 @prefix ex: <http://example.org/vocab#> .
 
-Delete <#> profile:first_name "Tim" .
+Delete { <#> profile:first_name "Tim" } .
 Add    { <#> profile:first_name "Timothy" } .
 
 UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
@@ -332,7 +332,7 @@ Bind ?event <#> /schema:attendee[/schema:url = <http://conferences.ted.com/TED20
 Add { ?event rdf:type schema:Event } .
 
 Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
-Delete ?ted schema:startDate "2009-02-04".
+Delete { ?ted schema:startDate "2009-02-04" } .
 Add { ?ted schema:location _:loc } .
 Add { _:loc schema:name "Long Beach, California" } .
 Add { _:loc schema:geo _:geo } .
@@ -355,7 +355,7 @@ Add { _:geo schema:longitude "-118.2054" } .
 @prefix profile: <http://ogp.me/ns/profile#> .
 @prefix ex: <http://example.org/vocab#> .
 
-Delete <#> profile:first_name "Tim" .
+Delete { <#> profile:first_name "Tim" } .
 Add    { <#> profile:first_name "Timothy" } .
 
 UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
@@ -364,7 +364,7 @@ Bind ?event <#> /schema:attendee[/schema:url = <http://conferences.ted.com/TED20
 Add { ?event rdf:type schema:Event } .
 
 Bind ?ted <http://conferences.ted.com/TED2009/> /^schema:url! .
-Delete ?ted schema:startDate "2009-02-04".
+Delete { ?ted schema:startDate "2009-02-04" } .
 Add {
   ?ted schema:location [
     schema:name "Long Beach, California" ;

@@ -29,7 +29,7 @@ trait Semantics[Rdf <: RDF] {
 
     def Statement(statement: m.Statement[Rdf], state: State): State = statement match {
       case add@m.Add(_)                => Add(add, state)
-      case delete@m.Delete(_, _, _)    => Delete(delete, state)
+      case delete@m.Delete(_)          => Delete(delete, state)
       case bind@m.Bind(_, _, _)        => Bind(bind, state)
       case ul@m.UpdateList(_, _, _, _) => UpdateList(ul, state)
     }
@@ -40,6 +40,14 @@ trait Semantics[Rdf <: RDF] {
       val State(graph, varmap) = state
       val groundTriples: Vector[Rdf#Triple] = triples.map { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
       State(graph union Graph(groundTriples), varmap)
+    }
+
+    def Delete(delete: m.Delete[Rdf], state: State): State = {
+      val m.Delete(triples) = delete
+      val State(graph, varmap) = state
+      val groundTriples: Vector[Rdf#Triple] = triples.map { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
+      // TODO should be an error
+      State(graph diff Graph(groundTriples), varmap)
     }
 
     def UpdateList(updateList: m.UpdateList[Rdf], state: State): State = {
@@ -71,11 +79,10 @@ trait Semantics[Rdf <: RDF] {
           ops.getObjects(graph, cursor, rdf.rest).to[List] match {
             case Nil         => sys.error(s"[UpdateList/step1] out of rdf:list")
             case next :: Nil =>
-              val elem = ops.getObjects(graph, cursor, rdf.first).headOption.getOrElse(sys.error("[UpdateList/step1] no rdf:first"))
+              // val elem = ops.getObjects(graph, cursor, rdf.first).headOption.getOrElse(sys.error("[UpdateList/step1] no rdf:first"))
               step1(cursor, rdf.rest, next, steps.map(_ - 1))
             case _           => sys.error("[UpdateList/step1] malformed list: more than one element after bnode rdf:rest")
           }
-
         }
 
       val (sLeft, pLeft, oLeft) = step1(groundS, p, headList, left)
@@ -112,15 +119,6 @@ trait Semantics[Rdf <: RDF] {
 
       State(graph.diff(Graph(triplesToRemove)).union(Graph(triplesToAdd)), varmap)
 
-    }
-
-
-    def Delete(delete: m.Delete[Rdf], state: State): State = {
-      val m.Delete(s, p, o) = delete
-      val State(graph, varmap) = state
-      val groundTriple = Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap))
-      // TODO should be an error
-      State(graph diff Graph(groundTriple), varmap)
     }
 
     def VarOrConcrete(vcn: m.VarOrConcrete[Rdf], varmap: Map[m.Var, Rdf#Node]): Rdf#Node = vcn match {

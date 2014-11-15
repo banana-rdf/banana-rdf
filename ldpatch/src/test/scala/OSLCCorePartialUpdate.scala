@@ -89,7 +89,7 @@ _:b1 dcterms:title "A very good link title";
 
 Bind ?label <http://example.com/bugs/2314>/^rdf:subject[/rdf:predicate = oslc_cm:relatedChangeRequest][/rdf:object = <http://myserver/mycmapp/bugs/1235>] .
 
-Delete ?label dcterms:title "A bad link title" .
+Delete { ?label dcterms:title "A bad link title" } .
 Add { ?label dcterms:title "A very good link title" } .
 """)
 
