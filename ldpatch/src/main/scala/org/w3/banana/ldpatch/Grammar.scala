@@ -92,6 +92,13 @@ trait Grammar[Rdf <: RDF] {
         ("UpdateList" | "UL") ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ Slice ~ WS1 ~ ListFoo ~ WS0 ~ '.' ~> ((s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, list: Seq[m.VarOrConcrete[Rdf]]) => m.UpdateList(s, p, slice, list))
       )
 
+      // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice collection "."
+      def updateList2: Rule1[m.UpdateList2[Rdf]] = rule (
+        ("UpdateList" | "UL") ~ reInitGraph ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ Slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
+          (s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, node: Rdf#Node) => m.UpdateList2(s, p, slice, node, graph)
+        }
+      )
+
       // TODO remove
       def Object: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
@@ -236,7 +243,7 @@ trait Grammar[Rdf <: RDF] {
           } else {
             val bnodes: Seq[Rdf#BNode] = os.map { _ => BNode() }
             val bnodesVar: Seq[m.VarOrConcrete[Rdf]] = bnodes.map(m.Concrete(_))
-            val firsts: Seq[m.Triple[Rdf]] = bnodesVar.zip(os).map{ case (bnode, o) => m.Triple(o, rdf.first, bnode) }
+            val firsts: Seq[m.Triple[Rdf]] = bnodesVar.zip(os).map{ case (bnode, o) => m.Triple(bnode, rdf.first, o) }
             val rests: Seq[m.Triple[Rdf]] = bnodesVar.zip(bnodesVar.tail :+ m.Concrete(rdf.nil)).map { case (b1, b2) => m.Triple(b1, rdf.rest, b2) }
             this.graph ++= firsts
             this.graph ++= rests

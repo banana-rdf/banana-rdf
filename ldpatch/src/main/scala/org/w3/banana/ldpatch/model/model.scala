@@ -17,6 +17,7 @@ case class Delete[Rdf <: RDF](triples: Vector[Triple[Rdf]]) extends Statement[Rd
 case class Bind[Rdf <: RDF](varr: Var, startingNode: VarOrConcrete[Rdf], path: Path[Rdf]) extends Statement[Rdf]
 case class Cut[Rdf <: RDF](node: VarOrConcrete[Rdf]) extends Statement[Rdf]
 case class UpdateList[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, slice: Slice, list: Seq[VarOrConcrete[Rdf]]) extends Statement[Rdf]
+case class UpdateList2[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, slice: Slice, head: Rdf#Node, triples: Vector[Triple[Rdf]]) extends Statement[Rdf]
 
 case class Triple[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[Rdf])
 
