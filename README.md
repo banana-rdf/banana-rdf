@@ -122,12 +122,13 @@ To generate IntelliJ project files, just run the command:
 $ sbt gen-idea
 ```
 
-Code of Conduct
----------------
+Community
+=========
 
-**Banana-RDF contributors all agree to follow the [W3C Code of Ethics and Professional Conduct](http://www.w3.org/Consortium/cepc/).**
-
-If you want to take action, feel free to contact Alexandre Bertails <alexandre@bertails.org>. You can also contact W3C Staff as explained in [W3C Procedures](http://www.w3.org/Consortium/pwe/#Procedures).
+For discussions that don't fit in the [issues tracker](https://github.com/w3c/banana-rdf/issues), you may try
+either 
+*  the [w3c banana-rdf mailing list](http://lists.w3.org/Archives/Public/public-banana-rdf/), for longer discussions
+*  the banana-rdf irc channel on freenode using a dedicated IRC client connecting to [irc://irc.freenode.net:6667/banana-rdf](irc://irc.freenode.net:6667/banana-rdf) or using the [freenode html interface](http://webchat.freenode.net), for quick real time socialising
 
 Contributions
 -------------
@@ -145,6 +146,13 @@ to see the real diffs in a project. On Unix you can do this with the command
 ```
 $ cp bin/pre-commit .git/hooks/
 ```
+
+Code of Conduct
+---------------
+
+**Banana-RDF contributors all agree to follow the [W3C Code of Ethics and Professional Conduct](http://www.w3.org/Consortium/cepc/).**
+
+If you want to take action, feel free to contact Alexandre Bertails <alexandre@bertails.org>. You can also contact W3C Staff as explained in [W3C Procedures](http://www.w3.org/Consortium/pwe/#Procedures).
 
 Licence
 -------
