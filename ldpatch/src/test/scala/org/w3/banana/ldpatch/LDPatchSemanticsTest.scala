@@ -63,7 +63,7 @@ _:b2 a schema:Event ;
 
   "Path semantics" in {
 
-    val path = newParser("""/schema:attendee[/schema:url=<http://conferences.ted.com/TED2009/>]/schema:name""").Path.run().success.value
+    val path = newParser("""/schema:attendee[/schema:url=<http://conferences.ted.com/TED2009/>]/schema:name""").path.run().success.value
 
     val nodes = s.semantics.Path(path, URI("http://example.com/timbl#"), s.semantics.State(graph))
 
@@ -74,7 +74,7 @@ _:b2 a schema:Event ;
 
   "Path semantics (exception)" in {
 
-    val path = newParser("""/schema:attendee!""").Path.run().success.value
+    val path = newParser("""/schema:attendee!""").path.run().success.value
 
     a [RuntimeException] should be thrownBy {
 
@@ -201,7 +201,7 @@ _:b1 schema:name "F2F5 - Linked Data Platform" ;
   schema:url <https://www.w3.org/2012/ldp/wiki/F2F5> .
 """, "http://example.com/timbl").get
 
-    val ldpatch = newFreshParser(patch).LDPatch.run().success.value
+    val ldpatch = newFreshParser(patch).ldpatch.run().success.value
 
     val newGraph = s.semantics.LDPatch(ldpatch, graph)
 
@@ -222,7 +222,7 @@ Cut <http://example.com/timbl#> .
 
     val expectedGraph = Graph.empty
 
-    val ldpatch = newFreshParser(patch).LDPatch.run().success.value
+    val ldpatch = newFreshParser(patch).ldpatch.run().success.value
 
     val newGraph = s.semantics.LDPatch(ldpatch, graph)
 
@@ -287,7 +287,7 @@ _:b2 a schema:Event ;
   ] .
 """, "http://example.com/timbl").get
 
-    val ldpatch = newFreshParser(patch).LDPatch.run().success.value
+    val ldpatch = newFreshParser(patch).ldpatch.run().success.value
 
     val newGraph = s.semantics.LDPatch(ldpatch, graph)
 

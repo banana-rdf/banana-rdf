@@ -190,7 +190,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
   }
 
   "parse Path" in {
-    newParser("""/foaf:name/^foaf:name/<http://example.com/foo>""").Path.run().success.value should be(
+    newParser("""/foaf:name/^foaf:name/<http://example.com/foo>""").path.run().success.value should be(
       Path(Seq(
         StepForward(URI("http://xmlns.com/foaf/name")),
         StepBackward(URI("http://xmlns.com/foaf/name")),
@@ -198,7 +198,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
       ))
     )
 
-    newParser("""[/<http://example.com/foo>/foaf:name="Alexandre Bertails"]""").Path.run().success.value should be(
+    newParser("""[/<http://example.com/foo>/foaf:name="Alexandre Bertails"]""").path.run().success.value should be(
       Path(Seq(
         Filter(
           Path(Seq(
@@ -210,7 +210,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
       ))
     )
 
-    newParser("""[/<http://example.com/foo>/^foaf:name]/foaf:friend""").Path.run().success.value should be(
+    newParser("""[/<http://example.com/foo>/^foaf:name]/foaf:friend""").path.run().success.value should be(
       Path(Seq(
         Filter(
           Path(Seq(
@@ -223,7 +223,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
       ))
     )
 
-    newParser("""/foaf:name!/42""").Path.run().success.value should be(
+    newParser("""/foaf:name!/42""").path.run().success.value should be(
       Path(Seq(
         StepForward(URI("http://xmlns.com/foaf/name")),
         UnicityConstraint,
@@ -231,7 +231,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
       ))
     )
 
-    newParser("""/foaf:knows [ /foaf:holdsAccount /foaf:accountName = "bertails" ]""").Path.run().success.value should be(
+    newParser("""/foaf:knows [ /foaf:holdsAccount /foaf:accountName = "bertails" ]""").path.run().success.value should be(
       Path(Seq(
         StepForward(URI("http://xmlns.com/foaf/knows")),
         Filter(
@@ -293,10 +293,10 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
   }
 
   "parse Slice" in {
-    newParser("""42..2868""").Slice.run().success.value should be(Range(42, 2868))
-    newParser("""42..""").Slice.run().success.value should be(EverythingAfter(42))
-    newParser("""..2868""").Slice.run().success.value should be(Range(0, 2868))
-    newParser("""..""").Slice.run().success.value should be(End)
+    newParser("""42..2868""").slice.run().success.value should be(Range(42, 2868))
+    newParser("""42..""").slice.run().success.value should be(EverythingAfter(42))
+    newParser("""..2868""").slice.run().success.value should be(Range(0, 2868))
+    newParser("""..""").slice.run().success.value should be(End)
   }
 
   "parse UpdateList" in {
@@ -306,7 +306,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
   "parse Prologue" in {
     newFreshParser("""@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix v: <http://example.org/vocab#> .""").Prologue.run().success.value should be(
+@prefix v: <http://example.org/vocab#> .""").prologue.run().success.value should be(
       Map("rdf" -> URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#"), "foaf" -> URI("http://xmlns.com/foaf/0.1/"), "v" -> URI("http://example.org/vocab#"))
     )
   }
@@ -323,7 +323,7 @@ Bind ?alex
 
 UpdateList ?alex v:prefLang 0.. ( "fr" "en" ) .
 """
-    newFreshParser(patch).LDPatch.run() should be('Success)
+    newFreshParser(patch).ldpatch.run() should be('Success)
     
   }
 
@@ -351,12 +351,12 @@ Add { _:geo schema:latitude "33.7817" } .
 Add { _:geo schema:longitude "-118.2054" } .
 """
 //    val parser = newFreshParser(patch)
-//    parser.LDPatch.run() match {
+//    parser.ldpatch.run() match {
 //      case Failure(error: ParseError) =>
 //        println(parser.formatError(error))
 //    }
 
-    newFreshParser(patch).LDPatch.run() should be a ('Success)
+    newFreshParser(patch).ldpatch.run() should be a ('Success)
   }
 
   "parse Example 2 from spec - v2" in {
@@ -386,7 +386,7 @@ Add {
   ]
 } .
 """
-    newFreshParser(patch).LDPatch.run() should be a ('Success)
+    newFreshParser(patch).ldpatch.run() should be a ('Success)
   }
 
 

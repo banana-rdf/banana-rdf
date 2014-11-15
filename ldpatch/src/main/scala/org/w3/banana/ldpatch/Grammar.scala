@@ -20,7 +20,7 @@ trait Grammar[Rdf <: RDF] {
 
     def parseLDPatch(input: ParserInput, baseURI: Rdf#URI): Try[m.LDPatch[Rdf]] = {
       val parser = new PEGPatchParser(input, baseURI, prefixes = Map.empty)
-      parser.LDPatch.run() match {
+      parser.ldpatch.run() match {
 	case success @ Success(_) => success
 	case Failure(error: ParseError) => Failure(new RuntimeException(parser.formatError(error)))
 	case failure @ Failure(_) => failure
@@ -46,80 +46,73 @@ trait Grammar[Rdf <: RDF] {
           bnode
         })
       }
-      
+
+      def reInitGraph: Rule0 = rule (
+        run(this.graph = Vector.empty)
+      )
+
       // token separators
 
       def WS0: Rule0 = rule { zeroOrMore(WS) }
 
       def WS1: Rule0 = rule { oneOrMore(WS) }
 
-      // LDPatch ::= Prologue Statement*
-      def LDPatch: Rule1[m.LDPatch[Rdf]] = rule {
-        WS0 ~ Prologue ~> (prefixes => this.prefixes = prefixes) ~ WS1 ~ zeroOrMore(Statement).separatedBy(WS1) ~ WS0 ~ EOI ~> ((statements: Seq[m.Statement[Rdf]]) => m.LDPatch(statements))
+      // ldpatch ::= prologue statement*
+      def ldpatch: Rule1[m.LDPatch[Rdf]] = rule {
+        WS0 ~ prologue ~> (prefixes => this.prefixes = prefixes) ~ WS1 ~ zeroOrMore(statement).separatedBy(WS1) ~ WS0 ~ EOI ~> {
+          (statements: Seq[m.Statement[Rdf]]) => m.LDPatch(statements)
+        }
       }
 
-      // Prologue ::= prefixID*
-      def Prologue: Rule1[Map[String, Rdf#URI]] = rule { zeroOrMore(prefixID).separatedBy(WS1) ~> ((prefixes: Seq[(String, Rdf#URI)]) => push(this.prefixes ++ prefixes)) }
+      // prologue ::= prefixID*
+      def prologue: Rule1[Map[String, Rdf#URI]] = rule { zeroOrMore(prefixID).separatedBy(WS1) ~> ((prefixes: Seq[(String, Rdf#URI)]) => push(this.prefixes ++ prefixes)) }
 
-      // Statement ::= Bind | Add | Delete | UpdateList
-      def Statement: Rule1[m.Statement[Rdf]] = rule (
+      // statement ::= bind | add | delete | updateList
+      def statement: Rule1[m.Statement[Rdf]] = rule (
         bind | add | delete | cut | updateList
       )
 
-      // Bind ::= ("Bind" | "B") Var Value Path? "."
+      // bind ::= ("Bind" | "B") Var value path? "."
       def bind: Rule1[m.Bind[Rdf]] = rule (
-        ("Bind" | 'B') ~ WS1 ~ Var ~ WS1 ~ Value ~ optional(WS0 ~ Path) ~ WS0 ~ '.' ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
+        ("Bind" | 'B') ~ WS1 ~ Var ~ WS1 ~ value ~ optional(WS0 ~ path) ~ WS0 ~ '.' ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
       )
 
-      // Add ::= ("Add" | "A") "{" triples "}" "."
+      // add ::= ("Add" | "A") "{" triples "}" "."
       def add: Rule1[m.Add[Rdf]] = rule (
         ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Add(triples) }
       )
 
-      // Delete ::= ("Delete" | "D") "{" triples "}" "."
+      // delete ::= ("Delete" | "D") "{" triples "}" "."
       def delete: Rule1[m.Delete[Rdf]] = rule (
         ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Delete(triples) }
       )
 
-      // Cut ::= ("Cut" | "C") (iri | Var) "."
+      // cut ::= ("Cut" | "C") (iri | Var) "."
       def cut: Rule1[m.Cut[Rdf]] = rule (
         ("Cut" | "C") ~ WS1 ~ (iri ~> (m.Concrete(_)) | Var) ~ WS0 ~ '.' ~> { (node: m.VarOrConcrete[Rdf]) => m.Cut(node) }
       )
 
-      // UpdateList ::= ("UpdateList" | "UL") Subject Predicate Slice collection "."
+      // updateList ::= ("UpdateList" | "UL") subject predicate slice collection "."
       def updateList: Rule1[m.UpdateList[Rdf]] = rule (
-        ("UpdateList" | "UL") ~ reInitGraph ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ Slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
+        ("UpdateList" | "UL") ~ reInitGraph ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
           (s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, node: Rdf#Node) => m.UpdateList(s, p, slice, node, graph)
         }
       )
 
-      // TODO remove
-      def Object: Rule1[m.VarOrConcrete[Rdf]] = rule (
-          iri ~> (m.Concrete(_))
-        | BlankNode ~> (m.Concrete(_))
-        | literal ~> (m.Concrete(_))
-        | Var
-      )
-
-      // Value ::= iri | literal | Var
-      def Value: Rule1[m.VarOrConcrete[Rdf]] = rule (
+      // value ::= iri | literal | Var
+      def value: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | literal ~> (m.Concrete(_))
         | Var
       )
 
-      // List ::= '(' Object* ')'
-      def ListFoo: Rule1[Seq[m.VarOrConcrete[Rdf]]] = rule (
-        '(' ~ WS0 ~ zeroOrMore(Object).separatedBy(WS1) ~ WS0 ~ ')'
+      // path ::= ( step | constraint )*
+      def path: Rule1[m.Path[Rdf]] = rule (
+        zeroOrMore(step | constraint).separatedBy(WS0) ~> ((pathElems: Seq[m.PathElement[Rdf]]) => m.Path(pathElems))
       )
 
-      // Path ::= ( Step | Constraint )*
-      def Path: Rule1[m.Path[Rdf]] = rule (
-        zeroOrMore(Step | Constraint).separatedBy(WS0) ~> ((pathElems: Seq[m.PathElement[Rdf]]) => m.Path(pathElems))
-      )
-
-      // Step ::= '/' ( '^' iri | iri | INDEX )
-      def Step: Rule1[m.Step[Rdf]] = rule (
+      // step ::= '/' ( '^' iri | iri | INDEX )
+      def step: Rule1[m.Step[Rdf]] = rule (
         '/' ~ (
             '^' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(uri))
           | iri ~> ((uri: Rdf#URI) => m.StepForward(uri))
@@ -127,14 +120,14 @@ trait Grammar[Rdf <: RDF] {
         )
       )
 
-      // Constraint ::= '[' Path ( '=' Value )? ']' | '!'
-      def Constraint: Rule1[m.Constraint[Rdf]] = rule (
-          '[' ~ WS0 ~ Path ~ optional(WS0 ~ '=' ~ WS0 ~ Value) ~ WS0 ~ ']' ~> ((path: m.Path[Rdf], valueOpt: Option[m.VarOrConcrete[Rdf]]) => m.Filter(path, valueOpt))
+      // constraint ::= '[' path ( '=' value )? ']' | '!'
+      def constraint: Rule1[m.Constraint[Rdf]] = rule (
+          '[' ~ WS0 ~ path ~ optional(WS0 ~ '=' ~ WS0 ~ value) ~ WS0 ~ ']' ~> ((path: m.Path[Rdf], valueOpt: Option[m.VarOrConcrete[Rdf]]) => m.Filter(path, valueOpt))
         | '!' ~ push(m.UnicityConstraint)
       )
 
-      // Slice ::= INDEX? '..' INDEX?
-      def Slice: Rule1[m.Slice] = rule (
+      // slice ::= INDEX? '..' INDEX?
+      def slice: Rule1[m.Slice] = rule (
         optional(INDEX) ~ ".." ~ optional(INDEX) ~> ((leftOpt: Option[Int], rightOpt: Option[Int]) => (leftOpt, rightOpt) match {
           case (Some(left), Some(right)) => m.Range(left, right)
           case (Some(index), None)       => m.EverythingAfter(index)
@@ -165,13 +158,13 @@ trait Grammar[Rdf <: RDF] {
 
       // copied from Turtle
 
-      // triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
-
-      def reInitGraph: Rule0 = rule (
-        run(this.graph = Vector.empty)
-      )
+      // prefixID ::= "@prefix" PNAME_NS IRIREF "."
+      def prefixID: Rule1[(String, Rdf#URI)] = rule {
+        "@prefix" ~ WS1 ~ PNAME_NS ~ WS0 ~ IRIREF ~ WS0 ~ '.' ~> ((qname: String, iri: Rdf#URI) => (qname, iri))
+      }
 
       // TODO simplify the second part of the 
+      // triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
       def triples: Rule1[Vector[m.Triple[Rdf]]] = rule (
           reInitGraph ~ (
               subject ~ WS1 ~ predicateObjectList
@@ -185,9 +178,24 @@ trait Grammar[Rdf <: RDF] {
         verbObjectList ~ WS0 ~ zeroOrMore(';' ~ WS0 ~ optional(verbObjectList)) ~> ((subject: m.VarOrConcrete[Rdf]) => ())
       )
 
-      // contraction of: verb objectList
+      // HELPER: contraction of [[ verb objectList ]]
       def verbObjectList: Rule[m.VarOrConcrete[Rdf] :: HNil, m.VarOrConcrete[Rdf] :: HNil] = rule (
         verb ~ WS1 ~ objectList ~> { (p: Rdf#URI) => () }
+      )
+
+      // objectList ::= object (',' object)*
+      def objectList: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule {
+        objectt ~ makeTriple ~ WS0 ~ zeroOrMore(',' ~ WS0 ~ objectt ~ WS0 ~ makeTriple)
+      }
+
+      // HELPER: assumes that the current subject/predicate state is
+      // set, then consumes the latest object on the stack, and
+      // produces a Triple as a side-effect
+      def makeTriple: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: m.VarOrConcrete[Rdf] :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule (
+        run { (s: m.VarOrConcrete[Rdf], p: Rdf#URI, o: m.VarOrConcrete[Rdf]) =>
+          graph = graph :+ m.Triple(s, p, o)
+          push(s) ~ push(p)
+        }
       )
 
       // verb ::= predicate | 'a'
@@ -196,37 +204,37 @@ trait Grammar[Rdf <: RDF] {
         | 'a' ~ push(rdf.`type`)
       )
 
-      // predicate ::= iri
-      def predicate: Rule1[Rdf#URI] = rule (
-        iri
-      )
-
-
-//      private var curSubject: m.VarOrConcrete[Rdf] = null
-//      private var curPredicate: Rdf#URI = URI("http://example.com/fake")
-
-      // objectList ::= object (',' object)*
-      def objectList: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule {
-        // the real production rule
-        objectt ~ makeTriple ~ WS0 ~ zeroOrMore(',' ~ WS0 ~ objectt ~ WS0 ~ makeTriple)
-      }
-
-      // assumes that the current subject/predicate state is set, then
-      // consumes the latest object on the stack, and produces a
-      // Triple as a side-effect
-      def makeTriple: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: m.VarOrConcrete[Rdf] :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule (
-        run { (s: m.VarOrConcrete[Rdf], p: Rdf#URI, o: m.VarOrConcrete[Rdf]) =>
-          graph = graph :+ m.Triple(s, p, o)
-          push(s) ~ push(p)
-        }
-      )
-
       // subject ::= iri | BlankNode | collection | Var
       def subject: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))
         | collection ~> (m.Concrete(_))
         | Var
+      )
+
+      // predicate ::= iri
+      def predicate: Rule1[Rdf#URI] = rule (
+        iri
+      )
+
+      // object ::= iri | BlankNode | collection | blankNodePropertyList | literal
+      def objectt: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | BlankNode ~> (m.Concrete(_))
+        | collection ~> (m.Concrete(_))
+        | blankNodePropertyList ~> (m.Concrete(_))
+        | literal ~> (m.Concrete(_))
+        | Var
+      )
+
+      // literal ::= RDFLiteral | NumericLiteral | BooleanLiteral
+      def literal: Rule1[Rdf#Literal] = rule (
+        RDFLiteral | NumericLiteral | BooleanLiteral
+      )
+
+      // blankNodePropertyList ::= '[' predicateObjectList ']'
+      def blankNodePropertyList: Rule1[Rdf#BNode] = rule (
+        '[' ~ WS0 ~ push{ val bnode = BNode() ; bnode :: m.Concrete(bnode) :: HNil } ~ predicateObjectList ~ WS0 ~ ']'
       )
 
       // collection ::= '(' object* ')'
@@ -244,32 +252,6 @@ trait Grammar[Rdf <: RDF] {
             bnodes.head
           }
         }
-      )
-
-      // object ::= iri | BlankNode | collection | blankNodePropertyList | literal
-      def objectt: Rule1[m.VarOrConcrete[Rdf]] = rule (
-          iri ~> (m.Concrete(_))
-        | BlankNode ~> (m.Concrete(_))
-        | collection ~> (m.Concrete(_))
-        | blankNodePropertyList ~> (m.Concrete(_))
-        | literal ~> (m.Concrete(_))
-        | Var
-      )
-
-      // blankNodePropertyList ::= '[' predicateObjectList ']'
-      def blankNodePropertyList: Rule1[Rdf#BNode] = rule (
-        '[' ~ WS0 ~ push{ val bnode = BNode() ; bnode :: m.Concrete(bnode) :: HNil } ~ predicateObjectList ~ WS0 ~ ']'
-      )
-
-
-      // prefixID ::= "@prefix" PNAME_NS IRIREF "."
-      def prefixID: Rule1[(String, Rdf#URI)] = rule {
-        "@prefix" ~ WS1 ~ PNAME_NS ~ WS0 ~ IRIREF ~ WS0 ~ '.' ~> ((qname: String, iri: Rdf#URI) => (qname, iri))
-      }
-      
-      // literal ::= RDFLiteral | NumericLiteral | BooleanLiteral
-      def literal: Rule1[Rdf#Literal] = rule (
-        RDFLiteral | NumericLiteral | BooleanLiteral
       )
 
       // NumericLiteral ::= INTEGER | DECIMAL | DOUBLE
