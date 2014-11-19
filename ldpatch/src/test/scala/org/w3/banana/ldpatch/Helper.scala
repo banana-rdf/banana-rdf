@@ -44,8 +44,8 @@ ldpatch ::= prologue statement*
 prologue ::= prefixID*
 statement ::= bind | add | delete | updateList
 bind ::= ("Bind" | "B") Var value path? "."
-add ::= ("Add" | "A") "{" triples "}" "."
-delete ::= ("Delete" | "D") "{" triples "}" "."
+add ::= ("Add" | "A") "{" graph "}" "."
+delete ::= ("Delete" | "D") "{" graph "}" "."
 cut ::= ("Cut" | "C") (iri | Var) "."
 updateList ::= ("UpdateList" | "UL") subject predicate slice collection "."
 value ::= iri | literal | Var
@@ -57,6 +57,7 @@ INDEX ::= [0-9]+
 Var ::= '?' VARNAME
 VARNAME ::= ( PN_CHARS_U | [0-9] ) ( PN_CHARS_U | [0-9] | #x00B7 | [#x0300-#x036F] | [#x203F-#x2040] )*
 prefixID ::= "@prefix" PNAME_NS IRIREF "."
+graph ::= triples ( '.' triples )* '.'?
 triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
 predicateObjectList ::= verb objectList (';' (verb objectList)?)*
 objectList ::= object (',' object)*
@@ -125,10 +126,20 @@ PN_LOCAL_ESC ::= '\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | "'" | '(' | ')' 
       s"""<a href="#grammar-production-$ref">$ref</a>"""
     })}
 
+//    val tr = s"""
+//<tr id="grammar-production-$l">
+//    <td>[$index]</td>
+//    <td><code>$l</code></td>
+//    <td>::=</td>
+//    <td>$td</td>
+//</tr>
+//""".trim
+//    tr
+
     val tr = s"""
 <tr id="grammar-production-$l">
     <td>[$index]</td>
-    <td><code>$l</code></td>
+    <td><a href="#grammar-production-$l">$l</a></td>
     <td>::=</td>
     <td>$td</td>
 </tr>

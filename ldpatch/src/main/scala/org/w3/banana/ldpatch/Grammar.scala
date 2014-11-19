@@ -32,7 +32,7 @@ trait Grammar[Rdf <: RDF] {
       baseURI: Rdf#URI,
       var prefixes: Map[String, Rdf#URI] = Map.empty,
       var bnodeMap: Map[String, Rdf#BNode] = Map.empty,
-      var graph: Vector[m.Triple[Rdf]] = Vector.empty
+      var triplesAcc: Vector[m.Triple[Rdf]] = Vector.empty
     ) extends Parser with StringBuilding {
 
 
@@ -47,8 +47,8 @@ trait Grammar[Rdf <: RDF] {
         })
       }
 
-      def reInitGraph: Rule0 = rule (
-        run(this.graph = Vector.empty)
+      def emptyTriplesAcc: Rule0 = rule (
+        run(this.triplesAcc = Vector.empty)
       )
 
       // token separators
@@ -77,14 +77,14 @@ trait Grammar[Rdf <: RDF] {
         ("Bind" | 'B') ~ WS1 ~ Var ~ WS1 ~ value ~ optional(WS0 ~ path) ~ WS0 ~ '.' ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
       )
 
-      // add ::= ("Add" | "A") "{" triples "}" "."
+      // add ::= ("Add" | "A") "{" graph "}" "."
       def add: Rule1[m.Add[Rdf]] = rule (
-        ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Add(triples) }
+        ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Add(graph) }
       )
 
-      // delete ::= ("Delete" | "D") "{" triples "}" "."
+      // delete ::= ("Delete" | "D") "{" graph "}" "."
       def delete: Rule1[m.Delete[Rdf]] = rule (
-        ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ triples ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (triples: Vector[m.Triple[Rdf]]) => m.Delete(triples) }
+        ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(graph) }
       )
 
       // cut ::= ("Cut" | "C") (iri | Var) "."
@@ -94,8 +94,8 @@ trait Grammar[Rdf <: RDF] {
 
       // updateList ::= ("UpdateList" | "UL") subject predicate slice collection "."
       def updateList: Rule1[m.UpdateList[Rdf]] = rule (
-        ("UpdateList" | "UL") ~ reInitGraph ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
-          (s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, node: Rdf#Node) => m.UpdateList(s, p, slice, node, graph)
+        ("UpdateList" | "UL") ~ emptyTriplesAcc ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
+          (s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, node: Rdf#Node) => m.UpdateList(s, p, slice, node, triplesAcc)
         }
       )
 
@@ -163,14 +163,19 @@ trait Grammar[Rdf <: RDF] {
         "@prefix" ~ WS1 ~ PNAME_NS ~ WS0 ~ IRIREF ~ WS0 ~ '.' ~> ((qname: String, iri: Rdf#URI) => (qname, iri))
       }
 
+      // graph ::= triples ( '.' triples )* '.'?
+      def graph: Rule1[Vector[m.Triple[Rdf]]] = rule (
+        zeroOrMore(triples).separatedBy('.') ~ optional('.') ~> { (_: Seq[Vector[m.Triple[Rdf]]]).flatten.toVector /* TODO optimize */ }
+      )
+
       // TODO simplify the second part of the 
       // triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
       def triples: Rule1[Vector[m.Triple[Rdf]]] = rule (
-          reInitGraph ~ (
+          emptyTriplesAcc ~ (
               subject ~ WS1 ~ predicateObjectList
             | blankNodePropertyList ~> (m.Concrete(_)) ~ WS0 ~ optional(run((n: m.VarOrConcrete[Rdf]) => n :: n :: HNil) ~ predicateObjectList) ~> ((n: m.VarOrConcrete[Rdf]) => ())
 //            | blankNodePropertyList ~> (m.Concrete(_)) ~ WS0 ~ optional(run((n: m.VarOrConcrete[Rdf]) => push(n) ~ predicateObjectList ~ push(n)))
-          ) ~> (() => push(graph))
+          ) ~> (() => push(triplesAcc))
       )
 
       // predicateObjectList ::= verb objectList (';' (verb objectList)?)*
@@ -193,7 +198,7 @@ trait Grammar[Rdf <: RDF] {
       // produces a Triple as a side-effect
       def makeTriple: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: m.VarOrConcrete[Rdf] :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule (
         run { (s: m.VarOrConcrete[Rdf], p: Rdf#URI, o: m.VarOrConcrete[Rdf]) =>
-          graph = graph :+ m.Triple(s, p, o)
+          triplesAcc = triplesAcc :+ m.Triple(s, p, o)
           push(s) ~ push(p)
         }
       )
@@ -247,8 +252,8 @@ trait Grammar[Rdf <: RDF] {
             val bnodesVar: Seq[m.VarOrConcrete[Rdf]] = bnodes.map(m.Concrete(_))
             val firsts: Seq[m.Triple[Rdf]] = bnodesVar.zip(os).map{ case (bnode, o) => m.Triple(bnode, rdf.first, o) }
             val rests: Seq[m.Triple[Rdf]] = bnodesVar.zip(bnodesVar.tail :+ m.Concrete(rdf.nil)).map { case (b1, b2) => m.Triple(b1, rdf.rest, b2) }
-            this.graph ++= firsts
-            this.graph ++= rests
+            this.triplesAcc ++= firsts
+            this.triplesAcc ++= rests
             bnodes.head
           }
         }

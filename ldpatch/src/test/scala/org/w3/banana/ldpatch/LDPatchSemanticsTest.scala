@@ -241,7 +241,13 @@ Cut <http://example.com/timbl#> .
 @prefix ex: <http://example.org/vocab#> .
 
 Delete { <#> profile:first_name "Tim" } .
-Add    { <#> profile:first_name "Timothy" } .
+Add {
+  <#> profile:first_name "Timothy" ;
+    profile:image <https://example.org/timbl.jpg> .
+} .
+
+Bind ?workLocation <#> /schema:workLocation .
+Cut ?workLocation.
 
 UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
 
@@ -270,7 +276,7 @@ Add {
   schema:alternateName "TimBL" ;
   profile:first_name "Timothy" ;
   profile:last_name "Berners-Lee" ;
-  schema:workLocation [ schema:name "W3C/MIT" ] ;
+  profile:image <https://example.org/timbl.jpg> ;
   schema:attendee _:b1, _:b2 ;
   ex:preferredLanguages ( "en" "fr-CH" ).
 
