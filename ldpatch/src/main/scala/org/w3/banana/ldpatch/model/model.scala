@@ -10,12 +10,12 @@ import scalaz.Equal
 
 case class LDPatch[Rdf <: RDF](statements: Seq[Statement[Rdf]])
 
-sealed trait Statement[Rdf <: RDF]
+sealed trait Statement[+Rdf <: RDF]
 
 case class Add[Rdf <: RDF](triples: Vector[Triple[Rdf]]) extends Statement[Rdf]
 case class Delete[Rdf <: RDF](triples: Vector[Triple[Rdf]]) extends Statement[Rdf]
 case class Bind[Rdf <: RDF](varr: Var, startingNode: VarOrConcrete[Rdf], path: Path[Rdf]) extends Statement[Rdf]
-case class Cut[Rdf <: RDF](node: VarOrConcrete[Rdf]) extends Statement[Rdf]
+case class Cut(varr: Var) extends Statement[Nothing]
 case class UpdateList[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, slice: Slice, head: Rdf#Node, triples: Vector[Triple[Rdf]]) extends Statement[Rdf]
 
 case class Triple[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[Rdf])

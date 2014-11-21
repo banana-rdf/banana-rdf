@@ -186,7 +186,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
 
   "parse Cut" in {
     newParser("""Cut ?betehess .""").cut.run().success.value should be(Cut(Var("betehess")))
-    newParser("""Cut <http://example.com/foo> .""").cut.run().success.value should be(Cut(Concrete(URI("http://example.com/foo"))))
+// TODO should not compile    newParser("""Cut <http://example.com/foo> .""").cut.run().success.value should be(Cut(Concrete(URI("http://example.com/foo"))))
   }
 
   "parse Path" in {

@@ -87,9 +87,9 @@ trait Grammar[Rdf <: RDF] {
         ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(graph) }
       )
 
-      // cut ::= ("Cut" | "C") varOrIRI "."
-      def cut: Rule1[m.Cut[Rdf]] = rule (
-        ("Cut" | "C") ~ WS1 ~ varOrIRI ~ WS0 ~ '.' ~> { (node: m.VarOrConcrete[Rdf]) => m.Cut(node) }
+      // cut ::= ("Cut" | "C") VAR1 "."
+      def cut: Rule1[m.Cut] = rule (
+        ("Cut" | "C") ~ WS1 ~ VAR1 ~ WS0 ~ '.' ~> { (varr: m.Var) => m.Cut(varr) }
       )
 
       // updateList ::= ("UpdateList" | "UL") varOrIRI predicate slice collection "."
@@ -99,7 +99,13 @@ trait Grammar[Rdf <: RDF] {
         }
       )
 
-      // value ::= iri | literal | Var
+      // varOrIRI ::= iri | VAR1
+      def varOrIRI: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | VAR1
+      )
+
+      // value ::= iri | literal | VAR1
       def value: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | literal ~> (m.Concrete(_))
@@ -295,12 +301,6 @@ trait Grammar[Rdf <: RDF] {
       // [135s] iri ::= IRIREF | PrefixedName
       def iri: Rule1[Rdf#URI] = rule (
         IRIREF | PrefixedName
-      )
-
-      // [143s] varOrIRI ::= iri | VAR1
-      def varOrIRI: Rule1[m.VarOrConcrete[Rdf]] = rule (
-          iri ~> (m.Concrete(_))
-        | VAR1
       )
 
       // [136s] PrefixedName ::= PNAME_LN | PNAME_NS

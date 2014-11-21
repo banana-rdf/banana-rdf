@@ -51,30 +51,32 @@ trait Semantics[Rdf <: RDF] {
       State(graph diff Graph(groundTriples), varmap)
     }
 
-    def Cut(cut: m.Cut[Rdf], state: State): State = {
+    def Cut(cut: m.Cut, state: State): State = {
 
-      val m.Cut(node) = cut
+      val m.Cut(varr) = cut
 
       val State(graph, varmap) = state
 
-      val groundNode = VarOrConcrete(node, varmap).fold(
-        uri => uri,
+      val bnode = VarOrConcrete(varr, varmap).fold(
+        uri => sys.error(s"[Cut] $varr was bound to uri $uri instead of a bnode"),
         bnode => bnode,
-        literal => sys.error(s"[Cut] $node was bound to a literal")
+        literal => sys.error(s"[Cut] $varr was bound to literal $literal instead of a bnode")
       )
 
       def isBNode(node: Rdf#Node): Boolean = node.fold(uri => false, bnode => true, literal => false)
       
       @annotation.tailrec
-      def loop(nodes: Vector[Rdf#Node], graph: Rdf#Graph): Rdf#Graph = nodes match {
+      def loop(bnodes: Vector[Rdf#Node], graph: Rdf#Graph): Rdf#Graph = bnodes match {
         case Vector() => graph
-        case node +: rest =>
-          val outcomingArcs = ops.find(graph, node, ANY, ANY).toList
-          val newNodes = outcomingArcs.collect { case Triple(_, _, o) if isBNode(o) => o }
-          loop(rest ++ newNodes, graph diff Graph(outcomingArcs.toList))
+        case bnode +: rest =>
+          val outgoingArcs = ops.find(graph, bnode, ANY, ANY).toList
+          val newBNodes = outgoingArcs.collect { case Triple(_, _, o) if isBNode(o) => o }
+          loop(rest ++ newBNodes, graph diff Graph(outgoingArcs))
       }
 
-      val newGraph = loop(Vector(groundNode), graph)
+      val incomingArcs = ops.find(graph, ANY, ANY, bnode)
+
+      val newGraph = loop(Vector(bnode), graph diff Graph(incomingArcs.toList))
 
       State(newGraph, varmap)
 
