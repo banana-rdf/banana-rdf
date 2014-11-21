@@ -224,7 +224,9 @@ Cut <http://example.com/timbl#> .
 
     val newGraph = s.semantics.LDPatch(ldpatch, graph)
 
-    assert(graph isIsomorphicWith newGraph)
+    val expectedGraph = Graph.empty
+
+    assert(expectedGraph isIsomorphicWith newGraph)
 
   }
 

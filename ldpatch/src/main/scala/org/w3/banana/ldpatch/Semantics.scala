@@ -74,9 +74,7 @@ trait Semantics[Rdf <: RDF] {
           loop(rest ++ newNodes, graph diff Graph(outcomingArcs.toList))
       }
 
-      val newGraph =
-        if (isBNode(groundNode)) loop(Vector(groundNode), graph)
-        else graph
+      val newGraph = loop(Vector(groundNode), graph)
 
       State(newGraph, varmap)
 
