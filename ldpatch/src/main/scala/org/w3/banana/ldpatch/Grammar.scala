@@ -74,7 +74,7 @@ trait Grammar[Rdf <: RDF] {
 
       // bind ::= ("Bind" | "B") Var value path? "."
       def bind: Rule1[m.Bind[Rdf]] = rule (
-        ("Bind" | 'B') ~ WS1 ~ Var ~ WS1 ~ value ~ optional(WS0 ~ path) ~ WS0 ~ '.' ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
+        ("Bind" | 'B') ~ WS1 ~ VAR1 ~ WS1 ~ value ~ optional(WS0 ~ path) ~ WS0 ~ '.' ~> ((varr: m.Var, value: m.VarOrConcrete[Rdf], pathOpt: Option[m.Path[Rdf]]) => m.Bind(varr, value, pathOpt.getOrElse(m.Path(Seq.empty))))
       )
 
       // add ::= ("Add" | "A") "{" graph "}" "."
@@ -87,14 +87,14 @@ trait Grammar[Rdf <: RDF] {
         ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(graph) }
       )
 
-      // cut ::= ("Cut" | "C") (iri | Var) "."
+      // cut ::= ("Cut" | "C") varOrIRI "."
       def cut: Rule1[m.Cut[Rdf]] = rule (
-        ("Cut" | "C") ~ WS1 ~ (iri ~> (m.Concrete(_)) | Var) ~ WS0 ~ '.' ~> { (node: m.VarOrConcrete[Rdf]) => m.Cut(node) }
+        ("Cut" | "C") ~ WS1 ~ varOrIRI ~ WS0 ~ '.' ~> { (node: m.VarOrConcrete[Rdf]) => m.Cut(node) }
       )
 
-      // updateList ::= ("UpdateList" | "UL") subject predicate slice collection "."
+      // updateList ::= ("UpdateList" | "UL") varOrIRI predicate slice collection "."
       def updateList: Rule1[m.UpdateList[Rdf]] = rule (
-        ("UpdateList" | "UL") ~ emptyTriplesAcc ~ WS1 ~ subject ~ WS1 ~ predicate ~ WS1 ~ slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
+        ("UpdateList" | "UL") ~ emptyTriplesAcc ~ WS1 ~ varOrIRI ~ WS1 ~ predicate ~ WS1 ~ slice ~ WS1 ~ collection ~ WS0 ~ '.' ~> {
           (s: m.VarOrConcrete[Rdf], p: Rdf#URI, slice: m.Slice, node: Rdf#Node) => m.UpdateList(s, p, slice, node, triplesAcc)
         }
       )
@@ -103,7 +103,7 @@ trait Grammar[Rdf <: RDF] {
       def value: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | literal ~> (m.Concrete(_))
-        | Var
+        | VAR1
       )
 
       // path ::= ('/'? step | constraint )? ( '/' step | constraint )*
@@ -113,7 +113,7 @@ trait Grammar[Rdf <: RDF] {
         }
       )
 
-      // step ::= ( '^' iri | iri | INDEX )
+      // step ::= '^' iri | iri | INDEX
       def step: Rule1[m.Step[Rdf]] = rule (
           '^' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(uri))
         | iri ~> ((uri: Rdf#URI) => m.StepForward(uri))
@@ -143,8 +143,8 @@ trait Grammar[Rdf <: RDF] {
 
       // copied from SPARQL
 
-      // Var ::= '?' VARNAME
-      def Var: Rule1[m.Var] = rule (
+      // VAR1 ::= '?' VARNAME
+      def VAR1: Rule1[m.Var] = rule (
         '?' ~ VARNAME
       )
 
@@ -209,12 +209,12 @@ trait Grammar[Rdf <: RDF] {
         | 'a' ~ push(rdf.`type`)
       )
 
-      // subject ::= iri | BlankNode | collection | Var
+      // subject ::= iri | BlankNode | collection | VAR1
       def subject: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))
         | collection ~> (m.Concrete(_))
-        | Var
+        | VAR1
       )
 
       // predicate ::= iri
@@ -229,7 +229,7 @@ trait Grammar[Rdf <: RDF] {
         | collection ~> (m.Concrete(_))
         | blankNodePropertyList ~> (m.Concrete(_))
         | literal ~> (m.Concrete(_))
-        | Var
+        | VAR1
       )
 
       // literal ::= RDFLiteral | NumericLiteral | BooleanLiteral
@@ -295,6 +295,12 @@ trait Grammar[Rdf <: RDF] {
       // iri ::= IRIREF | PrefixedName
       def iri: Rule1[Rdf#URI] = rule (
         IRIREF | PrefixedName
+      )
+
+      // varOrIRI ::= iri | VAR1
+      def varOrIRI: Rule1[m.VarOrConcrete[Rdf]] = rule (
+          iri ~> (m.Concrete(_))
+        | VAR1
       )
 
       // PrefixedName ::= PNAME_LN | PNAME_NS

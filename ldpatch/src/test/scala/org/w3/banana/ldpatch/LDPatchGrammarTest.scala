@@ -93,7 +93,7 @@ abstract class LDPatchGrammarTest[Rdf <: RDF](implicit
   }
 
   "parse Var" in {
-    newParser("""?name""").Var.run().success.value should be(Var("name"))
+    newParser("""?name""").VAR1.run().success.value should be(Var("name"))
   }
 
   "parse triples" in {
