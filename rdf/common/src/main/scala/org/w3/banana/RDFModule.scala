@@ -2,6 +2,7 @@ package org.w3.banana
 
 import org.w3.banana.io.SparqlQueryResultsReader
 import io._
+import scala.concurrent.Future
 import scala.util.Try
 
 trait RDFModule {
@@ -30,7 +31,7 @@ trait SparqlOpsModule extends RDFModule {
 
 trait SparqlGraphModule extends RDFModule {
 
-  implicit val sparqlGraph: SparqlEngine[Rdf, Rdf#Graph]
+  implicit val sparqlGraph: SparqlEngine[Rdf, Try, Rdf#Graph]
 
 }
 
@@ -38,7 +39,7 @@ trait SparqlHttpModule extends RDFModule {
 
   import java.net.URL
 
-  implicit val sparqlHttp: SparqlEngine[Rdf, URL]
+  implicit val sparqlHttp: SparqlEngine[Rdf, Future, URL]
 
 }
 

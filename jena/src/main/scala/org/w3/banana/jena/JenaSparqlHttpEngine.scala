@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import java.net.URL
 
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph }
+import com.hp.hpl.jena.graph.{Graph => JenaGraph}
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.update.UpdateExecutionFactory
 import org.w3.banana._
@@ -10,7 +10,7 @@ import org.w3.banana._
 import scala.concurrent._
 
 class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena], ec: ExecutionContext)
-    extends SparqlEngine[Jena, URL] with SparqlUpdate[Jena, URL] {
+    extends SparqlEngine[Jena, Future, URL] with SparqlUpdate[Jena, Future, URL] {
 
   val querySolution = new util.QuerySolution(ops)
 

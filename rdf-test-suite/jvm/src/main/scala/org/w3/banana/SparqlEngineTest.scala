@@ -10,11 +10,13 @@ class SparqlEngineTest[Rdf <: RDF, A](
 )(implicit
   val reader: RDFReader[Rdf, Try, RDFXML],
   val ops: RDFOps[Rdf],
+  val comonad: scalaz.Comonad[scala.util.Try],
+  val monad: scalaz.Monad[scala.util.Try],
   val sparqlOps: SparqlOps[Rdf],
-  val graphStore: GraphStore[Rdf, A],
-  val sparqlEngine: SparqlEngine[Rdf, A],
+  val graphStore: GraphStore[Rdf, Try, A],
+  val sparqlEngine: SparqlEngine[Rdf, Try, A],
   val lifecycle: Lifecycle[Rdf, A]
-) extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
+) extends WordSpec with SparqlEngineTesterTrait[Rdf, Try, A] with Matchers with BeforeAndAfterAll with TryValues {
 
   import ops._
   import sparqlEngine.sparqlEngineSyntax._
@@ -35,7 +37,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
                            |}""".stripMargin).success.value
 
     val names: Iterable[String] =
-      store.executeSelect(query).getOrFail().iterator.to[Iterable].map {
+      store.executeSelect(query).get.iterator.to[Iterable].map {
         row => row("name").success.value.as[String].success.value
       }
 
@@ -62,7 +64,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
       "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
 
     val names: Iterable[String] =
-      store.executeSelect(query, bindings).getOrFail().iterator.to[Iterable].map {
+      store.executeSelect(query, bindings).get.iterator.to[Iterable].map {
         row => row("name").success.value.as[String].success.value
       }
 
@@ -83,7 +85,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
                               |  }
                               |}""".stripMargin).success.value
 
-    val clonedGraph = store.executeConstruct(query).getOrFail()
+    val clonedGraph = store.executeConstruct(query).get
 
     assert(clonedGraph isIsomorphicWith graph)
   }
@@ -103,7 +105,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
                         |  }
                         |}""".stripMargin).success.value
 
-    val alexIsThere = store.executeAsk(query).getOrFail()
+    val alexIsThere = store.executeAsk(query).get
 
     alexIsThere should be(true)
 
@@ -129,7 +131,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
       "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"),
       "name" -> "Alexandre Bertails".toNode)
 
-    val alexIsThere = store.executeAsk(query, bindings).getOrFail()
+    val alexIsThere = store.executeAsk(query, bindings).get
 
     alexIsThere should be(true)
 
@@ -145,7 +147,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
                         |  }
                         |}""".stripMargin).success.value
 
-    val alexKnowsHenry = store.executeAsk(query).getOrFail()
+    val alexKnowsHenry = store.executeAsk(query).get
 
     alexKnowsHenry should be(true)
 

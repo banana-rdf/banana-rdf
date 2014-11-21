@@ -1,7 +1,8 @@
 package org.w3.banana
 
-import org.scalatest.{ BeforeAndAfterAll, Matchers, TryValues, WordSpec }
+import org.scalatest.{BeforeAndAfterAll, Matchers, TryValues, WordSpec}
 import org.w3.banana.io._
+
 import scala.util.Try
 
 /* Sparql Update gets a special test as not all servers implement it. 
@@ -11,11 +12,13 @@ class SparqlUpdateEngineTest[Rdf <: RDF, A](
 )(implicit
   val reader: RDFReader[Rdf, Try, RDFXML],
   val ops: RDFOps[Rdf],
+  val comonad: scalaz.Comonad[scala.util.Try],
+  val monad: scalaz.Monad[scala.util.Try],
   val sparqlOps: SparqlOps[Rdf],
-  val graphStore: GraphStore[Rdf, A],
-  val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
+  val graphStore: GraphStore[Rdf, Try, A],
+  val sparqlUpdateEngine: SparqlEngine[Rdf, Try, A] with SparqlUpdate[Rdf,Try, A],
   val lifecycle: Lifecycle[Rdf, A]
-) extends WordSpec with SparqlEngineTesterTrait[Rdf, A] with Matchers with BeforeAndAfterAll with TryValues {
+) extends WordSpec with SparqlEngineTesterTrait[Rdf, Try, A] with Matchers with BeforeAndAfterAll with TryValues {
 
   import ops._
   import org.w3.banana.diesel._
@@ -41,7 +44,7 @@ class SparqlUpdateEngineTest[Rdf <: RDF, A](
         """.stripMargin
     ).success.value
 
-    store.executeUpdate(updateQuery).getOrFail()
+    store.executeUpdate(updateQuery).get
 
     val selectQuery = parseSelect(
       """
@@ -57,7 +60,7 @@ class SparqlUpdateEngineTest[Rdf <: RDF, A](
           |}
         """.stripMargin).success.value
 
-    val projects = store.executeSelect(selectQuery).getOrFail().iterator.to[Iterable]
+    val projects = store.executeSelect(selectQuery).get.iterator.to[Iterable]
     val result = projects.map(row =>
       row("currentProject").success.value.as[Rdf#URI].success.value
     )

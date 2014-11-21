@@ -2,9 +2,9 @@ package org.w3.banana.examples
 
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
-import scala.concurrent.ExecutionContext.Implicits.global
 import org.w3.banana._
 import org.w3.banana.io._
+
 import scala.util.Try
 
 /* Here is an example storing in a local RDF store:
@@ -22,7 +22,7 @@ abstract class GraphStoreExample[Rdf <: RDF, Store](implicit
   ops: RDFOps[Rdf],
   turtleReader: RDFReader[Rdf, Try, Turtle],
   rdfXMLWriter: RDFWriter[Rdf, Try, RDFXML],
-  rdfStore: RDFStore[Rdf, Store]
+  rdfStore: RDFStore[Rdf, Try, Store]
 ) {
 
   import ops._
@@ -56,13 +56,13 @@ abstract class GraphStoreExample[Rdf <: RDF, Store](implicit
       } yield {
         println("Successfully stored triples in store")
       }
-    script.getOrFail()
+    script.get
   }
 
 }
 
-import org.w3.banana.jena._
 import com.hp.hpl.jena.query.Dataset
+import org.w3.banana.jena._
 
 object GraphExampleWithJena extends GraphStoreExample[Jena, Dataset] {
 
@@ -73,8 +73,8 @@ object GraphExampleWithJena extends GraphStoreExample[Jena, Dataset] {
 
 }
 
-import org.w3.banana.sesame._
 import org.openrdf.repository.RepositoryConnection
+import org.w3.banana.sesame._
 
 object GraphExampleWithSesame extends GraphStoreExample[Sesame, RepositoryConnection] {
 

@@ -5,6 +5,7 @@ import org.w3.banana._
 import org.w3.banana.io.SparqlQueryResultsReader
 import org.w3.banana.jena.io.{ JenaSolutionsWriter, JenaRDFWriter, JenaRDFReader, JenaQueryResultsReader }
 import org.w3.banana.io._
+import scala.concurrent.Future
 import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -36,12 +37,12 @@ with XmlQueryResultsReaderModule {
 
   implicit val sparqlOps: SparqlOps[Jena] = new JenaSparqlOps
 
-  implicit val sparqlGraph: SparqlEngine[Jena, Jena#Graph] = JenaGraphSparqlEngine(ops)
+  implicit val sparqlGraph: SparqlEngine[Jena, Try, Jena#Graph] = JenaGraphSparqlEngine(ops)
 
   import java.net.URL
-  implicit val sparqlHttp: SparqlEngine[Jena, URL] = new JenaSparqlHttpEngine
+  implicit val sparqlHttp: SparqlEngine[Jena, Future, URL] = new JenaSparqlHttpEngine
 
-  implicit val rdfStore: RDFStore[Jena, Dataset] with SparqlUpdate[Jena, Dataset] = new JenaDatasetStore(true)
+  implicit val rdfStore: RDFStore[Jena, Try, Dataset] with SparqlUpdate[Jena, Try, Dataset] = new JenaDatasetStore(true)
 
   implicit val rdfXMLReader: RDFReader[Jena, Try, RDFXML] = JenaRDFReader.rdfxmlReader()
 

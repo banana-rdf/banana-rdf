@@ -3,17 +3,26 @@ package org.w3.banana
 import org.scalatest._
 import org.w3.banana.diesel._
 import org.w3.banana.io._
-import scala.util.Try
 
-class GraphStoreTest[Rdf <: RDF, A](
+import scala.util.Try
+import scalaz._
+import scalaz.syntax._
+import comonad._
+
+class GraphStoreTest[Rdf <: RDF, M[+_] : Monad: Comonad, A](
   store: A
 )(implicit
   val ops: RDFOps[Rdf],
   val reader: RDFReader[Rdf, Try, RDFXML],
-  val graphStore: GraphStore[Rdf, A],
+  val graphStore: GraphStore[Rdf, M, A],
   val lifecycle: Lifecycle[Rdf, A]
 ) extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
+  // both Monad and Comonad are Functors, so they compete for the
+  // syntax. So we choose arbitrarily one of them.
+  // TODO @betehess to ask scalaz people
+  val M = Monad[M]
+  import M.monadSyntax._
   import graphStore.graphStoreSyntax._
   import lifecycle.lifecycleSyntax._
   import ops._
@@ -61,7 +70,7 @@ class GraphStoreTest[Rdf <: RDF, A](
       assert(rGraph isIsomorphicWith graph)
       assert(rGraph2 isIsomorphicWith graph2)
     }
-    r.getOrFail()
+    r.copoint
   }
 
   "appendToGraph should be equivalent to graph union" in {
@@ -74,7 +83,7 @@ class GraphStoreTest[Rdf <: RDF, A](
     } yield {
       assert(rGraph isIsomorphicWith union(List(graph, graph2)))
     }
-    r.getOrFail()
+    r.copoint
   }
 
   "delete/insert triples" in {
@@ -93,7 +102,7 @@ class GraphStoreTest[Rdf <: RDF, A](
       ).graph
       assert(rGraph isIsomorphicWith expected)
     }
-    r.getOrFail()
+    r.copoint
   }
 
 }

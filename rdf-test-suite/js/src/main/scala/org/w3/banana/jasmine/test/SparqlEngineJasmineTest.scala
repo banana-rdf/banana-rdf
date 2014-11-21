@@ -1,10 +1,12 @@
 package org.w3.banana.jasmine.test
 
+import java.io._
+
 import org.w3.banana._
 import org.w3.banana.diesel._
 import org.w3.banana.io._
-import scala.util.Try
-import java.io._
+
+import scala.concurrent.Future
 import scala.scalajs.test.JasmineTest
 
 /**
@@ -14,10 +16,10 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
   val store: A
 )(implicit
   ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, Try, Turtle],
+  reader: RDFReader[Rdf, Future, Turtle],
   sparqlOps: SparqlOps[Rdf],
-  val graphStore: GraphStore[Rdf, A],
-  val sparqlEngine: SparqlEngine[Rdf, A],
+  val graphStore: GraphStore[Rdf, Future, A],
+  val sparqlEngine: SparqlEngine[Rdf, Future, A],
   val lifecycle: Lifecycle[Rdf, A]
 ) extends JasmineTest {
 
@@ -32,7 +34,7 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
 
   val resource = new FileInputStream("rdf-test-suite/src/main/resources/new-tr.rdf")
 
-  val graph = reader.read(resource, "http://example.com") getOrElse sys.error("ouch")
+  val graph = reader.read(resource, "http://example.com").getOrFail()
 
   val graph1: Rdf#Graph = (
     bnode("betehess")
@@ -174,10 +176,10 @@ abstract class SparqlEngineJasmineTest[Rdf <: RDF, A](
     val store: A
   )(implicit
     ops: RDFOps[Rdf],
-    reader: RDFReader[Rdf, Try, Turtle],
+    reader: RDFReader[Rdf, Future, Turtle],
     sparqlOps: SparqlOps[Rdf],
-    val graphStore: GraphStore[Rdf, A],
-    val sparqlUpdateEngine: SparqlEngine[Rdf, A] with SparqlUpdate[Rdf, A],
+    val graphStore: GraphStore[Rdf,Future, A],
+    val sparqlUpdateEngine: SparqlEngine[Rdf, Future, A] with SparqlUpdate[Rdf, Future, A],
     val lifecycle: Lifecycle[Rdf, A]
   ) extends JasmineTest {
     import ops._
