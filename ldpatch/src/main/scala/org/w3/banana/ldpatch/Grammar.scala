@@ -209,7 +209,7 @@ trait Grammar[Rdf <: RDF] {
         | 'a' ~ push(rdf.`type`)
       )
 
-      // [10t] subject ::= iri | BlankNode | collection | VAR1
+      // [10t*] subject ::= iri | BlankNode | collection | VAR1
       def subject: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))
@@ -222,7 +222,7 @@ trait Grammar[Rdf <: RDF] {
         iri
       )
 
-      // [12t] object ::= iri | BlankNode | collection | blankNodePropertyList | literal
+      // [12t*] object ::= iri | BlankNode | collection | blankNodePropertyList | literal | VAR1
       def objectt: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))

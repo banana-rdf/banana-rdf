@@ -62,9 +62,9 @@ graph ::= triples ( '.' triples )* '.'?
 [7t] predicateObjectList ::= verb objectList (';' (verb objectList)?)*
 [8t] objectList ::= object (',' object)*
 [9t] verb ::= predicate | 'a'
-[10t] subject ::= iri | BlankNode | collection | VAR1
+[10t*] subject ::= iri | BlankNode | collection | VAR1
 [11t] predicate ::= iri
-[12t] object ::= iri | BlankNode | collection | blankNodePropertyList | literal
+[12t*] object ::= iri | BlankNode | collection | blankNodePropertyList | literal | VAR1
 [13t] literal ::= RDFLiteral | NumericLiteral | BooleanLiteral
 [14t] blankNodePropertyList ::= '[' predicateObjectList ']'
 [15t] collection ::= '(' object* ')'
@@ -106,7 +106,7 @@ graph ::= triples ( '.' triples )* '.'?
 
   case class Rule(opt: Option[String], lhs: String, rhs: String)
 
-  val rule = """^(\[\w+\])? *([^:]+) +::= +(.*)$""".r
+  val rule = """^(\[\w+\*?\])? *([^:]+) +::= +(.*)$""".r
 
   val rules = input.split("\n").to[List].filter(_.nonEmpty).map {
     case rule(null, l, r) => Rule(None, l, r)

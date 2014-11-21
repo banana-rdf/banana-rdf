@@ -57,7 +57,11 @@ trait Semantics[Rdf <: RDF] {
 
       val State(graph, varmap) = state
 
-      val groundNode = VarOrConcrete(node, varmap)
+      val groundNode = VarOrConcrete(node, varmap).fold(
+        uri => uri,
+        bnode => bnode,
+        literal => sys.error(s"[Cut] $node was bound to a literal")
+      )
 
       def isBNode(node: Rdf#Node): Boolean = node.fold(uri => false, bnode => true, literal => false)
       
