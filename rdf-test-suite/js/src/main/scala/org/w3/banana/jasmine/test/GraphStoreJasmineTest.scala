@@ -1,20 +1,10 @@
 package org.w3.banana.jasmine.test
 
-import org.w3.banana._
-import org.w3.banana.syntax._
 import org.w3.banana.diesel._
-import org.w3.banana.binder._
-import scala.concurrent.ExecutionContext
-import scala.scalajs.concurrent.JSExecutionContext
-import scalaz.Scalaz._
-import scala.util._
-import scala.collection.immutable.ListMap
-import java.io._
-import scala.concurrent.Future
-import org.w3.banana.{ RDFStore => RDFStoreInterface }
 import org.w3.banana.io._
-import scala.util.Try
-import scala.scalajs.js
+import org.w3.banana.{RDFStore => RDFStoreInterface, _}
+
+import scala.concurrent.Future
 import scala.scalajs.test.JasmineTest
 
 /**
@@ -22,15 +12,15 @@ import scala.scalajs.test.JasmineTest
  */
 abstract class GraphStoreJasmineTest[Rdf <: RDF, A](store: A)(
   implicit ops: RDFOps[Rdf],
-  val reader: RDFReader[Rdf, Try, RDFXML],
-  val graphStore: GraphStore[Rdf, A],
+  val reader: RDFReader[Rdf, Future, RDFXML],
+  val graphStore: GraphStore[Rdf, Future, A],
   val lifecycle: Lifecycle[Rdf, A])
     extends JasmineTest {
 
-  import ops._
   import graphStore.graphStoreSyntax._
-  import lifecycle.lifecycleSyntax._
-  import JSExecutionContext.Implicits.queue
+  import ops._
+
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
   val foaf = FOAFPrefix[Rdf]
 

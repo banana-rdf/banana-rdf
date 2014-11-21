@@ -3,6 +3,8 @@ package org.w3.banana.sesame
 import org.openrdf.repository.RepositoryConnection
 import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
+import org.w3.banana.util.tryInstances._
+
 import org.w3.banana._
 
 class SesameSparqlEngineTest extends SparqlEngineTest[Sesame, RepositoryConnection]({

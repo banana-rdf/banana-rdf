@@ -5,10 +5,9 @@ import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.update.UpdateAction
 import org.w3.banana._
 
-import scala.concurrent._
 import scala.util.Try
 
-class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil, ec: ExecutionContext) extends RDFStore[Jena, Dataset] with SparqlUpdate[Jena, Dataset] {
+class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaUtil: JenaUtil) extends RDFStore[Jena, Try, Dataset] with SparqlUpdate[Jena, Try, Dataset] {
 
   /* Transactor */
 
@@ -33,7 +32,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
 
   lazy val querySolution = new util.QuerySolution(ops)
 
-  def executeSelect(dataset: Dataset, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Future[Jena#Solutions] = Future {
+  def executeSelect(dataset: Dataset, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Try[Jena#Solutions] = Try {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
@@ -44,7 +43,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
   }
 
   /** Executes a Construct query. */
-  def executeConstruct(dataset: Dataset, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Future[Jena#Graph] = Future {
+  def executeConstruct(dataset: Dataset, query: Jena#ConstructQuery, bindings: Map[String, Jena#Node]): Try[Jena#Graph] = Try {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
@@ -55,7 +54,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
   }
 
   /** Executes a Ask query. */
-  def executeAsk(dataset: Dataset, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Future[Boolean] = Future {
+  def executeAsk(dataset: Dataset, query: Jena#AskQuery, bindings: Map[String, Jena#Node]): Try[Boolean] = Try {
     val qexec: QueryExecution =
       if (bindings.isEmpty)
         QueryExecutionFactory.create(query, dataset)
@@ -65,7 +64,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
     result
   }
 
-  def executeUpdate(dataset: Dataset, query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) = Future {
+  def executeUpdate(dataset: Dataset, query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) = Try {
     if (bindings.isEmpty)
       UpdateAction.execute(query, dataset)
     else
@@ -74,7 +73,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
 
   /* GraphStore */
 
-  def appendToGraph(dataset: Dataset, uri: Jena#URI, graph: Jena#Graph): Future[Unit] = Future {
+  def appendToGraph(dataset: Dataset, uri: Jena#URI, graph: Jena#Graph): Try[Unit] = Try {
     val dg = dataset.asDatasetGraph
     ops.getTriples(graph).foreach {
       case ops.Triple(s, p, o) =>
@@ -82,7 +81,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
     }
   }
 
-  def removeTriples(dataset: Dataset, uri: Jena#URI, triples: Iterable[TripleMatch[Jena]]): Future[Unit] = Future {
+  def removeTriples(dataset: Dataset, uri: Jena#URI, triples: Iterable[TripleMatch[Jena]]): Try[Unit] = Try {
     val dg = dataset.asDatasetGraph
     triples.foreach {
       case (s, p, o) =>
@@ -90,7 +89,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
     }
   }
 
-  def getGraph(dataset: Dataset, uri: Jena#URI): Future[Jena#Graph] = Future {
+  def getGraph(dataset: Dataset, uri: Jena#URI): Try[Jena#Graph] = Try {
     val dg = dataset.asDatasetGraph
     val graph = dg.getGraph(uri)
     if (defensiveCopy)
@@ -99,7 +98,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
       graph
   }
 
-  def removeGraph(dataset: Dataset, uri: Jena#URI): Future[Unit] = Future {
+  def removeGraph(dataset: Dataset, uri: Jena#URI): Try[Unit] = Try {
     val dg = dataset.asDatasetGraph
     dg.removeGraph(uri)
   }

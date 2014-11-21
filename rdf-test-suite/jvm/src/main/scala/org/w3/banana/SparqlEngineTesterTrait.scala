@@ -2,25 +2,36 @@ package org.w3.banana
 
 import java.io.FileInputStream
 
-import org.scalatest.{ Suite, BeforeAndAfterAll }
-import scala.concurrent.ExecutionContext.Implicits.global
-import io._
+import org.scalatest.{BeforeAndAfterAll, Suite}
+import org.w3.banana.io._
+
 import scala.util.Try
+import scalaz.{Comonad, Monad}
+import scalaz.syntax._
+import comonad._
 
 // TODO
-trait SparqlEngineTesterTrait[Rdf <: RDF, A] extends BeforeAndAfterAll { self: Suite =>
+trait SparqlEngineTesterTrait[Rdf <: RDF, M[+_], A] extends BeforeAndAfterAll { self: Suite =>
   val store: A
   val reader: RDFReader[Rdf, Try, RDFXML]
   implicit val ops: RDFOps[Rdf]
-  implicit val graphStore: GraphStore[Rdf, A]
+  implicit val graphStore: GraphStore[Rdf, M, A]
+  implicit val monad:  Monad[M]
+  implicit val comonad: Comonad[M]
+
   val lifecycle: Lifecycle[Rdf, A]
 
-  import ops._
+  // both Monad and Comonad are Functors, so they compete for the
+  // syntax. So we choose arbitrarily one of them.
+  // TODO @betehess to ask scalaz people
+  val M = Monad[M]
+  import M.monadSyntax._
   import graphStore.graphStoreSyntax._
   import lifecycle.lifecycleSyntax._
-  import diesel._
+  import ops._
+  import org.w3.banana.diesel._
 
-  abstract override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit = {
     store.stop()
   }
 
@@ -51,7 +62,7 @@ trait SparqlEngineTesterTrait[Rdf <: RDF, A] extends BeforeAndAfterAll { self: S
         _ <- store.appendToGraph(URI("http://example.com/graph2"), graph2)
         _ <- store.appendToGraph(URI("http://example.com/graph"), graph)
       } yield ()
-    init.getOrFail()
+    init.copoint
   }
 
 }

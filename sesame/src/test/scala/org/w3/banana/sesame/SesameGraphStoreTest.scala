@@ -5,8 +5,11 @@ import org.openrdf.repository.sail.SailRepository
 import org.openrdf.sail.memory.MemoryStore
 import org.w3.banana._
 import org.w3.banana.sesame.Sesame._
+import org.w3.banana.util.tryInstances._
+import scala.util.Try
 
-abstract class SesameGraphStoreTest(conn: RepositoryConnection) extends GraphStoreTest[Sesame, RepositoryConnection](conn) {
+
+abstract class SesameGraphStoreTest(conn: RepositoryConnection) extends GraphStoreTest[Sesame, Try, RepositoryConnection](conn) {
 
   import graphStore.graphStoreSyntax._
   import ops._
@@ -15,7 +18,7 @@ abstract class SesameGraphStoreTest(conn: RepositoryConnection) extends GraphSto
     val defaultGraph =
       conn.appendToGraph(makeUri("http://example.com/foo"), graph).flatMap { _ =>
         conn.getGraph(null.asInstanceOf[Sesame#URI])
-      }.getOrFail()
+      }.get
     defaultGraph should have size (0)
   }
 
