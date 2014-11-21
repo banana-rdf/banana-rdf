@@ -106,18 +106,18 @@ trait Grammar[Rdf <: RDF] {
         | Var
       )
 
-      // path ::= ( step | constraint )*
+      // path ::= ('/'? step | constraint )? ( '/' step | constraint )*
       def path: Rule1[m.Path[Rdf]] = rule (
-        zeroOrMore(step | constraint).separatedBy(WS0) ~> ((pathElems: Seq[m.PathElement[Rdf]]) => m.Path(pathElems))
+        optional(optional('/') ~ WS0 ~ step | constraint) ~ zeroOrMore(WS0 ~ ('/' ~ WS0 ~ step | constraint)) ~> {
+          (optPathElem: Option[m.PathElement[Rdf]], pathElems: Seq[m.PathElement[Rdf]]) => m.Path(optPathElem.toSeq ++ pathElems)
+        }
       )
 
-      // step ::= '/' ( '^' iri | iri | INDEX )
+      // step ::= ( '^' iri | iri | INDEX )
       def step: Rule1[m.Step[Rdf]] = rule (
-        '/' ~ (
-            '^' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(uri))
-          | iri ~> ((uri: Rdf#URI) => m.StepForward(uri))
-          | INDEX ~> (m.StepAt(_: Int))
-        )
+          '^' ~ iri ~> ((uri: Rdf#URI) => m.StepBackward(uri))
+        | iri ~> ((uri: Rdf#URI) => m.StepForward(uri))
+        | INDEX ~> (m.StepAt(_: Int))
       )
 
       // constraint ::= '[' path ( '=' value )? ']' | '!'
