@@ -194,7 +194,7 @@ Cut ?ted .
   profile:first_name "Tim" ;
   profile:last_name "Berners-Lee" ;
   schema:workLocation [ schema:name "W3C/MIT" ] ;
-  schema:attendee _:b1 ;
+  schema:attendee _:b1, _:b2 ;
   ex:preferredLanguages ( "en" "fr" ).
 
 _:b1 schema:name "F2F5 - Linked Data Platform" ;
@@ -220,13 +220,11 @@ _:b1 schema:name "F2F5 - Linked Data Platform" ;
 Cut <http://example.com/timbl#> .
 """
 
-    val expectedGraph = Graph.empty
-
     val ldpatch = newFreshParser(patch).ldpatch.run().success.value
 
     val newGraph = s.semantics.LDPatch(ldpatch, graph)
 
-    assert(expectedGraph isIsomorphicWith newGraph)
+    assert(graph isIsomorphicWith newGraph)
 
   }
 
@@ -247,7 +245,8 @@ Add {
 } .
 
 Bind ?workLocation <#> /schema:workLocation .
-Cut ?workLocation.
+Cut ?workLocation .
+Delete { <#> schema:workLocation ?workLocation } .
 
 UpdateList <#> ex:preferredLanguages 1..2 ( "fr-CH" ) .
 

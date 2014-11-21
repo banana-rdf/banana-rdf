@@ -52,20 +52,30 @@ trait Semantics[Rdf <: RDF] {
     }
 
     def Cut(cut: m.Cut[Rdf], state: State): State = {
+
       val m.Cut(node) = cut
+
       val State(graph, varmap) = state
+
       val groundNode = VarOrConcrete(node, varmap)
-      val incomingArcs = ops.find(graph, ANY, ANY, groundNode)
+
+      def isBNode(node: Rdf#Node): Boolean = node.fold(uri => false, bnode => true, literal => false)
+      
       @annotation.tailrec
       def loop(nodes: Vector[Rdf#Node], graph: Rdf#Graph): Rdf#Graph = nodes match {
         case Vector() => graph
         case node +: rest =>
           val outcomingArcs = ops.find(graph, node, ANY, ANY).toList
-          val newNodes = outcomingArcs.collect { case Triple(_, _, o) if o.fold(uri => true, bnode => true, literal => false) => o }
+          val newNodes = outcomingArcs.collect { case Triple(_, _, o) if isBNode(o) => o }
           loop(rest ++ newNodes, graph diff Graph(outcomingArcs.toList))
       }
-      val newGraph = loop(Vector(groundNode), graph diff Graph(incomingArcs.toList))
+
+      val newGraph =
+        if (isBNode(groundNode)) loop(Vector(groundNode), graph)
+        else graph
+
       State(newGraph, varmap)
+
     }
 
     def UpdateList(updateList: m.UpdateList[Rdf], state: State): State = {

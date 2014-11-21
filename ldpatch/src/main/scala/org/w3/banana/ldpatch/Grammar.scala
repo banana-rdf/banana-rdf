@@ -143,12 +143,12 @@ trait Grammar[Rdf <: RDF] {
 
       // copied from SPARQL
 
-      // VAR1 ::= '?' VARNAME
+      // [143s] VAR1 ::= '?' VARNAME
       def VAR1: Rule1[m.Var] = rule (
         '?' ~ VARNAME
       )
 
-      // VARNAME ::= ( PN_CHARS_U | [0-9] ) ( PN_CHARS_U | [0-9] | #x00B7 | [#x0300-#x036F] | [#x203F-#x2040] )*
+      // [166s] VARNAME ::= ( PN_CHARS_U | [0-9] ) ( PN_CHARS_U | [0-9] | #x00B7 | [#x0300-#x036F] | [#x203F-#x2040] )*
       def VARNAME: Rule1[m.Var] = rule (
         clearSB() ~ (PN_CHARS_U | CharPredicate.Digit ~ appendSB()) ~ zeroOrMore(
             PN_CHARS_U
@@ -158,7 +158,7 @@ trait Grammar[Rdf <: RDF] {
 
       // copied from Turtle
 
-      // prefixID ::= "@prefix" PNAME_NS IRIREF "."
+      // [4t] prefixID ::= "@prefix" PNAME_NS IRIREF "."
       def prefixID: Rule1[(String, Rdf#URI)] = rule {
         "@prefix" ~ WS1 ~ PNAME_NS ~ WS0 ~ IRIREF ~ WS0 ~ '.' ~> ((qname: String, iri: Rdf#URI) => (qname, iri))
       }
@@ -169,7 +169,7 @@ trait Grammar[Rdf <: RDF] {
       )
 
       // TODO simplify the second part of the 
-      // triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
+      // [6t] triples ::= subject predicateObjectList | blankNodePropertyList predicateObjectList?
       def triples: Rule1[Vector[m.Triple[Rdf]]] = rule (
           emptyTriplesAcc ~ (
               subject ~ WS1 ~ predicateObjectList
@@ -178,7 +178,7 @@ trait Grammar[Rdf <: RDF] {
           ) ~> (() => push(triplesAcc))
       )
 
-      // predicateObjectList ::= verb objectList (';' (verb objectList)?)*
+      // [7t] predicateObjectList ::= verb objectList (';' (verb objectList)?)*
       def predicateObjectList: Rule[m.VarOrConcrete[Rdf] :: HNil, HNil] = rule (
         verbObjectList ~ WS0 ~ zeroOrMore(';' ~ WS0 ~ optional(verbObjectList)) ~> ((subject: m.VarOrConcrete[Rdf]) => ())
       )
@@ -188,7 +188,7 @@ trait Grammar[Rdf <: RDF] {
         verb ~ WS1 ~ objectList ~> { (p: Rdf#URI) => () }
       )
 
-      // objectList ::= object (',' object)*
+      // [8t] objectList ::= object (',' object)*
       def objectList: Rule[m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil, m.VarOrConcrete[Rdf] :: Rdf#URI :: HNil] = rule {
         objectt ~ makeTriple ~ WS0 ~ zeroOrMore(',' ~ WS0 ~ objectt ~ WS0 ~ makeTriple)
       }
@@ -203,13 +203,13 @@ trait Grammar[Rdf <: RDF] {
         }
       )
 
-      // verb ::= predicate | 'a'
+      // [9t] verb ::= predicate | 'a'
       def verb: Rule1[Rdf#URI] = rule (
           predicate
         | 'a' ~ push(rdf.`type`)
       )
 
-      // subject ::= iri | BlankNode | collection | VAR1
+      // [10t] subject ::= iri | BlankNode | collection | VAR1
       def subject: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))
@@ -217,12 +217,12 @@ trait Grammar[Rdf <: RDF] {
         | VAR1
       )
 
-      // predicate ::= iri
+      // [11t] predicate ::= iri
       def predicate: Rule1[Rdf#URI] = rule (
         iri
       )
 
-      // object ::= iri | BlankNode | collection | blankNodePropertyList | literal
+      // [12t] object ::= iri | BlankNode | collection | blankNodePropertyList | literal
       def objectt: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | BlankNode ~> (m.Concrete(_))
@@ -232,17 +232,17 @@ trait Grammar[Rdf <: RDF] {
         | VAR1
       )
 
-      // literal ::= RDFLiteral | NumericLiteral | BooleanLiteral
+      // [13t] literal ::= RDFLiteral | NumericLiteral | BooleanLiteral
       def literal: Rule1[Rdf#Literal] = rule (
         RDFLiteral | NumericLiteral | BooleanLiteral
       )
 
-      // blankNodePropertyList ::= '[' predicateObjectList ']'
+      // [14t] blankNodePropertyList ::= '[' predicateObjectList ']'
       def blankNodePropertyList: Rule1[Rdf#BNode] = rule (
         '[' ~ WS0 ~ push{ val bnode = BNode() ; bnode :: m.Concrete(bnode) :: HNil } ~ predicateObjectList ~ WS0 ~ ']'
       )
 
-      // collection ::= '(' object* ')'
+      // [15t] collection ::= '(' object* ')'
       def collection: Rule1[Rdf#Node] = rule (
         '('  ~ WS0 ~ zeroOrMore(objectt ~ WS0) ~ ')' ~> { os: Seq[m.VarOrConcrete[Rdf]] =>
           if (os.isEmpty) {
@@ -259,14 +259,14 @@ trait Grammar[Rdf <: RDF] {
         }
       )
 
-      // NumericLiteral ::= INTEGER | DECIMAL | DOUBLE
+      // [16t] NumericLiteral ::= INTEGER | DECIMAL | DOUBLE
       def NumericLiteral: Rule1[Rdf#Literal] = rule (
           DOUBLE  ~> ((lexicalForm: String) => Literal(lexicalForm, xsd.double))
         | DECIMAL ~> ((lexicalForm: String) => Literal(lexicalForm, xsd.decimal))
         | INTEGER ~> ((lexicalForm: String) => Literal(lexicalForm, xsd.integer))
       )
 
-      // RDFLiteral ::= String (LANGTAG | '^^' iri)?
+      // [128s] RDFLiteral ::= String (LANGTAG | '^^' iri)?
       def RDFLiteral: Rule1[Rdf#Literal] = rule (
         String ~ optional(LangOrIRI) ~> ((lexicalForm: String, opt: Option[Either[Rdf#Lang, Rdf#URI]]) => opt match {
           case None                  => Literal(lexicalForm)
@@ -281,40 +281,40 @@ trait Grammar[Rdf <: RDF] {
         | "^^" ~ iri ~> ((datatype: Rdf#URI) => Right(datatype))
       )
 
-      // BooleanLiteral ::= 'true' | 'false'
+      // [133s] BooleanLiteral ::= 'true' | 'false'
       def BooleanLiteral: Rule1[Rdf#Literal] = rule (
           "true" ~ push(xsd.`true`)
         | "false" ~ push(xsd.`false`)
       )
 
-      // String ::= STRING_LITERAL_QUOTE | STRING_LITERAL_SINGLE_QUOTE | STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE
+      // [17] String ::= STRING_LITERAL_QUOTE | STRING_LITERAL_SINGLE_QUOTE | STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE
       def String: Rule1[String] = rule (
         STRING_LITERAL_QUOTE | STRING_LITERAL_SINGLE_QUOTE | STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE
       )
 
-      // iri ::= IRIREF | PrefixedName
+      // [135s] iri ::= IRIREF | PrefixedName
       def iri: Rule1[Rdf#URI] = rule (
         IRIREF | PrefixedName
       )
 
-      // varOrIRI ::= iri | VAR1
+      // [143s] varOrIRI ::= iri | VAR1
       def varOrIRI: Rule1[m.VarOrConcrete[Rdf]] = rule (
           iri ~> (m.Concrete(_))
         | VAR1
       )
 
-      // PrefixedName ::= PNAME_LN | PNAME_NS
+      // [136s] PrefixedName ::= PNAME_LN | PNAME_NS
       def PrefixedName: Rule1[Rdf#URI] = rule (
           PNAME_LN ~> ((prefix, localName) => URI(prefixes(prefix).getString + localName))
         | PNAME_NS ~> (prefix => URI(prefix))
       )
 
-      // BlankNode ::= BLANK_NODE_LABEL | ANON
+      // [137s] BlankNode ::= BLANK_NODE_LABEL | ANON
       def BlankNode: Rule1[Rdf#BNode] = rule (
         (BLANK_NODE_LABEL | ANON)
       )
 
-      // IRIREF ::= '<' ([^#x00-#x20<>"{}|^`\] | UCHAR)* '>' /* #x00=NULL #01-#x1F=control codes #x20=space */
+      // [18] IRIREF ::= '<' ([^#x00-#x20<>"{}|^`\] | UCHAR)* '>' /* #x00=NULL #01-#x1F=control codes #x20=space */
       def IRIREF: Rule1[Rdf#URI] = rule {
         '<' ~ clearSB() ~ zeroOrMore(IRIREF_CHAR) ~ '>' ~ push(baseURI.resolve(URI(sb.toString())))
       }
@@ -325,17 +325,17 @@ trait Grammar[Rdf <: RDF] {
         | (CharPredicate('\u0000' to '\u0020') ++ CharPredicate("<>\"{}|^`\\")).negated ~ appendSB()
       )
 
-      // PNAME_NS ::= PN_PREFIX? ':'
+      // [139s] PNAME_NS ::= PN_PREFIX? ':'
       def PNAME_NS: Rule1[String] = rule {
         optional(PN_PREFIX) ~ ':' ~> ((prefixOpt: Option[String]) => push(prefixOpt.getOrElse("")))
       }
 
-      // PNAME_LN ::= PNAME_NS PN_LOCAL
+      // [140s] PNAME_LN ::= PNAME_NS PN_LOCAL
       def PNAME_LN: Rule2[String, String] = rule (
         PNAME_NS ~ PN_LOCAL
       )
 
-      // BLANK_NODE_LABEL ::= '_:' (PN_CHARS_U | [0-9]) ((PN_CHARS | '.')* PN_CHARS)?
+      // [141s] BLANK_NODE_LABEL ::= '_:' (PN_CHARS_U | [0-9]) ((PN_CHARS | '.')* PN_CHARS)?
       def BLANK_NODE_LABEL: Rule1[Rdf#BNode] = rule (
         "_:" ~ clearSB() ~ BLANK_NODE_LABEL1 ~ optional(BLANK_NODE_LABEL2) ~ push(makeBNode(sb.toString()))
       )
@@ -351,22 +351,22 @@ trait Grammar[Rdf <: RDF] {
         oneOrMore(PN_CHARS) ~ test(lastChar != '.')
       )
 
-      // LANGTAG ::= '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)*
+      // [144s] LANGTAG ::= '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)*
       def LANGTAG: Rule1[Rdf#Lang] = rule (
         '@' ~ capture(oneOrMore(CharPredicate.Alpha) ~ zeroOrMore('-' ~ oneOrMore(CharPredicate.AlphaNum))) ~> ((langString: String) => Lang(langString))
       )
 
-      // INTEGER ::= [+-]? [0-9]+
+      // [19] INTEGER ::= [+-]? [0-9]+
       def INTEGER: Rule1[String] = rule (
         capture(optional(anyOf("+-")) ~ oneOrMore(CharPredicate.Digit))
       )
 
-      // DECIMAL ::= [+-]? [0-9]* '.' [0-9]+
+      // [20] DECIMAL ::= [+-]? [0-9]* '.' [0-9]+
       def DECIMAL: Rule1[String] = rule (
         capture(optional(anyOf("+-")) ~ zeroOrMore(CharPredicate.Digit) ~ '.' ~ zeroOrMore(CharPredicate.Digit))
       )
 
-      // DOUBLE ::= [+-]? ([0-9]+ '.' [0-9]* EXPONENT | '.' [0-9]+ EXPONENT | [0-9]+ EXPONENT)
+      // [21] DOUBLE ::= [+-]? ([0-9]+ '.' [0-9]* EXPONENT | '.' [0-9]+ EXPONENT | [0-9]+ EXPONENT)
       def DOUBLE: Rule1[String] = rule (
         capture(optional(anyOf("+-")) ~ (
             oneOrMore(CharPredicate.Digit) ~ '.' ~ zeroOrMore(CharPredicate.Digit) ~ EXPONENT
@@ -375,37 +375,37 @@ trait Grammar[Rdf <: RDF] {
         ))
       )
 
-      // EXPONENT ::= [eE] [+-]? [0-9]+
+      // [154s] EXPONENT ::= [eE] [+-]? [0-9]+
       def EXPONENT: Rule0 = rule (
         anyOf("eE") ~ optional(anyOf("+-")) ~ oneOrMore(CharPredicate.Digit)
       )
 
-      // STRING_LITERAL_QUOTE ::= '"' ([^#x22#x5C#xA#xD] | ECHAR | UCHAR)* '"'      /* #x22=" #x5C=\ #xA=new line #xD=carriage return */
+      // [22] STRING_LITERAL_QUOTE ::= '"' ([^#x22#x5C#xA#xD] | ECHAR | UCHAR)* '"'      /* #x22=" #x5C=\ #xA=new line #xD=carriage return */
       def STRING_LITERAL_QUOTE: Rule1[String] = rule (
         '"' ~ clearSB() ~ zeroOrMore(ECHAR | UCHAR | noneOf("\"\\\n\r") ~ appendSB()) ~ '"' ~ push(sb.toString())
       )
 
-      // STRING_LITERAL_SINGLE_QUOTE ::= "'" ([^#x27#x5C#xA#xD] | ECHAR | UCHAR)* "'"      /* #x27=' #x5C=\ #xA=new line #xD=carriage return */
+      // [23] STRING_LITERAL_SINGLE_QUOTE ::= "'" ([^#x27#x5C#xA#xD] | ECHAR | UCHAR)* "'"      /* #x27=' #x5C=\ #xA=new line #xD=carriage return */
       def STRING_LITERAL_SINGLE_QUOTE: Rule1[String] = rule (
         '\'' ~ clearSB() ~ zeroOrMore(ECHAR | UCHAR | noneOf("\"\\\n\r") ~ appendSB()) ~ '\'' ~ push(sb.toString())
       )
 
-      // STRING_LITERAL_LONG_SINGLE_QUOTE ::= "'''" (("'" | "''")? ([^'\] | ECHAR | UCHAR))* "'''"
+      // [24] STRING_LITERAL_LONG_SINGLE_QUOTE ::= "'''" (("'" | "''")? ([^'\] | ECHAR | UCHAR))* "'''"
       def STRING_LITERAL_LONG_SINGLE_QUOTE: Rule1[String] = rule (
         "'''" ~ clearSB() ~ zeroOrMore(optional('\'' ~ appendSB() ~ optional('\'' ~ appendSB())) ~ (ECHAR | UCHAR | noneOf("'\\") ~ appendSB())) ~ "'''" ~ push(sb.toString())
       )
 
-      // STRING_LITERAL_LONG_QUOTE ::= '"""' (('"' | '""')? ([^"\] | ECHAR | UCHAR))* '"""'
+      // [25] STRING_LITERAL_LONG_QUOTE ::= '"""' (('"' | '""')? ([^"\] | ECHAR | UCHAR))* '"""'
       def STRING_LITERAL_LONG_QUOTE: Rule1[String] = rule (
         "\"\"\"" ~ clearSB() ~ zeroOrMore(optional('"' ~ appendSB() ~ optional('"' ~ appendSB())) ~ (ECHAR | UCHAR | noneOf("\"\\") ~ appendSB())) ~ "\"\"\"" ~ push(sb.toString())
       )
 
-      // UCHAR ::= '\\u' HEX HEX HEX HEX | '\\U' HEX HEX HEX HEX HEX HEX HEX HEX
+      // [26] UCHAR ::= '\\u' HEX HEX HEX HEX | '\\U' HEX HEX HEX HEX HEX HEX HEX HEX
       def UCHAR: Rule0 = rule {
         "\\u" ~ capture(HexDigit ~ HexDigit ~ HexDigit ~ HexDigit) ~> ((code: String) => appendSB(java.lang.Integer.parseInt(code, 16).asInstanceOf[Char]))
       }
 
-      // ECHAR ::= '\' [tbnrf"'\]
+      // [159s] ECHAR ::= '\' [tbnrf"'\]
       def ECHAR: Rule0 = rule (
         '\\' ~ (
             't'  ~ appendSB('\t')
@@ -419,33 +419,33 @@ trait Grammar[Rdf <: RDF] {
         )
       )
 
-      // WS ::= #x20 | #x9 | #xD | #xA
+      // [161s] WS ::= #x20 | #x9 | #xD | #xA
       def WS: Rule0 = rule { anyOf(" \t\r\n") }
 
-      // ANON ::= '[' WS* ']'
+      // [162s] ANON ::= '[' WS* ']'
       def ANON: Rule1[Rdf#BNode] = rule (
         '[' ~ WS0 ~ ']' ~ push(BNode())
       )
 
-      // PN_CHARS_BASE ::= [A-Z] | [a-z] | [#x00C0-#x00D6] | [#x00D8-#x00F6] | [#x00F8-#x02FF] | [#x0370-#x037D] | [#x037F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
+      // [163s] PN_CHARS_BASE ::= [A-Z] | [a-z] | [#x00C0-#x00D6] | [#x00D8-#x00F6] | [#x00F8-#x02FF] | [#x0370-#x037D] | [#x037F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
       def PN_CHARS_BASE: Rule0 = rule (
           CharPredicate.Alpha ~ appendSB()
         | (between('\u00C0', '\u00D6') ++ between('\u00D8', '\u00F6') ++ between('\u00F8', '\u02FF') ++ between('\u0370', '\u037D') ++ between('\u037F', '\u1FFF') ++ between('\u200C', '\u200D') ++ between('\u2070', '\u218F') ++ between('\u2C00', '\u2FEF') ++ between('\u3001', '\uD7FF') ++ between('\uF900', '\uFDCF') ++ between('\uFDF0', '\uFFFD')) ~ appendSB()
       )
 
-      // PN_CHARS_U ::= PN_CHARS_BASE | '_'
+      // [164s] PN_CHARS_U ::= PN_CHARS_BASE | '_'
       def PN_CHARS_U: Rule0 = rule (
           PN_CHARS_BASE
         | '_' ~ appendSB()
       )
 
-      // PN_CHARS ::= PN_CHARS_U | '-' | [0-9] | #x00B7 | [#x0300-#x036F] | [#x203F-#x2040]
+      // [166s] PN_CHARS ::= PN_CHARS_U | '-' | [0-9] | #x00B7 | [#x0300-#x036F] | [#x203F-#x2040]
       def PN_CHARS: Rule0 = rule (
           PN_CHARS_U
         | (CharPredicate('-') ++ CharPredicate.Digit ++ CharPredicate('\u00B7') ++ between('\u0300', '\u036F') ++ between('\u203F', '\u2040')) ~ appendSB()
       )
 
-      // PN_PREFIX ::= PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
+      // [167s] PN_PREFIX ::= PN_CHARS_BASE ((PN_CHARS | '.')* PN_CHARS)?
       def PN_PREFIX: Rule1[String] = rule {
         clearSB() ~ PN_CHARS_BASE ~ optional(PN_PREFIX2) ~ push(sb.toString())
       }
@@ -457,7 +457,7 @@ trait Grammar[Rdf <: RDF] {
         oneOrMore(PN_CHARS) ~ test(lastChar != '.')
       }
 
-      // PN_LOCAL ::= (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
+      // [168s] PN_LOCAL ::= (PN_CHARS_U | ':' | [0-9] | PLX) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX))?
       def PN_LOCAL: Rule1[String] = rule (
         clearSB() ~ (PN_CHARS_U | (CharPredicate(':') ++ CharPredicate.Digit) ~ appendSB() | PLX) ~ optional(PN_LOCAL2) ~ push(sb.toString())
       )
@@ -468,18 +468,18 @@ trait Grammar[Rdf <: RDF] {
         oneOrMore(PN_CHARS | anyOf(".:") ~ appendSB() | PLX) ~ test(lastChar != '.')
       )
 
-      // PLX ::= PERCENT | PN_LOCAL_ESC
+      // [169s] PLX ::= PERCENT | PN_LOCAL_ESC
       def PLX: Rule0 = rule (
         PERCENT | PN_LOCAL_ESC
       )
 
-      // PERCENT ::= '%' HEX HEX
-      // HEX ::= [0-9] | [A-F] | [a-f]
+      // [170s] PERCENT ::= '%' HEX HEX
+      // [171s] HEX ::= [0-9] | [A-F] | [a-f]
       def PERCENT: Rule0 = rule (
         '%' ~ appendSB() ~ CharPredicate.HexDigit ~ appendSB() ~ CharPredicate.HexDigit ~ appendSB()
       )
 
-      // PN_LOCAL_ESC ::= '\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | "'" | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
+      // [172s] PN_LOCAL_ESC ::= '\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | "'" | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
       def PN_LOCAL_ESC: Rule0 = rule (
         '\\' ~ appendSB() ~ anyOf("_~.-!$&'()*+,;=/?#@%") ~ appendSB()
       )
