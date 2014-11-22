@@ -1,13 +1,9 @@
 package org.w3.banana.sesame.io
 
-import java.io.{ Writer => jWriter, _ }
+import java.io._
 
-import org.openrdf.rio.rdfxml.{ RDFXMLWriter => SRdfXmlWriter }
-import org.openrdf.rio.turtle.{ TurtleWriter => STurtleWriter }
-import org.openrdf.rio.{ RDFWriter => sRDFWriter }
-import org.w3.banana._
 import org.w3.banana.io._
-import org.w3.banana.sesame.{ Sesame, SesameOps }
+import org.w3.banana.sesame.{Sesame, SesameOps}
 
 import scala.util._
 
@@ -16,6 +12,8 @@ class SesameRDFWriter[T](implicit
   sesameSyntax: SesameSyntax[T],
   _syntax: Syntax[T]
 ) extends RDFWriter[Sesame, Try, T] {
+
+  val syntax = _syntax
 
   def write(graph: Sesame#Graph, os: OutputStream, base: String): Try[Unit] = Try {
     val sWriter = sesameSyntax.rdfWriter(os, base)

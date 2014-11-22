@@ -5,7 +5,7 @@ import java.io._
 
 import scala.util._
 
-trait BooleanWriter[T] extends Writer[Boolean, T] {
+trait BooleanWriter[T] extends Writer[Boolean, Try, T] {
 
   def format(bool: Boolean): String
 
@@ -22,6 +22,8 @@ object BooleanWriter {
    */
   implicit val Json = new BooleanWriter[SparqlAnswerJson] {
 
+    val syntax = Syntax[SparqlAnswerJson]
+
     def format(bool: Boolean): String =
       """{
         |  "head": {},
@@ -30,12 +32,15 @@ object BooleanWriter {
         | """.stripMargin.format(bool)
 
     override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
+
   }
 
   /**
    * <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">Sparql Query Results XML Format</a>
    */
   implicit val booleanWriterXml = new BooleanWriter[SparqlAnswerXml] {
+
+    val syntax = Syntax[SparqlAnswerXml]
 
     def format(bool: Boolean): String =
       """<?xml version="1.0"?>

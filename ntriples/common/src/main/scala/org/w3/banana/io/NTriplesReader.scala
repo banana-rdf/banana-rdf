@@ -14,6 +14,9 @@ import scala.util.{Failure, Success, Try}
  */
 class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rdf, Try, NTriples] {
    import NTriplesParser._
+
+   val syntax = Syntax[NTriples]
+
   /**
    * parse from the Input Stream and have the parser guess the encoding. If no encoding guessing
    * is needed use the reader method that takes a Reader.  This guessing may be more or less successful.

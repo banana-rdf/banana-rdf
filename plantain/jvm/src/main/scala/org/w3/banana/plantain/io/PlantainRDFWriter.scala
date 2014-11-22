@@ -15,6 +15,8 @@ import scala.util.Try
 
 object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
 
+  val syntax = Syntax[Turtle]
+
   /** accepts relative URIs */
   class MyUri(uri: String) extends sesame.URI {
     def getLocalName(): String = ???

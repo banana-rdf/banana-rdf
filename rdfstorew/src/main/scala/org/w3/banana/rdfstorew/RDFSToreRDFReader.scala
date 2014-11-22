@@ -7,8 +7,9 @@ import org.w3.banana.io._
 
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import scala.util.Try
 
-class RDFStoreTurtleReader(implicit ops: RDFStoreOps) extends RDFReader[RDFStore, Turtle] {
+class RDFStoreTurtleReader(implicit ops: RDFStoreOps) extends RDFReader[RDFStore, Try, Turtle] {
 
   val syntax = Syntax[Turtle]
 

@@ -11,6 +11,8 @@ import scala.util.Try
 
 object PlantainTurtleReader extends RDFReader[Plantain, Try, Turtle] {
 
+  val syntax = Syntax[Turtle]
+
   final class Sink extends RDFHandler {
 
     var graph: model.Graph[Uri] = PlantainOps.emptyGraph
