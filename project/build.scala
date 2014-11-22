@@ -132,8 +132,8 @@ object BananaRdfBuild extends Build {
       aggregate in Test in rdf_jvm := false,
       aggregate in Test in rdfTestSuite_jvm := false
     )
-  ).dependsOn(rdf_jvm, rdfTestSuite_jvm, jena, sesame, plantain_jvm, examples)
-   .aggregate(rdf_jvm, rdfTestSuite_jvm, jena, sesame, plantain_jvm, examples)
+  ).dependsOn(rdf_jvm, rdfTestSuite_jvm, jena, sesame, ntriples_jvm, plantain_jvm, examples)
+   .aggregate(rdf_jvm, rdfTestSuite_jvm, jena, sesame, ntriples_jvm, plantain_jvm, examples)
 
   /** A virtual module for gathering experimental ones. */
   lazy val experimental = Project(
