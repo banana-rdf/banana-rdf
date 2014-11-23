@@ -27,6 +27,8 @@ trait RDFOps[Rdf <: RDF]
 
   def getTriples(graph: Rdf#Graph): Iterable[Rdf#Triple]
 
+  def graphSize(g: Rdf#Graph): Int
+
   // triple
 
   def makeTriple(s: Rdf#Node, p: Rdf#URI, o: Rdf#Node): Rdf#Triple
@@ -36,8 +38,6 @@ trait RDFOps[Rdf <: RDF]
   // node
 
   def foldNode[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
-
-  def isURI[T](node: Rdf#Node) = foldNode[Boolean](node)(uri => true, bn => false, lit => false)
 
   // URI
 
@@ -84,12 +84,5 @@ trait RDFOps[Rdf <: RDF]
 
   // graph isomorphism
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
-
-  // graph size
-  def graphSize(g: Rdf#Graph): Int
-
-  //  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): syntax.SparqlSolutionSyntax[Rdf] = new syntax.SparqlSolutionSyntax[Rdf](solution)
-  //
-  //  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions): syntax.SparqlSolutionsSyntax[Rdf] = new syntax.SparqlSolutionsSyntax[Rdf](solutions)
 
 }
