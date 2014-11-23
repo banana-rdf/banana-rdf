@@ -7,6 +7,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory
 import com.hp.hpl.jena.rdf.model.impl.RDFWriterFImpl
 import com.hp.hpl.jena.rdfxml.xmloutput.impl.Abbreviated
 import org.apache.jena.riot.{Lang => JenaLang, _}
+import org.w3.banana.RDFWriterSelector
 import org.w3.banana.io._
 import org.w3.banana.jena.Jena.ops._
 
@@ -72,6 +73,6 @@ object JenaRDFWriter {
   implicit val n3Writer: RDFWriter[Jena, Try, N3] = makeRDFWriter[N3](RDFLanguages.N3)
 
   val selector: RDFWriterSelector[Jena, Try] =
-    RDFWriterSelector[Jena, Try, RDFXML] combineWith RDFWriterSelector[Jena, Try, Turtle]
+    WriterSelector[Jena#Graph, Try, RDFXML] combineWith WriterSelector[Jena#Graph, Try, Turtle]
 
 }

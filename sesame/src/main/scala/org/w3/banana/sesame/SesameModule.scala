@@ -2,11 +2,10 @@ package org.w3.banana.sesame
 
 import org.openrdf.repository.RepositoryConnection
 import org.w3.banana._
-import org.w3.banana.io.SparqlQueryResultsReader
+import org.w3.banana.io.{SparqlQueryResultsReader, _}
 import org.w3.banana.sesame.io._
-import org.w3.banana.io._
+
 import scala.util.Try
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SesameModule
     extends RDFModule
@@ -77,7 +76,7 @@ trait SesameModule
     ReaderSelector[Sesame, Try, RDFXML] combineWith
     ReaderSelector[Sesame, Try, JsonLd]
 
-  implicit val writerSelector: RDFWriterSelector[Sesame, Try] = sesameRDFWriterHelper.selector
+  implicit val writerSelector: org.w3.banana.RDFWriterSelector[Sesame, Try] = sesameRDFWriterHelper.selector
 
   implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
     SesameQueryResultsReader.queryResultsReaderJson

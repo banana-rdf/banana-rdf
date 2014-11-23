@@ -48,7 +48,8 @@ object BooleanWriter {
     override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
   }
 
-  implicit val selector: WriterSelector[Boolean] =
-    WriterSelector[Boolean, SparqlAnswerXml] combineWith WriterSelector[Boolean, SparqlAnswerJson]
+  implicit val selector: WriterSelector[Boolean,Try] =
+    WriterSelector[Boolean, Try, SparqlAnswerXml] combineWith
+      WriterSelector[Boolean, Try, SparqlAnswerJson]
 
 }

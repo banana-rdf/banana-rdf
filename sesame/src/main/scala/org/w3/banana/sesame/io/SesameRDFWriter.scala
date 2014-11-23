@@ -2,6 +2,7 @@ package org.w3.banana.sesame.io
 
 import java.io._
 
+import org.w3.banana.RDFWriterSelector
 import org.w3.banana.io._
 import org.w3.banana.sesame.{Sesame, SesameOps}
 
@@ -42,10 +43,10 @@ class SesameRDFWriterHelper(implicit ops: SesameOps) {
   implicit val jsonldFlattenedWriter: RDFWriter[Sesame, Try, JsonLdFlattened] = new SesameRDFWriter[JsonLdFlattened]
 
   val selector: RDFWriterSelector[Sesame, Try] =
-    RDFWriterSelector[Sesame, Try, RDFXML] combineWith
-    RDFWriterSelector[Sesame, Try, Turtle] combineWith
-    RDFWriterSelector[Sesame, Try, JsonLdCompacted] combineWith
-    RDFWriterSelector[Sesame, Try, JsonLdExpanded] combineWith
-    RDFWriterSelector[Sesame, Try, JsonLdFlattened]
+    WriterSelector[Sesame#Graph, Try, RDFXML] combineWith
+    WriterSelector[Sesame#Graph, Try, Turtle] combineWith
+    WriterSelector[Sesame#Graph, Try, JsonLdCompacted] combineWith
+    WriterSelector[Sesame#Graph, Try, JsonLdExpanded] combineWith
+    WriterSelector[Sesame#Graph, Try, JsonLdFlattened]
 
 }

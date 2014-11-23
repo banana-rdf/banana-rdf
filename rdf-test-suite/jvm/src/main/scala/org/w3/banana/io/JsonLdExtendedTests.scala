@@ -6,11 +6,12 @@ import org.scalatest._
 import org.w3.banana._
 
 import scalaz._
-import scalaz.syntax._, comonad._
+import scalaz.syntax._
+import comonad._
 
 class JsonLdExtendedTest[Rdf <: RDF, M[+_] : Comonad](implicit
   ops: RDFOps[Rdf],
-  writerSelector: RDFWriterSelector[Rdf, M],
+  writerSelector: org.w3.banana.RDFWriterSelector[Rdf, M],
   turtleReader: RDFReader[Rdf, M, Turtle],
   turtleWriter: RDFWriter[Rdf, M, Turtle],
   jsonldReader: RDFReader[Rdf, M, JsonLd],

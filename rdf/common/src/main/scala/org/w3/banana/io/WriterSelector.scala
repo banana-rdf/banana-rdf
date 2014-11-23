@@ -1,13 +1,11 @@
 package org.w3.banana
 package io
 
-import scala.util.Try
+trait WriterSelector[O,M[_]] extends (MediaRange => Option[Writer[O, M, Any]]) { self =>
 
-trait WriterSelector[O] extends (MediaRange => Option[Writer[O, Try, Any]]) { self =>
-
-  def combineWith(otherSelector: WriterSelector[O]): WriterSelector[O] =
-    new WriterSelector[O] {
-      def apply(range: MediaRange): Option[Writer[O, Try, Any]] = {
+  def combineWith(otherSelector: WriterSelector[O,M]): WriterSelector[O,M] =
+    new WriterSelector[O,M] {
+      def apply(range: MediaRange): Option[Writer[O, M, Any]] = {
         self(range) orElse otherSelector(range)
       }
     }
@@ -16,9 +14,9 @@ trait WriterSelector[O] extends (MediaRange => Option[Writer[O, Try, Any]]) { se
 
 object WriterSelector {
 
-  def apply[O, T](implicit syntax:  Syntax[T], writer: Writer[O, Try, T]): WriterSelector[O] =
-    new WriterSelector[O] {
-      def apply(range: MediaRange): Option[Writer[O, Try, Any]] =
+  def apply[O, M[_], T](implicit syntax:  Syntax[T], writer: Writer[O, M, T]): WriterSelector[O,M] =
+    new WriterSelector[O,M] {
+      def apply(range: MediaRange): Option[Writer[O, M, Any]] =
         syntax.mimeTypes.list.find(m => range.matches(m)).map(_ => writer)
     }
 

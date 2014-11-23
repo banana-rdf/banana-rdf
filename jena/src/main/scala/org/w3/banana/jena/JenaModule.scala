@@ -60,7 +60,7 @@ with XmlQueryResultsReaderModule {
 
   implicit val n3Writer: RDFWriter[Jena, Try, N3] = JenaRDFWriter.n3Writer
 
-  implicit val writerSelector: RDFWriterSelector[Jena, Try] = JenaRDFWriter.selector
+  implicit val writerSelector: org.w3.banana.RDFWriterSelector[Jena, Try] = JenaRDFWriter.selector
 
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter.solutionsWriterJson
