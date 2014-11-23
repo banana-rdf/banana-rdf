@@ -10,6 +10,9 @@ trait RDF {
   type Literal <: Node
   type Lang
 
+  // mutable graphs
+  type MGraph <: AnyRef
+
   // types for the graph traversal API
   type NodeMatch
   type NodeAny <: NodeMatch
