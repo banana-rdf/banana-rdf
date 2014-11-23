@@ -9,7 +9,7 @@ import org.w3.banana._
 
 import scala.collection.JavaConverters._
 
-class SesameOps extends RDFOps[Sesame] with DefaultURIOps[Sesame] {
+class SesameOps extends RDFOps[Sesame] with SesameMGraphOps with DefaultURIOps[Sesame] {
 
   val valueFactory: ValueFactory = ValueFactoryImpl.getInstance()
 

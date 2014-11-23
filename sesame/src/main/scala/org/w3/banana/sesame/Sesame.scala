@@ -17,6 +17,9 @@ trait Sesame extends RDF {
   type Literal = SesameLiteral
   type Lang = String
 
+  // mutable graphs
+  type MGraph = Model
+
   // types for the graph traversal API
   type NodeMatch = Value
   type NodeAny = Null
