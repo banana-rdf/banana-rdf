@@ -13,7 +13,9 @@ package object banana
 
   type SparqlSolutionsWriter[Rdf <: RDF, +T] = io.Writer[Rdf#Solutions, Try, T]
 
-  type SparqlSolutionsWriterSelector[Rdf <: RDF] = io.WriterSelector[Rdf#Solutions]
+  type SparqlSolutionsWriterSelector[Rdf <: RDF] = io.WriterSelector[Rdf#Solutions, Try]
+
+  type RDFWriterSelector[Rdf <: RDF, M[+_]] = io.WriterSelector[Rdf#Graph,M]
 
   implicit class FutureW[T](f: Future[T]) {
     def getOrFail(duration: Duration = Duration("3s")): T = {
