@@ -15,6 +15,9 @@ trait Jena extends RDF {
   type Literal = Node_Literal
   type Lang = String
 
+  // mutable graphs
+  type MGraph = JenaGraph
+
   // types for the graph traversal API
   type NodeMatch = JenaNode
   type NodeAny = Node_ANY
