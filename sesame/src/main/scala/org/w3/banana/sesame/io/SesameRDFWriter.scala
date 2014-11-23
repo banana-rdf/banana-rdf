@@ -8,7 +8,7 @@ import org.w3.banana.sesame.{Sesame, SesameOps}
 
 import scala.util._
 
-class SesameRDFWriter[T](implicit
+class SesameRDFWriter[T: Syntax](implicit
   ops: SesameOps,
   sesameSyntax: SesameSyntax[T]
 ) extends RDFWriter[Sesame, Try, T] {

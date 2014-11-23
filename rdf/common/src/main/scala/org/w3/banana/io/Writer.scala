@@ -7,7 +7,9 @@ import java.io.OutputStream
  * @tparam O the type of object that this Writer can serialize
  * @tparam T the Syntax that this Writer supports
  */
-trait Writer[-O, M[_], +T] {
+abstract class Writer[-O, M[_], +T: Syntax] {
+
+   val transformsTo: Syntax[T] = Syntax[T]
 
   //todo: add a method that takes a writer
 
