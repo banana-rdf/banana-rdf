@@ -112,10 +112,10 @@ trait Grammar[Rdf <: RDF] {
         | VAR1
       )
 
-      // path ::= ('/'? step | constraint )? ( '/' step | constraint )*
+      // path ::= ( '/' step | constraint )*
       def path: Rule1[m.Path[Rdf]] = rule (
-        optional(optional('/') ~ WS0 ~ step | constraint) ~ zeroOrMore(WS0 ~ ('/' ~ WS0 ~ step | constraint)) ~> {
-          (optPathElem: Option[m.PathElement[Rdf]], pathElems: Seq[m.PathElement[Rdf]]) => m.Path(optPathElem.toSeq ++ pathElems)
+        zeroOrMore(WS0 ~ ('/' ~ WS0 ~ step | constraint)) ~> {
+          (pathElems: Seq[m.PathElement[Rdf]]) => m.Path(pathElems)
         }
       )
 

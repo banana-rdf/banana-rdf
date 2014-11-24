@@ -50,7 +50,7 @@ cut ::= ("Cut" | "C") VAR1 "."
 updateList ::= ("UpdateList" | "UL") varOrIRI predicate slice collection "."
 varOrIRI ::= iri | VAR1
 value ::= iri | literal | VAR1
-path ::= ('/'? step | constraint )? ( '/' step | constraint )*
+path ::= ( '/' step | constraint )*
 step ::= '^' iri | iri | INDEX
 constraint ::= '[' path ( '=' value )? ']' | '!'
 slice ::= INDEX? '..' INDEX?
