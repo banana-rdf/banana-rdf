@@ -59,7 +59,7 @@ trait Grammar[Rdf <: RDF] {
 
       // ldpatch ::= prologue statement*
       def ldpatch: Rule1[m.LDPatch[Rdf]] = rule {
-        WS0 ~ prologue ~> (prefixes => this.prefixes = prefixes) ~ WS1 ~ zeroOrMore(statement).separatedBy(WS1) ~ WS0 ~ EOI ~> {
+        WS0 ~ prologue ~> (prefixes => this.prefixes = prefixes) ~ WS0 ~ zeroOrMore(statement).separatedBy(WS1) ~ WS0 ~ EOI ~> {
           (statements: Seq[m.Statement[Rdf]]) => m.LDPatch(statements)
         }
       }

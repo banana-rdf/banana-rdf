@@ -98,7 +98,6 @@ _:b2 a schema:Event ;
 
   }
 
-
   def testUpdate(initialList: List[Int], update: String, expectedList: List[Int]) = {
 
     import org.w3.banana.diesel._
@@ -164,6 +163,114 @@ _:b2 a schema:Event ;
     testUpdate(List(1, 2, 3, 4), """UpdateList <http://example.com/#> ex:numbers 2..1 ( 42 2868 ) .""", List(1, 2, 42, 2868, 3, 4))
 
   }
+
+
+
+  /* rdf:List manipulation examples */
+
+  val listGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( "lorem" "ipsum" "dolor" "sit" "amet" ).
+""", "http://example.com/timbl").get
+
+
+  "rdf:List manipulation examples - replace one element" in {
+
+    val ldpatch = newFreshParser("""
+UpdateList <#> <http://example.org/vocab#preferredLanguages> 1..2 ( "fr" ) .
+""").ldpatch.run().success.value
+
+    val expectedGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( "lorem" "fr" "dolor" "sit" "amet" ).
+""", "http://example.com/timbl").get
+
+    val newGraph = s.semantics.LDPatch(ldpatch, listGraph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
+  "rdf:List manipulation examples - insert new elements" in {
+
+    val ldpatch = newFreshParser("""
+UpdateList <#> <http://example.org/vocab#preferredLanguages> 2..2 ( "en" "fr" ) .
+""").ldpatch.run().success.value
+
+    val expectedGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( "lorem" "ipsum" "en" "fr" "dolor" "sit" "amet" ).
+""", "http://example.com/timbl").get
+
+    val newGraph = s.semantics.LDPatch(ldpatch, listGraph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
+  "rdf:List manipulation examples - append elements" in {
+
+    val ldpatch = newFreshParser("""
+UpdateList <#> <http://example.org/vocab#preferredLanguages> .. ( "en" "fr" ) .
+""").ldpatch.run().success.value
+
+    val expectedGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( "lorem" "ipsum" "dolor" "sit" "amet" "en" "fr" ).
+""", "http://example.com/timbl").get
+
+    val newGraph = s.semantics.LDPatch(ldpatch, listGraph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
+  "rdf:List manipulation examples - replace all the elements" in {
+
+    val ldpatch = newFreshParser("""
+UpdateList <#> <http://example.org/vocab#preferredLanguages> 2.. ( "en" "fr" ) .
+""").ldpatch.run().success.value
+
+    val expectedGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( "lorem" "ipsum" "en" "fr" ).
+""", "http://example.com/timbl").get
+
+    val newGraph = s.semantics.LDPatch(ldpatch, listGraph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
+  "rdf:List manipulation examples - remove elements" in {
+
+    val ldpatch = newFreshParser("""
+UpdateList <#> <http://example.org/vocab#preferredLanguages> 1..3 ( ) .
+""").ldpatch.run().success.value
+
+    val expectedGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( "lorem" "sit" "amet" ).
+""", "http://example.com/timbl").get
+
+    val newGraph = s.semantics.LDPatch(ldpatch, listGraph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
+  "rdf:List manipulation examples - empty a collection" in {
+
+    val ldpatch = newFreshParser("""
+UpdateList <#> <http://example.org/vocab#preferredLanguages> 0.. ( ) .
+""").ldpatch.run().success.value
+
+    val expectedGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( ).
+""", "http://example.com/timbl").get
+
+    val newGraph = s.semantics.LDPatch(ldpatch, listGraph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
+
+
 
 
 
