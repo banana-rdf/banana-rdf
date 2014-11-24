@@ -7,12 +7,22 @@ trait MGraphOps[Rdf <: RDF] {
 
   def makeEmptyMGraph(): Rdf#MGraph
 
-  def addTriple(graph: Rdf#MGraph, triple: Rdf#Triple): graph.type
+  def addTriple(mgraph: Rdf#MGraph, triple: Rdf#Triple): mgraph.type
 
-  def removeTriple(graph: Rdf#MGraph, triple: Rdf#Triple): graph.type
+  def removeTriple(mgraph: Rdf#MGraph, triple: Rdf#Triple): mgraph.type
 
-  def sizeMGraph(graph: Rdf#MGraph): Int
+  def sizeMGraph(mgraph: Rdf#MGraph): Int
 
-  def makeIGraph(graph: Rdf#MGraph): Rdf#MGraph
+  def makeIGraph(mgraph: Rdf#MGraph): Rdf#Graph
+
+  final def addTriples(mgraph: Rdf#MGraph, triples: TraversableOnce[Rdf#Triple]): mgraph.type = {
+    triples.foreach(triple => addTriple(mgraph, triple))
+    mgraph
+  }
+
+  final def removeTriples(mgraph: Rdf#MGraph, triples: TraversableOnce[Rdf#Triple]): mgraph.type = {
+    triples.foreach(triple => removeTriple(mgraph, triple))
+    mgraph
+  }
 
 }

@@ -9,18 +9,18 @@ trait SesameMGraphOps extends MGraphOps[Sesame] {
 
   final def makeEmptyMGraph(): Sesame#MGraph = new LinkedHashModel
 
-  final def addTriple(graph: Sesame#MGraph, triple: Sesame#Triple): graph.type = {
-    graph.add(triple)
-    graph
+  final def addTriple(mgraph: Sesame#MGraph, triple: Sesame#Triple): mgraph.type = {
+    mgraph.add(triple)
+    mgraph
   }
 
-  final def removeTriple(graph: Sesame#MGraph, triple: Sesame#Triple): graph.type = {
-    graph.remove(triple)
-    graph
+  final def removeTriple(mgraph: Sesame#MGraph, triple: Sesame#Triple): mgraph.type = {
+    mgraph.remove(triple)
+    mgraph
   }
 
-  final def sizeMGraph(graph: Sesame#MGraph): Int = graph.size
+  final def sizeMGraph(mgraph: Sesame#MGraph): Int = mgraph.size
 
-  final def makeIGraph(graph: Sesame#MGraph): Sesame#MGraph = graph
+  final def makeIGraph(mgraph: Sesame#MGraph): Sesame#Graph = mgraph
 
 }

@@ -9,18 +9,18 @@ trait JenaMGraphOps extends MGraphOps[Jena] {
 
   final def makeEmptyMGraph(): Jena#MGraph = Factory.createDefaultGraph
 
-  final def addTriple(graph: Jena#MGraph, triple: Jena#Triple): graph.type = {
-    graph.add(triple)
-    graph
+  final def addTriple(mgraph: Jena#MGraph, triple: Jena#Triple): mgraph.type = {
+    mgraph.add(triple)
+    mgraph
   }
 
-  final def removeTriple(graph: Jena#MGraph, triple: Jena#Triple): graph.type = {
-    graph.delete(triple)
-    graph
+  final def removeTriple(mgraph: Jena#MGraph, triple: Jena#Triple): mgraph.type = {
+    mgraph.delete(triple)
+    mgraph
   }
 
-  final def sizeMGraph(graph: Jena#MGraph): Int = graph.size
+  final def sizeMGraph(mgraph: Jena#MGraph): Int = mgraph.size
 
-  final def makeIGraph(graph: Jena#MGraph): Jena#MGraph = graph
+  final def makeIGraph(mgraph: Jena#MGraph): Jena#Graph = mgraph
 
 }

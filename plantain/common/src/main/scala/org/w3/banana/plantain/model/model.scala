@@ -1,18 +1,21 @@
 package org.w3.banana.plantain.model
 
-case class Graph[U](spo: Map[Node, Map[URI[U], Vector[Node]]], size: Int) {
+object Graph {
 
-  def triples: Iterable[Triple[U]] =
+  def empty[S, P, O]: Graph[S, P, O] = Graph(Map.empty, 0)
+
+}
+
+case class Graph[S, P, O](spo: Map[S, Map[P, Vector[O]]], size: Int) {
+
+  def triples: Iterable[(S, P, O)] =
     for {
       (s, pos) <- spo
       (p, os) <- pos
       o <- os
-    } yield Triple(s, p, o)
+    } yield (s, p, o)
 
-  def +(triple: Triple[U]): Graph[U] =
-    this.+(triple.subject, triple.predicate, triple.objectt)
-
-  def +(subject: Node, predicate: URI[U], objectt: Node): Graph[U] = {
+  def +(subject: S, predicate: P, objectt: O): Graph[S, P, O] = {
     spo.get(subject) match {
       case None => Graph(spo + (subject -> Map(predicate -> Vector(objectt))), size + 1)
       case Some(pos) => pos.get(predicate) match {
@@ -33,100 +36,84 @@ case class Graph[U](spo: Map[Node, Map[URI[U], Vector[Node]]], size: Int) {
   }
 
   @throws[java.util.NoSuchElementException]("if a triple does not exist")
-  def removeExistingTriple(triple: Triple[U]): Graph[U] = {
-    import triple.{ objectt, predicate, subject }
+  def -(subject: S, predicate: P, objectt: O): Graph[S, P, O] = {
     val pos = spo(subject)
     val os = pos(predicate)
     if (os.size == 1) { // then it must contains only $objectt
       if (!os.contains(objectt)) throw new NoSuchElementException(s"$objectt not found")
       val newPos = pos - predicate
       if (newPos.isEmpty) // then it was actually the only spo!
-        Graph[U](spo - subject, size - 1)
+        Graph(spo - subject, size - 1)
       else
-        Graph[U](spo + (subject -> newPos), size - 1)
+        Graph(spo + (subject -> newPos), size - 1)
     } else {
-      val newos = os filterNot { _ == objectt }
+      val newos = os.filterNot { _ == objectt }
       if (newos.size == os.size) throw new NoSuchElementException(s"$objectt not found")
       val newPos = pos + (predicate -> newos)
-      Graph[U](spo + (subject -> newPos), size - 1)
+      Graph(spo + (subject -> newPos), size - 1)
     }
   }
 
-  def -(s: NodeMatch, p: NodeMatch, o: NodeMatch): Graph[U] = {
-    val matchedTriples: Iterable[Triple[U]] = find(s, p, o)
-    val newGraph = matchedTriples.foldLeft(this) { _.removeExistingTriple(_) }
-    newGraph
+  def -(s: Option[S], p: Option[P], o: Option[O]): Graph[S, P, O] = {
+    val matchedTriples: Iterable[(S, P, O)] = find(s, p, o)
+    matchedTriples.foldLeft(this) { case (graph, (s, p, o)) => graph - (s, p, o) }
   }
 
-  def union(other: Graph[U]): Graph[U] = {
+  def union(other: Graph[S, P, O]): Graph[S, P, O] = {
     val (firstGraph, secondGraph) =
-      if (this.size > other.size)
-        (this, other)
-      else
-        (other, this)
-    secondGraph.triples.foldLeft(firstGraph) { _ + _ }
+      if (this.size > other.size) (this, other)
+      else (other, this)
+    secondGraph.triples.foldLeft(firstGraph) { case (graph, (s, p, o)) => graph + (s, p, o) }
   }
 
-  def find(subject: NodeMatch, predicate: NodeMatch, objectt: NodeMatch): Iterable[Triple[U]] =
+  def find(subject: Option[S], predicate: Option[P], objectt: Option[O]): Iterable[(S, P, O)] =
     (subject, predicate, objectt) match {
-      case (ANY, ANY, ANY) => triples
-      case (PlainNode(s), PlainNode(p: URI[U]), PlainNode(o)) => {
+
+      case (None, None, None) => triples
+
+      case (Some(s), Some(p), Some(o)) =>
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
           if os contains o
-        } yield Iterable(Triple(s, p, o))
+        } yield Iterable((s, p, o))
         opt getOrElse Iterable.empty
-      }
-      case (PlainNode(s), ANY, ANY) =>
+
+      case (Some(s), None, None) =>
         for {
           (p, os) <- spo.get(s) getOrElse Iterable.empty
           o <- os
-        } yield Triple(s, p, o)
-      case (PlainNode(s), PlainNode(p: URI[U]), ANY) => {
+        } yield (s, p, o)
+
+      case (Some(s), Some(p), None) =>
         val opt = for {
           pos <- spo.get(s)
           os <- pos.get(p)
         } yield {
-          os map { Triple[U](s, p, _) }
+          os.map { (s, p, _) }
         }
         opt getOrElse Iterable.empty
-      }
-      case _ => {
+
+      case _ =>
         // logger.warn(s"""inefficient pattern: ($subject, $predicate, $objectt)""")
         for {
           (s, pos) <- subject match {
-            case ANY => spo
-            case PlainNode(node) => spo filterKeys { _ == node }
+            case None       => spo
+            case Some(node) => spo.filterKeys { _ == node }
           }
           (p, os) <- predicate match {
-            case ANY => pos
-            case PlainNode(node) => pos filterKeys { _ == node }
+            case None       => pos
+            case Some(node) => pos filterKeys { _ == node }
           }
           o <- objectt match {
-            case ANY => os
-            case PlainNode(node) => if (os contains node) os else Iterable.empty
+            case None => os
+            case Some(node) => if (os contains node) os else Iterable.empty
           }
-        } yield Triple(s, p, o)
-      }
+        } yield (s, p, o)
+
     }
 
   override def toString(): String = triples.mkString("(", " ", ")")
 
 }
 
-case class Triple[U](subject: Node, predicate: URI[U], objectt: Node)
-
-sealed trait Node
-
-case class URI[U](underlying: U) extends Node
-
-case class BNode(label: String) extends Node
-
-case class Literal[U](lexicalForm: String, datatype: URI[U], langOpt: Option[String]) extends Node
-
-sealed trait NodeMatch
-
-case class PlainNode(node: Node) extends NodeMatch
-
-case object ANY extends NodeMatch

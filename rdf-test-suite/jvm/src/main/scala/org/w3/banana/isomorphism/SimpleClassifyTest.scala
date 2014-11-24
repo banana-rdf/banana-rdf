@@ -54,7 +54,6 @@ class SimpleClassifyTest[Rdf <: RDF](mappingGenerator: (() => VerticeCBuilder[Rd
     "two bnodes with each same type of relation" in {
       val bnGr = bnAlexRel1Graph() union bnAntonioRel1Graph()
       val clz = bnodeClassify(bnGr)
-      println(s"clz=$clz")
       clz.size should be(1)
       clz.head._2.size should be(2) // 2 bnodes in this classification
 
