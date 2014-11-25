@@ -7,7 +7,7 @@ import scala.util._
 object JenaSolutionsWriter {
 
   /** Creates a Sparql writer for the given syntax */
-  def apply[T](implicit
+  def apply[T:  Syntax](implicit
     jenaSparqlSyntax: JenaAnswerOutput[T]
   ): SparqlSolutionsWriter[Jena, T] = new SparqlSolutionsWriter[Jena, T] {
 
