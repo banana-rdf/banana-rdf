@@ -25,8 +25,8 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
 
     object Uri {
       def unapply(node: Plantain#Node): Option[jURI] = node match {
-        case uri: Uri => Some(baseUri.relativize(new jURI(uri.toString)))
-        case _        => None
+        case uri: Plantain#URI => Some(baseUri.relativize(new jURI(uri.toString)))
+        case _                 => None
       }
     }
 
@@ -37,10 +37,10 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
         case literal @ model.Literal(_, _, _) => throw new IllegalArgumentException(s"$literal was in subject position")
       }
       val predicate: sesame.URI = p match {
-        case uri: Uri => new MyUri(uri.toString())
+        case uri: Plantain#URI => new MyUri(uri.toString())
       }
       val objectt: sesame.Value = o match {
-        case uri: Uri                              => new MyUri(uri.toString)
+        case uri: Plantain#URI                     => new MyUri(uri.toString)
         case model.BNode(label)                    => new BNodeImpl(label)
         case model.Literal(lexicalForm, uri, null) => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
         case model.Literal(lexicalForm, _, lang)   => new LiteralImpl(lexicalForm, lang)

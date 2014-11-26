@@ -33,7 +33,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
     funBNode: Plantain#BNode => T,
     funLiteral: Plantain#Literal => T
   ): T = node match {
-    case uri: Uri               => funURI(uri)
+    case uri: Plantain#URI      => funURI(uri)
     case bnode: model.BNode     => funBNode(bnode)
     case literal: model.Literal => funLiteral(literal)
   }
@@ -92,9 +92,9 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
     predicate: Plantain#NodeMatch,
     objectt: Plantain#NodeMatch
   ): Iterator[Plantain#Triple] = predicate match {
-    case p: Uri => graph.find(Option(subject), Some(p), Option(objectt)).iterator
-    case null   => graph.find(Option(subject), None, Option(objectt)).iterator
-    case p      => sys.error(s"[find] invalid value in predicate position: $p")
+    case p: Plantain#URI => graph.find(Option(subject), Some(p), Option(objectt)).iterator
+    case null            => graph.find(Option(subject), None, Option(objectt)).iterator
+    case p               => sys.error(s"[find] invalid value in predicate position: $p")
   }
 
   // graph union
@@ -113,9 +113,12 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
 
   // graph isomorphism
 
+  final val iso = new GraphIsomorphism[Plantain](
+    new SimpleMappingGenerator[Plantain](VerticeCBuilder.simpleHash(this))(this)
+  )(this)
+
   final def isomorphism(left: Plantain#Graph, right: Plantain#Graph): Boolean = {
-    import Util.toSesameGraph
-    org.openrdf.model.util.ModelUtil.equals(toSesameGraph(left), toSesameGraph(right))
+    iso.findAnswer(left, right).isSuccess
   }
 
 }

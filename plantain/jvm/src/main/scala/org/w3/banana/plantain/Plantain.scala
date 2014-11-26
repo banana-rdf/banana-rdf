@@ -25,11 +25,5 @@ trait Plantain extends RDF {
 
 }
 
-package model {
-  final class MGraph[S, P, O](var graph: Graph[S, P, O])
-  final case class BNode(label: String)
-  final case class Literal(lexicalForm: String, datatype: Uri, langOpt: /*Optional*/String)
-}
-
 object Plantain extends PlantainModule
 
