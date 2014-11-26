@@ -4,6 +4,7 @@ import org.w3.banana._
 import akka.http.model.Uri
 import java.util.UUID
 import org.w3.banana.isomorphism._
+import java.math.BigInteger
 
 object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with PlantainURIOps {
 
@@ -55,25 +56,29 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
   // literal
 
   final val rdfLangString = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
-  final val xsdInt = makeUri("http://www.w3.org/2001/XMLSchema#int")
+  final val xsdInteger = makeUri("http://www.w3.org/2001/XMLSchema#integer")
   final val xsdString = makeUri("http://www.w3.org/2001/XMLSchema#string")
   final val xsdBoolean = makeUri("http://www.w3.org/2001/XMLSchema#boolean")
+  final val xsdDouble = makeUri("http://www.w3.org/2001/XMLSchema#double")
 
   final def makeLiteral(lexicalForm: String, datatype: Plantain#URI): Plantain#Literal = datatype match {
-    case `xsdInt`     => lexicalForm.toInt
-    case `xsdString`  => lexicalForm
-    case `xsdBoolean` => lexicalForm.toBoolean
-    case _            => model.Literal(lexicalForm, datatype, null)
+    case `xsdInteger`   => new BigInteger(lexicalForm)
+    case `xsdString`    => lexicalForm
+    case `xsdBoolean`   => lexicalForm.toBoolean
+    case `xsdDouble`    => lexicalForm.toDouble
+    case _              => model.Literal(lexicalForm, datatype, null)
   }
 
   final def makeLangTaggedLiteral(lexicalForm: String, lang: Plantain#Lang): Plantain#Literal =
     model.Literal(lexicalForm, rdfLangString, lang)
 
   final def fromLiteral(literal: Plantain#Literal): (String, Plantain#URI, Option[Plantain#Lang]) = literal match {
-    case i: Int     => (i.toString, xsdInt, None)
-    case s: String  => (s, xsdString, None)
-    case b: Boolean => (b.toString, xsdBoolean, None)
-    case model.Literal(lexicalForm, datatype, langOpt) => (lexicalForm, datatype, Option(langOpt))
+    case i: BigInteger => (i.toString, xsdInteger, None)
+    case s: String     => (s, xsdString, None)
+    case b: Boolean    => (b.toString, xsdBoolean, None)
+    case d: Double     => (d.toString, xsdDouble, None)
+    case model.Literal(lexicalForm, datatype, langOpt) =>
+      (lexicalForm, datatype, Option(langOpt))
   }
 
   // lang
