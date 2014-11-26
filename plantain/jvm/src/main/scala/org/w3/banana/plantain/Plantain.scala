@@ -13,8 +13,7 @@ trait Plantain extends RDF {
   type Node = Any
   type URI = Uri
   type BNode = model.BNode
-  // TODO it's a lot of work, but we should be able to use Any here
-  type Literal = model.Literal
+  type Literal = Any
   type Lang = String
 
   type MGraph = model.MGraph[Node, URI, Node]

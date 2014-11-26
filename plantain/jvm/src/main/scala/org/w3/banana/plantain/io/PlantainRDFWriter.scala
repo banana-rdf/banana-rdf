@@ -32,18 +32,20 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
 
     def statement(s: Plantain#Node, p: Plantain#URI, o: Plantain#Node): sesame.Statement = {
       val subject: sesame.Resource = s match {
-        case Uri(uri)                         => new MyUri(uri.toString)
-        case model.BNode(label)               => new BNodeImpl(label)
-        case literal @ model.Literal(_, _, _) => throw new IllegalArgumentException(s"$literal was in subject position")
+        case Uri(uri)           => new MyUri(uri.toString)
+        case model.BNode(label) => new BNodeImpl(label)
+        case literal            => throw new IllegalArgumentException(s"$literal was in subject position")
       }
       val predicate: sesame.URI = p match {
         case uri: Plantain#URI => new MyUri(uri.toString())
       }
       val objectt: sesame.Value = o match {
-        case uri: Plantain#URI                     => new MyUri(uri.toString)
-        case model.BNode(label)                    => new BNodeImpl(label)
-        case model.Literal(lexicalForm, uri, null) => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
-        case model.Literal(lexicalForm, _, lang)   => new LiteralImpl(lexicalForm, lang)
+        case uri: Plantain#URI   => new MyUri(uri.toString)
+        case model.BNode(label)  => new BNodeImpl(label)
+        case literal             => PlantainOps.fromLiteral(literal) match {
+          case (lexicalForm, uri, None)     => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
+          case (lexicalForm, _, Some(lang)) => new LiteralImpl(lexicalForm, lang)
+        }
       }
       new StatementImpl(subject, predicate, objectt)
     }
