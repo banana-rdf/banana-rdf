@@ -57,19 +57,22 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
   final val rdfLangString = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
   final val xsdInt = makeUri("http://www.w3.org/2001/XMLSchema#int")
   final val xsdString = makeUri("http://www.w3.org/2001/XMLSchema#string")
+  final val xsdBoolean = makeUri("http://www.w3.org/2001/XMLSchema#boolean")
 
   final def makeLiteral(lexicalForm: String, datatype: Plantain#URI): Plantain#Literal = datatype match {
-    case `xsdInt` => lexicalForm.toInt
-    case `xsdString` => lexicalForm
-    case _ => model.Literal(lexicalForm, datatype, null)
+    case `xsdInt`     => lexicalForm.toInt
+    case `xsdString`  => lexicalForm
+    case `xsdBoolean` => lexicalForm.toBoolean
+    case _            => model.Literal(lexicalForm, datatype, null)
   }
 
   final def makeLangTaggedLiteral(lexicalForm: String, lang: Plantain#Lang): Plantain#Literal =
     model.Literal(lexicalForm, rdfLangString, lang)
 
   final def fromLiteral(literal: Plantain#Literal): (String, Plantain#URI, Option[Plantain#Lang]) = literal match {
-    case i: Int => (i.toString, xsdInt, None)
-    case s: String => (s, xsdString, None)
+    case i: Int     => (i.toString, xsdInt, None)
+    case s: String  => (s, xsdString, None)
+    case b: Boolean => (b.toString, xsdBoolean, None)
     case model.Literal(lexicalForm, datatype, langOpt) => (lexicalForm, datatype, Option(langOpt))
   }
 
