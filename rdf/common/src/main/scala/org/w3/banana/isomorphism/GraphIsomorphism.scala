@@ -108,7 +108,7 @@ class GraphIsomorphism[Rdf <: RDF](val mappingGen: MappingGenerator[Rdf], maxCom
       val verifyAnswers = possibleAnswers.map { answer =>
         answer -> mapVerify(g1, g2, answer)
       }
-      val answerOpt = verifyAnswers.find {
+      val answerOpt = verifyAnswers.toList.find {
         case (s, err) =>
           //          println(s"===>$err = for answer ${s.toList}")
           err == Nil

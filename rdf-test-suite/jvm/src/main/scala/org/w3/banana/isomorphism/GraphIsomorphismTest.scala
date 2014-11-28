@@ -96,7 +96,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
         //with this system of categorisation the categories are very light
         // and they don't distinguish the literals
         //also the returned set covers symmetric results - this can also be optimised!
-        l.size should be(4)
+        l.toList.size should be(4)
       }
 
       val answer = findAnswer(
@@ -289,7 +289,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
 
     "for a map with 1 node mapped to one node" in {
       complexity(Success(lm)) should be(1)
-      branches(treeLevels(lm)).size should be(1)
+      branches(treeLevels(lm)).toList.size should be(1)
     }
 
     val lmX = lm ++ ListMap(2 -> Set(1))
@@ -297,7 +297,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
     "complexity calculation for bad maps" in {
       complexity(Failure(new Error("xxx"))) should be(0)
       complexity(Success(lmX)) should be(1) // the bad maps still count as a solution to look at
-      branches(treeLevels(lmX)).size should be(1)
+      branches(treeLevels(lmX)).toList.size should be(1)
     }
 
     "complexity calc for 3 bnodes size" in {

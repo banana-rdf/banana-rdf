@@ -281,8 +281,15 @@ object BananaRdfBuild extends Build {
       aggregate in Test := false,
       publishMavenStyle := true
     )
-  ).dependsOn(rdfTestSuite_jvm, rdfTestSuite_common_jvm, rdfTestSuite_js, rdfTestSuite_common_js)
-    .aggregate(rdfTestSuite_jvm, rdfTestSuite_js)
+  ).dependsOn(
+    rdfTestSuite_jvm,
+    rdfTestSuite_common_jvm,
+    rdfTestSuite_js,
+    rdfTestSuite_common_js
+  ).aggregate(
+    rdfTestSuite_jvm,
+    rdfTestSuite_js
+  )
 
   lazy val rdfTestSuite_jvm = Project(
     id = "rdf-test-suite_jvm",
@@ -291,7 +298,10 @@ object BananaRdfBuild extends Build {
       resourceDirectory in Test := baseDirectory.value / "src/main/resources",
       aggregate in Test := false
     )
-  ).dependsOn(rdf_jvm, rdfTestSuite_common_jvm).aggregate(rdfTestSuite_common_jvm)
+  ).dependsOn(
+    rdf_jvm,
+    rdfTestSuite_common_jvm
+  ).aggregate(rdfTestSuite_common_jvm)
 
   lazy val rdfTestSuite_js = Project(
     id = "rdf-test-suite_js",
@@ -310,6 +320,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       resolvers += sonatypeRepo,
       libraryDependencies += scalatest,
+      libraryDependencies += scalacheck,
       libraryDependencies += jasmine_jvm,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
@@ -317,7 +328,10 @@ object BananaRdfBuild extends Build {
       libraryDependencies += servlet,
       libraryDependencies += httpComponents
     )
-  ).dependsOn(rdf_jvm,ntriples_jvm)
+  ).dependsOn(
+    rdf_jvm,
+    ntriples_jvm
+  )
 
   lazy val rdfTestSuite_common_js = Project(
     id = "rdf-test-suite_common_js",
@@ -325,7 +339,8 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common_jvm) ++ Seq(
       resolvers += sonatypeRepo,
       libraryDependencies += scalajsJasmine
-    ) ++ jasmine_js
+//      ScalaJSKeys.scalaJSTestFramework := "org.scalacheck.ScalaCheckFramework"
+    ) ++ jasmine_js ++ scalacheckJs
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js)
 
   /** `jena`, an RDF implementation for Apache Jena. */

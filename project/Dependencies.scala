@@ -11,14 +11,14 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.0"
 
   /**
    * scalaz for scalajs
    * @see http://scalaz.org
    * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
    */
-  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.0.6")
+  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0")
 
   /**
    * joda-Time
@@ -40,6 +40,11 @@ object Dependencies {
    * @see http://repo1.maven.org/maven2/org/scalatest
    */
   val scalatest = "org.scalatest" %% "scalatest" % "2.2.0"
+
+  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.0"
+
+  val scalacheckJs = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.1-SNAPSHOT")
+
 
   /**
    * Akka Http Core

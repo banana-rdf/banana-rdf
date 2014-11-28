@@ -204,7 +204,7 @@ abstract class IsomorphismTests[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[R
         //with this system of categorisation the categories are very light
         // and they don't distinguish the literals
         //also the returned set covers symmetric results - this can also be optimised!
-        expect(l.size).toEqual(4)
+        expect(l.toList.size).toEqual(4)
       }
 
       val answer = findAnswer(
