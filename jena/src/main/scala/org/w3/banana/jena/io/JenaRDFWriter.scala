@@ -17,7 +17,7 @@ object JenaRDFWriter {
 
   private [JenaRDFWriter] val writerFactory = new RDFWriterFImpl()
 
-  private [JenaRDFWriter] def makeRDFWriter[S](lang: JenaLang)(implicit _syntax:  Syntax[S]): RDFWriter[Jena, Try, S] = new RDFWriter[Jena, Try, S] {
+  private [JenaRDFWriter] def makeRDFWriter[S](lang: JenaLang): RDFWriter[Jena, Try, S] = new RDFWriter[Jena, Try, S] {
 
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
       val model = ModelFactory.createModelForGraph(graph)
@@ -70,8 +70,5 @@ object JenaRDFWriter {
   }
 
   implicit val n3Writer: RDFWriter[Jena, Try, N3] = makeRDFWriter[N3](RDFLanguages.N3)
-
-  val selector: RDFWriterSelector[Jena, Try] =
-    RDFWriterSelector[Jena, Try, RDFXML] combineWith RDFWriterSelector[Jena, Try, Turtle]
 
 }

@@ -7,7 +7,7 @@ abstract class RdfXMLTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, RDFXML],
   writer: RDFWriter[Rdf, M, RDFXML]
-) extends SerialisationTestSuite[Rdf, M, RDFXML, RDFXML] {
+) extends SerialisationTestSuite[Rdf, M, RDFXML, RDFXML]("RDF/XML", "rdf") {
 
   val referenceGraphSerialisedForSyntax = """
   <rdf:RDF xmlns="http://purl.org/dc/elements/1.1/"

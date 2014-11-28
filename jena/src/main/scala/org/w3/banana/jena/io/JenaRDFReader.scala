@@ -68,7 +68,4 @@ object JenaRDFReader {
 
   implicit def n3Reader()(implicit ops: JenaOps): RDFReader[Jena, Try, N3] = makeRDFReader[N3](ops, Lang.N3)
 
-  implicit val selector: ReaderSelector[Jena, Try] =
-    ReaderSelector[Jena, Try, RDFXML] combineWith ReaderSelector[Jena, Try, Turtle]
-
 }

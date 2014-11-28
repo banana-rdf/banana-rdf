@@ -10,9 +10,10 @@ import scala.util.{Failure, Success, Try}
 /**
  *
  */
-class NTriplesTestSuite[Rdf <: RDF]()(
-  implicit ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, Try, NTriples]) extends WordSpec with Matchers {
+class NTriplesTestSuite[Rdf <: RDF](implicit
+  ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Try, NTriples]
+) extends WordSpec with Matchers {
 
   import ops._
   import NTriplesParser.toGraph

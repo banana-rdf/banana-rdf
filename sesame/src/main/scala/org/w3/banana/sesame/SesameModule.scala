@@ -2,31 +2,28 @@ package org.w3.banana.sesame
 
 import org.openrdf.repository.RepositoryConnection
 import org.w3.banana._
-import org.w3.banana.io.SparqlQueryResultsReader
+import org.w3.banana.io.{SparqlQueryResultsReader, _}
 import org.w3.banana.sesame.io._
-import org.w3.banana.io._
+
 import scala.util.Try
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SesameModule
-    extends RDFModule
-    with RDFOpsModule
-    with RecordBinderModule
-    with SparqlGraphModule
-    // with SparqlHttpModule
-    with RDFXMLReaderModule
-    with TurtleReaderModule
-    with NTriplesReaderModule
-    with JsonLDReaderModule
-    with ReaderSelectorModule
-    with RDFXMLWriterModule
-    with TurtleWriterModule
-    with JsonLDWriterModule
-    with WriterSelectorModule
-    with JsonSolutionsWriterModule
-    with XmlSolutionsWriterModule
-    with JsonQueryResultsReaderModule
-    with XmlQueryResultsReaderModule {
+extends RDFModule
+with RDFOpsModule
+with RecordBinderModule
+with SparqlGraphModule
+// with SparqlHttpModule
+with RDFXMLReaderModule
+with TurtleReaderModule
+with NTriplesReaderModule
+with JsonLDReaderModule
+with RDFXMLWriterModule
+with TurtleWriterModule
+with JsonLDWriterModule
+with JsonSolutionsWriterModule
+with XmlSolutionsWriterModule
+with JsonQueryResultsReaderModule
+with XmlQueryResultsReaderModule {
 
   type Rdf = Sesame
 
@@ -65,13 +62,6 @@ trait SesameModule
 
   implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] =
     SesameSolutionsWriter.solutionsWriterXml
-
-  implicit val readerSelector: ReaderSelector[Sesame, Try] =
-    ReaderSelector[Sesame, Try, Turtle] combineWith
-    ReaderSelector[Sesame, Try, RDFXML] combineWith
-    ReaderSelector[Sesame, Try, JsonLd]
-
-  implicit val writerSelector: RDFWriterSelector[Sesame, Try] = sesameRDFWriterHelper.selector
 
   implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Sesame, SparqlAnswerJson] =
     SesameQueryResultsReader.queryResultsReaderJson

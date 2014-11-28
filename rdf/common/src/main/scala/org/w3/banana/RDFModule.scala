@@ -1,7 +1,6 @@
 package org.w3.banana
 
-import org.w3.banana.io.SparqlQueryResultsReader
-import io._
+import org.w3.banana.io._
 import scala.concurrent.Future
 import scala.util.Try
 
@@ -79,12 +78,6 @@ trait JsonLDWriterModule extends RDFModule {
   implicit val jsonldFlattenedWriter: RDFWriter[Rdf, Try, JsonLdFlattened]
 }
 
-trait ReaderSelectorModule extends RDFModule {
-
-  implicit val readerSelector: ReaderSelector[Rdf, Try]
-
-}
-
 trait RDFXMLWriterModule extends RDFModule {
 
   implicit val rdfXMLWriter: RDFWriter[Rdf, Try, RDFXML]
@@ -97,12 +90,6 @@ trait TurtleWriterModule extends RDFModule {
 
 }
 
-trait WriterSelectorModule extends RDFModule {
-
-  implicit val writerSelector: RDFWriterSelector[Rdf, Try]
-
-}
-
 trait JsonSolutionsWriterModule extends RDFModule {
 
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Rdf, SparqlAnswerJson]
@@ -112,12 +99,6 @@ trait JsonSolutionsWriterModule extends RDFModule {
 trait XmlSolutionsWriterModule extends RDFModule {
 
   implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Rdf, SparqlAnswerXml]
-
-}
-
-trait SparqlSolutionsWriterSelectorModule extends RDFModule {
-
-  implicit val sparqlSolutionsWriterSelector: SparqlSolutionsWriterSelector[Rdf]
 
 }
 
