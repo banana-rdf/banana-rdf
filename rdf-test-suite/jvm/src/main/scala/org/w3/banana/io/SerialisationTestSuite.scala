@@ -11,12 +11,13 @@ import scalaz.syntax._, monad._, comonad._
  * Test Serialisations. Some serialisations have one parser and multiple serialisers, such
  * as with json-ld, hence the distinction Sin and Sout
  */
-abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, Sout](implicit
+abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, Sout](
+  syntax: String,
+  extension: String
+)(implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, Sin],
-  readerSyn: Syntax[Sin],
-  writer: RDFWriter[Rdf, M, Sout],
-  writerSyn: Syntax[Sout]
+  writer: RDFWriter[Rdf, M, Sout]
 ) extends WordSpec with Matchers {
 
   // both Monad and Comonad are Functors, so they compete for the
@@ -57,20 +58,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
   val fooPrefix = Prefix("foo", foo)
   val fooGraph = graphBuilder(fooPrefix)
 
-  s"read ${readerSyn.defaultMimeType} version of timbl's card" in {
-    WellKnownMimeExtensions.extension(readerSyn.mimeTypes.head).map { ext =>
-      val file = new File(s"rdf-test-suite/jvm/src/main/resources/card.$ext")
-      val fis = new FileInputStream(file)
-      try {
-        val graph = reader.read(fis, file.toURI.toString).copoint
-        graph.size should equal(77)
-      } finally {
-        fis.close()
-      }
-    }
-  }
-
-  s"simple ${readerSyn.defaultMimeType} string containing only absolute URIs" should {
+  s"simple $syntax string containing only absolute URIs" should {
 
     "parse using Readers (the base has no effect since all URIs are absolute)" in {
       val graph = reader.read(new StringReader(referenceGraphSerialisedForSyntax), rdfCore).copoint
@@ -86,7 +74,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
 
   }
 
-  s"write ref graph as ${writerSyn.defaultMimeType} string, read it & compare" in {
+  s"write ref graph as $syntax string, read it & compare" in {
     val soutString =
       writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").copoint
     soutString should not be ('empty)

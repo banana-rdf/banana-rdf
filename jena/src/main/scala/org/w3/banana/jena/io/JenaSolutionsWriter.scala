@@ -28,8 +28,4 @@ object JenaSolutionsWriter {
   implicit val solutionsWriterXml: SparqlSolutionsWriter[Jena, SparqlAnswerXml] =
     JenaSolutionsWriter[SparqlAnswerXml]
 
-  implicit val solutionsWriterSelector: SparqlSolutionsWriterSelector[Jena] =
-    SparqlSolutionWriterSelector[Jena, SparqlAnswerXml] combineWith
-      SparqlSolutionWriterSelector[Jena, SparqlAnswerXml]
-
 }

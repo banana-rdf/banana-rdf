@@ -1,21 +1,14 @@
 package org.w3
 
-import org.w3.banana.io.BananaSparqlSolutionWriterSelector
-
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util._
 
-package object banana
-    extends BananaSparqlSolutionWriterSelector {
+package object banana {
 
   type TripleMatch[Rdf <: RDF] = (Rdf#NodeMatch, Rdf#NodeMatch, Rdf#NodeMatch)
 
   type SparqlSolutionsWriter[Rdf <: RDF, +T] = io.Writer[Rdf#Solutions, Try, T]
-
-  type SparqlSolutionsWriterSelector[Rdf <: RDF] = io.WriterSelector[Rdf#Solutions, Try]
-
-  type RDFWriterSelector[Rdf <: RDF, M[+_]] = io.WriterSelector[Rdf#Graph,M]
 
   implicit class FutureW[T](f: Future[T]) {
     def getOrFail(duration: Duration = Duration("3s")): T = {

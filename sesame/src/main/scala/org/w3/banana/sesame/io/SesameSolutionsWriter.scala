@@ -1,46 +1,51 @@
 package org.w3.banana.sesame.io
 
 import java.io._
-
 import org.w3.banana._
 import org.w3.banana.sesame.Sesame
 import org.w3.banana.io._
-
 import scala.util._
+import org.openrdf.query.resultio.TupleQueryResultWriter
 
-/**
- * Creates a blocking Sparql writer for the given syntax
- */
+private abstract class SesameSolutionsWriter[S] extends SparqlSolutionsWriter[Sesame, S] {
+
+  def writer(outputStream: OutputStream): TupleQueryResultWriter
+
+  def write(answers: Sesame#Solutions, os: OutputStream, base: String) = Try {
+    val sWriter = writer(os)
+    // sWriter.startQueryResult(answers.getBindingNames)
+    sWriter.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
+    answers.foreach { answer => sWriter.handleSolution(answer) }
+    sWriter.endQueryResult()
+  }
+
+  def asString(answers: Sesame#Solutions, base: String) = Try {
+    // TODO this goes through the lossy outputstream in order to then
+    // recode a string, even though it does not really know what the
+    // required encoding is
+    val out = new ByteArrayOutputStream()
+    write(answers, out, base)
+    new String(out.toByteArray, "UTF-8")
+  }
+
+}
+
 object SesameSolutionsWriter {
 
-  def apply[T](implicit sesameSparqlSyntax: SesameAnswerOutput[T], _syntax:  Syntax[T]) =
-    new SparqlSolutionsWriter[Sesame, T] {
+  val solutionsWriterJson: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] = new SesameSolutionsWriter[SparqlAnswerJson] {
 
-      val syntax = _syntax
+    import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 
-      def write(answers: Sesame#Solutions, os: OutputStream, base: String) = Try {
-        val sWriter = sesameSparqlSyntax.writer(os)
-        // sWriter.startQueryResult(answers.getBindingNames)
-        sWriter.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
-        answers foreach { answer => sWriter.handleSolution(answer) }
-        sWriter.endQueryResult()
-      }
+    def writer(outputStream: OutputStream): TupleQueryResultWriter = new SPARQLResultsJSONWriter(outputStream)
 
-      override def asString(answers: Sesame#Solutions, base: String) = Try {
-        //todo: this is very ugly, as it goes through the lossy outputstream in order to then recode
-        //todo: a string, even though it does not really know what the required encoding is
-        val out = new ByteArrayOutputStream()
-        write(answers, out, base)
-        new String(out.toByteArray, "UTF-8")
-      }
-    }
+  }
 
-  implicit val solutionsWriterJson = SesameSolutionsWriter[SparqlAnswerJson]
+  val solutionsWriterXml: SparqlSolutionsWriter[Sesame, SparqlAnswerXml] = new SesameSolutionsWriter[SparqlAnswerXml] {
 
-  implicit val solutionsWriterXml = SesameSolutionsWriter[SparqlAnswerXml]
+    import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
 
-  implicit val writerSelector: SparqlSolutionsWriterSelector[Sesame] =
-    SparqlSolutionWriterSelector[Sesame, SparqlAnswerXml] combineWith
-      SparqlSolutionWriterSelector[Sesame, SparqlAnswerXml]
+    def writer(outputStream: OutputStream): TupleQueryResultWriter = new SPARQLResultsXMLWriter(outputStream)
+
+  }
 
 }
