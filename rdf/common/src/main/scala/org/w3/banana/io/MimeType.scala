@@ -37,9 +37,12 @@ object MimeType {
 case class MimeType(mainType: String, subType: String, params: Map[String, String] = Map()) {
 
   lazy val mime: String = {
-    val paramString =
-      params.map { case (k, v) => s"""$k="$v"""" }.mkString("", ";", "")
-    s"${mainType}/${subType};${paramString}"
+    val paramString = {
+      val ps = params.map { case (k, v) => s"""$k="$v""""}.mkString("", ";", "")
+      if (ps.isEmpty) ""
+      else ";"+ps
+    }
+    s"${mainType}/${subType}${paramString}"
   }
 
 }

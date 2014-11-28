@@ -62,7 +62,7 @@ object SesameSyntax {
 
   implicit val jsonLdFlattened: SesameSyntax[JsonLdFlattened] = jsonldSyntax(JSONLDMode.FLATTEN)
 
-  private def jsonldSyntax[T](mode: JSONLDMode) = new SesameSyntax[T] {
+  def jsonldSyntax[T](mode: JSONLDMode) = new SesameSyntax[T] {
     import org.w3.banana.sesame.Sesame.ops._
 
     def rdfWriter(os: OutputStream, base: String) = {
