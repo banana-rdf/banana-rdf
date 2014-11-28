@@ -5,43 +5,41 @@ import java.io.{ InputStream, Reader }
 import org.w3.banana._
 import org.w3.banana.io.SparqlQueryResultsReader
 import org.w3.banana.jena.Jena
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 import org.w3.banana.io._
-
+import com.hp.hpl.jena.sparql.resultset.{ JSONInput, SPARQLResult, XMLInput }
 import scala.util._
 
-/**
- * Creates a blocking Sparql BlockingReader for the given syntax
- */
+abstract private class JenaQueryResultsReader[S] extends SparqlQueryResultsReader[Jena, S] {
+
+  def parse(in: InputStream): SPARQLResult
+
+  def read(in: InputStream, base: String = ""): Try[Either[Jena#Solutions, Boolean]] = Try {
+    val resultSet = parse(in)
+    if (resultSet.isBoolean) {
+      Right(resultSet.getBooleanResult)
+    } else if (resultSet.isResultSet) {
+      Left(resultSet.getResultSet)
+    } else {
+      throw new WrongExpectation("was expecting either a boolean or result set answer. received a model? " + resultSet.isModel)
+    }
+  }
+
+  def read(reader: Reader, base: String) = ???
+
+}
+
 object JenaQueryResultsReader {
 
   type Answer = Either[Jena#Solutions, Boolean]
 
-  def apply[S](implicit jenaSparqlSyntax: JenaAnswerInput[S]): SparqlQueryResultsReader[Jena, S] =
-    new SparqlQueryResultsReader[Jena, S] {
-
-      def read(in: InputStream, base: String = ""): Try[Answer] =
-        Try {
-          val resultSet = jenaSparqlSyntax.parse(in)
-          if (resultSet.isBoolean) {
-            Right(resultSet.getBooleanResult)
-          } else if (resultSet.isResultSet) {
-            Left(resultSet.getResultSet)
-          } else {
-            throw new WrongExpectation("was expecting either a boolean or result set answer. received a model? " + resultSet.isModel)
-          }
-        }
-
-      def read(reader: Reader, base: String) = throw new NotImplementedException
+  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
+    new JenaQueryResultsReader[SparqlAnswerJson] {
+      def parse(in: InputStream) = JSONInput.make(in)
     }
 
-  implicit val queryResultsReaderJson: SparqlQueryResultsReader[Jena, SparqlAnswerJson] =
-    JenaQueryResultsReader[SparqlAnswerJson]
-
   implicit val queryResultsReaderXml: SparqlQueryResultsReader[Jena, SparqlAnswerXml] =
-    JenaQueryResultsReader[SparqlAnswerXml]
-
-  //implicit val queryResultsReaderSelector: ReaderSelector[Jena, Any] =
-  //   ReaderSelector[Jena, SparqlAnswerJson] combineWith ReaderSelector[Jena, SparqlAnswerXml]
+    new JenaQueryResultsReader[SparqlAnswerXml] {
+      def parse(in: InputStream) = XMLInput.make(in)
+    }
 
 }

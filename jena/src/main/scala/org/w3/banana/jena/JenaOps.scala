@@ -7,7 +7,7 @@ import org.w3.banana._
 
 import scala.collection.JavaConverters._
 
-class JenaOps extends RDFOps[Jena] with DefaultURIOps[Jena] {
+class JenaOps extends RDFOps[Jena] with JenaMGraphOps with DefaultURIOps[Jena] {
 
   // graph
 

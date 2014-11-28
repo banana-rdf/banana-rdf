@@ -14,10 +14,11 @@ object RDFOps {
  *   - we allow literals in subject position
  */
 trait RDFOps[Rdf <: RDF]
-    extends URIOps[Rdf]
-    with RDFDSL[Rdf]
-    with CommonPrefixes[Rdf]
-    with syntax.RDFSyntax[Rdf] {
+extends MGraphOps[Rdf]
+with URIOps[Rdf]
+with RDFDSL[Rdf]
+with CommonPrefixes[Rdf]
+with syntax.RDFSyntax[Rdf] {
 
   // graph
 
@@ -26,6 +27,8 @@ trait RDFOps[Rdf <: RDF]
   def makeGraph(it: Iterable[Rdf#Triple]): Rdf#Graph
 
   def getTriples(graph: Rdf#Graph): Iterable[Rdf#Triple]
+
+  def graphSize(g: Rdf#Graph): Int
 
   // triple
 
@@ -36,8 +39,6 @@ trait RDFOps[Rdf <: RDF]
   // node
 
   def foldNode[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
-
-  def isURI[T](node: Rdf#Node) = foldNode[Boolean](node)(uri => true, bn => false, lit => false)
 
   // URI
 
@@ -84,12 +85,5 @@ trait RDFOps[Rdf <: RDF]
 
   // graph isomorphism
   def isomorphism(left: Rdf#Graph, right: Rdf#Graph): Boolean
-
-  // graph size
-  def graphSize(g: Rdf#Graph): Int
-
-  //  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): syntax.SparqlSolutionSyntax[Rdf] = new syntax.SparqlSolutionSyntax[Rdf](solution)
-  //
-  //  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions): syntax.SparqlSolutionsSyntax[Rdf] = new syntax.SparqlSolutionsSyntax[Rdf](solutions)
 
 }
