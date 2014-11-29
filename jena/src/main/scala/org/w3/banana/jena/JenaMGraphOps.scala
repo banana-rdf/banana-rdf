@@ -3,9 +3,12 @@ package org.w3.banana.jena
 import org.w3.banana._
 import com.hp.hpl.jena.graph.Factory
 
-trait JenaMGraphOps extends MGraphOps[Jena] {
+trait JenaMGraphOps extends MGraphOps[Jena] { self: JenaOps =>
 
-  final def makeMGraph(graph: Jena#Graph): Jena#MGraph = graph
+  final def makeMGraph(graph: Jena#Graph): Jena#MGraph = {
+    val mgraph = makeEmptyMGraph()
+    addTriples(mgraph, self.getTriples(graph))
+  }
 
   final def makeEmptyMGraph(): Jena#MGraph = Factory.createDefaultGraph
 

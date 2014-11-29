@@ -4,6 +4,7 @@ import org.w3.banana._
 
 trait RDFSyntax[Rdf <: RDF]
   extends GraphSyntax[Rdf]
+  with MGraphSyntax[Rdf]
   with TripleMatchSyntax[Rdf]
   with TripleSyntax[Rdf]
   with NodeMatchSyntax[Rdf]

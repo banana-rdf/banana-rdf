@@ -23,7 +23,7 @@ object BuildSettings {
     parallelExecution in Test := false,
     offline := true,
     // TODO
-    testOptions in Test += Tests.Argument("-oDS"),
+//    testOptions in Test += Tests.Argument("-oDS"),
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Yinline-warnings"),
     scalacOptions in (Compile,doc) := Seq("-groups", "-implicits"),
     resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",

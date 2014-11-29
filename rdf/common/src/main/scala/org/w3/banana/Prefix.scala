@@ -10,11 +10,16 @@ trait Prefix[Rdf <: RDF] {
 }
 
 object Prefix {
-  def apply[Rdf <: RDF](prefixName: String, prefixIri: String)(implicit ops: RDFOps[Rdf]) =
-    new PrefixBuilder(prefixName, prefixIri)(ops)
+  def apply[Rdf <: RDF : RDFOps](prefixName: String, prefixIri: String): Prefix[Rdf] =
+    new PrefixBuilder(prefixName, prefixIri)
 }
 
-class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(implicit ops: RDFOps[Rdf]) extends Prefix[Rdf] {
+private [banana] class PrefixBuilder[Rdf <: RDF](
+  val prefixName: String,
+  val prefixIri: String
+)(implicit
+  ops: RDFOps[Rdf]
+) extends Prefix[Rdf] {
 
   import ops._
 
@@ -39,7 +44,7 @@ class PrefixBuilder[Rdf <: RDF](val prefixName: String, val prefixIri: String)(i
 }
 
 object RDFSPrefix {
-  def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new RDFSPrefix(ops)
+  def apply[Rdf <: RDF : RDFOps](implicit ops: RDFOps[Rdf]) = new RDFSPrefix(ops)
 }
 
 class RDFSPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("rdf", "http://www.w3.org/2000/01/rdf-schema#")(ops) {

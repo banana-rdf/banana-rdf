@@ -55,6 +55,8 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
     new PointedGraphs(instances, graph)
   }
 
+  def makeMGraph()(implicit ops: RDFOps[Rdf]): Rdf#MGraph = ops.makeMGraph(graph)
+
   def size(implicit ops: RDFOps[Rdf]): Int = ops.graphSize(graph)
 
 }
