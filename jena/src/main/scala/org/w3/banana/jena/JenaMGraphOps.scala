@@ -22,6 +22,8 @@ trait JenaMGraphOps extends MGraphOps[Jena] { self: JenaOps =>
     mgraph
   }
 
+  final def exists(mgraph: Jena#MGraph, triple: Jena#Triple): Boolean = mgraph.contains(triple)
+
   final def sizeMGraph(mgraph: Jena#MGraph): Int = mgraph.size
 
   final def makeIGraph(mgraph: Jena#MGraph): Jena#Graph = mgraph

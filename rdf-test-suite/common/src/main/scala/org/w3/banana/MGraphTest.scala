@@ -42,6 +42,24 @@ class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
       check(originalGraph isIsomorphicWith Graph(triples))
     }
 
+    "An MGraph must be able to remove existing triples" in {
+      val mgraph = Graph(triples).makeMGraph()
+      mgraph -= Triple(BNode("foo"), ex("bar"), ex("baz"))
+      check(mgraph.makeIGraph() isIsomorphicWith Graph(Triple(BNode("foo"), ex("qux"), Literal("foobar"))))
+    }
+
+    "Trying to remove a non-existing triple must not fail" in {
+      val mgraph = Graph(triples).makeMGraph()
+      mgraph -= Triple(ex("does"), ex("not"), ex("exist"))
+      check(mgraph.makeIGraph() isIsomorphicWith Graph(triples))
+    }
+
+    "MGraph knows if a triple was already added" in {
+      val mgraph = Graph(triples).makeMGraph()
+      check(! mgraph.exists(Triple(ex("does"), ex("not"), ex("exist"))))
+      check(mgraph.exists(Triple(BNode("foo"), ex("bar"), ex("baz"))))
+    }
+
   }
 
 }

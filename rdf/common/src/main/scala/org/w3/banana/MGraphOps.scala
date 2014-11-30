@@ -7,6 +7,8 @@ trait MGraphOps[Rdf <: RDF] {
 
   def makeEmptyMGraph(): Rdf#MGraph
 
+  def exists(mgraph: Rdf#MGraph, triple: Rdf#Triple): Boolean
+
   def addTriple(mgraph: Rdf#MGraph, triple: Rdf#Triple): mgraph.type
 
   def removeTriple(mgraph: Rdf#MGraph, triple: Rdf#Triple): mgraph.type

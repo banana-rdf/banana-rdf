@@ -22,6 +22,9 @@ trait SesameMGraphOps extends MGraphOps[Sesame] { self: SesameOps =>
     mgraph
   }
 
+  final def exists(mgraph: Sesame#MGraph, triple: Sesame#Triple): Boolean =
+    mgraph.contains(triple)
+
   final def sizeMGraph(mgraph: Sesame#MGraph): Int = mgraph.size
 
   final def makeIGraph(mgraph: Sesame#MGraph): Sesame#Graph = mgraph
