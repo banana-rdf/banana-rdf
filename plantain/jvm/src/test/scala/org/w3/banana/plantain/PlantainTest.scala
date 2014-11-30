@@ -31,10 +31,11 @@ class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
 class PlantainSimpleClassifyTest() extends SimpleClassifyTest[Plantain](
   new SimpleMappingGenerator[Plantain](_))
 
-class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain]((vtg: () => VerticeCBuilder[Plantain]) =>
-  new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain](vtg)))
+class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain](
+  (vtg: () => VerticeCBuilder[Plantain]) =>
+  new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain](vtg))
+)
 
-class PlantainIsoTest() extends IsomorphismTests[Plantain]
 
 // New shared tests
 
@@ -43,3 +44,5 @@ object PlantainGraphTest extends GraphTest[Plantain]
 object PlantainMGraphTest extends MGraphTest[Plantain]
 
 object PlantainGraphUnionTest extends GraphUnionTest[Plantain]
+
+object PlantainIsomorphismsTest extends IsomorphismTest[Plantain]

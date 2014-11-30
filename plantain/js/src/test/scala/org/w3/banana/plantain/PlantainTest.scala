@@ -2,11 +2,10 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-//import org.w3.banana.iso.IsomorphismTests
+import org.w3.banana.isomorphism._
+
 //
 ////class PlantainTurtleTest extends TurtleTestSuite[Plantain]
-//
-//class PlantainGraphUnionTest extends GraphUnionTest[Plantain]
 //
 //class PlantainPointedGraphTest extends PointedGraphTester[Plantain]
 //
@@ -26,11 +25,11 @@ import org.w3.banana._
 //
 //class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
 //
-//class PlantainStandardIsomorphismTest() extends IsomorphismTests[Plantain]
-//
 
 object PlantainGraphTest extends GraphTest[Plantain]
 
 object PlantainMGraphTest extends MGraphTest[Plantain]
 
 object PlantainGraphUnionTest extends GraphUnionTest[Plantain]
+
+object PlantainIsomorphismsTest extends IsomorphismTest[Plantain]

@@ -1,12 +1,12 @@
 package org.w3.banana.isomorphism
 
-import org.scalatest.Suite
-import org.w3.banana.{ FOAFPrefix, RDF, RDFOps, RDFPrefix }
+import org.w3.banana._
 
 /**
  * Created by hjs on 04/09/2014.
  */
-trait IsomorphismBNodeTrait[Rdf <: RDF] { self: Suite =>
+trait IsomorphismBNodeTrait[Rdf <: RDF] {
+
   implicit val ops: RDFOps[Rdf]
 
   import ops._
