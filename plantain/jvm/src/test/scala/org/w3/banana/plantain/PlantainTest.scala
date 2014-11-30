@@ -10,10 +10,6 @@ class PlantainTurtleTest extends TurtleTestSuite[Plantain, Try]
 
 class PlantainNTripleTestSuite extends NTriplesTestSuite[Plantain]
 
-class PlantainGraphTest extends GraphTest[Plantain]
-
-class PlantainGraphUnionTest extends GraphUnionTest[Plantain]
-
 class PlantainPointedGraphTest extends PointedGraphTester[Plantain]
 
 import org.w3.banana.diesel._
@@ -42,8 +38,7 @@ class PlantainIsoTest() extends IsomorphismTests[Plantain]
 
 // New shared tests
 
-// Todo:
-// class PlantainGraphUnionJvmTest extends GraphUnionJvmTest[Plantain]
+object PlantainGraphTest extends GraphTest[Plantain]
 
 object PlantainMGraphTest extends MGraphTest[Plantain]
 

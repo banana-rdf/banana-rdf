@@ -1,10 +1,9 @@
 package org.w3.banana
 
-import org.scalatest._
 import org.w3.banana.diesel._
+import zcheck.SpecLite
 
-abstract class GraphTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
-    extends WordSpec with Matchers {
+class GraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
   import ops._
 
@@ -47,66 +46,67 @@ abstract class GraphTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     -- rdf("baz") ->- "baz"
   ).graph
 
-  "union tests" when {
+  "union test" should {
 
     "union must compute the union of two graphs, and should not touch the graphs" in {
       val result = union(foo :: bar :: Nil)
-      isomorphism(foo, fooReference) should be(true)
-      isomorphism(bar, barReference) should be(true)
-      isomorphism(foo, bar) should be(false)
-      graphSize(result) should be(graphSize(foobar))
-      isomorphism(foobar, result) should be(true)
+      check(isomorphism(foo, fooReference))
+      check(isomorphism(bar, barReference))
+      check(! isomorphism(foo, bar))
+      graphSize(result) must_==(graphSize(foobar))
+      check(isomorphism(foobar, result))
     }
 
     "union of Nil must return an empty graph" in {
       val result: Rdf#Graph = union(Nil)
-      isomorphism(result, emptyGraph) should be(true)
-      graphSize(result) should be(0)
+      check(isomorphism(result, emptyGraph))
+      graphSize(result) must_==(0)
     }
 
     "union of a single graph must return an isomorphic graph" in {
       val result = union(foo :: Nil)
-      isomorphism(result, foo) should be(true)
+      check(isomorphism(result, foo))
     }
   }
 
-  "diff tests" when {
+  "diff tests" should {
+
     "removing one triple in a 1 triple graph must return the empty graph" in {
-      isomorphism(diff(foo1gr, foo1gr), emptyGraph) should be(true)
+      check(isomorphism(diff(foo1gr, foo1gr), emptyGraph))
     }
 
     "removing one triple in a 2 triple graph must leave the other triple in the graph" in {
 
       val d = diff(foo1gr union bar1gr, foo1gr)
-      graphSize(d) should be(graphSize(bar1gr))
-      isomorphism(d, bar1gr) should be(true)
+      graphSize(d) must_==(graphSize(bar1gr))
+      check(isomorphism(d, bar1gr))
 
       val oneBNGraph = bnNameGr(1, "Henry") union bnNameGr(1, "Alexandre")
       val d2 = diff(oneBNGraph, bnNameGr(1, "Alexandre"))
-      graphSize(d2) should be(1)
-      isomorphism(d2, bnNameGr(1, "Henry")) should be(true)
+      graphSize(d2) must_==(1)
+      check(isomorphism(d2, bnNameGr(1, "Henry")))
 
       val twoBNGraph = bnNameGr(1, "Henry") union bnNameGr(2, "Alexandre")
       val d3 = diff(twoBNGraph, bnNameGr(2, "Alexandre"))
-      isomorphism(d3, bnNameGr(1, "Henry")) should be(true)
+      check(isomorphism(d3, bnNameGr(1, "Henry")))
 
     }
 
     "removing a triple that is not present in a 2 triple graph must return the same graph" in {
       val d = diff(foo1gr union bar1gr, bnNameGr(1, "George"))
-      graphSize(d) should be(graphSize(foo1gr union bar1gr))
-      isomorphism(d, foo1gr union bar1gr) should be(true)
+      graphSize(d) must_==(graphSize(foo1gr union bar1gr))
+      check(isomorphism(d, foo1gr union bar1gr))
 
       val oneBNGraph = bnNameGr(1, "Henry") union bnNameGr(1, "Alexandre")
       val d2 = diff(oneBNGraph, bnNameGr(1, "{}"))
-      isomorphism(d2, oneBNGraph) should be(true)
+      check(isomorphism(d2, oneBNGraph))
 
       val twoBNGraph = bnNameGr(1, "Henry") union bnNameGr(2, "Alexandre")
       val d3 = diff(twoBNGraph, foo1gr)
-      isomorphism(d3, twoBNGraph) should be(true)
+      check(isomorphism(d3, twoBNGraph))
 
       val d4 = diff(twoBNGraph, bnNameGr(1, "And now for something completely different"))
-      isomorphism(d4, twoBNGraph) should be(true)
+      check(isomorphism(d4, twoBNGraph))
 
     }
 

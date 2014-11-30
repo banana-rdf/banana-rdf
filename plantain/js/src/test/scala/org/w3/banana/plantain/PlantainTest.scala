@@ -29,6 +29,7 @@ import org.w3.banana._
 //class PlantainStandardIsomorphismTest() extends IsomorphismTests[Plantain]
 //
 
+object PlantainGraphTest extends GraphTest[Plantain]
 
 object PlantainMGraphTest extends MGraphTest[Plantain]
 
