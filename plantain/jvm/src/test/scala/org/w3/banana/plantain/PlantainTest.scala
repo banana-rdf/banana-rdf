@@ -42,6 +42,7 @@ class PlantainIsoTest() extends IsomorphismTests[Plantain]
 
 // New shared tests
 
-class PlantainGraphUnionJvmTest extends GraphUnionJvmTest[Plantain]
+// Todo:
+// class PlantainGraphUnionJvmTest extends GraphUnionJvmTest[Plantain]
 
 object PlantainMGraphTest extends MGraphTest[Plantain]

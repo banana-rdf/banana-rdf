@@ -9,5 +9,5 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.1.1")
 
 addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.56.7")
 
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
+// addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
 

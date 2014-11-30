@@ -110,7 +110,7 @@ object BananaRdfBuild extends Build {
     id = "banana",
     base = file("."),
     settings = buildSettings ++ Unidoc.settings
-  ).dependsOn(banana_js, banana_jvm)
+  )//.dependsOn(banana_js, banana_jvm)
    .aggregate(banana_js, banana_jvm)
 
   /** `banana_js`, a js only meta project. */
@@ -120,8 +120,9 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ Unidoc.settings ++ Seq(
       aggregate in Test in rdf_js := false,
       aggregate in Test in rdfTestSuite_js := false
-    )
-  ).dependsOn(rdf_js, rdfTestSuite_js, plantain_js)
+    ) ++ zcheckJsSettings
+  ).enablePlugins(SbtScalajs)
+    .dependsOn(rdf_js, rdfTestSuite_js, plantain_js)
    .aggregate(rdf_js, rdfTestSuite_js, plantain_js)
 
   /** `banana_jvm`, a jvm only meta project. */
@@ -131,7 +132,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ Unidoc.settings ++ Seq (
       aggregate in Test in rdf_jvm := false,
       aggregate in Test in rdfTestSuite_jvm := false
-    )
+    )++ zcheckJvmSettings
   ).dependsOn(rdf_jvm, rdfTestSuite_jvm, jena, sesame, ntriples_jvm, plantain_jvm, examples)
    .aggregate(rdf_jvm, rdfTestSuite_jvm, jena, sesame, ntriples_jvm, plantain_jvm, examples)
 
@@ -321,7 +322,7 @@ object BananaRdfBuild extends Build {
       resolvers += sonatypeRepo,
       libraryDependencies += scalatest,
 //      libraryDependencies += scalacheck,
-      libraryDependencies += jasmine_jvm,
+     // libraryDependencies += jasmine_jvm,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
       libraryDependencies += fuseki,
@@ -337,9 +338,9 @@ object BananaRdfBuild extends Build {
     id = "rdf-test-suite_common_js",
     base = file("rdf-test-suite/.common_js"),
     settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common_jvm) ++ Seq(
-      resolvers += sonatypeRepo,
-      libraryDependencies += scalajsJasmine
-    ) ++ jasmine_js ++ zcheckJsSettings
+      resolvers += sonatypeRepo
+     // libraryDependencies += scalajsJasmine
+    ) ++ zcheckJsSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js)
 
   /** `jena`, an RDF implementation for Apache Jena. */
@@ -409,7 +410,7 @@ object BananaRdfBuild extends Build {
     base = file("plantain/js"),
     settings = buildSettings ++ Seq(
       publishMavenStyle := true
-    )
+    )++ zcheckJsSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
     .aggregate(plantain_common_js)
 
@@ -419,7 +420,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(plantain_common_jvm) ++ Seq(
       resolvers += sonatypeRepo,
       publishMavenStyle := true
-    ) ++ jasmine_jsTest
+    ) ++ zcheckJsSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile")
 
   /** `rdfstorew`, a js only module binding rdfstore-js into banana-rdf
@@ -433,7 +434,7 @@ object BananaRdfBuild extends Build {
       jsDependencies += ProvidedJS / "rdf_store.js",
       jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
       skip in packageJSDependencies := false
-    ) ++ jasmine_js
+    ) //++ jasmine_js
   ).enablePlugins(SbtScalajs)
     .dependsOn(rdf_js, rdf_common_js, rdfTestSuite_js % "test-internal->compile")
 
