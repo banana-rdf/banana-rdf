@@ -320,14 +320,14 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       resolvers += sonatypeRepo,
       libraryDependencies += scalatest,
-      libraryDependencies += scalacheck,
+//      libraryDependencies += scalacheck,
       libraryDependencies += jasmine_jvm,
       libraryDependencies += jodaTime,
       libraryDependencies += jodaConvert,
       libraryDependencies += fuseki,
       libraryDependencies += servlet,
       libraryDependencies += httpComponents
-    )
+    ) ++ zcheckJvmSettings
   ).dependsOn(
     rdf_jvm,
     ntriples_jvm
@@ -339,8 +339,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ sjsDeps ++ linkedSources(rdfTestSuite_common_jvm) ++ Seq(
       resolvers += sonatypeRepo,
       libraryDependencies += scalajsJasmine
-//      ScalaJSKeys.scalaJSTestFramework := "org.scalacheck.ScalaCheckFramework"
-    ) ++ jasmine_js ++ scalacheckJs
+    ) ++ jasmine_js ++ zcheckJsSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js)
 
   /** `jena`, an RDF implementation for Apache Jena. */

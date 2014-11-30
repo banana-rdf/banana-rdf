@@ -45,6 +45,17 @@ object Dependencies {
 
   val scalacheckJs = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.1-SNAPSHOT")
 
+  val zcheckJsSettings = Seq(
+    resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.5.2",
+    ScalaJSKeys.scalaJSTestFramework := "org.scalacheck.ScalaCheckFramework"
+  )
+
+  val zcheckJvmSettings = Seq(
+    resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
+    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.5.2",
+    testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1")
+  )
 
   /**
    * Akka Http Core
