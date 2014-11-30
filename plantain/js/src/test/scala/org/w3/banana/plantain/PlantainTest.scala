@@ -31,3 +31,5 @@ import org.w3.banana._
 
 
 object PlantainMGraphTest extends MGraphTest[Plantain]
+
+object PlantainGraphUnionTest extends GraphUnionTest[Plantain]
