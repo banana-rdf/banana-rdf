@@ -1,7 +1,7 @@
 
-//package org.w3.banana.plantain
-//
-//import org.w3.banana._
+package org.w3.banana.plantain
+
+import org.w3.banana._
 //import org.w3.banana.iso.IsomorphismTests
 //
 ////class PlantainTurtleTest extends TurtleTestSuite[Plantain]
@@ -29,3 +29,5 @@
 //class PlantainStandardIsomorphismTest() extends IsomorphismTests[Plantain]
 //
 
+
+object PlantainMGraphTest extends MGraphTest[Plantain]

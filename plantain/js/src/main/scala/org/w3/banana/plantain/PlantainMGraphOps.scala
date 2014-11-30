@@ -20,6 +20,11 @@ trait PlantainMGraphOps extends MGraphOps[Plantain] {
     mgraph
   }
 
+  def exists(mgraph: Plantain#MGraph, triple: Plantain#Triple): Boolean = {
+    val (s, p, o) = triple
+    mgraph.graph.find(Some(s), Some(p), Some(o)).nonEmpty
+  }
+
   def sizeMGraph(mgraph: Plantain#MGraph): Int = mgraph.graph.size
 
   def makeIGraph(mgraph: Plantain#MGraph): Plantain#Graph = mgraph.graph

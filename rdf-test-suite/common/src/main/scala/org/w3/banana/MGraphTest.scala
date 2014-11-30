@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scalaz.SpecLite
+import zcheck.SpecLite
 
 class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
