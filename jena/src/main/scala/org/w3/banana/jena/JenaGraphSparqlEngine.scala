@@ -3,6 +3,7 @@ package org.w3.banana.jena
 import com.hp.hpl.jena.graph.{Graph => JenaGraph}
 import com.hp.hpl.jena.query._
 import com.hp.hpl.jena.rdf.model._
+import com.hp.hpl.jena.update.{GraphStoreFactory, UpdateExecutionFactory}
 import org.w3.banana._
 
 import scala.util.Try
@@ -11,7 +12,7 @@ import scala.util.Try
  * Treat a Graph as a Sparql Engine
  */
 class JenaGraphSparqlEngine(implicit ops: RDFOps[Jena])
-    extends SparqlEngine[Jena, Try, Jena#Graph] {
+    extends SparqlEngine[Jena, Try, Jena#Graph] with SparqlUpdate[Jena, Try, Jena#Graph] {
   val querySolution = new util.QuerySolution(ops)
 
   def qexec(graph: Jena#Graph, query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
@@ -38,6 +39,18 @@ class JenaGraphSparqlEngine(implicit ops: RDFOps[Jena])
       qexec(graph, query, bindings).execAsk()
     }
 
+  def executeUpdate(graph: Jena#Graph, updateQuery: Jena#UpdateQuery, bindings: Map[String, Jena#Node]): Try[Jena#Graph] =
+    Try {
+      import ops._
+      val newGraph = ops.makeGraph(graph.triples)
+      val graphstore= GraphStoreFactory.create(newGraph)
+      val u = if (bindings.isEmpty)
+        UpdateExecutionFactory.create(updateQuery, graphstore)
+      else
+        UpdateExecutionFactory.create(updateQuery, graphstore, querySolution.getMap(bindings))
+      u.execute()
+      newGraph
+    }
 }
 
 object JenaGraphSparqlEngine {

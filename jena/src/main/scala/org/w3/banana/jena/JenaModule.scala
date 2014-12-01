@@ -37,7 +37,8 @@ with XmlQueryResultsReaderModule {
 
   implicit val sparqlOps: SparqlOps[Jena] = new JenaSparqlOps
 
-  implicit val sparqlGraph: SparqlEngine[Jena, Try, Jena#Graph] = JenaGraphSparqlEngine(ops)
+  implicit val sparqlGraph: SparqlEngine[Jena, Try, Jena#Graph]
+    with SparqlUpdate[Rdf,Try, Rdf#Graph] = JenaGraphSparqlEngine(ops)
 
   import java.net.URL
   implicit val sparqlHttp: SparqlEngine[Jena, Future, URL] = new JenaSparqlHttpEngine

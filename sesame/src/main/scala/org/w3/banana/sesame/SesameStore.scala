@@ -54,10 +54,11 @@ class SesameStore
     result
   }
 
-  def executeUpdate(conn: RepositoryConnection, query: Sesame#UpdateQuery, bindings: Map[String, Sesame#Node]): Try[Unit] = Try {
+  def executeUpdate(conn: RepositoryConnection, query: Sesame#UpdateQuery, bindings: Map[String, Sesame#Node]): Try[RepositoryConnection] = Try {
     val updateQuery = conn.prepareUpdate(QueryLanguage.SPARQL, query.query)
     bindings foreach { case (name, value) => updateQuery.setBinding(name, value) }
     updateQuery.execute()
+    conn
   }
 
   /* GraphStore */

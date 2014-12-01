@@ -65,8 +65,10 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
   }
 
   def executeUpdate(dataset: Dataset, query: Jena#UpdateQuery, bindings: Map[String, Jena#Node]) = Try {
-    if (bindings.isEmpty)
+    if (bindings.isEmpty) {
       UpdateAction.execute(query, dataset)
+      dataset
+    }
     else
       throw new NotImplementedError("todo: how does one (can one?) set the bindings in a dataset in Jena?")
   }
