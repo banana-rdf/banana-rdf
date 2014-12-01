@@ -10,3 +10,5 @@ object JenaMGraphTest extends MGraphTest[Jena]
 object JenaIsomorphismTest extends IsomorphismTest[Jena]
 
 object JenaGraphUnionTest extends GraphUnionTest[Jena]
+
+object JenaPointedGraphTest extends PointedGraphTest[Jena]

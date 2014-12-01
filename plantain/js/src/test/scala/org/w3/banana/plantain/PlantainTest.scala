@@ -33,3 +33,5 @@ object PlantainMGraphTest extends MGraphTest[Plantain]
 object PlantainGraphUnionTest extends GraphUnionTest[Plantain]
 
 object PlantainIsomorphismsTest extends IsomorphismTest[Plantain]
+
+object PlantainPointedGraphTest extends PointedGraphTest[Plantain]
