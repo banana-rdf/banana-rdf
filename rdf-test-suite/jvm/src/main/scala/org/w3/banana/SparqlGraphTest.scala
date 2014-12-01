@@ -11,7 +11,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Try, RDFXML],
   sparqlOperations: SparqlOps[Rdf],
-  sparqlGraph: SparqlEngine[Rdf, Try, Rdf#Graph],
+  sparqlGraph: SparqlEngine[Rdf, Try, Rdf#Graph] with SparqlUpdate[Rdf,Try, Rdf#Graph],
   sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
   sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]
 ) extends WordSpec with Matchers with Inside with TryValues {
@@ -176,5 +176,42 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
 
     assert(contructed1 isIsomorphicWith constructed2, "the results of both queries should be isomorphic")
   }
+
+  import sparqlGraph.sparqlUpdateSyntax._
+
+
+  "Update Sparql Graph" should {
+
+     val query1 = parseSelect(
+       """
+         |PREFIX rec: <http://www.w3.org/2001/02pd/rec54#>
+         |SELECT ?note
+         |WHERE {
+         |  ?note a rec:NOTE .
+         |}
+       """.stripMargin).success.value
+
+     val answers1 = graph.executeSelect(query1,Map()).get.toIterable.toList
+     println("graph.size="+graphSize(graph))
+
+     assert(answers1.size == 15)
+
+     val updateComand = parseUpdate(
+       """
+         | PREFIX rec: <http://www.w3.org/2001/02pd/rec54#>
+         | DELETE { ?note ?r ?b . }
+         | WHERE { ?note a rec:NOTE;
+         |               ?r ?b .
+         |       }
+       """.stripMargin
+     ).get
+
+     val newgraph = graph.executeUpdate(updateComand,Map()).get
+
+     val answers2 = newgraph.executeSelect(query1,Map()).get.toIterable.toList
+    println("graph.size="+graphSize(newgraph))
+    assert(answers2.size == 0)
+
+   }
 
 }

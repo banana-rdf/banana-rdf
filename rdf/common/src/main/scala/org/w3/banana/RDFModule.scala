@@ -32,6 +32,7 @@ trait SparqlOpsModule extends RDFModule {
 trait SparqlGraphModule extends RDFModule {
 
   implicit val sparqlGraph: SparqlEngine[Rdf, Try, Rdf#Graph]
+    with SparqlUpdate[Rdf,Try, Rdf#Graph]
 
 }
 
