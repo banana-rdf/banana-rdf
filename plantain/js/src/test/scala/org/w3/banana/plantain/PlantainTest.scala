@@ -35,3 +35,9 @@ object PlantainGraphUnionTest extends GraphUnionTest[Plantain]
 object PlantainIsomorphismsTest extends IsomorphismTest[Plantain]
 
 object PlantainPointedGraphTest extends PointedGraphTest[Plantain]
+
+import org.w3.banana.diesel._
+
+object PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantain]
+
+object PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
