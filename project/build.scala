@@ -382,45 +382,31 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ Seq(
       publishMavenStyle := true
     )
-  ).dependsOn(rdfTestSuite, plantain_jvm, plantain_common_jvm, plantain_js, plantain_common_js)
+  ).dependsOn(rdfTestSuite, plantain_jvm, plantain_js)
     .aggregate(plantain_jvm, plantain_js)
+
+  val plantainSharedSettings = Seq(
+    unmanagedSourceDirectories in Compile +=
+      baseDirectory.value  / "common" / "src" / "main" / "scala"
+  )
 
   lazy val plantain_jvm = Project(
     id = "plantain_jvm",
     base = file("plantain/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       libraryDependencies += akkaHttpCore,
-      libraryDependencies +=  sesameRioTurtle,
+      libraryDependencies += sesameRioTurtle,
       libraryDependencies += jsonldJava,
       publishMavenStyle := true
-    )
-  ).dependsOn(rdf_jvm, ntriples_jvm, plantain_common_jvm % "compile;test->test", rdfTestSuite_jvm % "test-internal->compile")
-    .aggregate(plantain_common_jvm)
-
-  lazy val plantain_common_jvm = Project(
-    id = "plantain_common_jvm",
-    base = file("plantain/common"),
-    settings = buildSettings ++ scalajsJvmSettings ++ Seq(
-      publishMavenStyle := true
-    )
-  ) dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
+    ) ++ plantainSharedSettings
+  ).dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   lazy val plantain_js = Project(
     id = "plantain_js",
     base = file("plantain/js"),
     settings = buildSettings ++ Seq(
       publishMavenStyle := true
-    )++ zcheckJsSettings
-  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
-    .aggregate(plantain_common_js)
-
-  lazy val plantain_common_js = Project(
-    id = "plantain_common_js",
-    base = file("plantain/.common_js"),
-    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(plantain_common_jvm) ++ Seq(
-      resolvers += sonatypeRepo,
-      publishMavenStyle := true
-    ) ++ zcheckJsSettings
+    ) ++ plantainSharedSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile")
 
   /** `rdfstorew`, a js only module binding rdfstore-js into banana-rdf
