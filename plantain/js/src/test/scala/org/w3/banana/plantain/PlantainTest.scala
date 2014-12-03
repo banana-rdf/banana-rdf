@@ -6,18 +6,6 @@ import org.w3.banana.isomorphism._
 
 //
 ////class PlantainTurtleTest extends TurtleTestSuite[Plantain]
-//
-//
-//import org.w3.banana.binder._
-//
-//class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
-//
-//class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
-//
-//import org.w3.banana.syntax._
-//
-//class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
-//
 
 object PlantainGraphTest extends GraphTest[Plantain]
 
@@ -42,3 +30,7 @@ class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
 class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
 
 class PlantainCustomBinderTest extends CustomBindersTest[Plantain]
+
+import org.w3.banana.syntax._
+
+class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]

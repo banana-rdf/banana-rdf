@@ -10,10 +10,6 @@ class PlantainTurtleTest extends TurtleTestSuite[Plantain, Try]
 
 class PlantainNTripleTestSuite extends NTriplesTestSuite[Plantain]
 
-import org.w3.banana.syntax._
-
-class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
-
 class PlantainSimpleClassifyTest() extends SimpleClassifyTest[Plantain](
   new SimpleMappingGenerator[Plantain](_))
 
@@ -48,3 +44,7 @@ class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
 class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
 
 class PlantainCustomBinderTest extends CustomBindersTest[Plantain]
+
+import org.w3.banana.syntax._
+
+class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]

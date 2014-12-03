@@ -27,3 +27,7 @@ class JenaCommonBindersTest extends CommonBindersTest[Jena]
 class JenaRecordBinderTest extends RecordBinderTest[Jena]
 
 class JenaCustomBinderTest extends CustomBindersTest[Jena]
+
+import org.w3.banana.syntax._
+
+class JenaUriSyntaxTest extends UriSyntaxTest[Jena]

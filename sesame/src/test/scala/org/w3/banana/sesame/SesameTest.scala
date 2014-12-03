@@ -27,3 +27,7 @@ class SesameCommonBindersTest extends CommonBindersTest[Sesame]
 class SesameRecordBinderTest extends RecordBinderTest[Sesame]
 
 class SesameCustomBinderTest extends CustomBindersTest[Sesame]
+
+import org.w3.banana.syntax._
+
+class SesameUriSyntaxTest extends UriSyntaxTest[Sesame]
