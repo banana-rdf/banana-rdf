@@ -18,7 +18,7 @@ object Dependencies {
    * @see http://scalaz.org
    * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
    */
-  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0")
+  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0-4")
 
   /**
    * joda-Time
