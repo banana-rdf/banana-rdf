@@ -19,3 +19,11 @@ import org.w3.banana.diesel._
 object SesameDieselGraphConstructTest extends DieselGraphConstructTest[Sesame]
 
 object SesameDieselGraphExplorationTest extends DieselGraphExplorationTest[Sesame]
+
+import org.w3.banana.binder._
+
+class SesameCommonBindersTest extends CommonBindersTest[Sesame]
+
+class SesameRecordBinderTest extends RecordBinderTest[Sesame]
+
+class SesameCustomBinderTest extends CustomBindersTest[Sesame]

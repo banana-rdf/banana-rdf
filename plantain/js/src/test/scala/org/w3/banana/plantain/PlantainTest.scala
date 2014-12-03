@@ -7,13 +7,6 @@ import org.w3.banana.isomorphism._
 //
 ////class PlantainTurtleTest extends TurtleTestSuite[Plantain]
 //
-//class PlantainPointedGraphTest extends PointedGraphTester[Plantain]
-//
-//import org.w3.banana.diesel._
-//
-//class PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantain]
-//
-//class PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
 //
 //import org.w3.banana.binder._
 //
@@ -41,3 +34,11 @@ import org.w3.banana.diesel._
 object PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantain]
 
 object PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
+
+import org.w3.banana.binder._
+
+class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
+
+class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
+
+class PlantainCustomBinderTest extends CustomBindersTest[Plantain]

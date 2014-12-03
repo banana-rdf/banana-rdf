@@ -1,14 +1,16 @@
 package org.w3.banana.binder
 
-import org.w3.banana._
-import org.w3.banana.diesel._
+import org.w3.banana._, diesel._
 import scala.util._
 import java.security.interfaces.RSAPublicKey
 import java.security.KeyFactory
 import java.security.spec.RSAPublicKeySpec
 import java.math.BigInteger
 
-class ObjectExamples[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], recordBinder: RecordBinder[Rdf]) {
+class ObjectExamples[Rdf <: RDF](implicit
+  ops: RDFOps[Rdf],
+  recordBinder: RecordBinder[Rdf]
+) {
 
   import ops._
   import recordBinder._

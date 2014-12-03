@@ -10,12 +10,6 @@ class PlantainTurtleTest extends TurtleTestSuite[Plantain, Try]
 
 class PlantainNTripleTestSuite extends NTriplesTestSuite[Plantain]
 
-import org.w3.banana.binder._
-
-class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
-
-class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
-
 import org.w3.banana.syntax._
 
 class PlantainUriSyntaxTest extends UriSyntaxTest[Plantain]
@@ -46,3 +40,11 @@ import org.w3.banana.diesel._
 object PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantain]
 
 object PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
+
+import org.w3.banana.binder._
+
+class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
+
+class PlantainRecordBinderTest extends RecordBinderTest[Plantain]
+
+class PlantainCustomBinderTest extends CustomBindersTest[Plantain]
