@@ -2,6 +2,8 @@ package org.w3.banana.sesame
 
 import org.w3.banana._
 
+object SesameOpsTest extends RDFOpsTest[Sesame]
+
 object SesameGraphTest extends GraphTest[Sesame]
 
 object SesameMGraphTest extends MGraphTest[Sesame]
@@ -22,12 +24,12 @@ object SesameDieselGraphExplorationTest extends DieselGraphExplorationTest[Sesam
 
 import org.w3.banana.binder._
 
-class SesameCommonBindersTest extends CommonBindersTest[Sesame]
+object SesameCommonBindersTest extends CommonBindersTest[Sesame]
 
-class SesameRecordBinderTest extends RecordBinderTest[Sesame]
+object SesameRecordBinderTest extends RecordBinderTest[Sesame]
 
-class SesameCustomBinderTest extends CustomBindersTest[Sesame]
+object SesameCustomBinderTest extends CustomBindersTest[Sesame]
 
 import org.w3.banana.syntax._
 
-class SesameUriSyntaxTest extends UriSyntaxTest[Sesame]
+object SesameUriSyntaxTest extends UriSyntaxTest[Sesame]

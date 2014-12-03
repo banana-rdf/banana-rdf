@@ -1,9 +1,8 @@
 package org.w3.banana
 
-import org.scalatest._
+import zcheck.SpecLite
 
-abstract class RDFOpsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
-    extends WordSpec with Matchers with OptionValues {
+class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
   import ops._
 
@@ -13,11 +12,11 @@ abstract class RDFOpsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
     val (lexicalForm, datatype, langOpt) = fromLiteral(plainLiteral)
 
-    lexicalForm should be("Alexandre")
+    lexicalForm must_==("Alexandre")
 
-    datatype should be(xsd.string)
+    datatype must_==(xsd.string)
 
-    langOpt should be(None)
+    langOpt must_==(None)
 
   }
 
@@ -29,11 +28,11 @@ abstract class RDFOpsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
     val (lexicalForm, datatype, langOpt) = fromLiteral(typedLiteral)
 
-    lexicalForm should be("Alexandre")
+    lexicalForm must_==("Alexandre")
 
-    datatype should be(foaf.name)
+    datatype must_==(foaf.name)
 
-    langOpt should be(None)
+    langOpt must_==(None)
 
   }
 
@@ -43,11 +42,11 @@ abstract class RDFOpsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
 
     val (lexicalForm, datatype, langOpt) = fromLiteral(langLiteral)
 
-    lexicalForm should be("Alexandre")
+    lexicalForm must_==("Alexandre")
 
-    datatype should be(Literal.rdfLangString)
+    datatype must_==(Literal.rdfLangString)
 
-    langOpt.value should be("fr")
+    langOpt must_==(Some(Lang("fr")))
 
   }
 

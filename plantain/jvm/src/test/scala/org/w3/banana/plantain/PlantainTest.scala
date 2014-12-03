@@ -21,6 +21,8 @@ class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain](
 
 // New shared tests
 
+object PlantainOpsTest extends RDFOpsTest[Plantain]
+
 object PlantainGraphTest extends GraphTest[Plantain]
 
 object PlantainMGraphTest extends MGraphTest[Plantain]

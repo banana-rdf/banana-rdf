@@ -2,6 +2,8 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
+object JenaOpsTest extends RDFOpsTest[Jena]
+
 object JenaGraphTest extends GraphTest[Jena]
 
 object JenaMGraphTest extends MGraphTest[Jena]
@@ -22,12 +24,12 @@ object JenaDieselGraphExplorationTest extends DieselGraphExplorationTest[Jena]
 
 import org.w3.banana.binder._
 
-class JenaCommonBindersTest extends CommonBindersTest[Jena]
+object JenaCommonBindersTest extends CommonBindersTest[Jena]
 
-class JenaRecordBinderTest extends RecordBinderTest[Jena]
+object JenaRecordBinderTest extends RecordBinderTest[Jena]
 
-class JenaCustomBinderTest extends CustomBindersTest[Jena]
+object JenaCustomBinderTest extends CustomBindersTest[Jena]
 
 import org.w3.banana.syntax._
 
-class JenaUriSyntaxTest extends UriSyntaxTest[Jena]
+object JenaUriSyntaxTest extends UriSyntaxTest[Jena]

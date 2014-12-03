@@ -2,16 +2,18 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import org.w3.banana.isomorphism._
 
-//
-////class PlantainTurtleTest extends TurtleTestSuite[Plantain]
+//class PlantainTurtleTest extends TurtleTestSuite[Plantain]
+
+object PlantainOpsTest extends RDFOpsTest[Plantain]
 
 object PlantainGraphTest extends GraphTest[Plantain]
 
 object PlantainMGraphTest extends MGraphTest[Plantain]
 
 object PlantainGraphUnionTest extends GraphUnionTest[Plantain]
+
+import org.w3.banana.isomorphism._
 
 object PlantainIsomorphismsTest extends IsomorphismTest[Plantain]
 
