@@ -21,5 +21,6 @@ sbt-launch*.jar
 .idea_modules
 .ensime*
 *.egp
+local.sbt
 
 # just for convenience
