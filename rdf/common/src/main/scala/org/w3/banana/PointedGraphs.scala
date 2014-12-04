@@ -1,7 +1,7 @@
 package org.w3.banana
 
 import org.w3.banana.binder._
-import org.w3.banana.diesel._
+import org.w3.banana.syntax.DieselSyntax._
 
 import scala.util._
 

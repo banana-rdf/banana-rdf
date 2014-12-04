@@ -18,6 +18,21 @@ class PlantainIsoGraphTest extends GraphIsomorphismTest[Plantain](
   new GraphIsomorphism[Plantain](new SimpleMappingGenerator[Plantain](vtg))
 )
 
+/* this is testing that the implicits for diesel are correctly found */
+object `this must compile` {
+
+  import PlantainOps._
+
+  val g: PointedGraph[Plantain] = (
+    bnode("betehess") -- rdf.first ->- "Alexandre"
+  )
+
+  val gg: PointedGraph[Plantain] = (
+    model.BNode("betehess") -- rdf.first ->- "Alexandre"
+  )
+
+
+}
 
 // New shared tests
 

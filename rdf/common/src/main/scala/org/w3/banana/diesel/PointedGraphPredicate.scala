@@ -14,6 +14,7 @@ class PointedGraphPredicate[Rdf <: RDF](pointed: PointedGraph[Rdf], p: Rdf#URI) 
   }
 
   def ->-[T](o: T, os: T*)(implicit ops: RDFOps[Rdf], toPG: ToPG[Rdf, T]): PointedGraph[Rdf] = {
+    import ops._
     if (os.isEmpty)
       this.->-(toPG.toPG(o))
     else
@@ -25,10 +26,12 @@ class PointedGraphPredicate[Rdf <: RDF](pointed: PointedGraph[Rdf], p: Rdf#URI) 
     case Some(t) => this.->-(t)
   }
 
-  def ->-[T](objList: ObjectList[T])(implicit ops: RDFOps[Rdf], toPG: ToPG[Rdf, T]): PointedGraph[Rdf] =
+  def ->-[T](objList: ObjectList[T])(implicit ops: RDFOps[Rdf], toPG: ToPG[Rdf, T]): PointedGraph[Rdf] = {
+    import ops._
     objList.ts.foldLeft(pointed)(
       (acc, t) => acc -- p ->- t
     )
+  }
 
   def ->-[T](objects: Set[T])(implicit ops: RDFOps[Rdf], toPG: ToPG[Rdf, T]): PointedGraph[Rdf] = {
     import ops._

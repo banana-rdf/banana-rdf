@@ -9,6 +9,8 @@ trait PGBinder[Rdf <: RDF, T] extends FromPG[Rdf, T] with ToPG[Rdf, T] { self =>
   // this is here for convenience
   // do we want to move it somewhere else?
   def withClasses(classUris: ClassUrisFor[Rdf, T])(implicit ops: RDFOps[Rdf]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+    import ops._
+
     // Q: do we want to check the classes here?
     def fromPG(pointed: PointedGraph[Rdf]): Try[T] =
       self.fromPG(pointed)

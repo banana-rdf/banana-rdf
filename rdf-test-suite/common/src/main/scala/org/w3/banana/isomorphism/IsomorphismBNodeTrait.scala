@@ -21,9 +21,10 @@ trait IsomorphismBNodeTrait[Rdf <: RDF] {
   def antonio(i: Int) = BNode("antonio" + i)
 
   def groundedGraph = (
-    toPointedGraphW[Rdf](hjs)
-    -- foaf.knows ->- timbl
-    -- foaf.name ->- "Henry Story").graph
+    hjs
+      -- foaf.knows ->- timbl
+      -- foaf.name ->- "Henry Story"
+  ).graph
 
   def list(size: Int, bnprefix: String) = {
     def bn(i: Int) = BNode(bnprefix + i)
