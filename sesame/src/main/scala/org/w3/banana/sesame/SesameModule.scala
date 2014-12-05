@@ -8,22 +8,23 @@ import org.w3.banana.sesame.io._
 import scala.util.Try
 
 trait SesameModule
-extends RDFModule
-with RDFOpsModule
-with RecordBinderModule
-with SparqlGraphModule
-// with SparqlHttpModule
-with RDFXMLReaderModule
-with TurtleReaderModule
-with NTriplesReaderModule
-with JsonLDReaderModule
-with RDFXMLWriterModule
-with TurtleWriterModule
-with JsonLDWriterModule
-with JsonSolutionsWriterModule
-with XmlSolutionsWriterModule
-with JsonQueryResultsReaderModule
-with XmlQueryResultsReaderModule {
+    extends RDFModule
+    with RDFOpsModule
+    with RecordBinderModule
+    with SparqlGraphModule
+    // with SparqlHttpModule
+    with RDFXMLReaderModule
+    with TurtleReaderModule
+    with NTriplesReaderModule
+    with NTriplesWriterModule
+    with JsonLDReaderModule
+    with RDFXMLWriterModule
+    with TurtleWriterModule
+    with JsonLDWriterModule
+    with JsonSolutionsWriterModule
+    with XmlSolutionsWriterModule
+    with JsonQueryResultsReaderModule
+    with XmlQueryResultsReaderModule {
 
   type Rdf = Sesame
 
@@ -56,6 +57,8 @@ with XmlQueryResultsReaderModule {
   implicit val jsonldExpandedWriter: RDFWriter[Sesame, Try, JsonLdExpanded] = sesameRDFWriterHelper.jsonldExpandedWriter
 
   implicit val jsonldFlattenedWriter: RDFWriter[Sesame, Try, JsonLdFlattened] = sesameRDFWriterHelper.jsonldFlattenedWriter
+
+  override implicit val ntriplesWriter: RDFWriter[Sesame, Try, NTriples] = new NTriplesWriter[Sesame]
 
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
     SesameSolutionsWriter.solutionsWriterJson

@@ -12,7 +12,8 @@ import scala.util.{Failure, Success, Try}
  */
 class NTriplesTestSuite[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
-  reader: RDFReader[Rdf, Try, NTriples]
+  reader: RDFReader[Rdf, Try, NTriples],
+  writer: RDFWriter[Rdf, Try, NTriples]
 ) extends WordSpec with Matchers {
 
   import ops._
@@ -32,11 +33,11 @@ class NTriplesTestSuite[Rdf <: RDF](implicit
     node.fold(
       uri => s"<${uri.getString}>",
       bn => s"_:${fromBNode(bn)}",
-      _ match {
-      case Literal(lexical,Literal.xsdString,None) => s""""$lexical""""
-      case Literal(lexical,tp,None)=>s""""$lexical"^^<$tp>"""
-      case Literal(lexical,Literal.xsdString,Some(lang)) => s""""$lexical"@$lang"""
-    })
+      {
+        case Literal(lexical, Literal.xsdString, None) => s""""$lexical""""
+        case Literal(lexical, tp, None) => s""""$lexical"^^<$tp>"""
+        case Literal(lexical, Literal.xsdString, Some(lang)) => s""""$lexical"@$lang"""
+      })
 
 
   def ntparser(ntstring: String, skip: Boolean=false) =
@@ -131,6 +132,38 @@ class NTriplesTestSuite[Rdf <: RDF](implicit
     }
 
   }
+
+  "Ntriplets writer " should  {
+    "write one triplet" in {
+
+      val g = Graph(Triple(URI(bblfish),rdf.`type`,foaf.Person))
+      val trstr = writer.asString(g,base = "http://example")
+      trstr match {
+        case Success(str)=>
+          val graphTry = toGraph(ntparser(str))
+          assert( graphTry.get isIsomorphicWith g)
+        case Failure(e)=>this.fail(s"cannot write ${g.toString} because of "+e.getMessage)
+      }
+    }
+
+    "write more triplets" in {
+      //TODO: rewrite with random triplets generators in future
+      val g = Graph(
+        Triple(URI(bblfish), foaf.name, Literal(name)),
+        Triple(URI(bblfish), foaf.knows, BNode("betehess")),
+        Triple(BNode("betehess"), foaf.homepage, URI("http://bertails.org/"))
+      )
+      val trstr = writer.asString(g,base = "http://example")
+      trstr match {
+        case Success(str)=>
+          val graphTry = toGraph(ntparser(str))
+          assert( graphTry.get isIsomorphicWith g)
+        case Failure(e)=>this.fail(s"cannot write ${g.toString} because of "+e.getMessage)
+      }
+    }
+
+  }
+
 
   "Test that parser can parse a document containing one triple. The parser " should {
 
