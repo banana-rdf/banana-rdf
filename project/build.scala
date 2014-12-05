@@ -210,6 +210,8 @@ object BananaRdfBuild extends Build {
       )
   ).dependsOn(ntriples_common_jvm, ntriples_jvm)
     .aggregate(ntriples_jvm)
+    .dependsOn(ntriples_common_js, ntriples_js)
+    .aggregate(ntriples_js)
 
   lazy val ntriples_jvm = Project(
     id = "ntriples_jvm",
@@ -229,23 +231,22 @@ object BananaRdfBuild extends Build {
   ).dependsOn(rdf_jvm)
 
 //  not doing the js part yet
-//  lazy val ntriples_js = Project(
-//    id = "ntriples_js",
-//    base = file("ntriples/js"),
-//    settings = buildSettings ++ sjsDeps ++ Seq(
-//      aggregate in Test := false,
-//      publishMavenStyle := true
-//    )
-//  ).enablePlugins(SbtScalajs)
-//    .dependsOn(rdf_common_js).aggregate(rdf_common_js)
-//
-//  lazy val ntriples_common_js = Project(
-//    id = "ntriples_common_js",
-//    base = file("ntriples/.common_js"),
-//    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(rdf_common_jvm) ++ Seq(
-//      publishMavenStyle := true
-//    )
-//  ).enablePlugins(SbtScalajs)
+  lazy val ntriples_js = Project(
+    id = "ntriples_js",
+    base = file("ntriples/js"),
+    settings = buildSettings ++ sjsDeps++ linkedSources(ntriples_jvm) ++ Seq(
+      aggregate in Test := false,
+      publishMavenStyle := true
+    )
+  ).enablePlugins(SbtScalajs).dependsOn(ntriples_common_js).aggregate(ntriples_common_js)
+
+  lazy val ntriples_common_js = Project(
+    id = "ntriples_common_js",
+    base = file("ntriples/.common_js"),
+    settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(ntriples_common_jvm) ++ Seq(
+      publishMavenStyle := true
+    )
+  ).enablePlugins(SbtScalajs).dependsOn(rdf_js)
 
 
   /** `ldpatch`, an implementation for LD Patch.
@@ -396,7 +397,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ Seq(
       publishMavenStyle := true
     )
-  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
+  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, ntriples_js,  plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
     .aggregate(plantain_common_js)
 
   lazy val plantain_common_js = Project(
