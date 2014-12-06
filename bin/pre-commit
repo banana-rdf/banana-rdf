@@ -5,7 +5,7 @@
 #if test $(sbt compile | grep -c -E "Reformatted|Failed") != 0
 if test $(sbt ";scalariformFormat;test:scalariformFormat" | grep -c -E "Reformatted|Failed") != 0
 then
-echo "Sbt detected problems. Code was not scalariformatted. It should be now."
+echo "Sbt detected problems. Code was not scalariformatted. It should be now.\nSo please retry git commit"
 exit 1
 fi
 if test $(sbt test | grep -c -E "error.*Failed tests:") != 0

@@ -3,7 +3,7 @@ package org.w3.banana
 import scala.util.Try
 
 /**
- * A typeclass for `T`s supporting transactions.
+ * A typeclass for `A`s supporting transactions.
  */
 trait Transactor[Rdf <: RDF, A] {
 
