@@ -23,18 +23,18 @@ class NTriplesWriter[Rdf <: RDF](implicit val ops:RDFOps[Rdf]) extends RDFWriter
    */
   def node2Str(node:Rdf#Node): String = ops.foldNode(node)(
     { case ops.URI(url) => "<" + url + ">"},
-  { case ops.BNode(id) => "_:" + id},
-  {
+    { case ops.BNode(id) => "_:" + id},
+    {
       case ops.Literal((string, ops.URI(datatype), Some(lang))) => "\"" + string + "\"" + "@" + lang
-      case ops.Literal((string, ops.URI(datatype), None)) if ops.isLiteral(node) => "\"" + string + "\"" + "^^<" + datatype + ">"
+      case ops.Literal((string, ops.URI(datatype), None)) => "\"" + string + "\"" + "^^<" + datatype + ">"
     }
   )
 
-  override def write(graph: Rdf#Graph, os: OutputStream, base: String): Try[Unit] = asString(graph,base).map{
+  def write(graph: Rdf#Graph, os: OutputStream, base: String): Try[Unit] = asString(graph,base).map{
     string=> os.write(string.getBytes("UTF-8"))
   }
 
-  override def asString(graph: Rdf#Graph, base: String): Try[String] = Try{
+  def asString(graph: Rdf#Graph, base: String): Try[String] = Try{
     (
       for { trip <- ops.getTriples(graph)
             (subject,property,objectt) = ops.fromTriple(trip)

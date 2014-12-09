@@ -37,15 +37,7 @@ trait RDFOps[Rdf <: RDF]
 
   def foldNode[T](node: Rdf#Node)(funURI: Rdf#URI => T, funBNode: Rdf#BNode => T, funLiteral: Rdf#Literal => T): T
 
-  /**
-   * Function that is used avoid typeerasure problems during pattern matching
-   * @param node Rdf node will be accessed
-   * @tparam T
-   * @return true if node is URI
-   */
   def isURI[T](node: Rdf#Node) = foldNode[Boolean](node)(uri => true, bn => false, lit => false)
-
-  def isLiteral[T](node: Rdf#Node) = foldNode[Boolean](node)(uri => false, bn => false, lit => true)
 
   // URI
 

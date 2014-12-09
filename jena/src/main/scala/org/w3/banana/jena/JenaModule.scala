@@ -18,7 +18,6 @@ with SparqlHttpModule
 with RDFXMLReaderModule
 with TurtleReaderModule
 with NTriplesReaderModule
-with NTriplesWriterModule
 with ReaderSelectorModule
 with RDFXMLWriterModule
 with TurtleWriterModule
@@ -60,8 +59,6 @@ with XmlQueryResultsReaderModule {
   implicit val turtleWriter: RDFWriter[Jena, Try, Turtle] = JenaRDFWriter.turtleWriter
 
   implicit val n3Writer: RDFWriter[Jena, Try, N3] = JenaRDFWriter.n3Writer
-
-  override implicit val ntriplesWriter: RDFWriter[Jena, Try, NTriples] = new NTriplesWriter[Jena]
 
   implicit val writerSelector: org.w3.banana.RDFWriterSelector[Jena, Try] = JenaRDFWriter.selector
 
