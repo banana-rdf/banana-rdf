@@ -203,7 +203,7 @@ object BananaRdfBuild extends Build {
    */
   lazy val ntriples = Project(
     id = "ntriples",
-    base = file("ntriples"),
+    base = file("io/ntriples"),
     settings = buildSettings ++
       Seq(
         aggregate in Test := false,
@@ -216,7 +216,7 @@ object BananaRdfBuild extends Build {
 
   lazy val ntriples_jvm = Project(
     id = "ntriples_jvm",
-    base = file("ntriples/jvm"),
+    base = file("io/ntriples/jvm"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       aggregate in Test := false,
       publishMavenStyle := true
@@ -225,7 +225,7 @@ object BananaRdfBuild extends Build {
 
   lazy val ntriples_common_jvm = Project(
     id = "ntriples_common_jvm",
-    base = file("ntriples/common"),
+    base = file("io/ntriples/common"),
     settings = buildSettings ++ scalajsJvmSettings ++ Seq(
       publishMavenStyle := true
     )
@@ -234,7 +234,7 @@ object BananaRdfBuild extends Build {
 //  not doing the js part yet
   lazy val ntriples_js = Project(
     id = "ntriples_js",
-    base = file("ntriples/js"),
+    base = file("io/ntriples/js"),
     settings = buildSettings ++ sjsDeps++ linkedSources(ntriples_jvm) ++ Seq(
       aggregate in Test := false,
       publishMavenStyle := true
@@ -243,7 +243,7 @@ object BananaRdfBuild extends Build {
 
   lazy val ntriples_common_js = Project(
     id = "ntriples_common_js",
-    base = file("ntriples/.common_js"),
+    base = file("io/ntriples/.common_js"),
     settings = buildSettings ++ sjsDeps ++ scalaz_js ++ linkedSources(ntriples_common_jvm) ++ Seq(
       publishMavenStyle := true
     )

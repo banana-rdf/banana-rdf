@@ -20,12 +20,12 @@ with NTriplesWriterModule {
 
   implicit val recordBinder: binder.RecordBinder[Plantain] = binder.RecordBinder[Plantain]
 
-  override implicit val turtleReader: RDFReader[Plantain, Try, Turtle] = PlantainTurtleReader
+  implicit val turtleReader: RDFReader[Plantain, Try, Turtle] = PlantainTurtleReader
 
-  override implicit val turtleWriter: RDFWriter[Plantain, Try, Turtle] = PlantainTurtleWriter
+  implicit val turtleWriter: RDFWriter[Plantain, Try, Turtle] = PlantainTurtleWriter
 
-  override implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader[Plantain]
+  implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader[Plantain]
 
-  override implicit val ntriplesWriter: RDFWriter[Plantain, Try, NTriples] = new NTriplesWriter[Plantain]
+  implicit val ntriplesWriter: RDFWriter[Plantain, Try, NTriples] = new NTriplesWriter[Plantain]
 
 }

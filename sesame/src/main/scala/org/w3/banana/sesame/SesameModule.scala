@@ -16,7 +16,6 @@ trait SesameModule
     with RDFXMLReaderModule
     with TurtleReaderModule
     with NTriplesReaderModule
-    with NTriplesWriterModule
     with JsonLDReaderModule
     with RDFXMLWriterModule
     with TurtleWriterModule
@@ -57,8 +56,6 @@ trait SesameModule
   implicit val jsonldExpandedWriter: RDFWriter[Sesame, Try, JsonLdExpanded] = sesameRDFWriterHelper.jsonldExpandedWriter
 
   implicit val jsonldFlattenedWriter: RDFWriter[Sesame, Try, JsonLdFlattened] = sesameRDFWriterHelper.jsonldFlattenedWriter
-
-  override implicit val ntriplesWriter: RDFWriter[Sesame, Try, NTriples] = new NTriplesWriter[Sesame]
 
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Sesame, SparqlAnswerJson] =
     SesameSolutionsWriter.solutionsWriterJson

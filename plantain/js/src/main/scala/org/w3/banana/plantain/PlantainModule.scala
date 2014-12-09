@@ -23,8 +23,8 @@ trait PlantainModule
   //  implicit val TurtleReader: RDFReader[Plantain, Turtle] = PlantainTurtleReader
 
   //  implicit val TurtleWriter: RDFWriter[Plantain, Turtle] = PlantainTurtleWriter
-  override implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader[Plantain]
+  implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader[Plantain]
 
-  override implicit val ntriplesWriter: RDFWriter[Plantain, Try, NTriples] = new NTriplesWriter[Plantain]
+  implicit val ntriplesWriter: RDFWriter[Plantain, Try, NTriples] = new NTriplesWriter[Plantain]
 
 }

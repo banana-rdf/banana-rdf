@@ -137,19 +137,4 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
     iso.findAnswer(left, right).isSuccess
   }
 
-  /**
-   * It is overridden because it fails on Generic plantain URI's
-   * @param node RDFNode to be folded
-   * @param funURI functions that works on URI
-   * @param funBNode function that works on BlankNode
-   * @param funLiteral function that works on Literal
-   * @tparam T
-   * @return
-   */
-  override def foldNode[T](node: Plantain#Node)(funURI: Plantain#URI => T, funBNode: Plantain#BNode => T, funLiteral: Plantain#Literal => T): T = node match {
-    case uri: Plantain#URI => funURI(uri)
-    case bnode: Plantain#BNode => funBNode(bnode)
-    case literal: Plantain#Literal => funLiteral(literal)
-  }
-
 }
