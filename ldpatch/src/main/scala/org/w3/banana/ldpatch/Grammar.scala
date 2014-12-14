@@ -69,7 +69,7 @@ trait Grammar[Rdf <: RDF] {
 
       // statement ::= bind | add | delete | updateList
       def statement: Rule1[m.Statement[Rdf]] = rule (
-        bind | add | delete | cut | updateList
+        bind | add | addNew | delete | deleteAny | cut | updateList
       )
 
       // bind ::= ("Bind" | "B") Var value path? "."
@@ -79,12 +79,22 @@ trait Grammar[Rdf <: RDF] {
 
       // add ::= ("Add" | "A") "{" graph "}" "."
       def add: Rule1[m.Add[Rdf]] = rule (
-        ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Add(graph) }
+        ("Add" | 'A') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Add(m.Lax, graph) }
+      )
+
+      // addNew ::= ("AddNew" | "AN") "{" graph "}" "."
+      def addNew: Rule1[m.Add[Rdf]] = rule (
+        ("AddNew" | "AN") ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Add(m.Strict, graph) }
       )
 
       // delete ::= ("Delete" | "D") "{" graph "}" "."
       def delete: Rule1[m.Delete[Rdf]] = rule (
-        ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(graph) }
+        ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(m.Strict, graph) }
+      )
+
+      // deleteAny ::= ("DeleteAny" | "DA") "{" graph "}" "."
+      def deleteAny: Rule1[m.Delete[Rdf]] = rule (
+        ("DeleteAny" | "DA") ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(m.Lax, graph) }
       )
 
       // cut ::= ("Cut" | "C") VAR1 "."
@@ -142,9 +152,14 @@ trait Grammar[Rdf <: RDF] {
         })
       )
 
-      // INDEX ::= [0-9]+
+      // INDEX ::= '-'? [0-9]+
       def INDEX: Rule1[Int] = rule (
-        capture(oneOrMore(Digit)) ~> ((s: String) => s.toInt)
+        capture(optional('-') ~ oneOrMore(Digit)) ~> { (s: String) =>
+          if (s.charAt(0) == '-')
+            - s.substring(1).toInt
+          else
+            s.toInt
+        }
       )
 
       // copied from SPARQL

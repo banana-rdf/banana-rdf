@@ -237,6 +237,22 @@ UpdateList <#> <http://example.org/vocab#preferredLanguages> 2.. ( "en" "fr" ) .
 
   }
 
+  "rdf:List manipulation examples - replace last n elements" in {
+
+    val ldpatch = newFreshParser("""
+UpdateList <#> <http://example.org/vocab#preferredLanguages> -3.. ( "en" "fr" ) .
+""").ldpatch.run().success.value
+
+    val expectedGraph = reader.read("""
+<#> <http://example.org/vocab#preferredLanguages> ( "lorem" "ipsum" "en" "fr" ).
+""", "http://example.com/timbl").get
+
+    val newGraph = s.semantics.LDPatch(ldpatch, listGraph)
+
+    assert(expectedGraph isIsomorphicWith newGraph)
+
+  }
+
   "rdf:List manipulation examples - remove elements" in {
 
     val ldpatch = newFreshParser("""

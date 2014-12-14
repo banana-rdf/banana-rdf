@@ -23,13 +23,26 @@ trait Semantics[Rdf <: RDF] {
       def apply(graph: Rdf#Graph): State = State(graph, Map.empty)
     }
 
+    /** Computes the length of a `rdf:List`. */
+    def length(graph: Rdf#Graph, list: Rdf#Node): Int = {
+      lazy val max = graph.size
+      @annotation.tailrec
+      def loop(current: Rdf#Node, counter: Int): Int = current match {
+        case rdf.nil => counter
+        case node    =>
+          val next = ops.getObjects(graph, node, rdf.rest).headOption.getOrElse(sys.error("malformed list"))
+          loop(next, counter + 1)
+      }
+      loop(list, 0)
+    }
+
     def LDPatch(patch: m.LDPatch[Rdf], graph: Rdf#Graph): Rdf#Graph = {
       patch.statements.foldLeft(State(graph, Map.empty)){ case (state, statement) => Statement(statement, state) }.graph
     }
 
     def Statement(statement: m.Statement[Rdf], state: State): State = statement match {
-      case add@m.Add(_)                   => Add(add, state)
-      case delete@m.Delete(_)             => Delete(delete, state)
+      case add@m.Add(_, _)                => Add(add, state)
+      case delete@m.Delete(_, _)          => Delete(delete, state)
       case bind@m.Bind(_, _, _)           => Bind(bind, state)
       case cut@m.Cut(_)                   => Cut(cut, state)
       case ul@m.UpdateList(_, _, _, _, _) => UpdateList(ul, state)
@@ -37,17 +50,36 @@ trait Semantics[Rdf <: RDF] {
 
 
     def Add(add: m.Add[Rdf], state: State): State = {
-      val m.Add(triples) = add
+      val m.Add(mode, triples) = add
       val State(graph, varmap) = state
-      val groundTriples: Vector[Rdf#Triple] = triples.map { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
+      val f: m.Triple[Rdf] => Rdf#Triple = mode match {
+        case m.Lax => { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
+        case m.Strict => { case m.Triple(s, p, o) =>
+          val groundS = VarOrConcrete(s, varmap)
+          val groundO = VarOrConcrete(o, varmap)
+          val triple = Triple(groundS, p, groundO)
+          if (! ops.find(graph, groundS, p, groundO).isEmpty) sys.error(s"[AddNew] $triple already exists in the graph")
+          triple
+        }
+      }
+      val groundTriples: Vector[Rdf#Triple] = triples.map(f)
       State(graph union Graph(groundTriples), varmap)
     }
 
     def Delete(delete: m.Delete[Rdf], state: State): State = {
-      val m.Delete(triples) = delete
+      val m.Delete(mode, triples) = delete
       val State(graph, varmap) = state
-      val groundTriples: Vector[Rdf#Triple] = triples.map { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
-      // TODO should be an error
+      val f: m.Triple[Rdf] => Rdf#Triple = mode match {
+        case m.Lax => { case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
+        case m.Strict => { case m.Triple(s, p, o) =>
+          val groundS = VarOrConcrete(s, varmap)
+          val groundO = VarOrConcrete(o, varmap)
+          val triple = Triple(groundS, p, groundO)
+          if (ops.find(graph, groundS, p, groundO).isEmpty) sys.error(s"[Delete] $triple did not exist in the graph")
+          triple
+        }
+      }
+      val groundTriples: Vector[Rdf#Triple] = triples.map(f)
       State(graph diff Graph(groundTriples), varmap)
     }
 
@@ -97,10 +129,18 @@ trait Semantics[Rdf <: RDF] {
 
       val groundTriples: Seq[Rdf#Triple] = triples.map{ case m.Triple(s, p, o) => Triple(VarOrConcrete(s, varmap), p, VarOrConcrete(o, varmap)) }
 
-      val (left, right) = slice match {
-        case m.Range(leftIndex, rightIndex) => (Some(leftIndex), Some(rightIndex))
-        case m.EverythingAfter(index)       => (Some(index), None)
-        case m.End                          => (None, None)
+      val (left, right) = {
+        lazy val len = length(graph, headList)
+        def positiveIndex(index: Int): Int = {
+          val i = if (index < 0) index + len else index
+          assert(i >= 0, s"[UpdateList] Index out of bound: $index")
+          i
+        }
+        slice match {
+          case m.Range(leftIndex, rightIndex) => (Some(positiveIndex(leftIndex)), Some(positiveIndex(rightIndex)))
+          case m.EverythingAfter(index)       => (Some(positiveIndex(index)), None)
+          case m.End                          => (None, None)
+        }
       }
 
       @annotation.tailrec
@@ -183,13 +223,24 @@ trait Semantics[Rdf <: RDF] {
 
         case m.StepBackward(uri) => nodes.flatMap(node => ops.getSubjects(graph, uri, node))
 
-        case m.StepAt(index) =>
+        case m.StepAt(index) => nodes.flatMap { node =>
+
+          val positiveIndex = if (index < 0) index + length(graph, node) else index
+          assert(positiveIndex >= 0, s"[StepAt] Index out of bound: $index")
+
           @annotation.tailrec
-          def loop(nodes: Set[Rdf#Node], index: Int): Set[Rdf#Node] = index match {
-            case 0 => nodes
-            case i => loop(nodes.flatMap(node => ops.getObjects(graph, node, ops.rdf.rest)), i-1)
+          def loop(node: Rdf#Node, index: Int): Option[Rdf#Node] = index match {
+            case 0 => Some(node)
+            case i => node match {
+              case rdf.nil => None
+              case _       =>
+                val next = ops.getObjects(graph, node, rdf.rest).headOption.getOrElse(sys.error("[StepAt] malformed list"))
+                loop(next, i - 1)
+            }
           }
-          loop(nodes, index)
+
+          loop(node, index)
+        }
 
         case m.Filter(path, None) => nodes.filter(node => Path(path, node, state).nonEmpty)
 
