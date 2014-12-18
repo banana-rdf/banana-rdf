@@ -15,13 +15,13 @@ object BuildSettings {
 
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    version := "0.7.1-SNAPSHOT",
-    scalaVersion := "2.11.2",
-    crossScalaVersions := Seq("2.11.2", "2.10.4"),
+    version := "0.7.1",
+    scalaVersion := "2.11.4",
+    crossScalaVersions := Seq("2.11.4", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     fork := false,
     parallelExecution in Test := false,
-    offline := true,
+    offline := true, 
     // TODO
     testOptions in Test += Tests.Argument("-oDS"),
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Yinline-warnings"),
@@ -262,7 +262,7 @@ object BananaRdfBuild extends Build {
       // this will be needed until parboiled 2.0.1 gets released
       // see https://github.com/sirthias/parboiled2/issues/84#
       libraryDependencies <++= scalaVersion {
-        case "2.11.2" => Seq("org.scala-lang" % "scala-reflect" % "2.11.2")
+        case "2.11.4" => Seq("org.scala-lang" % "scala-reflect" % "2.11.4")
         case _ => Seq.empty
       },
       libraryDependencies += scalatest % "test"
