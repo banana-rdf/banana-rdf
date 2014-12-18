@@ -11,7 +11,8 @@ with RDFOpsModule
 with RecordBinderModule
 with TurtleReaderModule
 with TurtleWriterModule
-with NTriplesReaderModule {
+with NTriplesReaderModule
+with NTriplesWriterModule {
 
   type Rdf = Plantain
 
@@ -24,5 +25,7 @@ with NTriplesReaderModule {
   implicit val turtleWriter: RDFWriter[Plantain, Try, Turtle] = PlantainTurtleWriter
 
   implicit val ntriplesReader: RDFReader[Plantain, Try, NTriples] = new NTriplesReader[Plantain]
+
+  implicit val ntriplesWriter: RDFWriter[Plantain, Try, NTriples] = new NTriplesWriter[Plantain]
 
 }
