@@ -31,11 +31,11 @@ object AddNew {
 }
 
 object Delete {
-  def apply[Rdf <: RDF](triples: Vector[Triple[Rdf]]): Delete[Rdf] = Delete(Strict, triples)
+  def apply[Rdf <: RDF](triples: Vector[Triple[Rdf]]): Delete[Rdf] = Delete(Lax, triples)
 }
 
-object DeleteAny {
-  def apply[Rdf <: RDF](triples: Vector[Triple[Rdf]]): Delete[Rdf] = Delete(Lax, triples)
+object DeleteExisting {
+  def apply[Rdf <: RDF](triples: Vector[Triple[Rdf]]): Delete[Rdf] = Delete(Strict, triples)
 }
 
 case class Triple[Rdf <: RDF](s: VarOrConcrete[Rdf], p: Rdf#URI, o: VarOrConcrete[Rdf])

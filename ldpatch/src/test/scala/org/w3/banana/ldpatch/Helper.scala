@@ -42,12 +42,12 @@ object Main extends App {
   val input = """
 ldpatch ::= prologue statement*
 prologue ::= prefixID*
-statement ::= bind | add | delete | updateList
+statement ::= bind | add | addNew | delete | deleteExisting | cut | updateList
 bind ::= ("Bind" | "B") Var value path? "."
 add ::= ("Add" | "A") "{" graph "}" "."
 addNew ::= ("AddNew" | "AN") "{" graph "}" "."
 delete ::= ("Delete" | "D") "{" graph "}" "."
-deleteAny ::= ("DeleteAny" | "DA") "{" graph "}" "."
+deleteExisting ::= ("DeleteExisting" | "DE") "{" graph "}" "."
 cut ::= ("Cut" | "C") VAR1 "."
 updateList ::= ("UpdateList" | "UL") varOrIRI predicate slice collection "."
 varOrIRI ::= iri | VAR1

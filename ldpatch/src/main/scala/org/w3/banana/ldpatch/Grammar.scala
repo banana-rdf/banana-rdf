@@ -67,9 +67,9 @@ trait Grammar[Rdf <: RDF] {
       // prologue ::= prefixID*
       def prologue: Rule1[Map[String, Rdf#URI]] = rule { zeroOrMore(prefixID).separatedBy(WS1) ~> ((prefixes: Seq[(String, Rdf#URI)]) => push(this.prefixes ++ prefixes)) }
 
-      // statement ::= bind | add | delete | updateList
+      // statement ::= bind | add | addNew | delete | deleteExisting | cut | updateList
       def statement: Rule1[m.Statement[Rdf]] = rule (
-        bind | add | addNew | delete | deleteAny | cut | updateList
+        bind | add | addNew | delete | deleteExisting | cut | updateList
       )
 
       // bind ::= ("Bind" | "B") Var value path? "."
@@ -89,12 +89,12 @@ trait Grammar[Rdf <: RDF] {
 
       // delete ::= ("Delete" | "D") "{" graph "}" "."
       def delete: Rule1[m.Delete[Rdf]] = rule (
-        ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(m.Strict, graph) }
+        ("Delete" | 'D') ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(m.Lax, graph) }
       )
 
-      // deleteAny ::= ("DeleteAny" | "DA") "{" graph "}" "."
-      def deleteAny: Rule1[m.Delete[Rdf]] = rule (
-        ("DeleteAny" | "DA") ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(m.Lax, graph) }
+      // deleteExisting ::= ("DeleteExisting" | "DE") "{" graph "}" "."
+      def deleteExisting: Rule1[m.Delete[Rdf]] = rule (
+        ("DeleteExisting" | "DE") ~ WS1 ~ '{' ~ WS0 ~ graph ~ WS0 ~ '}' ~ WS0 ~ '.' ~> { (graph: Vector[m.Triple[Rdf]]) => m.Delete(m.Strict, graph) }
       )
 
       // cut ::= ("Cut" | "C") VAR1 "."
