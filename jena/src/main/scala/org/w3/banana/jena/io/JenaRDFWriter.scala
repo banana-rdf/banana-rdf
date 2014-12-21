@@ -74,11 +74,11 @@ object JenaRDFWriter {
   implicit val jsonldCompactedWriter: RDFWriter[Jena, Try, JsonLdCompacted] =
     makeRDFWriter[JsonLdCompacted](RDFLanguages.JSONLD)
 
-  implicit val jsonldExpandedWriter: RDFWriter[Jena, Try, JsonLdExpanded] =
-    makeRDFWriter[JsonLdExpanded](RDFLanguages.JSONLD)
-
-  implicit val jsonldFlattenedWriter: RDFWriter[Jena, Try, JsonLdFlattened] =
-    makeRDFWriter[JsonLdFlattened](RDFLanguages.JSONLD)
+//  implicit val jsonldExpandedWriter: RDFWriter[Jena, Try, JsonLdExpanded] =
+//    makeRDFWriter[JsonLdExpanded](RDFLanguages.JSONLD)
+//
+//  implicit val jsonldFlattenedWriter: RDFWriter[Jena, Try, JsonLdFlattened] =
+//    makeRDFWriter[JsonLdFlattened](RDFLanguages.JSONLD)
 
     /* NOTE: in RDFLanguages in Jena we have only JSONLD and
      * RDFJSON, that is rdf-json:

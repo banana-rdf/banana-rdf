@@ -69,8 +69,5 @@ trait JenaModule
 
   implicit val jsonldCompactedWriter: RDFWriter[Jena, Try, JsonLdCompacted] =
     JenaRDFWriter.jsonldCompactedWriter
-  implicit val jsonldExpandedWriter: RDFWriter[Jena, Try, JsonLdExpanded] =
-    JenaRDFWriter.jsonldExpandedWriter
-  implicit val jsonldFlattenedWriter: RDFWriter[Jena, Try, JsonLdFlattened] =
-    JenaRDFWriter.jsonldFlattenedWriter
+
 }
