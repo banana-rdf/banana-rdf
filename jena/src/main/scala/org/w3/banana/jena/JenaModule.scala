@@ -17,11 +17,7 @@ with SparqlHttpModule
 with RDFXMLReaderModule
 with TurtleReaderModule
 with NTriplesReaderModule
-<<<<<<< HEAD
 with NTriplesWriterModule
-=======
-with ReaderSelectorModule
->>>>>>> 7519d70... move ntriples to io folder, made fixes according to peer reviews, fixed overrides
 with RDFXMLWriterModule
 with TurtleWriterModule
 with JsonSolutionsWriterModule

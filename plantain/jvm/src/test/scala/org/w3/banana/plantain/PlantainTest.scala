@@ -1,7 +1,7 @@
 package org.w3.banana.plantain
 
 import org.w3.banana._
-import org.w3.banana.io.{NTriplesReaderTestSuite, TurtleTestSuite}
+import org.w3.banana.io._
 import org.w3.banana.isomorphism._
 import scala.util.Try
 import org.w3.banana.util.tryInstances._
