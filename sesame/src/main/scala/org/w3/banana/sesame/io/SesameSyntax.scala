@@ -1,7 +1,8 @@
 package org.w3.banana.sesame.io
 
-import java.io.{OutputStream, Writer}
+import java.io.{OutputStreamWriter, OutputStream, Writer}
 import java.net.{URI => jURI}
+import java.nio.charset.Charset
 
 import com.github.jsonldjava.sesame.SesameJSONLDWriter
 import org.openrdf.model.{Statement, URI => sURI}
@@ -38,21 +39,22 @@ object SesameSyntax {
   }
 
   implicit val Turtle: SesameSyntax[Turtle] = new SesameSyntax[Turtle] {
-    // Sesame's parser does not handle relative URI, but let us override the behavior :-)
-    def write(uri: sURI, writer: Writer, baseURI: jURI) = {
-      val juri = new jURI(uri.toString)
-      val uriToWrite = baseURI.relativize(juri)
-      writer.write("<" + uriToWrite + ">")
-    }
 
-    def rdfWriter(os: OutputStream, base: String) = new STurtleWriter(os) {
-      val baseUri = new jURI(base)
-      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
-    }
+    def rdfWriter(os: OutputStream, base: String) = new RelativeWriter(os,base)
 
-    def rdfWriter(wr: Writer, base: String) = new STurtleWriter(wr) {
+    def rdfWriter(wr: Writer, base: String) = new RelativeWriter(wr,base)
+
+    class RelativeWriter(wr:Writer,base:String) extends STurtleWriter(wr)
+    {
       val baseUri = new jURI(base)
-      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
+      def this(out:OutputStream,base:String) =this(new OutputStreamWriter(out, Charset.forName("UTF-8")),base)
+
+      // Sesame's parser does not handle relative URI, but let us override the behavior :-)
+      override def writeURI(uri: sURI): Unit = {
+        val juri = new jURI(uri.toString)
+        val uriToWrite = baseUri.relativize(juri)
+        if(juri == uriToWrite) super.writeURI(uri) else writer.write("<" + uriToWrite + ">")
+      }
     }
   }
 

@@ -20,7 +20,7 @@ class SesameRDFWriter[T: Syntax](implicit
    * @param b second triplet
    * @return false if order change is required
    */
-  protected def sortTriple(a:Sesame#Triple,b:Sesame#Triple) = if(a.getSubject==b.getSubject)
+  protected def sortTriple(a:Sesame#Triple,b:Sesame#Triple) = if(a.getSubject.stringValue==b.getSubject.stringValue)
     a.getPredicate.stringValue < b.getPredicate.stringValue else a.getSubject.stringValue < b.getSubject.stringValue
 
   /**
