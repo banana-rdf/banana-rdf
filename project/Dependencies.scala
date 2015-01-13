@@ -41,9 +41,13 @@ object Dependencies {
    */
   val scalatest = "org.scalatest" %% "scalatest" % "2.2.0"
 
-  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.0"
-
-  val scalacheckJs = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.1-SNAPSHOT")
+  
+  /** ScalaCheck
+    * @see http://scalacheck.org/
+    * @see http://repo1.maven.org/maven2/org/scalacheck/
+    */
+  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
+  val scalacheckJs = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.1")
 
   val zcheckJsSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
