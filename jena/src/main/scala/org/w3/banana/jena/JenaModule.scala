@@ -70,4 +70,7 @@ with XmlQueryResultsReaderModule {
   implicit val xmlQueryResultsReader: SparqlQueryResultsReader[Jena, SparqlAnswerXml] =
     JenaQueryResultsReader.queryResultsReaderXml
 
+  implicit val jsonldCompactedWriter: RDFWriter[Jena, Try, JsonLdCompacted] =
+    JenaRDFWriter.jsonldCompactedWriter
+
 }
