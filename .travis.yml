@@ -45,3 +45,6 @@ matrix:
 
 notifications:
   irc: "chat.freenode.net#banana-rdf"
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/3e0365f444b1edebc7d1
