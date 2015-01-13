@@ -32,7 +32,7 @@ object JenaRDFWriter {
     }
   }
 
-  implicit val rdfxmlWriter: RDFWriter[Jena, Try, RDFXML] = new RDFWriter[Jena, Try, RDFXML] {
+  val rdfxmlWriter: RDFWriter[Jena, Try, RDFXML] = new RDFWriter[Jena, Try, RDFXML] {
 
     def write(graph: Jena#Graph, os: OutputStream, base: String): Try[Unit] = Try {
       val writer = new Abbreviated()
@@ -52,7 +52,7 @@ object JenaRDFWriter {
 
   }
 
-  implicit val turtleWriter: RDFWriter[Jena, Try, Turtle] = new RDFWriter[Jena, Try, Turtle] {
+  val turtleWriter: RDFWriter[Jena, Try, Turtle] = new RDFWriter[Jena, Try, Turtle] {
 
     // with the turtle writer we pass it  relative graph as that seems to stop the parser from adding the
     // @base statement at the top!
@@ -69,6 +69,9 @@ object JenaRDFWriter {
     }
   }
 
-  implicit val n3Writer: RDFWriter[Jena, Try, N3] = makeRDFWriter[N3](RDFLanguages.N3)
+  val n3Writer: RDFWriter[Jena, Try, N3] = makeRDFWriter[N3](RDFLanguages.N3)
+
+  val jsonldCompactedWriter: RDFWriter[Jena, Try, JsonLdCompacted] =
+    makeRDFWriter[JsonLdCompacted](RDFLanguages.JSONLD)
 
 }

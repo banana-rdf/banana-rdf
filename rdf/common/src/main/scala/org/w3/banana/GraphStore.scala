@@ -1,10 +1,10 @@
 package org.w3.banana
 
 /**
- * A typeclass for graph stores supporting manipulations of [RDF Datasets](http://www.w3.org/TR/rdf11-concepts/#h2_section-dataset).
- *
- * With this interface, one can only manipulate named graphs (no
- * default graph) through their names (only as URIs, no bnode).
+* A typeclass for graph stores supporting [RDF Datasets](http://www.w3.org/TR/rdf11-concepts/#h2_section-dataset) manipulations.
+*
+* The store of type `A` can manipulate named graphs (no default graph) through their names (only URIs, no bnode).
+* Operations happen inside the context `M`.
  */
 trait GraphStore[Rdf <: RDF, M[+_], A] {
 
