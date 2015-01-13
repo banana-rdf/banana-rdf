@@ -13,18 +13,25 @@
 # On Travis, there is currently 2 cores and so the default SBT java settings are adequate. The rule seems to be to set
 # the flag -XmxN, where N = No. cores / 4 - eg with 8 cores(4 real, with hyper threading 8) - -Xmx2048m
 #
+
 language: scala
+
 env:
   export SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=300M -XX:ReservedCodeCacheSize=128m -Xmx2G"
+
 jdk:
   # see https://github.com/travis-ci/travis-cookbooks/issues/35
   - oraclejdk7
+
 scala:
   - 2.10.4
-  - 2.11.2
+  - 2.11.4
+
 branches:
   only:
     - master
+    - radical
+
 matrix:
   include:
     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
@@ -35,5 +42,6 @@ matrix:
       scala:  2.10.4      
   allow_failures: 
    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test 
-#script:
-#  - ./sbt test
+
+notifications:
+  irc: "chat.freenode.net#banana-rdf"
