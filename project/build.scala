@@ -5,6 +5,8 @@ import com.inthenow.sbt.scalajs.SbtScalajs._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 import sbt.Keys._
 import sbt._
+import sbtunidoc.Plugin._
+import sbtunidoc.Plugin.UnidocKeys._
 
 import scala.scalajs.sbtplugin.ScalaJSPlugin.ScalaJSKeys._
 import scala.scalajs.sbtplugin.ScalaJSPlugin._
@@ -15,9 +17,9 @@ object BuildSettings {
 
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    version := "0.7.1-SNAPSHOT",
+    version := "0.7.2.radical-SNAPSHOT",
     scalaVersion := "2.11.4",
-    crossScalaVersions := Seq("2.11.2", "2.10.4"),
+    crossScalaVersions := Seq("2.11.4", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     fork := false,
     parallelExecution in Test := false,
@@ -109,7 +111,7 @@ object BananaRdfBuild extends Build {
   lazy val banana = Project(
     id = "banana",
     base = file("."),
-    settings = buildSettings ++ Unidoc.settings
+    settings = buildSettings ++ unidocSettings
   )//.dependsOn(banana_js, banana_jvm)
    .aggregate(banana_js, banana_jvm)
 
@@ -117,7 +119,7 @@ object BananaRdfBuild extends Build {
   lazy val banana_js = Project(
     id = "banana_js",
     base = file(".banana_js"),
-    settings = buildSettings ++ Unidoc.settings ++ Seq(
+    settings = buildSettings ++ Seq(
       aggregate in Test in rdf_js := false,
       aggregate in Test in rdfTestSuite_js := false
     ) ++ zcheckJsSettings
@@ -129,7 +131,7 @@ object BananaRdfBuild extends Build {
   lazy val banana_jvm = Project(
     id = "banana_jvm",
     base = file(".banana_jvm"),
-    settings = buildSettings ++ Unidoc.settings ++ Seq (
+    settings = buildSettings ++ Seq (
       aggregate in Test in rdf_jvm := false,
       aggregate in Test in rdfTestSuite_jvm := false
     )++ zcheckJvmSettings
@@ -140,7 +142,7 @@ object BananaRdfBuild extends Build {
   lazy val experimental = Project(
     id = "experimental",
     base = file(".experimental"),
-    settings = buildSettings ++ Unidoc.settings,
+    settings = buildSettings,
     aggregate = Seq(ldpatch)
   )
 
@@ -263,7 +265,7 @@ object BananaRdfBuild extends Build {
       // this will be needed until parboiled 2.0.1 gets released
       // see https://github.com/sirthias/parboiled2/issues/84#
       libraryDependencies <++= scalaVersion {
-        case "2.11.2" => Seq("org.scala-lang" % "scala-reflect" % "2.11.2")
+        case "2.11.4" => Seq("org.scala-lang" % "scala-reflect" % "2.11.4")
         case _ => Seq.empty
       },
       libraryDependencies += scalatest % "test"
