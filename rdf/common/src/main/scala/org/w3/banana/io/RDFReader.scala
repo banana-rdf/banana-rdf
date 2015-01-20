@@ -3,15 +3,15 @@ package io
 
 import java.io._
 
-/** RDF readers for a given syntax. */
+/** RDF readers.
+  * 
+  * All functions return results in the context `M`. `S` is a phantom
+  * type for the syntax.
+  */
 trait RDFReader[Rdf <: RDF, M[_], +S] {
 
-
-  /** Tries parsing an RDF Graph from an [[java.io.InputStream]] and a base URI.
-    * 
-    * If the encoding for the input is known, prefer the Reader
-    * version of this function.
-    * @param base the base URI to use, to resolve relative URLs found in the InputStream
+  /** Tries parsing an RDF Graph from an [[java.io.InputStream]] and a
+    * base URI.
     */
   def read(is: InputStream, base: String): M[Rdf#Graph]
 

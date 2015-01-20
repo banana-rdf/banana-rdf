@@ -417,6 +417,18 @@ object BananaRdfBuild extends Build {
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, ntriples_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
     .aggregate(plantain_common_js)
 
+  lazy val `N3.js` = Project(
+    id = "n3-js",
+    base = file("N3.js"),
+    settings = buildSettings ++ Seq(
+      publishMavenStyle := true,
+      // TODO remove this dependency
+      libraryDependencies ++= Seq("org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"),
+      jsDependencies += ProvidedJS / "n3-browser.js" commonJSName "N3",
+      skip in ScalaJSKeys.packageJSDependencies := false
+    )++ zcheckJsSettings
+  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile")
+
   lazy val plantain_common_js = Project(
     id = "plantain_common_js",
     base = file("plantain/.common_js"),
