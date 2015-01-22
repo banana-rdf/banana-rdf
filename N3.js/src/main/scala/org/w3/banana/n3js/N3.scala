@@ -14,7 +14,7 @@ object N3 extends js.Object {
 
 trait Parser extends js.Object {
 
-  def parse(s: String, callback: js.Function3[js.Error, js.UndefOr[Triple], js.UndefOr[js.Dynamic], Unit]): Unit
+  def parse(s: String, callback: js.Function3[js.Error, js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit
 
   def parse(callback: js.Function3[js.Any, js.UndefOr[Triple], js.UndefOr[js.Any], Unit]): Unit
 
@@ -39,18 +39,14 @@ object Parser {
       val promise = Promise[Unit]()
       parser.parse(
         input,
-        (error: js.Error, triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dynamic]) => {
+        (error: js.Error, triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dictionary[String]]) => {
           if (triple.isDefined)
             tripleCallback(triple.get)
           else if (error != null)
             promise.failure(ParsingError(error))
           else {
-            if (prefixes.isDefined) {
-              // it's supposed to be an array but I can't find a better way...
-              js.Object.properties(prefixes.get.asInstanceOf[js.Object]).forEach((key: String) => {
-                val value = prefixes.get.selectDynamic(key).asInstanceOf[String]
-                prefixCallback(key, value)
-              })
+            prefixes.foreach { prefixes =>
+              js.Object.properties(prefixes).forEach((key: String) => prefixCallback(key, prefixes(key)))
             }
             promise.complete(Success(()))
           }

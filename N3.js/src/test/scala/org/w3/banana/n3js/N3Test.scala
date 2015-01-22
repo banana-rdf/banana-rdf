@@ -1,6 +1,5 @@
 package org.w3.banana.n3js
 
-import org.w3.banana._
 import zcheck.SpecLite
 import scala.scalajs.js
 
@@ -11,7 +10,7 @@ import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 object N3Test extends SpecLite {
 
   // see https://github.com/RubenVerborgh/N3.js#from-rdf-chunks-to-triples
-  "N3.Parser() -- error" in {
+  "N3.Parser(): error" in {
 
     val parser = N3.Parser()
 
@@ -40,7 +39,11 @@ c:Jerry a c:Mouse;
         c:smarterThan c:Tom.
 """
 
-    parser.parse(input)((t: Triple) => triples :+= t, (k: String, v: String) => prefixes += (k -> v)).foreach { _ =>
+    parser.parse(
+      input)(
+      (t: Triple) => triples :+= t,
+      (k: String, v: String) => prefixes += (k -> v)
+    ).foreach { _ =>
       check(triples.size == 3)
 
       val triple = triples.head
@@ -55,7 +58,7 @@ c:Jerry a c:Mouse;
   }
 
   // see https://github.com/RubenVerborgh/N3.js#from-rdf-chunks-to-triples
-  "N3.Parser() -- From RDF chunks to triples" in {
+  "N3.Parser(): From RDF chunks to triples" in {
 
     val parser = N3.Parser()
 
@@ -86,7 +89,7 @@ c:Jerry a c:Mouse;
   }
 
   // see https://github.com/RubenVerborgh/N3.js#storing
-  "N3.Store() -- Storting" in {
+  "N3.Store(): Storing" in {
 
     val store = N3.Store()
 
