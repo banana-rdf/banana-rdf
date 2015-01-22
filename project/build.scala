@@ -422,8 +422,7 @@ object BananaRdfBuild extends Build {
     base = file("N3.js"),
     settings = buildSettings ++ Seq(
       publishMavenStyle := true,
-      // TODO remove this dependency
-      libraryDependencies ++= Seq("org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"),
+      // libraryDependencies ++= Seq("org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"),
       jsDependencies += ProvidedJS / "n3-browser.js" commonJSName "N3",
       skip in ScalaJSKeys.packageJSDependencies := false
     )++ zcheckJsSettings

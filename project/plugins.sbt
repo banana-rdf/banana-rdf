@@ -12,4 +12,3 @@ addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.56.7")
 // addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.1")
-
