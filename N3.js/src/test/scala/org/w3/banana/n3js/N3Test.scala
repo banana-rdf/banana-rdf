@@ -4,7 +4,50 @@ import org.w3.banana._
 import zcheck.SpecLite
 import scala.scalajs.js
 
+import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+
+// the async stuff doesn't get properly tested by zcheck. Need to wait
+// for scala-js 0.6. Look for [error] in the output in the meantime...
 object N3Test extends SpecLite {
+
+  // see https://github.com/RubenVerborgh/N3.js#from-rdf-chunks-to-triples
+  "N3.Parser() -- error" in {
+
+    val parser = N3.Parser()
+
+    val input =
+"""
+@prefix c: http://example.org/cartoons#>.
+"""
+
+    parser.parse(input){ (t: Triple) => () }.failed.foreach { case ParsingError(_) => () }
+
+  }
+
+  // see https://github.com/RubenVerborgh/N3.js#from-an-rdf-document-to-triples
+  "N3.Parser(): From an RDF document to triples " in {
+
+    val parser = N3.Parser()
+
+    var triples: Vector[Triple] = Vector.empty
+
+    val input =
+"""
+@prefix c: <http://example.org/cartoons#>.
+c:Tom a c:Cat.
+c:Jerry a c:Mouse;
+        c:smarterThan c:Tom.
+"""
+
+    parser.parse(input){ (t: Triple) => triples :+= t }.foreach { _ =>
+      check(triples.size == 3)
+      val triple = triples.head
+      check(triple.subject == "http://example.org/cartoons#Tom")
+      check(triple.predicate == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+      check(triple.`object` == "http://example.org/cartoons#Cat")
+    }
+
+  }
 
   // see https://github.com/RubenVerborgh/N3.js#from-rdf-chunks-to-triples
   "N3.Parser() -- chunks" in {

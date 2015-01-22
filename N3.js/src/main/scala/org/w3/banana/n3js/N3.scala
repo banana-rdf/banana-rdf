@@ -14,13 +14,51 @@ object N3 extends js.Object {
 
 trait Parser extends js.Object {
 
-//  def parse(s: js.String, callback: js.Function3[js.Any, js.Any, js.Any, js.Any]): js.Dynamic
+  def parse(s: String, callback: js.Function3[js.Error, js.UndefOr[Triple], js.UndefOr[js.Any], Unit]): Unit
 
   def parse(callback: js.Function3[js.Any, js.UndefOr[Triple], js.UndefOr[js.Any], Unit]): Unit
 
   def addChunk(chunk: String): Unit
 
   def end(): Unit
+
+}
+
+object Parser {
+
+  implicit class ParserW(val parser: Parser) extends AnyVal {
+
+    import scala.concurrent._
+    import scala.util.Success
+
+    def parse[T](input: String)(f: Triple => Unit): Future[Unit] = {
+      val promise = Promise[Unit]()
+      parser.parse(
+        input,
+        (error: js.Error, triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Any]) => {
+          // that's why I hate Javascript...
+          if (triple != null && triple.isDefined)
+            f(triple.get)
+          else if (error != null)
+            promise.failure(ParsingError(error))
+          else
+            promise.complete(Success(()))
+          //prefixes.foreach { p => println("prefixes: "+p) }
+          ()
+        }
+      )
+      promise.future
+    }
+
+  }
+
+}
+
+case class ParsingError(message: String) extends Exception(message)
+
+object ParsingError {
+
+  def apply(error: js.Error): ParsingError = ParsingError(error.message)
 
 }
 
