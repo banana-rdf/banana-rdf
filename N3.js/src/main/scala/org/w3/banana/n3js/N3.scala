@@ -14,7 +14,7 @@ object N3 extends js.Object {
 
 trait Parser extends js.Object {
 
-  def parse(s: String, callback: js.Function3[js.Error, js.UndefOr[Triple], js.UndefOr[js.Any], Unit]): Unit
+  def parse(s: String, callback: js.Function3[js.Error, js.UndefOr[Triple], js.UndefOr[js.Dynamic], Unit]): Unit
 
   def parse(callback: js.Function3[js.Any, js.UndefOr[Triple], js.UndefOr[js.Any], Unit]): Unit
 
@@ -31,19 +31,29 @@ object Parser {
     import scala.concurrent._
     import scala.util.Success
 
-    def parse[T](input: String)(f: Triple => Unit): Future[Unit] = {
+    def parse[T](
+      input: String)(
+      tripleCallback: Triple => Unit,
+      prefixCallback: (String, String) => Unit = (_:String, _:String) => ()
+    ): Future[Unit] = {
       val promise = Promise[Unit]()
       parser.parse(
         input,
-        (error: js.Error, triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Any]) => {
-          // that's why I hate Javascript...
-          if (triple != null && triple.isDefined)
-            f(triple.get)
+        (error: js.Error, triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dynamic]) => {
+          if (triple.isDefined)
+            tripleCallback(triple.get)
           else if (error != null)
             promise.failure(ParsingError(error))
-          else
+          else {
+            if (prefixes.isDefined) {
+              // it's supposed to be an array but I can't find a better way...
+              js.Object.properties(prefixes.get.asInstanceOf[js.Object]).forEach((key: String) => {
+                val value = prefixes.get.selectDynamic(key).asInstanceOf[String]
+                prefixCallback(key, value)
+              })
+            }
             promise.complete(Success(()))
-          //prefixes.foreach { p => println("prefixes: "+p) }
+          }
           ()
         }
       )

@@ -20,7 +20,7 @@ object N3Test extends SpecLite {
 @prefix c: http://example.org/cartoons#>.
 """
 
-    parser.parse(input){ (t: Triple) => () }.failed.foreach { case ParsingError(_) => () }
+    parser.parse(input)((t: Triple) => ()).failed.foreach { case ParsingError(_) => () }
 
   }
 
@@ -30,6 +30,7 @@ object N3Test extends SpecLite {
     val parser = N3.Parser()
 
     var triples: Vector[Triple] = Vector.empty
+    var prefixes: Map[String, String] = Map.empty
 
     val input =
 """
@@ -39,18 +40,22 @@ c:Jerry a c:Mouse;
         c:smarterThan c:Tom.
 """
 
-    parser.parse(input){ (t: Triple) => triples :+= t }.foreach { _ =>
+    parser.parse(input)((t: Triple) => triples :+= t, (k: String, v: String) => prefixes += (k -> v)).foreach { _ =>
       check(triples.size == 3)
+
       val triple = triples.head
+
       check(triple.subject == "http://example.org/cartoons#Tom")
       check(triple.predicate == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
       check(triple.`object` == "http://example.org/cartoons#Cat")
+
+      check(prefixes == Map("c" -> "http://example.org/cartoons#"))
     }
 
   }
 
   // see https://github.com/RubenVerborgh/N3.js#from-rdf-chunks-to-triples
-  "N3.Parser() -- chunks" in {
+  "N3.Parser() -- From RDF chunks to triples" in {
 
     val parser = N3.Parser()
 
@@ -81,7 +86,7 @@ c:Jerry a c:Mouse;
   }
 
   // see https://github.com/RubenVerborgh/N3.js#storing
-  "N3.Store()" in {
+  "N3.Store() -- Storting" in {
 
     val store = N3.Store()
 
