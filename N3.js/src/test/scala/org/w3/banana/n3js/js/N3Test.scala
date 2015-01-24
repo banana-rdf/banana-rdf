@@ -1,4 +1,5 @@
 package org.w3.banana.n3js
+package js
 
 import zcheck.SpecLite
 import scala.scalajs.js
@@ -65,9 +66,9 @@ c:Jerry a c:Mouse;
     var triples: Vector[Triple] = Vector.empty
 
     parser.parse(
-      (error: js.Any, triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Any]) => {
+      (error: js.UndefOr[js.Any], triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Any]) => {
         triple.foreach { (t: Triple) => triples :+= t }
-        prefixes.foreach { p => println("prefixes: "+p) }
+        //prefixes.foreach { p => println("prefixes: "+p) }
       }
     )
 

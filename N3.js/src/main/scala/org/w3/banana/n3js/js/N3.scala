@@ -1,4 +1,5 @@
 package org.w3.banana.n3js
+package js
 
 import scala.scalajs.js
 
@@ -14,9 +15,9 @@ object N3 extends js.Object {
 
 trait Parser extends js.Object {
 
-  def parse(s: String, callback: js.Function3[js.Error, js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit
+  def parse(s: String, callback: js.Function3[js.UndefOr[js.Error], js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit
 
-  def parse(callback: js.Function3[js.Any, js.UndefOr[Triple], js.UndefOr[js.Any], Unit]): Unit
+  def parse(callback: js.Function3[js.UndefOr[js.Error], js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit
 
   def addChunk(chunk: String): Unit
 
@@ -31,19 +32,28 @@ object Parser {
     import scala.concurrent._
     import scala.util.Success
 
+    /** Parses the `input` and call the `tripleCallback` and
+      * `prefixCallback` functions when a triple or a prefix are
+      * found.
+      *       
+      * Note: according to N3.js documentation, `prefixCallback` is
+      * actually called at the end of the parsing.
+      * 
+      * @return a [[scala.concurrent.Future]] that signals that parsing is done.
+      */
     def parse[T](
       input: String)(
       tripleCallback: Triple => Unit,
-      prefixCallback: (String, String) => Unit = (_:String, _:String) => ()
+      prefixCallback: (String, String) => Unit = (_: String, _: String) => ()
     ): Future[Unit] = {
       val promise = Promise[Unit]()
       parser.parse(
         input,
-        (error: js.Error, triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dictionary[String]]) => {
+        (error: js.UndefOr[js.Error], triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dictionary[String]]) => {
           if (triple.isDefined)
             tripleCallback(triple.get)
-          else if (error != null)
-            promise.failure(ParsingError(error))
+          else if (error.isDefined)
+            promise.failure(ParsingError(error.get))
           else {
             prefixes.foreach { prefixes =>
               js.Object.properties(prefixes).forEach((key: String) => prefixCallback(key, prefixes(key)))
