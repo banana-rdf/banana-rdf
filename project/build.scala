@@ -423,7 +423,7 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ Seq(
       publishMavenStyle := true,
       // libraryDependencies ++= Seq("org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"),
-      jsDependencies += ProvidedJS / "n3-browser.js" commonJSName "N3",
+      jsDependencies += "org.webjars" % "N3.js" % "799fee7697"/ "n3-browser.min.js" commonJSName "N3",
       skip in ScalaJSKeys.packageJSDependencies := false
     )++ zcheckJsSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile")
