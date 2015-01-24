@@ -66,6 +66,37 @@ object Parser {
       promise.future
     }
 
+    /** Allows parsing in chunks. The callbacks are registered and the
+      * termination is notified through the return
+      * [[scala.concurrent.Future]].
+      * 
+      * @return A [[scala.concurrent.Future]] that resolves when the parsing is done.
+      */
+    def parseChunks(
+      tripleCallback: Triple => Unit,
+      prefixCallback: (String, String) => Unit = (_: String, _: String) => ()
+    ): Future[Unit] = {
+      val promise = Promise[Unit]()
+      parser.parse(
+        (error: js.UndefOr[js.Error], triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dictionary[String]]) => {
+          if (triple.isDefined)
+            tripleCallback(triple.get)
+          else if (error.isDefined)
+            promise.failure(ParsingError(error.get))
+          else {
+            prefixes.foreach { prefixes =>
+              js.Object.properties(prefixes).forEach((key: String) => prefixCallback(key, prefixes(key)))
+            }
+            promise.complete(Success(()))
+          }
+          ()
+        }
+      )
+      promise.future
+    }
+
+
+
   }
 
 }

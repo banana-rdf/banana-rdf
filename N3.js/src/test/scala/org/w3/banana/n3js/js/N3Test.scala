@@ -64,28 +64,34 @@ c:Jerry a c:Mouse;
     val parser = N3.Parser()
 
     var triples: Vector[Triple] = Vector.empty
+    var prefixes: Map[String, String] = Map.empty
 
-    parser.parse(
-      (error: js.UndefOr[js.Any], triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Any]) => {
-        triple.foreach { (t: Triple) => triples :+= t }
-        //prefixes.foreach { p => println("prefixes: "+p) }
-      }
+    val future = parser.parseChunks(
+      (t: Triple) => triples :+= t,
+      (k: String, v: String) => prefixes += (k -> v)
     )
 
     parser.addChunk("@prefix c: <http://example.org/cartoons#>.\n")
     parser.addChunk("c:Tom a ")
     parser.addChunk("c:Cat. c:Jerry a")
-    // got an exception when adding that...
-//    parser.addChunk(" c:Mouse.")
+    parser.addChunk(" c:Mouse.")
+    // if I uncomment the following line, I get an exception somewhere
+    // (hard to know where with scala-js)
+    parser.addChunk("foo")
     parser.end()
 
-    check(triples.size == 1)
+    future.foreach { _ =>
 
-    val triple = triples.head
+      check(triples.size == 2)
 
-    check(triple.subject == "http://example.org/cartoons#Tom")
-    check(triple.predicate == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
-    check(triple.`object` == "http://example.org/cartoons#Cat")
+      val triple = triples.head
+
+      check(triple.subject == "http://example.org/cartoons#Tom")
+      check(triple.predicate == "http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
+      check(triple.`object` == "http://example.org/cartoons#Cat")
+
+    }
+
 
   }
 
