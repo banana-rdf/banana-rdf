@@ -50,9 +50,9 @@ object Parser {
       parser.parse(
         input,
         (error: js.UndefOr[js.Error], triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dictionary[String]]) => {
-          if (triple.isDefined)
+          if (triple != null && triple.isDefined)
             tripleCallback(triple.get)
-          else if (error.isDefined)
+          else if (triple != null && error.isDefined)
             promise.failure(ParsingError(error.get))
           else {
             prefixes.foreach { prefixes =>
@@ -79,9 +79,9 @@ object Parser {
       val promise = Promise[Unit]()
       parser.parse(
         (error: js.UndefOr[js.Error], triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dictionary[String]]) => {
-          if (triple.isDefined)
+          if (triple != null && triple.isDefined)
             tripleCallback(triple.get)
-          else if (error.isDefined)
+          else if (error != null && error.isDefined)
             promise.failure(ParsingError(error.get))
           else {
             prefixes.foreach { prefixes =>
@@ -123,6 +123,39 @@ object Triple {
     import triple._
     def s: String = s"{ $subject $predicate $objekt }"
     def objekt = `object`
+  }
+
+  import org.w3.banana._
+  import N3.Util
+
+  def toBananaTriple[Rdf <: RDF](t: Triple)(implicit ops: RDFOps[Rdf]): Rdf#Triple = {
+    val s = Node.toBananaNode(t.subject)
+    val p = ops.makeUri(t.predicate)
+    val o = Node.toBananaNode(t.`object`)
+    ops.makeTriple(s, p, o)
+  }
+
+}
+
+object Node {
+
+  import org.w3.banana._
+  import N3.Util
+
+  def toBananaNode[Rdf <: RDF](s: String)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
+    import ops._
+    if (Util.isIRI(s)) {
+      makeUri(s)
+    } else if (Util.isBlank(s)) {
+      makeBNodeLabel(s.substring(2))
+    } else {
+      val lexicalForm = Util.getLiteralValue(s)
+      val lang = Util.getLiteralLanguage(s)
+      if (lang.isEmpty)
+        makeLiteral(lexicalForm, makeUri(Util.getLiteralType(s)))
+      else
+        makeLangTaggedLiteral(lexicalForm, makeLang(lang))
+    }
   }
 
 }

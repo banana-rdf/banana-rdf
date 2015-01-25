@@ -1,4 +1,5 @@
-package org.w3.banana.n3js
+package org.w3.banana
+package n3js
 package js
 
 import zcheck.SpecLite

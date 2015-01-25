@@ -426,7 +426,7 @@ object BananaRdfBuild extends Build {
       jsDependencies += "org.webjars" % "N3.js" % "799fee7697"/ "n3-browser.min.js" commonJSName "N3",
       skip in ScalaJSKeys.packageJSDependencies := false
     )++ zcheckJsSettings
-  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile")
+  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
 
   lazy val plantain_common_js = Project(
     id = "plantain_common_js",
