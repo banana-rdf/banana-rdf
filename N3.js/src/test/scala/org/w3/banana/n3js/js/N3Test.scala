@@ -75,11 +75,11 @@ c:Jerry a c:Mouse;
     parser.addChunk("@prefix c: <http://example.org/cartoons#>.\n")
     parser.addChunk("c:Tom a ")
     parser.addChunk("c:Cat. c:Jerry a")
+    check(triples.size == 1)
     parser.addChunk(" c:Mouse.")
-    // if I uncomment the following line, I get an exception somewhere
-    // (hard to know where with scala-js)
-    parser.addChunk("foo")
     parser.end()
+
+    check(triples.size == 2)
 
     future.foreach { _ =>
 
