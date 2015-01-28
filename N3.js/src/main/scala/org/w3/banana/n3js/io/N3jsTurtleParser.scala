@@ -7,6 +7,7 @@ import org.w3.banana.io._
 import java.io._
 import scala.concurrent.{ Future, ExecutionContext }
 
+/** A TurtleParser for N3.js. */
 class N3jsTurtleParser[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
   ec: ExecutionContext

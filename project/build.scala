@@ -413,7 +413,7 @@ object BananaRdfBuild extends Build {
     base = file("plantain/js"),
     settings = buildSettings ++ Seq(
       publishMavenStyle := true
-    )++ zcheckJsSettings
+    ) ++ zcheckJsSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, ntriples_js, plantain_common_js % "compile;test->test", rdfTestSuite_js % "test-internal->compile")
     .aggregate(plantain_common_js)
 
@@ -425,7 +425,17 @@ object BananaRdfBuild extends Build {
       // libraryDependencies ++= Seq("org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"),
       jsDependencies += "org.webjars" % "N3.js" % "799fee7697"/ "n3-browser.min.js" commonJSName "N3",
       skip in ScalaJSKeys.packageJSDependencies := false
-    )++ zcheckJsSettings
+    ) ++ zcheckJsSettings
+  ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
+
+  lazy val `jsonld.js` = Project(
+    id = "jsonld-js",
+    base = file("jsonld.js"),
+    settings = buildSettings ++ Seq(
+      publishMavenStyle := true,
+      jsDependencies += ProvidedJS / "jsonld.js" commonJSName "jsonld",
+      skip in ScalaJSKeys.packageJSDependencies := false
+    ) ++ zcheckJsSettings
   ).enablePlugins(SbtScalajs).dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
 
   lazy val plantain_common_js = Project(
