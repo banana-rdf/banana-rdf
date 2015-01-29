@@ -1,3 +1,5 @@
+//logLevel := Level.Debug
+
 addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
 
 resolvers += Resolver.url(

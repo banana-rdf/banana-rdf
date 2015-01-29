@@ -32,6 +32,8 @@ object BananaRdfBuild extends Build {
   import BuildSettings._
   import Dependencies._
 
+  val crossBuildType =  SharedBuild  //SbtLinkedBuild CommonBaseBuild SharedBuild   SymLinkedBuild
+
   /** `banana`, the root project. */
   lazy val bananaM  = CrossModule(RootBuild,
     id              = "banana",
@@ -50,7 +52,7 @@ object BananaRdfBuild extends Build {
     .settings(zcheckJsSettings:_*)
 
   /** `rdf`, a cross-compiled base module for RDF abstractions. */
-  lazy val rdfM = CrossModule(SymLinkedBuild,
+  lazy val rdfM = CrossModule(crossBuildType,
     id              = "rdf",
     baseDir         = "rdf",
     defaultSettings = buildSettings,
@@ -62,7 +64,7 @@ object BananaRdfBuild extends Build {
   lazy val rdf_js  = rdfM.project(Js, rdf_common_js)
 
   lazy val rdf_common_jvm = rdfM
-    .project(JvmShared)
+    .project(Jvm,Shared)
     .settings(
       Seq(
         libraryDependencies += scalaz,
@@ -70,11 +72,11 @@ object BananaRdfBuild extends Build {
         libraryDependencies += jodaConvert): _*)
 
   lazy val rdf_common_js = rdfM
-    .project(JsShared)
+    .project(Js,Shared)
     .settings(scalaz_js: _*)
 
   /** `ntriples`, blocking yet streaming parser */
-  lazy val ntriplesM  = CrossModule(SymLinkedBuild,
+  lazy val ntriplesM  = CrossModule(crossBuildType,
     id                = "ntriples",
     baseDir           = "io/ntriples",
     defaultSettings   = buildSettings,
@@ -82,14 +84,14 @@ object BananaRdfBuild extends Build {
     sharedLabel       = "common")
 
   lazy val ntriples     = ntriplesM.project(Module, ntriples_jvm, ntriples_js)
-  lazy val ntriples_jvm = ntriplesM.project(Jvm, ntriples_common_jvm)
-  lazy val ntriples_js = ntriplesM.project(Js, ntriples_common_js)
+  lazy val ntriples_jvm = ntriplesM.project(Jvm, Empty,  ntriples_common_jvm)
+  lazy val ntriples_js = ntriplesM.project(Js,Empty,  ntriples_common_js)
   lazy val ntriples_common_jvm = ntriplesM
-    .project(JvmShared)
+    .project(Jvm,Shared)
     .dependsOn(rdf_jvm)
 
   lazy val ntriples_common_js = ntriplesM
-    .project(JsShared)
+    .project(Js,Shared)
     .dependsOn(rdf_js)
 
   /** `ldpatch`, an implementation for LD Patch. See http://www.w3.org/TR/ldpatch/ .*/
@@ -109,7 +111,7 @@ object BananaRdfBuild extends Build {
     .dependsOn(rdf_jvm, jena, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `rdf-test-suite`, a cross-compiled test suite for RDF. */
-  lazy val rdfTestSuiteM = CrossModule(SymLinkedBuild,
+  lazy val rdfTestSuiteM = CrossModule(crossBuildType,
     id              = "rdf-test-suite",
     baseDir         = "rdf-test-suite",
     defaultSettings = buildSettings,
@@ -130,7 +132,7 @@ object BananaRdfBuild extends Build {
     .dependsOn(rdf_js)
 ****/
   lazy val rdfTestSuite_common_jvm = rdfTestSuiteM
-    .project(JvmShared)
+    .project(Jvm, Shared)
     .settings(
       Seq(
         //resolvers += sonatypeRepo,
@@ -189,7 +191,7 @@ object BananaRdfBuild extends Build {
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `plantain`, a cross-compiled Scala implementation for RDF.  */
-  lazy val plantainM = CrossModule(SymLinkedBuild,
+  lazy val plantainM = CrossModule(crossBuildType,
     id              = "plantain",
     baseDir         = "plantain",
     defaultSettings = buildSettings,
@@ -216,11 +218,11 @@ object BananaRdfBuild extends Build {
     .dependsOn(rdf_js, ntriples_js) ///////////////, rdfTestSuite_js % "test-internal->compile")
 
   lazy val plantain_common_jvm = plantainM
-    .project(JvmShared)
+    .project(Jvm, Shared)
     .dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   lazy val plantain_common_js  = plantainM
-    .project(JsShared)
+    .project(Js, Shared)
     .settings(scalaz_js ++ zcheckJsSettings:_*)
     .dependsOn(rdf_js) //////////:Todo  , rdfTestSuite_js % "test-internal->compile")
 
@@ -257,6 +259,7 @@ object BananaRdfBuild extends Build {
   )
 
   lazy val experimental = experimentalM.project(Module, ldpatch)
+
 }
 
 /*
