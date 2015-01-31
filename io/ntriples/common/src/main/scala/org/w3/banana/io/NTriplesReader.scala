@@ -86,6 +86,11 @@ object  NTriplesParser {
 
   def whitespace(ci: Int) = {
     val c = ci.toChar
+    c == ' ' || c == '\t'
+  }
+
+  def whitespaceEOL(ci: Int) = {
+    val c = ci.toChar
     c == ' ' || c == '\t' || c == '\n' || c == '\r'
   }
 
@@ -414,7 +419,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
   private def parseNextTriple(): Try[Rdf#Triple] = {
     read() match {
       case -1 => Failure(EOF("while starting to parse next triple"))
-      case w if whitespace(w) => parseNextTriple()
+      case w if whitespaceEOL(w) => parseNextTriple()
       case '#' => {
         parseComment()
         parseNextTriple()
