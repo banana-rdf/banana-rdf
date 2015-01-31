@@ -1,6 +1,6 @@
 package org.w3.banana.io
 
-import java.io.{InputStream, InputStreamReader, LineNumberReader, Reader}
+import java.io.{InputStream, InputStreamReader, Reader}
 import java.lang.Character._
 
 import org.w3.banana.{RDF, RDFOps}
@@ -45,6 +45,7 @@ class NTriplesReader[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends RDFReader[Rd
 
 object  NTriplesParser {
   private def digit(c: Char) = '0'<= c && c <= '9'
+  private def whitespace(c: Char) = c == ' ' || c == '\t'
   private def alpha(c: Char) = ('A' <= c && c <= 'Z') ||  ('a' <= c && c <= 'z')
   private def hex(c: Char) = digit(c) || ('A' <= c && c <= 'F') ||  ( 'a' <= c && c <= 'f')
   private def alphaNum(c: Char) = alpha(c) ||  digit(c)
@@ -85,7 +86,7 @@ object  NTriplesParser {
 
   def whitespace(ci: Int) = {
     val c = ci.toChar
-    c == ' ' || c == '\t'
+    c == ' ' || c == '\t' || c == '\n' || c == '\r'
   }
 
   def hexVal(chars: Seq[Char]): Char = {
@@ -131,12 +132,12 @@ object  NTriplesParser {
  *  todo
  *   - broken lines should be returned complete so that the user can edit them and to help debugging
  *
- * @param plainReader  will be wrapped in a LineNumberReader with default buffering
+ * @param reader  Reader for input
  * @param skipBrokenLines  broken lines will be skipped, rather than halting the parsing, if true
  * @param ops the Operations corresponding to the Rdf type
  * @tparam Rdf a subtype of RDF
  */
-class NTriplesParser[Rdf <: RDF](plainReader: Reader,
+class NTriplesParser[Rdf <: RDF](reader: Reader,
             val skipBrokenLines: Boolean = false)
                                 (implicit
                                  val ops: RDFOps[Rdf])
@@ -144,7 +145,7 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
 
   import ops._
   import org.w3.banana.io.NTriplesParser._
-  val reader = new LineNumberReader(plainReader)
+  var lineNumber = 0
 
   import scala.collection.mutable
   import scala.collection.mutable.StringBuilder._
@@ -413,17 +414,17 @@ class NTriplesParser[Rdf <: RDF](plainReader: Reader,
   private def parseNextTriple(): Try[Rdf#Triple] = {
     read() match {
       case -1 => Failure(EOF("while starting to parse next triple"))
-      case w if isWhitespace(w) => parseNextTriple()
+      case w if whitespace(w) => parseNextTriple()
       case '#' => {
         parseComment()
         parseNextTriple()
       }
-      case c => parseTriple(c)
+      case c => {lineNumber += 1; parseTriple(c); }
     }
   }
 
-  private def Error(char: Int,msg: String) = ParseException(reader.getLineNumber(), char, msg)
-  private def EOF(message: String)= ParseException(reader.getLineNumber,-1,message)
+  private def Error(char: Int,msg: String) = ParseException(lineNumber, char, msg)
+  private def EOF(message: String)= ParseException(lineNumber,-1,message)
 
 }
 
