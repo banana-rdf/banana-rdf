@@ -10,7 +10,7 @@ class PlantainTurtleTest extends TurtleTestSuite[Plantain, Try]
 
 class PlantainNTripleReaderTestSuite extends NTriplesReaderTestSuite[Plantain]
 
-class PlantainNTripleWriterTestSuite extends NTriplesReaderTestSuite[Plantain]
+class PlantainNTripleWriterTestSuite extends NTriplesWriterTestSuite[Plantain]
 
 class PlantainSimpleClassifyTest() extends SimpleClassifyTest[Plantain](
   new SimpleMappingGenerator[Plantain](_))
