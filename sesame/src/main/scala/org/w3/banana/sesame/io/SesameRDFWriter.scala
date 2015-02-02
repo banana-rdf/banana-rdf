@@ -2,10 +2,11 @@ package org.w3.banana.sesame.io
 
 import java.io._
 
+import org.openrdf.rio
 import org.w3.banana.RDFWriterSelector
 import org.w3.banana.io._
 import org.w3.banana.sesame.{Sesame, SesameOps}
-
+import scala.collection.JavaConversions._
 import scala.util._
 
 class SesameRDFWriter[T: Syntax](implicit
@@ -13,19 +14,35 @@ class SesameRDFWriter[T: Syntax](implicit
   sesameSyntax: SesameSyntax[T]
 ) extends RDFWriter[Sesame, Try, T] {
 
-  def write(graph: Sesame#Graph, os: OutputStream, base: String): Try[Unit] = Try {
-    val sWriter = sesameSyntax.rdfWriter(os, base)
+  /**
+   * Sort function that sorts triplets in order to produce nice looking Turtle
+   * @param a first triplet
+   * @param b second triplet
+   * @return false if order change is required
+   */
+  protected def sortTriple(a:Sesame#Triple,b:Sesame#Triple) = if(a.getSubject.stringValue==b.getSubject.stringValue)
+    a.getPredicate.stringValue < b.getPredicate.stringValue else a.getSubject.stringValue < b.getSubject.stringValue
+
+  /**
+   * Writes Sesame graph with turtle writer
+   * @param graph
+   * @param sWriter
+   */
+  protected def writeGraph(graph:Sesame#Graph,sWriter:rio.RDFWriter) = {
     sWriter.startRDF()
-    ops.getTriples(graph) foreach sWriter.handleStatement
+    for(n <- graph.getNamespaces) sWriter.handleNamespace(n.getPrefix,n.getName)
+    val trips = ops.getTriples(graph).toStream.sortWith(sortTriple)
+    trips foreach sWriter.handleStatement
     sWriter.endRDF()
   }
+
+  def write(graph: Sesame#Graph, os: OutputStream, base: String): Try[Unit] =
+    Try (    writeGraph(graph, sesameSyntax.rdfWriter(os, base)) )
 
   def asString(graph: Sesame#Graph, base: String): Try[String] = Try {
     val result = new StringWriter()
     val sWriter = sesameSyntax.rdfWriter(result, base)
-    sWriter.startRDF()
-    ops.getTriples(graph) foreach sWriter.handleStatement
-    sWriter.endRDF()
+    this.writeGraph(graph,sWriter)
     result.toString
   }
 }

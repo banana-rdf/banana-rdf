@@ -5,6 +5,9 @@ import org.w3.banana.io.{NTriplesReaderTestSuite, TurtleTestSuite}
 import org.w3.banana.isomorphism._
 import scala.util.Try
 import org.w3.banana.util.tryInstances._
+import org.w3.banana.meta._
+import org.w3.banana.annotations._
+
 
 class PlantainTurtleTest extends TurtleTestSuite[Plantain, Try]
 
@@ -45,3 +48,7 @@ class PlantainIsoTest() extends IsomorphismTests[Plantain]
 // New shared tests
 
 class PlantainGraphUnionJvmTest extends GraphUnionJvmTest[Plantain]
+
+class PlantainAnnotationTest extends AnnotationTest[Plantain]{
+  override def materialize(p: Person): Map[Plantain#URI, Any] = Mappable.materializeMappable[Person].toMap[Plantain](p)
+}

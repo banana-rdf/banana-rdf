@@ -16,8 +16,8 @@ object BuildSettings {
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
     version := "0.7.2-SNAPSHOT",
-    scalaVersion := "2.11.4",
-    crossScalaVersions := Seq("2.11.4", "2.10.4"),
+    scalaVersion := "2.11.5",
+    crossScalaVersions := Seq("2.11.5", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     fork := false,
     parallelExecution in Test := false,
@@ -142,6 +142,47 @@ object BananaRdfBuild extends Build {
     settings = buildSettings ++ Unidoc.settings,
     aggregate = Seq(ldpatch)
   )
+
+
+
+  /**
+   * meta programming module for macroses
+   */
+  lazy val meta_jvm = Project(
+    id = "meta_jvm",
+    base = file("meta/jvm"),
+    settings = buildSettings ++ scalajsJvmSettings ++ Seq(
+      name := "banana-meta",
+      scalaVersion := "2.11.5",
+      aggregate in Test := false,
+      publishMavenStyle := true,
+      libraryDependencies += "com.softwaremill.macwire" %% "macros" % "0.7.3",
+      libraryDependencies ++= (if (scalaVersion.value startsWith "2.11.") Nil else Seq(
+        "org.scalamacros" %% "quasiquotes" % "2.0.1",
+        compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+      )),
+      (unmanagedSourceDirectories in Compile) += baseDirectory.value.getParentFile / "shared/src/main/scala"
+    )
+  ).dependsOn(rdf_jvm)
+
+  lazy val meta_js = Project(
+    id = "meta_js",
+    base = file("meta/js"),
+    settings = buildSettings ++  sjsDeps  ++ Seq(
+      name := "banana-meta",
+      scalaVersion := "2.11.5",
+      aggregate in Test := false,
+      publishMavenStyle := true,
+      libraryDependencies += "com.softwaremill.macwire" %% "macros" % "0.7.3",
+      libraryDependencies ++= (if (scalaVersion.value startsWith "2.11.") Nil else Seq(
+      "org.scalamacros" %% "quasiquotes" % "2.0.1",
+      compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+      )),
+      (unmanagedSourceDirectories in Compile) += baseDirectory.value.getParentFile / "shared/src/main/scala"
+    )
+  ).dependsOn(rdf_js)
+
+
 
   /** `rdf`, a cross-compiled base module for RDF abstractions.
     *
@@ -292,7 +333,7 @@ object BananaRdfBuild extends Build {
       resourceDirectory in Test := baseDirectory.value / "src/main/resources",
       aggregate in Test := false
     )
-  ).dependsOn(rdf_jvm, rdfTestSuite_common_jvm).aggregate(rdfTestSuite_common_jvm)
+  ).dependsOn(rdf_jvm, rdfTestSuite_common_jvm,meta_jvm).aggregate(rdfTestSuite_common_jvm)
 
   lazy val rdfTestSuite_js = Project(
     id = "rdf-test-suite_js",
@@ -302,7 +343,7 @@ object BananaRdfBuild extends Build {
       aggregate in Test := false
     )
   ).enablePlugins(SbtScalajs)
-    .dependsOn(rdf_js, rdfTestSuite_common_js)
+    .dependsOn(rdf_js, rdfTestSuite_common_js,meta_js)
     .aggregate(rdfTestSuite_common_js)
 
   lazy val rdfTestSuite_common_jvm = Project(
