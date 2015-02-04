@@ -22,7 +22,8 @@ object Dependencies {
    * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
    */
   // Todo: %%%! --> %%%
-  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.0-4")
+  //val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.0-4")
+  val scalaz_js = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalaz-core" % "7.1.0-4")
 
   /**
    * joda-Time
@@ -50,22 +51,21 @@ object Dependencies {
     * @see http://scalacheck.org/
     * @see http://repo1.maven.org/maven2/org/scalacheck/
     */
-
-  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
-  ///Todo:
-   val scalacheckJs = Seq() //Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.1")
+  //Todo:
+  val scalacheck = "com.github.inthenow" %% "scalacheck" % "1.12.2"
+  //Todo:
+  val scalacheckJs = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalacheck" % "1.12.2")
 
   val zcheckJsSettings = Seq(
-    resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns)
-///Todo:
-   // ,
-   // libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.5.3",
-   // ScalaJSKeys.scalaJSTestFramework := "org.scalacheck.ScalaCheckFramework"
-  )
+    resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.0",
+    testFrameworks := Seq(new TestFramework("org.scalacheck.ScalaCheckFramework"))
+  ) ++ scalacheckJs
 
   val zcheckJvmSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.5.3",
+    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.0",
+    libraryDependencies += scalacheck,
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1")
   )
 

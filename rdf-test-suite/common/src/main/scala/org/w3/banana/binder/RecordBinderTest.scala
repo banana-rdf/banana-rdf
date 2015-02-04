@@ -2,8 +2,6 @@ package org.w3.banana.binder
 
 import org.w3.banana._, syntax._, diesel._
 import scala.util._
-import java.security.KeyPairGenerator
-import java.security.interfaces.RSAPublicKey
 import zcheck.SpecLite
 
 class RecordBinderTest[Rdf <: RDF](implicit
@@ -21,8 +19,6 @@ class RecordBinderTest[Rdf <: RDF](implicit
   val person = Person("Alexandre Bertails")
   val personWithNickname = person.copy(nickname = Some("betehess"))
   val me = Me("Name")
-  val keyGen = KeyPairGenerator.getInstance("RSA");
-  val rsa: RSAPublicKey = { keyGen.initialize(512); keyGen.genKeyPair().getPublic().asInstanceOf[RSAPublicKey] }
 
   "serializing and deserializing a City" in {
     city.toPG.as[City] must_==(Success(city))
@@ -34,20 +30,6 @@ class RecordBinderTest[Rdf <: RDF](implicit
       -- foaf("otherNames") ->- "Lutetia"
     ).graph
     check(city.toPG.graph.isIsomorphicWith(expectedGraph))
-  }
-
-  "serializing and deserializing a public key" in {
-    import Cert._
-    val rsaPg = rsa.toPG
-    //todo: there is a bug below. The isomorphism does not work, even though it should.
-    //    System.out.println(s"rsag=${rsaPg.graph}")
-    //    val expectedGraph = (
-    //      URI("#k") -- cert.modulus ->- rsa.getModulus.toByteArray
-    //              -- cert.exponent ->- rsa.getPublicExponent
-    //      ).graph
-    //    System.out.println(s"expectedGraph=${expectedGraph}")
-    //    rsaPg.graph.isIsomorphicWith(expectedGraph) must be(true)
-    rsaPg.as[RSAPublicKey] must_==(Success(rsa))
   }
 
   "graph constant pointer" in {

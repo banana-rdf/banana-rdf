@@ -72,11 +72,10 @@ class UriSyntaxTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
     me.resolveAgainst(host) must_==(URI("http://bblfish.net/people/card/henry#me"))
   }
 
-  "transforming java URIs and URLs to Rdf#URI" in {
+  "transforming java URIs to Rdf#URI" in {
     val card = "http://bblfish.net/people/henry/card"
     val uri: Rdf#URI = URI(card)
 
-    new URL(card).toUri must_==(uri)
     new java.net.URI(card).toUri must_==(uri)
   }
 
