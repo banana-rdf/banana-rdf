@@ -1,7 +1,10 @@
 import sbt.Keys._
 import sbt._
 
-import scala.scalajs.sbtplugin.ScalaJSPlugin._
+import com.inthenow.sbt.scalajs.SbtScalajs
+import com.inthenow.sbt.scalajs.SbtScalajs._
+import org.scalajs.sbtplugin._
+import ScalaJSPlugin.autoImport._
 
 object Dependencies {
   // Note: %%% can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting...
@@ -18,7 +21,9 @@ object Dependencies {
    * @see http://scalaz.org
    * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
    */
-  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0-4")
+  // Todo: %%%! --> %%%
+  //val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.0-4")
+  val scalaz_js = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalaz-core" % "7.1.0-4")
 
   /**
    * joda-Time
@@ -46,18 +51,21 @@ object Dependencies {
     * @see http://scalacheck.org/
     * @see http://repo1.maven.org/maven2/org/scalacheck/
     */
-  val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
-  val scalacheckJs = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.1")
+  //Todo:
+  val scalacheck = "com.github.inthenow" %% "scalacheck" % "1.12.2"
+  //Todo:
+  val scalacheckJs = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalacheck" % "1.12.2")
 
   val zcheckJsSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.5.3",
-    ScalaJSKeys.scalaJSTestFramework := "org.scalacheck.ScalaCheckFramework"
-  )
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.0",
+    testFrameworks := Seq(new TestFramework("org.scalacheck.ScalaCheckFramework"))
+  ) ++ scalacheckJs
 
   val zcheckJvmSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.5.3",
+    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.0",
+    libraryDependencies += scalacheck,
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1")
   )
 
@@ -95,7 +103,8 @@ object Dependencies {
    * @see http://repo1.maven.org/maven2/org/openrdf/sesame/
    */
   val sesameVersion = "2.8.0-beta2"
-  
+
+
   val sesameQueryAlgebra = "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion
   val sesameQueryParser = "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion
   val sesameQueryResult = "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % sesameVersion
@@ -104,7 +113,8 @@ object Dependencies {
   val sesameSailMemory = "org.openrdf.sesame" % "sesame-sail-memory" % sesameVersion
   val sesameSailNativeRdf = "org.openrdf.sesame" % "sesame-sail-nativerdf" % sesameVersion
   val sesameRepositorySail = "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion
-
+  //TODO:
+  //val sesame
   /**
    * jsonld-java
    * @see https://github.com/jsonld-java/jsonld-java
@@ -118,23 +128,6 @@ object Dependencies {
    * @see http://repo1.maven.org/maven2/org/parboiled/
    */
   val parboiled2 = "org.parboiled" %% "parboiled" % "2.0.0"
-
-  /**
-   * Jasmine js and jvm
-   * @see https://github.com/InTheNow
-   * @see https://oss.sonatype.org/content/repositories/releases/com/github/inthenow/
-   */
-  val jasmine_version = "0.3.1"
-  val jasmine_jvm = "com.github.inthenow" %% "jasmine_jvm" % jasmine_version
-  val jasmine_js = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % jasmine_version)
-  val jasmine_jsTest = Seq(libraryDependencies += "com.github.inthenow" %%% "jasmine_js" % jasmine_version % "test")
-
-  /**
-   * scalajs-jasmine-test-framework
-   * @see http://scala-js.org
-   * @see http://dl.bintray.com/content/scala-js/scala-js-releases/org.scala-lang.modules.scalajs/scalajs-jasmine-test-framework_2.11
-   */
-  val scalajsJasmine = "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion
 
   /**
    * jena-fuseki
