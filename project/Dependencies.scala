@@ -85,6 +85,9 @@ object Dependencies {
   val sesameSailNativeRdf = "org.openrdf.sesame" % "sesame-sail-nativerdf" % sesameVersion
   val sesameRepositorySail = "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion
 
+  val bigdataVersion = "1.4.0"
+  val latestBigdata = "com.bigdata" % "bigdata" % bigdataVersion
+
   /**
    * jsonld-java
    * @see https://github.com/jsonld-java/jsonld-java

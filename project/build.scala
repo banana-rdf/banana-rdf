@@ -132,8 +132,8 @@ object BananaRdfBuild extends Build {
       aggregate in Test in rdf_jvm := false,
       aggregate in Test in rdfTestSuite_jvm := false
     )
-  ).dependsOn(rdf_jvm, rdfTestSuite_jvm, jena, sesame, ntriples_jvm, plantain_jvm, examples)
-   .aggregate(rdf_jvm, rdfTestSuite_jvm, jena, sesame, ntriples_jvm, plantain_jvm, examples)
+  ).dependsOn(rdf_jvm, rdfTestSuite_jvm, jena, sesame, bigdata, ntriples_jvm, plantain_jvm, examples)
+   .aggregate(rdf_jvm, rdfTestSuite_jvm, jena, sesame, bigdata, ntriples_jvm, plantain_jvm, examples)
 
   /** A virtual module for gathering experimental ones. */
   lazy val experimental = Project(
@@ -355,6 +355,24 @@ object BananaRdfBuild extends Build {
       libraryDependencies += sesameSailNativeRdf,
       libraryDependencies += sesameRepositorySail,
       libraryDependencies += jsonldJava
+    )
+  ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
+
+  /** `sesame`, an RDF implementation for Sesame. */
+  lazy val bigdata = Project(
+    id = "bigdata",
+    base = file("bigdata"),
+    settings = buildSettings ++ Seq(
+      resolvers += "Bigdata releases" at "http://systap.com/maven/releases/",
+      resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
+      libraryDependencies += latestBigdata,
+      libraryDependencies += sesameQueryAlgebra,
+      libraryDependencies += sesameQueryParser,
+      libraryDependencies += sesameQueryResult,
+      libraryDependencies += sesameRioTurtle,
+      libraryDependencies += sesameRioRdfxml,
+      libraryDependencies += jsonldJava,
+      name := "banana-bigdata"
     )
   ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
