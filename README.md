@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/w3c/banana-rdf.png?label=ready&title=Ready)](https://waffle.io/w3c/banana-rdf)
 banana-rdf
 ==========
 
