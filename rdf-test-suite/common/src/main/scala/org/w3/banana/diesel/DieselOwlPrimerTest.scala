@@ -18,16 +18,68 @@ import org.w3.banana.PointedGraphs
  */
 class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
   import ops._
+  import scala.language.postfixOps
 
-  val owl = OWLPrefix[Rdf]
-  val rdfs = RDFSPrefix[Rdf]
-  val otherOnt   = Prefix("otherOnt", "http://example.org/otherOntologies/families/")
+  val owl      = OWLPrefix[Rdf]
+  val rdfs     = RDFSPrefix[Rdf]
+  val otherOnt = Prefix("otherOnt", "http://example.org/otherOntologies/families/")
 
   implicit def toGraph[Rdf <: RDF](s:Iterable[PointedGraph[Rdf]])(implicit ops: RDFOps[Rdf]):Rdf#Graph =
     ops.makeGraph(s.map(pg => ops.getTriples(pg.graph)).flatten)
 
-
   class FAMILYPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("families", "http://example.com/owl/families/")(ops) {
+
+    // T-Box
+    // Classes
+    val Person           = apply("Person")
+    val Woman            = apply("Woman")
+    val Parent           = apply("Parent")
+    val Father           = apply("Father")
+    val Grandfather      = apply("Grandfather")
+    val Mother           = apply("Mother")
+    val SocialRole       = apply("SocialRole")
+    val Man              = apply("Man")
+    val Teenager         = apply("Teenager")
+    val ChildlessPerson  = apply("ChildlessPerson")
+    val Human            = apply("Human")
+    val Female           = apply("Female")
+    val HappyPerson      = apply("HappyPerson")
+    val JohnsChildren    = apply("JohnsChildren")
+    val NarcisticPerson  = apply("NarcisticPerson")
+    val MyBirthdayGuests = apply("MyBirthdayGuests")
+    val Dead             = apply("Dead")
+    val Orphan           = apply("Orphan")
+    val Adult            = apply("Ad ult")
+    val YoungChild       = apply("YoungChild")
+
+    // Object Properties
+    val hasWife        = apply("hasWife")
+    val hasChild       = apply("hasChild")
+    val hasDaughter    = apply("hasDaughter")
+    val loves          = apply("loves")
+    val hasRelative    = apply("hasRelative")
+    val hasSpouse      = apply("hasSpouse")
+    val hasGrandparent = apply("hasGrandparent")
+    val hasParent      = apply("hasParent")
+    val parentOf       = apply("parentOf")
+    val hasBrother     = apply("hasBrother")
+    val hasFather      = apply("hasFather")
+    val hasUncle       = apply("hasUncle")
+    val hasSon         = apply("hasSon")
+    val hasAncestor    = apply("hasAncestor")
+    val hasHusband     = apply("hasHusband")
+
+    // DataProperty
+    val hasAge = apply("hasAge")
+    val hasSSN = apply("hasSSN")
+
+    //Datatype
+    val personAge  = apply("personAge")
+    val minorAge   = apply("minorAge")
+    val majorAge   = apply("majorAge")
+    val toddlerAge = apply("toddlerAge")
+
+    // A-Box
     // Named Individuals
     val John   = apply("John")
     val Mary   = apply("Mary")
@@ -37,55 +89,6 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLit
     val Bill   = apply("Bill")
     val Meg    = apply("Meg")
     val Susan  = apply("Susan")
-
-    // Classes
-    val Person = apply("Person")
-    val Woman = apply("Woman")
-    val Parent = apply("Parent")
-    val Father = apply("Father")
-    val Grandfather = apply("Grandfather")
-    val Mother = apply("Mother")
-    val SocialRole = apply("SocialRole")
-    val Man = apply("Man")
-    val Teenager = apply("Teenager")
-    val ChildlessPerson = apply("ChildlessPerson")
-    val Human = apply("Human")
-    val Female = apply("Female")
-    val HappyPerson = apply("HappyPerson")
-    val JohnsChildren = apply("JohnsChildren")
-    val NarcisticPerson = apply("NarcisticPerson")
-    val MyBirthdayGuests = apply("MyBirthdayGuests")
-    val Dead = apply("Dead")
-    val Orphan = apply("Orphan")
-    val Adult = apply("Adult")
-    val YoungChild = apply("YoungChild")
-
-    // Object Properties
-    val hasWife = apply("hasWife")
-    val hasChild = apply("hasChild")
-    val hasDaughter = apply("hasDaughter")
-    val loves = apply("loves")
-    val hasRelative = apply("hasRelative")
-    val hasSpouse = apply("hasSpouse")
-    val hasGrandparent = apply("hasGrandparent")
-    val hasParent = apply("hasParent")
-    val parentOf = apply("parentOf")
-    val hasBrother = apply("hasBrother")
-    val hasFather = apply("hasFather")
-    val hasUncle = apply("hasUncle")
-    val hasSon = apply("hasSon")
-    val hasAncestor = apply("hasAncestor")
-    val hasHusband = apply("hasHusband")
-
-    // DataProperty
-    val hasAge = apply("hasAge")
-    val hasSSN = apply("hasSSN")
-
-    //Datatype
-    val personAge = apply("personAge")
-    val minorAge = apply("minorAge")
-    val majorAge = apply("majorAge")
-    val toddlerAge = apply("toddlerAge")
   }
 
   object FAMILYPrefix {
@@ -94,13 +97,115 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLit
 
   val f   = FAMILYPrefix[Rdf]
 
+  object Owl2{
+
+    def equivalentClasses(ce:Rdf#URI,pg:PointedGraph[Rdf]):PointedGraph[Rdf] = ce -- owl.equivalentClass ->- pg
+
+
+    def objectComplementOf(ce:Rdf#URI):PointedGraph[Rdf] = (
+      bnode -- rdf.typ          ->- owl.Class
+            -- owl.complementOf ->- ce
+      )
+    def ¬(ce:Rdf#URI):PointedGraph[Rdf] = objectComplementOf(ce)
+
+    def objectIntersectionOf(ce:PointedGraph[Rdf]*):PointedGraph[Rdf] = (
+      bnode() -- rdf.typ          ->- owl.Class
+              -- owl.intersectionOf ->- ce.toList
+      )
+
+    implicit def uriToPG(u:Rdf#URI):PointedGraph[Rdf] = u.toPG
+
+
+  }
+
+  implicit class UriOps(ce:Rdf#URI) {
+    def equivalentClasses(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = Owl2.equivalentClasses(ce, pg)
+    def ≡(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = equivalentClasses(pg)
+
+    def objectComplementOf( ):PointedGraph[Rdf] = Owl2.objectComplementOf(ce)
+    def ¬():PointedGraph[Rdf] = objectComplementOf
+
+    def objectIntersectionOf(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = Owl2.objectIntersectionOf(ce.toPG, pg )
+    def ⊓(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = objectIntersectionOf(pg)
+
+  }
+
+  implicit class PgOps(p:PointedGraph[Rdf]) {
+  /*  def equivalentClasses(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = Owl2.equivalentClasses(ce, pg)
+    def ≡(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = equivalentClasses(pg)
+
+    def objectComplementOf( ):PointedGraph[Rdf] = Owl2.objectComplementOf(ce)
+    def ¬():PointedGraph[Rdf] = objectComplementOf
+*/
+    def objectIntersectionOf(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = Owl2.objectIntersectionOf(p, pg )
+    def ⊓(pg:PointedGraph[Rdf]):PointedGraph[Rdf] = objectIntersectionOf(pg)
+
+
+  }
+
+  "Diesel/Owl must support class expressions of the form: ObjectComplementOf " in {
+
+    /**
+      #Functional-Style Syntax
+      EquivalentClasses(
+        :ChildlessPerson
+        ObjectIntersectionOf(
+          :Person
+          ObjectComplementOf( :Parent )
+        )
+      )
+
+      #Turtle Syntax
+      :ChildlessPerson  owl:equivalentClass  [
+        rdf:type            owl:Class ;
+        owl:intersectionOf  ( :Person
+                              [ rdf:type          owl:Class ;
+                                owl:complementOf  :Parent ] )
+      ] .
+     */
+
+    import Owl2._
+
+    val g:Rdf#Graph = Seq (
+        f.ChildlessPerson -- owl.equivalentClass ->- ( bnode
+        -- rdf.typ            ->- owl.Class
+        -- owl.intersectionOf ->- List( f.Person.toPG,
+                                        bnode -- rdf.typ          ->- owl.Class
+                                              -- owl.complementOf ->- f.Parent))
+    )
+
+    // owl Funcion Graph
+    val fg  = equivalentClasses(f.ChildlessPerson, objectIntersectionOf( f.Person, objectComplementOf(f.Parent)))
+
+    // Scala Graph
+    val sg  = f.ChildlessPerson ≡ (f.Person ⊓ (f.Parent¬))
+    val sg2 = f.ChildlessPerson ≡ (f.Person ⊓ ¬(f.Parent))
+
+    val expectedGraph = Graph(
+      Triple(URI("http://example.com/owl/families/ChildlessPerson"), URI("http://www.w3.org/2002/07/owl#equivalentClass"), bnode("a")),
+      Triple(bnode("a"), URI("http://www.w3.org/2002/07/owl#intersectionOf"),     bnode("d")) ,
+      Triple(bnode("a"), URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),  URI("http://www.w3.org/2002/07/owl#Class")),
+      Triple(bnode("c"), URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),  URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#nil")),
+      Triple(bnode("b"), URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),  URI("http://www.w3.org/2002/07/owl#Class")),
+      Triple(bnode("b"), URI("http://www.w3.org/2002/07/owl#complementOf"),       URI("http://example.com/owl/families/Parent")),
+      Triple(bnode("d"), URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"), URI("http://example.com/owl/families/Person")),
+      Triple(bnode("c"), URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#first"), bnode("b")),
+      Triple(bnode("d"), URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),  bnode("c"))
+    )
+
+    check(g         isIsomorphicWith expectedGraph)
+    check(fg.graph  isIsomorphicWith expectedGraph)
+    check(sg.graph  isIsomorphicWith expectedGraph)
+    check(sg2.graph isIsomorphicWith expectedGraph)
+  }
+
   "Diesel/Owl must create the owl primer ontology" in {
 
-    val g:Rdf#Graph  =   Seq (
-      f("John")  a owl.NamedIndividual,
-      f("Mary")  a owl.NamedIndividual,
-      f("Jim")   a owl.NamedIndividual,
-      f("James") a owl.NamedIndividual,
+    val g:Rdf#Graph = Seq (
+      f("John")    a owl.NamedIndividual,
+      f("Mary")    a owl.NamedIndividual,
+      f("Jim")     a owl.NamedIndividual,
+      f("James")   a owl.NamedIndividual,
       f("Jack")    a owl.NamedIndividual,
       f("Bill")    a owl.NamedIndividual,
       f("Susan")   a owl.NamedIndividual,
@@ -357,7 +462,7 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLit
           -- owl.targetValue        ->- 53
 
     )
-   // check(g  isIsomorphicWith g2)
+   //check(g  isIsomorphicWith g2)
   }
 
 }

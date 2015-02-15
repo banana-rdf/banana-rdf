@@ -34,7 +34,7 @@ object BananaRdfBuild extends Build {
   import BuildSettings._
   import Dependencies._
 
-  val crossBuildType =  SharedBuild  //SbtLinkedBuild CommonBaseBuild SharedBuild   SymLinkedBuild
+  val crossBuildType =  CommonBaseBuild  //SbtLinkedBuild CommonBaseBuild SharedBuild   SymLinkedBuild
 
   /** `banana`, the root project. */
   lazy val bananaM  = CrossModule(RootBuild,
