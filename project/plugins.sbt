@@ -15,3 +15,4 @@ addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.6.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.1")
 
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.5")
