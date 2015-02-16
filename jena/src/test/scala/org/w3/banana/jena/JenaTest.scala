@@ -22,6 +22,8 @@ object JenaDieselGraphConstructTest extends DieselGraphConstructTest[Jena]
 
 object JenaDieselGraphExplorationTest extends DieselGraphExplorationTest[Jena]
 
+object JenaDieselOwlPrimerTest extends DieselOwlPrimerTest[Jena]
+
 import org.w3.banana.binder._
 
 object JenaCommonBindersTest extends CommonBindersTest[Jena]

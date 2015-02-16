@@ -25,6 +25,8 @@ object PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantai
 
 object PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
 
+object PlantainDieselOwlPrimerTest extends DieselOwlPrimerTest[Plantain]
+
 import org.w3.banana.binder._
 
 class PlantainCommonBindersTest extends CommonBindersTest[Plantain]
