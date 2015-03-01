@@ -38,7 +38,7 @@ trait SparqlHttpModule extends RDFModule {
 
   import java.net.URL
 
-  implicit val sparqlHttp: SparqlEngine[Rdf, Future, URL]
+  implicit val sparqlHttp: SparqlEngine[Rdf, Try, URL]
 
 }
 
