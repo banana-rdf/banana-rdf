@@ -1,51 +1,40 @@
 # doc: http://about.travis-ci.org/docs/user/languages/scala/
-#
-# Java flags reasoning, also see https://weblogs.java.net/blog/kcpeppe/archive/2013/12/11/case-study-jvm-hotspot-flags
-#
-# -XX:+CMSClassUnloadingEnabled - effectively adds GC to Perm space.
-# -XX:+UseConcMarkSweepGC       - must be enabled for CMSClassUnloadingEnabled to work
-# -XX:MaxPermSize=300M          - In Java 8, this setting is non-mutable and set at 300M - let's be prepared. Also, for Java 7, 
-#                                 fixing the actual size is not recommended - see above article 
-# 
-# SBT Concurrency: 
-# By default, SBT runs tasks concurrently and sets the limit of parallel tasks by looking at the number of cores available.
-# Note however, that each tasks uses more memory as well, so machines with more cores will need to allocate more memory to SBT.
-# On Travis, there is currently 2 cores and so the default SBT java settings are adequate. The rule seems to be to set
-# the flag -XmxN, where N = No. cores / 4 - eg with 8 cores(4 real, with hyper threading 8) - -Xmx2048m
-#
 
-# use Docker
-# see http://blog.travis-ci.com/2014-12-17-faster-builds-with-container-based-infrastructure/
 sudo: false
 
 language: scala
 
-env:
-  export SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=300M -XX:ReservedCodeCacheSize=128m -Xmx2G"
+cache:
+  directories:
+    - $HOME/.m2/repository
+    - $HOME/.sbt
+    - $HOME/.ivy2
+
+script:
+   - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts travis/jvmopts test
 
 jdk:
-  # see https://github.com/travis-ci/travis-cookbooks/issues/35
   - oraclejdk7
 
 scala:
   - 2.10.4
-  - 2.11.4
+  - 2.11.5
 
 branches:
   only:
-    - master
-    - radical
+    - /^series/.*$/
 
-matrix:
-  include:
-    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-      jdk:    oraclejdk7
-      scala:  2.11.2
-    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-      jdk:    oraclejdk7
-      scala:  2.10.4      
-  allow_failures: 
-   - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test 
+## nobody looks at experimental these days so let's save resources
+# matrix:
+#   include:
+#     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
+#       jdk:    oraclejdk7
+#       scala:  2.11.5
+#     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
+#       jdk:    oraclejdk7
+#       scala:  2.10.4      
+#   allow_failures: 
+#    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test 
 
 notifications:
   irc: "chat.freenode.net#banana-rdf"
