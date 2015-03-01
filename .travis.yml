@@ -11,7 +11,10 @@ cache:
     - $HOME/.ivy2
 
 script:
-   - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts travis/jvmopts test
+  - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts travis/jvmopts test
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.sbt -name "*.lock" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
 jdk:
   - oraclejdk7
