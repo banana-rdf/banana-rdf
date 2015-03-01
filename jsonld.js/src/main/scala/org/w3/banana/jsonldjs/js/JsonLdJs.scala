@@ -23,7 +23,7 @@ object foo {
           val triples =
             data.selectDynamic("@default")
                 .asInstanceOf[js.Array[js.Dictionary[js.Dictionary[String]]]]
-          triples.forEach { (triple: js.Dictionary[js.Dictionary[String]]) =>
+          triples.foreach { (triple: js.Dictionary[js.Dictionary[String]]) =>
             mgraph += Triple.toBananaTriple(triple)
           }
           promise.success(mgraph.makeIGraph())
@@ -50,7 +50,7 @@ object jsonld extends js.Object {
     doc: js.Dynamic,
     format: js.Dictionary[String],
     callback: js.Function2[js.Error, js.Dynamic, Unit]
-  ): Unit = ???
+  ): Unit = js.native
 
 }
 

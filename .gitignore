@@ -22,4 +22,7 @@ sbt-launch*.jar
 .ensime*
 *.egp
 
-# just for convenience
+# just for convenience for now - needs tidying up
+.local*
+*local*
+scala_common*

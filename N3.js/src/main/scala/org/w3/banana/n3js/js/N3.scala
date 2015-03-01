@@ -6,23 +6,23 @@ import scala.scalajs.js
 
 object N3 extends js.Object {
 
-  def Parser(): Parser = ???
+  def Parser(): Parser = js.native
 
-  def Store(): Store = ???
+  def Store(): Store = js.native
 
-  val Util: Util = ???
+  val Util: Util = js.native
 
 }
 
 trait Parser extends js.Object {
 
-  def parse(s: String, callback: js.Function3[js.UndefOr[js.Error], js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit
+  def parse(s: String, callback: js.Function3[js.UndefOr[js.Error], js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit = js.native
 
-  def parse(callback: js.Function3[js.UndefOr[js.Error], js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit
+  def parse(callback: js.Function3[js.UndefOr[js.Error], js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit = js.native
 
-  def addChunk(chunk: String): Unit
+  def addChunk(chunk: String): Unit = js.native
 
-  def end(): Unit
+  def end(): Unit = js.native
 
 }
 
@@ -57,7 +57,7 @@ object Parser {
             promise.failure(ParsingError(error.get))
           else {
             prefixes.foreach { prefixes =>
-              js.Object.properties(prefixes).forEach((key: String) => prefixCallback(key, prefixes(key)))
+              js.Object.properties(prefixes).foreach((key: String) => prefixCallback(key, prefixes(key)))
             }
             promise.complete(Success(()))
           }
@@ -86,7 +86,7 @@ object Parser {
             promise.failure(ParsingError(error.get))
           else {
             prefixes.foreach { prefixes =>
-              js.Object.properties(prefixes).forEach((key: String) => prefixCallback(key, prefixes(key)))
+              js.Object.properties(prefixes).foreach((key: String) => prefixCallback(key, prefixes(key)))
             }
             promise.complete(Success(()))
           }
@@ -112,9 +112,9 @@ object ParsingError {
 
 trait Triple extends js.Object {
 
-  def subject: String = ???
-  def predicate: String = ???
-  def `object`: String = ???
+  def subject: String = js.native
+  def predicate: String = js.native
+  def `object`: String = js.native
 
 }
 
@@ -163,29 +163,28 @@ object Node {
 
 trait Util extends js.Object {
 
-  def isIRI(s: String): Boolean = ???
-  def isBlank(s: String): Boolean = ???
-  def isLiteral(s: String): Boolean = ???
-  def getLiteralValue(s: String): String = ???
-  def getLiteralLanguage(s: String): String = ???
-  def getLiteralType(s: String): String = ???
-  def isPrefixedName(s: String): Boolean = ???
-  def expandPrefixedName(s: String, prefixes: Dynamic): String = ???
+  def isIRI(s: String): Boolean = js.native
+  def isBlank(s: String): Boolean = js.native
+  def isLiteral(s: String): Boolean = js.native
+  def getLiteralValue(s: String): String = js.native
+  def getLiteralLanguage(s: String): String = js.native
+  def getLiteralType(s: String): String = js.native
+  def isPrefixedName(s: String): Boolean = js.native
+  def expandPrefixedName(s: String, prefixes: Dynamic): String = js.native
 
 }
 
 trait Store extends js.Object {
 
-  def addTriple(s: js.String, p: js.String, o: js.String): Unit
+  def addTriple(s: String, p: String, o: String): Unit = js.native
 
-  def addTriple(triple: Triple): Unit
+  def addTriple(triple: Triple): Unit = js.native
 
-  def find(s: js.String, p: js.String, o: js.String): js.Array[Triple]
+  def find(s: String, p: String, o: String): js.Array[Triple] = js.native
 
 }
 
 object Store {
-
 
   implicit class StoreW(val store: Store) extends AnyVal {
 
