@@ -22,6 +22,8 @@ object BuildSettings {
     offline := true,
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Yinline-warnings"),
     scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
+    // rhino cannot be used for now because of limitations in jsonld.js
+    scalaJSStage in Global := FastOptStage,
     description := "RDF framework for Scala",
     startYear := Some(2012),
     //Todo:
@@ -261,22 +263,6 @@ object BananaRdfBuild extends Build {
       ) ++ zcheckJsSettings : _*
     )
     .dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
-
-  /** `rdfstorew`, a js only module binding rdfstore-js into banana-rdf abstractions. */
-  lazy val rdfstorewM  = CrossModule(SingleBuild,
-    id                = "rdfstorew",
-    baseDir           = "rdfstorew",
-    defaultSettings   = buildSettings,
-    modulePrefix      = "banana-")
-
-  lazy val rdfstorew = rdfstorewM
-    .project(Js)
-    .settings(
-      Seq(
-        jsDependencies += ProvidedJS / "rdf_store.js",
-        jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
-        skip in packageJSDependencies := false): _*)
-    .dependsOn(rdf_js, jena)//////////////, rdfTestSuite_js % "test-internal->compile")
 
   /** `examples`, a bunch of working examples using banana-rdf abstractions. */
   lazy val examplesM = CrossModule(SingleBuild,
