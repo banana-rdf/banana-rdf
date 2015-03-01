@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
  * Sparql update test on a Fuseki embedded server
  */
-class JenaFusekiSparqlTest extends  FlatSpec
+class JenaFusekiSparqlTest extends FlatSpec
   with Matchers with BeforeAndAfterAll with JenaModule{
 
   val data = "rdf-test-suite/jvm/src/main/resources/known-tr-editors.rdf"
@@ -25,7 +25,7 @@ class JenaFusekiSparqlTest extends  FlatSpec
   /**
    * Start Fuseki server
    */
-  override def beforeAll: Unit = {
+  override def beforeAll(): Unit = {
     server.start
   }
 
@@ -48,7 +48,7 @@ class JenaFusekiSparqlTest extends  FlatSpec
     val url = new URL("http://localhost:3030/ds/update")
     val query = parseUpdate(sparqlUpdate).get
     val updateEndpoint = new JenaSparqlHttpEngine
-    updateEndpoint.executeUpdate(url, query, Map()).getOrFail()
+    updateEndpoint.executeUpdate(url, query, Map()).getOrFail(scala.concurrent.duration.Duration("6s"))
 
     val selectQuery = parseSelect(
       """
