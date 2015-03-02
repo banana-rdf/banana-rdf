@@ -11,14 +11,14 @@ import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 // for scala-js 0.6. Look for [error] in the output in the meantime...
 object JsonLdJsTest extends SpecLite {
 
-  // see @@@
-  "parsejsonld.toRDF" in {
-
-    val input = """{
+  val input = """{
   "http://schema.org/name": "Manu Sporny",
   "http://schema.org/url": {"@id": "http://manu.sporny.org/"},
   "http://schema.org/image": {"@id": "http://manu.sporny.org/images/manu.png"}
 }"""
+
+  // parse() returns the internal representation
+  "parsejsonld.toRDF" in {
 
     val doc = js.JSON.parse(input)
 
@@ -26,16 +26,11 @@ object JsonLdJsTest extends SpecLite {
       check(err == null)
       check(data.selectDynamic("@default") != null)
       ()
-
-//        println("err: "+err.message)
-//      } else {
-//        println(js.JSON.stringify(data))
-//      }
     })
 
   }
 
-
+//  @betehess: I was not able to get a (err != null)
 //  "parsejsonld.toRDF -- error" in {
 //
 //    val input = """{
