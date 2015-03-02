@@ -52,7 +52,7 @@ object BananaRdfBuild extends Build {
     .settings(zcheckJvmSettings:_*)
 
   lazy val banana_js = bananaM
-    .project(Js, rdf_js, rdfTestSuite_js, plantain_js)
+    .project(Js, rdf_js, rdfTestSuite_js, plantain_js, n3Js, jsonldJs)
     .settings(zcheckJsSettings:_*)
 
   /** `rdf`, a cross-compiled base module for RDF abstractions. */
@@ -237,7 +237,7 @@ object BananaRdfBuild extends Build {
     defaultSettings   = buildSettings,
     modulePrefix      = "banana-")
 
-  lazy val `N3.js` = n3JsM
+  lazy val n3Js = n3JsM
     .project(Js)
     .settings(
       Seq(
@@ -254,7 +254,7 @@ object BananaRdfBuild extends Build {
     defaultSettings   = buildSettings,
     modulePrefix      = "banana-")
 
-  lazy val `jsonld.js` = jsonldJsM
+  lazy val jsonldJs = jsonldJsM
     .project(Js)
     .settings(
       Seq(
