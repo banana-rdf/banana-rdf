@@ -2,7 +2,6 @@ package org.w3.banana
 package jsonldjs
 package io
 
-import jsonldjs.js._
 import org.w3.banana.io._
 import java.io._
 import scala.concurrent.{ Future, ExecutionContext }

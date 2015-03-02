@@ -1,6 +1,5 @@
 package org.w3.banana
 package jsonldjs
-package js
 
 import zcheck.SpecLite
 import scala.scalajs.js

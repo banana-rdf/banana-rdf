@@ -1,5 +1,4 @@
 package org.w3.banana
-package jsonldjs
 
 /** jsonld.js facade types for Scala.js.
   * 
@@ -8,6 +7,6 @@ package jsonldjs
   * 
   * See https://github.com/digitalbazaar/jsonld.js .
   */
-package object js {
+package object jsonldjs {
 
 }

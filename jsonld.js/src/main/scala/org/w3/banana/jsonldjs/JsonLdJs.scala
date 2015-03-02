@@ -1,6 +1,5 @@
 package org.w3.banana
 package jsonldjs
-package js
 
 import scala.scalajs.js
 import scala.concurrent.{ Future, Promise }
