@@ -1,11 +1,11 @@
-package org.w3.banana.io
+package org.w3.banana
+package io
 
 import java.io._
-import org.scalatest._
+import zcheck.SpecLite
 import org.w3.banana.{ Prefix, RDF, RDFOps }
 import scalaz._
 import scalaz.syntax._, monad._, comonad._
-
 
 /**
  * Test Serialisations. Some serialisations have one parser and multiple serialisers, such
@@ -18,7 +18,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, Sin],
   writer: RDFWriter[Rdf, M, Sout]
-) extends WordSpec with Matchers {
+) extends SpecLite {
 
   // both Monad and Comonad are Functors, so they compete for the
   // syntax. So we choose arbitrarily one of them.
@@ -77,7 +77,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
   s"write ref graph as $syntax string, read it & compare" in {
     val soutString =
       writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").copoint
-    soutString should not be ('empty)
+    assert(soutString.nonEmpty)
     val graph = reader.read(new StringReader(soutString), rdfCore).copoint
     assert(referenceGraph isIsomorphicWith graph)
   }

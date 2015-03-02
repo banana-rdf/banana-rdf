@@ -1,6 +1,5 @@
-package org.w3.banana.io
-
-import org.w3.banana.{RDF, RDFOps}
+package org.w3.banana
+package io
 
 import scalaz._
 
