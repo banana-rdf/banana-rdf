@@ -4,9 +4,9 @@ package jsonldjs
 import scala.scalajs.js
 import scala.concurrent.{ Future, Promise }
 
-// the content of foo should be in jsonld but it doesn't work! Don't
-// know why...
-object foo {
+// the content of jsonldHelper should be in jsonld but it doesn't
+// work! Don't know why...
+object jsonldHelper {
 
   def toRDF[Rdf <: RDF](doc: js.Dynamic, base: String)(implicit ops: RDFOps[Rdf]): Future[Rdf#Graph] = {
     import ops.mgraphW
@@ -38,7 +38,7 @@ object foo {
     if (doc == null)
       Future.failed(ParsingError("input was not valid JSON"))
     else
-      foo.toRDF(doc, base)
+      jsonldHelper.toRDF(doc, base)
   }
 
 }

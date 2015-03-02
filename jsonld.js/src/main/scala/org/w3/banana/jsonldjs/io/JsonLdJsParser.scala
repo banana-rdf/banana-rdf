@@ -32,7 +32,7 @@ class JsonLdJsParser[Rdf <: RDF](implicit
     val input = loop(new StringBuffer())
     // TODO: why can't I dispatch on jsonld directly???
     //jsonld.toRDF(input, base)
-    foo.toRDF(input, base)
+    jsonldHelper.toRDF(input, base)
   }
 
   def read(is: InputStream, base: String): Future[Rdf#Graph] = {
