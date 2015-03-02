@@ -1,20 +1,17 @@
-# doc: http://about.travis-ci.org/docs/user/languages/scala/
+# sbt/travis documentation
+# * http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
+# * http://docs.travis-ci.com/user/languages/scala/
+# * http://blog.travis-ci.com/2014-12-17-faster-builds-with-container-based-infrastructure/
+#
+# Java flags
+# * https://weblogs.java.net/blog/kcpeppe/archive/2013/12/11/case-study-jvm-hotspot-flag
 
 sudo: false
 
 language: scala
 
-cache:
-  directories:
-    - $HOME/.m2/repository
-    - $HOME/.sbt
-    - $HOME/.ivy2
-
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts travis/jvmopts test
-  # Tricks to avoid unnecessary cache updates
-  - find $HOME/.sbt -name "*.lock" | xargs rm
-  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+  - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis-jvmopts test
 
 jdk:
   - oraclejdk7
