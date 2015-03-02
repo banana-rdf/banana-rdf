@@ -2,7 +2,6 @@ package org.w3.banana
 package n3js
 package io
 
-import n3js.js._
 import org.w3.banana.io._
 import java.io._
 import scala.concurrent.{ Future, ExecutionContext }
@@ -17,8 +16,8 @@ class N3jsTurtleParser[Rdf <: RDF](implicit
 
   def read(reader: Reader, base: String): Future[Rdf#Graph] = {
     val mgraph = makeEmptyMGraph()
-    val parser = js.N3.Parser()
-    val future = parser.parseChunks((t: Triple) => mgraph += js.Triple.toBananaTriple(t))
+    val parser = N3.Parser()
+    val future = parser.parseChunks((t: Triple) => mgraph += n3js.Triple.toBananaTriple(t))
     val bf = new BufferedReader(reader)
     @annotation.tailrec
     def loop(): Unit = {

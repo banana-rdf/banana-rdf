@@ -1,5 +1,4 @@
 package org.w3.banana
-package n3js
 
 /** N3.js facade types for Scala.js.
   * 
@@ -8,6 +7,6 @@ package n3js
   * 
   * See https://github.com/RubenVerborgh/N3.js .
   */
-package object js {
+package object n3js {
 
 }
