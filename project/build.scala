@@ -218,7 +218,7 @@ object BananaRdfBuild extends Build {
     .project(Js, plantain_common_js)
     .settings(
       Seq(
-        //scalaJSStage in Test := FastOptStage
+        scalaJSStage in Test := FastOptStage
       ) ++ zcheckJsSettings: _*
     )
     .dependsOn(rdf_js, ntriples_js, rdfTestSuite_js % "test-internal->compile")
@@ -243,7 +243,7 @@ object BananaRdfBuild extends Build {
     .project(Js)
     .settings(
       Seq(
-        //scalaJSStage in Test := FastOptStage,
+        scalaJSStage in Test := FastOptStage,
         jsDependencies += "org.webjars" % "N3.js" % "799fee7697"/ "n3-browser.min.js" commonJSName "N3",
         skip in packageJSDependencies := false
       ) ++ zcheckJsSettings : _*
