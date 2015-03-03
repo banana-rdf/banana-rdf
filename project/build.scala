@@ -22,8 +22,6 @@ object BuildSettings {
     offline := true,
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Yinline-warnings"),
     scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
-    // rhino cannot be used for now because of limitations in jsonld.js
-    scalaJSStage in Global := FastOptStage,
     description := "RDF framework for Scala",
     startYear := Some(2012),
     //Todo:
@@ -218,7 +216,11 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_js = plantainM
     .project(Js, plantain_common_js)
-    .settings(zcheckJsSettings:_*)
+    .settings(
+      Seq(
+        //scalaJSStage in Test := FastOptStage
+      ) ++ zcheckJsSettings: _*
+    )
     .dependsOn(rdf_js, ntriples_js, rdfTestSuite_js % "test-internal->compile")
 
   lazy val plantain_common_jvm = plantainM
@@ -241,6 +243,7 @@ object BananaRdfBuild extends Build {
     .project(Js)
     .settings(
       Seq(
+        //scalaJSStage in Test := FastOptStage,
         jsDependencies += "org.webjars" % "N3.js" % "799fee7697"/ "n3-browser.min.js" commonJSName "N3",
         skip in packageJSDependencies := false
       ) ++ zcheckJsSettings : _*
@@ -258,6 +261,7 @@ object BananaRdfBuild extends Build {
     .project(Js)
     .settings(
       Seq(
+        scalaJSStage in Test := FastOptStage,
         jsDependencies += ProvidedJS / "jsonld.js" commonJSName "jsonld",
         skip in packageJSDependencies := false
       ) ++ zcheckJsSettings : _*
