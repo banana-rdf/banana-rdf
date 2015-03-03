@@ -56,7 +56,7 @@ object Parser {
             promise.failure(ParsingError(error.get))
           else {
             prefixes.foreach { prefixes =>
-              js.Object.properties(prefixes).foreach((key: String) => prefixCallback(key, prefixes(key)))
+              prefixes.foreach { case (key, prefix) => prefixCallback(key, prefix) }
             }
             promise.complete(Success(()))
           }
@@ -85,7 +85,7 @@ object Parser {
             promise.failure(ParsingError(error.get))
           else {
             prefixes.foreach { prefixes =>
-              js.Object.properties(prefixes).foreach((key: String) => prefixCallback(key, prefixes(key)))
+              prefixes.foreach { case (key, prefix) => prefixCallback(key, prefix) }
             }
             promise.complete(Success(()))
           }
