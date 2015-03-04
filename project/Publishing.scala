@@ -56,6 +56,10 @@ object Publishing {
       }
     }
 
+    // regex matching at least 4 word character at the very end of the
+    // String (basically the SHA from the version if it exists)
+    val r = """\w{4,}$""".r
+
     Option(System.getProperty("banana.publish")) match {
 
       case Some("bintray") =>
@@ -67,7 +71,7 @@ object Publishing {
       case None =>
         val nexus = "https://oss.sonatype.org/"
         val publishSetting = publishTo <<= version { (v: String) =>
-          if (v.trim.endsWith("SNAPSHOT"))
+          if (r.findFirstMatchIn(v).isDefined)
             Some("snapshots" at nexus + "content/repositories/snapshots")
           else
             Some("releases" at nexus + "service/local/staging/deploy/maven2")
@@ -76,7 +80,7 @@ object Publishing {
 
       case Some(SshUri(hostname, basePath)) =>
         val publishSetting = publishTo <<= version { (v: String) =>
-          if (v.trim.endsWith("SNAPSHOT"))
+          if (r.findFirstMatchIn(v).isDefined)
             Some(Resolver.ssh("banana.publish specified server", hostname, basePath + "snapshots"))
           else
             Some(Resolver.ssh("banana.publish specified server", hostname, basePath + "resolver"))
