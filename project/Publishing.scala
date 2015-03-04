@@ -17,11 +17,6 @@ object Publishing {
             <url>http://bertails.org/</url>
           </developer>
           <developer>
-            <id>antoniogarrote</id>
-            <name>Antonio Garrote</name>
-            <url>https://github.com/antoniogarrote/</url>
-          </developer>
-          <developer>
             <id>InTheNow</id>
             <name>Alistair Johnson</name>
             <url>https://github.com/inthenow</url>
@@ -40,30 +35,56 @@ object Publishing {
     licenses +=("W3C", url("http://opensource.org/licenses/W3C"))
   )
 
-  //sbt -Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
-  //sbt -Dbanana.publish=bintray
-  def publicationSettings = pomSettings ++
-    (Option(System.getProperty("banana.publish")) match {
-      case Some("bintray") => Seq(
-        // bintray
-        repository in bintray := "banana-rdf",
-        bintrayOrganization in bintray := Some("banana-rdf")
-      ) ++ bintrayPublishSettings
-      case opt: Option[String] => {
-        Seq(
-          publishTo <<= version { (v: String) =>
-            val nexus = "https://oss.sonatype.org/"
-            val other = opt.map(_.split(":"))
-            if (v.trim.endsWith("SNAPSHOT")) {
-              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "snapshots"))
-              repo.orElse(Some("snapshots" at nexus + "content/repositories/snapshots"))
-            } else {
-              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "resolver"))
-              repo.orElse(Some("releases" at nexus + "service/local/staging/deploy/maven2"))
-            }
-          }
-        )
+  /** The env variable `banana.publish` determines how/where we publish:
+    * 
+    * - if absent, publish to OSS sonatype
+    * - if set to "bintray", publish to the banana-rdf organization
+    * - if set to a SSH URI, publish there
+    * 
+    * For example:
+    * 
+    * - `sbt -Dbanana.publish=bintray`
+    * - `sbt -Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/`
+    */
+  def publicationSettings = pomSettings ++ Seq(publishArtifact in Test := false) ++ {
+  
+    // extractor for the components of the SSH URI
+    object SshUri {
+      def unapply(s: String): Option[(String, String)] = s.split(":") match {
+        case Array(hostname, basePath) => Some((hostname, basePath))
+        case _                         => None
       }
-    }) ++ Seq(publishArtifact in Test := false)
+    }
+
+    Option(System.getProperty("banana.publish")) match {
+
+      case Some("bintray") =>
+        bintrayPublishSettings ++ Seq(
+          repository in bintray := "banana-rdf",
+          bintrayOrganization in bintray := Some("banana-rdf")
+        )
+
+      case None =>
+        val nexus = "https://oss.sonatype.org/"
+        val publishSetting = publishTo <<= version { (v: String) =>
+          if (v.trim.endsWith("SNAPSHOT"))
+            Some("snapshots" at nexus + "content/repositories/snapshots")
+          else
+            Some("releases" at nexus + "service/local/staging/deploy/maven2")
+        }
+        Seq(publishSetting)
+
+      case Some(SshUri(hostname, basePath)) =>
+        val publishSetting = publishTo <<= version { (v: String) =>
+          if (v.trim.endsWith("SNAPSHOT"))
+            Some(Resolver.ssh("banana.publish specified server", hostname, basePath + "snapshots"))
+          else
+            Some(Resolver.ssh("banana.publish specified server", hostname, basePath + "resolver"))
+        }
+        Seq(publishSetting)
+
+    }
+
+  }
 
 }

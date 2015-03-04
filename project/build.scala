@@ -8,12 +8,12 @@ import sbtunidoc.Plugin._
 import ScalaJSPlugin.autoImport._
 
 object BuildSettings {
-  import Publishing._
+
   implicit val logger = ConsoleLogger()
 
-  val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
+  val buildSettings = Publishing.publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    version := "0.8.0-SNAPSHOT",
+    version := "0.8.0." + GitHelper.headSha(),
     scalaVersion := "2.11.5",
     crossScalaVersions := Seq("2.11.5", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
