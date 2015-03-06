@@ -248,7 +248,7 @@ object BananaRdfBuild extends Build {
         skip in packageJSDependencies := false
       ) ++ zcheckJsSettings : _*
     )
-    .dependsOn(rdf_js, plantain_common_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
+    .dependsOn(rdf_js, plantain_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
 
   /** `jsonld.js`, a js only module binding jsonld.js into banana-rdf abstractions. */
   lazy val jsonldJsM  = CrossModule(SingleBuild,
