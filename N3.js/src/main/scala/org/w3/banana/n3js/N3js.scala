@@ -1,8 +1,6 @@
 package org.w3.banana
 package n3js
 
-import scala.scalajs.js
-
 /** A N3.js-based implementation of the RDF model.
   * 
   * For now, only the URIs and Literal are natively handled by N3.js.
