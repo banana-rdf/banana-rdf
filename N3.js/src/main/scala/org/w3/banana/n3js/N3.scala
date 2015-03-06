@@ -171,6 +171,11 @@ trait Util extends js.Object {
   def isPrefixedName(s: String): Boolean = js.native
   def expandPrefixedName(s: String, prefixes: Dynamic): String = js.native
 
+  def createIRI(iri: String): String = js.native
+  def createLiteral(lexicalForm: String, langOrIri: String): String = js.native
+  def createLiteral(i: Int): String = js.native
+  def createLiteral(b: Boolean): String = js.native
+
 }
 
 trait Store extends js.Object {
