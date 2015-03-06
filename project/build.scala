@@ -8,12 +8,12 @@ import sbtunidoc.Plugin._
 import ScalaJSPlugin.autoImport._
 
 object BuildSettings {
-
+  import Publishing._
   implicit val logger = ConsoleLogger()
 
-  val buildSettings = Publishing.publicationSettings ++ defaultScalariformSettings ++ Seq(
+  val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    version := "0.8.0." + GitHelper.headSha(),
+    version := "0.8.0-SNAPSHOT",
     scalaVersion := "2.11.5",
     crossScalaVersions := Seq("2.11.5", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
@@ -50,7 +50,7 @@ object BananaRdfBuild extends Build {
     .settings(zcheckJvmSettings:_*)
 
   lazy val banana_js = bananaM
-    .project(Js, rdf_js, rdfTestSuite_js, ntriples_js, plantain_js, n3Js, jsonldJs)
+    .project(Js, rdf_js, rdfTestSuite_js, plantain_js, n3Js, jsonldJs)
     .settings(zcheckJsSettings:_*)
 
   /** `rdf`, a cross-compiled base module for RDF abstractions. */
