@@ -12,11 +12,11 @@ trait N3js extends RDF {
   type Triple = (Node, URI, Node)
   type Node = Any
   type URI = String
-  type BNode = model.BNode
+  type BNode = n3js.BNode
   type Literal = String
   type Lang = String
 
-  type MGraph = model.MGraph[Node, URI, Node]
+  type MGraph = n3js.MGraph[Node, URI, Node]
 
   // types for the graph traversal API
   type NodeMatch = Node

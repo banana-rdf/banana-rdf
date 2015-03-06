@@ -34,7 +34,7 @@ object N3jsOps extends RDFOps[N3js] with N3jsMGraphOps with DefaultURIOps[N3js] 
     funBNode: N3js#BNode => T,
     funLiteral: N3js#Literal => T
   ): T = node match {
-    case bnode @ BNode(_)               => funBNode(bnode)
+    case bnode @ n3js.BNode(_)          => funBNode(bnode)
     case s: String if Util.isIRI(s)     => funURI(s)
     case s: String if Util.isLiteral(s) => funLiteral(s)
   }
@@ -47,9 +47,9 @@ object N3jsOps extends RDFOps[N3js] with N3jsMGraphOps with DefaultURIOps[N3js] 
 
   // bnode
 
-  final def makeBNode(): N3js#BNode = model.BNode(UUID.randomUUID().toString)
+  final def makeBNode(): N3js#BNode = n3js.BNode(UUID.randomUUID().toString)
 
-  final def makeBNodeLabel(label: String): N3js#BNode = model.BNode(label)
+  final def makeBNodeLabel(label: String): N3js#BNode = n3js.BNode(label)
 
   final def fromBNode(bnode: N3js#BNode): String = bnode.label
 
