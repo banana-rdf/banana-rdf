@@ -1,9 +1,6 @@
 import sbt._
 import sbt.Keys._
 
-import bintray.Plugin._
-import bintray.Keys._
-
 import sbtrelease.ReleasePlugin.ReleaseKeys._
 import sbtrelease.ReleasePlugin._
 
