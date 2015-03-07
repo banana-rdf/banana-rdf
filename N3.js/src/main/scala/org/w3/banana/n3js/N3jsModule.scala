@@ -16,6 +16,6 @@ with RecordBinderModule {
 
   implicit val recordBinder: binder.RecordBinder[N3js] = binder.RecordBinder[N3js]
 
-  implicit val turtleReader: RDFReader[Rdf, Future, Turtle] = new n3js.io.N3jsTurtleParser[N3js]
+  implicit val turtleReader: RDFReader[N3js, Future, Turtle] = new n3js.io.N3jsTurtleParser[N3js]
 
 }

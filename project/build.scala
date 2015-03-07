@@ -49,7 +49,7 @@ object BananaRdfBuild extends Build {
     .settings(zcheckJvmSettings:_*)
 
   lazy val banana_js = bananaM
-    .project(Js, rdf_js, rdfTestSuite_js, plantain_js, n3Js, jsonldJs)
+    .project(Js, rdf_js, rdfTestSuite_js, ntriples_js, plantain_js, n3Js, jsonldJs)
     .settings(zcheckJsSettings:_*)
 
   /** `rdf`, a cross-compiled base module for RDF abstractions. */
