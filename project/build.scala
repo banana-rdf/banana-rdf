@@ -13,7 +13,6 @@ object BuildSettings {
 
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    version := "0.8.0-SNAPSHOT",
     scalaVersion := "2.11.5",
     crossScalaVersions := Seq("2.11.5", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
@@ -34,7 +33,7 @@ object BananaRdfBuild extends Build {
   import BuildSettings._
   import Dependencies._
 
-  val crossBuildType =  SharedBuild  //SbtLinkedBuild CommonBaseBuild SharedBuild   SymLinkedBuild
+  val crossBuildType = SbtLinkedBuild
 
   /** `banana`, the root project. */
   lazy val bananaM  = CrossModule(RootBuild,
@@ -271,7 +270,7 @@ object BananaRdfBuild extends Build {
   /** `examples`, a bunch of working examples using banana-rdf abstractions. */
   lazy val examplesM = CrossModule(SingleBuild,
     id              = "examples",
-    baseDir         = ".examples",
+    baseDir         = "misc/examples",
     defaultSettings = buildSettings
   )
 
