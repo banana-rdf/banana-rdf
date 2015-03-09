@@ -48,7 +48,7 @@ SELECT DISTINCT ?language WHERE {
 
     /* executes the query */
 
-    val answers: Rdf#Solutions = endpoint.executeSelect(query).getOrFail()
+    val answers: Rdf#Solutions = endpoint.executeSelect(query).get
 
     /* iterate through the solutions */
 
