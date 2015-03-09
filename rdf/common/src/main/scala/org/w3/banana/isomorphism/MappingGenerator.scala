@@ -35,7 +35,7 @@ object MappingGenerator {
    */
   def complexity[T](maps: Try[Map[T, Set[T]]]) = {
     maps match {
-      case x: Failure[T] => 0
+      case Failure(_) => 0
       case Success(m) => m.values.foldLeft(1)((n, v) => n * v.size)
     }
   }

@@ -6,12 +6,10 @@ import com.hp.hpl.jena.tdb.TDBFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, _}
 import org.w3.banana._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 /**
  * Sparql update test on a Fuseki embedded server
  */
-class JenaFusekiSparqlTest extends  FlatSpec
+class JenaFusekiSparqlTest extends FlatSpec
   with Matchers with BeforeAndAfterAll with JenaModule{
 
   val data = "rdf-test-suite/jvm/src/main/resources/known-tr-editors.rdf"
@@ -25,8 +23,15 @@ class JenaFusekiSparqlTest extends  FlatSpec
   /**
    * Start Fuseki server
    */
-  override def beforeAll: Unit = {
+  override def beforeAll(): Unit = {
     server.start
+  }
+
+  /**
+   * Stop server
+   */
+  override def afterAll(): Unit = {
+    server.stop
   }
 
   "The repository" must "contain person 'Morgana'" in {
@@ -48,7 +53,7 @@ class JenaFusekiSparqlTest extends  FlatSpec
     val url = new URL("http://localhost:3030/ds/update")
     val query = parseUpdate(sparqlUpdate).get
     val updateEndpoint = new JenaSparqlHttpEngine
-    updateEndpoint.executeUpdate(url, query, Map()).getOrFail()
+    updateEndpoint.executeUpdate(url, query, Map()).get
 
     val selectQuery = parseSelect(
       """
@@ -66,7 +71,7 @@ class JenaFusekiSparqlTest extends  FlatSpec
       """.stripMargin).get
 
     val client = new URL("http://localhost:3030/ds/query")
-    val results = client.executeSelect(selectQuery).getOrFail().iterator.to[Iterable]
+    val results = client.executeSelect(selectQuery).get.iterator.to[Iterable]
     val result = results.map(
       row => row("firstName").get
     )
@@ -75,10 +80,4 @@ class JenaFusekiSparqlTest extends  FlatSpec
     result.head.getLiteralLexicalForm should be ("Morgana")
   }
 
-  /**
-   * Stop server
-   */
-  override def afterAll: Unit = {
-    server.stop
-  }
 }

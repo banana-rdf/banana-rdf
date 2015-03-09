@@ -13,7 +13,6 @@ object BuildSettings {
 
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    version := "0.8.0-SNAPSHOT",
     scalaVersion := "2.11.5",
     crossScalaVersions := Seq("2.11.5", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
@@ -33,8 +32,8 @@ object BananaRdfBuild extends Build {
 
   import BuildSettings._
   import Dependencies._
-
-  val crossBuildType =  CommonBaseBuild  //SbtLinkedBuild CommonBaseBuild SharedBuild   SymLinkedBuild
+ 
+  val crossBuildType = SbtLinkedBuild
 
   /** `banana`, the root project. */
   lazy val bananaM  = CrossModule(RootBuild,
@@ -50,7 +49,7 @@ object BananaRdfBuild extends Build {
     .settings(zcheckJvmSettings:_*)
 
   lazy val banana_js = bananaM
-    .project(Js, rdf_js, rdfTestSuite_js,   plantain_js)
+    .project(Js, rdf_js, rdfTestSuite_js, ntriples_js, plantain_js, n3Js, jsonldJs)
     .settings(zcheckJsSettings:_*)
 
   /** `rdf`, a cross-compiled base module for RDF abstractions. */
@@ -216,7 +215,11 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_js = plantainM
     .project(Js, plantain_common_js)
-    .settings(zcheckJsSettings:_*)
+    .settings(
+      Seq(
+        //scalaJSStage in Test := FastOptStage
+      ) ++ zcheckJsSettings: _*
+    )
     .dependsOn(rdf_js, ntriples_js, rdfTestSuite_js % "test-internal->compile")
 
   lazy val plantain_common_jvm = plantainM
@@ -228,26 +231,46 @@ object BananaRdfBuild extends Build {
     .settings(scalaz_js ++ zcheckJsSettings:_*)
     .dependsOn(rdf_js , rdfTestSuite_js % "test-internal->compile")
 
-  /** `rdfstorew`, a js only module binding rdfstore-js into banana-rdf abstractions. */
-  lazy val rdfstorewM  = CrossModule(SingleBuild,
-    id                = "rdfstorew",
-    baseDir           = "rdfstorew",
+  /** `N3.js`, a js only module binding N3.js into banana-rdf abstractions. */
+  lazy val n3JsM  = CrossModule(SingleBuild,
+    id                = "n3-js",
+    baseDir           = "N3.js",
     defaultSettings   = buildSettings,
     modulePrefix      = "banana-")
 
-  lazy val rdfstorew = rdfstorewM
+  lazy val n3Js = n3JsM
     .project(Js)
     .settings(
       Seq(
-        jsDependencies += ProvidedJS / "rdf_store.js",
-        jsDependencies += "org.webjars" % "momentjs" % "2.7.0" / "moment.js",
-        skip in packageJSDependencies := false): _*)
-    .dependsOn(rdf_js, jena)//////////////, rdfTestSuite_js % "test-internal->compile")
+        //scalaJSStage in Test := FastOptStage,
+        jsDependencies += "org.webjars" % "N3.js" % "9a8de1fc6c"/ "n3-browser.min.js" commonJSName "N3",
+        skip in packageJSDependencies := false
+      ) ++ zcheckJsSettings : _*
+    )
+    .dependsOn(rdf_js, plantain_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
+
+  /** `jsonld.js`, a js only module binding jsonld.js into banana-rdf abstractions. */
+  lazy val jsonldJsM  = CrossModule(SingleBuild,
+    id                = "jsonld-js",
+    baseDir           = "jsonld.js",
+    defaultSettings   = buildSettings,
+    modulePrefix      = "banana-")
+
+  lazy val jsonldJs = jsonldJsM
+    .project(Js)
+    .settings(
+      Seq(
+        scalaJSStage in Test := FastOptStage,
+        jsDependencies += ProvidedJS / "jsonld.js" commonJSName "jsonld",
+        skip in packageJSDependencies := false
+      ) ++ zcheckJsSettings : _*
+    )
+    .dependsOn(rdf_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
 
   /** `examples`, a bunch of working examples using banana-rdf abstractions. */
   lazy val examplesM = CrossModule(SingleBuild,
     id              = "examples",
-    baseDir         = ".examples",
+    baseDir         = "misc/examples",
     defaultSettings = buildSettings
   )
 
