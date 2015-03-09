@@ -3,6 +3,7 @@ import sbt.Keys._
 
 import sbtrelease.ReleasePlugin.ReleaseKeys._
 import sbtrelease.ReleasePlugin._
+import com.typesafe.sbt.pgp.PgpKeys
 
 object Publishing {
 
@@ -43,6 +44,7 @@ object Publishing {
       else
         Some("releases" at nexus + "content/repositories/releases/")
     },
+    publishArtifactsAction := PgpKeys.publishSigned.value,
     publishArtifact in Test := false
   )
 
