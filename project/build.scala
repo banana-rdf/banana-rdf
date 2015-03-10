@@ -32,7 +32,7 @@ object BananaRdfBuild extends Build {
 
   import BuildSettings._
   import Dependencies._
-
+ 
   val crossBuildType = SbtLinkedBuild
 
   /** `banana`, the root project. */
