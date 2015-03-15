@@ -14,7 +14,8 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
 
   object Triple {
     def apply(s: Rdf#Node, p: Rdf#URI, o: Rdf#Node): Rdf#Triple = makeTriple(s, p, o)
-    def unapply(triple: Rdf#Triple): Some[(Rdf#Node, Rdf#URI, Rdf#Node)] = Some(fromTriple(triple))
+    def unapply(triple: Rdf#Triple): Some[(Rdf#Node, Rdf#URI, Rdf#Node)] =
+      Some(fromTriple(triple))
   }
 
   // URI
@@ -22,6 +23,8 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
   object URI {
     def apply(s: String): Rdf#URI = makeUri(s)
     def unapply(uri: Rdf#URI): Some[String] = Some(fromUri(uri))
+    def unapply(node: Rdf#Node): Option[String] =
+      foldNode(node)(unapply, bnode => None, lit => None)
   }
 
   // bnode
@@ -30,6 +33,8 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
     def apply(): Rdf#BNode = makeBNode()
     def apply(s: String): Rdf#BNode = makeBNodeLabel(s)
     def unapply(bn: Rdf#BNode): Some[String] = Some(fromBNode(bn))
+    def unapply(node: Rdf#Node): Option[String] =
+      foldNode(node)(uri => None, unapply, lit => None)
   }
 
   def bnode(): Rdf#BNode = BNode()
@@ -41,6 +46,8 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
     val xsdString = makeUri("http://www.w3.org/2001/XMLSchema#string")
     val rdfLangString = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
     def unapply(literal: Rdf#Literal): Some[(String, Rdf#URI, Option[Rdf#Lang])] = Some(fromLiteral(literal))
+    def unapply(node: Rdf#Node): Option[(String, Rdf#URI, Option[Rdf#Lang])] =
+      foldNode(node)(uri => None, bnode => None, unapply)
     def apply(lexicalForm: String): Rdf#Literal = makeLiteral(lexicalForm, xsdString)
     def apply(lexicalForm: String, datatype: Rdf#URI): Rdf#Literal = makeLiteral(lexicalForm, datatype)
     def tagged(lexicalForm: String, lang: Rdf#Lang): Rdf#Literal = makeLangTaggedLiteral(lexicalForm, lang)

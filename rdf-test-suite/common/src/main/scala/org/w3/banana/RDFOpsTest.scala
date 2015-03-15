@@ -50,4 +50,23 @@ class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
   }
 
+  "Rdf#Node extractors" in {
+
+    val initialNodes: List[Rdf#Node] = List(URI("http://example.com"), BNode(), Literal("foobar"))
+
+    val nodes = initialNodes.map {
+      case uri@URI(_)           => uri
+      case bnode@BNode(_)       => bnode
+      case lit@Literal(_, _, _) => lit
+      case _                    => sys.error("should not arrive here")
+    }
+
+    initialNodes must_==(nodes)
+
+  }
+
+
+
+
+
 }
