@@ -47,7 +47,7 @@ object RDFSPrefix {
   def apply[Rdf <: RDF : RDFOps](implicit ops: RDFOps[Rdf]) = new RDFSPrefix(ops)
 }
 
-class RDFSPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("rdf", "http://www.w3.org/2000/01/rdf-schema#")(ops) {
+class RDFSPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("rdfs", "http://www.w3.org/2000/01/rdf-schema#")(ops) {
   val Class = apply("Class")
   val Container = apply("Container")
   val ContainerMembershipProperty = apply("ContainerMembershipProperty")
