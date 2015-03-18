@@ -58,13 +58,13 @@ object Dependencies {
 
   val zcheckJsSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.0",
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.1",
     testFrameworks := Seq(new TestFramework("org.scalacheck.ScalaCheckFramework"))
   ) ++ scalacheckJs
 
   val zcheckJvmSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.0",
+    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.1",
     libraryDependencies += scalacheck,
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1")
   )

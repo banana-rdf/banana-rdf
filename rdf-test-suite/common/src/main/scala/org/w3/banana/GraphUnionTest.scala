@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 import org.w3.banana.diesel._
 
 abstract class GraphUnionTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
