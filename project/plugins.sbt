@@ -7,9 +7,9 @@ resolvers += Resolver.url(
   url("http://dl.bintray.com/content/sbt/sbt-plugin-releases"))(
   Resolver.ivyStylePatterns)
 
-addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.6.1")
+addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.6.2")
 
-dependencyOverrides += "org.scala-js" % "sbt-scalajs" % "0.6.0"
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.2")
 
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
 
