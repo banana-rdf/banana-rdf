@@ -46,17 +46,23 @@ object BananaRdfBuild extends Build {
 
   lazy val banana_jvm = bananaM
     .project(Jvm, rdf_jvm, rdfTestSuite_jvm, ntriples_jvm, plantain_jvm, jena, sesame, examples)
+    .settings(aggregate in Test in rdf_jvm:= false,
+              aggregate in Test in rdfTestSuite_jvm := false,
+              aggregate in Test in ntriples_jvm := false)
     .settings(zcheckJvmSettings:_*)
 
   lazy val banana_js = bananaM
-    .project(Js, rdf_js, rdfTestSuite_js, ntriples_js, plantain_js, n3Js, jsonldJs)
+    .project(Js, rdf_js, rdfTestSuite_js, ntriples_js, plantain_js, /*n3Js,*/ jsonldJs)
+    .settings(aggregate in Test in rdf_js := false,
+              aggregate in Test in rdfTestSuite_js := false,
+              aggregate in Test in ntriples_js := false)
     .settings(zcheckJsSettings:_*)
 
   /** `rdf`, a cross-compiled base module for RDF abstractions. */
   lazy val rdfM = CrossModule(crossBuildType,
     id              = "rdf",
     baseDir         = "rdf",
-    defaultSettings = buildSettings,
+    defaultSettings = buildSettings ++ Seq(aggregate in Test := false),
     modulePrefix    = "banana-",
     sharedLabel     = "common")
 
@@ -80,13 +86,14 @@ object BananaRdfBuild extends Build {
   lazy val ntriplesM  = CrossModule(crossBuildType,
     id                = "ntriples",
     baseDir           = "io/ntriples",
-    defaultSettings   = buildSettings,
+    defaultSettings   = buildSettings++ Seq(aggregate in Test := false),
     modulePrefix      = "banana-io-",
     sharedLabel       = "common")
 
   lazy val ntriples     = ntriplesM.project(Module, ntriples_jvm, ntriples_js)
   lazy val ntriples_jvm = ntriplesM.project(Jvm, Empty,  ntriples_common_jvm)
-  lazy val ntriples_js = ntriplesM.project(Js,Empty,  ntriples_common_js)
+  lazy val ntriples_js  = ntriplesM.project(Js,Empty,  ntriples_common_js)
+
   lazy val ntriples_common_jvm = ntriplesM
     .project(Jvm,Shared)
     .dependsOn(rdf_jvm)
@@ -115,7 +122,7 @@ object BananaRdfBuild extends Build {
   lazy val rdfTestSuiteM = CrossModule(crossBuildType,
     id              = "rdf-test-suite",
     baseDir         = "rdf-test-suite",
-    defaultSettings = buildSettings,
+    defaultSettings = buildSettings++ Seq(aggregate in Test := false),
     modulePrefix    = "banana-",
     sharedLabel     = "common"
   )
@@ -125,12 +132,12 @@ object BananaRdfBuild extends Build {
   lazy val rdfTestSuite_jvm = rdfTestSuiteM
     .project(Jvm, rdfTestSuite_common_jvm)
     .settings(Seq(resourceDirectory in Test := baseDirectory.value / "src/main/resources"):_*)
-    .dependsOn(rdf_jvm)
+    .dependsOn(rdf_jvm, ntriples_jvm)
 
   lazy val rdfTestSuite_js = rdfTestSuiteM
     .project(Js, rdfTestSuite_common_js)
     .settings(Seq(resourceDirectory in Test := baseDirectory.value / "src/main/resources"): _*)
-    .dependsOn(rdf_js)
+    .dependsOn(rdf_js, ntriples_js)
 
   lazy val rdfTestSuite_common_jvm = rdfTestSuiteM
     .project(Jvm, Shared)
@@ -149,7 +156,7 @@ object BananaRdfBuild extends Build {
   lazy val rdfTestSuite_common_js = rdfTestSuiteM
     .project(Js, Shared)
     .settings(zcheckJsSettings: _*)
-    .dependsOn(rdf_js)
+    .dependsOn(rdf_js, ntriples_js)
 
   /** `jena`, an RDF implementation for Apache Jena. */
   lazy val jenaM = CrossModule(SingleBuild,
@@ -202,7 +209,6 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain = plantainM
     .project(Module, plantain_jvm, plantain_js)
-    .dependsOn(rdfTestSuite)
 
   lazy val plantain_jvm = plantainM
     .project(Jvm, plantain_common_jvm)
@@ -247,7 +253,7 @@ object BananaRdfBuild extends Build {
         skip in packageJSDependencies := false
       ) ++ zcheckJsSettings : _*
     )
-    .dependsOn(rdf_js, plantain_js, rdfTestSuite_js % "test-internal->compile", plantain_js % "test-internal->compile")
+    .dependsOn(rdf_js, plantain_js, rdfTestSuite_js % "test-internal->compile")
 
   /** `jsonld.js`, a js only module binding jsonld.js into banana-rdf abstractions. */
   lazy val jsonldJsM  = CrossModule(SingleBuild,
