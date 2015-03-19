@@ -1,7 +1,6 @@
 package org.w3.banana
 
 import org.w3.banana.io._
-import scala.concurrent.Future
 import scala.util.Try
 
 trait RDFModule {
