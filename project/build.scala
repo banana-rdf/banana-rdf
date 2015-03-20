@@ -25,6 +25,7 @@ object BuildSettings {
     startYear := Some(2012),
     //Todo:
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns)
+    
   )
 }
 

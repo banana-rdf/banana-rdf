@@ -14,3 +14,5 @@ addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.1")
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.5")
+
+dependencyOverrides += "org.scala-js" %% "scalajs-sbt-test-adapter" % "0.6.0"
