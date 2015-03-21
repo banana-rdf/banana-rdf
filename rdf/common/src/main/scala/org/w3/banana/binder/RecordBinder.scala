@@ -308,6 +308,360 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
 
     }
 
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15], p16: Property[Rdf, T16])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15), p16.pos(t16))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        def v16 = p16.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15; t16 <- v16) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15], p16: Property[Rdf, T16], p17: Property[Rdf, T17])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15), p16.pos(t16), p17.pos(t17))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        def v16 = p16.extract(pointed)
+        def v17 = p17.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15; t16 <- v16; t17 <- v17) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15], p16: Property[Rdf, T16], p17: Property[Rdf, T17], p18: Property[Rdf, T18])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15), p16.pos(t16), p17.pos(t17), p18.pos(t18))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        def v16 = p16.extract(pointed)
+        def v17 = p17.extract(pointed)
+        def v18 = p18.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15; t16 <- v16; t17 <- v17; t18 <- v18) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15], p16: Property[Rdf, T16], p17: Property[Rdf, T17], p18: Property[Rdf, T18], p19: Property[Rdf, T19])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15), p16.pos(t16), p17.pos(t17), p18.pos(t18), p19.pos(t19))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        def v16 = p16.extract(pointed)
+        def v17 = p17.extract(pointed)
+        def v18 = p18.extract(pointed)
+        def v19 = p19.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15; t16 <- v16; t17 <- v17; t18 <- v18; t19 <- v19) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15], p16: Property[Rdf, T16], p17: Property[Rdf, T17], p18: Property[Rdf, T18], p19: Property[Rdf, T19], p20: Property[Rdf, T20])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15), p16.pos(t16), p17.pos(t17), p18.pos(t18), p19.pos(t19), p20.pos(t20))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        def v16 = p16.extract(pointed)
+        def v17 = p17.extract(pointed)
+        def v18 = p18.extract(pointed)
+        def v19 = p19.extract(pointed)
+        def v20 = p20.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15; t16 <- v16; t17 <- v17; t18 <- v18; t19 <- v19; t20 <- v20) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15], p16: Property[Rdf, T16], p17: Property[Rdf, T17], p18: Property[Rdf, T18], p19: Property[Rdf, T19], p20: Property[Rdf, T20], p21: Property[Rdf, T21])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15), p16.pos(t16), p17.pos(t17), p18.pos(t18), p19.pos(t19), p20.pos(t20), p21.pos(t21))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        def v16 = p16.extract(pointed)
+        def v17 = p17.extract(pointed)
+        def v18 = p18.extract(pointed)
+        def v19 = p19.extract(pointed)
+        def v20 = p20.extract(pointed)
+        def v21 = p21.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15; t16 <- v16; t17 <- v17; t18 <- v18; t19 <- v19; t20 <- v20; t21 <- v21) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21)
+      }
+
+    }
+
+    def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22](p1: Property[Rdf, T1], p2: Property[Rdf, T2], p3: Property[Rdf, T3], p4: Property[Rdf, T4], p5: Property[Rdf, T5], p6: Property[Rdf, T6], p7: Property[Rdf, T7], p8: Property[Rdf, T8], p9: Property[Rdf, T9], p10: Property[Rdf, T10], p11: Property[Rdf, T11], p12: Property[Rdf, T12], p13: Property[Rdf, T13], p14: Property[Rdf, T14], p15: Property[Rdf, T15], p16: Property[Rdf, T16], p17: Property[Rdf, T17], p18: Property[Rdf, T18], p19: Property[Rdf, T19], p20: Property[Rdf, T20], p21: Property[Rdf, T21], p22: Property[Rdf, T22])(apply: (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22) => T, unapply: T => Option[(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+
+      def toPG(t: T): PointedGraph[Rdf] = {
+        val Some((t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22)) = unapply(t)
+        make(t, p1.pos(t1), p2.pos(t2), p3.pos(t3), p4.pos(t4), p5.pos(t5), p6.pos(t6), p7.pos(t7), p8.pos(t8), p9.pos(t9), p10.pos(t10), p11.pos(t11), p12.pos(t12), p13.pos(t13), p14.pos(t14), p15.pos(t15), p16.pos(t16), p17.pos(t17), p18.pos(t18), p19.pos(t19), p20.pos(t20), p21.pos(t21), p22.pos(t22))
+      }
+
+      def fromPG(pointed: PointedGraph[Rdf]): Try[T] = {
+        def v1 = p1.extract(pointed)
+        def v2 = p2.extract(pointed)
+        def v3 = p3.extract(pointed)
+        def v4 = p4.extract(pointed)
+        def v5 = p5.extract(pointed)
+        def v6 = p6.extract(pointed)
+        def v7 = p7.extract(pointed)
+        def v8 = p8.extract(pointed)
+        def v9 = p9.extract(pointed)
+        def v10 = p10.extract(pointed)
+        def v11 = p11.extract(pointed)
+        def v12 = p12.extract(pointed)
+        def v13 = p13.extract(pointed)
+        def v14 = p14.extract(pointed)
+        def v15 = p15.extract(pointed)
+        def v16 = p16.extract(pointed)
+        def v17 = p17.extract(pointed)
+        def v18 = p18.extract(pointed)
+        def v19 = p19.extract(pointed)
+        def v20 = p20.extract(pointed)
+        def v21 = p21.extract(pointed)
+        def v22 = p22.extract(pointed)
+        for (t1 <- v1; t2 <- v2; t3 <- v3; t4 <- v4; t5 <- v5; t6 <- v6; t7 <- v7; t8 <- v8; t9 <- v9; t10 <- v10; t11 <- v11; t12 <- v12; t13 <- v13; t14 <- v14; t15 <- v15; t16 <- v16; t17 <- v17; t18 <- v18; t19 <- v19; t20 <- v20; t21 <- v21; t22 <- v22) yield apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22)
+      }
+
+    }
+
   }
 
 }
