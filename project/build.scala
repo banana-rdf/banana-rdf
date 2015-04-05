@@ -13,11 +13,12 @@ object BuildSettings {
 
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
-    scalaVersion := "2.11.5",
-    crossScalaVersions := Seq("2.11.5", "2.10.4"),
+    scalaVersion := "2.11.6",
+    crossScalaVersions := Seq("2.11.6", "2.10.4"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     fork := false,
     parallelExecution in Test := false,
+    publishArtifact in Test := true,
     offline := true,
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Yinline-warnings"),
     scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
