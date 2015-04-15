@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 
 /**
  *  see org.w3.banana.binder.CommonBindersTest for more tests

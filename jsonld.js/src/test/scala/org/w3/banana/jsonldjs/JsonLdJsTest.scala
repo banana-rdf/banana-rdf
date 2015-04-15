@@ -1,7 +1,7 @@
 package org.w3.banana
 package jsonldjs
 
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 import scala.scalajs.js
 
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow

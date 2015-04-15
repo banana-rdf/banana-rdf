@@ -2,7 +2,7 @@ package org.w3.banana
 package io
 
 import java.io._
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 import org.w3.banana.{ Prefix, RDF, RDFOps }
 import scalaz._
 import scalaz.syntax._, monad._, comonad._
