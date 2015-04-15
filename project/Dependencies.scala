@@ -22,8 +22,8 @@ object Dependencies {
    * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
    */
   // Todo: %%%! --> %%%
-  //val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.0-4")
-  val scalaz_js = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalaz-core" % "7.1.0-4")
+  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.1-2")
+  //val scalaz_js = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalaz-core" % "7.1.0-4")
 
   /**
    * joda-Time
@@ -56,15 +56,21 @@ object Dependencies {
   //Todo:
   val scalacheckJs = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalacheck" % "1.12.2")
 
+  val zcheckJs =  Seq(
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.2"
+  )
+
   val zcheckJsSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.1",
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.2",
     testFrameworks := Seq(new TestFramework("org.scalacheck.ScalaCheckFramework"))
   ) ++ scalacheckJs
 
+  val zcheckJvm = "com.github.inthenow" %% "zcheck" % "0.6.2"
+
   val zcheckJvmSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.1",
+    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.2",
     libraryDependencies += scalacheck,
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1")
   )

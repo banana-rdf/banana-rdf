@@ -1,3 +1,4 @@
+import com.typesafe.sbt.pgp.SbtPgpCommandContext
 import sbt._
 import sbt.Keys._
 import com.inthenow.sbt.scalajs._
@@ -34,7 +35,7 @@ object BananaRdfBuild extends Build {
   import BuildSettings._
   import Dependencies._
  
-  val crossBuildType = SbtLinkedBuild
+  val crossBuildType = CommonBaseBuild
 
   /** `banana`, the root project. */
   lazy val bananaM  = CrossModule(RootBuild,
@@ -92,15 +93,17 @@ object BananaRdfBuild extends Build {
     sharedLabel       = "common")
 
   lazy val ntriples     = ntriplesM.project(Module, ntriples_jvm, ntriples_js)
-  lazy val ntriples_jvm = ntriplesM.project(Jvm, Empty,  ntriples_common_jvm)
-  lazy val ntriples_js  = ntriplesM.project(Js,Empty,  ntriples_common_js)
+  lazy val ntriples_jvm = ntriplesM.project(Jvm, Empty,  ntriples_common_jvm).dependsOn(rdf_jvm)
+  lazy val ntriples_js  = ntriplesM.project(Js,Empty,  ntriples_common_js).dependsOn(rdf_js)
 
   lazy val ntriples_common_jvm = ntriplesM
     .project(Jvm,Shared)
+    .settings(buildSettings:_*)
     .dependsOn(rdf_jvm)
 
   lazy val ntriples_common_js = ntriplesM
     .project(Js,Shared)
+    .settings(buildSettings:_*)
     .dependsOn(rdf_js)
 
   /** `ldpatch`, an implementation for LD Patch. See http://www.w3.org/TR/ldpatch/ .*/
@@ -237,7 +240,7 @@ object BananaRdfBuild extends Build {
         aggregate in Test in rdf_js := false,
               aggregate in Test in rdfTestSuite_js := false,
               aggregate in Test in ntriples_js := false
-      ) ++ zcheckJsSettings: _*
+      ) ++ zcheckJs: _*
     )
     .dependsOn(rdf_js, ntriples_js, rdfTestSuite_js % "test-internal->compile")
 
@@ -249,7 +252,7 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_common_js  = plantainM
     .project(Js, Shared)
-    .settings(scalaz_js ++ zcheckJsSettings:_*)
+    .settings(scalaz_js ++ zcheckJs:_*)
     .settings(aggregate in Test in rdf_js := false,
               aggregate in Test in rdfTestSuite_js := false)
     .dependsOn(rdf_js , rdfTestSuite_js % "test-internal->compile")
