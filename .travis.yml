@@ -17,31 +17,28 @@ sudo: false
 
 language: scala
 
+## Scala-JS 0.6.13 and later uses NodeJS instead of Rhino to run Scala-JS tests
+# here we configure NodeJS enviroment
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - npm install
+  - npm install jsdom
+
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis-jvmopts test
+  - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis-jvmopts validate
 
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 
 scala:
-  - 2.10.4
-  - 2.11.5
+  - 2.12.1
+  - 2.11.8
 
 branches:
   only:
     - /^series/.*$/
-
-## nobody looks at experimental these days so let's save resources
-# matrix:
-#   include:
-#     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-#       jdk:    oraclejdk7
-#       scala:  2.11.5
-#     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-#       jdk:    oraclejdk7
-#       scala:  2.10.4      
-#   allow_failures: 
-#    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test 
 
 notifications:
   irc: "chat.freenode.net#banana-rdf"

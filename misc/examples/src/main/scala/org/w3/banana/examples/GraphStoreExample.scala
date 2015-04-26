@@ -61,13 +61,13 @@ abstract class GraphStoreExample[Rdf <: RDF, Store](implicit
 
 }
 
-import com.hp.hpl.jena.query.Dataset
+import org.apache.jena.query.Dataset
 import org.w3.banana.jena._
 
 object GraphExampleWithJena extends GraphStoreExample[Jena, Dataset] {
 
   def makeRDFStore(file: String): Dataset = {
-    import com.hp.hpl.jena.tdb.TDBFactory
+    import org.apache.jena.tdb.TDBFactory
     TDBFactory.createDataset(file)
   }
 

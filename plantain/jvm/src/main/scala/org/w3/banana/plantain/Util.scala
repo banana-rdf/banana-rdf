@@ -1,14 +1,8 @@
 package org.w3.banana.plantain
 
-import java.io.{ ByteArrayOutputStream, OutputStream }
-import java.net.{ URI => jURI } //we use jURIs because the correctly work with relative Uris
-import akka.http.model.Uri
+import akka.http.scaladsl.model.Uri
 import org.openrdf.model.impl._
-import org.openrdf.rio.turtle._
-import org.openrdf.{ model => sesame }
-import org.w3.banana.plantain._
-import org.w3.banana.io._
-import scala.util.Try
+import org.openrdf.{model => sesame}
 
 
 object Util {

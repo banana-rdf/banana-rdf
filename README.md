@@ -3,6 +3,19 @@ banana-rdf
 
 [![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png)](http://travis-ci.org/w3c/banana-rdf) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w3c/banana-rdf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+The current published version 0.8.4-SNAPSHOT for scala 2.12 is to be found on the [http://bblfish.net/work/repo/snapshots](bblfish.net/work/repo/snapshots) repository.
+
+```scala
+val banana = (name: String) => "org.w3" %% name % "0.8.4-SNAPSHOT" excludeAll (ExclusionRule(organization = "org.scala-stm"))
+
+//add the bblfish-snapshots repository to the resolvers
+
+resolvers += "bblfish-snapshots" at "http://bblfish.net/work/repo/snapshots"
+
+//choose the packages you need for your dependencies
+val bananaDeps = Seq("banana", "banana-rdf", "banana-sesame").map(banana)
+```
+
 An RDF library in Scala
 -----------------------
 
@@ -23,21 +36,23 @@ looking at you, Jena and Sesame). We try to keep a clear distinction
 between the core concepts and the enhanced syntax that Scala can give
 us.
 
-[`RDF`](https://github.com/w3c/banana-rdf/blob/master/rdf/src/main/scala/RDF.scala)
+[`RDF`](rdf/shared/src/main/scala/org/w3/banana/RDF.scala)
 itself is defined as a record of types. Implementations just have to
 _plug_ their own types. And because types alone are not enough, we
 introduce the
-[`RDFOps`](https://github.com/w3c/banana-rdf/blob/master/rdf/src/main/scala/RDFOps.scala)
+[`RDFOps`](rdf/shared/src/main/scala/org/w3/banana/RDFOps.scala)
 typeclass, which defines the mandatory operations that an RDF
 implementation must
-implement. [`SparqlOps`](https://github.com/w3c/banana-rdf/blob/master/rdf/src/main/scala/SparqlOps.scala)
+implement. [`SparqlOps`](rdf/shared/src/main/scala/org/w3/banana/SparqlOps.scala)
 does the same for SPARQL.
 
-With `banana-rdf`, you get `Diesel`, a nice DSL to build and navigate
+With `banana-rdf`, you get _Diesel_, a nice DSL to build and navigate
 within **pointed graphs** (graphs with a pointer to an inner
 node). You also get an abstraction for **graph stores**
-(`GraphStore`), which do not have to be **SPARQL engines**
-(`SparqlEngine`). Of course, you can **serialize** and **deserialize**
+([`GraphStore`](rdf/shared/src/main/scala/org/w3/banana/GraphStore.scala)), 
+which do not have to be **SPARQL engines**
+([`SparqlEngine`](rdf/shared/src/main/scala/org/w3/banana/SparqlEngine.scala)). 
+Of course, you can **serialize** and **deserialize**
 most of the RDF syntaxes as well as JSON-LD (RDFa will come soon).
 
 `banana-rdf` introduces the concept of **binders**, which let you
@@ -47,7 +62,7 @@ ORM techniques, this does not rely on annotation or reflection.
 
 Until we write thorough documentation, the best place to understand
 what you can do is to go through the [test
-suite](https://github.com/w3c/banana-rdf/tree/master/rdf-test-suite).
+suite](https://github.com/w3c/banana-rdf/tree/series/0.8.x/rdf-test-suite).
 
 How to start geeking
 --------------------
@@ -108,19 +123,8 @@ $ sbt eclipse
 IntelliJ IDEA
 -------------
 
-IntelliJ IDEA works with just one global change:
+IntelliJ IDEA works out of the box since 2016.
 
-In `~/.sbt/0.13/plugins/build.sbt`
-
-```
-    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.6.0")
-```
-
-To generate IntelliJ project files, just run the command:
-
-``` bash
-$ sbt gen-idea
-```
 
 Community
 =========
@@ -128,24 +132,7 @@ Community
 For discussions that don't fit in the [issues tracker](https://github.com/w3c/banana-rdf/issues), you may try
 either 
 *  the [w3c banana-rdf mailing list](http://lists.w3.org/Archives/Public/public-banana-rdf/), for longer discussions
-*  the banana-rdf irc channel on freenode using a dedicated IRC client connecting to [irc://irc.freenode.net:6667/banana-rdf](irc://irc.freenode.net:6667/banana-rdf) or using the [freenode html interface](http://webchat.freenode.net), for quick real time socialising
-
-Contributions
--------------
-
-All contributions are welcome. By contributing, you accept to give the
-ownership of your contribution to the [World Wide Web
-Consortium](http://www.w3.org). They are a _nonprofit organization_
-and just want to simplify the governance of this opensource project.
-
-Before contributing please make sure to copy the [bin/pre-commit](bin/pre-commit)
-shell script to the `.git/hooks/` directory of your clone.  This will ensure that all 
-your commits are formatted in a consistent way before you push, making it easier
-to see the real diffs in a project. On Unix you can do this with the command
-
-```
-$ cp bin/pre-commit .git/hooks/
-```
+*  the [banana-rdf gitter channel](https://gitter.im/banana-rdf/banana-rdf), for quick real time socialising
 
 Code of Conduct
 ---------------

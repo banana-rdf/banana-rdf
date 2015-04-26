@@ -8,6 +8,10 @@ object JenaGraphTest extends GraphTest[Jena]
 
 object JenaMGraphTest extends MGraphTest[Jena]
 
+import org.w3.banana.io._
+
+object JenaRDFLoaderTestSuite extends RDFLoaderTestSuite with JenaModule
+
 import org.w3.banana.isomorphism._
 
 object JenaIsomorphismTest extends IsomorphismTest[Jena]

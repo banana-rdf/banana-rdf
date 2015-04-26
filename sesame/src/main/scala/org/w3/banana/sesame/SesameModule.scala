@@ -1,8 +1,9 @@
-package org.w3.banana.sesame
+package org.w3.banana
+package sesame
 
 import org.openrdf.repository.RepositoryConnection
 import org.w3.banana._
-import org.w3.banana.io.{SparqlQueryResultsReader, _}
+import org.w3.banana.io.{ SparqlQueryResultsReader, _ }
 import org.w3.banana.sesame.io._
 
 import scala.util.Try
@@ -12,7 +13,6 @@ trait SesameModule
     with RDFOpsModule
     with RecordBinderModule
     with SparqlGraphModule
-    // with SparqlHttpModule
     with RDFXMLReaderModule
     with TurtleReaderModule
     with NTriplesReaderModule
@@ -43,6 +43,8 @@ trait SesameModule
   implicit val turtleReader: RDFReader[Sesame, Try, Turtle] = new SesameTurtleReader
 
   implicit val jsonldReader: RDFReader[Sesame, Try, JsonLd] = new SesameJSONLDReader
+
+  implicit val rdfLoader: RDFLoader[Sesame, Try] = new SesameRDFLoader
 
   implicit val ntriplesReader: RDFReader[Sesame, Try, NTriples] = new NTriplesReader
 

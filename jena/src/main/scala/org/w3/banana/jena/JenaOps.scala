@@ -1,8 +1,8 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.datatypes.{ BaseDatatype, RDFDatatype, TypeMapper }
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _ }
-import com.hp.hpl.jena.rdf.model.{ Literal => JenaLiteral, Seq => _, _ }
+import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
+import org.apache.jena.graph.{Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _}
+import org.apache.jena.rdf.model.{Literal => JenaLiteral, Seq => _}
 import org.w3.banana._
 
 import scala.collection.JavaConverters._
@@ -60,11 +60,11 @@ class JenaOps extends RDFOps[Jena] with JenaMGraphOps with DefaultURIOps[Jena] {
 
   // bnode
 
-  def makeBNode() = NodeFactory.createAnon().asInstanceOf[Node_Blank]
+  def makeBNode(): Node_Blank = NodeFactory.createBlankNode().asInstanceOf[Node_Blank]
 
   def makeBNodeLabel(label: String): Jena#BNode = {
-    val id = AnonId.create(label)
-    NodeFactory.createAnon(id).asInstanceOf[Node_Blank]
+    val id = BlankNodeId.create(label)
+    NodeFactory.createBlankNode(id).asInstanceOf[Node_Blank]
   }
 
   def fromBNode(bn: Jena#BNode): String =

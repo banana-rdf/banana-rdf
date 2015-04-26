@@ -1,12 +1,13 @@
-package org.w3.banana.jena.io
+package org.w3.banana.jena
+package io
 
-import com.hp.hpl.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
-import com.hp.hpl.jena.rdf.model.{RDFReader => _}
+import org.apache.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
+import org.apache.jena.rdf.model.{RDFReader => _}
 import java.io._
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
 import org.w3.banana.io._
-import org.w3.banana.jena.{Jena, JenaOps}
+import org.w3.banana.jena.{ Jena, JenaOps }
 import scala.util._
 
 /** A triple sink that accumulates triples in a graph. */
@@ -18,12 +19,13 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
   def base(base: String): Unit = ()
   def finish(): Unit = ()
   def prefix(prefix: String, iri: String): Unit = prefixes += (prefix -> iri)
-  def quad(quad: com.hp.hpl.jena.sparql.core.Quad): Unit = ()
+  def quad(quad: org.apache.jena.sparql.core.Quad): Unit = ()
   def start(): Unit = ()
   def triple(triple: JenaTriple): Unit = {
-    def isXsdString(node: JenaNode): Boolean =
+    def isXsdString(node: JenaNode): Boolean = {
       node.isLiteral &&
-      node.getLiteralDatatypeURI == "http://www.w3.org/2001/XMLSchema#string"
+        node.getLiteralDatatypeURI == "http://www.w3.org/2001/XMLSchema#string"
+    }
     val o = triple.getObject
     val t =
       // if o is a xsd:string literal
@@ -40,7 +42,8 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
       }
     graph.add(t)
   }
-  def tuple(tuple: org.apache.jena.atlas.lib.Tuple[JenaNode]): Unit = ()
+
+  def tuple(tuple: org.apache.jena.atlas.lib.tuple.Tuple[JenaNode]): Unit = ()
 }
 
 object JenaRDFReader {
@@ -57,8 +60,20 @@ object JenaRDFReader {
 
     def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      RDFDataMgr.parse(sink, reader, base, lang)
+      RDFDataMgr.parse(sink, reader.asInstanceOf[StringReader], base, lang)
       sink.graph
+    }
+  }
+
+  def makeRDFLoader() = new RDFLoader[Jena, Try] {
+    /**
+     * Read triples from the given location.
+     *
+     * The syntax is determined from input source URI
+     *  (content negotiation or extension).
+     */
+    def load(url: java.net.URL): Try[Jena#Graph] = {
+      Try(RDFDataMgr.loadGraph(url.toString))
     }
   }
 
@@ -68,4 +83,7 @@ object JenaRDFReader {
 
   implicit def n3Reader()(implicit ops: JenaOps): RDFReader[Jena, Try, N3] = makeRDFReader[N3](ops, Lang.N3)
 
+  implicit def jsonldReader()(implicit ops: JenaOps): RDFReader[Jena, Try, JsonLd] = makeRDFReader[JsonLd](ops, Lang.JSONLD)
+
+  implicit def rdfLoader()(implicit ops: JenaOps): RDFLoader[Jena, Try] = makeRDFLoader()
 }

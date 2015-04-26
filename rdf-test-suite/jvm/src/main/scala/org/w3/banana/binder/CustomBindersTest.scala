@@ -1,10 +1,9 @@
 package org.w3.banana.binder
 
-import org.w3.banana._, syntax._, diesel._
-import scala.util._
-import zcheck.SpecLite
+import org.scalatest.{Matchers, WordSpec}
+import org.w3.banana._
 
-class CustomBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+class CustomBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers {
 
   import ops._
   
@@ -13,7 +12,7 @@ class CustomBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite 
     import org.w3.banana.binder.JodaTimeBinders._
 
     val dateTime = DateTime.now()
-    dateTime.toPG.as[DateTime].get.compareTo(dateTime) must_==(0)
+    dateTime.toPG.as[DateTime].get.compareTo(dateTime) shouldEqual 0
   }
 
 }

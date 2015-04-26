@@ -2,9 +2,11 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 import java.net.URL
-import zcheck.SpecLite
 
-class UriSyntaxJvmTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+import org.scalatest.{Matchers, WordSpec}
+
+
+class UriSyntaxJvmTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers {
 
   import ops._
 
@@ -12,7 +14,7 @@ class UriSyntaxJvmTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
     val card = "http://bblfish.net/people/henry/card"
     val uri: Rdf#URI = URI(card)
 
-    new URL(card).toUri must_==(uri)
+    new URL(card).toUri shouldEqual uri
   }
 
 }

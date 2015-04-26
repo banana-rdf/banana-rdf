@@ -1,8 +1,7 @@
 package org.w3.banana.plantain
 
+import akka.http.scaladsl.model.Uri
 import org.w3.banana._
-import org.w3.banana.plantain.model._
-import akka.http.model.Uri
 
 trait PlantainURIOps extends URIOps[Plantain] {
 
@@ -18,7 +17,7 @@ trait PlantainURIOps extends URIOps[Plantain] {
     uri.fragment
 
   def isPureFragment(u: Plantain#URI): Boolean =
-    u.scheme.isEmpty && u.authority.isEmpty && u.path.isEmpty && u.query.isEmpty && u.fragment.isDefined
+    u.scheme.isEmpty && u.authority.isEmpty && u.path.isEmpty && u.query().isEmpty && u.fragment.isDefined
 
   def resolve(uri: Plantain#URI, other: Plantain#URI): Plantain#URI =
     other.resolvedAgainst(uri)
@@ -34,7 +33,7 @@ trait PlantainURIOps extends URIOps[Plantain] {
   // TODO should rely on a spray.http.Uri when https://github.com/spray/spray/issues/818 is addressed
   // for implementation algorithm, see https://github.com/stain/cxf/blob/trunk/rt/frontend/jaxrs/src/main/java/org/apache/cxf/jaxrs/utils/HttpUtils.java
   def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
-    import java.net.{ URI => jURI }
+    import java.net.{URI => jURI}
     val juri = new jURI(uri.toString).relativize(new jURI(other.toString))
     Uri(juri.toString)
   }

@@ -2,11 +2,13 @@ package org.w3.banana
 package jsonldjs
 package io
 
-import zcheck.SpecLite
-import scalajs.concurrent.JSExecutionContext.Implicits.runNow
+
+import org.scalatest.{Matchers, WordSpec}
+
+import scalajs.concurrent.JSExecutionContext.Implicits.queue
 import org.w3.banana.plantain._
 
-object JsonLdJsParserTest extends SpecLite {
+object JsonLdJsParserTest extends WordSpec with Matchers {
 
   import PlantainOps._
 
@@ -31,7 +33,7 @@ object JsonLdJsParserTest extends SpecLite {
           -- schema("image") ->- URI("http://manu.sporny.org/images/manu.png")
       ).graph
 
-      check(g isIsomorphicWith graph)
+      (g isIsomorphicWith graph) shouldEqual true
     }
 
   }
