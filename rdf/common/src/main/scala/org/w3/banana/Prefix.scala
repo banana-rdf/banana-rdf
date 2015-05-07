@@ -14,7 +14,7 @@ object Prefix {
     new PrefixBuilder(prefixName, prefixIri)
 }
 
-private [banana] class PrefixBuilder[Rdf <: RDF](
+class PrefixBuilder[Rdf <: RDF](
   val prefixName: String,
   val prefixIri: String
 )(implicit
