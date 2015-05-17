@@ -3,7 +3,7 @@ package org.w3.banana.binder
 import org.w3.banana._, syntax._, diesel._
 import scala.util._
 
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 
 class CustomBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 

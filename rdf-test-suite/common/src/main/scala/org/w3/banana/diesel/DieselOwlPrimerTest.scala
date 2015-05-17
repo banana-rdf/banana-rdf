@@ -2,7 +2,7 @@ package org.w3.banana.diesel
 
 import org.w3.banana._
 import org.w3.banana.syntax._
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 import scalaz.Scalaz.{ none, some }
 import org.w3.banana.PointedGraphs
 
