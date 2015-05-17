@@ -14,7 +14,7 @@ object BuildSettings {
   val buildSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
     organization := "org.w3",
     scalaVersion := "2.11.6",
-    crossScalaVersions := Seq("2.11.6", "2.10.4"),
+    crossScalaVersions := Seq("2.11.6", "2.10.5"),
     javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     fork := false,
     parallelExecution in Test := false,
@@ -67,14 +67,13 @@ object BananaRdfBuild extends Build {
   lazy val rdf_common_jvm = rdfM
     .project(Jvm,Shared)
     .settings(
-      Seq(
         libraryDependencies += scalaz,
         libraryDependencies += jodaTime,
-        libraryDependencies += jodaConvert): _*)
+        libraryDependencies += jodaConvert).settings(buildSettings:_*) //temporal fix
 
   lazy val rdf_common_js = rdfM
     .project(Js,Shared)
-    .settings(scalaz_js: _*)
+    .settings(scalaz_js: _*).settings(buildSettings:_*) //temporal fix
 
   /** `ntriples`, blocking yet streaming parser */
   lazy val ntriplesM  = CrossModule(crossBuildType,
@@ -88,11 +87,11 @@ object BananaRdfBuild extends Build {
   lazy val ntriples_jvm = ntriplesM.project(Jvm, Empty,  ntriples_common_jvm)
   lazy val ntriples_js = ntriplesM.project(Js,Empty,  ntriples_common_js)
   lazy val ntriples_common_jvm = ntriplesM
-    .project(Jvm,Shared)
+    .project(Jvm,Shared).settings(buildSettings:_*) //temporal fix
     .dependsOn(rdf_jvm)
 
   lazy val ntriples_common_js = ntriplesM
-    .project(Js,Shared)
+    .project(Js,Shared).settings(buildSettings:_*) //temporal fix
     .dependsOn(rdf_js)
 
   /** `ldpatch`, an implementation for LD Patch. See http://www.w3.org/TR/ldpatch/ .*/
@@ -143,12 +142,12 @@ object BananaRdfBuild extends Build {
         libraryDependencies += fuseki,
         libraryDependencies += servlet,
         libraryDependencies += httpComponents
-      ) ++ zcheckJvmSettings: _*)
+      ) ++ zcheckJvmSettings: _*).settings(buildSettings:_*) //temporal fix
     .dependsOn(rdf_jvm, ntriples_jvm)
 
   lazy val rdfTestSuite_common_js = rdfTestSuiteM
     .project(Js, Shared)
-    .settings(zcheckJsSettings: _*)
+    .settings(zcheckJsSettings: _*).settings(buildSettings:_*) //temporal fix
     .dependsOn(rdf_js)
 
   /** `jena`, an RDF implementation for Apache Jena. */
@@ -178,8 +177,8 @@ object BananaRdfBuild extends Build {
 
   lazy val sesame = sesameM
     .project(Jvm)
-    .settings(
-      Seq(
+    .settings(buildSettings:_*)
+    .settings(   
         libraryDependencies += sesameQueryAlgebra,
         libraryDependencies += sesameQueryParser,
         libraryDependencies += sesameQueryResult,
@@ -188,7 +187,7 @@ object BananaRdfBuild extends Build {
         libraryDependencies += sesameSailMemory,
         libraryDependencies += sesameSailNativeRdf,
         libraryDependencies += sesameRepositorySail,
-        libraryDependencies += jsonldJava): _*)
+        libraryDependencies += jsonldJava)
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `plantain`, a cross-compiled Scala implementation for RDF.  */
@@ -224,12 +223,12 @@ object BananaRdfBuild extends Build {
 
   lazy val plantain_common_jvm = plantainM
     .project(Jvm, Shared)
-    .dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile")
+    .dependsOn(rdf_jvm, rdfTestSuite_jvm % "test-internal->compile").settings(buildSettings:_*) //temporal fix
 
   lazy val plantain_common_js  = plantainM
     .project(Js, Shared)
     .settings(scalaz_js ++ zcheckJsSettings:_*)
-    .dependsOn(rdf_js , rdfTestSuite_js % "test-internal->compile")
+    .dependsOn(rdf_js , rdfTestSuite_js % "test-internal->compile").settings(buildSettings:_*) //temporal fix
 
   /** `N3.js`, a js only module binding N3.js into banana-rdf abstractions. */
   lazy val n3JsM  = CrossModule(SingleBuild,
