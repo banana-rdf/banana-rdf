@@ -1,5 +1,13 @@
 package org.w3.banana
 package n3js
+import org.w3.banana.io._
+import org.w3.banana.{ RDFOps, RDF }
+import scala.concurrent.Future
+import scalaz._
+import Scalaz._
+import scala.concurrent.ExecutionContext.Implicits.global
+import N3js.ops
+import org.w3.banana.util.TryInstances
 
 object N3jsOpsTest extends RDFOpsTest[N3js]
 
@@ -28,6 +36,8 @@ class N3jsCommonBindersTest extends CommonBindersTest[N3js]
 class N3jsRecordBinderTest extends RecordBinderTest[N3js]
 
 class N3jsCustomBinderTest extends CustomBindersTest[N3js]
+
+//class N3jsTurtleSuite extends TurtleTestSuite[N3js, Future] //cannot use it as we do not have Comonad for Futures
 
 import org.w3.banana.syntax._
 
