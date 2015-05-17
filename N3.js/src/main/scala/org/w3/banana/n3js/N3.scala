@@ -2,6 +2,7 @@ package org.w3.banana
 package n3js
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSName
 
 object N3 extends js.Object {
 
@@ -25,6 +26,26 @@ trait Parser extends js.Object {
 
 }
 
+@JSName("N3.Writer")
+class N3Writer extends js.Object {
+
+  def addTriple(sub:N3js#Node,prop:N3js#URI,obj:N3js#Node,graph:String,done:js.Function1[Any,Unit]):Unit = js.native
+
+  def addTriple(sub:N3js#Node,prop:N3js#URI,obj:N3js#Node,done:js.Function1[Any,Unit]):Unit = js.native
+
+  def addTriple(obj:N3js#Triple):Unit = js.native
+
+  def addTriples(triples:js.Array[N3js#Triple]):Unit = js.native
+
+  def end(done:js.Function2[Any,String,Unit]):Unit = js.native
+
+  def addPrefix(prefix:String, iri:String, done:js.Function1[Any,Unit]):Unit = js.native
+
+  def addPrefixes(prefixes:js.Array[String], done:js.Function1[Any,Unit]):Unit = js.native
+
+}
+
+
 object Parser {
 
   implicit class ParserW(val parser: Parser) extends AnyVal {
@@ -35,17 +56,17 @@ object Parser {
     /** Parses the `input` and call the `tripleCallback` and
       * `prefixCallback` functions when a triple or a prefix are
       * found.
-      *       
+      *
       * Note: according to N3.js documentation, `prefixCallback` is
       * actually called at the end of the parsing.
-      * 
+      *
       * @return a [[scala.concurrent.Future]] that signals that parsing is done.
       */
     def parse[T](
-      input: String)(
-      tripleCallback: Triple => Unit,
-      prefixCallback: (String, String) => Unit = (_: String, _: String) => ()
-    ): Future[Unit] = {
+                  input: String)(
+                  tripleCallback: Triple => Unit,
+                  prefixCallback: (String, String) => Unit = (_: String, _: String) => ()
+                  ): Future[Unit] = {
       val promise = Promise[Unit]()
       parser.parse(
         input,
@@ -69,13 +90,13 @@ object Parser {
     /** Allows parsing in chunks. The callbacks are registered and the
       * termination is notified through the return
       * [[scala.concurrent.Future]].
-      * 
+      *
       * @return A [[scala.concurrent.Future]] that resolves when the parsing is done.
       */
     def parseChunks(
-      tripleCallback: Triple => Unit,
-      prefixCallback: (String, String) => Unit = (_: String, _: String) => ()
-    ): Future[Unit] = {
+                     tripleCallback: Triple => Unit,
+                     prefixCallback: (String, String) => Unit = (_: String, _: String) => ()
+                     ): Future[Unit] = {
       val promise = Promise[Unit]()
       parser.parse(
         (error: js.UndefOr[js.Error], triple: js.UndefOr[Triple], prefixes: js.UndefOr[js.Dictionary[String]]) => {
