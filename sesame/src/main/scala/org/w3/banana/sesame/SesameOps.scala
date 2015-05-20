@@ -167,7 +167,7 @@ class SesameOps extends RDFOps[Sesame] with SesameMGraphOps with DefaultURIOps[S
   def isomorphism(left: Sesame#Graph, right: Sesame#Graph): Boolean = {
     val leftNoContext = left.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava
     val rightNoContext = right.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava
-    ModelUtil.equals(leftNoContext, rightNoContext)
+    Models.isomorphic(leftNoContext, rightNoContext)
   }
 
   def graphSize(g: Sesame#Graph): Int = g.size()

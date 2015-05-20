@@ -9,7 +9,7 @@ resolvers += Resolver.url(
 
 addSbtPlugin("com.github.inthenow" % "sbt-scalajs" % "0.6.2")
 
-dependencyOverrides += "org.scala-js" % "sbt-scalajs" % "0.6.0"
+dependencyOverrides += "org.scala-js" % "sbt-scalajs" % "0.6.3"
 
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
 

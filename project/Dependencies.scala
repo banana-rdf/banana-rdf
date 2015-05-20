@@ -14,7 +14,7 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.0"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.1"
 
   /**
    * scalaz for scalajs
@@ -22,8 +22,7 @@ object Dependencies {
    * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
    */
   // Todo: %%%! --> %%%
-  //val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.0-4")
-  val scalaz_js = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalaz-core" % "7.1.0-4")
+  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.1-2")
 
   /**
    * joda-Time
@@ -44,10 +43,10 @@ object Dependencies {
    * @see http://www.scalatest.org
    * @see http://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = "org.scalatest" %% "scalatest" % "2.2.0"
+  val scalatest = "org.scalatest" %% "scalatest" % "2.2.4"
 
-  
-  /** ScalaCheck
+
+   /** ScalaCheck
     * @see http://scalacheck.org/
     * @see http://repo1.maven.org/maven2/org/scalacheck/
     */
@@ -56,19 +55,25 @@ object Dependencies {
   //Todo:
   val scalacheckJs = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalacheck" % "1.12.2")
 
+  val zcheckJs =  Seq(
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.2"
+  )
+
   val zcheckJsSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.0",
+    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.2",
     testFrameworks := Seq(new TestFramework("org.scalacheck.ScalaCheckFramework"))
   ) ++ scalacheckJs
 
+  val zcheckJvm = "com.github.inthenow" %% "zcheck" % "0.6.2"
+
   val zcheckJvmSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.0",
+    libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.2",
     libraryDependencies += scalacheck,
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1")
   )
-
+  
   /**
    * Akka Http Core
    * @see http://akka.io
@@ -102,7 +107,7 @@ object Dependencies {
    * @see http://www.openrdf.org/
    * @see http://repo1.maven.org/maven2/org/openrdf/sesame/
    */
-  val sesameVersion = "2.8.0-beta2"
+  val sesameVersion = "2.8.3"
 
 
   val sesameQueryAlgebra = "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion

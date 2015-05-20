@@ -2,7 +2,7 @@ package org.w3.banana
 package n3js
 package io
 
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 import scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import org.w3.banana.plantain._
 

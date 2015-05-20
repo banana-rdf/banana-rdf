@@ -4,7 +4,7 @@ import org.w3.banana._, syntax._, diesel._
 import scala.util._
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 
 class RecordBinderJvmTest[Rdf <: RDF](implicit
                                    ops: RDFOps[Rdf],
