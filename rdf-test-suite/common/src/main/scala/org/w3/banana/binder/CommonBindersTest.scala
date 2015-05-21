@@ -3,10 +3,6 @@ package org.w3.banana.binder
 import com.inthenow.zcheck.SpecLite
 import org.w3.banana._, syntax._, diesel._
 import scala.util._
-<<<<<<< HEAD
-import com.inthenow.zcheck.SpecLite
-=======
->>>>>>> 963fc71... updated dependencies + movement to CommonBuild to fix the build issue
 
 class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 

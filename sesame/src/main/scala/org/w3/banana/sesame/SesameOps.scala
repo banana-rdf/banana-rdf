@@ -158,12 +158,6 @@ class SesameOps extends RDFOps[Sesame] with SesameMGraphOps with DefaultURIOps[S
   }
 
   // graph isomorphism
-
-  /**
-   * the new ModelUtil.equals changed its semantics. See
-   * - https://openrdf.atlassian.net/browse/SES-1695
-   * - https://groups.google.com/forum/#!topic/sesame-devel/CGFDn7mESLg/discussion
-   */
   def isomorphism(left: Sesame#Graph, right: Sesame#Graph): Boolean = {
     val leftNoContext = left.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava
     val rightNoContext = right.asScala.map(s => makeTriple(s.getSubject, s.getPredicate, s.getObject)).asJava

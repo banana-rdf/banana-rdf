@@ -23,10 +23,6 @@ object Dependencies {
    */
   // Todo: %%%! --> %%%
   val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.1-2")
-<<<<<<< HEAD
-  //val scalaz_js = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalaz-core" % "7.1.0-4")
-=======
->>>>>>> 963fc71... updated dependencies + movement to CommonBuild to fix the build issue
 
   /**
    * joda-Time

@@ -34,11 +34,7 @@ object BananaRdfBuild extends Build {
   import BuildSettings._
   import Dependencies._
  
-<<<<<<< HEAD
   val crossBuildType = CommonBaseBuild
-=======
-  val crossBuildType =  CommonBaseBuild
->>>>>>> 963fc71... updated dependencies + movement to CommonBuild to fix the build issue
 
   /** `banana`, the root project. */
   lazy val bananaM  = CrossModule(RootBuild,
@@ -193,16 +189,10 @@ object BananaRdfBuild extends Build {
 
   lazy val sesame = sesameM
     .project(Jvm)
-<<<<<<< HEAD
     .settings(aggregate in Test in rdf_jvm := false,
              aggregate in Test in ntriples_jvm := false,
               aggregate in Test in rdfTestSuite_jvm := false)
     .settings(
-      Seq(
-=======
-    .settings(buildSettings:_*)
-    .settings(   
->>>>>>> 963fc71... updated dependencies + movement to CommonBuild to fix the build issue
         libraryDependencies += sesameQueryAlgebra,
         libraryDependencies += sesameQueryParser,
         libraryDependencies += sesameQueryResult,
@@ -259,11 +249,8 @@ object BananaRdfBuild extends Build {
   lazy val plantain_common_js  = plantainM
     .project(Js, Shared)
     .settings(scalaz_js ++ zcheckJs:_*)
-<<<<<<< HEAD
     .settings(aggregate in Test in rdf_js := false,
               aggregate in Test in rdfTestSuite_js := false)
-=======
->>>>>>> 963fc71... updated dependencies + movement to CommonBuild to fix the build issue
     .dependsOn(rdf_js , rdfTestSuite_js % "test-internal->compile")
 
   /** `N3.js`, a js only module binding N3.js into banana-rdf abstractions. */
