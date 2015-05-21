@@ -4,9 +4,8 @@ package util
 import scalaz.{ Monad, Comonad }
 import scala.util.Try
 
-trait TryInstances {
-
-  implicit val tryInstance: Monad[Try] with Comonad[Try] = new Monad[Try] with Comonad[Try] {
+object tryInstances {
+  implicit final val TryInstance = new Monad[Try] with Comonad[Try] {
     def point[A](a: => A): Try[A] = Try(a)
     def bind[A, B](fa: Try[A])(f: A => Try[B]): Try[B] = fa flatMap f
     override def map[A, B](fa: Try[A])(f: A => B): Try[B] = fa map f
@@ -14,7 +13,4 @@ trait TryInstances {
     override def cojoin[A](a: Try[A]): Try[Try[A]] = Try(a)
     def copoint[A](p: Try[A]): A = p.get
   }
-
 }
-
-object tryInstances extends TryInstances
