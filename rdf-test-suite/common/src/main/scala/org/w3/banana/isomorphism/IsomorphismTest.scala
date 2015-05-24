@@ -1,7 +1,7 @@
 package org.w3.banana.isomorphism
 
 import org.w3.banana._
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 
 /**
  * Generic Tests for  isomorphism functions that use whatever the Ops implementation chooses

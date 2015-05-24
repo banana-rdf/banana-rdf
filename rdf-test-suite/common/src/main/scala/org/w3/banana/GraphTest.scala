@@ -1,7 +1,7 @@
 package org.w3.banana
 
 import org.w3.banana.diesel._
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 
 class GraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 

@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 
 trait SpecLiteExtra { self: SpecLite =>
 

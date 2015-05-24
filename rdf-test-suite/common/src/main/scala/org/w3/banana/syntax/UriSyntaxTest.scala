@@ -2,7 +2,7 @@ package org.w3.banana.syntax
 
 import org.w3.banana._
 import java.net.URL
-import zcheck.SpecLite
+import com.inthenow.zcheck.SpecLite
 
 class UriSyntaxTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
