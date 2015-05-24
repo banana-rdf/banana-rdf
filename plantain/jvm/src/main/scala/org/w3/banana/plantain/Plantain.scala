@@ -1,7 +1,7 @@
 package org.w3.banana.plantain
 
+import akka.http.scaladsl.model.Uri
 import org.w3.banana._
-import akka.http.model.Uri
 
 /** A Scala-based RDF implementation that limits boxing.
   */
