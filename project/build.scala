@@ -46,7 +46,7 @@ object BananaRdfBuild extends Build {
     .settings(unidocSettings:_*)
 
   lazy val banana_jvm = bananaM
-    .project(Jvm, rdf_jvm, rdfTestSuite_jvm, ntriples_jvm, plantain_jvm, jena, sesame, examples)
+    .project(Jvm, rdf_jvm, rdfTestSuite_jvm, ntriples_jvm, plantain_jvm, jena, sesame, bigdata,examples)
     .settings(aggregate in Test in rdf_jvm:= false,
               aggregate in Test in rdfTestSuite_jvm := false,
               aggregate in Test in ntriples_jvm := false)
@@ -203,6 +203,32 @@ object BananaRdfBuild extends Build {
         libraryDependencies += sesameRepositorySail,
         libraryDependencies += jsonldJava)
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
+
+
+  lazy val bigdataM = CrossModule(SingleBuild,
+    id              = "bigdata",
+    baseDir         = "bigdata",
+    defaultSettings = buildSettings,
+    modulePrefix    = "banana-")
+
+
+  /** `sesame`, an RDF implementation for Bigdata/BlazaGraph. */
+  lazy val bigdata = bigdataM
+    .project(Jvm)
+    .settings(
+      resolvers += "Bigdata releases" at "http://systap.com/maven/releases/",
+      resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
+      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full),
+      libraryDependencies += bigdataDatabase,
+      libraryDependencies += simulacrum,
+      libraryDependencies += sesameQueryAlgebra,
+      libraryDependencies += sesameQueryParser,
+      libraryDependencies += sesameQueryResult,
+      libraryDependencies += sesameRioTurtle,
+      libraryDependencies += sesameRioRdfxml,
+      libraryDependencies += jsonldJava,
+      name := "banana-bigdata"
+    ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
   /** `plantain`, a cross-compiled Scala implementation for RDF.  */
   lazy val plantainM = CrossModule(crossBuildType,
