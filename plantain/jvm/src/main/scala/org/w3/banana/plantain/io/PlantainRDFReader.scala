@@ -2,7 +2,7 @@ package org.w3.banana.plantain
 package io
 
 import java.io.{ Reader, InputStream }
-import akka.http.model.Uri
+import akka.http.scaladsl.model.Uri
 import org.openrdf.rio._
 import org.openrdf.rio.turtle._
 import org.openrdf.{ model => sesame }

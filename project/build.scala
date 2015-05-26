@@ -24,8 +24,8 @@ object BuildSettings {
     scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
     description := "RDF framework for Scala",
     startYear := Some(2012),
-    resolvers += Resolver.bintrayRepo("inthenow","releases")
-    
+    resolvers += Resolver.bintrayRepo("inthenow","releases"),
+    updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
   )
 }
 

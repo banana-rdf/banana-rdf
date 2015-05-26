@@ -1,13 +1,14 @@
 package org.w3.banana.plantain.io
 
-import java.io.{ ByteArrayOutputStream, OutputStream }
-import java.net.{ URI => jURI } //we use jURIs because the correctly work with relative Uris
-import akka.http.model.Uri
+import java.io.{ByteArrayOutputStream, OutputStream}
+import java.net.{URI => jURI}
+
 import org.openrdf.model.impl._
 import org.openrdf.rio.turtle._
-import org.openrdf.{ model => sesame }
-import org.w3.banana.plantain._
+import org.openrdf.{model => sesame}
 import org.w3.banana.io._
+import org.w3.banana.plantain._
+
 import scala.util.Try
 
 object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {

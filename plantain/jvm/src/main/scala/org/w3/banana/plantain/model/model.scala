@@ -1,7 +1,6 @@
 package org.w3.banana.plantain.model
 
-import org.w3.banana._
-import akka.http.model.Uri
+import akka.http.scaladsl.model.Uri
 
 final class MGraph[S, P, O](var graph: Graph[S, P, O])
 

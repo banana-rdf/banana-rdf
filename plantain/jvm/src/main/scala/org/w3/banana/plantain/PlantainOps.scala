@@ -1,10 +1,10 @@
 package org.w3.banana.plantain
 
-import org.w3.banana._
-import akka.http.model.Uri
-import java.util.UUID
-import org.w3.banana.isomorphism._
 import java.math.BigInteger
+
+import akka.http.scaladsl.model.Uri
+import org.w3.banana._
+import org.w3.banana.isomorphism._
 
 object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with PlantainURIOps {
 
