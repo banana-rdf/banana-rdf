@@ -1,15 +1,10 @@
-package org.w3.banana
+package org.w3.banana.bigdata
 
-import org.openrdf.model.{URI, Resource, Statement, Value}
+import org.openrdf.model.Statement
 import org.openrdf.query.{GraphQueryResult, BindingSet, TupleQueryResult}
 import org.openrdf.repository.RepositoryResult
-import scala.collection.immutable.{Map, List}
 
-/**
- * I put here some implicits to add Iterable support for bigdata StatementIterators
- * as they do not implement Java iterator/iterable so JavaConversions do not work for them
- */
-package object bigdata extends BigdataResultsConversions
+object extensions extends BigdataResultsConversions
 
 trait BigdataResultsConversions
 {

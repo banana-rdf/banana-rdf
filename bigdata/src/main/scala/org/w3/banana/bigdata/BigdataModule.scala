@@ -1,9 +1,17 @@
 package org.w3.banana.bigdata
 
 import org.w3.banana._
+import org.w3.banana.bigdata.io._
+import org.w3.banana.io._
+
+import scala.util.Try
 
 
-class BigdataModule  extends RDFModule with RDFOpsModule  with RecordBinderModule //with  SparqlGraphModule
+class BigdataModule  extends RDFModule
+  with RDFOpsModule
+  with RecordBinderModule
+  with RDFXMLWriterModule
+  with TurtleWriterModule
 {
 
   override type Rdf = Bigdata
@@ -18,5 +26,10 @@ class BigdataModule  extends RDFModule with RDFOpsModule  with RecordBinderModul
   implicit val ops: RDFOps[Bigdata] = new BigdataOps()(config)
 
   implicit val recordBinder: binder.RecordBinder[Bigdata] = binder.RecordBinder[Bigdata]
+  
+  implicit val bigdataRDFWriterHelper = new BigdataRDFWriterHelper
 
+  implicit val rdfXMLWriter: RDFWriter[Bigdata, Try, RDFXML] = bigdataRDFWriterHelper.rdfxmlWriter
+
+  implicit val turtleWriter: RDFWriter[Bigdata, Try, Turtle] = bigdataRDFWriterHelper.turtleWriter
 }

@@ -2,11 +2,10 @@ package org.w3.banana.bigdata
 
 import org.scalatest._
 import org.w3.banana._
-import org.w3.banana.binder.CommonBindersTest
-import org.w3.banana.diesel.{DieselGraphConstructTest, DieselGraphExplorationTest}
+import org.w3.banana.io.SparqlAnswerXml
 
 
-class BigdataOpsTest/*() extends RDFOpsTest[Bigdata]*/ (implicit ops: RDFOps[Bigdata]) extends WordSpec with Matchers with OptionValues {
+class BigdataOpsTest(implicit ops: RDFOps[Bigdata]) extends WordSpec with Matchers with OptionValues {
 
   type Rdf = Bigdata
 
@@ -57,19 +56,36 @@ class BigdataOpsTest/*() extends RDFOpsTest[Bigdata]*/ (implicit ops: RDFOps[Big
   }
 }
 
-class BigdataCommonBindersTest extends CommonBindersTest[Bigdata]
+class BigdataGraphTest extends GraphTest[Bigdata]
+
+//class BigdataMGraphTest extends MGraphTest[Bigdata] //TODO: fix this MGraphTest
+
+import org.w3.banana.isomorphism._
+
+object BigdataIsomorphismTest extends IsomorphismTest[Bigdata]
+
+object BigdataGraphUnionTest extends GraphUnionTest[Bigdata]
+
+class BigdataPointedGraphTest extends PointedGraphTest[Bigdata]
+
+import org.w3.banana.diesel._
 
 class BigdataDieselGraphConstructTest extends DieselGraphConstructTest[Bigdata]
 
 class BigdataDieselGraphExplorationTest extends DieselGraphExplorationTest[Bigdata]
 
-class BigdataGraphTest extends GraphTest[Bigdata]
+class BigdataDieselOwlPrimerTest extends DieselOwlPrimerTest[Bigdata]
 
-//class BigdataIsomorphismTest() extends IsomorphismTests[Bigdata]
+import org.w3.banana.binder._
 
-//class BigdataPointedGraphTest extends PointedGraphTester[Bigdata]
+class BigdataCommonBindersTest extends CommonBindersTest[Bigdata]
+
+import org.w3.banana.syntax._
+
+//class BigdataUriSyntaxTest extends UriSyntaxTest[Bigdata] //BIGDATA DOES NOT SUPPORT RELATIVE URIs
 
 //class BigdataRecordBinderTest extends RecordBinderTest[Bigdata] //BIGDATA DOES NOT SUPPORT RELATIVE URIs
 
-//class BigdataUriSyntaxTest extends UriSyntaxTest[Bigdata]
+//class BigdataSparqlGraphTest extends SparqlGraphTest[Bigdata, SparqlAnswerXml]
 
+class BigdataCustomBinderTest extends CustomBindersTest[Bigdata]

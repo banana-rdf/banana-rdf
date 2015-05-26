@@ -1,9 +1,6 @@
 package org.w3.banana.bigdata
 
 import org.w3.banana.RDFOps
-import org.w3.banana.bigdata.Bigdata
-
-import scalaz.Value
 
 /**
  * As there is not BigdataModel I decided to created my own, by modifying plantain graph
@@ -64,12 +61,6 @@ case class BigdataGraph(spo: Map[Bigdata#Node, Map[Bigdata#URI, Vector[Bigdata#N
       BigdataGraph(spo + (subject -> newPos), size - 1)
     }
   }
-/*
-  def -(s: Bigdata#NodeMatch, p: Bigdata#NodeMatch, o: Bigdata#NodeMatch): BigdataGraph = {
-    val matchedTriples: Iterable[Bigdata#Triple] = find(s, p, o)
-    val newGraph = matchedTriples.foldLeft(this) { _.removeExistingTriple(_) }
-    newGraph
-  }*/
 
   def union(other: BigdataGraph): BigdataGraph = {
     val (firstGraph, secondGraph) =

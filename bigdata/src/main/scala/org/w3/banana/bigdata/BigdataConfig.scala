@@ -2,22 +2,17 @@ package org.w3.banana.bigdata
 
 import java.util.Properties
 
-
-/**
- * Bigdata configuration, Rdf parameter is used to resolve it from module
- * @tparam Rdf
- */
-trait BigdataConfig[Rdf<:Bigdata]
+trait BigdataConfig[Rdf <: Bigdata]
 {
   def journal:String
   def basePrefix:String
   def properties:Properties
 }
 
-case object DefaultBigdataConfig extends BigdataConfig[Bigdata]{
+object DefaultBigdataConfig extends BigdataConfig[Bigdata]{
   val basePrefix:String = "http://todo.example.com/"
 
-  lazy val journal="bigdata.jnl"
+  lazy val journal = "bigdata.jnl"
   /**
   BigData settings
     */
