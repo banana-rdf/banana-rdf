@@ -61,6 +61,11 @@ class Foo[Rdf <: RDF](
     .flatMap { s =>
       ???
     }
+    .collect {
+      case somethingMuchLongerThatDidntFitPreviousLine if ??? =>
+        // notice the indentation
+        ???
+    }
 
   // that's a more general comment, not really attached to the very
   // next line of code, more like a section of code
