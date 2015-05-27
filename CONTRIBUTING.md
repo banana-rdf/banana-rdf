@@ -51,6 +51,19 @@ class Foo[Rdf <: RDF](
     ???
   }
 
+  list
+    .filter(! _.isEmpty)
+    .map(s => s.toString.toUppercase)
+    .flatMap { s =>
+      ???
+    }
+
+  list.foldLeft(0) { (acc, i) => acc + i }
+
+  list.foldLeft(0)(_ + _)
+  
+  list.collect { case Blah("blah", x) if x.isEmpty => ??? }
+
 }
 
 /** A much shorter comment, just one line. */
