@@ -13,6 +13,14 @@ and just want to simplify the governance of this opensource project.
 Your code must look like that:
 
 ```scala
+package org.w3.banana
+package mypackage
+
+import scala.util.{ Try, Success, Failure }
+import java.net.{ URI => jURI, _ }
+// do not be afraid of wildcards
+import java.io._
+
 /**
  * First sentence ending with a period.
  *
