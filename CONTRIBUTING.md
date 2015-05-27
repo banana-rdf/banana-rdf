@@ -21,13 +21,12 @@ import java.net.{ URI => jURI, _ }
 // do not be afraid of wildcards
 import java.io._
 
-/**
- * First sentence ending with a period.
+/** First sentence ending with a period.
  *
- * Then next paragraph.
- * And a second line.
+ *  Then next paragraph.
+ *  And a second line.
  *
- * And so on.
+ *  And so on.
  */
 class Foo[Rdf <: RDF](
   foo: String,
