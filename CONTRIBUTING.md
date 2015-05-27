@@ -21,12 +21,13 @@ import java.net.{ URI => jURI, _ }
 // do not be afraid of wildcards
 import java.io._
 
-/** First sentence ending with a period.
+/**
+ * First sentence ending with a period.
  *
- *  Then next paragraph.
- *  And a second line.
+ * Then next paragraph.
+ * And a second line.
  *
- *  And so on.
+ * And so on.
  */
 class Foo[Rdf <: RDF](
   foo: String,
@@ -51,12 +52,18 @@ class Foo[Rdf <: RDF](
     ???
   }
 
+  // that's an inline comment helpful when reading the code
+  // there could be several lines too!
+  // TODO no really, do it some day
   list
     .filter(! _.isEmpty)
     .map(s => s.toString.toUppercase)
     .flatMap { s =>
       ???
     }
+
+  // that's a more general comment, not really attached to the very
+  // next line of code, more like a section of code
 
   list.foldLeft(0) { (acc, i) => acc + i }
 
