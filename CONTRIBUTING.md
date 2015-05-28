@@ -52,6 +52,8 @@ class Foo[Rdf <: RDF](
     ???
   }
 
+  list.filter(! _.isEmpty).map(s => s.toString.toUppercase).flatMap { s => ??? }
+
   // that's an inline comment helpful when reading the code
   // there could be several lines too!
   // TODO no really, do it some day
