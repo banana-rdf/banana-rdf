@@ -130,23 +130,6 @@ either
 *  the [w3c banana-rdf mailing list](http://lists.w3.org/Archives/Public/public-banana-rdf/), for longer discussions
 *  the banana-rdf irc channel on freenode using a dedicated IRC client connecting to [irc://irc.freenode.net:6667/banana-rdf](irc://irc.freenode.net:6667/banana-rdf) or using the [freenode html interface](http://webchat.freenode.net), for quick real time socialising
 
-Contributions
--------------
-
-All contributions are welcome. By contributing, you accept to give the
-ownership of your contribution to the [World Wide Web
-Consortium](http://www.w3.org). They are a _nonprofit organization_
-and just want to simplify the governance of this opensource project.
-
-Before contributing please make sure to copy the [bin/pre-commit](bin/pre-commit)
-shell script to the `.git/hooks/` directory of your clone.  This will ensure that all 
-your commits are formatted in a consistent way before you push, making it easier
-to see the real diffs in a project. On Unix you can do this with the command
-
-```
-$ cp bin/pre-commit .git/hooks/
-```
-
 Code of Conduct
 ---------------
 
