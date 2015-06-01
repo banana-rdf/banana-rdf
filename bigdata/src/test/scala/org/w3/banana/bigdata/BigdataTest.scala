@@ -58,7 +58,7 @@ class BigdataOpsTest(implicit ops: RDFOps[Bigdata]) extends WordSpec with Matche
 
 class BigdataGraphTest extends GraphTest[Bigdata]
 
-//class BigdataMGraphTest extends MGraphTest[Bigdata] //TODO: fix this MGraphTest
+class BigdataMGraphTest extends MGraphTest[Bigdata]
 
 import org.w3.banana.isomorphism._
 

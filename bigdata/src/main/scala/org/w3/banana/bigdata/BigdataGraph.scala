@@ -1,15 +1,18 @@
 package org.w3.banana.bigdata
 
-import org.w3.banana.RDFOps
+import org.w3.banana.{CommonPrefixes, Prefix, RDFOps}
 
 /**
  * As there is not BigdataModel I decided to created my own, by modifying plantain graph
  * @param spo
  * @param size
  */
-case class BigdataGraph(spo: Map[Bigdata#Node, Map[Bigdata#URI, Vector[Bigdata#Node]]], size: Int) {
-
-  private lazy val ops = implicitly[RDFOps[Bigdata]] //temporal
+case class BigdataGraph(
+                         spo: Map[Bigdata#Node, Map[Bigdata#URI, Vector[Bigdata#Node]]],
+                         size: Int,
+                         prefixes:Set[Prefix[Bigdata]] = Set.empty[Prefix[Bigdata]])
+                       (implicit val ops:RDFOps[Bigdata])
+  {
 
 
     def triples: Iterable[Bigdata#Triple] =

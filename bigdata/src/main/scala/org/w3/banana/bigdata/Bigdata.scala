@@ -22,7 +22,7 @@ trait Bigdata extends RDF{
   type Literal = BigdataLiteral
   type Lang = String
 
-  type MGraph = BigdataGraph
+  type MGraph = BigdataMGraph
 
   // types for the graph traversal API
   type NodeMatch = BigdataValue

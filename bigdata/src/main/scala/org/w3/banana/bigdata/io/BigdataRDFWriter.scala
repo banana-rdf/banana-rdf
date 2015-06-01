@@ -30,10 +30,3 @@ class BigdataRDFWriter[T](implicit
   }
 }
 
-class BigdataRDFWriterHelper(implicit ops: RDFOps[Bigdata]) {
-
-  implicit val rdfxmlWriter: RDFWriter[Bigdata, Try, RDFXML] = new BigdataRDFWriter[RDFXML]
-
-  implicit val turtleWriter: RDFWriter[Bigdata, Try, Turtle] = new BigdataRDFWriter[Turtle]
-
-}

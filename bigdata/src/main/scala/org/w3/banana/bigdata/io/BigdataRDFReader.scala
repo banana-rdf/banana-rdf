@@ -1,71 +1,108 @@
 package org.w3.banana.bigdata.io
-/*
-
 import java.io._
 import java.util.LinkedList
 
+import com.bigdata.rdf.model
+import com.bigdata.rdf.model._
 import org.openrdf.model._
 import org.openrdf.model.impl.{LinkedHashModel, LiteralImpl, StatementImpl}
+import org.openrdf.rio.{ParseErrorListener, RDFHandler}
 import org.w3.banana._
-import org.w3.banana.bigdata.Bigdata
+import org.w3.banana.bigdata.{BigdataMGraph, BigdataGraph, Bigdata}
 import org.w3.banana.io._
-
+import com.bigdata.rdf.rio.turtle
 import scala.util._
 
-trait CollectorFix extends org.openrdf.rio.helpers.StatementCollector {
+class TurtleBigdataParser(base:String) extends com.bigdata.rdf.rio.turtle.BigdataTurtleParser{
 
-  def ops: RDFOps[Bigdata]
+  this.setValueFactory(BigdataValueFactoryImpl.getInstance(base))
 
-  override def handleStatement(st: Statement): Unit = st.getObject match {
-    case o: Literal if o.getDatatype == null && o.getLanguage == null =>
-      super.handleStatement(
-        new StatementImpl(
-          st.getSubject,
-          st.getPredicate,
-          new LiteralImpl(o.getLabel, ops.xsd.string)))
-    case other =>
-      super.handleStatement(st)
+}
+
+class BigdataCollector(implicit ops:RDFOps[Bigdata]) extends RDFHandler with ParseErrorListener
+{
+
+  val graph: BigdataMGraph = ops.makeEmptyMGraph()
+
+  def robustStatement(st:BigdataStatement):BigdataStatement = st.getObject match {
+    case o:Literal if o.getDatatype == null && o.getLanguage == null =>
+      val factory = o.getValueFactory
+      val newObj = factory.createLiteral(o.getLabel, ops.xsd.string) //fix if literal is string with null datatype
+      factory.createStatement(st.getSubject,st.getPredicate,newObj,st.getContext,st.getStatementType,st.getUserFlag)
+    case _=>st //if everything is right, than return itself
   }
 
+
+  override def handleStatement(st: Statement): Unit = st match {
+    case bst:BigdataStatement=>
+      ops.addTriple(graph,robustStatement(bst))
+    case other=> println(s"ERROR: the statement ${other} of ${other.getClass.getName} class is of wrong type")
+  }
+
+
+  override def endRDF(): Unit = {
+  }
+
+  override def startRDF(): Unit = {
+  }
+
+  override def fatalError(msg: String, lineNo: Int, colNo: Int): Unit = {
+    //what logger should we use in banana-rdf?
+    //I do not like using print statements
+    println(s"FATAL error $msg at LINE $lineNo COL $colNo occurred")
+  }
+
+  override def error(msg: String, lineNo: Int, colNo: Int): Unit = {
+    println(s"nonfatal error $msg at LINE $lineNo COL $colNo occurred")
+
+  }
+
+  override def warning(msg: String, lineNo: Int, colNo: Int): Unit = {
+    println(s"WARNING $msg at LINE $lineNo COL $colNo occurred")
+  }
+
+  override def handleComment(s: String): Unit = {
+
+  }
+
+  override def handleNamespace(s: String, s1: String): Unit = {
+  }
 }
 
 abstract class AbstractBigdataReader[T] extends RDFReader[Bigdata, Try, T] {
 
   implicit def ops: RDFOps[Bigdata]
 
-  def getParser(): org.openrdf.rio.RDFParser
+
+  def getParser(base:String): org.openrdf.rio.RDFParser
 
   def read(in: InputStream, base: String): Try[Bigdata#Graph] = Try {
-    val parser = getParser()
-    val triples = new LinkedList[Statement]
-    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix {
-      val ops = AbstractBigdataReader.this.ops
-    }
+    val parser = getParser(base)
+    val collector =  new BigdataCollector
     parser.setRDFHandler(collector)
     parser.parse(in, base)
-    new LinkedHashModel(triples)
+    collector.graph.graph
   }
 
   def read(reader: Reader, base: String): Try[Bigdata#Graph] = Try {
-    val parser = getParser()
-    val triples = new LinkedList[Statement]
-    val collector = new org.openrdf.rio.helpers.StatementCollector(triples) with CollectorFix {
-      val ops = AbstractBigdataReader.this.ops
-    }
+    val parser = getParser(base)
+    val collector = new BigdataCollector
     parser.setRDFHandler(collector)
     parser.parse(reader, base)
-    new LinkedHashModel(triples)
+    collector.graph.graph
   }
 
 }
 
 class BigdataTurtleReader(implicit val ops: RDFOps[Bigdata]) extends AbstractBigdataReader[Turtle] {
-  def getParser() = new org.openrdf.rio.turtle.TurtleParser
+  override def getParser(base:String): org.openrdf.rio.RDFParser = new TurtleBigdataParser(base)
+
 }
 
+/*
 class BigdataRDFXMLReader(implicit val ops: RDFOps[Bigdata]) extends AbstractBigdataReader[RDFXML] {
-  def getParser() = new org.openrdf.rio.rdfxml.RDFXMLParser
+  def getParser(): org.openrdf.rio.RDFParser = new BigdataRDF
 }
-
 */
+
 

@@ -211,6 +211,11 @@ object BananaRdfBuild extends Build {
     defaultSettings = buildSettings,
     modulePrefix    = "banana-")
 
+  lazy val bigdataSesameVersion = "2.7.13"
+
+  lazy val bigdataRioTurtle = "org.openrdf.sesame" % "sesame-rio-turtle" % bigdataSesameVersion//another version of sesame is used
+
+  lazy val bigdataRioRdfxml = "org.openrdf.sesame" % "sesame-rio-turtle" % bigdataSesameVersion //another version of sesame is used
 
   /** `sesame`, an RDF implementation for Bigdata/BlazaGraph. */
   lazy val bigdata = bigdataM
@@ -220,13 +225,12 @@ object BananaRdfBuild extends Build {
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
       addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full),
       libraryDependencies += bigdataDatabase,
-      libraryDependencies += simulacrum,
-      libraryDependencies += sesameQueryAlgebra,
+/*      libraryDependencies += sesameQueryAlgebra,
       libraryDependencies += sesameQueryParser,
-      libraryDependencies += sesameQueryResult,
-      libraryDependencies += sesameRioTurtle,
-      libraryDependencies += sesameRioRdfxml,
-      libraryDependencies += jsonldJava,
+      libraryDependencies += sesameQueryResult,*/
+      libraryDependencies += bigdataRioTurtle ,
+      libraryDependencies += bigdataRioRdfxml,
+//      libraryDependencies += jsonldJava,
       name := "banana-bigdata"
     ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 

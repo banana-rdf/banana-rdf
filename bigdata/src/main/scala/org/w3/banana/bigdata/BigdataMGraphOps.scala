@@ -12,25 +12,25 @@ trait BigdataMGraphOps extends MGraphOps[Bigdata] {
     addTriples(mgraph, self.getTriples(graph))
   }
 
-  def makeEmptyMGraph(): Bigdata#MGraph = self.emptyGraph
+  def makeEmptyMGraph(): Bigdata#MGraph = BigdataMGraph(self.emptyGraph)
 
   //def addTriple(mgraph: Bigdata#MGraph, triple: Bigdata#Triple): Bigdata#MGraph = mgraph + triple
 
   //def removeTriple(mgraph: Bigdata#MGraph, triple: Bigdata#Triple): Bigdata#MGraph = mgraph - triple
 
   override def addTriple(mgraph: Bigdata#MGraph, triple: Bigdata#Triple): mgraph.type = {
-    mgraph.graph += triple
+    mgraph.graph = mgraph.graph + triple
     mgraph
   }
 
   override def removeTriple(mgraph: Bigdata#MGraph, triple: Bigdata#Triple): mgraph.type = {
-    mgraph.graph -= triple
+    mgraph.graph = mgraph.graph - triple
     mgraph
   }
 
-  final def exists(mgraph: Bigdata#MGraph, triple: Bigdata#Triple): Boolean = mgraph.contains(triple)
+  final def exists(mgraph: Bigdata#MGraph, triple: Bigdata#Triple): Boolean = mgraph.graph.contains(triple)
 
   final def sizeMGraph(mgraph: Bigdata#MGraph): Int = mgraph.size
 
-  final def makeIGraph(mgraph: Bigdata#MGraph): Bigdata#Graph = mgraph
+  final def makeIGraph(mgraph: Bigdata#MGraph): Bigdata#Graph = mgraph.graph
 }

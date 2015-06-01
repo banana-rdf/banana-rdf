@@ -7,11 +7,19 @@ import org.w3.banana.io._
 import scala.util.Try
 
 
-class BigdataModule  extends RDFModule
+class BigdataModule
+  extends RDFModule
   with RDFOpsModule
   with RecordBinderModule
+  //with SparqlGraphModule
+  //with RDFXMLReaderModule
+  with TurtleReaderModule
+  with NTriplesReaderModule
   with RDFXMLWriterModule
   with TurtleWriterModule
+  with NTriplesWriterModule
+  with JsonSolutionsWriterModule
+  with XmlSolutionsWriterModule
 {
 
   override type Rdf = Bigdata
@@ -26,10 +34,22 @@ class BigdataModule  extends RDFModule
   implicit val ops: RDFOps[Bigdata] = new BigdataOps()(config)
 
   implicit val recordBinder: binder.RecordBinder[Bigdata] = binder.RecordBinder[Bigdata]
-  
-  implicit val bigdataRDFWriterHelper = new BigdataRDFWriterHelper
 
-  implicit val rdfXMLWriter: RDFWriter[Bigdata, Try, RDFXML] = bigdataRDFWriterHelper.rdfxmlWriter
+  //implicit val rdfXMLReader: RDFReader[Bigdata, Try, RDFXML] = new BigdataRDFXMLReader
 
-  implicit val turtleWriter: RDFWriter[Bigdata, Try, Turtle] = bigdataRDFWriterHelper.turtleWriter
+  implicit val turtleReader: RDFReader[Bigdata, Try, Turtle] = new BigdataTurtleReader
+
+  implicit val rdfXMLWriter: RDFWriter[Bigdata, Try, RDFXML] = new BigdataRDFWriter[RDFXML]
+
+  implicit val turtleWriter: RDFWriter[Bigdata, Try, Turtle] = new BigdataRDFWriter[Turtle]
+
+  implicit val ntriplesReader: RDFReader[Bigdata, Try, NTriples] = new NTriplesReader
+
+  implicit val ntriplesWriter: RDFWriter[Bigdata, Try, NTriples] = new NTriplesWriter
+
+  implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Bigdata, SparqlAnswerJson] = new BigdataSolutionsWriterJson
+
+  implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Bigdata, SparqlAnswerXml] = new BigdataSolutionsWriterXml
+
+
 }
