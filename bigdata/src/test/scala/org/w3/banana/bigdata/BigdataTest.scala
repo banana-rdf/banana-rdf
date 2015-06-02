@@ -84,7 +84,7 @@ import org.w3.banana.syntax._
 
 //class BigdataUriSyntaxTest extends UriSyntaxTest[Bigdata] //BIGDATA DOES NOT SUPPORT RELATIVE URIs
 
-//class BigdataRecordBinderTest extends RecordBinderTest[Bigdata] //BIGDATA DOES NOT SUPPORT RELATIVE URIs
+//class BigdataRecordBinderTest extends RecordBinderTest[Bigdata] //DOES NOT WORK, HELP NEEDED
 
 //class BigdataSparqlGraphTest extends SparqlGraphTest[Bigdata, SparqlAnswerXml]
 

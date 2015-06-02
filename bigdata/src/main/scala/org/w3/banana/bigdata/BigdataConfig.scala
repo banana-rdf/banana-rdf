@@ -2,6 +2,7 @@ package org.w3.banana.bigdata
 
 import java.util.Properties
 
+
 trait BigdataConfig[Rdf <: Bigdata]
 {
   def journal:String

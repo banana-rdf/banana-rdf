@@ -2,7 +2,6 @@ package org.w3.banana.bigdata
 
 
 import com.bigdata.rdf.model._
-import com.bigdata.rdf.sail._
 import org.openrdf.query.BindingSet
 import org.w3.banana.RDF
 
@@ -30,13 +29,18 @@ trait Bigdata extends RDF{
   type NodeConcrete = BigdataValue
 
   // types related to Sparql
-  type Query = BigdataSailQuery //It is a problem of bigdata that some BigdataParsed queries do not extend BigdataParsedQuery
+/*  type Query = BigdataSailQuery //It is a problem of bigdata that some BigdataParsed queries do not extend BigdataParsedQuery
   type SelectQuery = BigdataSailTupleQuery//BigdataParsedTupleQuery
   type ConstructQuery = BigdataSailGraphQuery
-  type AskQuery = BigdataSailBooleanQuery
+  type AskQuery = BigdataSailBooleanQuery*/
+
+  type Query = String
+  type SelectQuery = String
+  type ConstructQuery = String
+  type AskQuery = String
 
   //FIXME Can't use ParsedUpdate because of https://openrdf.atlassian.net/browse/SES-1847
-  type UpdateQuery = BigdataSailUpdate
+  type UpdateQuery = String//BigdataSailUpdate
 
   type Solution = BindingSet
   // instead of TupleQueryResult so that it's eager instead of lazy

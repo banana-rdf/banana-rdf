@@ -6,6 +6,7 @@ import com.bigdata.rdf.model
 import com.bigdata.rdf.model._
 import org.openrdf.model._
 import org.openrdf.model.impl.{LinkedHashModel, LiteralImpl, StatementImpl}
+import org.openrdf.rio.rdfxml.RDFXMLParser
 import org.openrdf.rio.{ParseErrorListener, RDFHandler}
 import org.w3.banana._
 import org.w3.banana.bigdata.{BigdataMGraph, BigdataGraph, Bigdata}
@@ -99,10 +100,16 @@ class BigdataTurtleReader(implicit val ops: RDFOps[Bigdata]) extends AbstractBig
 
 }
 
-/*
-class BigdataRDFXMLReader(implicit val ops: RDFOps[Bigdata]) extends AbstractBigdataReader[RDFXML] {
-  def getParser(): org.openrdf.rio.RDFParser = new BigdataRDF
+
+class RdfXmlBigdataParser(base:String) extends RDFXMLParser{
+
+  this.setValueFactory(BigdataValueFactoryImpl.getInstance(base))
+
 }
-*/
+
+class BigdataRDFXMLReader(implicit val ops: RDFOps[Bigdata]) extends AbstractBigdataReader[RDFXML] {
+  override def getParser(base:String): org.openrdf.rio.RDFParser = new RdfXmlBigdataParser(base)
+}
+
 
 

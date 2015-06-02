@@ -8,13 +8,19 @@ import org.w3.banana.util.tryInstances._
 class BigdataTurtleTests extends TurtleTestSuite[Bigdata, Try]{
 
   override def testRelative() = {
-    println("relative uris are not tested as they are not supported")
+    println("relative uris are not tested as they are not supported by bigdata")
+  }
+
+}
+
+class BigdataRdfXmlTests extends RdfXMLTestSuite[Bigdata,Try]{
+  override def testRelative() = {
+    println("relative uris are not tested as they are not supported by bigdata")
   }
 }
 
+class BigdataNTripleWriterTestSuite extends NTriplesWriterTestSuite[Bigdata]
 
-
-//HENRY your help is needed to make it work
+//HENRY: could you look why it fails?
 //class BigdataNTripleReaderTestSuite extends NTriplesReaderTestSuite[Bigdata]
 
-//class BigdataNTripleWriterTestSuite extends NTriplesWriterTestSuite[Bigdata]

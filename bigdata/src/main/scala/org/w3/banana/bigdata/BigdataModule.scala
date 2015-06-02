@@ -1,5 +1,6 @@
 package org.w3.banana.bigdata
 
+import com.bigdata.rdf.sail.BigdataSailRepositoryConnection
 import org.w3.banana._
 import org.w3.banana.bigdata.io._
 import org.w3.banana.io._
@@ -12,7 +13,7 @@ class BigdataModule
   with RDFOpsModule
   with RecordBinderModule
   //with SparqlGraphModule
-  //with RDFXMLReaderModule
+  with RDFXMLReaderModule
   with TurtleReaderModule
   with NTriplesReaderModule
   with RDFXMLWriterModule
@@ -29,13 +30,17 @@ class BigdataModule
    * baseURI is required for many things in bigdata,
    * http://todo.example/ is taken only because it is used in Bigdata banana-module
    */
-  implicit val config =  DefaultBigdataConfig
+  implicit val config:BigdataConfig[Rdf] =  DefaultBigdataConfig
 
   implicit val ops: RDFOps[Bigdata] = new BigdataOps()(config)
 
   implicit val recordBinder: binder.RecordBinder[Bigdata] = binder.RecordBinder[Bigdata]
 
-  //implicit val rdfXMLReader: RDFReader[Bigdata, Try, RDFXML] = new BigdataRDFXMLReader
+  //implicit val sparqlGraph: SparqlEngine[Bigdata, Try, Bigdata#Graph] = new BigdataGraphSparqlEngine
+  
+  implicit val rdfStore: RDFStore[Bigdata, Try, BigdataSailRepositoryConnection] = new BigdataStore
+
+  implicit val rdfXMLReader: RDFReader[Bigdata, Try, RDFXML] = new BigdataRDFXMLReader
 
   implicit val turtleReader: RDFReader[Bigdata, Try, Turtle] = new BigdataTurtleReader
 
