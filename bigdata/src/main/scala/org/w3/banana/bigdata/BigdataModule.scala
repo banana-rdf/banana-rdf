@@ -12,7 +12,7 @@ class BigdataModule
   extends RDFModule
   with RDFOpsModule
   with RecordBinderModule
-  //with SparqlGraphModule
+  with SparqlGraphModule
   with RDFXMLReaderModule
   with TurtleReaderModule
   with NTriplesReaderModule
@@ -25,18 +25,13 @@ class BigdataModule
 
   override type Rdf = Bigdata
 
-  /**
-   * Config contains config properties and base URI
-   * baseURI is required for many things in bigdata,
-   * http://todo.example/ is taken only because it is used in Bigdata banana-module
-   */
-  implicit val config:BigdataConfig[Rdf] =  DefaultBigdataConfig
-
-  implicit val ops: RDFOps[Bigdata] = new BigdataOps()(config)
+  implicit val ops: RDFOps[Bigdata] = new BigdataOps()
 
   implicit val recordBinder: binder.RecordBinder[Bigdata] = binder.RecordBinder[Bigdata]
 
-  //implicit val sparqlGraph: SparqlEngine[Bigdata, Try, Bigdata#Graph] = new BigdataGraphSparqlEngine
+  implicit val sparqlGraph: SparqlEngine[Bigdata, Try, Bigdata#Graph] = new BigdataGraphSparqlEngine
+
+  implicit val sparqlOps:SparqlOps[Bigdata] = new BigdataSparqOps
   
   implicit val rdfStore: RDFStore[Bigdata, Try, BigdataSailRepositoryConnection] = new BigdataStore
 
@@ -44,17 +39,20 @@ class BigdataModule
 
   implicit val turtleReader: RDFReader[Bigdata, Try, Turtle] = new BigdataTurtleReader
 
+  implicit val ntriplesReader: RDFReader[Bigdata, Try, NTriples] = new NTriplesReader
+
   implicit val rdfXMLWriter: RDFWriter[Bigdata, Try, RDFXML] = new BigdataRDFWriter[RDFXML]
 
   implicit val turtleWriter: RDFWriter[Bigdata, Try, Turtle] = new BigdataRDFWriter[Turtle]
 
-  implicit val ntriplesReader: RDFReader[Bigdata, Try, NTriples] = new NTriplesReader
-
   implicit val ntriplesWriter: RDFWriter[Bigdata, Try, NTriples] = new NTriplesWriter
 
-  implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Bigdata, SparqlAnswerJson] = new BigdataSolutionsWriterJson
+  implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Bigdata, SparqlAnswerJson] = BigdataSolutionsWriter.solutionsWriterJson
 
-  implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Bigdata, SparqlAnswerXml] = new BigdataSolutionsWriterXml
+  implicit val xmlSolutionsWriter: SparqlSolutionsWriter[Bigdata,SparqlAnswerXml]  = BigdataSolutionsWriter.solutionsWriterXml
 
+  implicit val jsonQueryResultsReader: SparqlQueryResultsReader[Bigdata, SparqlAnswerJson] = BigdataQueryResultsReader.queryResultsReaderJson
+
+  implicit val xmlQueryResultsReader: SparqlQueryResultsReader[Bigdata, SparqlAnswerXml] = BigdataQueryResultsReader.queryResultsReaderXml
 
 }

@@ -28,7 +28,7 @@ class BindingsAccumulator() extends TupleQueryResultHandler {
 }
 
 
-class BigdataStore(implicit val ops:RDFOps[Bigdata],val config:BigdataConfig[Bigdata])
+class BigdataStore(implicit val ops:RDFOps[Bigdata])
   extends BigdataGraphStore
   with BigdataSparqlEngine
   with RDFStore[Bigdata, Try, BigdataSailRepositoryConnection] {
@@ -38,7 +38,7 @@ class BigdataStore(implicit val ops:RDFOps[Bigdata],val config:BigdataConfig[Big
                              query: Bigdata#SelectQuery,
                              bindings: Map[String, BigdataValue]): Try[Vector[BindingSet]] = this.r(conn,{
     val accumulator = new BindingsAccumulator()
-    val tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query,config.basePrefix)
+    val tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query,BigdataConfig.basePrefix)
     bindings foreach { case (name, value) => tupleQuery.setBinding(name, value) }
     tupleQuery.evaluate(accumulator)
     accumulator.bindings()
@@ -48,7 +48,7 @@ class BigdataStore(implicit val ops:RDFOps[Bigdata],val config:BigdataConfig[Big
   override def executeConstruct(conn: BigdataSailRepositoryConnection,
                                 query: Bigdata#ConstructQuery,
                                 bindings: Map[String, BigdataValue]): Try[BigdataGraph] = this.r(conn,{
-    val graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL,query,config.basePrefix)
+    val graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL,query,BigdataConfig.basePrefix)
     val result = graphQuery.evaluate()
     val g = ops.makeGraph(result.toIterable.collect{case s:Bigdata#Triple=>s})
     g
@@ -56,6 +56,6 @@ class BigdataStore(implicit val ops:RDFOps[Bigdata],val config:BigdataConfig[Big
 
   /** Executes a Ask query. */
   override def executeAsk(conn: BigdataSailRepositoryConnection, query: Bigdata#AskQuery, bindings: Map[String, BigdataValue]): Try[Boolean] = this.r(conn,{
-    conn.prepareBooleanQuery(QueryLanguage.SPARQL,query,config.basePrefix).evaluate()
+    conn.prepareBooleanQuery(QueryLanguage.SPARQL,query,BigdataConfig.basePrefix).evaluate()
   })
 }

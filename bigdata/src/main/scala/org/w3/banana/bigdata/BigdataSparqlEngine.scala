@@ -13,7 +13,6 @@ trait BigdataSparqlEngine extends SparqlEngine[Bigdata,Try,BigdataSailRepository
 
   implicit def ops: RDFOps[Bigdata]
 
-  implicit def config:BigdataConfig[Bigdata]
 
 
   /** Executes a Select query. */
@@ -21,7 +20,7 @@ trait BigdataSparqlEngine extends SparqlEngine[Bigdata,Try,BigdataSailRepository
                              query: Bigdata#SelectQuery,
                              bindings: Map[String, BigdataValue]): Try[Vector[BindingSet]] = this.r(conn,{
     val accumulator = new BindingsAccumulator()
-    val tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query,config.basePrefix)
+    val tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query,BigdataConfig.basePrefix)
     bindings foreach { case (name, value) => tupleQuery.setBinding(name, value) }
     tupleQuery.evaluate(accumulator)
     accumulator.bindings()
@@ -31,7 +30,7 @@ trait BigdataSparqlEngine extends SparqlEngine[Bigdata,Try,BigdataSailRepository
   override def executeConstruct(conn: BigdataSailRepositoryConnection,
                                 query: Bigdata#ConstructQuery,
                                 bindings: Map[String, BigdataValue]): Try[BigdataGraph] = this.r(conn,{
-    val graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL,query,config.basePrefix)
+    val graphQuery = conn.prepareGraphQuery(QueryLanguage.SPARQL,query,BigdataConfig.basePrefix)
     val result = graphQuery.evaluate()
     val g = ops.makeGraph(result.toIterable.collect{case s:Bigdata#Triple=>s})
     g
@@ -39,6 +38,6 @@ trait BigdataSparqlEngine extends SparqlEngine[Bigdata,Try,BigdataSailRepository
 
   /** Executes a Ask query. */
   override def executeAsk(conn: BigdataSailRepositoryConnection, query: Bigdata#AskQuery, bindings: Map[String, BigdataValue]): Try[Boolean] = this.r(conn,{
-    conn.prepareBooleanQuery(QueryLanguage.SPARQL,query,config.basePrefix).evaluate()
+    conn.prepareBooleanQuery(QueryLanguage.SPARQL,query,BigdataConfig.basePrefix).evaluate()
   })
 }

@@ -67,6 +67,8 @@ class BigdataCollector(implicit ops:RDFOps[Bigdata]) extends RDFHandler with Par
   }
 
   override def handleNamespace(s: String, s1: String): Unit = {
+    val newPref: Set[Prefix[Bigdata]] = graph.graph.prefixes + Prefix(s,s1)
+    graph.graph = graph.graph.copy(prefixes = newPref)
   }
 }
 

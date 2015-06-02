@@ -9,10 +9,10 @@ import org.w3.banana.bigdata.Bigdata
 import org.w3.banana.isomorphism.{GraphIsomorphism, SimpleMappingGenerator, VerticeCBuilder}
 import org.w3.banana.{DefaultURIOps, RDFOps}
 
-class BigdataOps(implicit config:BigdataConfig[Bigdata]) extends RDFOps[Bigdata] with DefaultURIOps[Bigdata] with BigdataMGraphOps
+class BigdataOps extends RDFOps[Bigdata] with DefaultURIOps[Bigdata] with BigdataMGraphOps
 {
 
-  lazy val valueFactory: BigdataValueFactory= BigdataValueFactoryImpl.getInstance(config.basePrefix)
+  lazy val valueFactory: BigdataValueFactory= BigdataValueFactoryImpl.getInstance(BigdataConfig.basePrefix)
 
   def emptyGraph: Bigdata#Graph = BigdataGraph(Map.empty,0)
 

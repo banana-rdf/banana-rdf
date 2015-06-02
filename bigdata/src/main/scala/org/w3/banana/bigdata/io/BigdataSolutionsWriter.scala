@@ -7,7 +7,7 @@ import org.w3.banana.bigdata.Bigdata
 import org.w3.banana.io._
 import scala.util._
 import org.openrdf.query.resultio.TupleQueryResultWriter
-abstract class BigdataSolutionsWriter[S] extends SparqlSolutionsWriter[Bigdata, S] {
+private abstract class BigdataSolutionsWriter[S] extends SparqlSolutionsWriter[Bigdata, S] {
 
   def writer(outputStream: OutputStream): TupleQueryResultWriter
 
@@ -30,18 +30,23 @@ abstract class BigdataSolutionsWriter[S] extends SparqlSolutionsWriter[Bigdata, 
 
 }
 
-class BigdataSolutionsWriterJson extends BigdataSolutionsWriter[SparqlAnswerJson] with SparqlSolutionsWriter[Bigdata, SparqlAnswerJson]{
 
-  import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
+object BigdataSolutionsWriter {
 
-  def writer(outputStream: OutputStream): TupleQueryResultWriter = new SPARQLResultsJSONWriter(outputStream)
+  implicit val solutionsWriterJson: SparqlSolutionsWriter[Bigdata, SparqlAnswerJson] = new BigdataSolutionsWriter[SparqlAnswerJson] {
 
-}
+    import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriter
 
-class BigdataSolutionsWriterXml extends BigdataSolutionsWriter[SparqlAnswerXml] with SparqlSolutionsWriter[Bigdata, SparqlAnswerXml] {
+    def writer(outputStream: OutputStream): TupleQueryResultWriter = new SPARQLResultsJSONWriter(outputStream)
 
-  import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
+  }
 
-  def writer(outputStream: OutputStream): TupleQueryResultWriter = new SPARQLResultsXMLWriter(outputStream)
+  implicit val solutionsWriterXml: SparqlSolutionsWriter[Bigdata, SparqlAnswerXml] = new BigdataSolutionsWriter[SparqlAnswerXml] {
+
+    import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter
+
+    def writer(outputStream: OutputStream): TupleQueryResultWriter = new SPARQLResultsXMLWriter(outputStream)
+
+  }
 
 }

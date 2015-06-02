@@ -213,9 +213,15 @@ object BananaRdfBuild extends Build {
 
   lazy val bigdataSesameVersion = "2.7.13"
 
+  lazy val bigdataLuceneVersion = "3.0.0"//"3.6.2"
+
   lazy val bigdataRioTurtle = "org.openrdf.sesame" % "sesame-rio-turtle" % bigdataSesameVersion//another version of sesame is used
 
-  lazy val bigdataRioRdfxml = "org.openrdf.sesame" % "sesame-rio-turtle" % bigdataSesameVersion //another version of sesame is used
+  lazy val bigdataRioRdfxml = "org.openrdf.sesame" % "sesame-rio-rdfxml" % bigdataSesameVersion //another version of sesame is used
+
+  lazy val bigdataLuceneCore = "org.apache.lucene" % "lucene-core" % bigdataLuceneVersion //bigdata has outdated lucene
+
+  lazy val bigdataLuceneAnalyzers = "org.apache.lucene" % "lucene-analyzers" % bigdataLuceneVersion //bigdata has outdated lucene-analyzers
 
   /** `sesame`, an RDF implementation for Bigdata/BlazaGraph. */
   lazy val bigdata = bigdataM
@@ -223,14 +229,14 @@ object BananaRdfBuild extends Build {
     .settings(
       resolvers += "Bigdata releases" at "http://systap.com/maven/releases/",
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full),
       libraryDependencies += bigdataDatabase,
-/*      libraryDependencies += sesameQueryAlgebra,
-      libraryDependencies += sesameQueryParser,
-      libraryDependencies += sesameQueryResult,*/
+      //libraryDependencies += bigdataLuceneCore,
+      //libraryDependencies += bigdataLuceneAnalyzers,
+      //libraryDependencies += "org.apache.lucene" % "lucene-core" % "5.1.0",
+      //libraryDependencies += "org.apache.lucene" % "lucene-analyzers-common" % "5.1.0",
       libraryDependencies += bigdataRioTurtle ,
       libraryDependencies += bigdataRioRdfxml,
-//      libraryDependencies += jsonldJava,
+      libraryDependencies += jsonldJava,
       name := "banana-bigdata"
     ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
@@ -329,7 +335,7 @@ object BananaRdfBuild extends Build {
     defaultSettings = buildSettings
   )
 
-  lazy val examples = examplesM.project(Module, sesame, jena)
+  lazy val examples = examplesM.project(Module, sesame, jena, bigdata)
 
   /** A virtual module for gathering experimental ones. */
   lazy val experimentalM = CrossModule(SingleBuild,

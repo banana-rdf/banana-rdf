@@ -3,17 +3,18 @@ package org.w3.banana.bigdata
 import java.util.Properties
 
 
-trait BigdataConfig[Rdf <: Bigdata]
+trait BigdataConfig
 {
   def journal:String
   def basePrefix:String
   def properties:Properties
 }
 
-object DefaultBigdataConfig extends BigdataConfig[Bigdata]{
-  val basePrefix:String = "http://todo.example.com/"
+object BigdataConfig extends BigdataConfig{
 
-  lazy val journal = "bigdata.jnl"
+  //I know that it is terrible shared mutable stay but there is no other way to conifugure basestr and pass it to BigdataRDFStore
+  var basePrefix:String = "http://todo.example.com/"
+  var journal = "bigdata.jnl"
   /**
   BigData settings
     */
@@ -25,7 +26,7 @@ object DefaultBigdataConfig extends BigdataConfig[Bigdata]{
 
     props.setProperty("com.bigdata.rdf.sail.truthMaintenance","false")
     props.setProperty("com.bigdata.rdf.sail.statementIdentifiers","true")
-    props.setProperty("com.bigdata.journal.AbstractJournal.file",journal)
+    //props.setProperty("com.bigdata.journal.AbstractJournal.file",journal)
     props
   }
 
