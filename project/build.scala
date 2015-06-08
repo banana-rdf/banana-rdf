@@ -84,7 +84,7 @@ object BuildSettings {
               val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "snapshots"))
               repo.orElse(Some("snapshots" at nexus + "content/repositories/snapshots"))
             } else {
-              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "resolver"))
+              val repo = other.map(p => Resolver.ssh("banana.publish specified server", p(0), p(1) + "releases"))
               repo.orElse(Some("releases" at nexus + "service/local/staging/deploy/maven2"))
             }
           }
