@@ -47,7 +47,7 @@ ORM techniques, this does not rely on annotation or reflection.
 
 Until we write thorough documentation, the best place to understand
 what you can do is to go through the [test
-suite](https://github.com/w3c/banana-rdf/tree/master/rdf-test-suite).
+suite](https://github.com/w3c/banana-rdf/tree/series/0.8.x/rdf-test-suite).
 
 How to start geeking
 --------------------
