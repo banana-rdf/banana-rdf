@@ -24,8 +24,7 @@ object BuildSettings {
     scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
     description := "RDF framework for Scala",
     startYear := Some(2012),
-    resolvers += Resolver.bintrayRepo("inthenow","releases"),
-    updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
+    resolvers += Resolver.bintrayRepo("inthenow","releases")
   )
 }
 
@@ -211,17 +210,6 @@ object BananaRdfBuild extends Build {
     defaultSettings = buildSettings,
     modulePrefix    = "banana-")
 
-  lazy val bigdataSesameVersion = "2.7.13"
-
-  lazy val bigdataLuceneVersion = "3.0.0"//"3.6.2"
-
-  lazy val bigdataRioTurtle = "org.openrdf.sesame" % "sesame-rio-turtle" % bigdataSesameVersion//another version of sesame is used
-
-  lazy val bigdataRioRdfxml = "org.openrdf.sesame" % "sesame-rio-rdfxml" % bigdataSesameVersion //another version of sesame is used
-
-  lazy val bigdataLuceneCore = "org.apache.lucene" % "lucene-core" % bigdataLuceneVersion //bigdata has outdated lucene
-
-  lazy val bigdataLuceneAnalyzers = "org.apache.lucene" % "lucene-analyzers" % bigdataLuceneVersion //bigdata has outdated lucene-analyzers
 
   /** `sesame`, an RDF implementation for Bigdata/BlazaGraph. */
   lazy val bigdata = bigdataM
@@ -229,16 +217,14 @@ object BananaRdfBuild extends Build {
     .settings(
       resolvers += "Bigdata releases" at "http://systap.com/maven/releases/",
       resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
+      resolvers += "nxparser-repo" at "http://nxparser.googlecode.com/svn/repository/",
       libraryDependencies += bigdataDatabase,
-      //libraryDependencies += bigdataLuceneCore,
-      //libraryDependencies += bigdataLuceneAnalyzers,
-      //libraryDependencies += "org.apache.lucene" % "lucene-core" % "5.1.0",
-      //libraryDependencies += "org.apache.lucene" % "lucene-analyzers-common" % "5.1.0",
+      dependencyOverrides += bigdataLuceneCore,
+      dependencyOverrides += bigdataLuceneAnalyzers, //bigdata uses outdated lucene
       libraryDependencies += bigdataRioTurtle ,
       libraryDependencies += bigdataRioRdfxml,
-      libraryDependencies += jsonldJava,
       name := "banana-bigdata"
-    ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
+    ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm) //I do not use test-internal due to deps issues
 
   /** `plantain`, a cross-compiled Scala implementation for RDF.  */
   lazy val plantainM = CrossModule(crossBuildType,

@@ -117,7 +117,15 @@ object Dependencies {
   val sesameRepositorySail = "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion
 
   val bigdataVersion = "1.5.1"
-  val bigdataDatabase =   "com.bigdata" % "bigdata" % bigdataVersion //*Database to avoid name clash
+  val bigdataSesameVersion = "2.7.13"
+  val bigdataLuceneVersion = "3.0.0"//bigdata uses outdated version of lucene
+
+  val bigdataDatabase =   "com.bigdata" % "bigdata" % bigdataVersion
+  val bigdataRioTurtle = "org.openrdf.sesame" % "sesame-rio-turtle" % bigdataSesameVersion//another version of sesame is used
+  val bigdataRioRdfxml = "org.openrdf.sesame" % "sesame-rio-rdfxml" % bigdataSesameVersion //another version of sesame is used
+  val bigdataLuceneCore = "org.apache.lucene" % "lucene-core" % bigdataLuceneVersion //bigdata uses outdated lucene
+  val bigdataLuceneAnalyzers = "org.apache.lucene" % "lucene-analyzers" % bigdataLuceneVersion //bigdata uses outdated lucene-analyzers
+
 
   val simulacrum = "com.github.mpilquist" %% "simulacrum" % "0.3.0" //for better typeclasses in the Future
 
