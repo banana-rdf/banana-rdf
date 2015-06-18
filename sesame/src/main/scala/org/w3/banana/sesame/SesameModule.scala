@@ -38,6 +38,8 @@ trait SesameModule
 
   implicit val rdfStore: RDFStore[Sesame, Try, RepositoryConnection] with SparqlUpdate[Sesame, Try, RepositoryConnection] = new SesameStore
 
+  implicit val transactor: Transactor[Sesame, RepositoryConnection] = rdfStore
+
   implicit val rdfXMLReader: RDFReader[Sesame, Try, RDFXML] = new SesameRDFXMLReader
 
   implicit val turtleReader: RDFReader[Sesame, Try, Turtle] = new SesameTurtleReader

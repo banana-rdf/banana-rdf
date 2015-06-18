@@ -11,27 +11,8 @@ import scala.util.{Failure, Try}
 
 class SesameStore
     extends RDFStore[Sesame, Try, RepositoryConnection]
-    with SparqlUpdate[Sesame, Try, RepositoryConnection] {
-
-  /* Transactor */
-
-  def r[T](conn: RepositoryConnection, body: => T): Try[T] = Try{
-    val result = body
-    conn.close()
-    result
-  }
-
-  def rw[T](conn: RepositoryConnection, body: => T): Try[T] = Try{
-    conn.begin()
-    val result = body
-    conn.commit()
-    conn.close()
-    result
-  }.recoverWith{ case exception=>
-    conn.rollback()
-    conn.close()
-    Failure(exception)
-  }
+    with SparqlUpdate[Sesame, Try, RepositoryConnection]
+    with SesameTransactor {
 
   /* SparqlEngine */
 
