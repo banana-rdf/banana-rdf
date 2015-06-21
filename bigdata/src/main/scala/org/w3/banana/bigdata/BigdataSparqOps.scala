@@ -8,11 +8,22 @@ import scala.collection.JavaConversions._
 import scala.util.{Success, Failure, Try}
 
 class BigdataSparqOps extends SparqlOps[Bigdata]{
-  override def parseSelect(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] = Try(query)
+
+  protected def withPrefixes(str:String, prefixes: Seq[Prefix[Bigdata]]) = if(prefixes.isEmpty) str else
+    prefixes
+      .filterNot(pr=>pr.prefixName!="" && str.contains(s"prefix ${pr.prefixName}"))
+      .reverse //to be added in a right order to the query
+      .foldLeft(str)( (acc,pr)=>{
+      val pref = s"prefix ${pr.prefixName}: <${pr.prefixIri.toString}>\n"
+      pref+acc
+    })
+
+
+  override def parseSelect(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] = Try(withPrefixes(query,prefixes))
 
   override def solutionIterator(solutions: Vector[BindingSet]): Iterator[BindingSet] = solutions.iterator
 
-  override def parseConstruct(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] = Try(query)
+  override def parseConstruct(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] =  Try(withPrefixes(query,prefixes))
 
   override def varnames(solution: BindingSet): Set[String] = solution.getBindingNames.toSet
 
@@ -27,7 +38,7 @@ class BigdataSparqOps extends SparqlOps[Bigdata]{
    * @param query a Sparql query
    * @return A validation containing the Query
    */
-  override def parseQuery(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] = Try(query)
+  override def parseQuery(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] =  Try(withPrefixes(query,prefixes))
 
   /**
    * A fold operation.
@@ -41,7 +52,7 @@ class BigdataSparqOps extends SparqlOps[Bigdata]{
     select(query) //NOTE: until the dependency from connection is not fix we use just strings
   }
 
-  override def parseAsk(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] = Try(query)
+  override def parseAsk(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[String] =  Try(withPrefixes(query,prefixes))
 
   override def getNode(solution: BindingSet, v: String): Try[BigdataValue] =  solution.getValue(v) match {
       case null=>
@@ -53,5 +64,5 @@ class BigdataSparqOps extends SparqlOps[Bigdata]{
     }
 
 
-  override def parseUpdate(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[Bigdata#UpdateQuery] = Try(query)
+  override def parseUpdate(query: String, prefixes: Seq[Prefix[Bigdata]]): Try[Bigdata#UpdateQuery] =  Try(withPrefixes(query,prefixes))
 }

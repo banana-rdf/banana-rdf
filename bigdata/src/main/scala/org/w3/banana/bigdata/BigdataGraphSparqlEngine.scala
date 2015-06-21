@@ -27,7 +27,7 @@ class BigdataGraphSparqlEngine(implicit ops:RDFOps[Bigdata])
   def withGraph(graph: Bigdata#Graph) = {
     val store = new TemporalBigdata
     val con = store.repo.getUnisolatedConnection //only one unisolated writer is possible
-    graph.prefixes.find(p=>p.prefixName=="").foreach(p=>BigdataConfig.basePrefix=p.prefixIri)
+    //graph.prefixes.find(p=>p.prefixName=="").foreach(p=>BigdataConfig.basePrefix=p.prefixIri)
     store.rw(con,{
         graph.triples.foreach{  case tr=>   con.add(tr)   }
         store

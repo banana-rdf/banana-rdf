@@ -1,10 +1,9 @@
 package org.w3.banana.bigdata
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileInputStream}
-import com.bigdata.rdf.sail.{BigdataSailRepository, BigdataSail}
 import org.scalatest._
 import org.w3.banana._
-import org.w3.banana.io.{RDFReader, RDFXML, SparqlAnswerXml}
+import org.w3.banana.io.SparqlAnswerXml
+import org.w3.banana.syntax.UriSyntaxTest
 
 
 class BigdataOpsTest(implicit ops: RDFOps[Bigdata]) extends WordSpec with Matchers with OptionValues {
@@ -82,9 +81,7 @@ import org.w3.banana.binder._
 
 class BigdataCommonBindersTest extends CommonBindersTest[Bigdata]
 
-//class BigdataUriSyntaxTest extends UriSyntaxTest[Bigdata] //BIGDATA DOES NOT SUPPORT RELATIVE URIs
-
-//class BigdataRecordBinderTest extends RecordBinderTest[Bigdata] //DOES NOT WORK, HELP NEEDED
+class BigdataUriSyntaxTest extends UriSyntaxTest[Bigdata]
 
 class BigdataSparqlGraphTest extends SparqlGraphTest[Bigdata, SparqlAnswerXml]()(
   Bigdata.ops,
@@ -92,6 +89,8 @@ class BigdataSparqlGraphTest extends SparqlGraphTest[Bigdata, SparqlAnswerXml]()
   Bigdata.sparqlOps,
   Bigdata.sparqlGraph,
   Bigdata.xmlSolutionsWriter,
-  Bigdata.xmlQueryResultsReader) //implicit resolution does not work for some strange reason for me
+  Bigdata.xmlQueryResultsReader)
+
+class BigdataRecordBinderTest extends RecordBinderTest[Bigdata]
 
 class BigdataCustomBinderTest extends CustomBindersTest[Bigdata]

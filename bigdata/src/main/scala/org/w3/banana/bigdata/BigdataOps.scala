@@ -39,8 +39,13 @@ class BigdataOps extends RDFOps[Bigdata] with DefaultURIOps[Bigdata] with Bigdat
 
   // URI
 
-
-  def makeUri(iriStr: String): Bigdata#URI =valueFactory.createURI(iriStr)
+  def makeUri(iriStr: String): Bigdata#URI = iriStr match {
+    case "" => valueFactory.createURI(":")
+    case relative if !relative.contains(":")  =>
+      println("WARNING: relative URLs are only partially supported!")
+      valueFactory.createURI(s":$relative")
+    case iri  => valueFactory.createURI(iri)
+  }
 
   def fromUri(node: Bigdata#URI): String = node.toString
 

@@ -27,7 +27,7 @@ class BigdataModule
 
   implicit val ops: RDFOps[Bigdata] = new BigdataOps()
 
-  implicit val recordBinder: binder.RecordBinder[Bigdata] = binder.RecordBinder[Bigdata]
+  implicit val recordBinder: binder.RecordBinder[Bigdata] = new BigdataBinder
 
   implicit val sparqlGraph: SparqlEngine[Bigdata, Try, Bigdata#Graph] = new BigdataGraphSparqlEngine
 

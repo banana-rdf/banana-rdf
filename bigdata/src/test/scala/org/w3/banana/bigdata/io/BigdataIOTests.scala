@@ -21,6 +21,5 @@ class BigdataRdfXmlTests extends RdfXMLTestSuite[Bigdata,Try]{
 
 class BigdataNTripleWriterTestSuite extends NTriplesWriterTestSuite[Bigdata]
 
-//HENRY: could you look why it fails?
-//class BigdataNTripleReaderTestSuite extends NTriplesReaderTestSuite[Bigdata]
+class BigdataNTripleReaderTestSuite extends NTriplesReaderTestSuite[Bigdata]
 

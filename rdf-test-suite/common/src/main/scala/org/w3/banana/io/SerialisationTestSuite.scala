@@ -82,6 +82,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
     assert(referenceGraph isIsomorphicWith graph)
   }
 
+  /** when we will move it to scalatest RelativeURIs tag will be used instead of this method*/
   def testRelative() = {
     "graphs with relative URIs" should {
 
