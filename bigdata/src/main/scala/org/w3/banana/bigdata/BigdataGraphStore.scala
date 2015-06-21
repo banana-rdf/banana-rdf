@@ -12,7 +12,7 @@ import scala.util.Try
 class BigdataGraphStore(implicit ops:RDFOps[Bigdata]) extends GraphStore[Bigdata, Try,BigdataSailRepositoryConnection] with BigdataTransactor {
 
   def appendToGraph(conn: BigdataSailRepositoryConnection, uri: Bigdata#URI, graph: Bigdata#Graph): Try[Unit] = this.rw(conn, () => {
-    graph.triples.foreach(t => conn.add(t.getSubject, t.getPredicate, t.getObject, t.getContext))
+    graph.triples.foreach(t => conn.add(t.getSubject, t.getPredicate, t.getObject, uri))
   })
 
   def getGraph(conn: BigdataSailRepositoryConnection, uri: Bigdata#URI): Try[Bigdata#Graph] = this.r(conn, {

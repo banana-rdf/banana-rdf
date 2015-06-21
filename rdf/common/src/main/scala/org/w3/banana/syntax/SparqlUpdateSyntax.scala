@@ -4,7 +4,7 @@ import org.w3.banana._
 
 final class SparqlUpdateSyntax[Rdf <: RDF, M[_], A] {
 
-  implicit def sparqlUpdateSyntaxW(a: A) = new SparqlUpdateSyntaxW[Rdf, M, A](a)
+  implicit def sparqlUpdateSyntaxW(a: A): SparqlUpdateSyntaxW[Rdf, M, A] = new SparqlUpdateSyntaxW[Rdf, M, A](a)
 
 }
 

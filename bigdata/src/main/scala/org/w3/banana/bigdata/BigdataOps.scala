@@ -40,14 +40,14 @@ class BigdataOps extends RDFOps[Bigdata] with DefaultURIOps[Bigdata] with Bigdat
   // URI
 
   def makeUri(iriStr: String): Bigdata#URI = iriStr match {
-    case "" => valueFactory.createURI(":")
-    case relative if !relative.contains(":")  =>
-      println("WARNING: relative URLs are only partially supported!")
-      valueFactory.createURI(s":$relative")
+    case relative if !relative.contains(":")  => valueFactory.createURI(s":$relative")
     case iri  => valueFactory.createURI(iri)
   }
 
-  def fromUri(node: Bigdata#URI): String = node.toString
+  def fromUri(uri: Bigdata#URI): String =  uri.toString match {
+    case relative if relative.startsWith(":")=>relative.tail
+    case other => other
+  }
 
   // bnode
 
@@ -136,5 +136,16 @@ class BigdataOps extends RDFOps[Bigdata] with DefaultURIOps[Bigdata] with Bigdat
   }
 
   def graphSize(g: Bigdata#Graph): Int = g.size
+  
 
+
+  import java.net.{ URI => jURI }
+
+  override def resolve(uri: BigdataURI, against: BigdataURI): BigdataURI = {
+    val againstUri = fromUri(against)
+    val juri =
+      if (againstUri.isEmpty) new jURI(uri.toString.split("#")(0))
+      else new jURI(uri.toString).resolve(againstUri)
+    makeUri(juri.toString)
+  }
 }
