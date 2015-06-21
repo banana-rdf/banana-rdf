@@ -129,7 +129,7 @@ class BigdataOps extends RDFOps[Bigdata] with DefaultURIOps[Bigdata] with Bigdat
   // graph isomorphism
 
   // graph isomorphism
-  lazy val iso = new GraphIsomorphism[Bigdata](new SimpleMappingGenerator[Bigdata](VerticeCBuilder.simpleHash[Bigdata])) //TODO: fix null error
+  lazy val iso = new GraphIsomorphism[Bigdata](new SimpleMappingGenerator[Bigdata](VerticeCBuilder.simpleHash[Bigdata]),1048576*2)
 
   def isomorphism(left: Bigdata#Graph, right: Bigdata#Graph): Boolean = {
     iso.findAnswer(left, right).isSuccess
