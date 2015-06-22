@@ -13,7 +13,7 @@ object MimeType {
     chunks(0).split("/") match {
       case Array(tp, subTp) =>
         val params = chunks.drop(1).map { case paramRegex(name, value) =>
-          (name.toLowerCase.trim, value.trim)
+          (name.toLowerCase, value)
         }
         val paramMap = Map(params: _*) - "charset"
         Some(MimeType(tp, subTp, paramMap))
@@ -26,10 +26,9 @@ object MimeType {
   val ImageGif = MimeType("image", "gif")
   val ImagePng = MimeType("image", "png")
   val RdfTurtle = MimeType("text", "turtle")
-  val NTriples = MimeType("application", "n-triples")
+  val NTriples = MimeType("application", "ntriples")
   val TextHtml = MimeType("text", "html")
-  val RdfXml = MimeType("application", "rdf+xml")
-  val JsonLD = MimeType("application", "ld+json")
+  val RdfXml = MimeType("text", "rdf+xml")
   val SparqlQuery = MimeType("application", "sparql-query")
 
 }
