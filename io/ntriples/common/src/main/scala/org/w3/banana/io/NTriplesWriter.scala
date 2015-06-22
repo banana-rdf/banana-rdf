@@ -2,7 +2,7 @@ package org.w3.banana.io
 
 import java.io.OutputStream
 
-import org.w3.banana.{RDF, RDFOps}
+import org.w3.banana.{syntax, RDF, RDFOps}
 
 import scala.util.Try
 
@@ -14,9 +14,9 @@ import scala.util.Try
 class NTriplesWriter[Rdf <: RDF](implicit val ops:RDFOps[Rdf]) extends RDFWriter[Rdf,Try,NTriples]  {
   import ops._
 
-  protected def tripleAsString(triple: Rdf#Triple, base: Rdf#URI):String = {
+  protected def tripleAsString(triple: Rdf#Triple):String = {
     val (subject,property,objectt) = ops.fromTriple(triple)
-    node2Str(subject,base)+" "+node2Str(property,base)+" "+node2Str(objectt,base)+" ."
+    node2Str(subject)+" "+node2Str(property)+" "+node2Str(objectt)+" ."
   }
 
   /**
@@ -24,34 +24,26 @@ class NTriplesWriter[Rdf <: RDF](implicit val ops:RDFOps[Rdf]) extends RDFWriter
    * @param node Rdf node
    * @return
    */
-  def node2Str(node:Rdf#Node, base: Rdf#URI): String = ops.foldNode(node)(
-    uri => "<" + asString(uri,base) + ">",
-    { case ops.BNode(id) => "_:" + id },
-    _ match {
-      case ops.Literal((string, _, Some(lang))) => "\"" + string + "\"" + "@" + lang
-      case ops.Literal((string, datatype, None)) => "\"" + string + "\"" + "^^<" + asString(datatype,base).toString + ">"
+  def node2Str(node:Rdf#Node): String = ops.foldNode(node)(
+    { case ops.URI(url) => "<" + url + ">"},
+    { case ops.BNode(id) => "_:" + id},
+    {
+      case ops.Literal((string, ops.URI(datatype), Some(lang))) => "\"" + string + "\"" + "@" + lang
+      case ops.Literal((string, ops.URI(datatype), None)) => "\"" + string + "\"" + "^^<" + datatype + ">"
     }
   )
 
-  def asString(uri: Rdf#URI, base: Rdf#URI): String =
-    base.resolve(uri) match {
-      case ops.URI(uri) => uri
-    }
-
-
   def write(graph: Rdf#Graph, os: OutputStream, base: String): Try[Unit] = Try {
-    val baseUri = ops.URI(base)
     for (triple <- graph.triples) {
-      val line = tripleAsString(triple,baseUri) + "\r\n"
+      val line = tripleAsString(triple) + "\r\n"
       os.write(line.getBytes("UTF-8"))
     }
   }
 
   def asString(graph: Rdf#Graph, base: String): Try[String] = Try{
-    val baseUri = ops.URI(base)
     (
       for ( triple <- ops.getTriples(graph))
-      yield tripleAsString(triple,baseUri)
+      yield tripleAsString(triple)
     ).mkString("\r\n")
   }
 }
