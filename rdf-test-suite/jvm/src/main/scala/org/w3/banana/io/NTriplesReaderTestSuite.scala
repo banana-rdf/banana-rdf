@@ -15,6 +15,7 @@ class NTriplesWriterTestSuite[Rdf <: RDF]()(
   val foaf = FOAFPrefix[Rdf]
 
   val bblfish = "http://bblfish.net/people/henry/card#me"
+  val bblfishDoc = "http://bblfish.net/people/henry/card"
   val name = "Henry Story"
 
   val typ = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
@@ -27,9 +28,17 @@ class NTriplesWriterTestSuite[Rdf <: RDF]()(
     "write one triplet" in {
 
       val g = Graph(Triple(URI(bblfish),rdf.`type`,foaf.Person))
-      val str = writer.asString(g,base = "http://example").get
+      val str = writer.asString(g,base = "http://example.com/").get
       val graphTry = toGraph(ntparser(str))
       assert( graphTry.get isIsomorphicWith g)
+    }
+
+    "write one triplet from a graph with relative uris" in {
+      val relativeGraph = Graph(Triple(URI("#me"),rdf.`type`,foaf.Person))
+      val absoluteGraph = Graph(Triple(URI(bblfish),rdf.`type`,foaf.Person))
+      val str = writer.asString(relativeGraph,base = bblfishDoc).get
+      val graphTry = toGraph(ntparser(str))
+      assert( graphTry.get isIsomorphicWith absoluteGraph)
     }
 
     "write more triplets" in {
@@ -39,7 +48,8 @@ class NTriplesWriterTestSuite[Rdf <: RDF]()(
         Triple(URI(bblfish), foaf.knows, BNode("betehess")),
         Triple(BNode("betehess"), foaf.homepage, URI("http://bertails.org/"))
       )
-      val str = writer.asString(g,base = "http://example").get
+      //the base will get ignored on non relative graphs
+      val str = writer.asString(g,base = "http://example.org/").get
       val graphTry = toGraph(ntparser(str))
       assert( graphTry.get isIsomorphicWith g)
     }

@@ -86,7 +86,7 @@ object Syntax {
   }
 
   implicit val JsonLd: Syntax[JsonLd] = new Syntax[JsonLd] {
-    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType("application", "ld+json"))
+    val mimeTypes: NonEmptyList[MimeType] = NonEmptyList(MimeType.JsonLD)
   }
 
   implicit val RDFaXHTML: Syntax[RDFaXHTML] = new Syntax[RDFaXHTML] {
