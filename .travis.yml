@@ -24,7 +24,7 @@ scala:
   - 2.11.2
 branches:
   only:
-    - master
+    - series/0.7.x
 matrix:
   include:
     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
