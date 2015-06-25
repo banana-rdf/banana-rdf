@@ -1,0 +1,6 @@
+# Ignore generated files
+*
+# except for scalatex files
+!.scalatex
+#and .gitignore itself
+!.gitignore

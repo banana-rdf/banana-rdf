@@ -7,6 +7,7 @@ import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import sbtunidoc.Plugin._
 import ScalaJSPlugin.autoImport._
+import scalatex.ScalatexReadme
 
 object BuildSettings {
   import Publishing._
@@ -310,4 +311,12 @@ object BananaRdfBuild extends Build {
 
   lazy val experimental = experimentalM.project(Module, ldpatch)
 
+
+  /** Scalatex banana-rdf website, see http://lihaoyi.github.io/Scalatex/#QuickStart */
+  lazy val readme = scalatex.ScalatexReadme(
+    projectId = "readme",
+    wd = file(""),
+    url = "https://github.com/lihaoyi/scalatex/tree/master",
+    source = "Readme"
+  )
 }
