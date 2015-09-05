@@ -4,9 +4,11 @@ import org.w3.banana._
 import org.w3.banana.diesel._
 import java.net.URL
 
+
+
 /* declare your dependencies as a trait with all the modules you need
  */
-trait SPARQLExampleDependencies
+trait SPARQLHttpEndPointDependencies
   extends RDFModule
   with RDFOpsModule
   with SparqlOpsModule
@@ -23,13 +25,13 @@ trait SPARQLExampleDependencies
  *   project examples
  *   run-main org.w3.banana.examples.SPARQLExampleWithJena
  */
-trait SPARQLExample extends SPARQLExampleDependencies { self =>
+trait SPARQLConsumer extends SPARQLHttpEndPointDependencies {
 
   import ops._
   import sparqlOps._
   import sparqlHttp.sparqlEngineSyntax._
 
-  def main(args: Array[String]): Unit = {
+  def sparqlOperation(): Unit = {
 
     /* gets a SparqlEngine out of a Sparql endpoint */
 
@@ -38,13 +40,14 @@ trait SPARQLExample extends SPARQLExampleDependencies { self =>
     /* creates a Sparql Select query */
 
     val query = parseSelect("""
-PREFIX ont: <http://dbpedia.org/ontology/>
-SELECT DISTINCT ?language WHERE {
- ?language a ont:ProgrammingLanguage .
- ?language ont:influencedBy ?other .
- ?other ont:influencedBy ?language .
-} LIMIT 100
-""").get
+                                PREFIX ont: <http://dbpedia.org/ontology/>
+                                SELECT DISTINCT ?language WHERE {
+                                 ?language a ont:ProgrammingLanguage .
+                                 ?language ont:influencedBy ?other .
+                                 ?other ont:influencedBy ?language .
+                                } LIMIT 100
+                            """
+                            ).get
 
     /* executes the query */
 
@@ -69,5 +72,15 @@ SELECT DISTINCT ?language WHERE {
  * them. */
 
 import org.w3.banana.jena.JenaModule
+import org.w3.banana.sesame.SesameModule
 
-object SPARQLExampleWithJena extends SPARQLExample with JenaModule
+
+case class SPARQLConsumerWithJena() extends SPARQLConsumer with JenaModule
+case class SPARQLConsumerWithSesame() extends SPARQLConsumer with SesameModule
+
+object SPARQLConsumerApp extends App {
+
+  SPARQLConsumerWithJena().sparqlOperation()
+  SPARQLConsumerWithSesame().sparqlOperation()
+
+}
