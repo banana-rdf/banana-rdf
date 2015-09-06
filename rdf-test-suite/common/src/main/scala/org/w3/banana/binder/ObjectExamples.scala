@@ -49,6 +49,7 @@ class ObjectExamples[Rdf <: RDF](implicit
       def toPG(address: Address): PointedGraph[Rdf] = address match {
         case va: VerifiedAddress => VerifiedAddress.binder.toPG(va)
         case Unknown => Unknown.binder.toPG(Unknown)
+        case _ => throw new Error("Address toPG Binder error")
       }
     }
 

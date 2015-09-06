@@ -82,6 +82,13 @@ object Dependencies {
   val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "1.0-RC3"
 
   /**
+   * Apache Commons Logging
+   * @see http://commons.apache.org/proper/commons-logging/
+   * @see https://repo1.maven.org/maven2/commons-logging/commons-logging
+   */
+  val commonsLogging = "commons-logging" % "commons-logging" % "1.2"
+
+  /**
    * jena
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
