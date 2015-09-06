@@ -57,7 +57,7 @@ object JenaRDFReader {
 
     def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      RDFDataMgr.parse(sink, reader, base, lang)
+      RDFDataMgr.parse(sink, reader.asInstanceOf[StringReader], base, lang)
       sink.graph
     }
   }

@@ -20,7 +20,8 @@ object BuildSettings {
     fork := false,
     parallelExecution in Test := false,
     offline := true,
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Yinline-warnings"),
+    //TODO: -optimize causes issues for scala.js, so in new build setup should be jvm only
+    scalacOptions ++= Seq("-deprecation", "-unchecked", /*"-optimize",*/ "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140", "-Xfatal-warnings"),
     scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
     description := "RDF framework for Scala",
     startYear := Some(2012),
@@ -176,7 +177,7 @@ object BananaRdfBuild extends Build {
       Seq(
         resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
         libraryDependencies += jenaLibs,
-        libraryDependencies += logback,
+        libraryDependencies += commonsLogging,
         libraryDependencies += aalto): _*)
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
@@ -201,6 +202,7 @@ object BananaRdfBuild extends Build {
         libraryDependencies += sesameSailMemory,
         libraryDependencies += sesameSailNativeRdf,
         libraryDependencies += sesameRepositorySail,
+        libraryDependencies += commonsLogging,
         libraryDependencies += jsonldJava)
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 

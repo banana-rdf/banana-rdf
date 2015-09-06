@@ -1,6 +1,7 @@
 # see https://weblogs.java.net/blog/kcpeppe/archive/2013/12/11/case-study-jvm-hotspot-flags
 -Dfile.encoding=UTF8
--Xmx2024M
+-Xms1G
+-Xmx3G
 -Xss6M
 # In Java 8, this setting is non-mutable and set at 300M - let's be prepared. Also, for Java 7, fixing the actual size is not recommended - see above article
 -XX:MaxPermSize=512M
