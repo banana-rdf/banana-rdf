@@ -82,31 +82,36 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
     assert(referenceGraph isIsomorphicWith graph)
   }
 
-  "graphs with relative URIs" should {
+  /** when we will move it to scalatest RelativeURIs tag will be used instead of this method*/
+  def testRelative() = {
+    "graphs with relative URIs" should {
 
-    ", when moved to a new base, have all relative URLs transformed" in {
-      val bar = for {
-        relativeSerialisation <- writer.asString(referenceGraph, rdfCore)
-        computedFooGraph <- reader.read(new StringReader(relativeSerialisation), foo)
-      } yield {
-        computedFooGraph
+      ", when moved to a new base, have all relative URLs transformed" in {
+        val bar = for {
+          relativeSerialisation <- writer.asString(referenceGraph, rdfCore)
+          computedFooGraph <- reader.read(new StringReader(relativeSerialisation), foo)
+        } yield {
+          computedFooGraph
+        }
+
+        assert(fooGraph isIsomorphicWith bar.copoint)
       }
 
-      assert(fooGraph isIsomorphicWith bar.copoint)
-    }
-
-    """not be created just by taking URIs in absolute graphs and cutting the characters leading up to the base.
-      It is more complex than that.
-    """ in {
-      val rdfCoreResource = rdfCore + "imaginary"
-      val bar = for {
-        relativeSerialisation <- writer.asString(referenceGraph, rdfCoreResource)
-        computedFooGraph <- reader.read(new StringReader(relativeSerialisation), rdfCore)
-      } yield {
-        computedFooGraph
+      """not be created just by taking URIs in absolute graphs and cutting the characters leading up to the base.
+        It is more complex than that.
+      """ in {
+        val rdfCoreResource = rdfCore + "imaginary"
+        val bar = for {
+          relativeSerialisation <- writer.asString(referenceGraph, rdfCoreResource)
+          computedFooGraph <- reader.read(new StringReader(relativeSerialisation), rdfCore)
+        } yield {
+          computedFooGraph
+        }
+        assert(referenceGraph isIsomorphicWith bar.copoint)
       }
-      assert(referenceGraph isIsomorphicWith bar.copoint)
     }
   }
+
+  testRelative() //it is called as a method so we can override it when required
 
 }

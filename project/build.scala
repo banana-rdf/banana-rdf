@@ -25,8 +25,7 @@ object BuildSettings {
     scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
     description := "RDF framework for Scala",
     startYear := Some(2012),
-    resolvers += Resolver.bintrayRepo("inthenow","releases"),
-    updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
+    resolvers += Resolver.bintrayRepo("inthenow","releases")
   )
 }
 
@@ -47,7 +46,7 @@ object BananaRdfBuild extends Build {
     .settings(unidocSettings:_*)
 
   lazy val banana_jvm = bananaM
-    .project(Jvm, rdf_jvm, rdfTestSuite_jvm, ntriples_jvm, plantain_jvm, jena, sesame, examples)
+    .project(Jvm, rdf_jvm, rdfTestSuite_jvm, ntriples_jvm, plantain_jvm, jena, sesame, bigdata,examples)
     .settings(aggregate in Test in rdf_jvm:= false,
               aggregate in Test in rdfTestSuite_jvm := false,
               aggregate in Test in ntriples_jvm := false)
@@ -206,6 +205,29 @@ object BananaRdfBuild extends Build {
         libraryDependencies += jsonldJava)
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
 
+
+  lazy val bigdataM = CrossModule(SingleBuild,
+    id              = "bigdata",
+    baseDir         = "bigdata",
+    defaultSettings = buildSettings,
+    modulePrefix    = "banana-")
+
+
+  /** `sesame`, an RDF implementation for Bigdata/BlazaGraph. */
+  lazy val bigdata = bigdataM
+    .project(Jvm)
+    .settings(
+      resolvers += "Bigdata releases" at "http://systap.com/maven/releases/",
+      resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
+      resolvers += "nxparser-repo" at "http://nxparser.googlecode.com/svn/repository/",
+      libraryDependencies += bigdataDatabase,
+      dependencyOverrides += bigdataLuceneCore,
+      dependencyOverrides += bigdataLuceneAnalyzers, //bigdata uses outdated lucene
+      libraryDependencies += bigdataRioTurtle ,
+      libraryDependencies += bigdataRioRdfxml,
+      name := "banana-bigdata"
+    ) dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm) //I do not use test-internal due to deps issues
+
   /** `plantain`, a cross-compiled Scala implementation for RDF.  */
   lazy val plantainM = CrossModule(crossBuildType,
     id              = "plantain",
@@ -301,7 +323,7 @@ object BananaRdfBuild extends Build {
     defaultSettings = buildSettings
   )
 
-  lazy val examples = examplesM.project(Module, sesame, jena)
+  lazy val examples = examplesM.project(Module, sesame, jena, bigdata)
 
   /** A virtual module for gathering experimental ones. */
   lazy val experimentalM = CrossModule(SingleBuild,

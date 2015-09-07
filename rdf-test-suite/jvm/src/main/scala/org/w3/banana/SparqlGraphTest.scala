@@ -171,10 +171,10 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
                                |  ?ed contact:fullName ?name
                                |}""".stripMargin, Seq(base, rdf, contact)).success.value
 
-    val contructed1 = graph.executeConstruct(query1).get
+    val constructed1 = graph.executeConstruct(query1).get
     val constructed2 = graph.executeConstruct(query2).get
 
-    assert(contructed1 isIsomorphicWith constructed2, "the results of both queries should be isomorphic")
+    assert(constructed1 isIsomorphicWith constructed2, "the results of both queries should be isomorphic")
   }
 
 }
