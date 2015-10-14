@@ -46,7 +46,7 @@ object Dependencies {
    * @see http://akka.io
    * @see http://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "1.0-M1"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "1.0"
 
   /**
    * jena
