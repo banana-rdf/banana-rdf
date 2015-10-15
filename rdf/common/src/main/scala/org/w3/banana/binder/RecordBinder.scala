@@ -92,8 +92,8 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
   /**
    * Create PGB with pointer based on record fields.
    */
-  def pgbWithId[T](id: T => Rdf#URI) = new PGB[T] {
-    def makeSubject(t: T): Rdf#URI = id(t)
+  def pgbWithId[T](id: T => Rdf#Node) = new PGB[T] {
+    def makeSubject(t: T): Rdf#Node = id(t)
   }
 
   /**
@@ -106,11 +106,12 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
   /**
    * Create PGB with random UUID pointer.
    */
-  def pgb[T] = pgbWithId[T](_ => newUri("#"))
+  def pgb[T] = pgbWithId[T](_ => BNode())
+
 
   abstract class PGB[T] {
 
-    def makeSubject(t: T): Rdf#URI
+    def makeSubject(t: T): Rdf#Node
 
     def make(t: T, pos: Iterable[(Rdf#URI, PointedGraph[Rdf])]*)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
       val subject = makeSubject(t)
