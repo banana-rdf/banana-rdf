@@ -1,5 +1,6 @@
 package org.w3.banana.sesame.io
 
+import org.w3.banana.Prefix
 import org.w3.banana.io._
 import org.w3.banana.sesame._
 import java.io._
@@ -10,14 +11,14 @@ class SesameRDFWriter[T](implicit
   sesameSyntax: SesameSyntax[T]
 ) extends RDFWriter[Sesame, Try, T] {
 
-  def write(graph: Sesame#Graph, os: OutputStream, base: String): Try[Unit] = Try {
+  def write(graph: Sesame#Graph, os: OutputStream, base: String, prefixes: Prefix[Sesame]*): Try[Unit] = Try {
     val sWriter = sesameSyntax.rdfWriter(os, base)
     sWriter.startRDF()
     ops.getTriples(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
   }
 
-  def asString(graph: Sesame#Graph, base: String): Try[String] = Try {
+  def asString(graph: Sesame#Graph, base: String, prefixes: Prefix[Sesame]*): Try[String] = Try {
     val result = new StringWriter()
     val sWriter = sesameSyntax.rdfWriter(result, base)
     sWriter.startRDF()
