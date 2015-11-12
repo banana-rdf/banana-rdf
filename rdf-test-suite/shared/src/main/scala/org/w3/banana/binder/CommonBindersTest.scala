@@ -32,6 +32,18 @@ class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec 
     pg123.toPG.as[Int] shouldEqual Success(123)
   }
 
+  "serializing and deserializing a String" in {
+    val pgString = "abc".toPG
+    pgString.pointer shouldEqual (Literal("abc", xsd.string))
+    pgString.graph shouldEqual (Graph.empty)
+    pgString.toPG.as[String] shouldEqual (Success("abc"))
+
+    val taggedLiteral = makeLangTaggedLiteral("abcEng", Lang("en")).toPG
+    taggedLiteral.pointer shouldEqual (Literal.tagged("abcEng", Lang("en")))
+    taggedLiteral.graph shouldEqual (Graph.empty)
+    taggedLiteral.toPG.as[String] shouldEqual (Success("abcEng"))
+  }
+
   "serializing and deserializing a List of simple nodes" in {
     val bn1 = BNode()
     val bn2 = BNode()
