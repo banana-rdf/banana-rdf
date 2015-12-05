@@ -1,10 +1,6 @@
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys._
 import sbt._
-
-import com.inthenow.sbt.scalajs.SbtScalajs
-import com.inthenow.sbt.scalajs.SbtScalajs._
-import org.scalajs.sbtplugin._
-import ScalaJSPlugin.autoImport._
 
 object Dependencies {
   // Note: %%% can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting...
@@ -79,7 +75,7 @@ object Dependencies {
    * @see http://akka.io
    * @see http://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "1.0-RC3"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "2.0-M2"
 
   /**
    * Apache Commons Logging
