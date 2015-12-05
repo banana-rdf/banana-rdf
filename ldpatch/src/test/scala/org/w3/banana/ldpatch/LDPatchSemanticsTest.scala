@@ -1,12 +1,16 @@
 package org.w3.banana.ldpatch
 
-import org.w3.banana.{ Delete => _, _ }
-import org.scalatest.{ Filter => _, _ }
-import java.io._
-import scala.util.{ Try, Success, Failure }
-import org.w3.banana.ldpatch.model._
+import org.scalatest.{Filter => _, _}
+import org.w3.banana.io.{RDFReader, RDFWriter, Turtle}
+import org.w3.banana._
 
-abstract class LDPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle]) extends WordSpec with /*Must*/Matchers with TryValues { self =>
+import scala.concurrent.Future
+
+abstract class LDPatchSemanticsTest[Rdf <: RDF]()(
+  implicit ops: RDFOps[Rdf],
+  reader: RDFReader[Rdf, Future, Turtle],
+  writer: RDFWriter[Rdf, Future, Turtle]
+) extends WordSpec with /*Must*/Matchers with TryValues { self =>
 
   import ops._
 
@@ -83,8 +87,6 @@ _:b2 a schema:Event ;
 
     val ul = newParser("""UpdateList <#> ex:preferredLanguages 1>2 ( "fr-CH" ) .""").UpdateList.run().success.value
 
-    import org.w3.banana.diesel._
-
     val newGraph = s.semantics.UpdateList(ul, s.semantics.State(graph)).graph
 
     val l = (PointedGraph(URI("http://example.com/timbl#"), newGraph) / ex("preferredLanguages")).as[List[String]].success.value
@@ -95,8 +97,6 @@ _:b2 a schema:Event ;
 
 
   def testUpdate(initialList: List[Int], update: String, expectedList: List[Int]) = {
-
-    import org.w3.banana.diesel._
 
     val graph: Rdf#Graph = (URI("http://example.com/#") -- ex("numbers") ->- initialList).graph
 
