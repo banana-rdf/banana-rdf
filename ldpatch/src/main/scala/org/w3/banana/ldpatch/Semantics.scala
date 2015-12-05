@@ -1,8 +1,7 @@
 package org.w3.banana.ldpatch
 
 import org.w3.banana._
-import scala.util.Try
-import org.w3.banana.ldpatch.{ model => m }
+import org.w3.banana.ldpatch.{model => m}
 
 trait Semantics[Rdf <: RDF] {
 
@@ -159,7 +158,7 @@ trait Semantics[Rdf <: RDF] {
 
       val State(graph, varmap) = state
 
-      def PathElement(pathElem: m.PathElement[Rdf], nodes: Set[Rdf#Node]): Set[Rdf#Node] = pathElem match {
+      def PathElement(pathElem: m.PathElement[Rdf], nodes: Set[Rdf#Node]): Set[Rdf#Node] = (pathElem: @unchecked) match {
         case m.StepForward(uri) => nodes.flatMap(node => ops.getObjects(graph, node, uri))
 
         case m.StepBackward(uri) => nodes.flatMap(node => ops.getSubjects(graph, uri, node))

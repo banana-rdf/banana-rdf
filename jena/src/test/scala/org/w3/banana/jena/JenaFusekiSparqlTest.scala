@@ -23,16 +23,12 @@ class JenaFusekiSparqlTest extends FlatSpec
   /**
    * Start Fuseki server
    */
-  override def beforeAll(): Unit = {
-    server.start
-  }
+  override def beforeAll(): Unit = server.start()
 
   /**
    * Stop server
    */
-  override def afterAll(): Unit = {
-    server.stop
-  }
+  override def afterAll(): Unit = server.stop()
 
   "The repository" must "contain person 'Morgana'" in {
 
@@ -40,7 +36,7 @@ class JenaFusekiSparqlTest extends FlatSpec
       """
         |PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         |PREFIX c: <http://www.w3.org/2000/10/swap/pim/contact#>
-        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+        |PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         |
         |INSERT DATA {
         |   _:node1040 rdf:type c:Person .
@@ -58,8 +54,8 @@ class JenaFusekiSparqlTest extends FlatSpec
     val selectQuery = parseSelect(
       """
         |PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        |    PREFIX c: <http://www.w3.org/2000/10/swap/pim/contact#>
-        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+        |PREFIX c: <http://www.w3.org/2000/10/swap/pim/contact#>
+        |PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         |
         |    SELECT ?firstName
         |    WHERE {
@@ -76,7 +72,7 @@ class JenaFusekiSparqlTest extends FlatSpec
       row => row("firstName").get
     )
 
-    result should have size (1)
+    result should have size 1
     result.head.getLiteralLexicalForm should be ("Morgana")
   }
 

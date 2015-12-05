@@ -3,6 +3,7 @@ package n3js
 
 import scala.scalajs.js
 
+@js.native
 object N3 extends js.Object {
 
   def Parser(): Parser = js.native
@@ -13,6 +14,7 @@ object N3 extends js.Object {
 
 }
 
+@js.native
 trait Parser extends js.Object {
 
   def parse(s: String, callback: js.Function3[js.UndefOr[js.Error], js.UndefOr[Triple], js.UndefOr[js.Dictionary[String]], Unit]): Unit = js.native
@@ -109,6 +111,7 @@ object ParsingError {
 
 }
 
+@js.native
 trait Triple extends js.Object {
 
   def subject: String = js.native
@@ -125,9 +128,6 @@ object Triple {
     def objekt = `object`
   }
 
-  import org.w3.banana._
-  import N3.Util
-
   def toBananaTriple[Rdf <: RDF](t: Triple)(implicit ops: RDFOps[Rdf]): Rdf#Triple = {
     val s = Node.toBananaNode(t.subject)
     val p = ops.makeUri(t.predicate)
@@ -139,7 +139,6 @@ object Triple {
 
 object Node {
 
-  import org.w3.banana._
   import N3.Util
 
   def toBananaNode[Rdf <: RDF](s: String)(implicit ops: RDFOps[Rdf]): Rdf#Node = {
@@ -160,6 +159,7 @@ object Node {
 
 }
 
+@js.native
 trait Util extends js.Object {
 
   def isIRI(s: String): Boolean = js.native
@@ -178,6 +178,7 @@ trait Util extends js.Object {
 
 }
 
+@js.native
 trait Store extends js.Object {
 
   def addTriple(s: String, p: String, o: String): Unit = js.native

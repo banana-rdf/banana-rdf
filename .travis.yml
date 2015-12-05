@@ -21,11 +21,11 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis-jvmopts validate
 
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 
 scala:
-  - 2.10.5
-  - 2.11.6
+  - 2.10.6
+  - 2.11.7
 
 branches:
   only:
@@ -35,11 +35,11 @@ branches:
 # matrix:
 #   include:
 #     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-#       jdk:    oraclejdk7
-#       scala:  2.11.5
+#       jdk:    oraclejdk8
+#       scala:  2.11.7
 #     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-#       jdk:    oraclejdk7
-#       scala:  2.10.4      
+#       jdk:    oraclejdk8
+#       scala:  2.10.6
 #   allow_failures: 
 #    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test 
 

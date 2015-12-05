@@ -4,6 +4,7 @@ import com.hp.hpl.jena.query.Dataset
 import com.hp.hpl.jena.util.FileManager
 import org.apache.jena.fuseki.EmbeddedFusekiServer
 
+
 /**
  * Embedded Fuseki Server
  *
@@ -21,9 +22,9 @@ class FusekiServer(dataset:Dataset, port:Int = 3030, path:String = "ds", dataFil
     FileManager.get.readModel(model, file, "N-TRIPLES")
   }
 
-  val server = EmbeddedFusekiServer.create(port, tdb, path);
+  val server = EmbeddedFusekiServer.create(port, tdb, path)
 
-  def start() = server.start
+  def start() = server.start()
 
-  def stop() = server.stop
+  def stop() = server.stop()
 }
