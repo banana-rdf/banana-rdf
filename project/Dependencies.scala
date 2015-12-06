@@ -103,14 +103,14 @@ object Dependencies {
    * @see http://wiki.fasterxml.com/AaltoHome
    * @see http://repo1.maven.org/maven2/com/fasterxml/aalto-xml
    */
-  val aalto = "com.fasterxml" % "aalto-xml" % "0.9.7"
+  val aalto = "com.fasterxml" % "aalto-xml" % "1.0.0"
 
   /**
    * sesame
    * @see http://www.openrdf.org/
    * @see http://repo1.maven.org/maven2/org/openrdf/sesame/
    */
-  val sesameVersion = "2.8.3"
+  val sesameVersion = "2.8.7"
 
 
   val sesameQueryAlgebra = "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion
