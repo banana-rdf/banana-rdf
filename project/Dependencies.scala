@@ -32,7 +32,7 @@ object Dependencies {
    * @see http://joda-convert.sourceforge.net
    * @see http://repo1.maven.org/maven2/org/joda/joda-convert
    */
-  val jodaConvert = "org.joda" % "joda-convert" % "1.2"
+  val jodaConvert = "org.joda" % "joda-convert" % "1.8"
 
   /**
    * scalatest
