@@ -47,9 +47,9 @@ object Dependencies {
     * @see http://repo1.maven.org/maven2/org/scalacheck/
     */
   //Todo:
-  val scalacheck = "com.github.inthenow" %% "scalacheck" % "1.12.2"
+  val scalacheck = "com.github.inthenow" %% "scalacheck" % "1.12.5"
   //Todo:
-  val scalacheckJs = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalacheck" % "1.12.2")
+  val scalacheckJs = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalacheck" % "1.12.5")
 
   val zcheckJs =  Seq(
     libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.2"
@@ -144,5 +144,5 @@ object Dependencies {
    */
   val fuseki = "org.apache.jena" % "jena-fuseki" % "1.1.0" exclude ("org.eclipse.jetty.orbit", "javax.servlet") exclude ("org.apache.httpcomponents", "httpclient")
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.0.1"
-  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.3.2"
+  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.1"
 }
