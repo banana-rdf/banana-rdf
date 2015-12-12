@@ -25,7 +25,7 @@ object Dependencies {
    * @see http://joda-time.sourceforge.net
    * @see http://repo1.maven.org/maven2/joda-time/joda-time/
    */
-  val jodaTime = "joda-time" % "joda-time" % "2.1"
+  val jodaTime = "joda-time" % "joda-time" % "2.9.1"
 
   /**
    * joda-convert
