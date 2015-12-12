@@ -89,7 +89,7 @@ object Dependencies {
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "2.13.0"
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.0.0"
 
   /**
    * logback for jena
@@ -142,7 +142,7 @@ object Dependencies {
    * @see http://jena.apache.org/documentation/serving_data
    * @see http://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
-  val fuseki = "org.apache.jena" % "jena-fuseki" % "1.1.0" exclude ("org.eclipse.jetty.orbit", "javax.servlet") exclude ("org.apache.httpcomponents", "httpclient")
+  val fuseki = "org.apache.jena" % "apache-jena-fuseki" % "2.3.0" exclude ("org.eclipse.jetty.orbit", "javax.servlet") exclude ("org.apache.httpcomponents", "httpclient")
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.0.1"
   val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.3.2"
 }

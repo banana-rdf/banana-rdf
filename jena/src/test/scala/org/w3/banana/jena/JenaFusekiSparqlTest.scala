@@ -2,7 +2,6 @@ package org.w3.banana.jena
 
 import java.net.URL
 
-import com.hp.hpl.jena.tdb.TDBFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, _}
 import org.w3.banana._
 
@@ -14,8 +13,6 @@ class JenaFusekiSparqlTest extends FlatSpec
 
   val data = "rdf-test-suite/jvm/src/main/resources/known-tr-editors.rdf"
 
-  val server: FusekiServer = new FusekiServer(dataset = TDBFactory.createDataset(), dataFiles = List(data))
-
   import ops._
   import sparqlHttp.sparqlEngineSyntax._
   import sparqlOps._
@@ -24,14 +21,14 @@ class JenaFusekiSparqlTest extends FlatSpec
    * Start Fuseki server
    */
   override def beforeAll(): Unit = {
-    server.start
+    FusekiTestServer.allocServer(port = 3030, datasetPath = "rdf-test-suite/jvm/src/main/resources/")
   }
 
   /**
    * Stop server
    */
   override def afterAll(): Unit = {
-    server.stop
+    FusekiTestServer.freeServer()
   }
 
   "The repository" must "contain person 'Morgana'" in {
