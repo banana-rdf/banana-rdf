@@ -10,7 +10,7 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.1"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.0"
 
   /**
    * scalaz for scalajs
