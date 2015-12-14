@@ -7,6 +7,7 @@ import org.w3.banana.jena.Jena._
 
 import scala.util.Try
 
+import org.w3.banana.util.tryInstances._
 
 abstract class JenaGraphStoreTest(dataset: Dataset) extends GraphStoreTest[Jena, Try, Dataset](dataset) {
 
@@ -28,7 +29,7 @@ class JenaMemGraphStoreTest extends JenaGraphStoreTest({
 
 class JenaTDBGraphStoreTest extends JenaGraphStoreTest({
   val dataset = TDBFactory.createDataset("test.tdb")
-  dataset.getContext().set(TDB.symUnionDefaultGraph, false)
+  dataset.getContext.set(TDB.symUnionDefaultGraph, false)
   dataset
 })
 

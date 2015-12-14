@@ -3,6 +3,7 @@ package org.w3.banana.jena.io
 import org.apache.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
 import org.apache.jena.rdf.model.{RDFReader => _}
 import java.io._
+import org.apache.jena.atlas.lib.Tuple
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
 import org.w3.banana.io._
@@ -40,7 +41,7 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
       }
     graph.add(t)
   }
-  def tuple(tuple: org.apache.jena.atlas.lib.Tuple[JenaNode]): Unit = ()
+  def tuple(tuple: Tuple[JenaNode]): Unit = ()
 }
 
 object JenaRDFReader {

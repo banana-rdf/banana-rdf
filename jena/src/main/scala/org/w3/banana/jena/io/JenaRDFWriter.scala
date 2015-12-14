@@ -28,7 +28,7 @@ object JenaRDFWriter {
       val result = new StringWriter()
       val model = ModelFactory.createModelForGraph(graph)
       writerFactory.getWriter(lang.getLabel).write(model, result, base)
-      result.toString()
+      result.toString
     }
   }
 
@@ -47,7 +47,7 @@ object JenaRDFWriter {
       writer.setProperty("relativeURIs", "same-document,relative")
       val model = ModelFactory.createModelForGraph(graph)
       writer.write(model, result, base)
-      result.toString()
+      result.toString
     }
 
   }
@@ -65,7 +65,7 @@ object JenaRDFWriter {
       val result = new StringWriter()
       val relativeGraph = graph.relativize(URI(base))
       RDFDataMgr.write(result, relativeGraph, JenaLang.TURTLE)
-      result.toString()
+      result.toString
     }
   }
 

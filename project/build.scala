@@ -1,12 +1,10 @@
-import com.typesafe.sbt.pgp.SbtPgpCommandContext
-import sbt._
-import sbt.Keys._
-import com.inthenow.sbt.scalajs._
 import com.inthenow.sbt.scalajs.SbtScalajs._
+import com.inthenow.sbt.scalajs._
 import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
-import org.scalajs.sbtplugin.ScalaJSPlugin
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+import sbt.Keys._
+import sbt._
 import sbtunidoc.Plugin._
-import ScalaJSPlugin.autoImport._
 
 object BuildSettings {
   import Publishing._
@@ -151,7 +149,8 @@ object BananaRdfBuild extends Build {
         libraryDependencies += jodaConvert,
         libraryDependencies += fuseki,
         libraryDependencies += servlet,
-        libraryDependencies += httpComponents
+        libraryDependencies += httpComponents,
+        libraryDependencies += httpComponentsCache
       ) ++ zcheckJvmSettings: _*)
     .dependsOn(rdf_jvm)
 
@@ -177,6 +176,8 @@ object BananaRdfBuild extends Build {
       Seq(
         resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
         libraryDependencies += jenaLibs,
+        libraryDependencies += httpComponents,
+        libraryDependencies += httpComponentsCache,
         libraryDependencies += commonsLogging,
         libraryDependencies += aalto): _*)
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")
@@ -202,6 +203,7 @@ object BananaRdfBuild extends Build {
         libraryDependencies += sesameSailMemory,
         libraryDependencies += sesameSailNativeRdf,
         libraryDependencies += sesameRepositorySail,
+        libraryDependencies += httpComponents,
         libraryDependencies += commonsLogging,
         libraryDependencies += jsonldJava)
     .dependsOn(rdf_jvm, ntriples_jvm, rdfTestSuite_jvm % "test-internal->compile")

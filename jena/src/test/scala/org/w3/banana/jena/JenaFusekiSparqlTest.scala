@@ -2,6 +2,7 @@ package org.w3.banana.jena
 
 import java.net.URL
 
+import org.apache.jena.tdb.TDBFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, _}
 import org.w3.banana._
 
@@ -13,6 +14,8 @@ class JenaFusekiSparqlTest extends FlatSpec
 
   val data = "rdf-test-suite/jvm/src/main/resources/known-tr-editors.rdf"
 
+  val server: FusekiServer = new FusekiServer(dataset = TDBFactory.createDataset(), dataFiles = List(data))
+
   import ops._
   import sparqlHttp.sparqlEngineSyntax._
   import sparqlOps._
@@ -20,16 +23,12 @@ class JenaFusekiSparqlTest extends FlatSpec
   /**
    * Start Fuseki server
    */
-  override def beforeAll(): Unit = {
-    FusekiTestServer.allocServer(port = 3030, datasetPath = "rdf-test-suite/jvm/src/main/resources/")
-  }
+  override def beforeAll(): Unit = server.start()
 
   /**
    * Stop server
    */
-  override def afterAll(): Unit = {
-    FusekiTestServer.freeServer()
-  }
+  override def afterAll(): Unit = server.stop()
 
   "The repository" must "contain person 'Morgana'" in {
 
@@ -37,7 +36,7 @@ class JenaFusekiSparqlTest extends FlatSpec
       """
         |PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         |PREFIX c: <http://www.w3.org/2000/10/swap/pim/contact#>
-        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+        |PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         |
         |INSERT DATA {
         |   _:node1040 rdf:type c:Person .
@@ -55,8 +54,8 @@ class JenaFusekiSparqlTest extends FlatSpec
     val selectQuery = parseSelect(
       """
         |PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        |    PREFIX c: <http://www.w3.org/2000/10/swap/pim/contact#>
-        |prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+        |PREFIX c: <http://www.w3.org/2000/10/swap/pim/contact#>
+        |PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         |
         |    SELECT ?firstName
         |    WHERE {
@@ -73,7 +72,7 @@ class JenaFusekiSparqlTest extends FlatSpec
       row => row("firstName").get
     )
 
-    result should have size (1)
+    result should have size 1
     result.head.getLiteralLexicalForm should be ("Morgana")
   }
 

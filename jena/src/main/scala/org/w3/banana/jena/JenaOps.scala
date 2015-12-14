@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.{Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _}
-import org.apache.jena.rdf.model.{Literal => JenaLiteral, Seq => _}
+import org.apache.jena.rdf.model.{Seq => _, AnonId}
 import org.w3.banana._
 
 import scala.collection.JavaConverters._
