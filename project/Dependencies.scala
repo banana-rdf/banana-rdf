@@ -97,7 +97,7 @@ object Dependencies {
     * @see http://akka.io
    * @see http://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "2.0-M2"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "2.4.8"
 
   /**
    * Apache Commons Logging
