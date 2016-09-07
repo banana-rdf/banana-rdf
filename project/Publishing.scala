@@ -38,11 +38,10 @@ object Publishing {
 
   val publicationSettings = pomSettings ++ releaseSettings ++ Seq(
     publishTo := {
-      val artifactory = "http://artifactory-ndc.bnymellon.net/artifactory/"
       if (isSnapshot.value) {
-        Some("snapshots" at artifactory + "libs-snapshot-local")
+        Some("snapshots" at sys.env("REPOSITORY_SNAPSHOTS"))
       } else {
-        Some("releases" at artifactory + "libs-release-local")
+        Some("releases" at sys.env("REPOSITORY_RELEASES"))
       }
     },
     publishMavenStyle := true,
