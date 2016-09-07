@@ -12,7 +12,7 @@ object Publishing {
     pomExtra :=
       <url>https://github.com/w3c/banana-rdf</url>
         <developers>
-          <developer>
+ gio         <developer>
             <id>betehess</id>
             <name>Alexandre Bertails</name>
             <url>http://bertails.org/</url>
