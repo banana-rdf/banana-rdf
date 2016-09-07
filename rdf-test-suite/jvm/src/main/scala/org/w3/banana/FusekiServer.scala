@@ -1,8 +1,8 @@
 package org.w3.banana
 
-import com.hp.hpl.jena.query.Dataset
-import com.hp.hpl.jena.util.FileManager
 import org.apache.jena.fuseki.EmbeddedFusekiServer
+import org.apache.jena.query.Dataset
+import org.apache.jena.util.FileManager
 
 
 /**

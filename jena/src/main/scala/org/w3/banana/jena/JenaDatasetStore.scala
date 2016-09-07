@@ -1,8 +1,8 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph, Node => JenaNode}
-import com.hp.hpl.jena.query._
-import com.hp.hpl.jena.update.UpdateAction
+import org.apache.jena.graph.{Graph => JenaGraph, Node => JenaNode}
+import org.apache.jena.query._
+import org.apache.jena.update.UpdateAction
 import org.w3.banana._
 
 import scala.util.Try

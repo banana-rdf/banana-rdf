@@ -2,7 +2,7 @@ package org.w3.banana.jena
 
 import java.net.URL
 
-import com.hp.hpl.jena.tdb.TDBFactory
+import org.apache.jena.tdb.TDBFactory
 import org.scalatest.{BeforeAndAfterAll, Matchers, _}
 import org.w3.banana._
 

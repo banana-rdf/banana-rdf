@@ -97,7 +97,7 @@ object Dependencies {
     * @see http://akka.io
    * @see http://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core-experimental" % "2.0-M2"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "2.4.8"
 
   /**
    * Apache Commons Logging
@@ -113,7 +113,7 @@ object Dependencies {
     * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
-  val jenaLibs = withJenaExcludes("org.apache.jena" % "apache-jena-libs" % "2.13.0")
+  val jenaLibs = withJenaExcludes("org.apache.jena" % "apache-jena-libs" % "3.0.0")
 
   /**
    * logback for jena
@@ -170,10 +170,8 @@ object Dependencies {
     *
     * @see http://jena.apache.org/documentation/serving_data
    * @see http://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
-   *
-   * TODO: We can upgrade to jena-fuseki1 version 1.3.0 once we've upgraded to jena 3.
    */
-  val fuseki = withJenaExcludes("org.apache.jena" % "jena-fuseki1" % "1.1.2")
+  val fuseki = withJenaExcludes("org.apache.jena" % "jena-fuseki1" % "1.3.0")
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.0.1"
   val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.1"
 

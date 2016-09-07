@@ -1,8 +1,8 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{ Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _ }
-import com.hp.hpl.jena.query.{ QuerySolution, ResultSet, Query => JenaQuery }
-import com.hp.hpl.jena.update.UpdateRequest
+import org.apache.jena.graph.{Graph => JenaGraph, Node => JenaNode, Node_ANY, Node_Blank, Node_Literal, Node_URI, Triple => JenaTriple}
+import org.apache.jena.query.{Query => JenaQuery, QuerySolution, ResultSet}
+import org.apache.jena.update.UpdateRequest
 import org.w3.banana._
 
 trait Jena extends RDF {

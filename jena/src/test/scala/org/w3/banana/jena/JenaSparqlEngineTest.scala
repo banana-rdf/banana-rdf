@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.query.DatasetFactory
-import org.w3.banana.{SparqlUpdateEngineTest, SparqlEngineTest}
+import org.apache.jena.query.DatasetFactory
+import org.w3.banana._
 import org.w3.banana.jena.Jena._
 import org.w3.banana.util.tryInstances._
 

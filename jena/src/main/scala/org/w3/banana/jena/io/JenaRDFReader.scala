@@ -1,7 +1,7 @@
 package org.w3.banana.jena.io
 
-import com.hp.hpl.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
-import com.hp.hpl.jena.rdf.model.{RDFReader => _}
+import org.apache.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
+import org.apache.jena.rdf.model.{RDFReader => _}
 import java.io._
 import org.apache.jena.atlas.lib.Tuple
 import org.apache.jena.riot._
@@ -19,7 +19,7 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
   def base(base: String): Unit = ()
   def finish(): Unit = ()
   def prefix(prefix: String, iri: String): Unit = prefixes += (prefix -> iri)
-  def quad(quad: com.hp.hpl.jena.sparql.core.Quad): Unit = ()
+  def quad(quad: org.apache.jena.sparql.core.Quad): Unit = ()
   def start(): Unit = ()
   def triple(triple: JenaTriple): Unit = {
     def isXsdString(node: JenaNode): Boolean =

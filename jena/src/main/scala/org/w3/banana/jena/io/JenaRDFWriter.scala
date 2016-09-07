@@ -3,10 +3,10 @@ package io
 
 import java.io.{Writer => jWriter, _}
 
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import com.hp.hpl.jena.rdf.model.impl.RDFWriterFImpl
-import com.hp.hpl.jena.rdfxml.xmloutput.impl.Abbreviated
-import org.apache.jena.riot.{Lang => JenaLang, RDFDataMgr, RDFLanguages}
+import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.impl.RDFWriterFImpl
+import org.apache.jena.rdfxml.xmloutput.impl.Abbreviated
+import org.apache.jena.riot.{Lang => JenaLang, _}
 import org.w3.banana.io._
 import org.w3.banana.jena.Jena.ops._
 
