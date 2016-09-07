@@ -10,9 +10,9 @@ object Publishing {
   val pomSettings = Seq(
     pomIncludeRepository := { _ => false},
     pomExtra :=
-      <url>https://github.com/w3c/banana-rdf</url>
+      <url>https://github.com/modelfabric/banana-rdf</url>
         <developers>
- gio         <developer>
+          <developer>
             <id>betehess</id>
             <name>Alexandre Bertails</name>
             <url>http://bertails.org/</url>
@@ -29,8 +29,8 @@ object Publishing {
           </developer>
         </developers>
         <scm>
-          <url>git@github.com:w3c/banana-rdf.git</url>
-          <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
+          <url>https://github.com/modelfabric/banana-rdf.git</url>
+          <connection>scm:git:https://github.com/modelfabric/banana-rdf.git</connection>
         </scm>
     ,
     licenses +=("W3C", url("http://opensource.org/licenses/W3C"))
