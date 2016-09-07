@@ -45,7 +45,6 @@ object Publishing {
         Some("releases" at artifactory + "libs-release-local")
       }
     },
-    publishArtifactsAction := PgpKeys.publishSigned.value,
     publishMavenStyle := true,
     publishArtifact in Test := false
   )
