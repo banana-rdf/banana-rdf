@@ -1,9 +1,9 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{ Node => JenaNode }
-import com.hp.hpl.jena.query.{ QueryFactory, Query => JenaQuery }
-import com.hp.hpl.jena.rdf.model.RDFNode
-import com.hp.hpl.jena.update.UpdateFactory
+import org.apache.jena.graph.{ Node => JenaNode }
+import org.apache.jena.query.{ QueryFactory, Query => JenaQuery }
+import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.update.UpdateFactory
 import org.w3.banana.SparqlOps.withPrefixes
 import org.w3.banana._
 

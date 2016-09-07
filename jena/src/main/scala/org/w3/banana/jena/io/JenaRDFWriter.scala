@@ -3,9 +3,9 @@ package io
 
 import java.io.{Writer => jWriter, _}
 
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import com.hp.hpl.jena.rdf.model.impl.RDFWriterFImpl
-import com.hp.hpl.jena.rdfxml.xmloutput.impl.Abbreviated
+import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.impl.RDFWriterFImpl
+import org.apache.jena.rdfxml.xmloutput.impl.Abbreviated
 import org.apache.jena.riot.{Lang => JenaLang, _}
 import org.w3.banana.io._
 import org.w3.banana.jena.Jena.ops._
@@ -28,7 +28,7 @@ object JenaRDFWriter {
       val result = new StringWriter()
       val model = ModelFactory.createModelForGraph(graph)
       writerFactory.getWriter(lang.getLabel).write(model, result, base)
-      result.toString()
+      result.toString
     }
   }
 
@@ -47,7 +47,7 @@ object JenaRDFWriter {
       writer.setProperty("relativeURIs", "same-document,relative")
       val model = ModelFactory.createModelForGraph(graph)
       writer.write(model, result, base)
-      result.toString()
+      result.toString
     }
 
   }
@@ -65,7 +65,7 @@ object JenaRDFWriter {
       val result = new StringWriter()
       val relativeGraph = graph.relativize(URI(base))
       RDFDataMgr.write(result, relativeGraph, JenaLang.TURTLE)
-      result.toString()
+      result.toString
     }
   }
 
