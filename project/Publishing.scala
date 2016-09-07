@@ -38,13 +38,15 @@ object Publishing {
 
   val publicationSettings = pomSettings ++ releaseSettings ++ Seq(
     publishTo := {
-      val nexus = "https://oss.sonatype.org/"
-      if (isSnapshot.value)
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      val artifactory = "http://artifactory-ndc.bnymellon.net/artifactory/"
+      if (isSnapshot.value) {
+        Some("snapshots" at artifactory + "libs-snapshot-local")
+      } else {
+        Some("releases" at artifactory + "libs-release-local")
+      }
     },
     publishArtifactsAction := PgpKeys.publishSigned.value,
+    publishMavenStyle := true,
     publishArtifact in Test := false
   )
 
