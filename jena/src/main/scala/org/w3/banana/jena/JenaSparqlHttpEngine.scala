@@ -2,9 +2,9 @@ package org.w3.banana.jena
 
 import java.net.URL
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph}
-import com.hp.hpl.jena.query._
-import com.hp.hpl.jena.update.UpdateExecutionFactory
+import org.apache.jena.graph.{Graph => JenaGraph}
+import org.apache.jena.query._
+import org.apache.jena.update.UpdateExecutionFactory
 import org.w3.banana._
 import scala.util._
 

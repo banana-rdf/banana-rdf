@@ -1,6 +1,6 @@
 package org.w3.banana.jena.io
 
-import com.hp.hpl.jena.sparql.resultset.{ JSONOutput, OutputFormatter, XMLOutput }
+import org.apache.jena.sparql.resultset.{ JSONOutput, OutputFormatter, XMLOutput }
 import org.w3.banana.io._
 
 /**

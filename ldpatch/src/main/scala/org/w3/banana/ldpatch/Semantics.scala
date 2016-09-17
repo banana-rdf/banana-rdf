@@ -1,8 +1,7 @@
 package org.w3.banana.ldpatch
 
 import org.w3.banana._
-import scala.util.Try
-import org.w3.banana.ldpatch.{ model => m }
+import org.w3.banana.ldpatch.{model => m}
 
 trait Semantics[Rdf <: RDF] {
 
@@ -184,6 +183,8 @@ trait Semantics[Rdf <: RDF] {
           case 1 => nodes
           case n => sys.error("failed unicity constraint: got $n matches")
         }
+
+        case _ => ???
 
       }
 

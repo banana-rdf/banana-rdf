@@ -1,9 +1,13 @@
 package org.w3.banana.ldpatch
 
-import org.w3.banana.{ Delete => _, _ }
-import org.scalatest.{ Filter => _, _ }
+import org.w3.banana._
+import org.scalatest._
+import org.scalatest.Filter
 import java.io._
-import scala.util.{ Try, Success, Failure }
+
+import org.w3.banana.io.{RDFReader, Turtle}
+
+import scala.util.{Failure, Success, Try}
 import org.w3.banana.ldpatch.model._
 
 abstract class LDPatchSemanticsTest[Rdf <: RDF]()(implicit ops: RDFOps[Rdf], reader: RDFReader[Rdf, Turtle], writer: RDFWriter[Rdf, Turtle]) extends WordSpec with /*Must*/Matchers with TryValues { self =>

@@ -43,6 +43,7 @@ object jsonldHelper {
 
 }
 
+@js.native
 object jsonld extends js.Object {
 
   def toRDF(
