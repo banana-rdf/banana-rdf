@@ -23,22 +23,22 @@ looking at you, Jena and Sesame). We try to keep a clear distinction
 between the core concepts and the enhanced syntax that Scala can give
 us.
 
-[`RDF`](rdf/common/src/main/scala/org/w3/banana/RDF.scala)
+[`RDF`](rdf/shared/src/main/scala/org/w3/banana/RDF.scala)
 itself is defined as a record of types. Implementations just have to
 _plug_ their own types. And because types alone are not enough, we
 introduce the
-[`RDFOps`](rdf/common/src/main/scala/org/w3/banana/RDFOps.scala)
+[`RDFOps`](rdf/shared/src/main/scala/org/w3/banana/RDFOps.scala)
 typeclass, which defines the mandatory operations that an RDF
 implementation must
-implement. [`SparqlOps`](rdf/common/src/main/scala/org/w3/banana/SparqlOps.scala)
+implement. [`SparqlOps`](rdf/shared/src/main/scala/org/w3/banana/SparqlOps.scala)
 does the same for SPARQL.
 
 With `banana-rdf`, you get _Diesel_, a nice DSL to build and navigate
 within **pointed graphs** (graphs with a pointer to an inner
 node). You also get an abstraction for **graph stores**
-([`GraphStore`](rdf/common/src/main/scala/org/w3/banana/GraphStore.scala)), 
+([`GraphStore`](rdf/shared/src/main/scala/org/w3/banana/GraphStore.scala)), 
 which do not have to be **SPARQL engines**
-([`SparqlEngine`](rdf/common/src/main/scala/org/w3/banana/SparqlEngine.scala)). 
+([`SparqlEngine`](rdf/shared/src/main/scala/org/w3/banana/SparqlEngine.scala)). 
 Of course, you can **serialize** and **deserialize**
 most of the RDF syntaxes as well as JSON-LD (RDFa will come soon).
 
