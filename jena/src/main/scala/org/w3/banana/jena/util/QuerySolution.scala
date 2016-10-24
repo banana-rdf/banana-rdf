@@ -1,8 +1,8 @@
 package org.w3.banana.jena.util
 
-import com.hp.hpl.jena.datatypes.TypeMapper
-import com.hp.hpl.jena.query.{ QuerySolution => JenaQuerySolution, _ }
-import com.hp.hpl.jena.rdf.model._
+import org.apache.jena.datatypes.TypeMapper
+import org.apache.jena.query.{ QuerySolution => JenaQuerySolution, _ }
+import org.apache.jena.rdf.model._
 import org.w3.banana._
 import org.w3.banana.jena._
 

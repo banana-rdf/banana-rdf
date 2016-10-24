@@ -1,8 +1,8 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.graph.{Graph => JenaGraph}
-import com.hp.hpl.jena.query._
-import com.hp.hpl.jena.rdf.model._
+import org.apache.jena.graph.{Graph => JenaGraph}
+import org.apache.jena.query._
+import org.apache.jena.rdf.model._
 import org.w3.banana._
 
 import scala.util.Try
@@ -53,7 +53,7 @@ trait UnionGraph extends JenaGraphSparqlEngine {
 
   override def qexec(graph: Jena#Graph, query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
     val qe = super.qexec(graph, query, bindings)
-    import com.hp.hpl.jena.tdb.TDB
+    import org.apache.jena.tdb.TDB
     qe.getContext().set(TDB.symUnionDefaultGraph, true)
     qe
   }

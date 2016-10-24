@@ -1,6 +1,6 @@
 package org.w3.banana.jena
 
-import com.hp.hpl.jena.query.Dataset
+import org.apache.jena.query.Dataset
 import org.w3.banana._
 import org.w3.banana.jena.io._
 import org.w3.banana.io._

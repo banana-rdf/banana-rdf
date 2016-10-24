@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
 import org.w3.banana._
-import com.hp.hpl.jena.graph.Factory
+import org.apache.jena.graph.Factory
 
 trait JenaMGraphOps extends MGraphOps[Jena] { self: JenaOps =>
 

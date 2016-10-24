@@ -1,7 +1,8 @@
 package org.w3.banana.ldpatch
 
-import org.w3.banana.{ Delete => _, _ }
-import org.scalatest.{ Filter => _, _ }
+import org.w3.banana._
+import org.scalatest._
+import org.scalatest.Filter
 import java.io._
 import scala.util.{ Try, Success, Failure }
 import org.w3.banana.ldpatch.model._
@@ -294,7 +295,7 @@ Add _:loc schema:geo _:geo .
 Add _:geo schema:latitude "33.7817" .
 Add _:geo schema:longitude "-118.2054" .
 """
-    newFreshParser(patch).LDPatch.run() should be a ('Success)
+    newFreshParser(patch).LDPatch.run() should be a 'Success
   }
 
 
