@@ -40,7 +40,7 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
   * better ivy alternative for dependency resolution
   * @see https://github.com/alexarchambault/coursier
   */
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M14-2")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M15-1")
 
 /**
   * sbt-updates
@@ -48,4 +48,4 @@ addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M14-2")
   * for easier dependency updates monitoring
   * @see https://github.com/rtimush/sbt-updates
   */
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.2.0")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0")

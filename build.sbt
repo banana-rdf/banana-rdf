@@ -47,8 +47,8 @@ lazy val publicationSettings = pomSettings ++ Seq(
 
 lazy val commonSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
   organization := "org.w3",
-  scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.11.8"),
+  scalaVersion := "2.12.1",
+  crossScalaVersions := Seq("2.11.8", "2.12.1"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
   resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
   fork := false,
