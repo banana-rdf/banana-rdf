@@ -33,23 +33,12 @@ jdk:
   - oraclejdk8
 
 scala:
+  - 2.12.1
   - 2.11.8
 
 branches:
   only:
     - /^series/.*$/
-
-## nobody looks at experimental these days so let's save resources
-# matrix:
-#   include:
-#     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-#       jdk:    oraclejdk7
-#       scala:  2.11.5
-#     - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test
-#       jdk:    oraclejdk7
-#       scala:  2.10.4      
-#   allow_failures: 
-#    - script: sbt ++$TRAVIS_SCALA_VERSION experimental/test 
 
 notifications:
   irc: "chat.freenode.net#banana-rdf"
