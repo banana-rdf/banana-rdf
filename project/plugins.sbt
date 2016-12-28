@@ -6,7 +6,17 @@ addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.3")
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.3")
 
-addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
+/**
+  * Bintray pluging
+  *
+  * @see https://github.com/softprops/bintray-sbt
+  *
+  * note: there seems to be a problem with this plugin, in that it does not work
+  * well with other publications methods.  So we'll disable it for the moment.
+  * @see https://github.com/sbt/sbt-testng/issues/4
+  * @see https://github.com/typesafehub/dbuild/issues/158
+  */
+//addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
 /**
   * ScalaJS sbt plugin

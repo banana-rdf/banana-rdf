@@ -3,6 +3,19 @@ banana-rdf
 
 [![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png)](http://travis-ci.org/w3c/banana-rdf) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w3c/banana-rdf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+The current published version 0.9.0-SNAPSHOT for scala 2.12 is to be found on the [http://bblfish.net/work/repo/snapshots](bblfish.net/work/repo/snapshots) repository.
+
+```scala
+val banana = (name: String) => "org.w3" %% name % "0.9.0-SNAPSHOT" excludeAll (ExclusionRule(organization = "org.scala-stm"))
+
+//add the bblfish-snapshots repository to the resolvers
+
+resolvers += "bblfish-snapshots" at "http://bblfish.net/work/repo/snapshots"
+
+//choose the packages you need for your dependencies
+val bananaDeps = Seq("banana", "banana-rdf", "banana-sesame").map(banana)
+```
+
 An RDF library in Scala
 -----------------------
 
@@ -110,19 +123,8 @@ $ sbt eclipse
 IntelliJ IDEA
 -------------
 
-IntelliJ IDEA works with just one global change:
+IntelliJ IDEA works out of the box since 2016.
 
-In `~/.sbt/0.13/plugins/build.sbt`
-
-```
-    addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.6.0")
-```
-
-To generate IntelliJ project files, just run the command:
-
-``` bash
-$ sbt gen-idea
-```
 
 Community
 =========
@@ -130,7 +132,7 @@ Community
 For discussions that don't fit in the [issues tracker](https://github.com/w3c/banana-rdf/issues), you may try
 either 
 *  the [w3c banana-rdf mailing list](http://lists.w3.org/Archives/Public/public-banana-rdf/), for longer discussions
-*  the banana-rdf irc channel on freenode using a dedicated IRC client connecting to [irc://irc.freenode.net:6667/banana-rdf](irc://irc.freenode.net:6667/banana-rdf) or using the [freenode html interface](http://webchat.freenode.net), for quick real time socialising
+*  the [banana-rdf gitter channel](https://gitter.im/banana-rdf/banana-rdf), for quick real time socialising
 
 Code of Conduct
 ---------------
