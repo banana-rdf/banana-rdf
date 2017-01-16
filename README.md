@@ -3,10 +3,10 @@ banana-rdf
 
 [![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png)](http://travis-ci.org/w3c/banana-rdf) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w3c/banana-rdf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The current published version 0.9.0-SNAPSHOT for scala 2.12 is to be found on the [http://bblfish.net/work/repo/snapshots](bblfish.net/work/repo/snapshots) repository.
+The current published version 0.8.4-SNAPSHOT for scala 2.12 is to be found on the [http://bblfish.net/work/repo/snapshots](bblfish.net/work/repo/snapshots) repository.
 
 ```scala
-val banana = (name: String) => "org.w3" %% name % "0.9.0-SNAPSHOT" excludeAll (ExclusionRule(organization = "org.scala-stm"))
+val banana = (name: String) => "org.w3" %% name % "0.8.4-SNAPSHOT" excludeAll (ExclusionRule(organization = "org.scala-stm"))
 
 //add the bblfish-snapshots repository to the resolvers
 
