@@ -1,9 +1,8 @@
 import sbt._
 import sbt.Keys._
-
-import sbtrelease.ReleasePlugin.ReleaseKeys._
 import sbtrelease.ReleasePlugin._
-import com.typesafe.sbt.pgp.PgpKeys
+
+import scala.util.Try
 
 object Publishing {
 
@@ -36,12 +35,15 @@ object Publishing {
     licenses +=("W3C", url("http://opensource.org/licenses/W3C"))
   )
 
+  val snapshotRepository = Try("snapshots" at sys.env("REPOSITORY_SNAPSHOTS")).toOption
+  val releaseRepository =  Try("releases"  at sys.env("REPOSITORY_RELEASES" )).toOption
+
   val publicationSettings = pomSettings ++ releaseSettings ++ Seq(
     publishTo := {
       if (isSnapshot.value) {
-        Some("snapshots" at sys.env("REPOSITORY_SNAPSHOTS"))
+        snapshotRepository
       } else {
-        Some("releases" at sys.env("REPOSITORY_RELEASES"))
+        releaseRepository
       }
     },
     publishMavenStyle := true,
