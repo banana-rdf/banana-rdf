@@ -33,17 +33,38 @@ lazy val pomSettings = Seq(
   licenses +=("W3C", url("http://opensource.org/licenses/W3C"))
 )
 
-lazy val publicationSettings = pomSettings ++ Seq(
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-  },
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  publishArtifact in Test := false
-)
+//sbt -Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
+//sbt -Dbanana.publish=bintray
+lazy val publicationSettings = pomSettings ++ {
+  val pubre = """([^:]+):([^:]+)""".r
+  Option(System.getProperty("banana.publish")) match {
+    case Some("bintray") | None => Seq(
+// removed due to issue https://github.com/typesafehub/dbuild/issues/158
+//      publishTo := {
+//        val nexus = "https://oss.sonatype.org/"
+//        if (isSnapshot.value)
+//          Some("snapshots" at nexus + "content/repositories/snapshots")
+//        else
+//          Some("releases" at nexus + "service/local/staging/deploy/maven2")
+//      },
+//      releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+//      publishArtifact in Test := false
+    )
+    case Some(pubre(host, path)) =>
+      Seq(
+        publishTo := Some(
+          Resolver.ssh("banana.publish specified server",
+            host,
+            path + {
+              if (isSnapshot.value) "snapshots" else "releases"
+            }
+          )
+        ),
+        publishArtifact in Test := false
+      )
+    case other => Seq()
+  }
+}
 
 lazy val commonSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
   organization := "org.w3",
