@@ -1,5 +1,7 @@
 package org.w3.banana.sesame
 
+import java.net.URL
+
 import org.openrdf.repository.RepositoryConnection
 import org.w3.banana._
 import org.w3.banana.io.{SparqlQueryResultsReader, _}
@@ -12,7 +14,7 @@ trait SesameModule
     with RDFOpsModule
     with RecordBinderModule
     with SparqlGraphModule
-    // with SparqlHttpModule
+    with SparqlHttpModule
     with RDFXMLReaderModule
     with TurtleReaderModule
     with NTriplesReaderModule
@@ -33,6 +35,8 @@ trait SesameModule
   implicit val recordBinder: binder.RecordBinder[Sesame] = binder.RecordBinder[Sesame]
 
   implicit val sparqlOps: SparqlOps[Sesame] = SesameSparqlOps
+
+  implicit val sparqlHttp: SparqlEngine[Sesame, Try, URL] = SesameHttpSparqlEngine()
 
   implicit val sparqlGraph: SparqlEngine[Sesame, Try, Sesame#Graph] = SesameGraphSparqlEngine()
 
