@@ -7,17 +7,12 @@ import org.openrdf.repository.{RepositoryConnection, RepositoryResult}
 import org.w3.banana._
 
 import scala.collection.JavaConverters._
-import scala.util.Try
+import scala.util.{Failure, Try}
 
 class SesameStore
     extends RDFStore[Sesame, Try, RepositoryConnection]
-    with SparqlUpdate[Sesame, Try, RepositoryConnection] {
-
-  /* Transactor */
-
-  def r[T](conn: RepositoryConnection, body: => T): Try[T] = ???
-
-  def rw[T](conn: RepositoryConnection, body: => T): Try[T] = ???
+    with SparqlUpdate[Sesame, Try, RepositoryConnection]
+    with SesameTransactor {
 
   /* SparqlEngine */
 
