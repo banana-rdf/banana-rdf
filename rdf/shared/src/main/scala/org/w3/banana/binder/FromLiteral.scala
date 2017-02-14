@@ -67,7 +67,7 @@ object FromLiteral {
         try {
           Success(lexicalForm.toLong)
         } catch {
-          case _: NumberFormatException => Failure(FailedConversion(s"${literal} is an xsd.integer but is not an acceptable integer"))
+          case _: NumberFormatException => Failure(FailedConversion(s"${literal} is an xsd.integer but is not an acceptable long"))
         }
       } else {
         Failure(FailedConversion(s"${literal} is not an xsd:int"))
@@ -115,7 +115,7 @@ object FromLiteral {
         try {
           Success(lexicalForm.toFloat)
         } catch {
-          case _: NumberFormatException => Failure(FailedConversion(s"${literal} is an xsd.double but is not an acceptable double"))
+          case _: NumberFormatException => Failure(FailedConversion(s"${literal} is an xsd.double but is not an acceptable float"))
         }
       } else {
         Failure(FailedConversion(s"${literal} is not an xsd:double"))
