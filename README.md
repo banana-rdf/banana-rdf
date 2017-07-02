@@ -67,7 +67,12 @@ suite](https://github.com/w3c/banana-rdf/tree/series/0.8.x/rdf-test-suite).
 How to start geeking
 --------------------
 
-You only need a recent version of Java, that's all:
+To get going with banana-rdf  and get a feel for how to use it the easiest and
+fastest way may well be to use it directly in the Ammonite shell as explained in the
+[Scripting with Ammonite wiki page](https://github.com/banana-rdf/banana-rdf/wiki/Scripting-with-Ammonite).
+
+It always helps to have the code available, as there are a lot of useful examples in 
+the test suite. You only need a recent version of Java, that's all:
 
 ``` bash
 $ git clone git@github.com:w3c/banana-rdf.git
