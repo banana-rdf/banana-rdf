@@ -1,15 +1,19 @@
 package org.w3.banana.binder
 
-import org.w3.banana._, syntax._, diesel._
+import org.w3.banana._
+import syntax._
+import diesel._
+
 import scala.util._
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPublicKey
-import com.inthenow.zcheck.SpecLite
+
+import org.scalatest.WordSpec
 
 class RecordBinderJvmTest[Rdf <: RDF](implicit
                                    ops: RDFOps[Rdf],
                                    recordBinder: RecordBinder[Rdf]
-                                    ) extends SpecLite {
+                                    ) extends WordSpec {
 
   import ops._
 
@@ -34,6 +38,6 @@ class RecordBinderJvmTest[Rdf <: RDF](implicit
     //      ).graph
     //    System.out.println(s"expectedGraph=${expectedGraph}")
     //    rsaPg.graph.isIsomorphicWith(expectedGraph) must be(true)
-    rsaPg.as[RSAPublicKey] must_== (Success(rsa))
+    assert(rsaPg.as[RSAPublicKey] === (Success(rsa)))
   }
 }

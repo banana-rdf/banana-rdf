@@ -1,31 +1,34 @@
 package org.w3.banana.binder
 
-import com.inthenow.zcheck.SpecLite
-import org.w3.banana._, syntax._, diesel._
+import org.w3.banana._
+import syntax._
+import diesel._
+import org.scalatest.WordSpec
+
 import scala.util._
 
-class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec {
 
   import ops._
 
   "serializing and deserialiazing a Boolean" in {
     val truePg = true.toPG
-    truePg.pointer must_==(Literal("true", xsd.boolean))
-    truePg.graph must_==(Graph.empty)
-    true.toPG.as[Boolean] must_==(Success(true))
+    assert(truePg.pointer === (Literal("true", xsd.boolean)))
+    assert(truePg.graph === (Graph.empty))
+    assert(true.toPG.as[Boolean] === (Success(true)))
 
     val falsePg = false.toPG
-    truePg.pointer must_==(Literal("true", xsd.boolean))
-    truePg.graph must_==(Graph.empty)
-    false.toPG.as[Boolean] must_==(Success(false))
+    assert(truePg.pointer === (Literal("true", xsd.boolean)))
+    assert(truePg.graph === (Graph.empty))
+    assert(false.toPG.as[Boolean] === (Success(false)))
 
   }
 
   "serializing and deserializing an Integer" in {
     val pg123 = 123.toPG
-    pg123.pointer must_==(Literal("123", xsd.integer))
-    pg123.graph must_==(Graph.empty)
-    pg123.toPG.as[Int] must_==(Success(123))
+    assert(pg123.pointer === (Literal("123", xsd.integer)))
+    assert(pg123.graph === (Graph.empty))
+    assert(pg123.toPG.as[Int] === (Success(123)))
   }
 
   "serializing and deserializing a List of simple nodes" in {
@@ -44,26 +47,26 @@ class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite 
     val list = List(1, 2, 3)
     val listPg = binder.toPG(list)
     assert(listPg.graph isIsomorphicWith (constructedListGr))
-    binder.fromPG(listPg) must_==(Success(list))
+    assert(binder.fromPG(listPg) === (Success(list)))
   }
 
   "serializing and deserializing a List of complex types" in {
     val binder = implicitly[PGBinder[Rdf, List[List[Int]]]]
     val list = List(List(1, 2), List(3))
-    binder.fromPG(binder.toPG(list)) must_==(Success(list))
+    assert(binder.fromPG(binder.toPG(list)) === (Success(list)))
   }
 
   "serializing and deserializing a Tuple2" in {
     val binder = PGBinder[Rdf, (Int, String)]
     val tuple = (42, "42")
-    binder.fromPG(binder.toPG(tuple)) must_==(Success(tuple))
+    assert(binder.fromPG(binder.toPG(tuple)) === (Success(tuple)))
   }
 
   "serializing and deserializing a Map" in {
     val binder = PGBinder[Rdf, Map[String, List[Int]]]
     val map = Map("1" -> List(1, 2, 3), "2" -> List(4, 5))
-    binder.fromPG(binder.toPG(map)) must_==(Success(map))
-    binder.fromPG(binder.toPG(Map.empty)) must_==(Success(Map.empty))
+    assert(binder.fromPG(binder.toPG(map)) === (Success(map)))
+    assert(binder.fromPG(binder.toPG(Map.empty)) === (Success(Map.empty)))
   }
 
   "serializing and deserializing an Either" in {
@@ -71,16 +74,16 @@ class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite 
     val StringPGBinder = PGBinder[Rdf, String]
     val left = Left("foo")
     val right = Right(List(1, 2, 3))
-    binder.fromPG(binder.toPG(left)) must_==(Success(left))
-    binder.fromPG(binder.toPG(right)) must_==(Success(right))
-    check(binder.fromPG(StringPGBinder.toPG("foo")).isFailure)
+    assert(binder.fromPG(binder.toPG(left)) === (Success(left)))
+    assert(binder.fromPG(binder.toPG(right)) === (Success(right)))
+    assert(binder.fromPG(StringPGBinder.toPG("foo")).isFailure)
   }
 
   "serializing and deserialiazing Option" in {
     val opts: Option[String] = Some("foo")
     implicit val binder = PGBinder[Rdf, Option[String]]
-    opts.toPG.as[Option[String]] must_==(Success(opts))
-    (None: Option[String]).toPG.as[Option[String]] must_==(Success(None))
+    opts.toPG.as[Option[String]] === (Success(opts))
+    (None: Option[String]).toPG.as[Option[String]] === (Success(None))
   }
 
   def `this must compile` {

@@ -1,8 +1,9 @@
 package org.w3.banana
 
-import com.inthenow.zcheck.SpecLite
+import org.scalatest.WordSpec
 
-class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+
+class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec {
 
   import ops._
 
@@ -18,18 +19,18 @@ class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
   "MGraph" should {
 
     "An empty MGraph must yield an empty Graph" in {
-      check(makeEmptyMGraph().makeIGraph() isIsomorphicWith Graph.empty)
+      assert(makeEmptyMGraph().makeIGraph() isIsomorphicWith Graph.empty)
     }
 
     "An MGraph must accept new triples" in {
       val mgraph = makeEmptyMGraph()
       triples.foreach(triple => mgraph += triple)
-      check(mgraph.makeIGraph() isIsomorphicWith Graph(triples))
-      check((makeEmptyMGraph() ++= triples).makeIGraph() isIsomorphicWith Graph(triples))
+      assert(mgraph.makeIGraph() isIsomorphicWith Graph(triples))
+      assert((makeEmptyMGraph() ++= triples).makeIGraph() isIsomorphicWith Graph(triples))
     }
 
     "Going back and forth between Graph and MGraph must work" in {
-      check(Graph(triples).makeMGraph().makeIGraph() isIsomorphicWith Graph(triples))
+      assert(Graph(triples).makeMGraph().makeIGraph() isIsomorphicWith Graph(triples))
     }
 
     // in some implementations, Rdf#Graph and Rdf#MGraph can share
@@ -39,25 +40,25 @@ class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
       val originalGraph = Graph(triples)
       val mgraph = originalGraph.makeMGraph()
       mgraph += Triple(ex("foo"), ex("bar"), ex("baz"))
-      check(originalGraph isIsomorphicWith Graph(triples))
+      assert(originalGraph isIsomorphicWith Graph(triples))
     }
 
     "An MGraph must be able to remove existing triples" in {
       val mgraph = Graph(triples).makeMGraph()
       mgraph -= Triple(BNode("foo"), ex("bar"), ex("baz"))
-      check(mgraph.makeIGraph() isIsomorphicWith Graph(Triple(BNode("foo"), ex("qux"), Literal("foobar"))))
+      assert(mgraph.makeIGraph() isIsomorphicWith Graph(Triple(BNode("foo"), ex("qux"), Literal("foobar"))))
     }
 
     "Trying to remove a non-existing triple must not fail" in {
       val mgraph = Graph(triples).makeMGraph()
       mgraph -= Triple(ex("does"), ex("not"), ex("exist"))
-      check(mgraph.makeIGraph() isIsomorphicWith Graph(triples))
+      assert(mgraph.makeIGraph() isIsomorphicWith Graph(triples))
     }
 
     "MGraph knows if a triple was already added" in {
       val mgraph = Graph(triples).makeMGraph()
-      check(! mgraph.exists(Triple(ex("does"), ex("not"), ex("exist"))))
-      check(mgraph.exists(Triple(BNode("foo"), ex("bar"), ex("baz"))))
+      assert(! mgraph.exists(Triple(ex("does"), ex("not"), ex("exist"))))
+      assert(mgraph.exists(Triple(BNode("foo"), ex("bar"), ex("baz"))))
     }
 
   }

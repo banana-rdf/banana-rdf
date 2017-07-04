@@ -26,16 +26,7 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.0"
-
-  /**
-   * scalaz for scalajs
-    *
-    * @see http://scalaz.org
-   * @see http://repo1.maven.org/maven2/com/github/japgolly/fork/scalaz
-   */
-  // Todo: %%%! --> %%%
-  val scalaz_js = Seq(libraryDependencies += "com.github.japgolly.fork.scalaz" %%%! "scalaz-core" % "7.1.1-2")
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.14"
 
   /**
    * joda-Time
@@ -59,7 +50,7 @@ object Dependencies {
     * @see http://www.scalatest.org
    * @see http://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = "org.scalatest" %% "scalatest" % "2.2.4"
+  val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
 
 
    /** ScalaCheck
@@ -68,36 +59,26 @@ object Dependencies {
     * @see http://repo1.maven.org/maven2/org/scalacheck/
     */
   //Todo:
-  val scalacheck = "com.github.inthenow" %% "scalacheck" % "1.12.2"
-  //Todo:
-  val scalacheckJs = Seq(libraryDependencies += "com.github.inthenow" %%%! "scalacheck" % "1.12.2")
+//  val scalacheck = "com.github.inthenow" %% "scalacheck" % "1.12.2"
 
-  val zcheckJs =  Seq(
-    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.2"
-  )
+//  val zcheckJvm = "com.github.inthenow" %% "zcheck" % "0.6.2"
 
-  val zcheckJsSettings = Seq(
-    resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
-    libraryDependencies += "com.github.inthenow" %%% "zcheck" % "0.6.2",
-    testFrameworks := Seq(new TestFramework("org.scalacheck.ScalaCheckFramework"))
-  ) ++ scalacheckJs
-
-  val zcheckJvm = "com.github.inthenow" %% "zcheck" % "0.6.2"
-
+/*
   val zcheckJvmSettings = Seq(
     resolvers += Resolver.url("inthenow-releases", url("http://dl.bintray.com/inthenow/releases"))(Resolver.ivyStylePatterns),
     libraryDependencies += "com.github.inthenow" %% "zcheck" % "0.6.2",
-    libraryDependencies += scalacheck,
+    //libraryDependencies += scalacheck,
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1", "-verbosity", "1")
   )
-  
+*/
+
   /**
    * Akka Http Core
     *
     * @see http://akka.io
    * @see http://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.0.1"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.0.6"
 
   /**
    * Apache Commons Logging
@@ -163,7 +144,7 @@ object Dependencies {
     * @see http://parboiled.org
    * @see http://repo1.maven.org/maven2/org/parboiled/
    */
-  val parboiled2 = "org.parboiled" %% "parboiled" % "2.0.0"
+  val parboiled2 = "org.parboiled" %% "parboiled" % "2.1.4"
 
   /**
    * jena-fuseki

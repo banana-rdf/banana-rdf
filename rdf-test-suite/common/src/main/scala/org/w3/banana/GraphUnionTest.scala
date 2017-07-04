@@ -1,9 +1,9 @@
 package org.w3.banana
 
-import com.inthenow.zcheck.SpecLite
+import org.scalatest.WordSpec
 import org.w3.banana.diesel._
 
-abstract class GraphUnionTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+abstract class GraphUnionTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec {
 
   import ops._
 
@@ -40,20 +40,20 @@ abstract class GraphUnionTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Spe
 
   "union must compute the union of two graphs, and should not touch the graphs" in {
     val result = union(foo :: bar :: Nil)
-    check(isomorphism(foo, fooReference))
-    check(isomorphism(bar, barReference))
-    check(! isomorphism(foo, bar))
-    check(isomorphism(foobar, result))
+    assert(isomorphism(foo, fooReference))
+    assert(isomorphism(bar, barReference))
+    assert(! isomorphism(foo, bar))
+    assert(isomorphism(foobar, result))
   }
 
   "union of Nil must return an empty graph" in {
     val result: Rdf#Graph = union(Nil)
-    check(isomorphism(result, emptyGraph))
+    assert(isomorphism(result, emptyGraph))
   }
 
   "union of a single graph must return an isomorphic graph" in {
     val result = union(foo :: Nil)
-    check(isomorphism(result, foo))
+    assert(isomorphism(result, foo))
   }
 
 }

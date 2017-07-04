@@ -1,11 +1,12 @@
 package org.w3.banana.diesel
 
+import org.scalatest.WordSpec
 import org.w3.banana._
 import org.w3.banana.syntax._
-import com.inthenow.zcheck.SpecLite
-import scalaz.Scalaz.{ none, some }
 
-class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+import scalaz.Scalaz.{none, some}
+
+class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec {
 
   import ops._
 
@@ -25,7 +26,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(bnode("betehess"), foaf.title, Literal("Mr"))
       )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
 
   }
 
@@ -49,7 +50,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(URI("http://bblfish.net/#hjs"), foaf.currentProject, URI("http://webid.info/"))
       )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
   }
 
   "Diesel must accept triples written in the inverse order o-p-s using <--" in {
@@ -69,7 +70,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
       )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
   }
 
   "Diesel must allow easy use of rdf:type through the method 'a'" in {
@@ -85,7 +86,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(bnode("betehess"), foaf.name, Literal.tagged("Alexandre", Lang("fr")))
       )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
   }
 
   "Diesel must allow objectList definition with simple syntax" in {
@@ -99,7 +100,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(bnode("betehess"), foaf.name, Literal.tagged("Alexander", Lang("en")))
       )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
   }
 
   "Diesel must allow explicit objectList definition" in {
@@ -123,7 +124,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(bnode("b"), foaf.name, Literal.tagged("Alexandre", Lang("fr")))
       )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
   }
 
   "Diesel with empty explicit objectList definition" in {
@@ -137,7 +138,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
       Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
     )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
   }
 
   "Diesel must understand Scala's native types" in {
@@ -156,7 +157,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(bnode("betehess"), foaf.height, Literal("1.8", xsd.double))
       )
 
-    check(g isIsomorphicWith expectedGraph)
+    assert(g isIsomorphicWith expectedGraph)
   }
 
   "Diesel must support RDF collections" in {
@@ -184,7 +185,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
       bnode("betehess") -- foaf.name ->- l
     )
 
-    check(g.graph isIsomorphicWith expectedGraph.graph)
+    assert(g.graph isIsomorphicWith expectedGraph.graph)
   }
 
   "Diesel must support RDF collections (empty list)" in {
@@ -197,7 +198,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
       bnode("betehess") -- foaf.name ->- rdf.nil
     )
 
-    check(g.graph isIsomorphicWith expectedGraph.graph)
+    assert(g.graph isIsomorphicWith expectedGraph.graph)
   }
 
   "providing a None as an object does not emit a triple" in {
@@ -212,7 +213,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
       bnode("betehess") -- foaf.name ->- "Alexandre"
     ).graph
 
-    check(g isIsomorphicWith expectedGraph)
+    assert(g isIsomorphicWith expectedGraph)
 
   }
 
@@ -230,7 +231,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
       -- foaf.age ->- 42
     ).graph
 
-    check(g isIsomorphicWith expectedGraph)
+    assert(g isIsomorphicWith expectedGraph)
 
   }
 
@@ -252,7 +253,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
         Triple(bnode("h"), foaf.height, Literal("1.92", xsd.double))
       )
 
-    check(g.graph isIsomorphicWith expectedGraph)
+    assert(g.graph isIsomorphicWith expectedGraph)
 
   }
 
@@ -273,7 +274,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Sp
       Triple(bnode("foo"), foaf.homepage, URI("http://example.com"))
     ))
 
-    check(pg.graph isIsomorphicWith expectedGraph)
+    assert(pg.graph isIsomorphicWith expectedGraph)
   }
 
 }

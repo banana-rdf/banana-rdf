@@ -1,9 +1,10 @@
 package org.w3.banana.diesel
 
+import org.scalatest.WordSpec
 import org.w3.banana._
 import org.w3.banana.syntax._
-import com.inthenow.zcheck.SpecLite
-import scalaz.Scalaz.{ none, some }
+
+import scalaz.Scalaz.{none, some}
 import org.w3.banana.PointedGraphs
 
 
@@ -92,7 +93,7 @@ object FAMILYPrefix {
  *  - Has a few, W3C defined mappings to exchange syntaxes, including RDF, Functional and Manchester Syntax
  *
  */
-class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec {
   import ops._
   import ToGraph._
   import scala.language.postfixOps
@@ -194,10 +195,10 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLit
       Triple(bnode("d"), URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#rest"),  bnode("c"))
     )
 
-    check(g         isIsomorphicWith expectedGraph)
-    check(fg.graph  isIsomorphicWith expectedGraph)
-    check(sg.graph  isIsomorphicWith expectedGraph)
-    check(sg2.graph isIsomorphicWith expectedGraph)
+    assert(g         isIsomorphicWith expectedGraph)
+    assert(fg.graph  isIsomorphicWith expectedGraph)
+    assert(sg.graph  isIsomorphicWith expectedGraph)
+    assert(sg2.graph isIsomorphicWith expectedGraph)
   }
 
   "Diesel/Owl must create the owl primer ontology" in {
@@ -422,7 +423,7 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLit
           -- owl.targetValue        ->- 53
 
     )
-   //check(g  isIsomorphicWith g2)
+   //assert(g  isIsomorphicWith g2)
   }
 
   "Diesel/Owl must compile" in {

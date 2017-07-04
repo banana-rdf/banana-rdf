@@ -2,10 +2,14 @@ package org.w3.banana
 package io
 
 import java.io._
-import com.inthenow.zcheck.SpecLite
-import org.w3.banana.{ Prefix, RDF, RDFOps }
+
+import org.w3.banana.{Prefix, RDF, RDFOps}
+
 import scalaz._
-import scalaz.syntax._, monad._, comonad._
+import scalaz.syntax._
+import monad._
+import comonad._
+import org.scalatest.WordSpec
 
 /**
  * Test Serialisations. Some serialisations have one parser and multiple serialisers, such
@@ -18,7 +22,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, Sin],
   writer: RDFWriter[Rdf, M, Sout]
-) extends SpecLite {
+) extends WordSpec {
 
   // both Monad and Comonad are Functors, so they compete for the
   // syntax. So we choose arbitrarily one of them.

@@ -1,8 +1,9 @@
 package org.w3.banana
 
-import com.inthenow.zcheck.SpecLite
+import org.scalatest.WordSpec
 
-class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
+
+class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec {
 
   import ops._
 
@@ -12,11 +13,11 @@ class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
     val (lexicalForm, datatype, langOpt) = fromLiteral(plainLiteral)
 
-    lexicalForm must_==("Alexandre")
+    assert(lexicalForm === ("Alexandre"))
 
-    datatype must_==(xsd.string)
+    assert(datatype === (xsd.string))
 
-    langOpt must_==(None)
+    assert(langOpt === (None))
 
   }
 
@@ -28,11 +29,11 @@ class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
     val (lexicalForm, datatype, langOpt) = fromLiteral(typedLiteral)
 
-    lexicalForm must_==("Alexandre")
+    assert(lexicalForm === ("Alexandre"))
 
-    datatype must_==(foaf.name)
+    assert(datatype === (foaf.name))
 
-    langOpt must_==(None)
+    assert(langOpt === (None))
 
   }
 
@@ -42,11 +43,11 @@ class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
 
     val (lexicalForm, datatype, langOpt) = fromLiteral(langLiteral)
 
-    lexicalForm must_==("Alexandre")
+    assert(lexicalForm === ("Alexandre"))
 
-    datatype must_==(Literal.rdfLangString)
+    assert(datatype === (Literal.rdfLangString))
 
-    langOpt must_==(Some(Lang("fr")))
+    assert(langOpt === (Some(Lang("fr"))))
 
   }
 
@@ -61,7 +62,7 @@ class RDFOpsTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite {
       case _                    => sys.error("should not arrive here")
     }
 
-    initialNodes must_==(nodes)
+    assert(initialNodes === (nodes))
 
   }
 

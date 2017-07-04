@@ -1,11 +1,12 @@
 package org.w3.banana
 
-import com.inthenow.zcheck.SpecLite
+import org.scalatest.WordSpec
+
 
 /**
  *  see org.w3.banana.binder.CommonBindersTest for more tests
  */
-class PointedGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite with SpecLiteExtra {
+class PointedGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec {
 
   import ops._
 
@@ -17,10 +18,10 @@ class PointedGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite w
     "with URI pointers" in {
       val pg1 = PointedGraph(henry, Graph.empty)
       val pg2 = PointedGraph(URI(henryURI))
-      pg1.pointer must_==(pg2.pointer)
-      pg1.graph must_==(pg2.graph)
+      assert(pg1.pointer === (pg2.pointer))
+      assert(pg1.graph === (pg2.graph))
       //yet
-      pg1 must_not_==(pg2)
+      assert(pg1 !==(pg2) )
     }
 
     "with bnode pointers" in {
@@ -29,7 +30,7 @@ class PointedGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends SpecLite w
       val pg1 = PointedGraph(bnode, graph)
       val pg2 = PointedGraph(bnode, graph)
 
-      pg1 must_not_==(pg2)
+      assert(pg1 !== (pg2) )
     }
 
   }
