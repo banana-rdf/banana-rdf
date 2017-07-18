@@ -17,6 +17,7 @@ with SparqlHttpModule
 with RDFXMLReaderModule
 with TurtleReaderModule
 with NTriplesReaderModule
+with JsonLDReaderModule
 with NTriplesWriterModule
 with RDFXMLWriterModule
 with TurtleWriterModule
@@ -57,6 +58,8 @@ with XmlQueryResultsReaderModule {
   implicit val n3Writer: RDFWriter[Jena, Try, N3] = JenaRDFWriter.n3Writer
 
   implicit val ntriplesWriter: RDFWriter[Jena, Try, NTriples] = new NTriplesWriter[Jena]
+
+  implicit val jsonldReader: RDFReader[Rdf, Try, JsonLd] = JenaRDFReader.jsonLdReader
 
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter.solutionsWriterJson
