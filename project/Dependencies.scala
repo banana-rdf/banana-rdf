@@ -54,7 +54,7 @@ object Dependencies {
 // https://github.com/lihaoyi/Ammonite/issues/664
 // val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.1.1"
 // the following downloads more, so it would be nice to be able to come back to previous unless more is needed
-   val jenaLibs = "org.apache.jena" % "jena-tdb" % "3.3.0"
+   val jenaLibs = "org.apache.jena" % "jena-tdb" % "3.4.0"
 
   /**
    * logback for jena
@@ -105,7 +105,7 @@ object Dependencies {
    * @see http://jena.apache.org/documentation/serving_data
    * @see http://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
-  val fusekiVersion =  "2.4.1"
+  val fusekiVersion =  "3.4.0"
   val fuseki = "org.apache.jena" % "apache-jena-fuseki" % fusekiVersion
   val fusekiServer = "org.apache.jena" % "jena-fuseki-server" % fusekiVersion
 

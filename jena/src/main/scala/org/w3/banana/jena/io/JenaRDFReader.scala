@@ -3,10 +3,14 @@ package org.w3.banana.jena.io
 import org.apache.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
 import org.apache.jena.rdf.model.{RDFReader => _}
 import java.io._
+import java.nio.charset.Charset
+
+import org.apache.commons.io.input.ReaderInputStream
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
 import org.w3.banana.io._
 import org.w3.banana.jena.{Jena, JenaOps}
+
 import scala.util._
 
 /** A triple sink that accumulates triples in a graph. */
@@ -50,13 +54,14 @@ object JenaRDFReader {
 
     def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      RDFParser.create().lang(lang).source(is).base(base).parse(sink)
+      RDFParser.create().source(is).lang(lang).base(base).parse(sink)
       sink.graph
     }
 
     def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      RDFDataMgr.parse(sink, reader.asInstanceOf[StringReader], base, lang)
+      // why is Jena deprecating Readers, which should be the correct level to parse character based documents?
+      RDFParser.create().source(new ReaderInputStream(reader,Charset.forName("utf-8"))).lang(lang).base(base).parse(sink)
       sink.graph
     }
   }
