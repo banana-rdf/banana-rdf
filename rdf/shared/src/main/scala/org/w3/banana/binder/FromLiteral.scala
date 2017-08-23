@@ -20,7 +20,7 @@ object FromLiteral {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[String] = {
       val Literal(lexicalForm, datatype, _) = literal
-      if (datatype == xsd.string)
+      if (datatype == xsd.string || datatype == rdf.langString )
         Success(lexicalForm)
       else
         Failure(FailedConversion(s"${literal} is not an xsd:string"))
