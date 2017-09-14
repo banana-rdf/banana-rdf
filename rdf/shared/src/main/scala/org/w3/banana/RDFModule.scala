@@ -41,6 +41,14 @@ trait SparqlHttpModule extends RDFModule {
 
 }
 
+trait SparqlHttpModuleWithUpdate extends RDFModule {
+
+  import java.net.URL
+
+  implicit val sparqlHttp: SparqlEngine[Rdf, Try, URL] with SparqlUpdate[Rdf,Try,URL]
+
+}
+
 trait RDFXMLReaderModule extends RDFModule {
 
   implicit val rdfXMLReader: RDFReader[Rdf, Try, RDFXML]
