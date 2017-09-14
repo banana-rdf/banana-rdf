@@ -39,7 +39,11 @@ with XmlQueryResultsReaderModule {
   implicit val sparqlGraph: SparqlEngine[Jena, Try, Jena#Graph] = JenaGraphSparqlEngine(ops)
 
   import java.net.URL
-  implicit val sparqlHttp: SparqlEngine[Jena, Try, URL] = new JenaSparqlHttpEngine
+  /**
+    * @deprecated see issue [[https://github.com/banana-rdf/banana-rdf/issues/332]]
+    */
+  @deprecated("see issue https://github.com/banana-rdf/banana-rdf/issues/332", "0.8.x")
+  implicit val sparqlHttp: SparqlEngine[Jena, Try, URL] with SparqlUpdate[Jena, Try, URL] = new JenaSparqlHttpEngine
 
   implicit val rdfStore: RDFStore[Jena, Try, Dataset] with SparqlUpdate[Jena, Try, Dataset] = new JenaDatasetStore(true)
 

@@ -41,6 +41,18 @@ trait SparqlHttpModule extends RDFModule {
 
 }
 
+/**
+  * @deprecated see issue [[https://github.com/banana-rdf/banana-rdf/issues/332]]
+  */
+@deprecated("see issue https://github.com/banana-rdf/banana-rdf/issues/332", "0.8.x")
+trait SparqlHttpModuleWithUpdate extends RDFModule {
+
+  import java.net.URL
+
+  implicit val sparqlHttp: SparqlEngine[Rdf, Try, URL] with SparqlUpdate[Rdf,Try,URL]
+
+}
+
 trait RDFXMLReaderModule extends RDFModule {
 
   implicit val rdfXMLReader: RDFReader[Rdf, Try, RDFXML]
