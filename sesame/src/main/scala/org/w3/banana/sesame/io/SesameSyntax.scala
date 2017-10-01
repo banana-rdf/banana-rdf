@@ -8,6 +8,7 @@ import org.openrdf.model.{Statement, URI => sURI}
 import org.openrdf.rio.RDFWriter
 import org.openrdf.rio.helpers.{JSONLDMode, JSONLDSettings}
 import org.openrdf.rio.rdfxml.{RDFXMLWriter => SRdfXmlWriter}
+import org.openrdf.rio.trig.{TriGWriter => STrigWriter}
 import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.w3.banana.io._
 
@@ -35,6 +36,26 @@ object SesameSyntax {
         super.handleStatement(st.relativizeAgainst(baseUri))
       }
     }
+  }
+
+  implicit val TriG: SesameSyntax[TriG] = new SesameSyntax[TriG] {
+
+    def write(uri: sURI, writer: Writer, baseURI: jURI) = {
+      val juri = new jURI(uri.toString)
+      val uriToWrite = baseURI.relativize(juri)
+      writer.write("<" + uriToWrite + ">")
+    }
+
+    override def rdfWriter(os: OutputStream, base: String): RDFWriter = new STrigWriter(os) {
+      val baseUri = new jURI(base)
+      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
+    }
+
+    override def rdfWriter(wr: Writer, base: String): RDFWriter = new STrigWriter(wr) {
+      val baseUri = new jURI(base)
+      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
+    }
+
   }
 
   implicit val Turtle: SesameSyntax[Turtle] = new SesameSyntax[Turtle] {
