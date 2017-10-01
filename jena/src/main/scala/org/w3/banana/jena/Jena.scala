@@ -3,12 +3,14 @@ package org.w3.banana.jena
 import org.apache.jena.graph.{ Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _ }
 import org.apache.jena.query.{ QuerySolution, ResultSet, Query => JenaQuery }
 import org.apache.jena.update.UpdateRequest
+import org.apache.jena.sparql.core.{Quad => JenaQuad}
 import org.w3.banana._
 
 trait Jena extends RDF {
   // types related to the RDF datamodel
   type Graph = JenaGraph
   type Triple = JenaTriple
+  type Quad = JenaQuad
   type Node = JenaNode
   type URI = Node_URI
   type BNode = Node_Blank

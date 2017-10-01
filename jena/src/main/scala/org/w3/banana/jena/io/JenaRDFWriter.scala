@@ -3,6 +3,7 @@ package io
 
 import java.io.{Writer => jWriter, _}
 
+import org.apache.jena.graph.Graph
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.impl.RDFWriterFImpl
 import org.apache.jena.rdfxml.xmloutput.impl.Abbreviated
@@ -50,6 +51,20 @@ object JenaRDFWriter {
       result.toString()
     }
 
+  }
+
+  val trigWriter: RDFWriter[Jena, Try, TriG] = new RDFWriter[Jena, Try, TriG] {
+    override def write(graph: Graph, os: OutputStream, base: String) = Try {
+      val relativeGraph = graph.relativize(URI(base))
+      RDFDataMgr.write(os, relativeGraph, JenaLang.TRIG)
+    }
+
+    override def asString(graph: Graph, base: String) = Try {
+      val result = new StringWriter()
+      val relativeGraph = graph.relativize(URI(base))
+      RDFDataMgr.write(result, relativeGraph, JenaLang.TRIG)
+      result.toString
+    }
   }
 
   val turtleWriter: RDFWriter[Jena, Try, Turtle] = new RDFWriter[Jena, Try, Turtle] {
