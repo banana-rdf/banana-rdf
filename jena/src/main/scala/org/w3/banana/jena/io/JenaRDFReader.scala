@@ -10,7 +10,7 @@ import org.apache.jena.sparql.core.Quad
 import org.w3.banana.io._
 import org.w3.banana.jena.{Jena, JenaOps}
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util._
 
@@ -68,7 +68,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(in, base)
     val graph: Jena#Graph = Factory.createDefaultGraph
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       graph.add(quad.asTriple())
     }
     graph
@@ -78,7 +78,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(reader, base)
     val graph: Jena#Graph = Factory.createDefaultGraph
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       graph.add(quad.asTriple())
     }
     graph
@@ -88,7 +88,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(is, base)
     val graphMap = mutable.Map.empty[Option[Jena#Node], Jena#Graph]
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       val context = Option(quad.getGraph)
       if(!graphMap.contains(context)) {
         val graph = Factory.createDefaultGraph()
@@ -106,7 +106,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(reader, base)
     val graphMap = mutable.Map.empty[Option[Jena#Node], Jena#Graph]
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       val context = Option(quad.getGraph)
       if(!graphMap.contains(context)) {
         val graph = Factory.createDefaultGraph()
@@ -123,7 +123,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(is, base)
     val graph: Jena#Graph = Factory.createDefaultGraph
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       if(quad.getGraph == graphName) {
         graph.add(quad.asTriple())
       }
@@ -135,7 +135,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(reader, base)
     val graph: Jena#Graph = Factory.createDefaultGraph
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       if(quad.getGraph == graphName) {
         graph.add(quad.asTriple())
       }
@@ -147,7 +147,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(is, base)
     val graph: Jena#Graph = Factory.createDefaultGraph
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       if(quad.isDefaultGraph  ) {
         graph.add(quad.asTriple())
       }
@@ -159,7 +159,7 @@ private class JenaRDFQuadReader[S](lang: Lang) extends RDFQuadReader[Jena, Try, 
     val iter = prepareQuadIterator(reader, base)
     val graph: Jena#Graph = Factory.createDefaultGraph
 
-    for(quad <- iter) {
+    for(quad <- iter.asScala) {
       if(quad.getGraph == Quad.tripleInQuad || quad.isDefaultGraph) {
         graph.add(quad.asTriple())
       }

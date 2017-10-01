@@ -7,7 +7,7 @@ import com.github.jsonldjava.sesame.SesameJSONLDParser
 import org.openrdf.model._
 import org.openrdf.model.impl._
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import org.w3.banana._
 import org.w3.banana.io._
 import org.w3.banana.sesame.{Sesame, SesameUtil}
@@ -40,7 +40,7 @@ abstract class AbstractQuadSesameReader[T] extends AbstractSesameReader[T] with 
 
   protected def getContextMap(triples: java.util.Collection[Statement]): Map[Option[Sesame#Node], Sesame#Graph] = {
     val graphMap = mutable.Map.empty[Option[Sesame#Node], Sesame#Graph]
-    for(statement <- triples) {
+    for(statement <- triples.asScala) {
       val context = Option(statement.getContext) match {
         case Some(uri: Sesame#URI) => Some(uri)
         case Some(uri: Sesame#BNode) => Some(uri)
