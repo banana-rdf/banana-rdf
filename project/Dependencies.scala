@@ -71,7 +71,7 @@ object Dependencies {
    * @see http://www.openrdf.org/
    * @see http://repo1.maven.org/maven2/org/openrdf/sesame/
    */
-  val sesameVersion = "2.8.9-SNAPSHOT"
+  val sesameVersion = "2.9.0"
 
   val sesameQueryAlgebra = "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion
   val sesameQueryParser = "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion

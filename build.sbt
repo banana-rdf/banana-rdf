@@ -50,13 +50,17 @@ lazy val publicationSettings = pomSettings ++ {
 //      releasePublishArtifactsAction := PgpKeys.publishSigned.value,
 //      publishArtifact in Test := false
     )
-    case Some("artifactory") =>
+    case Some(pubre(host, path)) =>
       Seq(
         publishTo := Some(
-          "Artifactory Realm" at "http://wgserver2:8081/artifactory/nubivis;build.timestamp=" + new java.util.Date().getTime
+          Resolver.ssh("banana.publish specified server",
+            host,
+            path + {
+              if (isSnapshot.value) "snapshots" else "releases"
+            }
+          )
         ),
-        publishArtifact in Test := false,
-        credentials += Credentials(new File("credentials.properties"))
+        publishArtifact in Test := false
       )
     case other => Seq()
   }
@@ -64,13 +68,10 @@ lazy val publicationSettings = pomSettings ++ {
 
 lazy val commonSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
   organization := "org.w3",
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.1",
   crossScalaVersions := Seq("2.11.8", "2.12.1"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-  resolvers ++= Seq(
-    "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
-    Resolver.mavenLocal
-  ),
+  resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
   fork := false,
   parallelExecution in Test := false,
   offline := true,
@@ -112,7 +113,6 @@ lazy val rdfTestSuite = crossProject
   .settings(
     name := "banana-test",
     libraryDependencies += scalatest,
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.1",
     libraryDependencies += jodaTime,
     libraryDependencies += jodaConvert,
     libraryDependencies += fuseki,
