@@ -3,6 +3,8 @@ package io
 
 import org.apache.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
 import org.apache.jena.rdf.model.{RDFReader => _}
+import org.apache.jena.riot.RDFParser
+
 import java.io._
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
@@ -49,17 +51,19 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 object JenaRDFReader {
 
   def makeRDFReader[S](ops: JenaOps, lang: Lang): RDFReader[Jena, Try, S] = new RDFReader[Jena, Try, S] {
-    val factory = RDFParserRegistry.getFactory(lang)
+    // NOTE: There is also forceLang(lang)
+    val factory = RDFParser.create().lang(lang)
+      println(s"after RDFParser.create().lang($lang)")
 
     def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      factory.create(lang).read(is, base, null, sink, null)
-      //      RDFDataMgr.parse(sink, is, base, lang)
+      factory.base(base).source(is).build().parse(sink)
       sink.graph
     }
 
     def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
+      println(s"after new TripleSink; lang=$lang")
       RDFDataMgr.parse(sink, reader.asInstanceOf[StringReader], base, lang)
       sink.graph
     }
@@ -73,7 +77,12 @@ object JenaRDFReader {
      *  (content negotiation or extension).
      */
     def load(url: java.net.URL): Try[Jena#Graph] = {
-      Try(RDFDataMgr.loadGraph(url.toString))
+      Try{
+        RDFDataMgr.loadGraph(url.toString)
+//    	  val sink = new TripleSink
+//        RDFParser.create().source(url.toExternalForm()).parse(sink)
+//        sink.graph
+      }
     }
   }
 
