@@ -56,7 +56,6 @@ object JenaRDFReader {
   def makeRDFReader[S](ops: JenaOps, lang: Lang): RDFReader[Jena, Try, S] = new RDFReader[Jena, Try, S] {
     // NOTE: There is also forceLang(lang)
     val factory = RDFParser.create().lang(lang)
-      println(s"after RDFParser.create().lang($lang)")
 
     def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
@@ -66,8 +65,7 @@ object JenaRDFReader {
 
     def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      println(s"after new TripleSink; lang=$lang")
-      val cs: Charset  = StandardCharsets.UTF_8
+      val cs: Charset = StandardCharsets.UTF_8
       val is = new ReaderInputStream(reader, cs)
       factory.base(base).source(is).build().parse(sink)
       sink.graph
