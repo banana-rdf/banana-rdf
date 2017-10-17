@@ -11,6 +11,9 @@ import org.apache.jena.riot.system._
 import org.w3.banana.io._
 import org.w3.banana.jena.{ Jena, JenaOps }
 import scala.util._
+import java.nio.charset.Charset
+import org.apache.commons.io.input.ReaderInputStream
+import java.nio.charset.StandardCharsets
 
 /** A triple sink that accumulates triples in a graph. */
 final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
@@ -64,7 +67,9 @@ object JenaRDFReader {
     def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
       println(s"after new TripleSink; lang=$lang")
-      RDFDataMgr.parse(sink, reader.asInstanceOf[StringReader], base, lang)
+      val cs: Charset  = StandardCharsets.UTF_8
+      val is = new ReaderInputStream(reader, cs)
+      factory.base(base).source(is).build().parse(sink)
       sink.graph
     }
   }
