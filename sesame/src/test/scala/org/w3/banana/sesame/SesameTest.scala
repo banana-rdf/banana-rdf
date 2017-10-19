@@ -8,6 +8,10 @@ object SesameGraphTest extends GraphTest[Sesame]
 
 object SesameMGraphTest extends MGraphTest[Sesame]
 
+import org.w3.banana.io._
+
+object SesameRDFLoaderTestSuite extends RDFLoaderTestSuite with SesameModule
+
 import org.w3.banana.isomorphism._
 
 object SesameIsomorphismTest extends IsomorphismTest[Sesame]

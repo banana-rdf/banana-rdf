@@ -158,7 +158,7 @@ object DCTPrefix {
   def apply[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new DCTPrefix(ops)
 }
 
-class DCTPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("dc", "http://purl.org/dc/terms/")(ops) {
+class DCTPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("dct", "http://purl.org/dc/terms/")(ops) {
   val title = apply("title")
 
 }

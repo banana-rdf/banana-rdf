@@ -9,21 +9,21 @@ import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait JenaModule
-extends RDFModule
-with RDFOpsModule
-with RecordBinderModule
-with SparqlGraphModule
-with SparqlHttpModule
-with RDFXMLReaderModule
-with TurtleReaderModule
-with NTriplesReaderModule
-with NTriplesWriterModule
-with RDFXMLWriterModule
-with TurtleWriterModule
-with JsonSolutionsWriterModule
-with XmlSolutionsWriterModule
-with JsonQueryResultsReaderModule
-with XmlQueryResultsReaderModule {
+    extends RDFModule
+    with RDFOpsModule
+    with RecordBinderModule
+    with SparqlGraphModule
+    with SparqlHttpModule
+    with RDFXMLReaderModule
+    with TurtleReaderModule
+    with NTriplesReaderModule
+    with NTriplesWriterModule
+    with RDFXMLWriterModule
+    with TurtleWriterModule
+    with JsonSolutionsWriterModule
+    with XmlSolutionsWriterModule
+    with JsonQueryResultsReaderModule
+    with XmlQueryResultsReaderModule {
 
   type Rdf = Jena
 
@@ -58,6 +58,8 @@ with XmlQueryResultsReaderModule {
 
   implicit val ntriplesWriter: RDFWriter[Jena, Try, NTriples] = new NTriplesWriter[Jena]
 
+  implicit val rdfLoader: RDFLoader[Jena, Try] = JenaRDFReader.rdfLoader
+
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter.solutionsWriterJson
 
@@ -73,4 +75,6 @@ with XmlQueryResultsReaderModule {
   implicit val jsonldCompactedWriter: RDFWriter[Jena, Try, JsonLdCompacted] =
     JenaRDFWriter.jsonldCompactedWriter
 
+  implicit val jsonldReader: RDFReader[Jena, Try, JsonLd] =
+    JenaRDFReader.jsonldReader
 }

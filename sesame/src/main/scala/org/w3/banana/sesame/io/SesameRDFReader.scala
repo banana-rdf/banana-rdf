@@ -1,11 +1,12 @@
-package org.w3.banana.sesame.io
+package org.w3.banana.sesame
+package io
 
 import java.io._
 import java.util.LinkedList
 
 import com.github.jsonldjava.sesame.SesameJSONLDParser
 import org.openrdf.model._
-import org.openrdf.model.impl.{LinkedHashModel, LiteralImpl, StatementImpl}
+import org.openrdf.model.impl.{ LinkedHashModel, LiteralImpl, StatementImpl }
 import org.w3.banana._
 import org.w3.banana.io._
 import org.w3.banana.sesame.Sesame
@@ -74,4 +75,3 @@ class SesameRDFXMLReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesam
 class SesameJSONLDReader(implicit val ops: RDFOps[Sesame]) extends AbstractSesameReader[JsonLd] {
   def getParser() = new SesameJSONLDParser
 }
-
