@@ -44,7 +44,6 @@ object jsonldHelper {
 }
 
 @js.native
-@js.annotation.JSGlobal
 object jsonld extends js.Object {
 
   def toRDF(

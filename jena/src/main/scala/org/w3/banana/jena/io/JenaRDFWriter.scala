@@ -6,10 +6,7 @@ import java.io.{Writer => jWriter, _}
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.impl.RDFWriterFImpl
 import org.apache.jena.rdfxml.xmloutput.impl.Abbreviated
-import org.apache.jena.riot.{Lang => JenaLang}
-import org.apache.jena.riot.RDFDataMgr
-import org.apache.jena.riot.RDFLanguages
-
+import org.apache.jena.riot.{Lang => JenaLang, _}
 import org.w3.banana.io._
 import org.w3.banana.jena.Jena.ops._
 
