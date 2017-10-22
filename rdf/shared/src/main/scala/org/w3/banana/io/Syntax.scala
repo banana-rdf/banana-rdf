@@ -4,6 +4,7 @@ package io
 /* Some well-known syntaxes so that we can refer to them in banana-rdf. */
 
 trait N3
+trait TriG
 trait Turtle
 trait NTriples
 trait RDFXML

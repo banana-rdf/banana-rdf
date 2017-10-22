@@ -31,6 +31,8 @@ class SesameRDFWriterHelper(implicit ops: SesameOps) {
 
   implicit val rdfxmlWriter: RDFWriter[Sesame, Try, RDFXML] = new SesameRDFWriter[RDFXML]
 
+  implicit val trigWriter: RDFWriter[Sesame, Try, TriG] = new SesameRDFWriter[TriG]
+
   implicit val turtleWriter: RDFWriter[Sesame, Try, Turtle] = new SesameRDFWriter[Turtle]
 
   implicit val jsonldCompactedWriter: RDFWriter[Sesame, Try, JsonLdCompacted] = new SesameRDFWriter[JsonLdCompacted]

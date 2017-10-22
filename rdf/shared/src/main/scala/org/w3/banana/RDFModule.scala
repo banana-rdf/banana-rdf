@@ -47,6 +47,12 @@ trait RDFXMLReaderModule extends RDFModule {
 
 }
 
+trait TriGReaderModule extends RDFModule {
+
+  implicit val triGReader: RDFQuadReader[Rdf, Try, TriG]
+
+}
+
 trait TurtleReaderModule extends RDFModule {
 
   implicit val turtleReader: RDFReader[Rdf, Try, Turtle]
@@ -80,6 +86,12 @@ trait JsonLDWriterModule extends RDFModule {
 trait RDFXMLWriterModule extends RDFModule {
 
   implicit val rdfXMLWriter: RDFWriter[Rdf, Try, RDFXML]
+
+}
+
+trait TriGWriterModule extends RDFModule {
+
+  implicit  val triGWriter: RDFWriter[Rdf, Try, TriG]
 
 }
 

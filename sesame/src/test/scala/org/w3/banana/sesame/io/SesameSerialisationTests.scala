@@ -7,6 +7,10 @@ import org.w3.banana.util.tryInstances._
 
 class SesameTurtleTests extends TurtleTestSuite[Sesame, Try]
 
+class SesameTriGTests extends TriGTestSuite[Sesame, Try]
+
+class SesameTriGReaderTestSuite extends TriGReaderTestSuite[Sesame]
+
 class SesameNTripleReaderTestSuite extends NTriplesReaderTestSuite[Sesame]
 
 class SesameNTripleWriterTestSuite extends NTriplesWriterTestSuite[Sesame]

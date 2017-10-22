@@ -11,6 +11,7 @@ trait Sesame extends RDF {
   // types related to the RDF datamodel
   type Graph = Model
   type Triple = Statement
+  type Quad = Statement
   type Node = Value
   type URI = SesameURI
   type BNode = SesameBNode

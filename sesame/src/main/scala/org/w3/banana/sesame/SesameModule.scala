@@ -14,10 +14,12 @@ trait SesameModule
     with SparqlGraphModule
     // with SparqlHttpModule
     with RDFXMLReaderModule
+    with TriGReaderModule
     with TurtleReaderModule
     with NTriplesReaderModule
     with JsonLDReaderModule
     with RDFXMLWriterModule
+    with TriGWriterModule
     with TurtleWriterModule
     with NTriplesWriterModule
     with JsonLDWriterModule
@@ -40,6 +42,8 @@ trait SesameModule
 
   implicit val rdfXMLReader: RDFReader[Sesame, Try, RDFXML] = new SesameRDFXMLReader
 
+  implicit val triGReader: RDFQuadReader[Sesame, Try, TriG] = new SesameTriGReader
+
   implicit val turtleReader: RDFReader[Sesame, Try, Turtle] = new SesameTurtleReader
 
   implicit val jsonldReader: RDFReader[Sesame, Try, JsonLd] = new SesameJSONLDReader
@@ -49,6 +53,8 @@ trait SesameModule
   implicit val sesameRDFWriterHelper = new SesameRDFWriterHelper
 
   implicit val rdfXMLWriter: RDFWriter[Sesame, Try, RDFXML] = sesameRDFWriterHelper.rdfxmlWriter
+
+  implicit val triGWriter: RDFWriter[Sesame, Try, TriG] = sesameRDFWriterHelper.trigWriter
 
   implicit val turtleWriter: RDFWriter[Sesame, Try, Turtle] = sesameRDFWriterHelper.turtleWriter
 

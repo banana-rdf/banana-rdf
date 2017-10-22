@@ -10,6 +10,7 @@ trait Plantain extends RDF {
   // types related to the RDF datamodel
   type Graph = model.Graph[Node, URI, Node]
   type Triple = (Node, URI, Node)
+  type Quad = (Node, URI, Node, Node)
   type Node = Any
   type URI = java.net.URI
   type BNode = model.BNode
