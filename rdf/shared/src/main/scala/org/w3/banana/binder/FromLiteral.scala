@@ -59,22 +59,6 @@ object FromLiteral {
     }
   }
 
-  implicit def LongFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Long] {
-    import ops._
-    def fromLiteral(literal: Rdf#Literal): Try[Long] = {
-      val Literal(lexicalForm, datatype, _) = literal
-      if (datatype == xsd.integer) {
-        try {
-          Success(lexicalForm.toLong)
-        } catch {
-          case _: NumberFormatException => Failure(FailedConversion(s"${literal} is an xsd.integer but is not an acceptable long"))
-        }
-      } else {
-        Failure(FailedConversion(s"${literal} is not an xsd:int"))
-      }
-    }
-  }
-
   implicit def BigIntFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, BigInteger] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[BigInteger] = {
@@ -100,22 +84,6 @@ object FromLiteral {
           Success(lexicalForm.toDouble)
         } catch {
           case _: NumberFormatException => Failure(FailedConversion(s"${literal} is an xsd.double but is not an acceptable double"))
-        }
-      } else {
-        Failure(FailedConversion(s"${literal} is not an xsd:double"))
-      }
-    }
-  }
-
-  implicit def FloatFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Float] {
-    import ops._
-    def fromLiteral(literal: Rdf#Literal): Try[Float] = {
-      val Literal(lexicalForm, datatype, _) = literal
-      if (datatype == xsd.double || datatype == xsd.float) {
-        try {
-          Success(lexicalForm.toFloat)
-        } catch {
-          case _: NumberFormatException => Failure(FailedConversion(s"${literal} is an xsd.double but is not an acceptable float"))
         }
       } else {
         Failure(FailedConversion(s"${literal} is not an xsd:double"))
