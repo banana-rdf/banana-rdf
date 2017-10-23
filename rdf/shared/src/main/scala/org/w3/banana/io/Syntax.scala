@@ -12,6 +12,6 @@ trait SparqlAnswerJson
 trait SparqlAnswerXml
 
 trait JsonLd
-trait JsonLdCompacted
-trait JsonLdExpanded
-trait JsonLdFlattened
+trait JsonLdCompacted extends JsonLd
+trait JsonLdExpanded extends JsonLd
+trait JsonLdFlattened extends JsonLd

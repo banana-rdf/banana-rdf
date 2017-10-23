@@ -3,10 +3,14 @@ package org.w3.banana.jena.io
 import org.apache.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
 import org.apache.jena.rdf.model.{RDFReader => _}
 import java.io._
+import java.nio.charset.Charset
+
+import org.apache.commons.io.input.ReaderInputStream
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._
 import org.w3.banana.io._
 import org.w3.banana.jena.{Jena, JenaOps}
+
 import scala.util._
 
 /** A triple sink that accumulates triples in a graph. */
@@ -47,18 +51,17 @@ final class TripleSink(implicit ops: JenaOps) extends StreamRDF {
 object JenaRDFReader {
 
   def makeRDFReader[S](ops: JenaOps, lang: Lang): RDFReader[Jena, Try, S] = new RDFReader[Jena, Try, S] {
-    val factory = RDFParserRegistry.getFactory(lang)
 
     def read(is: InputStream, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      factory.create(lang).read(is, base, null, sink, null)
-      //      RDFDataMgr.parse(sink, is, base, lang)
+      RDFParser.create().source(is).lang(lang).base(base).parse(sink)
       sink.graph
     }
 
     def read(reader: Reader, base: String): Try[Jena#Graph] = Try {
       val sink = new TripleSink
-      RDFDataMgr.parse(sink, reader.asInstanceOf[StringReader], base, lang)
+      // why is Jena deprecating Readers, which should be the correct level to parse character based documents?
+      RDFParser.create().source(new ReaderInputStream(reader,Charset.forName("utf-8"))).lang(lang).base(base).parse(sink)
       sink.graph
     }
   }
@@ -69,4 +72,5 @@ object JenaRDFReader {
 
   implicit def n3Reader()(implicit ops: JenaOps): RDFReader[Jena, Try, N3] = makeRDFReader[N3](ops, Lang.N3)
 
+  implicit def jsonLdReader()(implicit ops: JenaOps): RDFReader[Jena,Try,JsonLd] = makeRDFReader[JsonLd](ops,Lang.JSONLD)
 }
