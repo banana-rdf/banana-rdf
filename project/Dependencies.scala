@@ -50,11 +50,7 @@ object Dependencies {
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
-// this does not work with  version 1.0.0 of Ammonite
-// https://github.com/lihaoyi/Ammonite/issues/664
-// val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.1.1"
-// the following downloads more, so it would be nice to be able to come back to previous unless more is needed
-   val jenaLibs = "org.apache.jena" % "jena-tdb" % "3.4.0"
+ val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.4.0"
 
   /**
    * logback for jena
