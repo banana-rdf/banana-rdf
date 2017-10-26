@@ -13,6 +13,9 @@ class SesameRDFWriter[T](implicit
 
   def write(graph: Sesame#Graph, os: OutputStream, base: String, prefixes: Prefix[Sesame]*): Try[Unit] = Try {
     val sWriter = sesameSyntax.rdfWriter(os, base)
+    prefixes.foreach(p => {
+      sWriter.handleNamespace(p.prefixName, p.prefixIri)
+    })
     sWriter.startRDF()
     ops.getTriples(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
@@ -21,6 +24,9 @@ class SesameRDFWriter[T](implicit
   def asString(graph: Sesame#Graph, base: String, prefixes: Prefix[Sesame]*): Try[String] = Try {
     val result = new StringWriter()
     val sWriter = sesameSyntax.rdfWriter(result, base)
+    prefixes.foreach(p => {
+      sWriter.handleNamespace(p.prefixName, p.prefixIri)
+    })
     sWriter.startRDF()
     ops.getTriples(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
