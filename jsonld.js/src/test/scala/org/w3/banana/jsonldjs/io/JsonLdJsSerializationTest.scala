@@ -6,7 +6,10 @@ import org.w3.banana.plantain._
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-object JsonLdJsSerializationTest extends AsyncWordSpec with Matchers {
+class JsonLdJsSerializationTest extends AsyncWordSpec with Matchers {
+
+  implicit override def executionContext =
+    scala.concurrent.ExecutionContext.Implicits.global
 
   import PlantainOps._
 
@@ -19,11 +22,13 @@ object JsonLdJsSerializationTest extends AsyncWordSpec with Matchers {
   val baseUri = "http://www.example.org"
 
   val srGraph = (
-    BNode()
+    URI("http://www.example.org/Manu")
       -- schema("name") ->- "Manu Sporny"
       -- schema("url") ->- URI("http://manu.sporny.org/")
       -- schema("image") ->- URI("http://manu.sporny.org/images/manu.png")
     ).graph
+
+  val jsonldRefString = """[{"@id":"http://www.example.org/Manu","http://schema.org/image":[{"@id":"http://manu.sporny.org/images/manu.png"}],"http://schema.org/url":[{"@id":"http://manu.sporny.org/"}],"http://schema.org/name":[{"@value":"Manu Sporny"}]}]"""
 
   "From Graph to JSONLd" in {
 
@@ -32,11 +37,7 @@ object JsonLdJsSerializationTest extends AsyncWordSpec with Matchers {
 
     fut.map { jsonldString =>
       println(jsonldString)
-      jsonldString shouldEqual """{
-"http://schema.org/name": "Manu Sporny",
-"http://schema.org/url": {"@id": "http://manu.sporny.org/"},
-"http://schema.org/image": {"@id": "http://manu.sporny.org/images/manu.png"}
-}"""
+      jsonldString shouldEqual jsonldRefString
     }
 
   }
