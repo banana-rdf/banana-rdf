@@ -51,7 +51,9 @@ object jsonldHelper {
 
   def fromRDF[Rdf <: RDF](_graph: Rdf#Graph, base: String)(implicit ops: RDFOps[Rdf]): Future[js.Dynamic] = {
     val promise = Promise[js.Dynamic]()
-    val dataset = fromRDFToDataset(_graph)
+    val dataset = Map(
+      "@default" -> fromRDFToDataset(_graph)
+    ).toJSDictionary
     jsonld.fromRDF(
       dataset,
       js.Dictionary(
@@ -79,7 +81,7 @@ object jsonld extends js.Object {
            ): Unit = js.native
 
   def fromRDF(
-               dataset: js.Array[js.Dictionary[js.Dictionary[String]]],
+               dataset: js.Dictionary[js.Array[js.Dictionary[js.Dictionary[String]]]],
                options: js.Dictionary[String],
                callback: js.Function2[js.Error, js.Dynamic, Unit]
              ): Unit = js.native
@@ -119,16 +121,17 @@ object Node {
   def fromBananaNode[Rdf <: RDF](node: Rdf#Node)(implicit ops: RDFOps[Rdf]): js.Dictionary[String] = {
     import ops._
     node match {
-      case uri@URI(_uri) =>
+      case URI(_uri) =>
         Map(
           "type" -> "IRI",
           "value" -> _uri
         )
-      case bnode@BNode(_) =>
+      case BNode(_label) =>
         Map(
-          "type" -> "blank node"
+          "type" -> "blank node",
+          "value" -> s"_:${_label}"
         )
-      case literal@Literal(lexical, datatype, lang) =>
+      case Literal(lexical, datatype, lang) =>
         Map(
           "type" -> "literal",
           "value" -> lexical,
