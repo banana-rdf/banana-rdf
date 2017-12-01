@@ -1,8 +1,6 @@
-import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
+import Dependencies._
 import sbt.Keys._
 import sbt._
-import Dependencies._
-import com.typesafe.sbt.pgp.PgpKeys
 
 lazy val pomSettings = Seq(
   pomIncludeRepository := { _ => false},
@@ -66,6 +64,10 @@ lazy val publicationSettings = pomSettings ++ {
   }
 }
 
+lazy val defaultScalariformSettings = Seq(
+  scalariformAutoformat := false
+)
+
 lazy val commonSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
   organization := "org.w3",
   scalaVersion := "2.12.1",
@@ -88,7 +90,7 @@ lazy val rdf = crossProject
   .settings(commonSettings: _*)
   .settings(
     name := "banana-rdf",
-    libraryDependencies += scalaz
+    libraryDependencies += "org.scalaz" %%% "scalaz-core" % scalazVersion
   )
   .jvmSettings(
     libraryDependencies ++= Seq(jodaTime, jodaConvert)
@@ -112,7 +114,7 @@ lazy val rdfTestSuite = crossProject
   .settings(commonSettings: _*)
   .settings(
     name := "banana-test",
-    libraryDependencies += scalatest,
+    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion,
     libraryDependencies += jodaTime,
     libraryDependencies += jodaConvert,
     libraryDependencies += fuseki,
@@ -139,13 +141,15 @@ lazy val plantain = crossProject
 lazy val plantainJS = plantain.js
 lazy val plantainJVM = plantain.jvm
 
-lazy val jena = Project("jena", file("jena"), settings = commonSettings)
+lazy val jena = Project("jena", file("jena"))
+  .settings(commonSettings: _*)
   .settings(
     name := "banana-jena",
     libraryDependencies ++= Seq(jenaLibs, commonsLogging, aalto )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
-lazy val sesame = Project("sesame", file("sesame"), settings = commonSettings)
+lazy val sesame = Project("sesame", file("sesame"))
+  .settings(commonSettings: _*)
   .settings(
     name := "banana-sesame",
     libraryDependencies ++= Seq(
@@ -162,29 +166,34 @@ lazy val sesame = Project("sesame", file("sesame"), settings = commonSettings)
     )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
-lazy val jsonldJS = Project("jsonld", file("jsonld.js"), settings = commonSettings)
+lazy val jsonldJS = Project("jsonld", file("jsonld.js"))
+  .settings(commonSettings: _*)
+  .settings()
   .settings(
-    name := "banana-jsonld"
-  ).dependsOn(rdfJS, ntriplesJS, plantainJS, rdfTestSuiteJS % "test->compile")
+    name := "banana-jsonld",
+    jsDependencies ++= Seq( ProvidedJS / "jsonld.js" commonJSName "jsonld" )
+  )
+  .dependsOn(rdfJS, ntriplesJS, plantainJS, rdfTestSuiteJS % "test->compile")
   .enablePlugins(ScalaJSPlugin)
 
-lazy val examples = Project("examples", file("misc/examples"), settings = commonSettings)
+lazy val examples = Project("examples", file("misc/examples"))
+  .settings(commonSettings: _*)
   .settings(
     name := "banana-examples"
   ).dependsOn(sesame, jena)
 
 lazy val runExamplesStr =
-  ";examples/run-main org.w3.banana.examples.GraphExampleWithJena" +
-    ";examples/run-main org.w3.banana.examples.GraphExampleWithSesame" +
-    ";examples/run-main org.w3.banana.examples.IOExampleWithJena" +
-    ";examples/run-main org.w3.banana.examples.IOExampleWithSesame" +
-    ";examples/run-main org.w3.banana.examples.SPARQLExampleWithJena"
-
-name := "banana"
+  ";examples/runMain org.w3.banana.examples.GraphExampleWithJena" +
+    ";examples/runMain org.w3.banana.examples.GraphExampleWithSesame" +
+    ";examples/runMain org.w3.banana.examples.IOExampleWithJena" +
+    ";examples/runMain org.w3.banana.examples.IOExampleWithSesame" +
+    ";examples/runMain org.w3.banana.examples.SPARQLExampleWithJena"
 
 commonSettings
 
-unidocSettings
+enablePlugins(ScalaUnidocPlugin)
+
+name := "banana"
 
 addCommandAlias("validate", ";compile;test;runExamples")
 
