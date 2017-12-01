@@ -6,7 +6,6 @@ import org.scalatest.{AsyncWordSpec, Matchers}
 import org.w3.banana.plantain._
 
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class JsonLdJsParserTest extends AsyncWordSpec with Matchers {
 
@@ -23,7 +22,7 @@ class JsonLdJsParserTest extends AsyncWordSpec with Matchers {
   val schema = Prefix[Plantain]("schema", "http://schema.org/")
 
   val srGraph = (
-    BNode()
+    URI("http://www.example.org/Manu")
       -- schema("name") ->- "Manu Sporny"
       -- schema("url") ->- URI("http://manu.sporny.org/")
       -- schema("image") ->- URI("http://manu.sporny.org/images/manu.png")
@@ -40,12 +39,7 @@ class JsonLdJsParserTest extends AsyncWordSpec with Matchers {
 
     parser.read(sr, "http://example.com").map { g =>
 
-      //(g isIsomorphicWith srGraph) shouldEqual true
-      val subj = URI("http://www.example.org/Manu")
-
-      g.size shouldEqual 3
-      for(triple <- g.triples) println(triple.toString())
-      g.contains( Triple(subj, schema("name"), Literal("Manu Sporny")) ) shouldEqual true
+      (g isIsomorphicWith srGraph) shouldEqual true
     }
 
   }
