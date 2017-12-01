@@ -36,7 +36,6 @@ class JsonLdJsSerializationTest extends AsyncWordSpec with Matchers {
     //fut shouldBe defined
 
     fut.map { jsonldString =>
-      println(jsonldString)
       jsonldString shouldEqual jsonldRefString
     }
 
