@@ -3,6 +3,7 @@ package jsonldjs
 
 import scala.scalajs.js
 import scala.concurrent.{ Future, Promise }
+import scala.scalajs.js.annotation.{ JSGlobal }
 
 // the content of jsonldHelper should be in jsonld but it doesn't
 // work! Don't know why...
@@ -21,15 +22,14 @@ object jsonldHelper {
         } else {
           val triples =
             data.selectDynamic("@default")
-                .asInstanceOf[js.Array[js.Dictionary[js.Dictionary[String]]]]
+              .asInstanceOf[js.Array[js.Dictionary[js.Dictionary[String]]]]
           triples.foreach { (triple: js.Dictionary[js.Dictionary[String]]) =>
             mgraph += Triple.toBananaTriple(triple)
           }
           promise.success(mgraph.makeIGraph())
         }
         ()
-      }
-    )
+      })
     promise.future
   }
 
@@ -44,13 +44,13 @@ object jsonldHelper {
 }
 
 @js.native
+@JSGlobal
 object jsonld extends js.Object {
 
   def toRDF(
     doc: js.Dynamic,
     format: js.Dictionary[String],
-    callback: js.Function2[js.Error, js.Dynamic, Unit]
-  ): Unit = js.native
+    callback: js.Function2[js.Error, js.Dynamic, Unit]): Unit = js.native
 
 }
 
@@ -68,8 +68,7 @@ object Triple {
     ops.makeTriple(
       Node.toBananaNode(triple("subject")),
       ops.makeUri(triple("predicate")("value")),
-      Node.toBananaNode(triple("object"))
-    )
+      Node.toBananaNode(triple("object")))
   }
 
 }

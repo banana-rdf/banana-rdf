@@ -2,13 +2,12 @@ package org.w3.banana
 package jsonldjs
 package io
 
-
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.{ Matchers, WordSpec }
 
 import scalajs.concurrent.JSExecutionContext.Implicits.queue
 import org.w3.banana.plantain._
 
-object JsonLdJsParserTest extends WordSpec with Matchers {
+class JsonLdJsParserTest extends WordSpec with Matchers {
 
   import PlantainOps._
 
@@ -28,10 +27,9 @@ object JsonLdJsParserTest extends WordSpec with Matchers {
       import org.w3.banana.binder.ToURI.URIToURI
       val graph = (
         BNode()
-          -- schema("name") ->- "Manu Sporny"
-          -- schema("url") ->- URI("http://manu.sporny.org/")
-          -- schema("image") ->- URI("http://manu.sporny.org/images/manu.png")
-      ).graph
+        -- schema("name") ->- "Manu Sporny"
+        -- schema("url") ->- URI("http://manu.sporny.org/")
+        -- schema("image") ->- URI("http://manu.sporny.org/images/manu.png")).graph
 
       (g isIsomorphicWith graph) shouldEqual true
     }
