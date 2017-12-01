@@ -4,12 +4,11 @@ import org.scalatest.{AsyncWordSpec, Matchers}
 import org.w3.banana.Prefix
 import org.w3.banana.plantain._
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 class JsonLdJsSerializationTest extends AsyncWordSpec with Matchers {
 
   implicit override def executionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+    scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
   import PlantainOps._
 

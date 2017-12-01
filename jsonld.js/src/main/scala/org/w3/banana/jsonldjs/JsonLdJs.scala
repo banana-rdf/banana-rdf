@@ -45,9 +45,9 @@ object jsonldHelper {
   }
 
   def fromRDFToDataset[Rdf <: RDF](_graph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): js.Array[Dictionary[Dictionary[String]]] =
-    (for(triple <- ops.getTriples(_graph)) yield
+    (for (triple <- ops.getTriples(_graph)) yield
       Triple.fromBananaTriple(triple)
-    ).toSet.toJSArray
+      ).toSet.toJSArray
 
   def fromRDF[Rdf <: RDF](_graph: Rdf#Graph, base: String)(implicit ops: RDFOps[Rdf]): Future[js.Dynamic] = {
     val promise = Promise[js.Dynamic]()
@@ -60,12 +60,13 @@ object jsonldHelper {
         "base" -> base
       ),
       (err: js.Error, data: js.Dynamic) => {
-      if (err != null) {
-        promise.failure(ParsingError(err))
-      } else {
-       promise.success(data)
-      }
-    })
+        if (err != null) {
+          promise.failure(ParsingError(err))
+        } else {
+          promise.success(data)
+        }
+        ()
+      })
     promise.future
   }
 }
@@ -136,7 +137,7 @@ object Node {
           "type" -> "literal",
           "value" -> lexical,
           "datatype" -> datatype.toString
-        ) ++ lang.map( _lang => Map("lang" -> _lang.toString) ).getOrElse(Map.empty)
+        ) ++ lang.map(_lang => Map("lang" -> _lang.toString)).getOrElse(Map.empty)
     }
   }.toJSDictionary
 

@@ -5,12 +5,11 @@ package io
 import org.scalatest.{AsyncWordSpec, Matchers}
 import org.w3.banana.plantain._
 
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 class JsonLdJsParserTest extends AsyncWordSpec with Matchers {
 
   implicit override def executionContext =
-    scala.concurrent.ExecutionContext.Implicits.global
+   scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
   import PlantainOps._
 
