@@ -4,11 +4,10 @@ import org.w3.banana.Prefix
 import org.w3.banana.io.{NTriplesReaderTestSuite, RdfXMLTestSuite, TurtleTestSuite, RDFWriter}
 import scala.util.Try
 import org.w3.banana.util.tryInstances._
-import scalaz.syntax._, comonad._
 
 class JenaTurtleTest extends TurtleTestSuite[Jena, Try] {
   "write with prefixes" in {
-    val prefix = Prefix[Jena]("foo", "http://purl.org/dc/elements/1.1/")
+    val prefix = Set(Prefix[Jena]("foo", "http://purl.org/dc/elements/1.1/"))
 
 //    val expectedString =
 //      """
@@ -18,14 +17,14 @@ class JenaTurtleTest extends TurtleTestSuite[Jena, Try] {
 //        |        foo:creator    "Dave Beckett" , "Art Barstow" ;
 //        |        foo:publisher  <http://www.w3.org/> .""".stripMargin
 
-    val withPrefix = writer.asString(referenceGraph, "", prefix).copoint
+    val withPrefix = writer.asString(referenceGraph, "", prefix).get
     withPrefix should include("@prefix foo:")
     withPrefix should include("foo:creator")
     withPrefix should include("foo:publisher")
     withPrefix should not include ("<http://purl.org/dc/elements/1.1/creator>")
     withPrefix should not include ("<http://purl.org/dc/elements/1.1/publisher>")
 
-    val noPrefix = writer.asString(referenceGraph, "").copoint
+    val noPrefix = writer.asString(referenceGraph, "").get
     noPrefix should not include ("@prefix foo:")
     noPrefix should not include ("foo:creator")
     noPrefix should not include ("foo:publisher")

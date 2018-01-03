@@ -11,7 +11,7 @@ class SesameRDFWriter[T](implicit
   sesameSyntax: SesameSyntax[T]
 ) extends RDFWriter[Sesame, Try, T] {
 
-  def write(graph: Sesame#Graph, os: OutputStream, base: String, prefixes: Prefix[Sesame]*): Try[Unit] = Try {
+  def write(graph: Sesame#Graph, os: OutputStream, base: String, prefixes: Set[Prefix[Sesame]]): Try[Unit] = Try {
     val sWriter = sesameSyntax.rdfWriter(os, base)
     prefixes.foreach(p => {
       sWriter.handleNamespace(p.prefixName, p.prefixIri)
@@ -21,7 +21,7 @@ class SesameRDFWriter[T](implicit
     sWriter.endRDF()
   }
 
-  def asString(graph: Sesame#Graph, base: String, prefixes: Prefix[Sesame]*): Try[String] = Try {
+  def asString(graph: Sesame#Graph, base: String, prefixes: Set[Prefix[Sesame]]): Try[String] = Try {
     val result = new StringWriter()
     val sWriter = sesameSyntax.rdfWriter(result, base)
     prefixes.foreach(p => {

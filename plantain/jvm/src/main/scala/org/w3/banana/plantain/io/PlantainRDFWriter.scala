@@ -67,12 +67,12 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
 
   }
 
-  def write(graph: Plantain#Graph, outputstream: OutputStream, base: String, prefixes: Prefix[Plantain]*): Try[Unit] = {
+  def write(graph: Plantain#Graph, outputstream: OutputStream, base: String, prefixes: Set[Prefix[Plantain]]): Try[Unit] = {
     val writer = new Writer(graph, outputstream, base)
     writer.write()
   }
 
-  def asString(graph: Plantain#Graph, base: String, prefixes: Prefix[Plantain]*): Try[String] = Try {
+  def asString(graph: Plantain#Graph, base: String, prefixes: Set[Prefix[Plantain]]): Try[String] = Try {
     val result = new ByteArrayOutputStream()
     val writer = new Writer(graph, result, base)
     writer.write()
