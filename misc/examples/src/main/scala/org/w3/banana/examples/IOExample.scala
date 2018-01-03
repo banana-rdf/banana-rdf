@@ -54,7 +54,7 @@ trait IOExample extends IOExampleDependencies {
     val graphAsXMLString = rdfXMLWriter.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsXMLString)
 
-    val graphAsTurtleString = turtleWriter.asString(graph10Triples, base = timblCard, foaf, rdf) getOrElse sys.error("coudn't serialize the graph")
+    val graphAsTurtleString = turtleWriter.asString(graph10Triples, base = timblCard, Set(foaf, rdf)) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsTurtleString)
   }
 
