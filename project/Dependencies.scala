@@ -8,7 +8,8 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.8"
+  val scalazVersion = "7.3.0-M18"
+  val scalaz = "org.scalaz" %% "scalaz-core" % scalazVersion
 
   /**
    * joda-Time
@@ -29,14 +30,15 @@ object Dependencies {
    * @see http://www.scalatest.org
    * @see http://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
+  val scalatestVersion = "3.0.1"
+  val scalatest = "org.scalatest" %% "scalatest" % scalatestVersion
   
   /**
    * Akka Http Core
    * @see http://akka.io
    * @see http://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.0.0"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.0.11"
 
   /**
    * Apache Commons Logging

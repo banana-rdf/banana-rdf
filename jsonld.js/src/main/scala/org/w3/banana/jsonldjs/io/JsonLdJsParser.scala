@@ -9,8 +9,7 @@ import scala.concurrent.{ Future, ExecutionContext }
 /** A JSON-LD parser for jsonld.js. */
 class JsonLdJsParser[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
-  ec: ExecutionContext
-) extends RDFReader[Rdf, Future, JsonLd] {
+  ec: ExecutionContext) extends RDFReader[Rdf, Future, JsonLd] {
 
   import ops._
 
