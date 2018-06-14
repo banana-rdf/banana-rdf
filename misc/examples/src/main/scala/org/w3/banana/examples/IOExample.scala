@@ -10,6 +10,7 @@ trait IOExampleDependencies
   extends RDFModule
   with RDFOpsModule
   with TurtleReaderModule
+  with TurtleWriterModule
   with RDFXMLWriterModule
 
 /* Here is an example doing some IO. Read below to see what's
@@ -45,11 +46,16 @@ trait IOExample extends IOExampleDependencies {
     if (ret.isSuccess)
       println(s"successfuly wrote TimBL's card to ${tmpFile.getAbsolutePath}")
 
+    val foaf = FOAFPrefix[Rdf]
+    val rdf = RDFSPrefix[Rdf]
     /* prints 10 triples to stdout */
 
     val graph10Triples = Graph(graph.triples.take(10).toSet)
-    val graphAsString = rdfXMLWriter.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
-    println(graphAsString)
+    val graphAsXMLString = rdfXMLWriter.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
+    println(graphAsXMLString)
+
+    val graphAsTurtleString = turtleWriter.asString(graph10Triples, base = timblCard, Set(foaf, rdf)) getOrElse sys.error("coudn't serialize the graph")
+    println(graphAsTurtleString)
   }
 
 }

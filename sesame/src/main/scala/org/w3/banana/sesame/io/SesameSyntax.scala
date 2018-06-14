@@ -38,21 +38,37 @@ object SesameSyntax {
   }
 
   implicit val Turtle: SesameSyntax[Turtle] = new SesameSyntax[Turtle] {
+    import org.w3.banana.sesame.Sesame.ops.makeUri
     // Sesame's parser does not handle relative URI, but let us override the behavior :-)
-    def write(uri: sURI, writer: Writer, baseURI: jURI) = {
+    def relativize(uri: sURI, baseURI: jURI): Either[sURI, String] = {
       val juri = new jURI(uri.toString)
-      val uriToWrite = baseURI.relativize(juri)
-      writer.write("<" + uriToWrite + ">")
+      val relative = baseURI.relativize(juri).toString
+
+      if (relative.length > 0) Left(makeUri(relative)) else Right(relative)
     }
 
     def rdfWriter(os: OutputStream, base: String) = new STurtleWriter(os) {
       val baseUri = new jURI(base)
-      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
+
+      override def writeURI(uri: sURI): Unit = {
+        val uriToWrite = relativize(uri, baseUri)
+        uriToWrite.fold(
+          super.writeURI,
+          s => writer.write("<" + s + ">")
+        )
+      }
     }
 
     def rdfWriter(wr: Writer, base: String) = new STurtleWriter(wr) {
       val baseUri = new jURI(base)
-      override def writeURI(uri: sURI): Unit = write(uri, writer, baseUri)
+
+      override def writeURI(uri: sURI): Unit = {
+        val uriToWrite = relativize(uri, baseUri)
+        uriToWrite.fold(
+          super.writeURI,
+          s => writer.write("<" + s + ">")
+        )
+      }
     }
   }
 

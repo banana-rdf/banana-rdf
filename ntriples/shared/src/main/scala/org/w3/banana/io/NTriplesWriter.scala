@@ -2,7 +2,7 @@ package org.w3.banana.io
 
 import java.io.OutputStream
 
-import org.w3.banana.{RDF, RDFOps}
+import org.w3.banana.{Prefix, RDF, RDFOps}
 
 import scala.util.Try
 
@@ -33,14 +33,14 @@ class NTriplesWriter[Rdf <: RDF](implicit val ops:RDFOps[Rdf]) extends RDFWriter
     }
   )
 
-  def write(graph: Rdf#Graph, os: OutputStream, base: String): Try[Unit] = Try {
+  def write(graph: Rdf#Graph, os: OutputStream, base: String, prefixes: Set[Prefix[Rdf]]): Try[Unit] = Try {
     for (triple <- graph.triples) {
       val line = tripleAsString(triple) + "\r\n"
       os.write(line.getBytes("UTF-8"))
     }
   }
 
-  def asString(graph: Rdf#Graph, base: String): Try[String] = Try{
+  def asString(graph: Rdf#Graph, base: String, prefixes: Set[Prefix[Rdf]]): Try[String] = Try{
     (
       for ( triple <- ops.getTriples(graph))
       yield tripleAsString(triple)
