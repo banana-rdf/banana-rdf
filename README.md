@@ -149,4 +149,4 @@ If you want to take action, feel free to contact Alexandre Bertails <alexandre@b
 Licence
 -------
 
-This source code is made available under the [W3C Licence](http://opensource.org/licenses/W3C). This is a business friendly license.
+This source code is made available under the [W3C Licence](http://opensource.org/licenses/W3C). This is a business friendly license. 
