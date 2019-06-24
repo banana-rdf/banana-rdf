@@ -10,7 +10,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
 
   // graph
 
-  final val emptyGraph: Plantain#Graph = model.Graph(Map.empty, 0)
+  final val emptyGraph: Plantain#Graph = model.IntHexastoreGraph.empty[Plantain#Node, Plantain#URI, Plantain#Node]
 
   final def makeGraph(triples: Iterable[Plantain#Triple]): Plantain#Graph =
     triples.foldLeft(emptyGraph) { case (g, (s, p, o)) => g + (s, p, o) }

@@ -6,7 +6,7 @@ trait PlantainMGraphOps extends MGraphOps[Plantain] {
 
   def makeMGraph(graph: Plantain#Graph): Plantain#MGraph = new model.MGraph(graph)
 
-  def makeEmptyMGraph(): Plantain#MGraph = new model.MGraph(model.Graph.empty)
+  def makeEmptyMGraph(): Plantain#MGraph = new model.MGraph(model.IntHexastoreGraph.empty)
 
   def addTriple(mgraph: Plantain#MGraph, triple: Plantain#Triple): mgraph.type = {
     val (s, p, o) = triple

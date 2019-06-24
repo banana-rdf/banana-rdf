@@ -3,7 +3,7 @@ package org.w3.banana.plantain.model
 import org.w3.banana._
 import java.net.URI
 
-final class MGraph[S, P, O](var graph: Graph[S, P, O])
+final class MGraph[S, P, O](var graph: IntHexastoreGraph[S, P, O])
 
 final case class BNode(label: String)
 

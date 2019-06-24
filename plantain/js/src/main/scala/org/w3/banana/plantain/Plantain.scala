@@ -8,7 +8,7 @@ import java.net.URI
 trait Plantain extends RDF {
 
   // types related to the RDF datamodel
-  type Graph = model.Graph[Node, URI, Node]
+  type Graph = model.IntHexastoreGraph[Node, URI, Node]
   type Triple = (Node, URI, Node)
   type Node = Any
   type URI = java.net.URI
