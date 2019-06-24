@@ -54,12 +54,9 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
     def write(): Try[Unit] = Try {
       val writer = new TurtleWriter(outputstream)
       writer.startRDF()
-      graph.spo foreach { case (s, pos) =>
-        pos foreach { case (p, os) =>
-          os foreach { o =>
-            writer.handleStatement(statement(s, p, o))
-          }
-        }
+      graph.triples foreach {
+        case (s, p, o) =>
+          writer.handleStatement(statement(s, p, o))
       }
       writer.endRDF()
     }
