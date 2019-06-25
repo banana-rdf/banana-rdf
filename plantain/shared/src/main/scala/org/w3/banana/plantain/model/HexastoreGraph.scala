@@ -8,7 +8,22 @@ object HexastoreMap {
   def empty[T]: HexastoreMap[T] = HexastoreMap(immutable.HashMap.empty[T, immutable.HashMap[T, immutable.List[T]]])
 }
 
-case class HexastoreMap[T](map: immutable.HashMap[T, immutable.HashMap[T, immutable.List[T]]]) {
+trait HexastoreStruct[T] {
+
+  def +(a: T, b: T, c: T): HexastoreStruct[T]
+
+  def -(a: T, b: T, c: T): HexastoreStruct[T]
+
+  def contains(a: T, b: T, c: T): Boolean
+
+  def ab(a: T, b: T): Iterable[(T, T, T)]
+
+  def a(a: T): Iterable[(T, T, T)]
+
+}
+
+case class HexastoreMap[T](map: immutable.HashMap[T, immutable.HashMap[T, immutable.List[T]]]) extends HexastoreStruct[T] {
+
   def +(a: T, b: T, c: T): HexastoreMap[T] = {
     val newMap = map.get(a) match {
       case Some(_bMap) =>
@@ -122,11 +137,11 @@ trait SPODictionaries[T, S, P, O] {
 
   def predicateOf(p: T): P
 
-  def removeFromSubjects(s: S): SPODictionaries[T, S, P, O]
+  def removeSubjectKey(s: T): SPODictionaries[T, S, P, O]
 
-  def removeFromPredicates(p: P): SPODictionaries[T, S, P, O]
+  def removePredicateKey(p: T): SPODictionaries[T, S, P, O]
 
-  def removeFromObjects(o: O): SPODictionaries[T, S, P, O]
+  def removeObjectKey(o: T): SPODictionaries[T, S, P, O]
 
   def tripleOf(triple: (T, T, T)): (S, P, O) = (subjectOf(triple._1), predicateOf(triple._2), objectOf(triple._3))
 
@@ -214,11 +229,11 @@ trait HexastoreGraph[T, S, P, O] {
 
     var newDicts = dicts
     if(!newHexastoreTriples.spo.map.contains(s))
-      newDicts = newDicts.removeFromSubjects(subject)
+      newDicts = newDicts.removeSubjectKey(s)
     if(!newHexastoreTriples.pos.map.contains(p))
-      newDicts = newDicts.removeFromPredicates(predicate)
+      newDicts = newDicts.removePredicateKey(p)
     if(!newHexastoreTriples.osp.map.contains(o))
-      newDicts = newDicts.removeFromObjects(objectt)
+      newDicts = newDicts.removeObjectKey(o)
 
     newHexastoreGraph(
       newHexastoreTriples,
@@ -288,8 +303,3 @@ trait HexastoreGraph[T, S, P, O] {
 
 }
 
-object HexastoreGraph {
-
-  // def apply[T, S, P, O](_hexaTriples: HexastoreTriples[T], _dicts: SPODictionaries[T,S,P,O]): HexastoreGraph[T,S,P,O]
-
-}
