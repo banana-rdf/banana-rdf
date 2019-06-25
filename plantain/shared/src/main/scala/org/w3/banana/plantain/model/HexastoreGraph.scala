@@ -8,7 +8,7 @@ object HexastoreMap {
   def empty[T]: HexastoreMap[T] = HexastoreMap(immutable.HashMap.empty[T, immutable.HashMap[T, immutable.List[T]]])
 }
 
-trait HexastoreStruct[T] {
+trait HexastoreStruct[T] extends Iterable[(T,T,T)] {
 
   def +(a: T, b: T, c: T): HexastoreStruct[T]
 
@@ -20,9 +20,12 @@ trait HexastoreStruct[T] {
 
   def a(a: T): Iterable[(T, T, T)]
 
+  def containsKey(a: T): Boolean
+
 }
 
 case class HexastoreMap[T](tripleKeyMap: immutable.HashMap[T, immutable.HashMap[T, immutable.List[T]]]) extends HexastoreStruct[T] {
+
 
   def +(a: T, b: T, c: T): HexastoreMap[T] = {
     val newMap = tripleKeyMap.get(a) match {
@@ -104,6 +107,15 @@ case class HexastoreMap[T](tripleKeyMap: immutable.HashMap[T, immutable.HashMap[
       .getOrElse(Iterable.empty)
   }
 
+  def iterator: Iterator[(T, T, T)] = {
+    for {
+      (a, bMap) <- tripleKeyMap
+      (b, cList) <- bMap
+      c <- cList
+    } yield (a, b, c)
+  }.iterator
+
+  def containsKey(a: T): Boolean = tripleKeyMap.contains(a)
 
 }
 
@@ -121,12 +133,12 @@ object HexastoreTriples {
 }
 
 case class HexastoreTriples[T](
-                                spo: HexastoreMap[T],
-                                sop: HexastoreMap[T],
-                                pso: HexastoreMap[T],
-                                pos: HexastoreMap[T],
-                                osp: HexastoreMap[T],
-                                ops: HexastoreMap[T]
+                                spo: HexastoreStruct[T],
+                                sop: HexastoreStruct[T],
+                                pso: HexastoreStruct[T],
+                                pos: HexastoreStruct[T],
+                                osp: HexastoreStruct[T],
+                                ops: HexastoreStruct[T]
                               )
 
 
@@ -138,13 +150,9 @@ trait HexastoreGraph[T, S, P, O] {
 
   def dicts: SPODictionary[T, S, P, O]
 
-
   def triples: Iterable[(S, P, O)] =
-    for {
-      (s, poMap) <- hexaTriples.spo.tripleKeyMap
-      (p, oList) <- poMap
-      o <- oList
-    } yield (dicts.subjectOf(s), dicts.predicateOf(p), dicts.objectOf(o))
+    for ((s, p, o) <- hexaTriples.spo)
+     yield (dicts.subjectOf(s), dicts.predicateOf(p), dicts.objectOf(o))
 
 
   def +(subject: S, predicate: P, objectt: O): HexastoreGraph[T, S, P, O] = {
@@ -196,11 +204,11 @@ trait HexastoreGraph[T, S, P, O] {
     //TODO: do something about ever growing dictionaries (complete rebuild?)
 
     var newDicts = dicts
-    if(!newHexastoreTriples.spo.tripleKeyMap.contains(s))
+    if(!newHexastoreTriples.spo.containsKey(s))
       newDicts = newDicts.removeSubjectKey(s)
-    if(!newHexastoreTriples.pos.tripleKeyMap.contains(p))
+    if(!newHexastoreTriples.pos.containsKey(p))
       newDicts = newDicts.removePredicateKey(p)
-    if(!newHexastoreTriples.osp.tripleKeyMap.contains(o))
+    if(!newHexastoreTriples.osp.containsKey(o))
       newDicts = newDicts.removeObjectKey(o)
 
     newHexastoreGraph(
