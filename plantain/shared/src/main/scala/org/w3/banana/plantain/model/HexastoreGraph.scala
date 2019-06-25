@@ -1,12 +1,6 @@
 package org.w3.banana.plantain.model
 
 import scala.collection.immutable
-import scala.util.Try
-
-object HexastoreMap {
-
-  def empty[T]: HexastoreMap[T] = HexastoreMap(immutable.HashMap.empty[T, immutable.HashMap[T, immutable.List[T]]])
-}
 
 trait HexastoreStruct[T] extends Iterable[(T,T,T)] {
 
@@ -119,6 +113,20 @@ case class HexastoreMap[T](tripleKeyMap: immutable.HashMap[T, immutable.HashMap[
 
 }
 
+object HexastoreMap {
+
+  def empty[T]: HexastoreMap[T] = HexastoreMap(immutable.HashMap.empty[T, immutable.HashMap[T, immutable.List[T]]])
+}
+
+case class HexastoreTriples[T](
+                                spo: HexastoreStruct[T],
+                                sop: HexastoreStruct[T],
+                                pso: HexastoreStruct[T],
+                                pos: HexastoreStruct[T],
+                                osp: HexastoreStruct[T],
+                                ops: HexastoreStruct[T]
+                              )
+
 object HexastoreTriples {
 
   def empty[T]: HexastoreTriples[T] = HexastoreTriples(
@@ -131,16 +139,6 @@ object HexastoreTriples {
   )
 
 }
-
-case class HexastoreTriples[T](
-                                spo: HexastoreStruct[T],
-                                sop: HexastoreStruct[T],
-                                pso: HexastoreStruct[T],
-                                pos: HexastoreStruct[T],
-                                osp: HexastoreStruct[T],
-                                ops: HexastoreStruct[T]
-                              )
-
 
 trait HexastoreGraph[T, S, P, O] {
 
