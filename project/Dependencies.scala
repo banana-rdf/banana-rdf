@@ -8,7 +8,7 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalazVersion = "7.3.0-M18"
+  val scalazVersion = "7.3.0-M30"
   val scalaz = "org.scalaz" %% "scalaz-core" % scalazVersion
 
   /**

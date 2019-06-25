@@ -24,7 +24,7 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.6")
   * @see http://www.scala-js.org/
   */
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.21")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.28")
 
 
 /**
