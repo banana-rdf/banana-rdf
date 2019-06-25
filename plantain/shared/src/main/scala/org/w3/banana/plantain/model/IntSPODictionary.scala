@@ -8,7 +8,7 @@ class IntSPODictionary[S, P, O](
                                  rpredicateMap: Map[P, Int],
                                  robjectMap: Map[O, Int],
                                  counter: Int
-                               ) extends SPODictionaries[Int, S, P, O] {
+                               ) extends SPODictionary[Int, S, P, O] {
 
 
   override def subjectOf(s: Int): S = subjectMap(s)
@@ -29,7 +29,7 @@ class IntSPODictionary[S, P, O](
 
   override def hasPredicate(p: P): Boolean = rpredicateMap.contains(p)
 
-  override def newFromTriple(s: S, p: P, o: O): (Int, Int, Int, SPODictionaries[Int, S, P, O]) = {
+  override def newFromTriple(s: S, p: P, o: O): (Int, Int, Int, SPODictionary[Int, S, P, O]) = {
     var newCounter = counter
     val subj = rsubjectMap.get(s) match {
       case Some(num) => (num, subjectMap, rsubjectMap)
@@ -55,19 +55,19 @@ class IntSPODictionary[S, P, O](
 
   }
 
-  override def removeSubjectKey(s: Int): SPODictionaries[Int, S, P, O] = new IntSPODictionary[S, P, O](
+  override def removeSubjectKey(s: Int): SPODictionary[Int, S, P, O] = new IntSPODictionary[S, P, O](
     subjectMap - s, predicateMap, objectMap,
     rsubjectMap - subjectOf(s), rpredicateMap, robjectMap,
     counter
   )
 
-  override def removePredicateKey(p: Int): SPODictionaries[Int, S, P, O] = new IntSPODictionary[S, P, O](
+  override def removePredicateKey(p: Int): SPODictionary[Int, S, P, O] = new IntSPODictionary[S, P, O](
     subjectMap, predicateMap - p, objectMap,
     rsubjectMap, rpredicateMap - predicateOf(p), robjectMap,
     counter
   )
 
-  override def removeObjectKey(o: Int): SPODictionaries[Int, S, P, O] = new IntSPODictionary[S, P, O](
+  override def removeObjectKey(o: Int): SPODictionary[Int, S, P, O] = new IntSPODictionary[S, P, O](
     subjectMap, predicateMap, objectMap - o,
     rsubjectMap, rpredicateMap, robjectMap - objectOf(o),
     counter

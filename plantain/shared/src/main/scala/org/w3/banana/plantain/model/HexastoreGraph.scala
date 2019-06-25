@@ -129,38 +129,6 @@ case class HexastoreTriples[T](
                                 ops: HexastoreMap[T]
                               )
 
-trait SPODictionaries[T, S, P, O] {
-
-  def subjectOf(s: T): S
-
-  def objectOf(o: T): O
-
-  def predicateOf(p: T): P
-
-  def removeSubjectKey(s: T): SPODictionaries[T, S, P, O]
-
-  def removePredicateKey(p: T): SPODictionaries[T, S, P, O]
-
-  def removeObjectKey(o: T): SPODictionaries[T, S, P, O]
-
-  def tripleOf(triple: (T, T, T)): (S, P, O) = (subjectOf(triple._1), predicateOf(triple._2), objectOf(triple._3))
-
-  def fromSubject(s: S): T
-
-  def fromObject(o: O): T
-
-  def fromPredicate(p: P): T
-
-  def hasSubject(s: S): Boolean
-
-  def hasObject(o: O): Boolean
-
-  def hasPredicate(p: P): Boolean
-
-  def newFromTriple(s: S, p: P, o: O): (T, T, T, SPODictionaries[T, S, P, O])
-
-
-}
 
 trait HexastoreGraph[T, S, P, O] {
 
@@ -168,7 +136,7 @@ trait HexastoreGraph[T, S, P, O] {
 
   def hexaTriples: HexastoreTriples[T]
 
-  def dicts: SPODictionaries[T, S, P, O]
+  def dicts: SPODictionary[T, S, P, O]
 
 
   def triples: Iterable[(S, P, O)] =
@@ -248,7 +216,7 @@ trait HexastoreGraph[T, S, P, O] {
     matchedTriples.foldLeft(this) { case (graph, (_s, _p, _o)) => graph - (_s, _p, _o) }
   }
 
-  def newHexastoreGraph(_hexaTriples: HexastoreTriples[T], _dicts: SPODictionaries[T, S, P, O], size: Int): HexastoreGraph[T, S, P, O]
+  def newHexastoreGraph(_hexaTriples: HexastoreTriples[T], _dicts: SPODictionary[T, S, P, O], size: Int): HexastoreGraph[T, S, P, O]
 
 
   def union(other: HexastoreGraph[T, S, P, O]): HexastoreGraph[T, S, P, O] = {
