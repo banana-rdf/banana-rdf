@@ -22,68 +22,68 @@ trait HexastoreStruct[T] {
 
 }
 
-case class HexastoreMap[T](map: immutable.HashMap[T, immutable.HashMap[T, immutable.List[T]]]) extends HexastoreStruct[T] {
+case class HexastoreMap[T](tripleKeyMap: immutable.HashMap[T, immutable.HashMap[T, immutable.List[T]]]) extends HexastoreStruct[T] {
 
   def +(a: T, b: T, c: T): HexastoreMap[T] = {
-    val newMap = map.get(a) match {
+    val newMap = tripleKeyMap.get(a) match {
       case Some(_bMap) =>
         _bMap.get(b) match {
           case Some(_cList) =>
             if (_cList.contains(c)) {
-              map
+              tripleKeyMap
             } else {
-              map + (a -> (_bMap + (b -> (_cList :+ c))))
+              tripleKeyMap + (a -> (_bMap + (b -> (_cList :+ c))))
             }
           case None =>
-            map + (a -> (_bMap + (b -> immutable.List(c))))
+            tripleKeyMap + (a -> (_bMap + (b -> immutable.List(c))))
         }
       case None =>
-        map + (a -> immutable.HashMap(b -> immutable.List(c)))
+        tripleKeyMap + (a -> immutable.HashMap(b -> immutable.List(c)))
     }
     HexastoreMap(newMap)
   }
 
   def -(a: T, b: T, c: T): HexastoreMap[T] = {
-    val newMap = map.get(a) match {
+    val newMap = tripleKeyMap.get(a) match {
       case Some(_bMap) =>
         _bMap.get(b) match {
           case Some(_cList) =>
             if (_cList.contains(c)) {
               val newCList = _cList.filter(_ == c)
               if (newCList.nonEmpty) {
-                map + (a -> (_bMap + (b -> newCList)))
+                tripleKeyMap + (a -> (_bMap + (b -> newCList)))
               } else {
                 val newBMap = _bMap - b
                 if (newBMap.nonEmpty) {
-                  map + (a -> newBMap)
+                  tripleKeyMap + (a -> newBMap)
                 } else {
-                  map - a
+                  tripleKeyMap - a
                 }
               }
             } else {
               //no such element
-              map
+              tripleKeyMap
             }
           case None =>
             //no such element
-            map
+            tripleKeyMap
         }
       case None =>
         //no such element
-        map
+        tripleKeyMap
     }
     HexastoreMap(newMap)
 
   }
 
   def contains(a: T, b: T, c: T): Boolean = {
-    map.get(a)
+    tripleKeyMap.get(a)
       .flatMap(_.get(b)).exists(_.contains(c))
 
   }
 
   def ab(a: T, b: T): Iterable[(T, T, T)] = {
-    val test = map.get(a)
+    val test = tripleKeyMap.get(a)
       .flatMap { bMap =>
         bMap.get(b)
       }
@@ -95,7 +95,7 @@ case class HexastoreMap[T](map: immutable.HashMap[T, immutable.HashMap[T, immuta
   }
 
   def a(a: T): Iterable[(T, T, T)] = {
-    map.get(a)
+    tripleKeyMap.get(a)
       .map { bMap =>
         bMap.flatMap { b =>
           b._2.map(c => (a, b._1, c))
@@ -141,7 +141,7 @@ trait HexastoreGraph[T, S, P, O] {
 
   def triples: Iterable[(S, P, O)] =
     for {
-      (s, poMap) <- hexaTriples.spo.map
+      (s, poMap) <- hexaTriples.spo.tripleKeyMap
       (p, oList) <- poMap
       o <- oList
     } yield (dicts.subjectOf(s), dicts.predicateOf(p), dicts.objectOf(o))
@@ -196,11 +196,11 @@ trait HexastoreGraph[T, S, P, O] {
     //TODO: do something about ever growing dictionaries (complete rebuild?)
 
     var newDicts = dicts
-    if(!newHexastoreTriples.spo.map.contains(s))
+    if(!newHexastoreTriples.spo.tripleKeyMap.contains(s))
       newDicts = newDicts.removeSubjectKey(s)
-    if(!newHexastoreTriples.pos.map.contains(p))
+    if(!newHexastoreTriples.pos.tripleKeyMap.contains(p))
       newDicts = newDicts.removePredicateKey(p)
-    if(!newHexastoreTriples.osp.map.contains(o))
+    if(!newHexastoreTriples.osp.tripleKeyMap.contains(o))
       newDicts = newDicts.removeObjectKey(o)
 
     newHexastoreGraph(
