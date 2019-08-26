@@ -516,14 +516,14 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
 
   "w3c tests of type rdft:TestNTriplesNegativeSyntax" should {
 
-    def fail(s: String,erros: Int, test: List[Try[Rdf#Triple]] => Boolean = _ => true) = {
+    def fail(s: String,erros: Int*) = {
       val parseIterator = ntparser(s,true)
       val resultList = parseIterator.toList
-      assert(test(resultList))
-      assert(resultList.filter{
+      val resultListErrorSize =resultList.filter{
         case Failure(ParseException(_,-1,_))=>false
         case _ => true
-      }.size == erros)
+      }.size
+      assert(erros.contains(resultListErrorSize))
     }
 
     "nt-syntax-bad-uri-01" in {
@@ -577,7 +577,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
     }
     "nt-syntax-bad-lang-01" in {
       fail("""# Bad lang tag
-             |<http://example/s> <http://example/p> "string"@1 .""".stripMargin,1)
+             |<http://example/s> <http://example/p> "string"@1 .""".stripMargin,1, 2)
     }
     "nt-syntax-bad-esc-01" in {
       fail("""# Bad string escape
