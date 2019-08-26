@@ -166,6 +166,24 @@ lazy val sesame = Project("sesame", file("sesame"))
     )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
+lazy val rdf4j = Project("rdf4j", file("rdf4j"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "banana-rdf4j",
+    libraryDependencies ++= Seq(
+      rdf4jQueryAlgebra,
+      rdf4jQueryParser,
+      rdf4jQueryResult,
+      rdf4jRioTurtle,
+      rdf4jRioRdfxml,
+      rdf4jRioJsonld,
+      rdf4jSailMemory,
+      rdf4jSailNativeRdf,
+      rdf4jRepositorySail,
+      commonsLogging
+    )
+  ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
+
 lazy val jsonldJS = Project("jsonld", file("jsonld.js"))
   .settings(commonSettings: _*)
   .settings()

@@ -85,6 +85,23 @@ object Dependencies {
   val sesameRepositorySail = "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion
 
   /**
+   * rdf4j
+   * @see https://rdf4j.eclipse.org/
+   **/
+  val rdf4jVersion = "3.0.0"
+
+  val rdf4jQueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % rdf4jVersion
+  val rdf4jQueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % rdf4jVersion
+  val rdf4jQueryResult = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % rdf4jVersion
+  val rdf4jRioTurtle = "org.eclipse.rdf4j" % "rdf4j-rio-turtle" % rdf4jVersion
+  val rdf4jRioRdfxml =  "org.eclipse.rdf4j" % "rdf4j-rio-rdfxml" % rdf4jVersion
+  val rdf4jRioJsonld =  "org.eclipse.rdf4j" % "rdf4j-rio-jsonld" % rdf4jVersion
+  val rdf4jSailMemory = "org.eclipse.rdf4j" % "rdf4j-sail-memory" % rdf4jVersion
+  val rdf4jSailNativeRdf = "org.eclipse.rdf4j" % "rdf4j-sail-nativerdf" % rdf4jVersion
+  val rdf4jRepositorySail = "org.eclipse.rdf4j" % "rdf4j-repository-sail" % rdf4jVersion
+
+
+  /**
    * jsonld-java
    * @see https://github.com/jsonld-java/jsonld-java
    * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-sesame
