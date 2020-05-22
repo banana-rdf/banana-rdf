@@ -1,6 +1,7 @@
 package org.w3.banana.isomorphism
 
-import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import org.w3.banana._
 
 
@@ -8,7 +9,7 @@ import org.w3.banana._
  * Generic Tests for  isomorphism functions that use whatever the Ops implementation chooses
  */
 class IsomorphismTest[Rdf <: RDF](implicit val ops: RDFOps[Rdf])
-extends WordSpec with Matchers with IsomorphismBNodeTrait[Rdf] {
+extends AnyWordSpec with Matchers with IsomorphismBNodeTrait[Rdf] {
 
   import ops._
 

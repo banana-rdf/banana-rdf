@@ -7,7 +7,8 @@ import scalaz._
 import scalaz.syntax._
 import comonad._
 import monad._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
  * Test Serialisations. Some serialisations have one parser and multiple serialisers, such
@@ -20,7 +21,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, M, Sin],
   writer: RDFWriter[Rdf, M, Sout]
-) extends WordSpec with Matchers {
+) extends AnyWordSpec with Matchers {
 
   // both Monad and Comonad are Functors, so they compete for the
   // syntax. So we choose arbitrarily one of them.

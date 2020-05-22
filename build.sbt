@@ -3,6 +3,7 @@ import sbt.Keys._
 import sbt._
 import Dependencies._
 import com.typesafe.sbt.pgp.PgpKeys
+import sbtcrossproject.CrossPlugin.autoImport.{ crossProject, CrossType }
 
 lazy val pomSettings = Seq(
   pomIncludeRepository := { _ => false},
@@ -48,7 +49,7 @@ lazy val publicationSettings = pomSettings ++ {
 //          Some("releases" at nexus + "service/local/staging/deploy/maven2")
 //      },
 //      releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-//      publishArtifact in Test := false
+//      Test / publishArtifact  := false
     )
     case Some(pubre(host, path)) =>
       Seq(
@@ -60,20 +61,20 @@ lazy val publicationSettings = pomSettings ++ {
             }
           )
         ),
-        publishArtifact in Test := false
+        Test / publishArtifact  := false
       )
     case other => Seq()
   }
 }
 
-lazy val commonSettings = publicationSettings ++ defaultScalariformSettings ++ Seq(
+lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "org.w3",
-  scalaVersion := "2.12.1",
-  crossScalaVersions := Seq("2.11.8", "2.12.1"),
+  scalaVersion := "2.12.11",
+  crossScalaVersions := Seq("2.11.12s", "2.12.11"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
-  resolvers += "apache-repo-releases" at "http://repository.apache.org/content/repositories/releases/",
+  resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
-  parallelExecution in Test := false,
+  Test / parallelExecution := false,
   offline := true,
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
   scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
@@ -82,13 +83,17 @@ lazy val commonSettings = publicationSettings ++ defaultScalariformSettings ++ S
   updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
 )
 
-lazy val rdf = crossProject
+lazy val scalariformSettings = Seq(
+   scalariformAutoformat := false
+)
+
+lazy val rdf = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("rdf")) //websim api
   .settings(commonSettings: _*)
   .settings(
     name := "banana-rdf",
-    libraryDependencies += scalaz
+    libraryDependencies += scalaz.value
   )
   .jvmSettings(
     libraryDependencies ++= Seq(jodaTime, jodaConvert)
@@ -97,7 +102,7 @@ lazy val rdf = crossProject
 lazy val rdfJS = rdf.js
 lazy val rdfJVM = rdf.jvm
 
-lazy val ntriples = crossProject
+lazy val ntriples = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .settings(commonSettings: _*)
   .in(file("ntriples"))
@@ -106,27 +111,27 @@ lazy val ntriples = crossProject
 lazy val ntriplesJS = ntriples.js
 lazy val ntriplesJVM = ntriples.jvm
 
-lazy val rdfTestSuite = crossProject
+lazy val rdfTestSuite = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("rdf-test-suite"))
   .settings(commonSettings: _*)
   .settings(
     name := "banana-test",
-    libraryDependencies += scalatest,
+    libraryDependencies += scalatest.value,
     libraryDependencies += jodaTime,
     libraryDependencies += jodaConvert,
     libraryDependencies += fuseki,
     libraryDependencies += fusekiServer,
     libraryDependencies += servlet,
     libraryDependencies += httpComponents,
-    resourceDirectory in Test := baseDirectory.value / "src/main/resources"
+    Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
   )
   .dependsOn(rdf, ntriples)
 
 lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
 lazy val rdfTestSuiteJS = rdfTestSuite.js
 
-lazy val plantain = crossProject
+lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("plantain"))
   .settings(commonSettings: _*)
@@ -139,13 +144,15 @@ lazy val plantain = crossProject
 lazy val plantainJS = plantain.js
 lazy val plantainJVM = plantain.jvm
 
-lazy val jena = Project("jena", file("jena"), settings = commonSettings)
+lazy val jena = Project("jena", file("jena"))
+  .settings(commonSettings: _*)
   .settings(
     name := "banana-jena",
     libraryDependencies ++= Seq(jenaLibs, commonsLogging, aalto )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
-lazy val sesame = Project("sesame", file("sesame"), settings = commonSettings)
+lazy val sesame = Project("sesame", file("sesame"))
+  .settings(commonSettings: _*)
   .settings(
     name := "banana-sesame",
     libraryDependencies ++= Seq(
@@ -162,30 +169,35 @@ lazy val sesame = Project("sesame", file("sesame"), settings = commonSettings)
     )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
-lazy val jsonldJS = Project("jsonld", file("jsonld.js"), settings = commonSettings)
+lazy val jsonldJS = Project("jsonld", file("jsonld.js"))
+  .settings(commonSettings: _*)
   .settings(
     name := "banana-jsonld"
   ).dependsOn(rdfJS, ntriplesJS, plantainJS, rdfTestSuiteJS % "test->compile")
   .enablePlugins(ScalaJSPlugin)
 
-lazy val examples = Project("examples", file("misc/examples"), settings = commonSettings)
+lazy val examples = Project("examples", file("misc/examples"))
+  .settings(commonSettings: _*)
   .settings(
     name := "banana-examples"
   ).dependsOn(sesame, jena)
 
-lazy val runExamplesStr =
-  ";examples/run-main org.w3.banana.examples.GraphExampleWithJena" +
-    ";examples/run-main org.w3.banana.examples.GraphExampleWithSesame" +
-    ";examples/run-main org.w3.banana.examples.IOExampleWithJena" +
-    ";examples/run-main org.w3.banana.examples.IOExampleWithSesame" +
-    ";examples/run-main org.w3.banana.examples.SPARQLExampleWithJena"
+lazy val runExamplesStr = ";examples/runMain org.w3.banana.examples.GraphExampleWithJena" +
+                          ";examples/runMain org.w3.banana.examples.GraphExampleWithSesame" +
+                          ";examples/runMain org.w3.banana.examples.IOExampleWithJena" +
+                          ";examples/runMain org.w3.banana.examples.IOExampleWithSesame" +
+                          ";examples/runMain org.w3.banana.examples.SPARQLExampleWithJena"
 
 name := "banana"
 
 commonSettings
 
-unidocSettings
+enablePlugins(ScalaUnidocPlugin)
+
+unidocProjectFilter in ( ScalaUnidoc, unidoc ) :=
+    inAnyProject -- inProjects( ntriplesJS, plantainJS, rdfJS, rdfTestSuiteJS )
 
 addCommandAlias("validate", ";compile;test;runExamples")
 
 addCommandAlias("runExamples", runExamplesStr)
+

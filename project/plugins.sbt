@@ -1,10 +1,10 @@
-addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.3")
 
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.2")
 
-addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.3")
+addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.3")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
 
 /**
   * Bintray pluging
@@ -19,12 +19,19 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.3")
 //addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
 /**
+  * ScalaJS cross project sbt plugin
+  *
+  * @see https://github.com/portable-scala/sbt-crossproject
+  */
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject"      % "1.0.0")
+
+/**
   * ScalaJS sbt plugin
   *
   * @see http://www.scala-js.org/
   */
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.13")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.33")
 
 
 /**
@@ -33,7 +40,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.13")
   * for drawing a dependency tree
   * @see https://github.com/gilt/sbt-dependency-graph-sugar
   */
-addSbtPlugin("com.gilt" % "sbt-dependency-graph-sugar" % "0.7.5-1")
+addSbtPlugin("com.gilt" % "sbt-dependency-graph-sugar" % "0.9.0")
 
 /**
   * scala-style
@@ -41,8 +48,7 @@ addSbtPlugin("com.gilt" % "sbt-dependency-graph-sugar" % "0.7.5-1")
   * for Scala style checking
   * @see http://www.scalastyle.org/
   */
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
-
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 
 /**
   * coursier
@@ -58,4 +64,4 @@ addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.2")
   * for easier dependency updates monitoring
   * @see https://github.com/rtimush/sbt-updates
   */
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.2")

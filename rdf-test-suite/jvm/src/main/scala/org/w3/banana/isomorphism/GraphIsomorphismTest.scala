@@ -1,6 +1,9 @@
 package org.w3.banana.isomorphism
 
-import org.scalatest.{ Matchers, Suite, WordSpec }
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.Suite
+
 import org.w3.banana.{ RDF, RDFOps }
 
 import scala.collection.immutable.ListMap
@@ -11,7 +14,7 @@ import scala.util.{ Failure, Success }
  */
 class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) => GraphIsomorphism[Rdf])(
   implicit val ops: RDFOps[Rdf])
-    extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
+    extends AnyWordSpec with IsomorphismBNodeTrait[Rdf] with Matchers { self: Suite =>
 
   import ops._
   import org.w3.banana.diesel._

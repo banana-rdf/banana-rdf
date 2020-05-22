@@ -4,11 +4,14 @@ package org.w3.banana.binder
 import org.w3.banana._
 import syntax._
 import diesel._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+
+
 
 import scala.util._
 
-class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers {
+class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWordSpec with Matchers {
 
   import ops._
 

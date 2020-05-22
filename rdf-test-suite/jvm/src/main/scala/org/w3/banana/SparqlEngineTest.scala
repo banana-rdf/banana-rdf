@@ -1,6 +1,10 @@
 package org.w3.banana
 
 import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+
+
 import org.w3.banana.diesel._
 import org.w3.banana.io._
 import scala.util.Try
@@ -16,7 +20,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
   val graphStore: GraphStore[Rdf, Try, A],
   val sparqlEngine: SparqlEngine[Rdf, Try, A],
   val lifecycle: Lifecycle[Rdf, A]
-) extends WordSpec with SparqlEngineTesterTrait[Rdf, Try, A] with Matchers with BeforeAndAfterAll with TryValues {
+) extends AnyWordSpec with SparqlEngineTesterTrait[Rdf, Try, A] with Matchers with BeforeAndAfterAll with TryValues {
 
   import ops._
   import sparqlEngine.sparqlEngineSyntax._

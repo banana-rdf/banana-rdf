@@ -1,6 +1,9 @@
 package org.w3.banana
 
-import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.BeforeAndAfterAll
+
 import org.w3.banana.diesel._
 import org.w3.banana.io._
 
@@ -16,7 +19,7 @@ class GraphStoreTest[Rdf <: RDF, M[+_] : Monad: Comonad, A](
   val reader: RDFReader[Rdf, Try, RDFXML],
   val graphStore: GraphStore[Rdf, M, A],
   val lifecycle: Lifecycle[Rdf, A]
-) extends WordSpec with Matchers with BeforeAndAfterAll with TestHelper {
+) extends AnyWordSpec with Matchers with BeforeAndAfterAll with TestHelper {
 
   // both Monad and Comonad are Functors, so they compete for the
   // syntax. So we choose arbitrarily one of them.

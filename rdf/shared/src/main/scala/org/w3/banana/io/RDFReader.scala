@@ -10,12 +10,12 @@ import java.io._
   */
 trait RDFReader[Rdf <: RDF, M[_], +S] {
 
-  /** Tries parsing an RDF Graph from an [[java.io.InputStream]] and a
+  /** Tries parsing an RDF Graph from an java.io.InputStream and a
     * base URI.
     */
   def read(is: InputStream, base: String): M[Rdf#Graph]
 
-  /** Tries parsing an RDF Graph from a [[java.io.Reader]] and a base URI.
+  /** Tries parsing an RDF Graph from a java.io.Reader and a base URI.
     * @param base the base URI to use, to resolve relative URLs found in the InputStream
     **/
   def read(reader: Reader, base: String): M[Rdf#Graph]

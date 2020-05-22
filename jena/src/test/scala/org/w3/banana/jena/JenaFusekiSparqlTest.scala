@@ -3,13 +3,15 @@ package org.w3.banana.jena
 import java.net.URL
 
 import org.apache.jena.tdb.TDBFactory
-import org.scalatest.{BeforeAndAfterAll, Matchers, _}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.BeforeAndAfterAll
 import org.w3.banana._
 
 /**
  * Sparql update test on a Fuseki embedded server
  */
-class JenaFusekiSparqlTest extends FlatSpec
+class JenaFusekiSparqlTest extends AnyFlatSpec
   with Matchers with BeforeAndAfterAll with JenaModule{
 
   lazy val data = "rdf-test-suite/jvm/src/main/resources/known-tr-editors.rdf"
