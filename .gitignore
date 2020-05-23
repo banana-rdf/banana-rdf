@@ -30,3 +30,4 @@ scala_common*
 .metals/
 .bloop/
 .vscode/
+metals.sbt

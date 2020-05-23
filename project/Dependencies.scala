@@ -12,7 +12,7 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.2.8")
+  val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.3.1")
 
   /**
    * joda-Time
