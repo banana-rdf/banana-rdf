@@ -172,9 +172,10 @@ lazy val sesame = Project("sesame", file("sesame"))
 lazy val jsonldJS = Project("jsonld", file("jsonld.js"))
   .settings(commonSettings: _*)
   .settings(
-    name := "banana-jsonld"
+    name := "banana-jsonld",
+     jsDependencies += ProvidedJS / "jsonld.js" commonJSName "jsonld"
   ).dependsOn(rdfJS, ntriplesJS, plantainJS, rdfTestSuiteJS % "test->compile")
-  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSPlugin, JSDependenciesPlugin )
 
 lazy val examples = Project("examples", file("misc/examples"))
   .settings(commonSettings: _*)

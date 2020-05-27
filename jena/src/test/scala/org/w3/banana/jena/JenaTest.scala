@@ -2,36 +2,36 @@ package org.w3.banana.jena
 
 import org.w3.banana._
 
-object JenaOpsTest extends RDFOpsTest[Jena]
+class JenaOpsTest extends RDFOpsTest[Jena]
 
-object JenaGraphTest extends GraphTest[Jena]
+class JenaGraphTest extends GraphTest[Jena]
 
-object JenaMGraphTest extends MGraphTest[Jena]
+class JenaMGraphTest extends MGraphTest[Jena]
 
 import org.w3.banana.isomorphism._
 
-object JenaIsomorphismTest extends IsomorphismTest[Jena]
+class JenaIsomorphismTest extends IsomorphismTest[Jena]
 
-object JenaGraphUnionTest extends GraphUnionTest[Jena]
+class JenaGraphUnionTest extends GraphUnionTest[Jena]
 
-object JenaPointedGraphTest extends PointedGraphTest[Jena]
+class JenaPointedGraphTest extends PointedGraphTest[Jena]
 
 import org.w3.banana.diesel._
 
-object JenaDieselGraphConstructTest extends DieselGraphConstructTest[Jena]
+class JenaDieselGraphConstructTest extends DieselGraphConstructTest[Jena]
 
-object JenaDieselGraphExplorationTest extends DieselGraphExplorationTest[Jena]
+class JenaDieselGraphExplorationTest extends DieselGraphExplorationTest[Jena]
 
-object JenaDieselOwlPrimerTest extends DieselOwlPrimerTest[Jena]
+class JenaDieselOwlPrimerTest extends DieselOwlPrimerTest[Jena]
 
 import org.w3.banana.binder._
 
-object JenaCommonBindersTest extends CommonBindersTest[Jena]
+class JenaCommonBindersTest extends CommonBindersTest[Jena]
 
-object JenaRecordBinderTest extends RecordBinderTest[Jena]
+class JenaRecordBinderTest extends RecordBinderTest[Jena]
 
-object JenaCustomBinderTest extends CustomBindersTest[Jena]
+class JenaCustomBinderTest extends CustomBindersTest[Jena]
 
 import org.w3.banana.syntax._
 
-object JenaUriSyntaxTest extends UriSyntaxTest[Jena]
+class JenaUriSyntaxTest extends UriSyntaxTest[Jena]

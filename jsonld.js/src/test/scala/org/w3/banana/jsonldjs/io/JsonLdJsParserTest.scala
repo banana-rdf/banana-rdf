@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import scalajs.concurrent.JSExecutionContext.Implicits.queue
 import org.w3.banana.plantain._
 
-object JsonLdJsParserTest extends AnyWordSpec with Matchers {
+class JsonLdJsParserTest extends AnyWordSpec with Matchers {
 
   import PlantainOps._
 

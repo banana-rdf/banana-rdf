@@ -2,36 +2,36 @@ package org.w3.banana.sesame
 
 import org.w3.banana._
 
-object SesameOpsTest extends RDFOpsTest[Sesame]
+class SesameOpsTest extends RDFOpsTest[Sesame]
 
-object SesameGraphTest extends GraphTest[Sesame]
+class SesameGraphTest extends GraphTest[Sesame]
 
-object SesameMGraphTest extends MGraphTest[Sesame]
+class SesameMGraphTest extends MGraphTest[Sesame]
 
 import org.w3.banana.isomorphism._
 
-object SesameIsomorphismTest extends IsomorphismTest[Sesame]
+class SesameIsomorphismTest extends IsomorphismTest[Sesame]
 
-object SesameGraphUnionTest extends GraphUnionTest[Sesame]
+class SesameGraphUnionTest extends GraphUnionTest[Sesame]
 
-object SesamePointedGraphTest extends PointedGraphTest[Sesame]
+class SesamePointedGraphTest extends PointedGraphTest[Sesame]
 
 import org.w3.banana.diesel._
 
-object SesameDieselGraphConstructTest extends DieselGraphConstructTest[Sesame]
+class SesameDieselGraphConstructTest extends DieselGraphConstructTest[Sesame]
 
-object SesameDieselGraphExplorationTest extends DieselGraphExplorationTest[Sesame]
+class SesameDieselGraphExplorationTest extends DieselGraphExplorationTest[Sesame]
 
-object SesameDieselOwlPrimerTest extends DieselOwlPrimerTest[Sesame]
+class SesameDieselOwlPrimerTest extends DieselOwlPrimerTest[Sesame]
 
 import org.w3.banana.binder._
 
-object SesameCommonBindersTest extends CommonBindersTest[Sesame]
+class SesameCommonBindersTest extends CommonBindersTest[Sesame]
 
-object SesameRecordBinderTest extends RecordBinderTest[Sesame]
+class SesameRecordBinderTest extends RecordBinderTest[Sesame]
 
-object SesameCustomBinderTest extends CustomBindersTest[Sesame]
+class SesameCustomBinderTest extends CustomBindersTest[Sesame]
 
 import org.w3.banana.syntax._
 
-object SesameUriSyntaxTest extends UriSyntaxTest[Sesame]
+class SesameUriSyntaxTest extends UriSyntaxTest[Sesame]

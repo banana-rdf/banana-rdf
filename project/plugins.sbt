@@ -26,6 +26,13 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
 addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject"      % "1.0.0")
 
 /**
+  * jsdependencies t sbt plugin
+  *
+  * @see https://github.com/scala-js/jsdependencies
+  */
+addSbtPlugin("org.scala-js" % "sbt-jsdependencies" % "1.0.1")
+
+/**
   * ScalaJS sbt plugin
   *
   * @see http://www.scala-js.org/
