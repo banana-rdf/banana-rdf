@@ -11,7 +11,7 @@ import org.openrdf.rio.rdfxml.{RDFXMLWriter => SRdfXmlWriter}
 import org.openrdf.rio.turtle.{TurtleWriter => STurtleWriter}
 import org.w3.banana.io._
 
-/** Typeclass that reflects a Sesame String that can be used to construct an [[RDFWriter]]. */
+/** Typeclass that reflects a Sesame String that can be used to construct an RDFWriter. */
 trait SesameSyntax[T] {
   def rdfWriter(os: OutputStream, base: String): RDFWriter
   def rdfWriter(wr: Writer, base: String): RDFWriter

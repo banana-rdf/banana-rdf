@@ -3,10 +3,13 @@ package org.w3.banana.syntax
 import org.w3.banana._
 import java.net.URL
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 
-class UriSyntaxJvmTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers {
+
+
+class UriSyntaxJvmTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWordSpec with Matchers {
 
   import ops._
 

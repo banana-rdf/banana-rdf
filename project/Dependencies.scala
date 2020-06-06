@@ -1,4 +1,8 @@
 import sbt._
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType, _}
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
+
 
 object Dependencies {
   // Note: %%% can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting...
@@ -8,7 +12,7 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.2.8"
+  val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.3.1")
 
   /**
    * joda-Time
@@ -29,7 +33,7 @@ object Dependencies {
    * @see http://www.scalatest.org
    * @see http://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = "org.scalatest" %% "scalatest" % "3.0.1"
+  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.1.2")
   
   /**
    * Akka Http Core
@@ -50,7 +54,7 @@ object Dependencies {
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
- val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.4.0"
+ val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.4.0" 
 
   /**
    * logback for jena
@@ -69,7 +73,7 @@ object Dependencies {
   /**
    * sesame
    * @see http://www.openrdf.org/
-   * @see http://repo1.maven.org/maven2/org/openrdf/sesame/
+   * @see https://repo1.maven.org/maven2/org/openrdf/sesame/
    */
   val sesameVersion = "2.9.0"
 
@@ -103,8 +107,8 @@ object Dependencies {
    */
   val fusekiVersion =  "3.4.0"
   val fuseki = "org.apache.jena" % "apache-jena-fuseki" % fusekiVersion
-  val fusekiServer = "org.apache.jena" % "jena-fuseki-server" % fusekiVersion
-
+  val fusekiServer = "org.apache.jena" % "jena-fuseki-server" % fusekiVersion 
+  
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.1.0"
   val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.2"
 }

@@ -1,13 +1,14 @@
 package org.w3.banana
 package jsonldjs
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.scalajs.js
 
 // the async stuff doesn't get properly tested by zcheck. Need to wait
 // for scala-js 0.6. Look for [error] in the output in the meantime...
-object JsonLdJsTest extends WordSpec with Matchers {
+class JsonLdJsTest extends AnyWordSpec with Matchers {
 
   val input = """{
   "http://schema.org/name": "Manu Sporny",

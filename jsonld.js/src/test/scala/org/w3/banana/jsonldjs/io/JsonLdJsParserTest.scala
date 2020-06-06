@@ -3,12 +3,13 @@ package jsonldjs
 package io
 
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 import scalajs.concurrent.JSExecutionContext.Implicits.queue
 import org.w3.banana.plantain._
 
-object JsonLdJsParserTest extends WordSpec with Matchers {
+class JsonLdJsParserTest extends AnyWordSpec with Matchers {
 
   import PlantainOps._
 

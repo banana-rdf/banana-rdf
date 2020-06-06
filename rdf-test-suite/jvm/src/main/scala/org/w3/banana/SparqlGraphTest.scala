@@ -3,6 +3,8 @@ package org.w3.banana
 import java.io._
 
 import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import org.w3.banana.diesel._
 import org.w3.banana.io.{ SparqlQueryResultsReader, _ }
 import scala.util.Try
@@ -14,7 +16,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
   sparqlGraph: SparqlEngine[Rdf, Try, Rdf#Graph],
   sparqlWriter: SparqlSolutionsWriter[Rdf, SyntaxType],
   sparqlReader: SparqlQueryResultsReader[Rdf, SyntaxType]
-) extends WordSpec with Matchers with Inside with TryValues {
+) extends AnyWordSpec with Matchers with Inside with TryValues {
 
   import ops._
   import sparqlGraph.sparqlEngineSyntax._

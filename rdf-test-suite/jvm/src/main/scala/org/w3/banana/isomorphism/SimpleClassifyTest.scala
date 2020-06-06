@@ -1,6 +1,7 @@
 package org.w3.banana.isomorphism
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 import org.w3.banana.isomorphism._
 import org.w3.banana.{ RDF, RDFOps }
 
@@ -13,7 +14,7 @@ import scala.util.Success
  */
 class SimpleClassifyTest[Rdf <: RDF](mappingGenerator: (() => VerticeCBuilder[Rdf]) => SimpleMappingGenerator[Rdf])(
   implicit val ops: RDFOps[Rdf])
-    extends WordSpec with IsomorphismBNodeTrait[Rdf] with Matchers {
+    extends AnyWordSpec with IsomorphismBNodeTrait[Rdf] with Matchers {
 
   import ops._
   val counting = mappingGenerator(VerticeCBuilder.counting)

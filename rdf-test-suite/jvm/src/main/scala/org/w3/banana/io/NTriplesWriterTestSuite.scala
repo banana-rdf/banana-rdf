@@ -2,13 +2,15 @@ package org.w3.banana.io
 
 import org.w3.banana._
 import scala.util._
-import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+
 import java.io._
 
 class NTriplesWriterTestSuite[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
   writer: RDFWriter[Rdf, Try, NTriples]
-) extends WordSpec with Matchers {
+) extends AnyWordSpec with Matchers {
 
   import ops._
 

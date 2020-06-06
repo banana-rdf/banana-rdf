@@ -2,7 +2,9 @@ package org.w3.banana.io
 
 import org.w3.banana._
 import scala.util._
-import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
+
 import java.io._
 
 /**
@@ -11,7 +13,7 @@ import java.io._
 class NTriplesReaderTestSuite[Rdf <: RDF](implicit
   ops: RDFOps[Rdf],
   reader: RDFReader[Rdf, Try, NTriples]
-) extends WordSpec with Matchers {
+) extends AnyWordSpec with Matchers {
 
   import ops._
   import NTriplesParser.toGraph
@@ -601,7 +603,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
       fail("""<http://example/s> <http://example/p> 1.0e1 .""".stripMargin,1)
     }
     "nt-syntax-bad-string-04" in {
-      fail("""<http://example/s> <http://example/p> '''abc''' .""".stripMargin,1)
+      fail("""<http://example/s> <http://example/p> '\''abc'\'' .""".stripMargin,1)
     }
     "nt-syntax-bad-string-05" in {
       fail("""<http://example/s> <http://example/p> ""\"abc\""\" .""".stripMargin,1)

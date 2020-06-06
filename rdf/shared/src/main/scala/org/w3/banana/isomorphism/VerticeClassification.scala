@@ -76,7 +76,7 @@ case class CountingVC(forwardRels: Int,
  *
  * @param ops needed to calculate the hash of Nodes
  */
-case class SimpleHashVCBuilder[Rdf <: RDF](implicit ops: RDFOps[Rdf])
+case class SimpleHashVCBuilder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
     extends VerticeCBuilder[Rdf] {
 
   val forwardRels = mutable.Map[Rdf#URI, Long]().withDefaultValue(0)

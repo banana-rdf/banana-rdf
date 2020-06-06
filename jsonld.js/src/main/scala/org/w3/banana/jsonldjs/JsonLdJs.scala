@@ -2,6 +2,7 @@ package org.w3.banana
 package jsonldjs
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation._
 import scala.concurrent.{ Future, Promise }
 
 // the content of jsonldHelper should be in jsonld but it doesn't
@@ -44,6 +45,7 @@ object jsonldHelper {
 }
 
 @js.native
+@JSGlobal
 object jsonld extends js.Object {
 
   def toRDF(

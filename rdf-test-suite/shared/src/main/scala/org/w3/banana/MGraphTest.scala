@@ -1,9 +1,12 @@
 package org.w3.banana
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.matchers.should.Matchers
 
 
-class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends WordSpec with Matchers {
+
+
+class MGraphTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWordSpec with Matchers {
 
   import ops._
 

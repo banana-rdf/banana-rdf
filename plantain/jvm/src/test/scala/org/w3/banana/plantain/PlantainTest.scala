@@ -38,25 +38,25 @@ object `this must compile` {
 
 // New shared tests
 
-object PlantainOpsTest extends RDFOpsTest[Plantain]
+class PlantainOpsTest extends RDFOpsTest[Plantain]
 
-object PlantainGraphTest extends GraphTest[Plantain]
+class PlantainGraphTest extends GraphTest[Plantain]
 
-object PlantainMGraphTest extends MGraphTest[Plantain]
+class PlantainMGraphTest extends MGraphTest[Plantain]
 
-object PlantainGraphUnionTest extends GraphUnionTest[Plantain]
+class PlantainGraphUnionTest extends GraphUnionTest[Plantain]
 
-object PlantainIsomorphismsTest extends IsomorphismTest[Plantain]
+class PlantainIsomorphismsTest extends IsomorphismTest[Plantain]
 
-object PlantainPointedGraphTest extends PointedGraphTest[Plantain]
+class PlantainPointedGraphTest extends PointedGraphTest[Plantain]
 
 import org.w3.banana.diesel._
 
-object PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantain]
+class PlantainDieselGraphConstructTest extends DieselGraphConstructTest[Plantain]
 
-object PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
+class PlantainDieselGraphExplorationTest extends DieselGraphExplorationTest[Plantain]
 
-object PlantainDieselOwlPrimerTest extends DieselOwlPrimerTest[Plantain]
+class PlantainDieselOwlPrimerTest extends DieselOwlPrimerTest[Plantain]
 
 import org.w3.banana.binder._
 

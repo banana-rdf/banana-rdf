@@ -27,3 +27,7 @@ sbt-launch*.jar
 .local*
 *local*
 scala_common*
+.metals/
+.bloop/
+.vscode/
+metals.sbt

@@ -123,8 +123,8 @@ object  NTriplesParser {
 
 /**
  * Parser for NTriples as specified at http://www.w3.org/TR/n-triples/
- * A Parser is constructed from a [[java.io.Reader]], and is an Iterator 
- * of Try of [[org.w3.banana.RDF#Triples]]
+ * A Parser is constructed from a java.io.Reader, and is an Iterator 
+ * of Try of org.w3.banana.RDF#Triples
  * 
  * This parser tries to be fast:
  *
@@ -258,7 +258,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
       case 'r' => '\r'
       case 'f' => '\f'
       case '"' => '"'
-      case ''' => '''
+      case '\'' => '\''
       case '\\' => '\\'
       case 'u' => parseShortHex()
       case 'U' => parseLongHex()
