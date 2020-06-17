@@ -75,7 +75,7 @@ object Dependencies {
    * @see http://www.rdf4j.org/
    * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
    */
-  val rdf4jVersion = "3.2.0"
+  val rdf4jVersion = "3.2.2"
 
   val rdf4jQueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % rdf4jVersion
   val rdf4jQueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % rdf4jVersion
