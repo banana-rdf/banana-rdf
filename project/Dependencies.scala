@@ -10,41 +10,43 @@ object Dependencies {
   /**
     * scalaz
     * @see http://scalaz.org
-    * @see http://repo1.maven.org/maven2/org/scalaz/
+    * @see https://repo1.maven.org/maven2/org/scalaz/
     */
   val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.3.1")
 
   /**
    * joda-Time
    * @see http://joda-time.sourceforge.net
-   * @see http://repo1.maven.org/maven2/joda-time/joda-time/
+   * @see https://repo1.maven.org/maven2/joda-time/joda-time/
    */
   val jodaTime = "joda-time" % "joda-time" % "2.9.6"
 
   /**
    * joda-convert
    * @see http://joda-convert.sourceforge.net
-   * @see http://repo1.maven.org/maven2/org/joda/joda-convert
+   * @see https://repo1.maven.org/maven2/org/joda/joda-convert
    */
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
 
   /**
    * scalatest
-   * @see http://www.scalatest.org
-   * @see http://repo1.maven.org/maven2/org/scalatest
+   * @see https://www.scalatest.org
+   * @see https://repo1.maven.org/maven2/org/scalatest
    */
   val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.1.2")
   
   /**
    * Akka Http Core
-   * @see http://akka.io
-   * @see http://repo1.maven.org/maven2/com/typesafe/akka
+   * @see https://akka.io
+   * @see https://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.0.0"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.1.12"
+
+  val akka = "com.typesafe.akka" %% "akka-actor-typed" % "2.6.6"
 
   /**
    * Apache Commons Logging
-   * @see http://commons.apache.org/proper/commons-logging/
+   * @see https://commons.apache.org/proper/commons-logging/
    * @see https://repo1.maven.org/maven2/commons-logging/commons-logging
    */
   val commonsLogging = "commons-logging" % "commons-logging" % "1.2"
@@ -52,14 +54,14 @@ object Dependencies {
   /**
    * jena
    * @see https://jena.apache.org/
-   * @see http://repo1.maven.org/maven2/org/apache/jena
+   * @see https://repo1.maven.org/maven2/org/apache/jena
    */
- val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.4.0" 
+ val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.15.0"
 
   /**
    * logback for jena
-   * @see http://logging.apache.org/log4j/1.2/
-   * @see http://repo1.maven.org/maven2/log4j/log4j/
+   * @see https://logging.apache.org/log4j/1.2/
+   * @see https://repo1.maven.org/maven2/log4j/log4j/
    */
   val logback = "log4j" % "log4j" % "1.2.16" % "provided"
 
@@ -89,26 +91,26 @@ object Dependencies {
   /**
    * jsonld-java
    * @see https://github.com/jsonld-java/jsonld-java
-   * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-sesame
+   * @see https://repo1.maven.org/maven2/com/github/jsonld-java/
    */
   val jsonldJava = "com.github.jsonld-java" % "jsonld-java-sesame" % "0.5.1"
 
   /**
    * parboiled
    * @see http://parboiled.org
-   * @see http://repo1.maven.org/maven2/org/parboiled/
+   * @see https://repo1.maven.org/maven2/org/parboiled/
    */
   val parboiled2 = "org.parboiled" %% "parboiled" % "2.1.3"
 
   /**
    * jena-fuseki
    * @see http://jena.apache.org/documentation/serving_data
-   * @see http://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
+   * @see https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
-  val fusekiVersion =  "3.4.0"
+  val fusekiVersion =  "3.15.0"
   val fuseki = "org.apache.jena" % "apache-jena-fuseki" % fusekiVersion
   val fusekiServer = "org.apache.jena" % "jena-fuseki-server" % fusekiVersion 
   
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.1.0"
-  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.2"
+  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.3"
 }

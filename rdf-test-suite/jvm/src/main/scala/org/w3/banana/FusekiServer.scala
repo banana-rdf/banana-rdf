@@ -1,11 +1,12 @@
 package org.w3.banana
 
 import org.apache.jena.atlas.lib.FileOps
-import org.apache.jena.fuseki.FusekiLogging
-import org.apache.jena.fuseki.jetty.{JettyFuseki, JettyServerConfig}
-import org.apache.jena.fuseki.server.FusekiEnv
+import org.apache.jena.fuseki.system.FusekiLogging
+import org.apache.jena.fuseki.jetty.JettyServerConfig
+import org.apache.jena.fuseki.webapp.FusekiEnv
 import org.apache.jena.query.Dataset
 import org.apache.jena.util.FileManager
+import org.apache.jena.fuseki.cmd.JettyFusekiWebapp
 
 /**
  * Embedded Fuseki Server
@@ -42,11 +43,11 @@ class FusekiServer(dataset:Dataset, port:Int = 3030, path:String = "ds", dataFil
   }
 
   val server ={
-    JettyFuseki.initializeServer(conf)
-    JettyFuseki.instance
+    JettyFusekiWebapp.initializeServer(conf)
+    JettyFusekiWebapp.instance
   } //EmbeddedFusekiServer.create(port, tdb, path);
 
-  JettyFuseki.initializeServer(conf)
+  JettyFusekiWebapp.initializeServer(conf)
 
   def start() = server.start
 

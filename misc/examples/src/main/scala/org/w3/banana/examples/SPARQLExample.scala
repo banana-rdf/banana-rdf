@@ -58,7 +58,7 @@ SELECT DISTINCT ?language WHERE {
       row("language").get.as[Rdf#URI].get
     }
 
-    println(languages.to[List])
+    println(languages.to(List))
   }
 
 }

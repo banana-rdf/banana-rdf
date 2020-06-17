@@ -50,7 +50,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
     }
 
     "parse a URL with an encoded character \\u" in {
-      val iri = ntparser("""http://example/\u0053>""").parseIRI()
+      val iri = ntparser("http://example/\u0053>").parseIRI()
       iri should equal (URI("http://example/S"))
     }
 
@@ -68,7 +68,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
     "not parse a plain Literal that does not close" in {
       val nt = ntparser(name)
       val lit = Try(nt.parseLiteral())
-      lit should be a 'failure
+      lit should be a Symbol("failure")
     }
 
     "parse a PlainLiteral"  in {
@@ -98,7 +98,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
     
     "not parse an illegal BNode" in {
       val bn = Try (ntparser(":-123 ").parseBNode())
-      bn should be a 'failure
+      bn should be a Symbol("failure")
     }
 
   }
@@ -222,7 +222,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
     def test(s: String, size: Int)(implicit test: Rdf#Graph => Boolean = _ => true) = {
       val parseAttempt = ntparse(s)
       assert(test(parseAttempt.get))
-      parseAttempt should be a 'success
+      parseAttempt should be a Symbol("success")
       parseAttempt.get.size should be(size)
     }
 

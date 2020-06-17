@@ -1,7 +1,7 @@
 package org.w3.banana
 package io
 
-import java.io._
+import java.io.{OutputStream=>jOut}
 
 import scala.util._
 
@@ -29,7 +29,7 @@ object BooleanWriter {
         |}
         | """.stripMargin.format(bool)
 
-    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
+    override def write(obj: Boolean, outputstream: jOut, base: String) = ???
 
   }
 
@@ -45,7 +45,7 @@ object BooleanWriter {
         |  <boolean>%s</boolean>
         |</sparql> """.stripMargin.format(bool) // "
 
-    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
+    override def write(obj: Boolean, outputstream: jOut, base: String) = ???
   }
 
 }

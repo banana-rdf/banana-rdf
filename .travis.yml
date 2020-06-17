@@ -30,9 +30,10 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION -jvm-opts .travis-jvmopts validate
 
 jdk:
-  - oraclejdk8
+  - oraclejdk11
 
 scala:
+  - 2.13.2
   - 2.12.1
   - 2.11.8
 

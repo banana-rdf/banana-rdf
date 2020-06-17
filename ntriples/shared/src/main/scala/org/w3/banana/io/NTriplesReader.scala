@@ -115,7 +115,7 @@ object  NTriplesParser {
       case Failure(other) => throw other // we break on first failure
       case Success(_) => true
     }
-    ntparser.ops.makeGraph(filteredIterator.map(_.get).toIterable)
+    ntparser.ops.makeGraph(filteredIterator.map(_.get).iterator.to(Iterable))
   }
 
 
@@ -200,9 +200,9 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
   @tailrec
   private def parseComment(): Unit = {
     read() match {
-      case -1 => Unit
-      case '\r' => Unit
-      case '\n' => Unit
+      case -1 => ()
+      case '\r' => ()
+      case '\n' => ()
       case _ => parseComment()
     }
   }

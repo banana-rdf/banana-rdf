@@ -69,14 +69,14 @@ lazy val publicationSettings = pomSettings ++ {
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "org.w3",
-  scalaVersion := "2.12.11",
-  crossScalaVersions := Seq("2.11.12", "2.12.11"),
-  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
+  scalaVersion := "2.13.2",
+//  crossScalaVersions := Seq("2.11.12", "2.12.11","2.13.2"),
+//  javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
   Test / parallelExecution := false,
   offline := true,
-  scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:implicitConversions,higherKinds", "-Xmax-classfile-name", "140"),
+  scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:implicitConversions,higherKinds"),
   scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
   description := "RDF framework for Scala",
   startYear := Some(2012),
@@ -136,13 +136,17 @@ lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .in(file("plantain"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(akkaHttpCore, sesameRioTurtle, jsonldJava)
+    libraryDependencies ++= Seq(akkaHttpCore, sesameRioTurtle, jsonldJava),
   )
   .settings(name := "banana-plantain")
   .dependsOn(rdf, ntriples, rdfTestSuite % "test->compile")
 
+
 lazy val plantainJS = plantain.js
-lazy val plantainJVM = plantain.jvm
+lazy val plantainJVM = plantain.jvm.settings(
+  libraryDependencies += akka
+)
+
 
 lazy val jena = Project("jena", file("jena"))
   .settings(commonSettings: _*)

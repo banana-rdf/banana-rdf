@@ -41,10 +41,10 @@ abstract class GraphUnionTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Any
 
   "union must compute the union of two graphs, and should not touch the graphs" in {
     val result = union(foo :: bar :: Nil)
-    isomorphism(foo, fooReference) shouldEqual true
-    isomorphism(bar, barReference) shouldEqual true
-    ! isomorphism(foo, bar) shouldEqual true
-    isomorphism(foobar, result) shouldEqual true
+    isomorphism(foo, fooReference) shouldEqual true;
+    isomorphism(bar, barReference) shouldEqual true;
+    ! isomorphism(foo, bar) shouldEqual true;
+    isomorphism(foobar, result) shouldEqual true;
   }
 
   "union of Nil must return an empty graph" in {

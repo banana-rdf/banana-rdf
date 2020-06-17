@@ -30,7 +30,7 @@ class JenaDatasetStore(defensiveCopy: Boolean)(implicit ops: RDFOps[Jena], jenaU
 
   /* SparqlEngine */
 
-  lazy val querySolution = new util.QuerySolution(ops)
+  lazy val querySolution = new org.w3.banana.jena.util.QuerySolution(ops)
 
   def executeSelect(dataset: Dataset, query: Jena#SelectQuery, bindings: Map[String, Jena#Node]): Try[Jena#Solutions] = Try {
     val qexec: QueryExecution =

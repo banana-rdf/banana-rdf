@@ -64,7 +64,7 @@ class SesameStore
 
   def appendToGraph(conn: RepositoryConnection, uri: Sesame#URI, graph: Sesame#Graph): Try[Unit] = Try {
     import org.w3.banana.sesame.Sesame.ops._
-    val triples = graph.triples.to[Iterable].asJava
+    val triples = graph.triples.asJava
     conn.add(triples, uri)
   }
 
