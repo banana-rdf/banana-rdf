@@ -1,10 +1,9 @@
 package org.w3.banana.rdf4j
 
-import org.eclipse.rdf4j.model.{ BNode => Rdf4jBNode, Literal => Rdf4jLiteral, URI => Rdf4jURI, IRI => Rdf4jIRI, _ }
+import org.eclipse.rdf4j.model.{ BNode => Rdf4jBNode, Literal => Rdf4jLiteral, IRI => Rdf4jIRI, _ }
 import org.eclipse.rdf4j.query._
 import org.eclipse.rdf4j.query.parser._
 import org.w3.banana._
-import org.w3.banana.rdf4j._
 
 case class Rdf4jParseUpdate(query: String)
 

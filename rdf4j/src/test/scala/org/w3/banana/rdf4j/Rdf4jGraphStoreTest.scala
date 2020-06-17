@@ -26,7 +26,7 @@ abstract class Rdf4jGraphStoreTest(conn: RepositoryConnection) extends GraphStor
 
 class Rdf4jMemoryGraphStoreTest extends Rdf4jGraphStoreTest({
   val repo = new SailRepository(new MemoryStore)
-  repo.initialize()
+  repo.init()
   repo.getConnection()
 })
 

@@ -10,7 +10,7 @@ class Rdf4jSparqlEngineTest extends SparqlEngineTest[Rdf4j, RepositoryConnection
   val repo = new SailRepository(new MemoryStore)
   //    val d = java.nio.file.Files.createTempDirectory("rdf4j-")
   //    val repo = new SailRepository((new NativeStore(d.toFile, "spoc,posc")))
-  repo.initialize()
+  repo.init()
   repo.getConnection()
 })
 
@@ -18,6 +18,6 @@ class Rdf4jSparqlEngineUpdateTest extends SparqlUpdateEngineTest[Rdf4j, Reposito
   val repo = new SailRepository(new MemoryStore)
   //    val d = java.nio.file.Files.createTempDirectory("rdf4j-")
   //    val repo = new SailRepository((new NativeStore(d.toFile, "spoc,posc")))
-  repo.initialize()
+  repo.init()
   repo.getConnection()
 })
