@@ -55,7 +55,7 @@ class Rdf4jOps extends RDFOps[Rdf4j] with Rdf4jMGraphOps with DefaultURIOps[Rdf4
     } catch {
       case iae: IllegalArgumentException =>
         new IRI {
-          override def equals(o: Any): Boolean = o.isInstanceOf[URI] && o.asInstanceOf[URI].toString == iriStr
+          override def equals(o: Any): Boolean = o.isInstanceOf[IRI] && o.asInstanceOf[IRI].toString.equals(iriStr)
           def getLocalName: String = iriStr
           def getNamespace: String = ""
           override def hashCode: Int = iriStr.hashCode
@@ -78,17 +78,13 @@ class Rdf4jOps extends RDFOps[Rdf4j] with Rdf4jMGraphOps with DefaultURIOps[Rdf4
   // literal
 
   val __xsdString = makeUri("http://www.w3.org/2001/XMLSchema#string")
-  val __rdfLangString = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
-
-  class LangLiteral(label: String, language: String) extends LiteralImpl(label, language) {
-    this.setDatatype(__rdfLangString)
-  }
 
   def makeLiteral(lexicalForm: String, datatype: Rdf4j#URI): Rdf4j#Literal =
     valueFactory.createLiteral(lexicalForm, datatype)
 
   def makeLangTaggedLiteral(lexicalForm: String, lang: Rdf4j#Lang): Rdf4j#Literal =
-    new LangLiteral(lexicalForm, lang)
+    // By setting the language, RDF4J sets the langString data type implicitly
+    valueFactory.createLiteral(lexicalForm, lang)
 
   def fromLiteral(literal: Rdf4j#Literal): (String, Rdf4j#URI, Option[Rdf4j#Lang]) =
     (literal.getLabel, literal.getDatatype, Option(literal.getLanguage.orElse(null)))
@@ -119,12 +115,12 @@ class Rdf4jOps extends RDFOps[Rdf4j] with Rdf4jMGraphOps with DefaultURIOps[Rdf4
   def find(graph: Rdf4j#Graph, subject: Rdf4j#NodeMatch, predicate: Rdf4j#NodeMatch, objectt: Rdf4j#NodeMatch): Iterator[Rdf4j#Triple] = {
     def sOpt: Option[Resource] =
       if (subject == null)
-        None
+        Some(null)
       else
         foldNode(subject)(Some.apply, Some.apply, _ => None)
     def pOpt: Option[Rdf4j#URI] =
       if (predicate == null)
-        None
+        Some(null)
       else
         foldNode(predicate)(Some.apply, _ => None, _ => None)
     val r = for {

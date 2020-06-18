@@ -13,6 +13,8 @@ class Rdf4jStore
     extends RDFStore[Rdf4j, Try, RepositoryConnection]
     with SparqlUpdate[Rdf4j, Try, RepositoryConnection] {
 
+  val valueFactory: ValueFactory = SimpleValueFactory.getInstance()
+
   /* Transactor */
 
   def r[T](conn: RepositoryConnection, body: => T): Try[T] = ???
@@ -64,14 +66,14 @@ class Rdf4jStore
 
   def appendToGraph(conn: RepositoryConnection, uri: Rdf4j#URI, graph: Rdf4j#Graph): Try[Unit] = Try {
     import Rdf4j.ops._
-    val triples = graph.triples.to[Iterable].asJava
+    val triples = graph.triples.asJava
     conn.add(triples, uri)
   }
 
   def removeTriples(conn: RepositoryConnection, uri: Rdf4j#URI, tripleMatches: Iterable[TripleMatch[Rdf4j]]): Try[Unit] = Try {
     val ts = tripleMatches.map {
       case (s, p, o) =>
-        new StatementImpl(s.asInstanceOf[Resource], p.asInstanceOf[URI], o)
+        valueFactory.createStatement(s.asInstanceOf[Resource], p.asInstanceOf[IRI], o)
     }
     conn.remove(ts.asJava, uri)
   }

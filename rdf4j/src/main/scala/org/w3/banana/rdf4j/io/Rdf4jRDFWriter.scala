@@ -15,10 +15,10 @@ class Rdf4jRDFWriter[T](implicit
 
   def write(graph: Rdf4j#Graph, os: OutputStream, base: String, prefixes: Set[Prefix[Rdf4j]]): Try[Unit] = Try {
     val sWriter = rdf4jSyntax.rdfWriter(os, base)
+    sWriter.startRDF()
     prefixes.foreach(p => {
       sWriter.handleNamespace(p.prefixName, p.prefixIri)
     })
-    sWriter.startRDF()
     ops.getTriples(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
   }
@@ -26,10 +26,10 @@ class Rdf4jRDFWriter[T](implicit
   def asString(graph: Rdf4j#Graph, base: String, prefixes: Set[Prefix[Rdf4j]]): Try[String] = Try {
     val result = new StringWriter()
     val sWriter = rdf4jSyntax.rdfWriter(result, base)
+    sWriter.startRDF()
     prefixes.foreach(p => {
       sWriter.handleNamespace(p.prefixName, p.prefixIri)
     })
-    sWriter.startRDF()
     ops.getTriples(graph) foreach sWriter.handleStatement
     sWriter.endRDF()
     result.toString

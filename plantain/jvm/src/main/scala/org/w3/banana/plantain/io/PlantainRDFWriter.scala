@@ -3,6 +3,7 @@ package org.w3.banana.plantain.io
 import java.io.{ByteArrayOutputStream, OutputStream}
 import java.net.{URI => jURI}
 
+import org.eclipse.rdf4j.model.ValueFactory
 import org.eclipse.rdf4j.model.impl._
 import org.eclipse.rdf4j.rio.turtle._
 import org.eclipse.rdf4j.{model => rdf4j}
@@ -14,8 +15,10 @@ import scala.util.Try
 
 object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
 
+  val valueFactory: ValueFactory = SimpleValueFactory.getInstance()
+
   /** accepts relative URIs */
-  class MyUri(uri: String) extends rdf4j.URI {
+  class MyUri(uri: String) extends rdf4j.IRI {
     def getLocalName(): String = ???
     def getNamespace(): String = ???
     def stringValue(): String = uri
@@ -35,21 +38,21 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
     def statement(s: Plantain#Node, p: Plantain#URI, o: Plantain#Node): rdf4j.Statement = {
       val subject: rdf4j.Resource = s match {
         case Uri(uri)           => new MyUri(uri.toString)
-        case model.BNode(label) => new BNodeImpl(label)
+        case model.BNode(label) => valueFactory.createBNode(label)
         case literal            => throw new IllegalArgumentException(s"$literal was in subject position")
       }
-      val predicate: rdf4j.URI = p match {
+      val predicate: rdf4j.IRI = p match {
         case uri: Plantain#URI => new MyUri(uri.toString())
       }
       val objectt: rdf4j.Value = o match {
         case uri: Plantain#URI   => new MyUri(uri.toString)
-        case model.BNode(label)  => new BNodeImpl(label)
+        case model.BNode(label)  => valueFactory.createBNode(label)
         case literal             => PlantainOps.fromLiteral(literal) match {
-          case (lexicalForm, uri, None)     => new LiteralImpl(lexicalForm, new URIImpl(uri.toString))
-          case (lexicalForm, _, Some(lang)) => new LiteralImpl(lexicalForm, lang)
+          case (lexicalForm, uri, None)     => valueFactory.createLiteral(lexicalForm, valueFactory.createIRI(uri.toString))
+          case (lexicalForm, _, Some(lang)) => valueFactory.createLiteral(lexicalForm, lang)
         }
       }
-      new StatementImpl(subject, predicate, objectt)
+      valueFactory.createStatement(subject, predicate, objectt)
     }
 
     def write(): Try[Unit] = Try {

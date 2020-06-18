@@ -4,7 +4,9 @@ import java.io._
 import java.util.LinkedList
 
 import org.eclipse.rdf4j.model._
-import org.eclipse.rdf4j.model.impl.{LinkedHashModel, LiteralImpl, StatementImpl}
+import org.eclipse.rdf4j.model.impl.{LinkedHashModel, SimpleValueFactory}
+import org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
+import org.eclipse.rdf4j.rio.turtle.TurtleParser
 import org.w3.banana._
 import org.w3.banana.io._
 import org.w3.banana.rdf4j.Rdf4j
@@ -15,14 +17,16 @@ trait CollectorFix extends org.eclipse.rdf4j.rio.helpers.StatementCollector {
 
   def ops: RDFOps[Rdf4j]
 
+  val valueFactory: ValueFactory = SimpleValueFactory.getInstance()
+
   override def handleStatement(st: Statement): Unit = st.getObject match {
     case o: Literal if o.getDatatype == null && o.getLanguage == null =>
       super.handleStatement(
-        new StatementImpl(
+        valueFactory.createStatement(
           st.getSubject,
           st.getPredicate,
-          new LiteralImpl(o.getLabel, ops.xsd.string)))
-    case other =>
+          valueFactory.createLiteral(o.getLabel, ops.xsd.string)))
+    case _ =>
       super.handleStatement(st)
   }
 
@@ -59,14 +63,14 @@ abstract class AbstractRdf4jReader[T] extends RDFReader[Rdf4j, Try, T] {
 }
 
 class Rdf4jTurtleReader(implicit val ops: RDFOps[Rdf4j]) extends AbstractRdf4jReader[Turtle] {
-  def getParser() = new org.eclipse.rdf4j.rio.turtle.TurtleParser
+  def getParser(): TurtleParser = new org.eclipse.rdf4j.rio.turtle.TurtleParser
 }
 
 class Rdf4jRDFXMLReader(implicit val ops: RDFOps[Rdf4j]) extends AbstractRdf4jReader[RDFXML] {
-  def getParser() = new org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
+  def getParser(): RDFXMLParser = new org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
 }
 
 class Rdf4jJSONLDReader(implicit val ops: RDFOps[Rdf4j]) extends AbstractRdf4jReader[JsonLd] {
-  def getParser() = new org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
+  def getParser(): RDFXMLParser = new org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
 }
 
