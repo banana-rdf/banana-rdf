@@ -121,7 +121,6 @@ lazy val rdfTestSuite = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies += jodaTime,
     libraryDependencies += jodaConvert,
     libraryDependencies += fuseki,
-    libraryDependencies += fusekiServer,
     libraryDependencies += servlet,
     libraryDependencies += httpComponents,
     Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
@@ -136,7 +135,7 @@ lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .in(file("plantain"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(akkaHttpCore, sesameRioTurtle, jsonldJava)
+    libraryDependencies ++= Seq(akkaHttpCore, sesameRioTurtle, jsonldJava, slf4jNop)
   )
   .settings(name := "banana-plantain")
   .dependsOn(rdf, ntriples, rdfTestSuite % "test->compile")
@@ -148,7 +147,8 @@ lazy val jena = Project("jena", file("jena"))
   .settings(commonSettings: _*)
   .settings(
     name := "banana-jena",
-    libraryDependencies ++= Seq(jenaLibs, commonsLogging, aalto )
+    Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
+    libraryDependencies ++= Seq(jenaLibs, slf4jNop, aalto )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
 lazy val sesame = Project("sesame", file("sesame"))
@@ -164,7 +164,7 @@ lazy val sesame = Project("sesame", file("sesame"))
       sesameSailMemory,
       sesameSailNativeRdf,
       sesameRepositorySail,
-      commonsLogging,
+      slf4jNop,
       jsonldJava
     )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")

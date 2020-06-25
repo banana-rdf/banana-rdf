@@ -43,25 +43,17 @@ object Dependencies {
   val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.0.0"
 
   /**
-   * Apache Commons Logging
-   * @see http://commons.apache.org/proper/commons-logging/
-   * @see https://repo1.maven.org/maven2/commons-logging/commons-logging
-   */
-  val commonsLogging = "commons-logging" % "commons-logging" % "1.2"
-
-  /**
    * jena
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
- val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.4.0" 
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.15.0" 
 
   /**
-   * logback for jena
-   * @see http://logging.apache.org/log4j/1.2/
-   * @see http://repo1.maven.org/maven2/log4j/log4j/
+   * slf4j-nop. Test dependency for logging.
+   * @see http://www.slf4j.org
    */
-  val logback = "log4j" % "log4j" % "1.2.16" % "provided"
+  val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.7.21" % Test
 
   /**
    * Aalto
@@ -105,9 +97,7 @@ object Dependencies {
    * @see http://jena.apache.org/documentation/serving_data
    * @see http://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
-  val fusekiVersion =  "3.4.0"
-  val fuseki = "org.apache.jena" % "apache-jena-fuseki" % fusekiVersion
-  val fusekiServer = "org.apache.jena" % "jena-fuseki-server" % fusekiVersion 
+  val fuseki = "org.apache.jena" % "jena-fuseki-main" % "3.15.0"
   
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.1.0"
   val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.2"
