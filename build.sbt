@@ -163,7 +163,7 @@ lazy val rdf4j = Project("rdf4j", file("rdf4j"))
       rdf4jSailMemory,
       rdf4jSailNativeRdf,
       rdf4jRepositorySail,
-      commonsLogging,
+      slf4jNop,
       jsonldJava
     )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
