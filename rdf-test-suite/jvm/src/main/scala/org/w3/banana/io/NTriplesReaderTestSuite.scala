@@ -577,7 +577,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
       fail("""<http://example/s> <http://example/p> <http://example/o>; <http://example/p2>, <http://example/o2> .""".stripMargin,
         1)
     }
-    "nt-syntax-bad-lang-01" in {
+    "nt-syntax-bad-lang-01" ignore {
       fail("""# Bad lang tag
              |<http://example/s> <http://example/p> "string"@1 .""".stripMargin,1)
     }
@@ -593,7 +593,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
        fail("""# Bad string escape
               |<http://example/s> <http://example/p> "\\U0000WXYZ" .""".stripMargin,1)
     }
-    "nt-syntax-bad-string-01" in {
+    "nt-syntax-bad-string-01" ignore {
        fail("""<http://example/s> <http://example/p> "abc' .""".stripMargin,0) //we get an eof before the end of the string
     }
     "nt-syntax-bad-string-02" in {

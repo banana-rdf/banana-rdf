@@ -15,7 +15,7 @@ trait SPARQLExampleDependencies
 /* Here is an example doing some IO. Read below to see what's
  * happening.
  * 
- * As you can see, we never use Jena nor Sesame directly. The binding
+ * As you can see, we never use Jena nor RDF4J directly. The binding
  * is done later by providing the module implementation you
  * want. Hopefully, you'll have the same results :-)
  * 

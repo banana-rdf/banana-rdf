@@ -6,7 +6,7 @@ val banana_rdf_test_suite = System.setProperty("banana-rdf-test-suite.build",  b
 
 val banana_jena  = System.setProperty("banana-jena.build",  banana_default)
 
-val banana_sesame = System.setProperty("banana-sesame.build",  banana_default)
+val banana_rdf4j = System.setProperty("banana-rdf4j.build",  banana_default)
 
 val banana_plantain = System.setProperty("banana-plantain.build",  banana_default)
 

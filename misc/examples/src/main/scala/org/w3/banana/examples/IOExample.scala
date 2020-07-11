@@ -1,8 +1,11 @@
 package org.w3.banana.examples
 
 import org.w3.banana._
+
 import scala.util.Properties
 import java.io.File
+
+import org.w3.banana.rdf4j.Rdf4jModule
 
 /* declare your dependencies as a trait with all the modules you need
  */
@@ -16,14 +19,14 @@ trait IOExampleDependencies
 /* Here is an example doing some IO. Read below to see what's
  * happening.
  * 
- * As you can see, we never use Jena nor Sesame directly. The binding
+ * As you can see, we never use Jena nor RDF4J directly. The binding
  * is done later by providing the module implementation you
  * want. Hopefully, you'll have the same results :-)
  * 
  * To run this example from sbt:
  *   project examples
  *   run-main org.w3.banana.examples.IOExampleWithJena
- *   run-main org.w3.banana.examples.IOExampleWithSesame
+ *   run-main org.w3.banana.examples.IOExampleWithRdf4j
  */
 trait IOExample extends IOExampleDependencies {
 
@@ -69,6 +72,4 @@ import org.w3.banana.jena.JenaModule
 
 object IOExampleWithJena extends IOExample with JenaModule
 
-import org.w3.banana.sesame.SesameModule
-
-object IOExampleWithSesame extends IOExample with SesameModule
+object IOExampleWithRdf4j extends IOExample with Rdf4jModule

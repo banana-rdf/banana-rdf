@@ -1,8 +1,6 @@
-import com.typesafe.sbt.SbtScalariform.defaultScalariformSettings
 import sbt.Keys._
 import sbt._
 import Dependencies._
-import com.typesafe.sbt.pgp.PgpKeys
 import sbtcrossproject.CrossPlugin.autoImport.{ crossProject, CrossType }
 
 lazy val pomSettings = Seq(
@@ -70,7 +68,7 @@ lazy val publicationSettings = pomSettings ++ {
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "org.w3",
   scalaVersion := "2.12.11",
-  crossScalaVersions := Seq("2.11.12", "2.12.11"),
+  crossScalaVersions := Seq("2.12.11"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8"),
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
@@ -135,7 +133,7 @@ lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .in(file("plantain"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(akkaHttpCore, sesameRioTurtle, jsonldJava, slf4jNop)
+    libraryDependencies ++= Seq(akkaHttpCore, rdf4jRioTurtle, jsonldJava, java8Compat)
   )
   .settings(name := "banana-plantain")
   .dependsOn(rdf, ntriples, rdfTestSuite % "test->compile")
@@ -151,20 +149,21 @@ lazy val jena = Project("jena", file("jena"))
     libraryDependencies ++= Seq(jenaLibs, slf4jNop, aalto )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
-lazy val sesame = Project("sesame", file("sesame"))
+lazy val rdf4j = Project("rdf4j", file("rdf4j"))
   .settings(commonSettings: _*)
   .settings(
-    name := "banana-sesame",
+    name := "banana-rdf4j",
     libraryDependencies ++= Seq(
-      sesameQueryAlgebra,
-      sesameQueryParser,
-      sesameQueryResult,
-      sesameRioTurtle,
-      sesameRioRdfxml,
-      sesameSailMemory,
-      sesameSailNativeRdf,
-      sesameRepositorySail,
-      slf4jNop,
+      rdf4jQueryAlgebra,
+      rdf4jQueryParser,
+      rdf4jQueryResult,
+      rdf4jRioTurtle,
+      rdf4jRioRdfxml,
+      rdf4jRioJsonLd,
+      rdf4jSailMemory,
+      rdf4jSailNativeRdf,
+      rdf4jRepositorySail,
+      commonsLogging,
       jsonldJava
     )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
@@ -181,12 +180,12 @@ lazy val examples = Project("examples", file("misc/examples"))
   .settings(commonSettings: _*)
   .settings(
     name := "banana-examples"
-  ).dependsOn(sesame, jena)
+  ).dependsOn(rdf4j, jena)
 
 lazy val runExamplesStr = ";examples/runMain org.w3.banana.examples.GraphExampleWithJena" +
-                          ";examples/runMain org.w3.banana.examples.GraphExampleWithSesame" +
+                          ";examples/runMain org.w3.banana.examples.GraphExampleWithRdf4j" +
                           ";examples/runMain org.w3.banana.examples.IOExampleWithJena" +
-                          ";examples/runMain org.w3.banana.examples.IOExampleWithSesame" +
+                          ";examples/runMain org.w3.banana.examples.IOExampleWithRdf4j" +
                           ";examples/runMain org.w3.banana.examples.SPARQLExampleWithJena"
 
 name := "banana"
