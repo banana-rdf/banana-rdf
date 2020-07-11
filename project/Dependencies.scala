@@ -17,7 +17,7 @@ object Dependencies {
   /**
    * joda-Time
    * @see http://joda-time.sourceforge.net
-   * @see http://repo1.maven.org/maven2/joda-time/joda-time/
+   * @see https://repo1.maven.org/maven2/joda-time/joda-time/
    */
   val jodaTime = "joda-time" % "joda-time" % "2.9.6"
 
@@ -37,10 +37,11 @@ object Dependencies {
   
   /**
    * Akka Http Core
-   * @see http://akka.io
-   * @see http://repo1.maven.org/maven2/com/typesafe/akka
+   * @see https://akka.io
+   * @see https://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.0.0"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.1.12"
+  val akka = "com.typesafe.akka" %% "akka-actor-typed" % "2.6.6"
 
   /**
    * jena
@@ -82,7 +83,7 @@ object Dependencies {
   /**
    * jsonld-java
    * @see https://github.com/jsonld-java/jsonld-java
-   * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-tools
+   * @see https://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-tools
    */
   val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.10.0"
 
@@ -95,17 +96,17 @@ object Dependencies {
   /**
    * parboiled
    * @see http://parboiled.org
-   * @see http://repo1.maven.org/maven2/org/parboiled/
+   * @see https://repo1.maven.org/maven2/org/parboiled/
    */
   val parboiled2 = "org.parboiled" %% "parboiled" % "2.1.3"
 
   /**
    * jena-fuseki
    * @see http://jena.apache.org/documentation/serving_data
-   * @see http://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
+   * @see https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
   val fuseki = "org.apache.jena" % "jena-fuseki-main" % "3.15.0"
   
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.1.0"
-  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.2"
+  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.3"
 }

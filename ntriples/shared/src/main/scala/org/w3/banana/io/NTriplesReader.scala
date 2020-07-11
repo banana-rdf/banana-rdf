@@ -194,15 +194,12 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
       case c => action(c.toChar)
     }
   
-
-
-
   @tailrec
   private def parseComment(): Unit = {
     read() match {
-      case -1 => Unit
-      case '\r' => Unit
-      case '\n' => Unit
+      case -1 => ()
+      case '\r' => ()
+      case '\n' => ()
       case _ => parseComment()
     }
   }

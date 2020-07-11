@@ -9,7 +9,7 @@ class RDFTransformer[A <: RDF, B <: RDF](
 ) {
 
   def transform(graph: A#Graph): B#Graph =
-    b.makeGraph(a.getTriples(graph).to[Iterable] map transformTriple)
+    b.makeGraph(a.getTriples(graph) map transformTriple)
 
   def transformTriple(triple: A#Triple): B#Triple = {
     val (s, p, o) = a.fromTriple(triple)

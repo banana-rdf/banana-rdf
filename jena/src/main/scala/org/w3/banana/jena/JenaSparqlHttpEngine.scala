@@ -11,7 +11,7 @@ import scala.util._
 class JenaSparqlHttpEngine(implicit ops: RDFOps[Jena])
     extends SparqlEngine[Jena, Try, URL] with SparqlUpdate[Jena, Try, URL] {
 
-  val querySolution = new util.QuerySolution(ops)
+  val querySolution = new org.w3.banana.jena.util.QuerySolution(ops)
 
   def qexec(endpoint: URL, query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
     val qe = QueryExecutionFactory.sparqlService(endpoint.toString, query)

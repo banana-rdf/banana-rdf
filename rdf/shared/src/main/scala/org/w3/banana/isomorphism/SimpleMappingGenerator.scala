@@ -72,9 +72,9 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implici
           vt.setBackwardRel(rel, subj)
         }, _ => ())
     }
-    bnodeClass.mapValues(_.result)
+    bnodeClass.mapValues(_.result).toMap
       .groupBy(_._2)
-      .mapValues(_.keys.toSet)
+      .mapValues(_.keys.toSet).toMap
   }
 
   case class ClassificationException(msg: String,
