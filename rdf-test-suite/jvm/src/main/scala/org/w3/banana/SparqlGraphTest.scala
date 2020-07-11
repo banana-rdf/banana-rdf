@@ -137,7 +137,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
                            |  ?ed contact:fullName "Alexandre Bertails"^^xsd:string .
                            |}""".stripMargin).success.value
 
-    "Alexandre Bertails must appear as an editor in new-tr.rdf" in { //was: taggedAs (SesameWIP)
+    "Alexandre Bertails must appear as an editor in new-tr.rdf" in { //was: taggedAs (Rdf4jWIP)
       val alexIsThere = graph.executeAsk(query).get
 
       assert(alexIsThere, " query " + query + " must return true")

@@ -1,9 +1,10 @@
 package org.w3.banana.examples
 
-import org.openrdf.repository.sail.SailRepository
-import org.openrdf.sail.memory.MemoryStore
+import org.eclipse.rdf4j.repository.sail.SailRepository
+import org.eclipse.rdf4j.sail.memory.MemoryStore
 import org.w3.banana._
 import org.w3.banana.io._
+import org.w3.banana.rdf4j._
 
 import scala.util.Try
 
@@ -16,7 +17,7 @@ import scala.util.Try
  * To run this example from sbt:
  *   project examples
  *   run-main org.w3.banana.examples.GraphExampleWithJena
- *   run-main org.w3.banana.examples.GraphExampleWithSesame
+ *   run-main org.w3.banana.examples.GraphExampleWithRdf4j
  */
 abstract class GraphStoreExample[Rdf <: RDF, Store](implicit
   ops: RDFOps[Rdf],
@@ -73,18 +74,17 @@ object GraphExampleWithJena extends GraphStoreExample[Jena, Dataset] {
 
 }
 
-import org.openrdf.repository.RepositoryConnection
-import org.w3.banana.sesame._
+import org.eclipse.rdf4j.repository.RepositoryConnection
 
-object GraphExampleWithSesame extends GraphStoreExample[Sesame, RepositoryConnection] {
+object GraphExampleWithRdf4j extends GraphStoreExample[Rdf4j, RepositoryConnection] {
 
   def makeRDFStore(file: String): RepositoryConnection = {
     val repo = new SailRepository(new MemoryStore)
-    val tempDir = java.nio.file.Files.createTempDirectory("sesame-").resolve(file).toFile
+    val tempDir = java.nio.file.Files.createTempDirectory("rdf4j-").resolve(file).toFile
     tempDir.mkdirs()
     tempDir.deleteOnExit()
     repo.setDataDir(tempDir)
-    repo.initialize()
+    repo.init()
     repo.getConnection()
   }
 }

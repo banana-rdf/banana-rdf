@@ -3,9 +3,9 @@ package io
 
 import java.io.{ Reader, InputStream }
 import akka.http.scaladsl.model.Uri
-import org.openrdf.rio._
-import org.openrdf.rio.turtle._
-import org.openrdf.{ model => sesame }
+import org.eclipse.rdf4j.rio._
+import org.eclipse.rdf4j.rio.turtle._
+import org.eclipse.rdf4j.{ model => rdf4j }
 import org.w3.banana.io._
 import scala.util.Try
 
@@ -27,20 +27,21 @@ object PlantainTurtleReader extends RDFReader[Plantain, Try, Turtle] {
 
     def handleNamespace(prefix: String, uri: String): Unit = prefixes += (prefix -> uri)
 
-    def handleStatement(statement: org.openrdf.model.Statement): Unit = {
+    def handleStatement(statement: org.eclipse.rdf4j.model.Statement): Unit = {
+      import scala.compat.java8.OptionConverters._
       val s: Plantain#Node = statement.getSubject match {
-        case bnode: sesame.BNode => BNode(bnode.getID)
-        case uri: sesame.URI     => URI(uri.toString)
+        case bnode: rdf4j.BNode => BNode(bnode.getID)
+        case uri: rdf4j.IRI     => URI(uri.toString)
       }
       val p: Plantain#URI = statement.getPredicate match {
-        case uri: sesame.URI => URI(uri.toString)
+        case uri: rdf4j.IRI => URI(uri.toString)
       }
       val o: Plantain#Node = statement.getObject match {
-        case bnode: sesame.BNode     => BNode(bnode.getID)
-        case uri: sesame.URI         => URI(uri.toString)
-        case literal: sesame.Literal => literal.getLanguage match {
-          case null => makeLiteral(literal.stringValue, Uri(literal.getDatatype.toString))
-          case lang => makeLangTaggedLiteral(literal.stringValue, lang)
+        case bnode: rdf4j.BNode     => BNode(bnode.getID)
+        case uri: rdf4j.IRI         => URI(uri.toString)
+        case literal: rdf4j.Literal => literal.getLanguage.asScala match {
+          case None => makeLiteral(literal.stringValue, Uri(literal.getDatatype.toString))
+          case Some(lang) => makeLangTaggedLiteral(literal.stringValue, lang)
         }
       }
       graph += (s, p, o)

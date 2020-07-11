@@ -13,7 +13,7 @@ val banana = (name: String) => "org.w3" %% name % "0.8.4" excludeAll (ExclusionR
 resolvers += "bblfish-snapshots" at "http://bblfish.net/work/repo/releases"
 
 //choose the packages you need for your dependencies
-val bananaDeps = Seq("banana", "banana-rdf", "banana-sesame").map(banana)
+val bananaDeps = Seq("banana", "banana-rdf", "banana-rdf4j").map(banana)
 ```
 
 An RDF library in Scala
@@ -24,7 +24,7 @@ in Scala.
 
 It can be used with existing libraries without any added cost. There
 is no wrapping involved: you manipulate directly the real objects. We
-currently support Jena, Sesame and Plantain, a pure Scala
+currently support Jena, RDF4J and Plantain, a pure Scala
 implementation.
 
 Features
@@ -32,7 +32,7 @@ Features
 
 `banana-rdf` emphasizes type-safety and immutability, so it can come
 with some cost when the underlying implementation is very mutable (I'm
-looking at you, Jena and Sesame). We try to keep a clear distinction
+looking at you, Jena and RDF4J). We try to keep a clear distinction
 between the core concepts and the enhanced syntax that Scala can give
 us.
 

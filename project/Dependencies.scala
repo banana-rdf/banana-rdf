@@ -71,27 +71,34 @@ object Dependencies {
   val aalto = "com.fasterxml" % "aalto-xml" % "1.0.0"
 
   /**
-   * sesame
-   * @see http://www.openrdf.org/
-   * @see https://repo1.maven.org/maven2/org/openrdf/sesame/
+   * RDF4J
+   * @see http://www.rdf4j.org/
+   * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
    */
-  val sesameVersion = "2.9.0"
+  val rdf4jVersion = "3.2.3"
 
-  val sesameQueryAlgebra = "org.openrdf.sesame" % "sesame-queryalgebra-evaluation" % sesameVersion
-  val sesameQueryParser = "org.openrdf.sesame" % "sesame-queryparser-sparql" % sesameVersion
-  val sesameQueryResult = "org.openrdf.sesame" % "sesame-queryresultio-sparqljson" % sesameVersion
-  val sesameRioTurtle = "org.openrdf.sesame" % "sesame-rio-turtle" % sesameVersion
-  val sesameRioRdfxml =  "org.openrdf.sesame" % "sesame-rio-rdfxml" % sesameVersion
-  val sesameSailMemory = "org.openrdf.sesame" % "sesame-sail-memory" % sesameVersion
-  val sesameSailNativeRdf = "org.openrdf.sesame" % "sesame-sail-nativerdf" % sesameVersion
-  val sesameRepositorySail = "org.openrdf.sesame" % "sesame-repository-sail" % sesameVersion
+  val rdf4jQueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % rdf4jVersion
+  val rdf4jQueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % rdf4jVersion
+  val rdf4jQueryResult = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % rdf4jVersion
+  val rdf4jRioTurtle = "org.eclipse.rdf4j" % "rdf4j-rio-turtle" % rdf4jVersion
+  val rdf4jRioRdfxml =  "org.eclipse.rdf4j" % "rdf4j-rio-rdfxml" % rdf4jVersion
+  val rdf4jRioJsonLd =  "org.eclipse.rdf4j" % "rdf4j-rio-jsonld" % rdf4jVersion
+  val rdf4jSailMemory = "org.eclipse.rdf4j" % "rdf4j-sail-memory" % rdf4jVersion
+  val rdf4jSailNativeRdf = "org.eclipse.rdf4j" % "rdf4j-sail-nativerdf" % rdf4jVersion
+  val rdf4jRepositorySail = "org.eclipse.rdf4j" % "rdf4j-repository-sail" % rdf4jVersion
 
   /**
    * jsonld-java
    * @see https://github.com/jsonld-java/jsonld-java
-   * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-sesame
+   * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-tools
    */
-  val jsonldJava = "com.github.jsonld-java" % "jsonld-java-sesame" % "0.5.1"
+  val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.10.0"
+
+  /**
+   * Java 8 Compatibility kit (needed until move to scala 2.13 is complete
+   * https://index.scala-lang.org/scala/scala-java8-compat/scala-java8-compat/0.8.0
+   */
+  val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"
 
   /**
    * parboiled
