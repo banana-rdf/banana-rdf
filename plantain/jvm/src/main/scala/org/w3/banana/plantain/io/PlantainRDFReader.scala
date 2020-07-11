@@ -28,19 +28,20 @@ object PlantainTurtleReader extends RDFReader[Plantain, Try, Turtle] {
     def handleNamespace(prefix: String, uri: String): Unit = prefixes += (prefix -> uri)
 
     def handleStatement(statement: org.eclipse.rdf4j.model.Statement): Unit = {
+      import scala.compat.java8.OptionConverters._
       val s: Plantain#Node = statement.getSubject match {
         case bnode: rdf4j.BNode => BNode(bnode.getID)
-        case uri: rdf4j.URI     => URI(uri.toString)
+        case uri: rdf4j.IRI     => URI(uri.toString)
       }
       val p: Plantain#URI = statement.getPredicate match {
-        case uri: rdf4j.URI => URI(uri.toString)
+        case uri: rdf4j.IRI => URI(uri.toString)
       }
       val o: Plantain#Node = statement.getObject match {
         case bnode: rdf4j.BNode     => BNode(bnode.getID)
-        case uri: rdf4j.URI         => URI(uri.toString)
-        case literal: rdf4j.Literal => literal.getLanguage match {
-          case null => makeLiteral(literal.stringValue, Uri(literal.getDatatype.toString))
-          case lang => makeLangTaggedLiteral(literal.stringValue, lang.orElse(null))
+        case uri: rdf4j.IRI         => URI(uri.toString)
+        case literal: rdf4j.Literal => literal.getLanguage.asScala match {
+          case None => makeLiteral(literal.stringValue, Uri(literal.getDatatype.toString))
+          case Some(lang) => makeLangTaggedLiteral(literal.stringValue, lang)
         }
       }
       graph += (s, p, o)

@@ -75,7 +75,7 @@ object Dependencies {
    * @see http://www.rdf4j.org/
    * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
    */
-  val rdf4jVersion = "3.2.2"
+  val rdf4jVersion = "3.2.3"
 
   val rdf4jQueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % rdf4jVersion
   val rdf4jQueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % rdf4jVersion
@@ -93,6 +93,12 @@ object Dependencies {
    * @see http://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-tools
    */
   val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.10.0"
+
+  /**
+   * Java 8 Compatibility kit (needed until move to scala 2.13 is complete
+   * https://index.scala-lang.org/scala/scala-java8-compat/scala-java8-compat/0.8.0
+   */
+  val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"
 
   /**
    * parboiled

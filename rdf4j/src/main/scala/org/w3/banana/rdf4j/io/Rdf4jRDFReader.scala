@@ -5,6 +5,7 @@ import java.util.LinkedList
 
 import org.eclipse.rdf4j.model._
 import org.eclipse.rdf4j.model.impl.{LinkedHashModel, SimpleValueFactory}
+import org.eclipse.rdf4j.rio.jsonld.JSONLDParser
 import org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
 import org.eclipse.rdf4j.rio.turtle.TurtleParser
 import org.w3.banana._
@@ -63,14 +64,14 @@ abstract class AbstractRdf4jReader[T] extends RDFReader[Rdf4j, Try, T] {
 }
 
 class Rdf4jTurtleReader(implicit val ops: RDFOps[Rdf4j]) extends AbstractRdf4jReader[Turtle] {
-  def getParser(): TurtleParser = new org.eclipse.rdf4j.rio.turtle.TurtleParser
+  def getParser(): TurtleParser = new TurtleParser()
 }
 
 class Rdf4jRDFXMLReader(implicit val ops: RDFOps[Rdf4j]) extends AbstractRdf4jReader[RDFXML] {
-  def getParser(): RDFXMLParser = new org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
+  def getParser(): RDFXMLParser = new RDFXMLParser()
 }
 
 class Rdf4jJSONLDReader(implicit val ops: RDFOps[Rdf4j]) extends AbstractRdf4jReader[JsonLd] {
-  def getParser(): RDFXMLParser = new org.eclipse.rdf4j.rio.rdfxml.RDFXMLParser
+  def getParser()  = new JSONLDParser()
 }
 
