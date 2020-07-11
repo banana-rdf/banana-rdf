@@ -36,7 +36,7 @@ class JenaFusekiSparqlTest extends AnyFlatSpec
     server.stop
   }
 
-  /*"The repository"*/ignore must "contain person 'Morgana'" in {
+  "The repository" must "contain person 'Morgana'" in {
 
     val sparqlUpdate =
       """

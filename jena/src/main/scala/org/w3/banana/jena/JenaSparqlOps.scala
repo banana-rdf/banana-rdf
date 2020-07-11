@@ -2,6 +2,7 @@ package org.w3.banana.jena
 
 import org.apache.jena.graph.{ Node => JenaNode }
 import org.apache.jena.query.{ QueryFactory, Query => JenaQuery }
+import org.apache.jena.query.QueryType
 import org.apache.jena.rdf.model.RDFNode
 import org.apache.jena.update.UpdateFactory
 import org.w3.banana.SparqlOps.withPrefixes
@@ -9,6 +10,8 @@ import org.w3.banana._
 
 import scala.collection.JavaConverters._
 import scala.util._
+import scala.unchecked
+
 
 class JenaSparqlOps(implicit jenaUtil: JenaUtil) extends SparqlOps[Jena] {
 
@@ -43,10 +46,10 @@ class JenaSparqlOps(implicit jenaUtil: JenaUtil) extends SparqlOps[Jena] {
       select: Jena#SelectQuery => T,
       construct: Jena#ConstructQuery => T,
       ask: Jena#AskQuery => T) =
-    query.getQueryType match {
-      case JenaQuery.QueryTypeSelect => select(query)
-      case JenaQuery.QueryTypeConstruct => construct(query)
-      case JenaQuery.QueryTypeAsk => ask(query)
+    (query.queryType: @unchecked) match {
+      case QueryType.SELECT => select(query)
+      case QueryType.CONSTRUCT => construct(query)
+      case QueryType.ASK => ask(query)
     }
 
   def getNode(solution: Jena#Solution, v: String): Try[Jena#Node] = {

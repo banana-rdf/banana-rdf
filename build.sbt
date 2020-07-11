@@ -119,7 +119,6 @@ lazy val rdfTestSuite = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies += jodaTime,
     libraryDependencies += jodaConvert,
     libraryDependencies += fuseki,
-    libraryDependencies += fusekiServer,
     libraryDependencies += servlet,
     libraryDependencies += httpComponents,
     Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
@@ -146,7 +145,8 @@ lazy val jena = Project("jena", file("jena"))
   .settings(commonSettings: _*)
   .settings(
     name := "banana-jena",
-    libraryDependencies ++= Seq(jenaLibs, commonsLogging, aalto )
+    Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
+    libraryDependencies ++= Seq(jenaLibs, slf4jNop, aalto )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
 lazy val rdf4j = Project("rdf4j", file("rdf4j"))
@@ -163,7 +163,7 @@ lazy val rdf4j = Project("rdf4j", file("rdf4j"))
       rdf4jSailMemory,
       rdf4jSailNativeRdf,
       rdf4jRepositorySail,
-      commonsLogging,
+      slf4jNop,
       jsonldJava
     )
   ).dependsOn(rdfJVM, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
