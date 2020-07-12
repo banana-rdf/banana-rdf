@@ -41,7 +41,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
                            |}""".stripMargin).success.value
 
     val names: Iterable[String] =
-      store.executeSelect(query).get.iterator.to[Iterable].map {
+      store.executeSelect(query).get.iterator.to(Iterable).map {
         row => row("name").success.value.as[String].success.value
       }
 
@@ -68,7 +68,7 @@ class SparqlEngineTest[Rdf <: RDF, A](
       "prop" -> URI("http://www.w3.org/2000/10/swap/pim/contact#fullName"))
 
     val names: Iterable[String] =
-      store.executeSelect(query, bindings).get.iterator.to[Iterable].map {
+      store.executeSelect(query, bindings).get.iterator.to(Iterable).map {
         row => row("name").success.value.as[String].success.value
       }
 

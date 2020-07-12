@@ -94,7 +94,7 @@ class GraphStoreTest[Rdf <: RDF, M[+_] : Monad: Comonad, A](
     val r = for {
       _ <- store.removeGraph(u)
       _ <- store.appendToGraph(u, foo)
-      _ <- store.removeTriples(u, (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.triples.to[Iterable])
+      _ <- store.removeTriples(u, (URI("http://example.com/foo") -- rdf("foo") ->- "foo").graph.triples)
       _ <- store.appendToGraph(u, (URI("http://example.com/foo") -- rdf("baz") ->- "baz").graph)
       rGraph <- store.getGraph(u)
     } yield {

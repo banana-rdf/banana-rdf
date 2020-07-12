@@ -12,7 +12,7 @@ import scala.util.Try
  */
 class JenaGraphSparqlEngine(implicit ops: RDFOps[Jena])
     extends SparqlEngine[Jena, Try, Jena#Graph] {
-  val querySolution = new util.QuerySolution(ops)
+  val querySolution = new org.w3.banana.jena.util.QuerySolution(ops)
 
   def qexec(graph: Jena#Graph, query: Jena#Query, bindings: Map[String, Jena#Node]): QueryExecution = {
     val model: Model = ModelFactory.createModelForGraph(graph)

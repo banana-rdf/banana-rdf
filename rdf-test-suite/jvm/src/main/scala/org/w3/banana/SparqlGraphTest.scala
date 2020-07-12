@@ -40,7 +40,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
                          """.stripMargin
 
     def testAnswer(solutions: Rdf#Solutions) = {
-      val rows = solutions.iterator.to[List]
+      val rows = solutions.iterator.to(List)
 
       val names: List[String] = rows.map {
         row => row("name").success.value.as[String].success.value
@@ -49,7 +49,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
       names should contain("Alexandre Bertails")
 
       val row = rows(0)
-      row("unknown") should be('failure)
+      row("unknown") should be(Symbol("failure"))
       true
     }
 

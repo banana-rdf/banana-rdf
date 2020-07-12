@@ -1,7 +1,7 @@
 package org.w3.banana
 package io
 
-import java.io._
+import java.io.OutputStream
 
 import scala.util._
 

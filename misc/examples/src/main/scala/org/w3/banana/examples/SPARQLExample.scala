@@ -52,13 +52,13 @@ SELECT DISTINCT ?language WHERE {
 
     /* iterate through the solutions */
 
-    val languages: Iterator[Rdf#URI] = answers.iterator map { row =>
+    val languages: Iterator[Rdf#URI] = answers.iterator() map { row =>
       /* row is an Rdf#Solution, we can get an Rdf#Node from the variable name */
       /* both the #Rdf#Node projection and the transformation to Rdf#URI can fail in the Try type, hense the flatMap */
       row("language").get.as[Rdf#URI].get
     }
 
-    println(languages.to[List])
+    println(languages.to(List))
   }
 
 }
