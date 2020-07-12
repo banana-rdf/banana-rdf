@@ -88,15 +88,8 @@ class Rdf4jOps extends RDFOps[Rdf4j] with Rdf4jMGraphOps with DefaultURIOps[Rdf4
 
   def fromLiteral(literal: Rdf4j#Literal): (String, Rdf4j#URI, Option[Rdf4j#Lang]) =
     (literal.getLabel, literal.getDatatype, Option(literal.getLanguage.orElse(null)))
-
-  /**
-    *  language tags are cases insensitive according to
-    * <a href="http://tools.ietf.org/html/bcp47#section-2.1.1">RFC 5646: Tags for Identifying Languages</a>
-    * which is referenced by <a href="http://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal">RDF11 Concepts</a>.
-    * Sesame does not take this into account, so canonicalise here to lower case. ( The NTriples Tests don't pass
-    * if the `.toLowerCase` transformation is removed .
-    */
-  def makeLang(langString: String): Rdf4j#Lang = langString.toLowerCase(Locale.ENGLISH)
+  
+  def makeLang(langString: String): Rdf4j#Lang = langString
 
   def fromLang(lang: Rdf4j#Lang): String = lang
 

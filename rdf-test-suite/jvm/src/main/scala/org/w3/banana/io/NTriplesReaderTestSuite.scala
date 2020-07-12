@@ -1,11 +1,12 @@
 package org.w3.banana.io
 
 import org.w3.banana._
+
 import scala.util._
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-
 import java.io._
+import java.lang.IllegalArgumentException
 
 /**
  *
@@ -129,10 +130,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
       val p = ntparser(str).parseTriple('_')
       p should be (Success(Triple(BNode("jane"),foaf.knows,BNode("tarzan"))))
     }
-
   }
-
-
 
 
   "Test that parser can parse a document containing one triple. The parser " should {
@@ -208,9 +206,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
         Triple(URI(bblfish), foaf.knows, BNode("betehess")),
         Triple(BNode("betehess"), foaf.homepage, URI("http://bertails.org/"))
       ))
-
     }
-
   }
 
 
@@ -222,7 +218,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
     def test(s: String, size: Int)(implicit test: Rdf#Graph => Boolean = _ => true) = {
       val parseAttempt = ntparse(s)
       assert(test(parseAttempt.get))
-      parseAttempt should be a 'success
+      parseAttempt should be a Symbol("success")
       parseAttempt.get.size should be(size)
     }
 
@@ -497,7 +493,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
         o.fold(uri=>false,bn=>false,lit=>lit.lexicalForm=="chat" && lit.lang == Some(Lang("en")))
       }
     }
-    "lantag_with_subtag" in {
+    "langtag_with_subtag" in {
       test( """<http://example.org/ex#a> <http://example.org/ex#b> "Cheers"@en-UK .""", 1){g=>
         val o = g.triples.head.objectt
         o.fold(uri=>false,
@@ -524,6 +520,9 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
       assert(test(resultList))
       assert(resultList.filter{
         case Failure(ParseException(_,-1,_))=>false
+        // remove failures that come from extra tests builtinto RDF libraries
+        // In this case only Rdf4J when creating language tags.
+        case Failure(e: IllegalArgumentException) => false
         case _ => true
       }.size == erros)
     }
@@ -577,7 +576,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
       fail("""<http://example/s> <http://example/p> <http://example/o>; <http://example/p2>, <http://example/o2> .""".stripMargin,
         1)
     }
-    "nt-syntax-bad-lang-01" ignore {
+    "nt-syntax-bad-lang-01" in {
       fail("""# Bad lang tag
              |<http://example/s> <http://example/p> "string"@1 .""".stripMargin,1)
     }
@@ -593,7 +592,7 @@ class NTriplesReaderTestSuite[Rdf <: RDF](implicit
        fail("""# Bad string escape
               |<http://example/s> <http://example/p> "\\U0000WXYZ" .""".stripMargin,1)
     }
-    "nt-syntax-bad-string-01" ignore {
+    "nt-syntax-bad-string-01" in {
        fail("""<http://example/s> <http://example/p> "abc' .""".stripMargin,0) //we get an eof before the end of the string
     }
     "nt-syntax-bad-string-02" in {
