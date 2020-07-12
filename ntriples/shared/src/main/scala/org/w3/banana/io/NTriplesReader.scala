@@ -156,9 +156,9 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
 
   var ended = false
 
-  def hasNext = !ended
+  def hasNext: Boolean = !ended
 
-  def next() = {
+  def next(): Try[Rdf#Triple] = {
     val result = parseNextTriple()
     ended = result match {
       case Failure(ParseException(_,c,_)) => {
