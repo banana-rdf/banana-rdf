@@ -1,53 +1,34 @@
-import sbt.Keys._
-import sbt._
+import sbt.Keys.{publishMavenStyle, _}
+import sbt.{url, _}
 import Dependencies._
-import sbtcrossproject.CrossPlugin.autoImport.{ crossProject, CrossType }
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
-lazy val pomSettings = Seq(
-  pomIncludeRepository := { _ => false},
-  pomExtra :=
-    <url>https://github.com/w3c/banana-rdf</url>
-      <developers>
-        <developer>
-          <id>betehess</id>
-          <name>Alexandre Bertails</name>
-          <url>http://bertails.org/</url>
-        </developer>
-        <developer>
-          <id>InTheNow</id>
-          <name>Alistair Johnson</name>
-          <url>https://github.com/inthenow</url>
-        </developer>
-        <developer>
-          <id>bblfish</id>
-          <name>Henry Story</name>
-          <url>http://bblfish.net/</url>
-        </developer>
-      </developers>
-      <scm>
-        <url>git@github.com:w3c/banana-rdf.git</url>
-        <connection>scm:git:git@github.com:w3c/banana-rdf.git</connection>
-      </scm>
-  ,
-  licenses +=("W3C", url("http://opensource.org/licenses/W3C"))
-)
 
 //sbt -Dbanana.publish=bblfish.net:/home/hjs/htdocs/work/repo/
 //sbt -Dbanana.publish=bintray
-lazy val publicationSettings = pomSettings ++ {
+lazy val publicationSettings = {
   val pubre = """([^:]+):([^:]+)""".r
   Option(System.getProperty("banana.publish")) match {
     case Some("bintray") | None => Seq(
-// removed due to issue https://github.com/typesafehub/dbuild/issues/158
-//      publishTo := {
-//        val nexus = "https://oss.sonatype.org/"
-//        if (isSnapshot.value)
-//          Some("snapshots" at nexus + "content/repositories/snapshots")
-//        else
-//          Some("releases" at nexus + "service/local/staging/deploy/maven2")
-//      },
-//      releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-//      Test / publishArtifact  := false
+      sonatypeProfileName := "net.bblfish",
+      publishTo := sonatypePublishToBundle.value,
+
+      // To sync with Maven central, you need to supply the following information:
+      publishMavenStyle := true,
+
+      // Open-source license of your choice
+      licenses +=("W3C", url("http://opensource.org/licenses/W3C")),
+      homepage := Some(url("https://github.com/banana-rdf/banana-rdf")),
+      scmInfo := Some(
+        ScmInfo(
+          url("https://github.com/banana-rdf/banana-rdf"),
+          "scm:git@github.com:banana-rdf/banana-rdf.git"
+        )
+      ),
+      developers := List(
+        Developer(id="bblfish", name="Henry Story", email="henry.story@bblfish.net", url=url("https://bblfish.net")),
+        Developer(id="bertails", name="Alexandre Bertails", email="alexandre@bertails.org", url=url("http://www.bertails.org/"))
+      )
     )
     case Some(pubre(host, path)) =>
       Seq(
@@ -66,7 +47,7 @@ lazy val publicationSettings = pomSettings ++ {
 }
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
-  organization := "org.w3",
+  organization := "net.bblfish.rdf",
   scalaVersion := "2.13.3",
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
