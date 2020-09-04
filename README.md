@@ -6,7 +6,7 @@ banana-rdf
 The current published version 0.8.5-SNAPSHOT for scala 2.13 is to be found on the Sonatype repository under groupId [net/bblfish/rdf/](https://oss.sonatype.org/content/repositories/snapshots/net/bblfish/rdf/).
 
 ```scala
-val banana = (name: String) => "org.w3" %% name % "0.8.5-SNAPSHOT" excludeAll (ExclusionRule(organization = "org.scala-stm"))
+val banana = (name: String) => "net.bblfish.rdf" %% name % "0.8.5-SNAPSHOT" excludeAll (ExclusionRule(organization = "org.scala-stm"))
 
 //choose the packages you need for your dependencies
 val bananaDeps = Seq("banana", "banana-rdf", "banana-rdf4j").map(banana)
