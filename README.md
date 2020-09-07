@@ -11,6 +11,10 @@ val banana = (name: String) => "net.bblfish.rdf" %% name % "0.8.5-SNAPSHOT" excl
 //choose the packages you need for your dependencies
 val bananaDeps = Seq("banana", "banana-rdf", "banana-rdf4j").map(banana)
 ```
+Also for snapshot releases you need to add the sonatype resolver 
+```scala
+resolvers += Resolver.sonatypeRepo("snapshots")
+```
 
 An RDF library in Scala
 -----------------------
