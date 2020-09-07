@@ -1,10 +1,8 @@
 addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.3")
 
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.2")
-
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
 
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
+//addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
 
 /**
   * Bintray pluging
@@ -72,3 +70,16 @@ addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.2")
   * @see https://github.com/rtimush/sbt-updates
   */
 addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.2")
+
+/**
+ * sbtsonatype plugin used to publish artifact to maven central via sonatype nexus
+ * @see https://github.com/xerial/sbt-sonatype
+ */
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.4")
+
+
+  /**
+  * plugin used to sign the artifcat with pgp keys
+  * @see https://github.com/sbt/sbt-pgp
+  */
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")

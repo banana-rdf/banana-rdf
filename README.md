@@ -3,17 +3,17 @@ banana-rdf
 
 [![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png)](http://travis-ci.org/w3c/banana-rdf) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w3c/banana-rdf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The current published version 0.8.4 for scala 2.12 is to be found on the [http://bblfish.net/work/repo/releases](http://bblfish.net/work/repo/releases) repository.
+The current published version 0.8.5-SNAPSHOT for scala 2.13 is to be found on the Sonatype repository under groupId [net/bblfish/rdf/](https://oss.sonatype.org/content/repositories/snapshots/net/bblfish/rdf/).
 
 ```scala
-val banana = (name: String) => "org.w3" %% name % "0.8.4" excludeAll (ExclusionRule(organization = "org.scala-stm"))
-
-//add the bblfish-snapshots repository to the resolvers
-
-resolvers += "bblfish-snapshots" at "http://bblfish.net/work/repo/releases"
+val banana = (name: String) => "net.bblfish.rdf" %% name % "0.8.5-SNAPSHOT" excludeAll (ExclusionRule(organization = "org.scala-stm"))
 
 //choose the packages you need for your dependencies
 val bananaDeps = Seq("banana", "banana-rdf", "banana-rdf4j").map(banana)
+```
+Also for snapshot releases you need to add the sonatype resolver 
+```scala
+resolvers += Resolver.sonatypeRepo("snapshots")
 ```
 
 An RDF library in Scala
