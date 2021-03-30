@@ -48,7 +48,7 @@ lazy val publicationSettings = {
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "net.bblfish.rdf",
-  scalaVersion := "2.13.5",
+  scalaVersion := "3.0.0-RC2",
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
   Test / parallelExecution := false,
@@ -73,7 +73,7 @@ lazy val rdf = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies += scalaz.value
   )
   .jvmSettings(
-    libraryDependencies ++= Seq(jodaTime, jodaConvert)
+    libraryDependencies ++= Seq(jodaTime, jodaConvert),
   )
 
 lazy val rdfJS = rdf.js
@@ -112,7 +112,7 @@ lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .in(file("plantain"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(akkaHttpCore, rdf4jRioTurtle, jsonldJava, java8Compat)
+    libraryDependencies ++= Seq(akkaHttpCore, rdf4jRioTurtle, jsonldJava)
   )
   .settings(name := "banana-plantain")
   .dependsOn(rdf, ntriples, rdfTestSuite % "test->compile")
