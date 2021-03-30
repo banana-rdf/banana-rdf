@@ -2,11 +2,8 @@ package org.w3.banana.diesel
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-
-
 import org.w3.banana._
 import org.w3.banana.syntax._
-
 import scalaz.Scalaz.{none, some}
 
 class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWordSpec with Matchers {
@@ -218,6 +215,32 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends An
 
     (g isIsomorphicWith expectedGraph)  shouldEqual true
 
+  }
+
+  "test JSON Literals" in {
+    val jwtRsa = """{
+						|   "kty" : "RSA",
+						|   "n"   : "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx
+						|            4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMs
+						|            tn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2
+						|            QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbI
+						|            SD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqb
+						|            w0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw",
+						|   "e"   : "AQAB",
+						|   "alg" : "RS256",
+						|   "kid" : "2011-04-29"
+						| }""".stripMargin
+
+    val cert = CertPrefix[Rdf]
+    val keyId = URI("http://alice.example/key#i")
+    val jwtPg = keyId -- cert.key ->- Literal(jwtRsa, rdf.JSON)
+
+    val expectedGraph =
+      Graph(
+        Triple(keyId, cert.key, Literal(jwtRsa, rdf.JSON)),
+      )
+
+    assert(jwtPg.graph isIsomorphicWith expectedGraph) shouldEqual true
   }
 
   "providing a Some(t) as an object just emits the triple with t as an object" in {
