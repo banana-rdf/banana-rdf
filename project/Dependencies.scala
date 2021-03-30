@@ -48,7 +48,7 @@ object Dependencies {
    * @see https://jena.apache.org/
    * @see http://repo1.maven.org/maven2/org/apache/jena
    */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.15.0" 
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.17.0"
 
   /**
    * slf4j-nop. Test dependency for logging.
@@ -85,7 +85,7 @@ object Dependencies {
    * @see https://github.com/jsonld-java/jsonld-java
    * @see https://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-tools
    */
-  val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.10.0"
+  val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.13.2"
 
   /**
    * Java 8 Compatibility kit (needed until move to scala 2.13 is complete
@@ -105,7 +105,7 @@ object Dependencies {
    * @see http://jena.apache.org/documentation/serving_data
    * @see https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
-  val fuseki = "org.apache.jena" % "jena-fuseki-main" % "3.15.0"
+  val fuseki = "org.apache.jena" % "jena-fuseki-main" % "3.17.0"
   
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.1.0"
   val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.3"
