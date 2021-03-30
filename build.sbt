@@ -48,7 +48,7 @@ lazy val publicationSettings = {
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "net.bblfish.rdf",
-  scalaVersion := "2.13.3",
+  scalaVersion := "2.13.5",
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
   Test / parallelExecution := false,

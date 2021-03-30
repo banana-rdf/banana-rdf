@@ -89,6 +89,7 @@ class RDFPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("rdf", "http
   val subject = apply("subject")
   val `type` = apply("type")
   val value = apply("value")
+  val JSON = apply("JSON")
 }
 
 object XSDPrefix {
