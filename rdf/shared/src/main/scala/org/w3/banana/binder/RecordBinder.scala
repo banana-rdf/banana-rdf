@@ -137,7 +137,9 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
 
     }
 
-    def apply[T1, T2](p1: Property[Rdf, T1], p2: Property[Rdf, T2])(apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PGBinder[Rdf, T] = new PGBinder[Rdf, T] {
+    def apply[T1, T2](p1: Property[Rdf, T1], p2: Property[Rdf, T2])
+                    (apply: (T1, T2) => T, unapply: T => Option[(T1, T2)]): PGBinder[Rdf, T] =
+      new PGBinder[Rdf, T] {
 
       def toPG(t: T): PointedGraph[Rdf] = {
         val Some((t1, t2)) = unapply(t)

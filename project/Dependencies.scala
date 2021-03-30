@@ -1,6 +1,7 @@
 import sbt._
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
-import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType, _}
+import sbt.Keys.scalaVersion
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject, _}
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
 
 
@@ -12,7 +13,7 @@ object Dependencies {
     * @see http://scalaz.org
     * @see http://repo1.maven.org/maven2/org/scalaz/
     */
-  val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.3.1")
+   val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.4.0-M7")
 
   /**
    * joda-Time
@@ -33,8 +34,8 @@ object Dependencies {
    * @see http://www.scalatest.org
    * @see http://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.1.2")
-  
+  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.6")
+
   /**
    * Akka Http Core
    * @see https://akka.io
@@ -91,7 +92,7 @@ object Dependencies {
    * Java 8 Compatibility kit (needed until move to scala 2.13 is complete
    * https://index.scala-lang.org/scala/scala-java8-compat/scala-java8-compat/0.8.0
    */
-  val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"
+  //val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"
 
   /**
    * parboiled

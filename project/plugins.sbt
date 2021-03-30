@@ -2,6 +2,9 @@ addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.3")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
 
+/** Dotty plugin */
+addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.3")
+
 //addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
 
 /**
@@ -21,7 +24,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
   *
   * @see https://github.com/portable-scala/sbt-crossproject
   */
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject"      % "1.0.0")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0")
 
 /**
   * jsdependencies t sbt plugin
@@ -61,7 +64,7 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
   * better ivy alternative for dependency resolution
   * @see https://github.com/alexarchambault/coursier
   */
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.2")
+// addSbtPlugin("io.get-coursier" % "sbt-coursier" % "2.0.0-RC6-8")
 
 /**
   * sbt-updates
@@ -69,17 +72,17 @@ addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.2")
   * for easier dependency updates monitoring
   * @see https://github.com/rtimush/sbt-updates
   */
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.2")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.2")
 
 /**
  * sbtsonatype plugin used to publish artifact to maven central via sonatype nexus
  * @see https://github.com/xerial/sbt-sonatype
  */
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.4")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.7")
 
 
   /**
   * plugin used to sign the artifcat with pgp keys
   * @see https://github.com/sbt/sbt-pgp
   */
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
+addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.1.2")
