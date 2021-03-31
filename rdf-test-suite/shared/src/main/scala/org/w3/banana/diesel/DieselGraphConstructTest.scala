@@ -240,7 +240,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends An
         Triple(keyId, cert.key, Literal(jwtRsa, rdf.JSON)),
       )
 
-    assert(jwtPg.graph isIsomorphicWith expectedGraph) shouldEqual true
+    (jwtPg.graph isIsomorphicWith expectedGraph) shouldEqual true
   }
 
   "providing a Some(t) as an object just emits the triple with t as an object" in {
