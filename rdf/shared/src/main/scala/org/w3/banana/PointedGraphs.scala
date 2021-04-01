@@ -14,7 +14,7 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
   def iterator = nodes.iterator map { PointedGraph(_, graph) }
 
   def /(p: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraphs[Rdf] = {
-    val ns: Iterable[Rdf#Node] = this flatMap { pointed: PointedGraph[Rdf] =>
+    val ns: Iterable[Rdf#Node] = this flatMap { (pointed: PointedGraph[Rdf]) =>
       import pointed.pointer
       ops.getObjects(graph, pointer, p)
     }
@@ -26,7 +26,7 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
     if (!it.hasNext) {
       Failure(WrongExpectation("expected exactly one node but got 0"))
     } else {
-      val first = it.next
+      val first = it.next()
       Success(PointedGraph(first, graph))
     }
   }
@@ -39,7 +39,7 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
     if (!it.hasNext) {
       Failure(WrongExpectation("expected exactly one node but got 0"))
     } else {
-      val first = it.next
+      val first = it.next()
       if (it.hasNext)
         Failure(WrongExpectation("expected exactly one node but got more than 1"))
       else

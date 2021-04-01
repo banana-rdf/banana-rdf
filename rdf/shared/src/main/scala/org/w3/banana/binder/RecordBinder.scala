@@ -40,7 +40,7 @@ class RecordBinder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf]) {
         if (constUri == uri)
           Success(constT)
         else
-          Failure(WrongExpectation(constUri + " does not equal " + uri))
+          Failure(WrongExpectation(String.valueOf(constUri) + " does not equal " + uri))
 
       def toURI(t: T): Rdf#URI = constUri
     }

@@ -34,15 +34,15 @@ object Dependencies {
    * @see http://www.scalatest.org
    * @see http://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.6")
+  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.7")
 
   /**
    * Akka Http Core
    * @see https://akka.io
    * @see https://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.1.12"
-  val akka = "com.typesafe.akka" %% "akka-actor-typed" % "2.6.6"
+  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.2.4"
+  val akka = "com.typesafe.akka" %% "akka-actor-typed" % "2.6.13"
 
   /**
    * jena
