@@ -23,8 +23,8 @@ package object banana {
    * @return the Execution Context
    */
   def sameThreadExecutionContext = new ExecutionContext {
-    def reportFailure(t: Throwable) { t.printStackTrace() }
-    def execute(runnable: Runnable) { runnable.run() }
+    def reportFailure(t: Throwable): Unit = { t.printStackTrace() }
+    def execute(runnable: Runnable): Unit = { runnable.run() }
   }
 
   implicit class TryW[T](t: Try[T]) {

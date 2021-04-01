@@ -48,13 +48,13 @@ lazy val publicationSettings = {
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "net.bblfish.rdf",
-  scalaVersion := "3.0.0-RC2",
+  scalaVersion := "2.13.5", //"3.0.0-RC2",
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
   Test / parallelExecution := false,
   offline := true,
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:implicitConversions,higherKinds"),
-  scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
+  Compile / doc / scalacOptions := Seq("-groups", "-implicits"),
   description := "RDF framework for Scala",
   startYear := Some(2012),
   updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
@@ -112,14 +112,15 @@ lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .in(file("plantain"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(akkaHttpCore, rdf4jRioTurtle, jsonldJava)
+    libraryDependencies ++= Seq(rdf4jRioTurtle, jsonldJava),
+    libraryDependencies += akkaHttpCore.withDottyCompat(scalaVersion.value)
   )
   .settings(name := "banana-plantain")
   .dependsOn(rdf, ntriples, rdfTestSuite % "test->compile")
 
 lazy val plantainJS = plantain.js
 lazy val plantainJVM = plantain.jvm.settings(
-  libraryDependencies += akka
+  libraryDependencies += akka.withDottyCompat(scalaVersion.value)
 )
 
 lazy val jena = Project("jena", file("jena"))
@@ -175,7 +176,7 @@ commonSettings
 
 enablePlugins(ScalaUnidocPlugin)
 
-unidocProjectFilter in ( ScalaUnidoc, unidoc ) :=
+ ScalaUnidoc / unidoc / unidocProjectFilter :=
     inAnyProject -- inProjects( ntriplesJS, plantainJS, rdfJS, rdfTestSuiteJS )
 
 addCommandAlias("validate", ";compile;test;runExamples")
