@@ -390,7 +390,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
     }
   }
 
-  private def endOfSentence(): Unit = read match {
+  private def endOfSentence(): Unit = read() match {
     case -1 => throw EOF("was still searching for '.'")
     case '.' => ()
     case c if whitespace(c) => endOfSentence()
