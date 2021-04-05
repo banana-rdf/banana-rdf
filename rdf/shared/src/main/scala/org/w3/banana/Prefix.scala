@@ -356,6 +356,7 @@ trait CommonPrefixes[Rdf <: RDF] { this: RDFOps[Rdf] =>
 
   lazy val xsd = XSDPrefix(this)
   lazy val rdf = RDFPrefix(this)
+  lazy val owl = OWLPrefix(this)
 
 }
 
