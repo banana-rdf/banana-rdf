@@ -4,7 +4,7 @@ import org.w3.banana._
 
 trait LiteralSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
-  implicit def literalW(literal: Rdf#Literal) =
+  implicit def literalW(literal: Rdf#Literal): LiteralW[Rdf] =
     new LiteralW[Rdf](literal)
 
 }

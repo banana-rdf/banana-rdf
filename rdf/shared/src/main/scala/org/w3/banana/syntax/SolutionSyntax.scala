@@ -6,7 +6,7 @@ import scala.util.Try
 
 trait SolutionSyntax[Rdf <: RDF] { self: SolutionSyntax[Rdf] =>
 
-  implicit def solutionW(solution: Rdf#Solution) = new SolutionW[Rdf](solution)
+  implicit def solutionW(solution: Rdf#Solution): SolutionW[Rdf] = new SolutionW[Rdf](solution)
 
 }
 

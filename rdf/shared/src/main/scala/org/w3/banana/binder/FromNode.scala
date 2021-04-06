@@ -10,15 +10,17 @@ trait FromNode[Rdf <: RDF, +T] {
 
 object FromNode {
 
-  implicit def PointedGraphFromNode[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromNode[Rdf, PointedGraph[Rdf]] {
+  implicit def PointedGraphFromNode[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromNode[Rdf,PointedGraph[Rdf]] =
+    new FromNode[Rdf, PointedGraph[Rdf]] {
     def fromNode(node: Rdf#Node): Try[PointedGraph[Rdf]] = Success(PointedGraph(node))
   }
 
-  implicit def NodeFromNode[Rdf <: RDF] = new FromNode[Rdf, Rdf#Node] {
+  implicit def NodeFromNode[Rdf <: RDF]: FromNode[Rdf,Rdf#Node] =
+    new FromNode[Rdf, Rdf#Node] {
     def fromNode(node: Rdf#Node): Try[Rdf#Node] = Success(node)
   }
 
-  implicit def FromURIFromNode[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], from: FromURI[Rdf, T]) =
+  implicit def FromURIFromNode[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], from: FromURI[Rdf, T]): FromNode[Rdf,T] =
     new FromNode[Rdf, T] {
       def fromNode(node: Rdf#Node): Try[T] = ops.foldNode(node)(
         uri => from.fromURI(uri),
@@ -27,7 +29,8 @@ object FromNode {
       )
     }
 
-  implicit def FromLiteralFromNode[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], from: FromLiteral[Rdf, T]) = new FromNode[Rdf, T] {
+  implicit def FromLiteralFromNode[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], from: FromLiteral[Rdf, T]): FromNode[Rdf,T] =
+    new FromNode[Rdf, T] {
     def fromNode(node: Rdf#Node): Try[T] = ops.foldNode(node)(
       uri => Failure(FailedConversion(s"expected Literal, got URI: $uri")),
       bnode => Failure(FailedConversion(s"expected Literal, got BNode: $bnode")),

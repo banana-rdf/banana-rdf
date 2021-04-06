@@ -6,13 +6,13 @@ import scala.util._
 
 object JodaTimeBinders {
 
-  implicit def DateTimeToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def DateTimeToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,DateTime] =
     new ToLiteral[Rdf, DateTime] {
       import ops._
       def toLiteral(dateTime: DateTime): Rdf#Literal = Literal(dateTime.toString, xsd.dateTime)
     }
 
-  implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, DateTime] {
+  implicit def DateTimeFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,DateTime] = new FromLiteral[Rdf, DateTime] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[DateTime] = {
       val Literal(lexicalForm, datatype, _) = literal

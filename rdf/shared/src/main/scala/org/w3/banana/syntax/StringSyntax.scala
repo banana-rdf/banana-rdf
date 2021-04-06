@@ -4,7 +4,7 @@ import org.w3.banana._
 
 trait StringSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
-  implicit def stringW(s: String) = new StringW[Rdf](s)
+  implicit def stringW(s: String): StringW[Rdf] = new StringW[Rdf](s)
 
 }
 

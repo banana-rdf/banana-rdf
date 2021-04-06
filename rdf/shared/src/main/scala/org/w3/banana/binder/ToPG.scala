@@ -11,11 +11,11 @@ trait ToPG[Rdf <: RDF, -T] {
 
 object ToPG {
 
-  implicit def PointedGraphToPG[Rdf <: RDF] = new ToPG[Rdf, PointedGraph[Rdf]] {
+  implicit def PointedGraphToPG[Rdf <: RDF]: ToPG[Rdf,PointedGraph[Rdf]] = new ToPG[Rdf, PointedGraph[Rdf]] {
     def toPG(t: PointedGraph[Rdf]): PointedGraph[Rdf] = t
   }
 
-  implicit def ToNodeToPG[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], to: ToNode[Rdf, T]) = new ToPG[Rdf, T] {
+  implicit def ToNodeToPG[Rdf <: RDF, T](implicit ops: RDFOps[Rdf], to: ToNode[Rdf, T]): ToPG[Rdf,T] = new ToPG[Rdf, T] {
     def toPG(t: T): PointedGraph[Rdf] = PointedGraph(to.toNode(t))
   }
 
@@ -28,7 +28,7 @@ object ToPG {
         val newBNode = bnode()
         val pointed = to.toPG(a)
         triples += Triple(newBNode, rdf.first, pointed.pointer)
-        triples ++= pointed.graph.triples
+        triples ++= ops.graphW(pointed.graph).triples
         triples += Triple(newBNode, rdf.rest, current)
         current = newBNode
       }

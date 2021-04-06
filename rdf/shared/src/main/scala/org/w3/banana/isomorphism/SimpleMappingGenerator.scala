@@ -54,23 +54,26 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implici
   def bnodeClassify(graph: Rdf#Graph): Map[VerticeClassification, Set[Rdf#BNode]] = {
     val bnodeClass = mutable.HashMap[Rdf#BNode, VerticeCBuilder[Rdf]]()
     for (Triple(subj, rel, obj) <- graph.triples) {
-      subj.fold(_ => (), bn =>
-        bnodeClass.get(bn) orElse {
+      subj.fold((_: Rdf#URI) => (),
+        (bn: Rdf#BNode) => bnodeClass.get(bn) orElse {
           val vt = VT()
           bnodeClass.put(bn, vt)
           Some(vt)
         } map { vt =>
           vt.setForwardRel(rel, obj)
-        }, _ => ())
+        },
+        (_: Rdf#Literal) => ())
 
-      obj.fold(_ => (), bn =>
-        bnodeClass.get(bn) orElse {
+      obj.fold(
+        (_: Rdf#URI) => (),
+        (bn: Rdf#BNode) => bnodeClass.get(bn) orElse {
           val vt = VT()
           bnodeClass.put(bn, vt)
           Some(vt)
-        } map { vt =>
+        }.map { vt =>
           vt.setBackwardRel(rel, subj)
-        }, _ => ())
+        },
+        (_: Rdf#Literal) => ())
     }
     bnodeClass.mapValues(_.result).toMap
       .groupBy(_._2)

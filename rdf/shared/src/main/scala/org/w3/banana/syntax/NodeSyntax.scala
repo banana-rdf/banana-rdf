@@ -4,7 +4,7 @@ import org.w3.banana._
 
 trait NodeSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
-  implicit def nodeW(node: Rdf#Node) = new NodeW[Rdf](node)
+  implicit def nodeW(node: Rdf#Node): NodeW[Rdf] = new NodeW[Rdf](node)
 
 }
 

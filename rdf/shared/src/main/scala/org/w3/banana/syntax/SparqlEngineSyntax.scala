@@ -4,7 +4,7 @@ import org.w3.banana._
 
 final class SparqlEngineSyntax[Rdf <: RDF, M[_], A] {
 
-  implicit def sparqlEngineW(a: A) = new SparqlEngineW[Rdf, M, A](a)
+  implicit def sparqlEngineW(a: A): SparqlEngineW[Rdf,M,A] = new SparqlEngineW[Rdf, M, A](a)
 
 }
 

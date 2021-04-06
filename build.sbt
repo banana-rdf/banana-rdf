@@ -48,12 +48,13 @@ lazy val publicationSettings = {
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "net.bblfish.rdf",
-  scalaVersion := "2.13.5", //"3.0.0-RC2",
+  scalaVersion := "3.0.0-RC2",
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
   Test / parallelExecution := false,
   offline := true,
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:implicitConversions,higherKinds"),
+   // "-source:3.0-migration"),
   Compile / doc / scalacOptions := Seq("-groups", "-implicits"),
   description := "RDF framework for Scala",
   startYear := Some(2012),

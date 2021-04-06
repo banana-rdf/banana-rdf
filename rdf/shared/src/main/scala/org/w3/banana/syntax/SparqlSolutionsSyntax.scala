@@ -4,7 +4,7 @@ import org.w3.banana._
 
 trait SparqlSolutionsSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
-  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions) = new SparqlSolutionsSyntaxW[Rdf](solutions)
+  implicit def sparqlSolutionsSyntax(solutions: Rdf#Solutions): SparqlSolutionsSyntaxW[Rdf] = new SparqlSolutionsSyntaxW[Rdf](solutions)
 
 }
 

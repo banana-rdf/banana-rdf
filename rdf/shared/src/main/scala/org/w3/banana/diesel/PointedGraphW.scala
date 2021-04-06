@@ -50,9 +50,9 @@ class PointedGraphW[Rdf <: RDF](val pointed: PointedGraph[Rdf]) extends AnyVal {
       classes exists { _ == clazz }
     }
     pointer.fold(
-      uri => isAIfNodeOrBNode,
-      bnode => isAIfNodeOrBNode,
-      literal => false
+      (uri: Rdf#URI) => isAIfNodeOrBNode,
+      (bnode: Rdf#BNode) => isAIfNodeOrBNode,
+      (literal: Rdf#Literal) => false
     )
   }
 

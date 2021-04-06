@@ -8,23 +8,23 @@ trait ToLiteral[Rdf <: RDF, -T] {
 
 object ToLiteral {
 
-  implicit def LiteralToLiteral[Rdf <: RDF] = new ToLiteral[Rdf, Rdf#Literal] {
+  implicit def LiteralToLiteral[Rdf <: RDF]: ToLiteral[Rdf,Rdf#Literal] = new ToLiteral[Rdf, Rdf#Literal] {
     def toLiteral(t: Rdf#Literal): Rdf#Literal = t
   }
 
-  implicit def StringToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def StringToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,String] =
     new ToLiteral[Rdf, String] {
       import ops._
       def toLiteral(s: String): Rdf#Literal = Literal(s, xsd.string)
     }
 
-  implicit def BooleanToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def BooleanToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,Boolean] =
     new ToLiteral[Rdf, Boolean] {
       import ops._
       def toLiteral(b: Boolean): Rdf#Literal = Literal(if (b) "true" else "false", xsd.boolean)
     }
 
-  implicit def IntToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def IntToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,Int] =
     new ToLiteral[Rdf, Int] {
       import ops._
       def toLiteral(i: Int): Rdf#Literal = Literal(i.toString, xsd.integer)
@@ -32,13 +32,13 @@ object ToLiteral {
 
   import java.math.BigInteger
 
-  implicit def BigIntToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def BigIntToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,BigInteger] =
     new ToLiteral[Rdf, BigInteger] {
       import ops._
       def toLiteral(i: BigInteger): Rdf#Literal = Literal(i.toString, xsd.integer)
     }
 
-  implicit def DoubleToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def DoubleToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,Double] =
     new ToLiteral[Rdf, Double] {
       import ops._
       def toLiteral(d: Double): Rdf#Literal = Literal(d.toString, xsd.double)
@@ -64,7 +64,7 @@ object ToLiteral {
     }
   */
 
-  implicit def ByteArrayToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def ByteArrayToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,Array[Byte]]{def bytes2Hex(bytes: Array[Byte]): String} =
     new ToLiteral[Rdf, Array[Byte]] {
       import ops._
       def bytes2Hex(bytes: Array[Byte]): String = {

@@ -10,7 +10,7 @@ trait FromURI[Rdf <: RDF, +T] {
 
 object FromURI {
 
-  implicit def URIFromURI[Rdf <: RDF] = new FromURI[Rdf, Rdf#URI] {
+  implicit def URIFromURI[Rdf <: RDF]: FromURI[Rdf,Rdf#URI] = new FromURI[Rdf, Rdf#URI] {
     def fromURI(uri: Rdf#URI): Try[Rdf#URI] = Success(uri)
   }
 
