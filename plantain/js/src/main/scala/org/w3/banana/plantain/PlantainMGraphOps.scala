@@ -10,13 +10,13 @@ trait PlantainMGraphOps extends MGraphOps[Plantain] {
 
   def addTriple(mgraph: Plantain#MGraph, triple: Plantain#Triple): mgraph.type = {
     val (s, p, o) = triple
-    mgraph.graph = mgraph.graph + (s, p, o)
+    mgraph.graph += (s, p, o)
     mgraph
   }
 
   def removeTriple(mgraph: Plantain#MGraph, triple: Plantain#Triple): mgraph.type = {
     val (s, p, o) = triple
-    mgraph.graph = mgraph.graph - (s, p, o)
+    mgraph.graph -= (s, p, o)
     mgraph
   }
 
