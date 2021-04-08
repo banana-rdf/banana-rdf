@@ -33,7 +33,7 @@ jdk:
   - oraclejdk11
 
 scala:
-  - 2.13.3
+  - 2.13.5
 
 branches:
   only:
