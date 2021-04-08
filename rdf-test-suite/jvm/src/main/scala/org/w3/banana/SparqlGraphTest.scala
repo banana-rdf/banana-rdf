@@ -40,7 +40,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
                          """.stripMargin
 
     def testAnswer(solutions: Rdf#Solutions) = {
-      val rows = solutions.iterator.to(List)
+      val rows = solutions.iterator().to(List)
 
       val names: List[String] = rows.map {
         row => row("name").success.value.as[String].success.value
@@ -72,7 +72,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
       val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")
       assert(answr2.isSuccess, "the serialised sparql answers must be deserialisable")
 
-      answr2.map(a => assert(testAnswer(a.left.get), "the deserialised answer must pass the same tests as the original one"))
+      answr2.map(a => assert(testAnswer(a.swap.getOrElse(fail("no solutions"))), "the deserialised answer must pass the same tests as the original one"))
     }
   }
 

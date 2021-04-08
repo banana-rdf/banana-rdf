@@ -1,5 +1,5 @@
 import sbt.Keys.{publishMavenStyle, _}
-import sbt.{url, _}
+import sbt.{CrossVersion, url, _}
 import Dependencies._
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
@@ -48,7 +48,7 @@ lazy val publicationSettings = {
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "net.bblfish.rdf",
-  scalaVersion := "3.0.0-RC2",
+  scalaVersion := "2.13.5", //"3.0.0-RC2",
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
   Test / parallelExecution := false,
@@ -114,14 +114,14 @@ lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(rdf4jRioTurtle, jsonldJava),
-    libraryDependencies += akkaHttpCore.withDottyCompat(scalaVersion.value)
+    libraryDependencies += akkaHttpCore
   )
   .settings(name := "banana-plantain")
   .dependsOn(rdf, ntriples, rdfTestSuite % "test->compile")
 
 lazy val plantainJS = plantain.js
 lazy val plantainJVM = plantain.jvm.settings(
-  libraryDependencies += akka.withDottyCompat(scalaVersion.value)
+  libraryDependencies += akka
 )
 
 lazy val jena = Project("jena", file("jena"))

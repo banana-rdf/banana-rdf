@@ -102,7 +102,7 @@ class CommonBindersTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWordSp
     (None: Option[String]).toPG.as[Option[String]] shouldEqual Success(None)
   }
 
-  def `this must compile` {
+  def `this must compile` : Unit = {
     implicitly[PGBinder[Rdf, Rdf#URI]]
     implicitly[NodeBinder[Rdf, Rdf#URI]]
     implicitly[PGBinder[Rdf, Rdf#Node]]

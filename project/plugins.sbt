@@ -2,11 +2,12 @@ addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.3")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
 
-/** Dotty plugin */
-addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.3")
-addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.4.0-SNAPSHOT")
-//addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
+/** Dotty plugin no longer needed for sbt 1.5.0  */
+//addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.4")
+/** scala3 migrate, kept here for references. Remove when migration complete */
+//addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.4.0-SNAPSHOT")
 
+//addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.9")
 
 /**
   * Bintray pluging

@@ -23,15 +23,17 @@ trait IsomorphismBNodeTrait[Rdf <: RDF] {
       -- foaf.name ->- "Henry Story"
   ).graph
 
-  def list(size: Int, bnprefix: String) = {
-    def bn(i: Int) = BNode(bnprefix + i)
+  def bn(bnprefix: String)(i: Int) = BNode(bnprefix + i)
+
+  def list(size: Int, bnPrefix: String) = {
+    val p = bnPrefix
     (1 to size).foldRight(
-      Graph(Triple(bn(0), rdf.first, Literal("0", xsd.integer)),
-        Triple(bn(0), rdf.rest, rdf.nil))) {
+      Graph(Triple(bn(p)(0), rdf.first, Literal("0", xsd.integer)),
+        Triple(bn(p)(0), rdf.rest, rdf.nil))) {
         case (i, g) =>
           g union (
-            bn(i) -- rdf.first ->- i
-            -- rdf.rest ->- bn(i - 1)
+            bn(p)(i) -- rdf.first ->- i
+              -- rdf.rest ->- bn(p)(i - 1)
           ).graph
 
       }

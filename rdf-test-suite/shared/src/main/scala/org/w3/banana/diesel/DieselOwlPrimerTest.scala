@@ -108,7 +108,7 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
     def equivalentClasses(ce:Rdf#URI,pg:PointedGraph[Rdf]):PointedGraph[Rdf] = ce -- owl.equivalentClass ->- pg
 
     def objectComplementOf(ce:Rdf#URI):PointedGraph[Rdf] = (
-      bnode -- rdf.typ          ->- owl.Class
+      bnode() -- rdf.typ          ->- owl.Class
             -- owl.complementOf ->- ce
       )
     def ¬(ce:Rdf#URI):PointedGraph[Rdf] = objectComplementOf(ce)
@@ -168,10 +168,10 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
     import Owl2._
 
     val g:Rdf#Graph = Seq (
-        f.ChildlessPerson -- owl.equivalentClass ->- ( bnode
+        f.ChildlessPerson -- owl.equivalentClass ->- ( bnode()
         -- rdf.typ            ->- owl.Class
         -- owl.intersectionOf ->- List( f.Person.toPG,
-                                        bnode -- rdf.typ          ->- owl.Class
+                                        bnode() -- rdf.typ          ->- owl.Class
                                               -- owl.complementOf ->- f.Parent))
     )
 
@@ -238,7 +238,7 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
 
 
       f.Mother --   rdfs.subClassOf ->- f.Woman
-               --  owl.equivalentClass ->- (bnode
+               --  owl.equivalentClass ->- (bnode()
         -- rdf.typ            ->-  owl.Class
         -- owl.intersectionOf ->- ( f.Woman,  f.Parent )),
 
@@ -249,58 +249,58 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
         -- owl.equivalentClass ->- f.Human
         -- owl.hasKey          ->- f.hasSSN,
 
-      f.Parent -- owl.equivalentClass ->- (bnode
+      f.Parent -- owl.equivalentClass ->- (bnode()
         -- rdf.typ     ->- owl.Class
         -- owl.unionOf ->-(f.Mother, f.Father)),
 
-      f.Parent -- owl.equivalentClass ->- (bnode
+      f.Parent -- owl.equivalentClass ->- (bnode()
         -- rdf.typ            ->- owl.Restriction
         -- owl.onProperty     ->- f.hasChild
         -- owl.someValuesFrom ->- f.Person ),
 
-      f.Grandfather -- rdfs.subClassOf  ->- (bnode
+      f.Grandfather -- rdfs.subClassOf  ->- (bnode()
         -- rdf.typ            ->- owl.Class
         -- owl.intersectionOf ->- ( f.Man,  f.Parent )),
 
-      f.HappyPerson -- owl.equivalentClass  ->- (bnode
+      f.HappyPerson -- owl.equivalentClass  ->- (bnode()
         -- rdf.typ ->-      owl.Class
-        -- owl.intersectionOf ->- ( bnode -- rdf.typ            ->- owl.Restriction
+        -- owl.intersectionOf ->- ( bnode() -- rdf.typ            ->- owl.Restriction
                                           -- owl.onProperty     ->- f.hasChild
                                           -- owl.allValuesFrom  ->- f.HappyPerson,
-                                    bnode -- rdf.typ            ->- owl.Restriction
+                                    bnode() -- rdf.typ            ->- owl.Restriction
                                           -- owl.onProperty     ->- f.hasChild
                                           -- owl.someValuesFrom ->- f.HappyPerson)),
 
-      f.JohnsChildren -- owl.equivalentClass ->- ( bnode
+      f.JohnsChildren -- owl.equivalentClass ->- ( bnode()
         -- rdf.typ        ->- owl.Restriction
         -- owl.onProperty ->- f.hasParent
         -- owl.hasValue   ->- f.John),
 
-      f.NarcisticPerson -- owl.equivalentClass ->- ( bnode
+      f.NarcisticPerson -- owl.equivalentClass ->- ( bnode()
         -- rdf.typ   ->-     owl.Restriction
         -- owl.onProperty ->- f.loves
         -- owl.hasSelf   ->-  true ),
 
-      f.MyBirthdayGuests -- owl.equivalentClass ->- ( bnode
+      f.MyBirthdayGuests -- owl.equivalentClass ->- ( bnode()
         -- rdf.typ ->-  owl.Class
         -- owl.oneOf ->- ( f.Bill, f.John, f.Mary )),
 
-      f.Orphan --  owl.equivalentClass ->- ( bnode
+      f.Orphan --  owl.equivalentClass ->- ( bnode()
         -- rdf.typ ->-           owl.Restriction
-        -- owl.onProperty    ->- (bnode -- owl.inverseOf ->-  f.hasChild)
+        -- owl.onProperty    ->- (bnode() -- owl.inverseOf ->-  f.hasChild)
         -- owl.allValuesFrom ->- f.Dead),
 
-      f.Teenager -- rdfs.subClassOf ->- ( bnode
+      f.Teenager -- rdfs.subClassOf ->- ( bnode()
         -- rdf.typ            ->- owl.Restriction
         -- owl.onProperty     ->- f.hasAge
-        -- owl.someValuesFrom ->- ( bnode
+        -- owl.someValuesFrom ->- ( bnode()
           -- rdf.typ              ->- rdfs.Datatype
           -- owl.onDatatype       ->- xsd.integer
-          -- owl.withRestrictions ->- ( bnode -- xsd.minExclusive ->- 12,
-                                        bnode -- xsd.maxInclusive ->- 19))),
+          -- owl.withRestrictions ->- ( bnode() -- xsd.minExclusive ->- 12,
+                                        bnode() -- xsd.maxInclusive ->- 19))),
 
       f.Man -- rdfs.subClassOf       ->- f.Person,
-      bnode -- rdf.typ               ->- owl.Axiom
+      bnode() -- rdf.typ               ->- owl.Axiom
             -- owl.annotatedSource   ->- f.Man
             -- owl.annotatedProperty ->- rdfs.subClassOf
             -- owl.annotatedTarget   ->- f.Person
@@ -308,56 +308,56 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
 
       f.Adult -- owl.equivalentClass ->-otherOnt("Grownup"),
 
-      f.Father -- rdfs.subClassOf  ->- ( bnode
+      f.Father -- rdfs.subClassOf  ->- ( bnode()
         -- rdf.typ            ->- owl.Class
         -- owl.intersectionOf ->- ( f.Man,  f.Parent )),
 
-      f.ChildlessPerson -- owl.equivalentClass ->- ( bnode
+      f.ChildlessPerson -- owl.equivalentClass ->- ( bnode()
         -- rdf.typ            ->- owl.Class
-        -- owl.intersectionOf ->- ( f.Person.toPG, bnode -- owl.complementOf ->- f.Parent)),
+        -- owl.intersectionOf ->- ( f.Person.toPG, bnode() -- owl.complementOf ->- f.Parent)),
 
-      f.ChildlessPerson -- rdfs.subClassOf ->- ( bnode
+      f.ChildlessPerson -- rdfs.subClassOf ->- ( bnode()
         -- rdf.typ            ->- owl.Class
         -- owl.intersectionOf ->- ( f.Person.toPG,
-                                    bnode -- owl.complementOf ->- ( bnode
+                                    bnode() -- owl.complementOf ->- ( bnode()
                                       -- rdf.typ            ->- owl.Restriction
-                                      -- owl.onProperty     ->- (bnode -- owl.inverseOf ->- f.hasParent)
+                                      -- owl.onProperty     ->- (bnode() -- owl.inverseOf ->- f.hasParent)
                                       -- owl.someValuesFrom ->- owl.Thing))),
 
-      bnode -- rdf.typ            ->- owl.Class
-            -- owl.intersectionOf ->- ( bnode -- rdf.typ   ->- owl.Class
+      bnode() -- rdf.typ            ->- owl.Class
+            -- owl.intersectionOf ->- ( bnode() -- rdf.typ   ->- owl.Class
                                               -- owl.oneOf ->- ( f.Mary,  f.Bill,  f.Meg ),
                                       f.Female.toPG)
-            -- rdfs.subClassOf ->- ( bnode
+            -- rdfs.subClassOf ->- ( bnode()
               -- rdf.typ            ->- owl.Class
               -- owl.intersectionOf ->- ( f.Parent.toPG,
-                                          bnode -- rdf.typ            ->- owl.Restriction
+                                          bnode() -- rdf.typ            ->- owl.Restriction
                                                 -- owl.maxCardinality ->- 1 //^^xsdf.nonNegativeInteger ;
                                                 -- owl.onProperty     ->- f.hasChild,
-                                          bnode -- rdf.typ            ->- owl.Restriction
+                                          bnode() -- rdf.typ            ->- owl.Restriction
                                                 -- owl.onProperty     ->- f.hasChild
                                                 -- owl.allValuesFrom  ->- f.Female)),
 
-      bnode -- rdf.typ     ->- owl.AllDisjointClasses
+      bnode() -- rdf.typ     ->- owl.AllDisjointClasses
             -- owl.members ->- ( f.Mother,  f.Father,  f.YoungChild ),
 
-      bnode -- rdf.typ     ->- owl.AllDisjointClasses
+      bnode() -- rdf.typ     ->- owl.AllDisjointClasses
             -- owl.members ->- ( f.Woman,  f.Man ),
 
-      f.personAge --  owl.equivalentClass ->- ( bnode
+      f.personAge --  owl.equivalentClass ->- ( bnode()
         -- rdf.typ              ->- rdfs.Datatype
         -- owl.onDatatype       ->- xsd.integer
-        -- owl.withRestrictions ->- ( bnode -- xsd.minInclusive ->- 0,
-                                      bnode -- xsd.maxInclusive ->- 150)),
+        -- owl.withRestrictions ->- ( bnode() -- xsd.minInclusive ->- 0,
+                                      bnode() -- xsd.maxInclusive ->- 150)),
 
-      f.majorAge -- owl.equivalentClass ->- ( bnode
+      f.majorAge -- owl.equivalentClass ->- ( bnode()
         -- rdf.typ ->-  rdfs.Datatype
         -- owl.intersectionOf ->- (
              f.personAge.toPG,
-             bnode -- rdf.typ                  ->- rdfs.Datatype
+             bnode() -- rdf.typ                  ->- rdfs.Datatype
                    -- owl.datatypeComplementOf ->- f.minorAge)),
 
-      f.toddlerAge --  owl.equivalentClass ->- ( bnode
+      f.toddlerAge --  owl.equivalentClass ->- ( bnode()
         -- rdf.typ   ->- rdfs.Datatype
         -- owl.oneOf ->- ( 1, 2)),
 
@@ -367,10 +367,10 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
 
       f.James -- owl.sameAs ->- f.Jim,
 
-      f.Jack -- rdf.typ ->- ( bnode
+      f.Jack -- rdf.typ ->- ( bnode()
         -- rdf.typ            ->- owl.Class
         -- owl.intersectionOf ->- ( f.Person.toPG,
-                                    bnode -- rdf.typ ->-          owl.Class
+                                    bnode() -- rdf.typ ->-          owl.Class
                                           -- owl.complementOf ->- f.Parent )),
 
 
@@ -381,42 +381,42 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
       f.John -- owl.differentFrom ->- f.Bill,
       f.John -- f.hasAge          ->- 51,
 
-      f.John -- rdf.typ ->- ( bnode
+      f.John -- rdf.typ ->- ( bnode()
         -- rdf.typ                     ->- owl.Restriction
         -- owl.maxQualifiedCardinality ->- 4
         -- owl.onProperty              ->-  f.hasChild
         -- owl.onClass                 ->-  f.Parent),
 
-      f.John --  rdf.typ ->- ( bnode
+      f.John --  rdf.typ ->- ( bnode()
         -- rdf.typ                      ->- owl.Restriction
         -- owl.minQualifiedCardinality  ->- 2
         -- owl.onProperty               ->- f.hasChild
         -- owl.onClass                  ->- f.Parent),
 
-      f.John -- rdf.typ ->- ( bnode
+      f.John -- rdf.typ ->- ( bnode()
         -- rdf.typ                   ->- owl.Restriction
         -- owl.qualifiedCardinality  ->- 3
         -- owl.onProperty            ->- f.hasChild
         -- owl.onClass               ->- f.Parent),
 
-    f.John -- rdf.typ ->- ( bnode
+    f.John -- rdf.typ ->- ( bnode()
       --rdf.typ         ->- owl.Restriction
       --owl.cardinality ->- 5
       --owl.onProperty  ->- f.hasChild),
 
     f.Father -- rdf.typ ->- f.SocialRole,
 
-    bnode -- rdf.typ                ->- owl.NegativePropertyAssertion
+    bnode() -- rdf.typ                ->- owl.NegativePropertyAssertion
           -- owl.sourceIndividual   ->- f.Bill
           -- owl.assertionProperty  ->- f.hasWife
           -- owl.targetIndividual   ->- f.Mary,
 
-    bnode -- rdf.typ               ->- owl.NegativePropertyAssertion
+    bnode() -- rdf.typ               ->- owl.NegativePropertyAssertion
           -- owl.sourceIndividual  ->- f.Bill
           -- owl.assertionProperty ->- f.hasDaughter
           -- owl.targetIndividual  ->- f.Susan,
 
-    bnode --  rdf.typ               ->- owl.NegativePropertyAssertion
+    bnode() --  rdf.typ               ->- owl.NegativePropertyAssertion
           -- owl.sourceIndividual   ->- f.Jack
           -- owl.assertionProperty  ->- f.hasAge
           -- owl.targetValue        ->- 53
@@ -460,7 +460,7 @@ class DieselOwlPrimerTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends AnyWord
         -- owl.equivalentClass ->- f.Human
         -- owl.hasKey ->- f.hasSSN,
 
-      f.Parent -- owl.equivalentClass ->- (bnode
+      f.Parent -- owl.equivalentClass ->- (bnode()
         -- rdf.typ ->- owl.Class
         -- owl.unionOf ->-(f.John, f.Bill)
         )

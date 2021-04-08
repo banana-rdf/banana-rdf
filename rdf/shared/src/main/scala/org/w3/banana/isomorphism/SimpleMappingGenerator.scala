@@ -14,7 +14,7 @@ import scala.util.Try
  * @param VT the classifier
  * @param maxComplexity the maximum number of solutions to look at, otherwise fails
  */
-class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implicit ops: RDFOps[Rdf])
+final class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implicit ops: RDFOps[Rdf])
     extends MappingGenerator[Rdf] {
 
   import ops._
@@ -55,18 +55,19 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implici
     val bnodeClass = mutable.HashMap[Rdf#BNode, VerticeCBuilder[Rdf]]()
     for (Triple(subj, rel, obj) <- graph.triples) {
       subj.fold((_: Rdf#URI) => (),
-        (bn: Rdf#BNode) => bnodeClass.get(bn) orElse {
+        (bn: Rdf#BNode) => bnodeClass.get(bn).orElse {
           val vt = VT()
           bnodeClass.put(bn, vt)
           Some(vt)
-        } map { vt =>
+        }.map { vt =>
           vt.setForwardRel(rel, obj)
         },
-        (_: Rdf#Literal) => ())
+        (_: Rdf#Literal) => ()
+      )
 
       obj.fold(
         (_: Rdf#URI) => (),
-        (bn: Rdf#BNode) => bnodeClass.get(bn) orElse {
+        (bn: Rdf#BNode) => bnodeClass.get(bn).orElse {
           val vt = VT()
           bnodeClass.put(bn, vt)
           Some(vt)
@@ -75,9 +76,9 @@ class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implici
         },
         (_: Rdf#Literal) => ())
     }
-    bnodeClass.mapValues(_.result).toMap
+    bnodeClass.view.mapValues(_.result).toMap
       .groupBy(_._2)
-      .mapValues(_.keys.toSet).toMap
+      .view.mapValues(_.keys.toSet).toMap
   }
 
   case class ClassificationException(msg: String,

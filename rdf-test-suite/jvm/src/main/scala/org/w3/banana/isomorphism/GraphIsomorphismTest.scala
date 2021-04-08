@@ -3,11 +3,10 @@ package org.w3.banana.isomorphism
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.Suite
-
-import org.w3.banana.{ RDF, RDFOps }
+import org.w3.banana.{PointedGraph, RDF, RDFOps}
 
 import scala.collection.immutable.ListMap
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 /**
  * Tests for the pure Scala implementation of Graph Isomorphism
@@ -92,7 +91,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
 
     "two graphs with 2 relations and 2 bnodes each" in {
       for (
-        l <- findPossibleMappings(
+        l <- possibleMappings(
           bnAlexRel1Graph(1) union bnAntonioRel1Graph(1),
           bnAlexRel1Graph(2) union bnAntonioRel1Graph(2))
       ) {
@@ -116,7 +115,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
       | The category with 1 solutions must be shown first""".stripMargin in {
       val g1 = bnAlexRel1Graph(1) union bnAntonioRel1Graph(1) union bnAlexRel2Graph(2) union bnAlexRel1Graph(0) union bnAlexRel2Graph(0)
       val g2 = bnAlexRel1Graph(3) union bnAntonioRel1Graph(3) union bnAntonioRel2Graph(4) union bnAlexRel1Graph(5) union bnAlexRel2Graph(5)
-      val answers = findPossibleMappings(g1, g2)
+      val answers = possibleMappings(g1, g2)
       val answer = findAnswer(g1, g2)
       answer.isFailure should be(true)
 
@@ -246,7 +245,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
     "a 1 triple ground graph" in {
       val g1 = (hjs -- foaf.name ->- "Henry Story").graph
       val expected = Graph(Triple(hjs, foaf.name, Literal("Henry Story")))
-      findAnswer(g1, expected).isSuccess should be(true)
+      findAnswer(g1, expected) should be(Success(List()))
 
       val nonExpected = Graph(Triple(hjs, foaf.name, Literal("Henri Story")))
       findAnswer(g1, nonExpected).isSuccess should be(false)
@@ -255,7 +254,7 @@ class GraphIsomorphismTest[Rdf <: RDF](isoFactory: (() => VerticeCBuilder[Rdf]) 
     "two grounded graphs with 2 relations" in {
       val g1 = groundedGraph
       val expected = groundedGraph
-      findAnswer(g1, expected).isSuccess should be(true)
+      findAnswer(g1, expected) should be(Success(List()))
     }
 
     "list of size 1" in {

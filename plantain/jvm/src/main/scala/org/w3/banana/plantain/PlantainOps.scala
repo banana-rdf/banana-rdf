@@ -55,11 +55,11 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
 
   // literal
 
-  final val rdfLangString = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
-  final val xsdInteger = makeUri("http://www.w3.org/2001/XMLSchema#integer")
-  final val xsdString = makeUri("http://www.w3.org/2001/XMLSchema#string")
-  final val xsdBoolean = makeUri("http://www.w3.org/2001/XMLSchema#boolean")
-  final val xsdDouble = makeUri("http://www.w3.org/2001/XMLSchema#double")
+  final val rdfLangString: Uri = makeUri("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
+  final val xsdInteger: Uri    = makeUri("http://www.w3.org/2001/XMLSchema#integer")
+  final val xsdString: Uri     = makeUri("http://www.w3.org/2001/XMLSchema#string")
+  final val xsdBoolean: Uri    = makeUri("http://www.w3.org/2001/XMLSchema#boolean")
+  final val xsdDouble: Uri     = makeUri("http://www.w3.org/2001/XMLSchema#double")
 
   final def makeLiteral(lexicalForm: String, datatype: Plantain#URI): Plantain#Literal = datatype match {
     case `xsdInteger`   => new BigInteger(lexicalForm)
@@ -96,7 +96,7 @@ object PlantainOps extends RDFOps[Plantain] with PlantainMGraphOps with Plantain
   final def foldNodeMatch[T](
     nodeMatch: Plantain#NodeMatch)(
     funANY: => T,
-      funConcrete: Plantain#Node => T
+    funConcrete: Plantain#Node => T
   ): T = nodeMatch match {
     case null => funANY
     case node => funConcrete(node)

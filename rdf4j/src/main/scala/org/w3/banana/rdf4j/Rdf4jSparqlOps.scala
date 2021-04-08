@@ -5,7 +5,7 @@ import org.eclipse.rdf4j.query.parser.{ ParsedBooleanQuery, ParsedGraphQuery, Pa
 import org.w3.banana.SparqlOps.withPrefixes
 import org.w3.banana._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util._
 
 object Rdf4jSparqlOps extends SparqlOps[Rdf4j] {

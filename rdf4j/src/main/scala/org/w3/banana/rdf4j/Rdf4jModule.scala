@@ -47,7 +47,7 @@ trait Rdf4jModule
 
   implicit val jsonldReader: RDFReader[Rdf, Try, JsonLd] = new Rdf4jJSONLDReader
 
-  implicit val rdf4jRDFWriterHelper = new Rdf4jRDFWriterHelper
+  implicit val rdf4jRDFWriterHelper: Rdf4jRDFWriterHelper = new Rdf4jRDFWriterHelper
 
   implicit val rdfXMLWriter: RDFWriter[Rdf4j, Try, RDFXML] = rdf4jRDFWriterHelper.rdfxmlWriter
 

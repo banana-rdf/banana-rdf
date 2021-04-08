@@ -10,29 +10,29 @@ object Dependencies {
 
   /**
     * scalaz
-    * @see http://scalaz.org
-    * @see http://repo1.maven.org/maven2/org/scalaz/
+    * @see https://scalaz.org
+    * @see https://repo1.maven.org/maven2/org/scalaz/
     */
    val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.4.0-M7")
 
   /**
    * joda-Time
-   * @see http://joda-time.sourceforge.net
+   * @see https://joda-time.sourceforge.net
    * @see https://repo1.maven.org/maven2/joda-time/joda-time/
    */
   val jodaTime = "joda-time" % "joda-time" % "2.9.6"
 
   /**
    * joda-convert
-   * @see http://joda-convert.sourceforge.net
-   * @see http://repo1.maven.org/maven2/org/joda/joda-convert
+   * @see https://joda-convert.sourceforge.net
+   * @see https://repo1.maven.org/maven2/org/joda/joda-convert
    */
   val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
 
   /**
    * scalatest
-   * @see http://www.scalatest.org
-   * @see http://repo1.maven.org/maven2/org/scalatest
+   * @see https://www.scalatest.org
+   * @see https://repo1.maven.org/maven2/org/scalatest
    */
   val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.7")
 
@@ -41,32 +41,32 @@ object Dependencies {
    * @see https://akka.io
    * @see https://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = "com.typesafe.akka" %% "akka-http-core" % "10.2.4"
-  val akka = "com.typesafe.akka" %% "akka-actor-typed" % "2.6.13"
+  val akkaHttpCore = ("com.typesafe.akka" %% "akka-http-core" % "10.2.4") cross CrossVersion.for3Use2_13
+  val akka = ("com.typesafe.akka" %% "akka-actor-typed" % "2.6.13") cross CrossVersion.for3Use2_13
 
   /**
    * jena
    * @see https://jena.apache.org/
-   * @see http://repo1.maven.org/maven2/org/apache/jena
+   * @see https://repo1.maven.org/maven2/org/apache/jena
    */
   val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.17.0"
 
   /**
    * slf4j-nop. Test dependency for logging.
-   * @see http://www.slf4j.org
+   * @see https://www.slf4j.org
    */
   val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.7.21" % Test
 
   /**
    * Aalto
-   * @see http://wiki.fasterxml.com/AaltoHome
-   * @see http://repo1.maven.org/maven2/com/fasterxml/aalto-xml
+   * @see https://wiki.fasterxml.com/AaltoHome
+   * @see https://repo1.maven.org/maven2/com/fasterxml/aalto-xml
    */
   val aalto = "com.fasterxml" % "aalto-xml" % "1.0.0"
 
   /**
    * RDF4J
-   * @see http://www.rdf4j.org/
+   * @see https://www.rdf4j.org/
    * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
    */
   val rdf4jVersion = "3.6.1"
@@ -89,21 +89,15 @@ object Dependencies {
   val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.13.2"
 
   /**
-   * Java 8 Compatibility kit (needed until move to scala 2.13 is complete
-   * https://index.scala-lang.org/scala/scala-java8-compat/scala-java8-compat/0.8.0
-   */
-  //val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.9.1"
-
-  /**
    * parboiled
-   * @see http://parboiled.org
+   * @see https://parboiled.org
    * @see https://repo1.maven.org/maven2/org/parboiled/
    */
   val parboiled2 = "org.parboiled" %% "parboiled" % "2.1.3"
 
   /**
    * jena-fuseki
-   * @see http://jena.apache.org/documentation/serving_data
+   * @see https://jena.apache.org/documentation/serving_data
    * @see https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
   val fuseki = "org.apache.jena" % "jena-fuseki-main" % "3.17.0"

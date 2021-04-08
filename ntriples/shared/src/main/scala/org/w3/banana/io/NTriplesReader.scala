@@ -115,7 +115,7 @@ object  NTriplesParser {
       case Failure(other) => throw other // we break on first failure
       case Success(_) => true
     }
-    ntparser.ops.makeGraph(filteredIterator.map(_.get).toIterable)
+    ntparser.ops.makeGraph(filteredIterator.map(_.get).iterator.to(Iterable))
   }
 
 
@@ -217,7 +217,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
    * The initial '<' has already been read
    */
   @tailrec
-  private[io] final def parseIRI(iribuf: mutable.StringBuilder = newBuilder): Rdf#URI = {
+  private[io] final def parseIRI(iribuf: mutable.StringBuilder = new StringBuilder()): Rdf#URI = {
      read() match {
       case -1 => throw EOF("unexpected end of stream reading URI starting with '" + iribuf.toString() + "'")
       case '>' => URI(iribuf.toString())
@@ -228,7 +228,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
   }
 
   @tailrec
-  private def readN(i: Int, buf: StringBuilder = newBuilder): String = {
+  private def readN(i: Int, buf: StringBuilder = new StringBuilder()): String = {
     if (i <= 0) buf.toString
     else read() match {
       case -1 => throw EOF("reached end of stream while trying to readN chars")
@@ -236,9 +236,9 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
     }
   }
 
-  private def parseShortHex(): Char = hexVal(readN(4).toCharArray)
+  private def parseShortHex(): Char = hexVal(readN(4).toIndexedSeq)
 
-  private def parseLongHex(): Char = hexVal(readN(8).toCharArray)
+  private def parseLongHex(): Char = hexVal(readN(8).toIndexedSeq)
 
   private def parseIRIQuotedChar(): Char =
     read() match {
@@ -263,7 +263,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
     }
 
 
-  private[io] def parsePlainLiteral(uribuf: mutable.StringBuilder = newBuilder): String =
+  private[io] def parsePlainLiteral(uribuf: mutable.StringBuilder = new StringBuilder()): String =
     read() match {
       case -1   => throw EOF("end of string Literal before end of quotation")
       case '"'  => uribuf.toString() //closing quote
@@ -289,7 +289,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
     }
   }
   private def parseLang(): Rdf#Lang = {
-    val buf = newBuilder
+    val buf = new StringBuilder()
     @tailrec
     def lang(): String = {
       read() match {
@@ -364,7 +364,7 @@ class NTriplesParser[Rdf <: RDF](reader: Reader,
     if (nc != ':') throw Error(nc,"bnode must start with _:")
     else tryRead { c =>
       if (blank_node_label_first_char(c)) {
-        parseBnodeLabel(newBuilder.append(c))
+        parseBnodeLabel(new StringBuilder().append(c))
       } else {
         throw Error(c,s"blank node starts with illegal character in first position 'x0${Integer.toHexString(c)}'")
       }

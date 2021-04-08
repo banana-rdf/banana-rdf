@@ -13,13 +13,13 @@ class MGraphW[Rdf <: RDF](val mgraph: Rdf#MGraph) extends AnyVal {
   def +=(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]): mgraph.type =
     ops.addTriple(mgraph, triple)
 
-  def ++=(triples: TraversableOnce[Rdf#Triple])(implicit ops: RDFOps[Rdf]): mgraph.type =
+  def ++=(triples: IterableOnce[Rdf#Triple])(implicit ops: RDFOps[Rdf]): mgraph.type =
     ops.addTriples(mgraph, triples)
 
   def -=(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]): mgraph.type =
     try ops.removeTriple(mgraph, triple) catch { case e: NoSuchElementException => mgraph }
 
-  def --=(triples: TraversableOnce[Rdf#Triple])(implicit ops: RDFOps[Rdf]): mgraph.type =
+  def --=(triples: IterableOnce[Rdf#Triple])(implicit ops: RDFOps[Rdf]): mgraph.type =
     ops.removeTriples(mgraph, triples)
 
   def exists(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]): Boolean =

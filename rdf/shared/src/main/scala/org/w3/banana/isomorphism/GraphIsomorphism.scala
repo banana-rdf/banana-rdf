@@ -25,15 +25,15 @@ import scalaz.EphemeralStream
  * - by using lazy data structures
  * - by optimising memory
  *
- *
  * @param mappingGen a mapping generator that knows to find for two graphs the possible mappings of bnodes between
  *                   them. Better mapping generators will find less mappings for the same graphs, without missing out
  *                   on correct ones.
  * @tparam Rdf RDF implementation to work with
  */
-case class GraphIsomorphism[Rdf <: RDF](
-  val mappingGen: MappingGenerator[Rdf], maxComplexity: Int = 65536)(
-  implicit ops: RDFOps[Rdf]) {
+//noinspection ScalaStyle
+final case class GraphIsomorphism[Rdf <: RDF](
+  val mappingGen: MappingGenerator[Rdf], maxComplexity: Int = 65536
+)(implicit ops: RDFOps[Rdf]) {
 
   import ops._
 
@@ -46,7 +46,7 @@ case class GraphIsomorphism[Rdf <: RDF](
   def groundTripleFilter(graph: Rdf#Graph): (Rdf#Graph, Rdf#Graph) = {
     var ground: Rdf#Graph = Graph.empty
     var nonGround: Rdf#Graph = Graph.empty
-    for (triple <- GraphIsomorphism.this.ops.graphW(graph).triples) {
+    for (triple <- graph.triples) {
       triple match {
         case Triple(s, r, o) if s.isBNode || o.isBNode => nonGround = nonGround + triple
         case _ => ground = ground + triple
@@ -60,7 +60,7 @@ case class GraphIsomorphism[Rdf <: RDF](
    * Find possible bnode mappings
    * @return A list of possible bnode mappings or a reason for the error
    */
-  def findPossibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[EphemeralStream[List[(Rdf#BNode, Rdf#BNode)]]] = {
+  def possibleMappings(g1: Rdf#Graph, g2: Rdf#Graph): Try[EphemeralStream[List[(Rdf#BNode, Rdf#BNode)]]] = {
     if (g1.size != g2.size)
       return Failure(MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}"))
 
@@ -105,19 +105,20 @@ case class GraphIsomorphism[Rdf <: RDF](
     }
   }
 
-  def findAnswer(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[(Rdf#BNode, Rdf#BNode)]] = {
-    findPossibleMappings(g1, g2).flatMap[List[(Rdf#BNode, Rdf#BNode)]] { possibleAnswers =>
-      val verifyAnswers: EphemeralStream[(List[(Rdf#BNode, Rdf#BNode)], List[MappingException])] = possibleAnswers.map[(List[(Rdf#BNode, Rdf#BNode)], List[MappingException])] { answer =>
-        scala.Predef.ArrowAssoc(answer) -> mapVerify(g1, g2, answer)
-      }
-      val answerOpt: Option[(List[(Rdf#BNode, Rdf#BNode)], List[MappingException])] = verifyAnswers.toList.find {
-        case (s, err) =>
-          //          println(s"===>$err = for answer ${s.toList}")
-          err == Nil
-      }
-      answerOpt.map[Success[List[(Rdf#BNode, Rdf#BNode)]]](a => Success.apply[List[(Rdf#BNode, Rdf#BNode)]](a._1)).getOrElse[Try[List[(Rdf#BNode, Rdf#BNode)]]](Failure.apply[Nothing](NoMappingException(verifyAnswers)))
-    }
-  }
+  /*
+   * @return A Stream of valid bnode mappings or a reason for the error
+   */
+  def possibleAnswers(g1: Rdf#Graph, g2: Rdf#Graph): Try[EphemeralStream[List[(Rdf#BNode, Rdf#BNode)]]] =
+    possibleMappings(g1, g2).map { _.filter(answer => mapVerify(g1, g2, answer).isEmpty) }
+
+  /** @return the first answer or the failure that there is no mapping */
+  def findAnswer(g1: Rdf#Graph, g2: Rdf#Graph): Try[List[(Rdf#BNode, Rdf#BNode)]] =
+      possibleAnswers(g1,g2).flatMap( _.headOption match {
+        case Some(nodeList) => Success(nodeList)
+        case None => Failure[Nothing](NoMappingException(EphemeralStream()))
+      })
+
+
 
   /**
    * Verify that the bnode bijection allows one to map graph1 to graph2
@@ -130,37 +131,28 @@ case class GraphIsomorphism[Rdf <: RDF](
     if (graph1.size != graph2.size)
       return List(MappingException(s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"))
 
-    //1. verify that bnodeBijection is a bijection, fail early
-    val bnodeBijection: mutable.HashMap[Rdf#BNode,Rdf#BNode] = {
-      var back: mutable.HashMap[Rdf#BNode,Rdf#BNode] = new mutable.HashMap[Rdf#BNode, Rdf#BNode]()
-      var map: mutable.HashMap[Rdf#BNode,Rdf#BNode] = new mutable.HashMap[Rdf#BNode, Rdf#BNode]()
-      for (m <- mapping) {
-        if (back.get(m._2).fold[Boolean](true)(bn => bn == m._1 && map.get(bn) == Some.apply[Rdf#BNode](m._2))) {
-          back += m.swap
-          if (map.put(m._1, m._2) != None) return List.apply[MappingException](MappingException(s"bnodeBijection is not a bijection: ${m._1} in $m already mapped."))
-        } else return List.apply[MappingException](MappingException(s"bnodeBijection is not a bijection: $m maps to more than one value"))
+    // 1. verify that bnodeBijection is a bijection, fail early
+    val bnodeBijection: mutable.HashMap[Rdf#BNode, Rdf#BNode] = {
+      val back = new mutable.HashMap[Rdf#BNode, Rdf#BNode]()
+      val map  = new mutable.HashMap[Rdf#BNode, Rdf#BNode]()
+      for ((from,to) <- mapping) {
+        if (back.put(to,from).fold[Boolean](true)(_ == from)
+            && map.put(from,to).fold(true)(_ == to)) { //all good
+        } else return List[MappingException](
+            MappingException(s"bnodeBijection is not a bijection: $from already mapped"))
       }
       map
     }
-
-    def bnmap(node: Rdf#Node): Rdf#Node = node.fold(uri => uri, bnode => bnodeBijection(bnode), lit => lit)
-
-    try {
-      for (Triple(sub, rel, obj) <- GraphIsomorphism.this.ops.graphW(graph1).triples) {
-        try {
-          val mapped: Rdf#Triple = makeTriple(bnmap(sub), rel, bnmap(obj))
-          if (!GraphIsomorphism.this.ops.graphW(graph2).contains(mapped)) throw MappingException(s"could not find map($sub,$rel,$obj)=$mapped in graph2")
-        } catch {
-          case e: java.util.NoSuchElementException => {
-            throw MappingException(s"could not find map for $sub or $obj")
-          }
-        }
+    def bnmap(node: Rdf#Node): Rdf#Node = node.fold(
+      (uri: Rdf#URI) => uri,
+      (bnode: Rdf#BNode) => bnodeBijection(bnode),
+      (lit: Rdf#Literal) => lit
+    )
+    //2. use the bijection to verify that it maps the triples correctly
+    val mappTriples = for (Triple(sub, rel, obj) <- graph1.triples) yield {
+        makeTriple(bnmap(sub), rel, bnmap(obj))
       }
-    } catch {
-      case e: MappingException => return List.apply[MappingException](e)
-    }
-
-    List.apply[Nothing]() // no errors
+    mappTriples.find(!graph2.contains(_)).toList.map(t=>MappingException(s"could not find map for $t"))
 
     //do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
   }

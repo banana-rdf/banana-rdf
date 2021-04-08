@@ -64,7 +64,7 @@ class SparqlUpdateEngineTest[Rdf <: RDF, A](
           |}
         """.stripMargin).success.value
 
-    val projects = store.executeSelect(selectQuery).get.iterator.to(Iterable)
+    val projects = store.executeSelect(selectQuery).get.iterator().to(Iterable)
     val result = projects.map(row =>
       row("currentProject").success.value.as[Rdf#URI].success.value
     )
