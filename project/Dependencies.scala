@@ -1,8 +1,5 @@
-import sbt._
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
-import sbt.Keys.scalaVersion
-import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject, _}
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
+import sbt._
 
 
 object Dependencies {
@@ -34,7 +31,7 @@ object Dependencies {
    * @see https://www.scalatest.org
    * @see https://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.7")
+  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.8")
 
   /**
    * Akka Http Core
@@ -42,7 +39,7 @@ object Dependencies {
    * @see https://repo1.maven.org/maven2/com/typesafe/akka
    */
   val akkaHttpCore = ("com.typesafe.akka" %% "akka-http-core" % "10.2.4") cross CrossVersion.for3Use2_13
-  val akka = ("com.typesafe.akka" %% "akka-actor-typed" % "2.6.13") cross CrossVersion.for3Use2_13
+  val akka = ("com.typesafe.akka" %% "akka-actor-typed" % "2.6.14") cross CrossVersion.for3Use2_13
 
   /**
    * jena
@@ -69,7 +66,7 @@ object Dependencies {
    * @see https://www.rdf4j.org/
    * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
    */
-  val rdf4jVersion = "3.6.1"
+  val rdf4jVersion = "3.6.3"
 
   val rdf4jQueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % rdf4jVersion
   val rdf4jQueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % rdf4jVersion
@@ -103,5 +100,5 @@ object Dependencies {
   val fuseki = "org.apache.jena" % "jena-fuseki-main" % "3.17.0"
   
   val servlet = "javax.servlet" % "javax.servlet-api" % "3.1.0"
-  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.3"
+  val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.13"
 }
