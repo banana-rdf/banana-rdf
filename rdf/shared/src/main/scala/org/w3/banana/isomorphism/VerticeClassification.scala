@@ -69,8 +69,7 @@ class CountingVCBuilder[Rdf <: RDF]
 
 }
 
-case class CountingVC(forwardRels: Int,
-  backwardRels: Int) extends VerticeClassification
+case class CountingVC(forwardRels: Int, backwardRels: Int) extends VerticeClassification
 
 /**
  *

@@ -4,7 +4,7 @@ import org.w3.banana._
 
 trait GraphSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
-  implicit def graphW(graph: Rdf#Graph) = new GraphW[Rdf](graph)
+  implicit def graphW(graph: Rdf#Graph): GraphW[Rdf] = new GraphW[Rdf](graph)
 
 }
 

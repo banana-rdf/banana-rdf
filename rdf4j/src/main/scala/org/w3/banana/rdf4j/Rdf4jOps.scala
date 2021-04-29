@@ -7,7 +7,7 @@ import org.eclipse.rdf4j.model.impl._
 import org.eclipse.rdf4j.model.util._
 import org.w3.banana._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class Rdf4jOps extends RDFOps[Rdf4j] with Rdf4jMGraphOps with DefaultURIOps[Rdf4j] {
 

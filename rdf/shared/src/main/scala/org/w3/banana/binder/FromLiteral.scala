@@ -12,11 +12,13 @@ trait FromLiteral[Rdf <: RDF, +T] {
 
 object FromLiteral {
 
-  implicit def LiteralFromLiteral[Rdf <: RDF] = new FromLiteral[Rdf, Rdf#Literal] {
-    def fromLiteral(literal: Rdf#Literal): Success[Rdf#Literal] = Success(literal)
-  }
+  implicit def LiteralFromLiteral[Rdf <: RDF]: FromLiteral[Rdf,Rdf#Literal] =
+    new FromLiteral[Rdf, Rdf#Literal] {
+      def fromLiteral(literal: Rdf#Literal): Success[Rdf#Literal] = Success(literal)
+    }
 
-  implicit def StringFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, String] {
+  implicit def StringFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,String] =
+    new FromLiteral[Rdf, String] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[String] = {
       val Literal(lexicalForm, datatype, _) = literal
@@ -27,7 +29,8 @@ object FromLiteral {
     }
   }
 
-  implicit def BooleanFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Boolean] {
+  implicit def BooleanFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,Boolean] =
+    new FromLiteral[Rdf, Boolean] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[Boolean] = {
       val Literal(lexicalForm, datatype, _) = literal
@@ -43,7 +46,8 @@ object FromLiteral {
     }
   }
 
-  implicit def IntFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Int] {
+  implicit def IntFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,Int] =
+    new FromLiteral[Rdf, Int] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[Int] = {
       val Literal(lexicalForm, datatype, _) = literal
@@ -59,7 +63,8 @@ object FromLiteral {
     }
   }
 
-  implicit def BigIntFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, BigInteger] {
+  implicit def BigIntFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,BigInteger] =
+    new FromLiteral[Rdf, BigInteger] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[BigInteger] = {
       val Literal(lexicalForm, datatype, _) = literal
@@ -75,7 +80,8 @@ object FromLiteral {
     }
   }
 
-  implicit def DoubleFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Double] {
+  implicit def DoubleFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,Double] =
+    new FromLiteral[Rdf, Double] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[Double] = {
       val Literal(lexicalForm, datatype, _) = literal
@@ -109,7 +115,8 @@ object FromLiteral {
     }
   }
 */
-  implicit def ByteArrayFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, Array[Byte]] {
+  implicit def ByteArrayFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,Array[Byte]] =
+    new FromLiteral[Rdf, Array[Byte]] {
     import ops._
     val whitespace = "\\s".r
     def hex2Bytes(hex: String): Try[Array[Byte]] = Try {

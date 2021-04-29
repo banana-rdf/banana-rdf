@@ -43,7 +43,7 @@ abstract class GraphUnionTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends Any
     val result = union(foo :: bar :: Nil)
     isomorphism(foo, fooReference) shouldEqual true
     isomorphism(bar, barReference) shouldEqual true
-    ! isomorphism(foo, bar) shouldEqual true
+    isomorphism(foo, bar) shouldEqual false
     isomorphism(foobar, result) shouldEqual true
   }
 

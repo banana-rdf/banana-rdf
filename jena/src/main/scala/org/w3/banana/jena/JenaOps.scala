@@ -5,7 +5,7 @@ import org.apache.jena.graph.{Graph => JenaGraph, Node => JenaNode, Triple => Je
 import org.apache.jena.rdf.model.{Literal => JenaLiteral, Seq => _}
 import org.w3.banana._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class JenaOps extends RDFOps[Jena] with JenaMGraphOps with DefaultURIOps[Jena] {
 
@@ -135,7 +135,7 @@ class JenaOps extends RDFOps[Jena] with JenaMGraphOps with DefaultURIOps[Jena] {
       funConcrete(nodeMatch.asInstanceOf[JenaNode])
 
   def find(graph: Jena#Graph, subject: Jena#NodeMatch, predicate: Jena#NodeMatch, objectt: Jena#NodeMatch): Iterator[Jena#Triple] = {
-    graph.find(subject, predicate, objectt).asScala.toIterator
+    graph.find(subject, predicate, objectt).asScala
   }
 
   // graph union

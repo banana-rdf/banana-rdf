@@ -7,7 +7,7 @@ case class PredicatePointedGraph[Rdf <: RDF](p: Rdf#URI, pointed: PointedGraph[R
   def --(s: Rdf#Node)(implicit ops: RDFOps[Rdf]): PointedGraph[Rdf] = {
     import ops._
     import pointed.{ graph => acc, pointer => o }
-    val graph = acc union Graph(Triple(s, p, o))
+    val graph = ops.graphW(acc) union Graph(Triple(s, p, o))
     PointedGraph(s, graph)
   }
 
@@ -15,7 +15,7 @@ case class PredicatePointedGraph[Rdf <: RDF](p: Rdf#URI, pointed: PointedGraph[R
     import ops._
     import pointed.{ graph => acc, pointer => o }
     import pointedSubject.{ graph => graphObject, pointer => s }
-    val graph = Graph(Triple(s, p, o)) union acc union graphObject
+    val graph = ops.graphW(ops.graphW(Graph(Triple(s, p, o))) union acc) union graphObject
     PointedGraph(s, graph)
   }
 

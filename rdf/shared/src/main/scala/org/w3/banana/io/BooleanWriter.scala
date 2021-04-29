@@ -20,8 +20,8 @@ object BooleanWriter {
   /**
    * <a href="http://www.w3.org/TR/sparql11-results-json/">Sparql 1.1 Query Results JSON Format</a>
    */
-  implicit val Json = new BooleanWriter[SparqlAnswerJson] {
-
+  implicit val Json: BooleanWriter[SparqlAnswerJson] =
+    new BooleanWriter[SparqlAnswerJson] {
     def format(bool: Boolean): String =
       """{
         |  "head": {},
@@ -29,15 +29,15 @@ object BooleanWriter {
         |}
         | """.stripMargin.format(bool)
 
-    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
+    override def write(obj: Boolean, outputstream: OutputStream, base: String) : Try[Unit] = ???
 
   }
 
   /**
    * <a href="http://www.w3.org/TR/rdf-sparql-XMLres/">Sparql Query Results XML Format</a>
    */
-  implicit val booleanWriterXml = new BooleanWriter[SparqlAnswerXml] {
-
+  implicit val booleanWriterXml: BooleanWriter[SparqlAnswerXml]  =
+    new BooleanWriter[SparqlAnswerXml] {
     def format(bool: Boolean): String =
       """<?xml version="1.0"?>
         |<sparql xmlns="http://www.w3.org/2005/sparql-results#">
@@ -45,7 +45,7 @@ object BooleanWriter {
         |  <boolean>%s</boolean>
         |</sparql> """.stripMargin.format(bool) // "
 
-    override def write(obj: Boolean, outputstream: OutputStream, base: String) = ???
+    override def write(obj: Boolean, outputstream: OutputStream, base: String): Try[Unit] = ???
   }
 
 }

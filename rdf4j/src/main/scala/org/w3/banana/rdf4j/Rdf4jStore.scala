@@ -6,7 +6,7 @@ import org.eclipse.rdf4j.query._
 import org.eclipse.rdf4j.repository.{RepositoryConnection, RepositoryResult}
 import org.w3.banana._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.Try
 
 class Rdf4jStore

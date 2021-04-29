@@ -6,7 +6,7 @@ import scala.util._
 
 object JsDateBinders {
 
-  implicit def JSDateToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) =
+  implicit def JSDateToLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): ToLiteral[Rdf,js.Date] =
     new ToLiteral[Rdf, js.Date] {
       import ops._
       def toLiteral(dateTime: js.Date): Rdf#Literal = {
@@ -15,7 +15,7 @@ object JsDateBinders {
       }
     }
 
-  implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]) = new FromLiteral[Rdf, js.Date] {
+  implicit def JSDateFromLiteral[Rdf <: RDF](implicit ops: RDFOps[Rdf]): FromLiteral[Rdf,js.Date] = new FromLiteral[Rdf, js.Date] {
     import ops._
     def fromLiteral(literal: Rdf#Literal): Try[js.Date] = {
       val Literal(lexicalForm, datatype, _) = literal

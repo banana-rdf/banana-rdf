@@ -1,5 +1,5 @@
 import sbt.Keys.{publishMavenStyle, _}
-import sbt.{url, _}
+import sbt.{CrossVersion, url, _}
 import Dependencies._
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
@@ -48,13 +48,14 @@ lazy val publicationSettings = {
 
 lazy val commonSettings = publicationSettings ++ scalariformSettings ++ Seq(
   organization := "net.bblfish.rdf",
-  scalaVersion := "2.13.5",
+  scalaVersion := "2.13.5", //"3.0.0-RC2",
   resolvers += "apache-repo-releases" at "https://repository.apache.org/content/repositories/releases/",
   fork := false,
   Test / parallelExecution := false,
   offline := true,
   scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:implicitConversions,higherKinds"),
-  scalacOptions in(Compile, doc) := Seq("-groups", "-implicits"),
+   // "-source:3.0-migration"),
+  Compile / doc / scalacOptions := Seq("-groups", "-implicits"),
   description := "RDF framework for Scala",
   startYear := Some(2012),
   updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
@@ -73,7 +74,7 @@ lazy val rdf = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies += scalaz.value
   )
   .jvmSettings(
-    libraryDependencies ++= Seq(jodaTime, jodaConvert)
+    libraryDependencies ++= Seq(jodaTime, jodaConvert),
   )
 
 lazy val rdfJS = rdf.js
@@ -112,7 +113,8 @@ lazy val plantain = crossProject(JSPlatform, JVMPlatform)
   .in(file("plantain"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++= Seq(akkaHttpCore, rdf4jRioTurtle, jsonldJava, java8Compat)
+    libraryDependencies ++= Seq(rdf4jRioTurtle, jsonldJava),
+    libraryDependencies += akkaHttpCore
   )
   .settings(name := "banana-plantain")
   .dependsOn(rdf, ntriples, rdfTestSuite % "test->compile")
@@ -175,7 +177,7 @@ commonSettings
 
 enablePlugins(ScalaUnidocPlugin)
 
-unidocProjectFilter in ( ScalaUnidoc, unidoc ) :=
+ ScalaUnidoc / unidoc / unidocProjectFilter :=
     inAnyProject -- inProjects( ntriplesJS, plantainJS, rdfJS, rdfTestSuiteJS )
 
 addCommandAlias("validate", ";compile;test;runExamples")

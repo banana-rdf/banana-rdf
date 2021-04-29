@@ -6,6 +6,7 @@ import org.apache.jena.fuseki.jetty.JettyServerConfig
 import org.apache.jena.query.Dataset
 import org.apache.jena.util.FileManager
 import org.apache.jena.fuseki.main.{FusekiServer => JenaFusekiServer}
+import org.apache.jena.riot.RDFDataMgr
 
 
 /**

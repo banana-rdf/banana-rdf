@@ -63,7 +63,7 @@ with XmlQueryResultsReaderModule {
 
   implicit val ntriplesWriter: RDFWriter[Jena, Try, NTriples] = new NTriplesWriter[Jena]
 
-  implicit val jsonldReader: RDFReader[Rdf, Try, JsonLd] = JenaRDFReader.jsonLdReader
+  implicit val jsonldReader: RDFReader[Rdf, Try, JsonLd] = JenaRDFReader.jsonLdReader()
 
   implicit val jsonSolutionsWriter: SparqlSolutionsWriter[Jena, SparqlAnswerJson] =
     JenaSolutionsWriter.solutionsWriterJson

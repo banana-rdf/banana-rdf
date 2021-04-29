@@ -8,7 +8,7 @@ import org.apache.jena.update.UpdateFactory
 import org.w3.banana.SparqlOps.withPrefixes
 import org.w3.banana._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util._
 import scala.unchecked
 

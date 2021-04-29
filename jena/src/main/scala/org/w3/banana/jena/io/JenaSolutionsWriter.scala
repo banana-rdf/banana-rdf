@@ -1,7 +1,11 @@
 package org.w3.banana.jena.io
 
 import java.io._
-import org.w3.banana._, io._, jena._
+import org.w3.banana._
+import io._
+import jena._
+import org.apache.jena.riot.ResultSetMgr
+
 import scala.util._
 
 object JenaSolutionsWriter {
@@ -12,13 +16,13 @@ object JenaSolutionsWriter {
   ): SparqlSolutionsWriter[Jena, T] = new SparqlSolutionsWriter[Jena, T] {
 
     def write(answers: Jena#Solutions, os: OutputStream, base: String) = Try {
-      jenaSparqlSyntax.formatter.format(os, answers)
+      ResultSetMgr.write(os,answers,jenaSparqlSyntax.formatter)
     }
 
     def asString(answers: Jena#Solutions, base: String): Try[String] = Try {
       val result = new ByteArrayOutputStream()
-      jenaSparqlSyntax.formatter.format(result, answers)
-      answers.toString
+      ResultSetMgr.write(result, answers, jenaSparqlSyntax.formatter)
+      result.toString
     }
   }
 

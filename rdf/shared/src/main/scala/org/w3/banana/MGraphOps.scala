@@ -17,13 +17,13 @@ trait MGraphOps[Rdf <: RDF] {
 
   def makeIGraph(mgraph: Rdf#MGraph): Rdf#Graph
 
-  final def addTriples(mgraph: Rdf#MGraph, triples: TraversableOnce[Rdf#Triple]): mgraph.type = {
-    triples.foreach(triple => addTriple(mgraph, triple))
+  final def addTriples(mgraph: Rdf#MGraph, triples: IterableOnce[Rdf#Triple]): mgraph.type = {
+    triples.iterator.foreach(triple => addTriple(mgraph, triple))
     mgraph
   }
 
-  final def removeTriples(mgraph: Rdf#MGraph, triples: TraversableOnce[Rdf#Triple]): mgraph.type = {
-    triples.foreach(triple => removeTriple(mgraph, triple))
+  final def removeTriples(mgraph: Rdf#MGraph, triples: IterableOnce[Rdf#Triple]): mgraph.type = {
+    triples.iterator.foreach(triple => removeTriple(mgraph, triple))
     mgraph
   }
 

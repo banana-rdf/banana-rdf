@@ -9,7 +9,7 @@ class PointedGraphPredicate[Rdf <: RDF](pointed: PointedGraph[Rdf], p: Rdf#URI) 
     import ops._
     import pointed.{ graph => acc, pointer => s }
     import pointedObject.{ graph => graphObject, pointer => o }
-    val graph = Graph(Triple(s, p, o)) union acc union graphObject
+    val graph = ops.graphW(ops.graphW(Graph(Triple(s, p, o))) union acc) union graphObject
     PointedGraph(s, graph)
   }
 
@@ -38,7 +38,7 @@ class PointedGraphPredicate[Rdf <: RDF](pointed: PointedGraph[Rdf], p: Rdf#URI) 
     val graph = objects.foldLeft(pointed.graph) {
       case (acc, obj) =>
         val pg = toPG.toPG(obj)
-        acc union Graph(Set(Triple(pointed.pointer, p, pg.pointer))) union pg.graph
+        ops.graphW(ops.graphW(acc) union Graph(Set(Triple(pointed.pointer, p, pg.pointer)))) union pg.graph
     }
     PointedGraph(pointed.pointer, graph)
   }

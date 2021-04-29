@@ -63,13 +63,16 @@ trait RDFDSL[Rdf <: RDF] { this: RDFOps[Rdf] =>
   // graph traversal
 
   def getObjects(graph: Rdf#Graph, subject: Rdf#Node, predicate: Rdf#URI): Iterable[Rdf#Node] =
-    find(graph, toConcreteNodeMatch(subject), toConcreteNodeMatch(predicate), ANY).map(t => fromTriple(t)._3).toIterable
+    find(graph, toConcreteNodeMatch(subject), toConcreteNodeMatch(predicate), ANY)
+      .map(t => fromTriple(t)._3).to(Iterable)
 
   def getPredicates(graph: Rdf#Graph, subject: Rdf#Node): Iterable[Rdf#URI] =
-    find(graph, toConcreteNodeMatch(subject), ANY, ANY).map(t => fromTriple(t)._2).toIterable
+    find(graph, toConcreteNodeMatch(subject), ANY, ANY)
+      .map(t => fromTriple(t)._2).to(Iterable)
 
   def getSubjects(graph: Rdf#Graph, predicate: Rdf#URI, obj: Rdf#Node): Iterable[Rdf#Node] =
-    find(graph, ANY, toConcreteNodeMatch(predicate), toConcreteNodeMatch(obj)).map(t => fromTriple(t)._1).toIterable
+    find(graph, ANY, toConcreteNodeMatch(predicate), toConcreteNodeMatch(obj))
+      .map(t => fromTriple(t)._1).to(Iterable)
 
   // TripleMatch
 

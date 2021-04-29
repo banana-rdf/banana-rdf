@@ -99,15 +99,15 @@ case class Graph[S, P, O](spo: Map[S, Map[P, Vector[O]]], size: Int) {
         for {
           (s, pos) <- subject match {
             case None       => spo
-            case Some(node) => spo.filterKeys { _ == node }
+            case Some(node) => spo.view.filterKeys( _ == node)
           }
           (p, os) <- predicate match {
             case None       => pos
-            case Some(node) => pos filterKeys { _ == node }
+            case Some(node) => pos.view.filterKeys(_ == node)
           }
           o <- objectt match {
             case None => os
-            case Some(node) => if (os contains node) os else Iterable.empty
+            case Some(node) => os.find(_ == node).toSeq
           }
         } yield (s, p, o)
 

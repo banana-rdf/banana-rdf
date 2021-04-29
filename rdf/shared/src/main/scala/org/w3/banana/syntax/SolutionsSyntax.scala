@@ -4,7 +4,7 @@ import org.w3.banana._
 
 trait SolutionsSyntax[Rdf <: RDF] { self: SolutionsSyntax[Rdf] =>
 
-  implicit def solutionsW(solutions: Rdf#Solutions) = new SolutionsW[Rdf](solutions)
+  implicit def solutionsW(solutions: Rdf#Solutions): SolutionsW[Rdf] = new SolutionsW[Rdf](solutions)
 
 }
 

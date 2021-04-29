@@ -6,7 +6,7 @@ import scala.util._
 
 trait SparqlSolutionSyntax[Rdf <: RDF] { self: RDFSyntax[Rdf] =>
 
-  implicit def sparqlSolutionSyntax(solution: Rdf#Solution) = new SparqlSolutionSyntaxW[Rdf](solution)
+  implicit def sparqlSolutionSyntax(solution: Rdf#Solution): SparqlSolutionSyntaxW[Rdf] = new SparqlSolutionSyntaxW[Rdf](solution)
 
 }
 

@@ -6,7 +6,7 @@ import scala.util.Try
 
 trait SparqlQuerySyntax[Rdf <: RDF] { self: SparqlQuerySyntax[Rdf] =>
 
-  implicit def sparqlQueryW(query: Rdf#Query) = new SparqlQueryW[Rdf](query)
+  implicit def sparqlQueryW(query: Rdf#Query): SparqlQueryW[Rdf] = new SparqlQueryW[Rdf](query)
 
   def parseSelect(query: String)(implicit sparqlOps: SparqlOps[Rdf]): Try[Rdf#SelectQuery] =
     sparqlOps.parseSelect(query, Seq.empty)

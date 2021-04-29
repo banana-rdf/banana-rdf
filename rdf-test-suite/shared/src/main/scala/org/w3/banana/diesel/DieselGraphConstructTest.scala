@@ -70,7 +70,7 @@ class DieselGraphConstructTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends An
         Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
       )
 
-    (g.graph isIsomorphicWith expectedGraph)  shouldEqual true
+    (g.graph isIsomorphicWith expectedGraph) shouldEqual true
   }
 
   "Diesel must allow easy use of rdf:type through the method 'a'" in {

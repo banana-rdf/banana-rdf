@@ -4,7 +4,7 @@ import org.w3.banana._
 
 final class LifecycleSyntax[Rdf <: RDF, A] {
 
-  implicit def lifecycleW(a: A) = new LifecycleW[Rdf, A](a)
+  implicit def lifecycleW(a: A): LifecycleW[Rdf,A] = new LifecycleW[Rdf, A](a)
 
 }
 

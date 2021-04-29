@@ -26,14 +26,14 @@ class JenaFusekiSparqlTest extends AnyFlatSpec
    * Start Fuseki server
    */
   override def beforeAll(): Unit = {
-    server.start
+    server.start()
   }
 
   /**
    * Stop server
    */
   override def afterAll(): Unit = {
-    server.stop
+    server.stop()
   }
 
   "The repository" must "contain person 'Morgana'" in {
@@ -73,7 +73,7 @@ class JenaFusekiSparqlTest extends AnyFlatSpec
       """.stripMargin).get
 
     val client = new URL("http://localhost:3030/ds/query")
-    val results = client.executeSelect(selectQuery).get.iterator.to(Iterable)
+    val results = client.executeSelect(selectQuery).get.iterator().to(Iterable)
     val result = results.map(
       row => row("firstName").get
     )

@@ -4,7 +4,7 @@ import org.w3.banana._
 
 final class GraphStoreSyntax[Rdf <: RDF, M[+_], A] {
 
-  implicit def graphStoreW(a: A) = new GraphStoreW[Rdf, M, A](a)
+  implicit def graphStoreW(a: A): GraphStoreW[Rdf,M,A] = new GraphStoreW[Rdf, M, A](a)
 
 }
 

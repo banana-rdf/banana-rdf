@@ -4,7 +4,7 @@ import org.w3.banana._
 
 final class TransactorSyntax[Rdf <: RDF, A] {
 
-  implicit def transactorW(a: A) = new TransactorW[Rdf, A](a)
+  implicit def transactorW(a: A): TransactorW[Rdf,A] = new TransactorW[Rdf, A](a)
 
 }
 
