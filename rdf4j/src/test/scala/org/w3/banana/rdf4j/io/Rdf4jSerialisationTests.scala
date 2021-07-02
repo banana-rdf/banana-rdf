@@ -8,6 +8,8 @@ import scala.util.Try
 
 class Rdf4jTurtleTests extends TurtleTestSuite[Rdf4j, Try]
 
+class Rdf4jRelativeTurtleTest extends RelativeTurtleTestSuite[Rdf4j, Try]
+
 class Rdf4jPrefixTest extends PrefixTestSuite[Rdf4j, Try]
 
 class Rdf4jNTripleReaderTestSuite extends NTriplesReaderTestSuite[Rdf4j]

@@ -29,7 +29,7 @@ class NTriplesWriterTestSuite[Rdf <: RDF](implicit
     "write one triplet" in {
 
       val g = Graph(Triple(URI(bblfish), rdf.`type`, foaf.Person))
-      val str = writer.asString(g, base = "http://example").get
+      val str = writer.asString(g, base = Some("http://example")).get
       val graphTry = toGraph(ntparser(str))
       assert(graphTry.get isIsomorphicWith g)
     }
@@ -41,7 +41,7 @@ class NTriplesWriterTestSuite[Rdf <: RDF](implicit
         Triple(URI(bblfish), foaf.knows, BNode("betehess")),
         Triple(BNode("betehess"), foaf.homepage, URI("http://bertails.org/"))
       )
-      val str = writer.asString(g, base = "http://example").get
+      val str = writer.asString(g, base = Some("http://example")).get
       val graphTry = toGraph(ntparser(str))
       assert(graphTry.get isIsomorphicWith g)
     }

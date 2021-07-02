@@ -385,25 +385,29 @@ object WebACLPrefix {
 }
 
 class WebACLPrefix[Rdf <: RDF](ops: RDFOps[Rdf]) extends PrefixBuilder("acl", "http://www.w3.org/ns/auth/acl#")(ops) {
-  val Authorization = apply("Authorization")
-  val agent = apply("agent")
-  val agentClass = apply("agentClass")
-  val accessTo = apply("accessTo")
-  val accessToClass = apply("accessToClass")
-  val defaultForNew = apply("defaultForNew")
-  val mode = apply("mode")
   val Access = apply("Access")
+  val Append = apply("Append")
+  val AuthenticatedAgent = apply("AuthenticatedAgent")
+  val Authorization = apply("Authorization")
+  val Control = apply("Control")
+  val Origin = apply("Origin")
   val Read = apply("Read")
   val Write = apply("Write")
-  val Append = apply("Append")
   val accessControl = apply("accessControl")
-  val Control = apply("Control")
+  val accessTo = apply("accessTo")
+  val accessToClass = apply("accessToClass")
+  val agent = apply("agent")
+  val agentClass = apply("agentClass")
+  val agentGroup = apply("agentGroup")
+  val default = apply("default")
+  val defaultForNew = apply("defaultForNew")
+  val delegates = apply("delegates")
+  val mode = apply("mode")
+  val origin = apply("origin")
   val owner = apply("owner")
-  val WebIDAgent = apply("WebIDAgent")
 
   //not officially supported:
-  val include = apply("include")
-  val regex = apply("regex")
+  val imports = apply("imports")
 }
 
 object CertPrefix {

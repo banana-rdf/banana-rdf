@@ -13,7 +13,7 @@ private abstract class Rdf4jSolutionsWriter[S] extends SparqlSolutionsWriter[Rdf
 
   def writer(outputStream: OutputStream): TupleQueryResultWriter
 
-  def write(answers: Rdf4j#Solutions, os: OutputStream, base: String) = Try {
+  def write(answers: Rdf4j#Solutions, os: OutputStream, base: Option[String]) = Try {
     val sWriter = writer(os)
     // sWriter.startQueryResult(answers.getBindingNames)
     sWriter.startQueryResult(new java.util.ArrayList()) // <- yeah, probably wrong...
@@ -21,7 +21,7 @@ private abstract class Rdf4jSolutionsWriter[S] extends SparqlSolutionsWriter[Rdf
     sWriter.endQueryResult()
   }
 
-  def asString(answers: Rdf4j#Solutions, base: String) = Try {
+  def asString(answers: Rdf4j#Solutions, base: Option[String]) = Try {
     // TODO this goes through the lossy outputstream in order to then
     // recode a string, even though it does not really know what the
     // required encoding is

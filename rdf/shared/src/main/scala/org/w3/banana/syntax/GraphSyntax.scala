@@ -21,9 +21,16 @@ class GraphW[Rdf <: RDF](val graph: Rdf#Graph) extends AnyVal {
   def isIsomorphicWith(otherGraph: Rdf#Graph)(implicit ops: RDFOps[Rdf]): Boolean = ops.isomorphism(graph, otherGraph)
 
   def contains(triple: Rdf#Triple)(implicit ops: RDFOps[Rdf]): Boolean = {
-    val (sub, rel, obj) = ops.fromTriple(triple)
     import ops.toConcreteNodeMatch
-    ops.find(graph, sub, rel, obj).hasNext
+    val (sub, rel, obj) = ops.fromTriple(triple)
+    select(sub,rel,obj).hasNext
+  }
+
+  /* note: this method could also be called find, but it clashes with jena's underlying
+   * graph.find. A bit awkward. Moving to Scala3 opaque types might help.
+   **/
+  def select(sub: Rdf#NodeMatch, rel: Rdf#NodeMatch, obj: Rdf#NodeMatch)(implicit ops: RDFOps[Rdf]): Iterator[Rdf#Triple] = {
+    ops.find(graph, sub, rel, obj)
   }
 
   /**

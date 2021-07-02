@@ -45,7 +45,7 @@ trait IOExample extends IOExampleDependencies {
 
     val tmpFile = new File(Properties.tmpDir, "card.ttl")
     val to = new java.io.FileOutputStream(tmpFile)
-    val ret = rdfXMLWriter.write(graph, to, base = timblCard)
+    val ret = rdfXMLWriter.write(graph, to, base = Some(timblCard))
     if (ret.isSuccess)
       println(s"successfuly wrote TimBL's card to ${tmpFile.getAbsolutePath}")
 
@@ -54,10 +54,10 @@ trait IOExample extends IOExampleDependencies {
     /* prints 10 triples to stdout */
 
     val graph10Triples = Graph(graph.triples.take(10).toSet)
-    val graphAsXMLString = rdfXMLWriter.asString(graph10Triples, base = timblCard) getOrElse sys.error("coudn't serialize the graph")
+    val graphAsXMLString = rdfXMLWriter.asString(graph10Triples, base = Some(timblCard)) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsXMLString)
 
-    val graphAsTurtleString = turtleWriter.asString(graph10Triples, base = timblCard, Set(foaf, rdf)) getOrElse sys.error("coudn't serialize the graph")
+    val graphAsTurtleString = turtleWriter.asString(graph10Triples, base = Some(timblCard), Set(foaf, rdf)) getOrElse sys.error("coudn't serialize the graph")
     println(graphAsTurtleString)
   }
 

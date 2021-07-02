@@ -66,7 +66,7 @@ class SparqlGraphTest[Rdf <: RDF, SyntaxType](implicit
 
       val out = new ByteArrayOutputStream()
 
-      val serialisedAnswer = sparqlWriter.write(answers, out, "")
+      val serialisedAnswer = sparqlWriter.write(answers, out, None)
       assert(serialisedAnswer.isSuccess, "the sparql must be serialisable")
 
       val answr2 = sparqlReader.read(new ByteArrayInputStream(out.toByteArray), "")

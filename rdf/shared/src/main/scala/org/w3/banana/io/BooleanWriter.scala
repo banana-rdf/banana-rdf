@@ -9,7 +9,7 @@ trait BooleanWriter[T] extends Writer[Boolean, Try, T] {
 
   def format(bool: Boolean): String
 
-  def asString(bool: Boolean, base: String): Try[String] = Try {
+  def asString(bool: Boolean, base: Option[String]): Try[String] = Try {
     format(bool)
   }
 
@@ -29,7 +29,7 @@ object BooleanWriter {
         |}
         | """.stripMargin.format(bool)
 
-    override def write(obj: Boolean, outputstream: OutputStream, base: String) : Try[Unit] = ???
+    override def write(obj: Boolean, outputstream: OutputStream, base: Option[String]) : Try[Unit] = ???
 
   }
 
@@ -45,7 +45,7 @@ object BooleanWriter {
         |  <boolean>%s</boolean>
         |</sparql> """.stripMargin.format(bool) // "
 
-    override def write(obj: Boolean, outputstream: OutputStream, base: String): Try[Unit] = ???
+    override def write(obj: Boolean, outputstream: OutputStream, base: Option[String]): Try[Unit] = ???
   }
 
 }

@@ -13,7 +13,7 @@ class Rdf4jRDFWriter[T](implicit
                         rdf4jSyntax: Rdf4jSyntax[T]
 ) extends RDFWriter[Rdf4j, Try, T] {
 
-  def write(graph: Rdf4j#Graph, os: OutputStream, base: String, prefixes: Set[Prefix[Rdf4j]]): Try[Unit] = Try {
+  def write(graph: Rdf4j#Graph, os: OutputStream, base: Option[String], prefixes: Set[Prefix[Rdf4j]]): Try[Unit] = Try {
     val sWriter = rdf4jSyntax.rdfWriter(os, base)
     sWriter.startRDF()
     prefixes.foreach(p => {
@@ -23,7 +23,7 @@ class Rdf4jRDFWriter[T](implicit
     sWriter.endRDF()
   }
 
-  def asString(graph: Rdf4j#Graph, base: String, prefixes: Set[Prefix[Rdf4j]]): Try[String] = Try {
+  def asString(graph: Rdf4j#Graph, base: Option[String], prefixes: Set[Prefix[Rdf4j]]): Try[String] = Try {
     val result = new StringWriter()
     val sWriter = rdf4jSyntax.rdfWriter(result, base)
     sWriter.startRDF()

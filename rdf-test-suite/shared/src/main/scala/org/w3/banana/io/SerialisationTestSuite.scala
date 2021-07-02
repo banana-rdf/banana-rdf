@@ -52,8 +52,8 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
     )
   }
 
-  val rdfCore = "http://www.w3.org/2001/sw/RDFCore/"
-  val rdfCorePrefix = Prefix("rdf", rdfCore)
+  val rdfCore = Some("http://www.w3.org/2001/sw/RDFCore/")
+  val rdfCorePrefix = Prefix("rdf", rdfCore.get)
   val referenceGraph = graphBuilder(rdfCorePrefix)
 
   // TODO: there is a bug in Sesame with hash uris as prefix
@@ -64,13 +64,13 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
   s"simple $syntax string containing only absolute URIs" should {
 
     "parse using Readers (the base has no effect since all URIs are absolute)" in {
-      val graph = reader.read(new StringReader(referenceGraphSerialisedForSyntax), rdfCore).copoint
+      val graph = reader.read(new StringReader(referenceGraphSerialisedForSyntax), rdfCore.get).copoint
       assert(referenceGraph isIsomorphicWith graph)
     }
 
     "parse using InputStream (the base has no effect since all URIs are absolute)" in {
       val graph = reader.read(
-        new ByteArrayInputStream(referenceGraphSerialisedForSyntax.getBytes("UTF-8")), rdfCore
+        new ByteArrayInputStream(referenceGraphSerialisedForSyntax.getBytes("UTF-8")), rdfCore.get
       ).copoint
       assert(referenceGraph isIsomorphicWith graph)
     }
@@ -79,9 +79,9 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
 
   s"write ref graph as $syntax string, read it & compare" in {
     val soutString =
-      writer.asString(referenceGraph, "http://www.w3.org/2001/sw/RDFCore/").copoint
+      writer.asString(referenceGraph, Some("http://www.w3.org/2001/sw/RDFCore/")).copoint
     assert(soutString.nonEmpty)
-    val graph = reader.read(new StringReader(soutString), rdfCore).copoint
+    val graph = reader.read(new StringReader(soutString), rdfCore.get).copoint
     assert(referenceGraph isIsomorphicWith graph)
   }
 
@@ -94,17 +94,16 @@ abstract class SerialisationTestSuite[Rdf <: RDF, M[+_] : Monad : Comonad, Sin, 
       } yield {
         computedFooGraph
       }
-
       assert(fooGraph isIsomorphicWith bar.copoint)
     }
 
     """not be created just by taking URIs in absolute graphs and cutting the characters leading up to the base.
       It is more complex than that.
     """ in {
-      val rdfCoreResource = rdfCore + "imaginary"
+      val rdfCoreResource = rdfCore.map(_ + "imaginary")
       val bar = for {
         relativeSerialisation <- writer.asString(referenceGraph, rdfCoreResource)
-        computedFooGraph <- reader.read(new StringReader(relativeSerialisation), rdfCore)
+        computedFooGraph <- reader.read(new StringReader(relativeSerialisation), rdfCore.get)
       } yield {
         computedFooGraph
       }
