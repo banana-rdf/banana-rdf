@@ -15,11 +15,11 @@ object JenaSolutionsWriter {
     jenaSparqlSyntax: JenaAnswerOutput[T]
   ): SparqlSolutionsWriter[Jena, T] = new SparqlSolutionsWriter[Jena, T] {
 
-    def write(answers: Jena#Solutions, os: OutputStream, base: String) = Try {
+    def write(answers: Jena#Solutions, os: OutputStream, base: Option[String]) = Try {
       ResultSetMgr.write(os,answers,jenaSparqlSyntax.formatter)
     }
 
-    def asString(answers: Jena#Solutions, base: String): Try[String] = Try {
+    def asString(answers: Jena#Solutions, base: Option[String]): Try[String] = Try {
       val result = new ByteArrayOutputStream()
       ResultSetMgr.write(result, answers, jenaSparqlSyntax.formatter)
       result.toString

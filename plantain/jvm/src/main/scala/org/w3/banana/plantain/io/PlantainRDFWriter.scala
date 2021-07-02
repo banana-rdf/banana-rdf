@@ -25,12 +25,13 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
     override def toString(): String = uri
   }
 
-  class Writer(graph: Plantain#Graph, outputstream: OutputStream, base: String) {
-    val baseUri = new jURI(base)
+  class Writer(graph: Plantain#Graph, outputstream: OutputStream, base: Option[String]) {
+    val baseUri: Option[jURI] = base.map(b => new jURI(b))
 
     object Uri {
       def unapply(node: Plantain#Node): Option[jURI] = node match {
-        case uri: Plantain#URI => Some(baseUri.relativize(new jURI(uri.toString)))
+        case uri: Plantain#URI =>
+          baseUri.map(bs=> bs.relativize(new jURI(uri.toString))).orElse(Some(new jURI(uri.toString)))
         case _                 => None
       }
     }
@@ -70,12 +71,12 @@ object PlantainTurtleWriter extends RDFWriter[Plantain, Try, Turtle] {
 
   }
 
-  def write(graph: Plantain#Graph, outputstream: OutputStream, base: String, prefixes: Set[Prefix[Plantain]]): Try[Unit] = {
+  def write(graph: Plantain#Graph, outputstream: OutputStream, base: Option[String], prefixes: Set[Prefix[Plantain]]): Try[Unit] = {
     val writer = new Writer(graph, outputstream, base)
     writer.write()
   }
 
-  def asString(graph: Plantain#Graph, base: String, prefixes: Set[Prefix[Plantain]]): Try[String] = Try {
+  def asString(graph: Plantain#Graph, base: Option[String], prefixes: Set[Prefix[Plantain]]): Try[String] = Try {
     val result = new ByteArrayOutputStream()
     val writer = new Writer(graph, result, base)
     writer.write()
