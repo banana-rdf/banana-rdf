@@ -55,12 +55,12 @@ object Rdf4jSyntax {
     // RDF4J's parser does not handle relative URI, but let us override the behavior :-)
     def relativize(uri: rdf4jIRI, baseURI: Option[jURI]): Either[rdf4jIRI, String] =
       baseURI match {
-        case None => Left(uri)
+        case None => if (uri.toString.length > 0) Left(uri) else Right("")
         case Some(base) => {
           val juri     = new jURI(uri.toString)
           val relative = base.relativize(juri).toString
 
-          if (relative.length > 0) Left(makeUri(relative)) else Right(relative)
+          if (relative.length > 0) Left(makeUri(relative)) else Right("")
         }
       }
 

@@ -78,8 +78,8 @@ abstract class RelativeGraphSerialisationTestSuite[Rdf <: RDF, M[+_]: Monad : Co
   val timbl = timBlcardURI.withFragment("i")
   val BLcardAbsolute = Graph(
     Triple(timbl, rdf.`type`, foaf.Person),
-    Triple(timbl,foaf.name,Literal("Tim Berners-Lee")),
-    Triple(timbl,foaf.workInfoHomepage,w3c)
+    Triple(timbl, foaf.name, Literal("Tim Berners-Lee")),
+    Triple(timbl, foaf.workInfoHomepage, w3c)
   )
 
   /**
@@ -92,6 +92,18 @@ abstract class RelativeGraphSerialisationTestSuite[Rdf <: RDF, M[+_]: Monad : Co
   ) union gr(
     URI("") -- owl.imports ->- URI("/.acl")
   )
+  s"Writing the empty graph in $syntax" should {
+    "not throw an exception" in {
+      writer.asString(Graph.empty,None).copoint
+    }
+  }
+  
+  s"Writing self references" should {
+    val defaultACLGraph: Rdf#Graph = (URI("") -- owl.imports ->- URI(".acl")).graph
+    "not throw an exception" in {
+      writer.asString(defaultACLGraph,None).copoint
+    }
+  }
 
   s"writing relative graphs to $syntax and reading them back from correct base" should {
 
