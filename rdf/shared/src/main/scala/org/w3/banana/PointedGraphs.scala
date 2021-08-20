@@ -11,12 +11,18 @@ class PointedGraphs[Rdf <: RDF](val nodes: Iterable[Rdf#Node], val graph: Rdf#Gr
     nodes.mkString("[", " ; ", "]")
   }
 
-  def iterator = nodes.iterator map { PointedGraph(_, graph) }
+  def iterator: Iterator[PointedGraph[Rdf]] = nodes.iterator map { PointedGraph(_, graph) }
 
   def /(p: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraphs[Rdf] = {
-    val ns: Iterable[Rdf#Node] = this flatMap { (pointed: PointedGraph[Rdf]) =>
-      import pointed.pointer
-      ops.getObjects(graph, pointer, p)
+    val ns: Iterable[Rdf#Node] = nodes flatMap { node =>
+      ops.getObjects(graph, node, p)
+    }
+    new PointedGraphs[Rdf](ns, graph)
+  }
+
+  def /-(p: Rdf#URI)(implicit ops: RDFOps[Rdf]): PointedGraphs[Rdf] = {
+    val ns: Iterable[Rdf#Node] = nodes flatMap { node =>
+      ops.getSubjects(graph, p, node)
     }
     new PointedGraphs[Rdf](ns, graph)
   }
