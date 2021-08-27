@@ -1,4 +1,6 @@
-val dottyVersion = "0.26.0-RC1"
+val Scala3Version = "3.0.1"
+
+val munit = "org.scalameta" %% "munit" % "0.7.28" % Test
 
 lazy val root = project
   .in(file("."))
@@ -6,9 +8,10 @@ lazy val root = project
     name := "dotty-simple",
     version := "0.1.0",
 
-    scalaVersion := dottyVersion,
+    scalaVersion := Scala3Version,
     libraryDependencies ++= Seq(
-      "org.apache.jena" % "apache-jena-libs" % "3.15.0",
-      "com.novocode" % "junit-interface" % "0.11" % "test"
+      "org.apache.jena" % "apache-jena-libs" % "4.1.0",
+      munit
     )
+
   )

@@ -4,7 +4,7 @@ import org.w3.banana._
 
 type RDFObj = RDF & Singleton
 
-trait RDFOps[T <: RDFObj](using val rdf: T) {
+trait RDFOps[T <: RDFObj](val rdf: T) {
    def emptyGraph: rdf.Graph
    def fromUri(uri: rdf.URI): String
    def makeUri(s: String): rdf.URI

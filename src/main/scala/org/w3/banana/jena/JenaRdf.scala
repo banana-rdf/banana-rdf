@@ -5,7 +5,7 @@ import org.apache.jena.query.{QuerySolution, ResultSet, Query => JenaQuery}
 import org.apache.jena.update.UpdateRequest
 import org.w3.banana.{RDF, _}
 
-trait JenaRdf extends RDF {
+object Jena extends RDF {
   // types related to the RDF datamodel
   type Graph = JenaGraph
   type Triple = JenaTriple
@@ -32,4 +32,3 @@ trait JenaRdf extends RDF {
   type Solutions = ResultSet
 }
 
-given JenaRdf as RDF = new JenaRdf{}
