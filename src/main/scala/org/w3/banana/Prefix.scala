@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import scala.util._
+import scala.util.*
 
 trait Prefix[T <: RDFObj](using val rdf: T) {
   def prefixName: String
@@ -21,7 +21,7 @@ class PrefixBuilder[T <: RDFObj](using val rdf2: T)(
   val prefixName: String,
   val prefixIri: String
 )(using val ops: RDFOps[rdf2.type]) extends Prefix[rdf2.type](using rdf2) {
-  import ops._
+  import ops.*
 
   override def toString: String = "Prefix(" + prefixName + ")"
 
@@ -29,7 +29,7 @@ class PrefixBuilder[T <: RDFObj](using val rdf2: T)(
 
   def unapply(iri: rdf.URI): Option[String] = {
     val uriString = fromUri(iri)
-    if (uriString.startsWith(prefixIri))
+    if uriString.startsWith(prefixIri) then
       Some(uriString.substring(prefixIri.length))
     else
       None
@@ -37,8 +37,8 @@ class PrefixBuilder[T <: RDFObj](using val rdf2: T)(
 
   def getLocalName(iri: rdf.URI): Try[String] =
     unapply(iri) match {
-      case None => Failure(Exception(this.toString + " couldn't extract localname for " + iri.toString))
       case Some(localname) => Success(localname)
+      case _: None.type => Failure(Exception(this.toString + " couldn't extract localname for " + iri))
     }
 
 }

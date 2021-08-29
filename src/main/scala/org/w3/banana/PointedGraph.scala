@@ -1,6 +1,6 @@
 package org.w3.banana
 
-import org.w3.banana._
+import org.w3.banana.*
 
 type RDFObj = RDF & Singleton
 

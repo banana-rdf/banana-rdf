@@ -1,13 +1,15 @@
 package org.w3.banana
 
+import org.apache.jena.graph.{Node_Blank, Node_Literal, Node_URI}
+
 trait RDF {
   // types related to the RDF datamodel
   type Graph
   type Triple
-  type Node
-  type URI <: Node
-  type BNode <: Node
-  type Literal <: Node
+  type Node 
+  type URI = Node_URI
+  type BNode = Node_Blank
+  type Literal = Node_Literal
   type Lang
 
   // mutable graphs

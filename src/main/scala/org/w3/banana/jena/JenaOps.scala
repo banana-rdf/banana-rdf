@@ -13,7 +13,7 @@ class JenaOps extends RDFOps(Jena): // with JenaMGraphOps with DefaultURIOps[Jen
   def makeUri(iriStr: String): rdf.URI = { NodeFactory.createURI(iriStr).asInstanceOf[Node_URI] }
 
   def fromUri(node: rdf.URI): String =
-    if (node.isURI)
+    if node.isURI then
       node.getURI
     else
       throw new RuntimeException("fromUri: " + node.toString() + " must be a URI")

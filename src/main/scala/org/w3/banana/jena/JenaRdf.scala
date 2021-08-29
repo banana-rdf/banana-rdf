@@ -1,9 +1,9 @@
 package org.w3.banana.jena
 
-import org.apache.jena.graph.{Graph => JenaGraph, Node => JenaNode, Triple => JenaTriple, _}
-import org.apache.jena.query.{QuerySolution, ResultSet, Query => JenaQuery}
+import org.apache.jena.graph.{Graph as JenaGraph, Node as JenaNode, Triple as JenaTriple, *}
+import org.apache.jena.query.{QuerySolution, ResultSet, Query as JenaQuery}
 import org.apache.jena.update.UpdateRequest
-import org.w3.banana.{RDF, _}
+import org.w3.banana.{RDF, *}
 
 object Jena extends RDF {
   // types related to the RDF datamodel
