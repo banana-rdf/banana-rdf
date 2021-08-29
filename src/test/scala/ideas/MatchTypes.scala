@@ -1,9 +1,5 @@
 package ideas
 
-import ideas.MatchTypes.Java
-import ideas.MatchTypes.Java.URI
-import ideas.MatchTypes.RDF.GetNode
-import org.apache.jena.graph.Graph
 
 /**
  * following an idea by Neko-kai https://twitter.com/kai_nyasha
@@ -23,27 +19,25 @@ object MatchTypes {
 		def mkStringLit(str: String): Literal
 		def mkTriple(subj: Node, rel: URI, obj: Node): Triple
 		def mkGraph(triples: Iterable[Triple]): Graph
-
 	}
 
 	object JenaRdf extends RDF {
-		import org.apache.jena.graph
-		import graph.{NodeFactory, Node_Blank, Node_Literal, Node_URI, Node as JenaNode}
-		import graph.{Triple as JenaTriple, Graph as JGraph, Factory}
+		import org.apache.jena.{graph as jena}
+		import org.apache.jena.graph.{NodeFactory, Factory}
 
-		override opaque type Graph = JGraph
-		override opaque type Triple = JenaTriple
-		override opaque type Node = JenaNode
-		override opaque type URI <: Node = Node_URI
-		override opaque type BNode <: Node = Node_Blank
-		override opaque type Literal <: Node = Node_Literal
+		override opaque type Graph = jena.Graph
+		override opaque type Triple = jena.Triple
+		override opaque type Node = jena.Node
+		override opaque type URI <: Node = jena.Node_URI
+		override opaque type BNode <: Node = jena.Node_Blank
+		override opaque type Literal <: Node = jena.Node_Literal
 
 		override def mkUri(iriStr: String): URI =
 			NodeFactory.createURI(iriStr).asInstanceOf[URI]
 		override def mkStringLit(str: String): Literal =
 			NodeFactory.createLiteral(str).asInstanceOf[Literal]
 		override def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
-			JenaTriple.create(subj, rel, obj)
+			jena.Triple.create(subj, rel, obj)
 		override def mkGraph(triples: Iterable[Triple]): Graph =
 			val g = Factory.createDefaultGraph()
 			triples.foreach(t => g.add(t))
@@ -59,7 +53,7 @@ object MatchTypes {
 		override opaque type Graph = Set[Triple]
 
 		override def mkUri(iriStr: String): URI = new java.net.URI(iriStr)
-		override def mkStringLit(str: String): String = str
+		override def mkStringLit(str: String): Literal = str
 		override def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
 			(subj,rel,obj)
 		override def mkGraph(triples: Iterable[Triple]): Graph =
@@ -88,24 +82,16 @@ object MatchTypes {
 	final case class PG[Rdf <: RDF](uri: RDF.Node[Rdf], graph: RDF.Graph[Rdf])
 }
 
-object Opaque {
-	opaque type Meter = Double
-	def Meter(x: Double): Meter = x
-
-	opaque type Second = Double
-	def Second(x: Double): Second = x
-}
-
 class MatchTypes extends munit.FunSuite {
 	import MatchTypes.*
 
+	val bblStr = "https://bblfish.net/#i"
+	val timStr = "https://www.w3.org/People/Berners-Lee/card#i"
+	val knows = "http://xmlns.com/foaf/0.1/knows"
+	val name = "http://xmlns.com/foaf/0.1/name"
 
 	test("Jena and Java instance test") {
 		import MatchTypes.*
-		val bblStr = "https://bblfish.net/#i"
-		val timStr = "https://www.w3.org/People/Berners-Lee/card#i"
-		val knows = "http://xmlns.com/foaf/0.1/knows"
-		val name = "http://xmlns.com/foaf/0.1/name"
 
 		val bblJna: RDF.URI[JenaRdf.type] = JenaRdf.mkUri(bblStr)
 		val bblJva: RDF.URI[Java.type] = Java.mkUri("bblStr")
@@ -128,4 +114,25 @@ class MatchTypes extends munit.FunSuite {
 		val pgJena: PG[Jena] = PG(bblJna,grJena)
 		val pgJava: PG[Java] = PG(bblJva,grJava)
 	}
+
+	import RDF.{Graph,URI,Triple}
+
+	//next we want to develop methods that are completely independent of the implementation
+	def buildGraph[Rdf<:RDF](using rdf: Rdf): RDF.Graph[rdf.type] = {
+		type Rdf = rdf.type
+		val bbl: URI[Rdf] = rdf.mkUri(bblStr)
+		val bKt: Triple[Rdf] = rdf.mkTriple(bbl, rdf.mkUri(knows), rdf.mkUri(timStr))
+		rdf.mkGraph(Seq(bKt))
+	}
+
+	test("Build a graph in Jena") {
+		given rdf: JenaRdf.type = JenaRdf
+		buildGraph[JenaRdf.type]
+	}
+
+	test("Build a graph in Java") {
+		given rdf: Java.type = Java
+		buildGraph[Java.type]
+	}
+
 }
