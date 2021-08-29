@@ -31,38 +31,38 @@ object MatchTypes {
 		import graph.{NodeFactory, Node_Blank, Node_Literal, Node_URI, Node as JenaNode}
 		import graph.{Triple as JenaTriple, Graph as JGraph, Factory}
 
-		override type Graph = JGraph
-		override type Triple = JenaTriple
-		override type Node = JenaNode
-		override type URI = Node_URI
-		override type BNode = Node_Blank
-		override type Literal = Node_Literal
+		override opaque type Graph = JGraph
+		override opaque type Triple = JenaTriple
+		override opaque type Node = JenaNode
+		override opaque type URI <: Node = Node_URI
+		override opaque type BNode <: Node = Node_Blank
+		override opaque type Literal <: Node = Node_Literal
 
 		override def mkUri(iriStr: String): URI =
 			NodeFactory.createURI(iriStr).asInstanceOf[URI]
-		override def mkStringLit(str: String): Node_Literal =
+		override def mkStringLit(str: String): Literal =
 			NodeFactory.createLiteral(str).asInstanceOf[Literal]
 		override def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
 			JenaTriple.create(subj, rel, obj)
-		override def mkGraph(triples: Iterable[Triple]): JGraph =
+		override def mkGraph(triples: Iterable[Triple]): Graph =
 			val g = Factory.createDefaultGraph()
 			triples.foreach(t => g.add(t))
 			g
 	}
 
 	object Java extends RDF {
-		override type Triple = (Node,URI,Node)
-		override type Node = java.net.URI|String|Int
-		override type URI = java.net.URI
-		override type BNode = Int
-		override type Literal = String
-		override type Graph = Set[Triple]
+		override opaque type Triple = Tuple3[Node,URI,Node]
+		override opaque type Node = java.net.URI|String|Int
+		override opaque type URI <: Node = java.net.URI
+		override opaque type BNode <: Node = Int
+		override opaque type Literal <: Node = String
+		override opaque type Graph = Set[Triple]
 
 		override def mkUri(iriStr: String): URI = new java.net.URI(iriStr)
 		override def mkStringLit(str: String): String = str
-		override def mkTriple(subj: Java.Node, rel: URI, obj: Java.Node): (Java.Node, URI, Java.Node) =
+		override def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
 			(subj,rel,obj)
-		override def mkGraph(triples: Iterable[(Node, URI, Node)]): Set[(Node, URI, Node)] =
+		override def mkGraph(triples: Iterable[Triple]): Graph =
 			triples.toSet
 	}
 
