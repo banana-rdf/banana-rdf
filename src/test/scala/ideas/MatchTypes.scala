@@ -31,12 +31,12 @@ object MatchTypes {
 			def subjectOf(triple: Triple): Node
 			def relationOf(triple: Triple): URI
 			def objectOf(triple: Triple): Node
-
-			extension (triple: Triple)
-				def subj: Node = Triple.subjectOf(triple)
-				def rel: URI = Triple.relationOf(triple)
-				def obj: Node = Triple.relationOf(triple)
 		}
+
+		extension (triple: Triple)
+			def subj: Node = Triple.subjectOf(triple)
+			def rel: URI = Triple.relationOf(triple)
+			def obj: Node = Triple.relationOf(triple)
 
 		//		val Node : Node
 //		val URI : URI
@@ -67,7 +67,7 @@ object MatchTypes {
 
 			override inline def subjectOf(triple: Triple): Node = triple.getSubject()
 			override inline def relationOf(triple: Triple): URI = triple.getPredicate().asInstanceOf[URI]
-			override inline def objectOf(triple: Triple): Node = triple.getObject()
+			override inline def objectOf(triple: Triple): Node  = triple.getObject()
 		}
 
 		override inline
@@ -175,7 +175,6 @@ class MatchTypes extends munit.FunSuite {
 		bKt.asMatchable match
 			case rdf.Triple(sub,rel,obj) => assertEquals(sub,bbl)
 			case _ => fail("triple did not match")
-		import rdf.Triple.*
 		assertEquals(bKt.subj,bbl)
 		rdf.mkGraph(Seq(bKt))
 	}
