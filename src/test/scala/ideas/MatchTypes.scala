@@ -1,9 +1,13 @@
 package ideas
 
+import org.apache.jena.sparql.resultset.ResultSetCompare.BNodeIso
+
 
 /**
  * following an idea by Neko-kai https://twitter.com/kai_nyasha
  *  https://discord.com/channels/632277896739946517/632277897448652844/880944909660606525
+ * seems to resolve the problem of loosing projection types
+ *  https://github.com/lampepfl/dotty/discussions/12527#discussioncomment-1251112
  *
  * Differences with banana-rdf:
  *  -
@@ -19,9 +23,19 @@ object MatchTypes {
 		type BNode <: Node
 		type Literal <: Node
 
+//		val Graph : ...
+		val Triple : TripleConstr
+		trait TripleConstr {
+			def apply(subj: Node, rel: URI, obj: Node): Triple
+			def unapply(triple: Triple): Option[(Node,URI,Node)]
+		}
+//		val Node : Node
+//		val URI : URI
+//		val BNode : BNode
+//		val Literal : Literal
+
 		def mkUri(iriStr: String): URI
 		def mkStringLit(str: String): Literal
-		def mkTriple(subj: Node, rel: URI, obj: Node): Triple
 		def mkGraph(triples: Iterable[Triple]): Graph
 	}
 
@@ -36,6 +50,13 @@ object MatchTypes {
 		override opaque type BNode <: Node = jena.Node_Blank
 		override opaque type Literal <: Node = jena.Node_Literal
 
+		override val Triple: TripleConstr = new TripleConstr {
+			override inline def apply(subj: Node, rel: URI, obj: Node): Triple =
+				jena.Triple.create(subj, rel, obj)
+			override def unapply(triple: Triple): Some[(Node, URI, Node)] =
+				Some((triple.getSubject,triple.getPredicate.asInstanceOf[URI],triple.getObject))
+		}
+
 		override inline
 		def mkUri(iriStr: String): URI =
 			NodeFactory.createURI(iriStr).asInstanceOf[URI]
@@ -43,10 +64,6 @@ object MatchTypes {
 		override inline
 		def mkStringLit(str: String): Literal =
 			NodeFactory.createLiteral(str).asInstanceOf[Literal]
-
-		override inline
-		def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
-			jena.Triple.create(subj, rel, obj)
 
 		override inline
 		def mkGraph(triples: Iterable[Triple]): Graph =
@@ -63,13 +80,15 @@ object MatchTypes {
 		override opaque type Literal <: Node = String
 		override opaque type Graph = Set[Triple]
 
+		override val Triple: TripleConstr = new TripleConstr {
+			override inline def apply(subj: Node, rel: URI, obj: Node): (Node, URI, Node) = (subj, rel, obj)
+			override def unapply(triple: (Node,URI, Node)): Option[(Node, URI, Node)] = Some(triple)
+		}
+
 		override inline
 		def mkUri(iriStr: String): URI = new java.net.URI(iriStr)
 		override inline
 		def mkStringLit(str: String): Literal = str
-		override inline
-		def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
-			(subj,rel,obj)
 		override inline
 		def mkGraph(triples: Iterable[Triple]): Graph = triples.toSet
 	}
@@ -117,9 +136,9 @@ class MatchTypes extends munit.FunSuite {
 
 		import RDF.Triple
 		val knowsJena: Triple[Jena] =
-			JenaRdf.mkTriple(bblJna, JenaRdf.mkUri(knows), JenaRdf.mkUri(timStr))
+			JenaRdf.Triple(bblJna, JenaRdf.mkUri(knows), JenaRdf.mkUri(timStr))
 		val knowsJava: Triple[Simple] =
-			Simple.mkTriple(bblJva, Simple.mkUri(knows), Simple.mkUri(timStr))
+			Simple.Triple(bblJva, Simple.mkUri(knows), Simple.mkUri(timStr))
 
 		import RDF.Graph
 		val grJena: Graph[Jena] = JenaRdf.mkGraph(Seq(knowsJena))
@@ -135,7 +154,11 @@ class MatchTypes extends munit.FunSuite {
 	def buildGraph[Rdf<:RDF](using rdf: Rdf): RDF.Graph[rdf.type] = {
 		type Rdf = rdf.type
 		val bbl: URI[Rdf] = rdf.mkUri(bblStr)
-		val bKt: Triple[Rdf] = rdf.mkTriple(bbl, rdf.mkUri(knows), rdf.mkUri(timStr))
+		val bKt: Triple[Rdf] = rdf.Triple(bbl, rdf.mkUri(knows), rdf.mkUri(timStr))
+		import compiletime.asMatchable
+		bKt.asMatchable match
+			case rdf.Triple(sub,rel,obj) => assertEquals(sub,bbl)
+			case _ => fail("triple did not match")
 		rdf.mkGraph(Seq(bKt))
 	}
 
@@ -144,9 +167,23 @@ class MatchTypes extends munit.FunSuite {
 		buildGraph[JenaRdf.type]
 	}
 
-	test("Build a graph in Java") {
+	test("Build a graph with Simple") {
 		given rdf: Simple.type = Simple
 		buildGraph[Simple.type]
+	}
+
+//	enum NodeType:
+//		case Uri, Lit, BN
+//
+//	def nodeType[Rdf<:RDF](using rdf: Rdf)(node: rdf.Node): NodeType = {
+//		node match
+//		case u: rdf.BNode => NodeType.BN
+//		case l: rdf.Literal => NodeType.Lit
+//		case u: rdf.URI => NodeType.Uri
+//	}
+
+	test("pattern matching on opaque types") {
+
 	}
 
 }
