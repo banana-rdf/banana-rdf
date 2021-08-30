@@ -32,5 +32,5 @@ lazy val root = project
 		  // "-Yexplicit-nulls",                  // For explicit nulls behavior.
 	  )
   )
-val Scala3Version = "3.0.1"
+val Scala3Version = "3.0.2-RC1"
 val munit = "org.scalameta" %% "munit" % "0.7.28" % Test

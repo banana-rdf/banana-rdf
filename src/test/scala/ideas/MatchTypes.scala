@@ -4,6 +4,10 @@ package ideas
 /**
  * following an idea by Neko-kai https://twitter.com/kai_nyasha
  *  https://discord.com/channels/632277896739946517/632277897448652844/880944909660606525
+ *
+ * Differences with banana-rdf:
+ *  -
+ *
  */
 object MatchTypes {
 
@@ -32,13 +36,20 @@ object MatchTypes {
 		override opaque type BNode <: Node = jena.Node_Blank
 		override opaque type Literal <: Node = jena.Node_Literal
 
-		override def mkUri(iriStr: String): URI =
+		override inline
+		def mkUri(iriStr: String): URI =
 			NodeFactory.createURI(iriStr).asInstanceOf[URI]
-		override def mkStringLit(str: String): Literal =
+
+		override inline
+		def mkStringLit(str: String): Literal =
 			NodeFactory.createLiteral(str).asInstanceOf[Literal]
-		override def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
+
+		override inline
+		def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
 			jena.Triple.create(subj, rel, obj)
-		override def mkGraph(triples: Iterable[Triple]): Graph =
+
+		override inline
+		def mkGraph(triples: Iterable[Triple]): Graph =
 			val g = Factory.createDefaultGraph()
 			triples.foreach(t => g.add(t))
 			g
@@ -52,12 +63,15 @@ object MatchTypes {
 		override opaque type Literal <: Node = String
 		override opaque type Graph = Set[Triple]
 
-		override def mkUri(iriStr: String): URI = new java.net.URI(iriStr)
-		override def mkStringLit(str: String): Literal = str
-		override def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
+		override inline
+		def mkUri(iriStr: String): URI = new java.net.URI(iriStr)
+		override inline
+		def mkStringLit(str: String): Literal = str
+		override inline
+		def mkTriple(subj: Node, rel: URI, obj: Node): Triple =
 			(subj,rel,obj)
-		override def mkGraph(triples: Iterable[Triple]): Graph =
-			triples.toSet
+		override inline
+		def mkGraph(triples: Iterable[Triple]): Graph = triples.toSet
 	}
 
 	object RDF {
