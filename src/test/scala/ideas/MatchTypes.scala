@@ -44,7 +44,7 @@ object MatchTypes {
 			g
 	}
 
-	object Java extends RDF {
+	object Simple extends RDF {
 		override opaque type Triple = Tuple3[Node,URI,Node]
 		override opaque type Node = java.net.URI|String|Int
 		override opaque type URI <: Node = java.net.URI
@@ -94,25 +94,25 @@ class MatchTypes extends munit.FunSuite {
 		import MatchTypes.*
 
 		val bblJna: RDF.URI[JenaRdf.type] = JenaRdf.mkUri(bblStr)
-		val bblJva: RDF.URI[Java.type] = Java.mkUri("bblStr")
+		val bblJva: RDF.URI[Simple.type] = Simple.mkUri("bblStr")
 
 		//work with generic types classes
 		import RDF.URI
 		type Jena = JenaRdf.type
-		type Java = Java.type
+		type Simple = Simple.type
 
 		import RDF.Triple
 		val knowsJena: Triple[Jena] =
 			JenaRdf.mkTriple(bblJna, JenaRdf.mkUri(knows), JenaRdf.mkUri(timStr))
-		val knowsJava: Triple[Java] =
-			Java.mkTriple(bblJva, Java.mkUri(knows), Java.mkUri(timStr))
+		val knowsJava: Triple[Simple] =
+			Simple.mkTriple(bblJva, Simple.mkUri(knows), Simple.mkUri(timStr))
 
 		import RDF.Graph
 		val grJena: Graph[Jena] = JenaRdf.mkGraph(Seq(knowsJena))
-		val grJava: Graph[Java] = Java.mkGraph(Seq(knowsJava))
+		val grJava: Graph[Simple] = Simple.mkGraph(Seq(knowsJava))
 
 		val pgJena: PG[Jena] = PG(bblJna,grJena)
-		val pgJava: PG[Java] = PG(bblJva,grJava)
+		val pgJava: PG[Simple] = PG(bblJva,grJava)
 	}
 
 	import RDF.{Graph,URI,Triple}
@@ -131,8 +131,8 @@ class MatchTypes extends munit.FunSuite {
 	}
 
 	test("Build a graph in Java") {
-		given rdf: Java.type = Java
-		buildGraph[Java.type]
+		given rdf: Simple.type = Simple
+		buildGraph[Simple.type]
 	}
 
 }
