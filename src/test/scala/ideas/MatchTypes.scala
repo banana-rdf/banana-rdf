@@ -24,12 +24,21 @@ object MatchTypes {
 		type Literal <: Node
 
 //		val Graph : ...
-		val Triple : TripleConstr
-		trait TripleConstr {
+		val Triple : TripleOps
+		trait TripleOps {
 			def apply(subj: Node, rel: URI, obj: Node): Triple
 			def unapply(triple: Triple): Option[(Node,URI,Node)]
+			def subjectOf(triple: Triple): Node
+			def relationOf(triple: Triple): URI
+			def objectOf(triple: Triple): Node
+
+			extension (triple: Triple)
+				def subj: Node = Triple.subjectOf(triple)
+				def rel: URI = Triple.relationOf(triple)
+				def obj: Node = Triple.relationOf(triple)
 		}
-//		val Node : Node
+
+		//		val Node : Node
 //		val URI : URI
 //		val BNode : BNode
 //		val Literal : Literal
@@ -50,11 +59,15 @@ object MatchTypes {
 		override opaque type BNode <: Node = jena.Node_Blank
 		override opaque type Literal <: Node = jena.Node_Literal
 
-		override val Triple: TripleConstr = new TripleConstr {
+		override val Triple: TripleOps = new TripleOps {
 			override inline def apply(subj: Node, rel: URI, obj: Node): Triple =
 				jena.Triple.create(subj, rel, obj)
 			override def unapply(triple: Triple): Some[(Node, URI, Node)] =
 				Some((triple.getSubject,triple.getPredicate.asInstanceOf[URI],triple.getObject))
+
+			override inline def subjectOf(triple: Triple): Node = triple.getSubject()
+			override inline def relationOf(triple: Triple): URI = triple.getPredicate().asInstanceOf[URI]
+			override inline def objectOf(triple: Triple): Node = triple.getObject()
 		}
 
 		override inline
@@ -80,9 +93,12 @@ object MatchTypes {
 		override opaque type Literal <: Node = String
 		override opaque type Graph = Set[Triple]
 
-		override val Triple: TripleConstr = new TripleConstr {
+		override val Triple: TripleOps = new TripleOps {
 			override inline def apply(subj: Node, rel: URI, obj: Node): (Node, URI, Node) = (subj, rel, obj)
-			override def unapply(triple: (Node,URI, Node)): Option[(Node, URI, Node)] = Some(triple)
+			override inline def subjectOf(triple: Triple): Node = triple._1
+			override inline def relationOf(triple: Triple): URI = triple._2
+			override inline def objectOf(triple: Triple): Node = triple._3
+			override inline def unapply(triple: Triple): Option[(Node, URI, Node)] = Some(triple)
 		}
 
 		override inline
@@ -159,17 +175,19 @@ class MatchTypes extends munit.FunSuite {
 		bKt.asMatchable match
 			case rdf.Triple(sub,rel,obj) => assertEquals(sub,bbl)
 			case _ => fail("triple did not match")
+		import rdf.Triple.*
+		assertEquals(bKt.subj,bbl)
 		rdf.mkGraph(Seq(bKt))
 	}
 
 	test("Build a graph in Jena") {
 		given rdf: JenaRdf.type = JenaRdf
-		buildGraph[JenaRdf.type]
+		val g: rdf.Graph = buildGraph[JenaRdf.type]
 	}
 
 	test("Build a graph with Simple") {
 		given rdf: Simple.type = Simple
-		buildGraph[Simple.type]
+		val g: rdf.Graph = buildGraph[Simple.type]
 	}
 
 //	enum NodeType:
@@ -182,8 +200,8 @@ class MatchTypes extends munit.FunSuite {
 //		case u: rdf.URI => NodeType.Uri
 //	}
 
-	test("pattern matching on opaque types") {
-
-	}
+//	test("pattern matching on opaque types") {
+//
+//	}
 
 }
