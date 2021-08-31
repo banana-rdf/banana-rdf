@@ -1,7 +1,9 @@
 package ideas
 
+import org.apache.jena.graph.{Factory, NodeFactory}
 import org.apache.jena.sparql.resultset.ResultSetCompare.BNodeIso
 
+import scala.util.Try
 
 /**
  * following an idea by Neko-kai https://twitter.com/kai_nyasha
@@ -23,7 +25,6 @@ object MatchTypes {
 		type BNode <: Node
 		type Literal <: Node
 
-//		val Graph : ...
 		val Triple : TripleOps
 		trait TripleOps {
 			def apply(subj: Node, rel: URI, obj: Node): Triple
@@ -36,16 +37,31 @@ object MatchTypes {
 		extension (triple: Triple)
 			def subj: Node = Triple.subjectOf(triple)
 			def rel: URI = Triple.relationOf(triple)
-			def obj: Node = Triple.relationOf(triple)
+			def obj: Node = Triple.objectOf(triple)
 
 		//		val Node : Node
-//		val URI : URI
+		val URI : URIOps
+		trait URIOps {
+			//todo: this will throw an exception, should return Option
+			def apply(uriStr: String): URI
+			def unapply(uri: URI): Option[String]
+			def mkUri(iriStr: String): Try[URI]
+		}
 //		val BNode : BNode
 //		val Literal : Literal
 
-		def mkUri(iriStr: String): URI
 		def mkStringLit(str: String): Literal
-		def mkGraph(triples: Iterable[Triple]): Graph
+
+		val Graph : GraphOps
+		trait GraphOps {
+			def empty: Graph
+			def apply(triples: Triple*): Graph
+			def triplesIn(graph: Graph): Iterable[Triple]
+		}
+
+		extension (graph: Graph)
+			def triples: Iterable[Triple] = Graph.triplesIn(graph)
+
 	}
 
 	object JenaRdf extends RDF {
@@ -70,14 +86,30 @@ object MatchTypes {
 			override inline def objectOf(triple: Triple): Node  = triple.getObject()
 		}
 
-		override inline
-		def mkUri(iriStr: String): URI =
-			NodeFactory.createURI(iriStr).asInstanceOf[URI]
+		val URI : URIOps = new URIOps {
+			//todo: this will throw an exception, should return Option
+			override inline def apply(uriStr: String): URI = NodeFactory.createURI(uriStr).asInstanceOf[URI]
+			override inline def unapply(uri: URI): Option[String] = Some(uri.getURI)
+			override inline def mkUri(iriStr: String): Try[URI] = Try(NodeFactory.createURI(iriStr).asInstanceOf[URI])
+		}
 
 		override inline
 		def mkStringLit(str: String): Literal =
 			NodeFactory.createLiteral(str).asInstanceOf[Literal]
 
+		val Graph = new GraphOps {
+			override inline def empty: Graph = Factory.empty()
+			override inline def apply(triples: Triple*): Graph =
+				val seq : Seq[Triple] = triples
+				seq.foldLeft(empty){(gr, tr) =>
+					gr.add(tr)
+					gr
+				}
+			import scala.jdk.CollectionConverters.{given,*}
+			def triplesIn(graph: Graph): Iterable[Triple] =
+				import org.apache.jena.graph.Node.ANY
+				graph.find(ANY, ANY, ANY).asScala.to(Iterable)
+		}
 		override inline
 		def mkGraph(triples: Iterable[Triple]): Graph =
 			val g = Factory.createDefaultGraph()
@@ -101,12 +133,23 @@ object MatchTypes {
 			override inline def unapply(triple: Triple): Option[(Node, URI, Node)] = Some(triple)
 		}
 
-		override inline
-		def mkUri(iriStr: String): URI = new java.net.URI(iriStr)
+		val URI : URIOps = new URIOps {
+			//todo: this will throw an exception, should return Option
+			// note: this implementation also parses the URI which Jena does not (I think).
+			override inline def apply(uriStr: String): URI = new java.net.URI(uriStr)
+			override inline def unapply(uri: URI): Option[String] = Some(uri.toString)
+			override inline def mkUri(iriStr: String): Try[URI] = Try(new java.net.URI(iriStr))
+		}
+
 		override inline
 		def mkStringLit(str: String): Literal = str
-		override inline
-		def mkGraph(triples: Iterable[Triple]): Graph = triples.toSet
+
+		override val Graph = new GraphOps {
+			override inline def empty: Graph = Set[Triple]()
+			override inline def apply(triples: Triple*): Graph = Set(triples*)
+			override inline def triplesIn(graph: Graph): Iterable[Triple] = graph.seq
+		}
+
 	}
 
 	object RDF {
@@ -142,8 +185,8 @@ class MatchTypes extends munit.FunSuite {
 	test("Jena and Java instance test") {
 		import MatchTypes.*
 
-		val bblJna: RDF.URI[JenaRdf.type] = JenaRdf.mkUri(bblStr)
-		val bblJva: RDF.URI[Simple.type] = Simple.mkUri("bblStr")
+		val bblJna: RDF.URI[JenaRdf.type] = JenaRdf.URI(bblStr)
+		val bblJva: RDF.URI[Simple.type] = Simple.URI(bblStr)
 
 		//work with generic types classes
 		import RDF.URI
@@ -152,41 +195,49 @@ class MatchTypes extends munit.FunSuite {
 
 		import RDF.Triple
 		val knowsJena: Triple[Jena] =
-			JenaRdf.Triple(bblJna, JenaRdf.mkUri(knows), JenaRdf.mkUri(timStr))
+			JenaRdf.Triple(bblJna, JenaRdf.URI(knows), JenaRdf.URI(timStr))
 		val knowsJava: Triple[Simple] =
-			Simple.Triple(bblJva, Simple.mkUri(knows), Simple.mkUri(timStr))
+			Simple.Triple(bblJva, Simple.URI(knows), Simple.URI(timStr))
 
 		import RDF.Graph
-		val grJena: Graph[Jena] = JenaRdf.mkGraph(Seq(knowsJena))
-		val grJava: Graph[Simple] = Simple.mkGraph(Seq(knowsJava))
+		val grJena: Graph[Jena] = JenaRdf.Graph(knowsJena)
+		val grJava: Graph[Simple] = Simple.Graph(knowsJava)
 
 		val pgJena: PG[Jena] = PG(bblJna,grJena)
 		val pgJava: PG[Simple] = PG(bblJva,grJava)
 	}
 
-	import RDF.{Graph,URI,Triple}
+//	import RDF.{Graph,URI}
 
-	//next we want to develop methods that are completely independent of the implementation
-	def buildGraph[Rdf<:RDF](using rdf: Rdf): RDF.Graph[rdf.type] = {
-		type Rdf = rdf.type
-		val bbl: URI[Rdf] = rdf.mkUri(bblStr)
-		val bKt: Triple[Rdf] = rdf.Triple(bbl, rdf.mkUri(knows), rdf.mkUri(timStr))
+	/**
+	 * construct a Graph completely independent of any implementation.
+	 * Note: here we don't seem to need the Graph[Rdf] notation.
+	 * @param rdf The rdf implementation that comes with the methods (used to be RDFOps[Rdf])
+	 * @tparam Rdf A subtype of RDF trait
+	 * @return an rdf.Graph (note: returning an RDF.Graph[Rdf] does not work).
+	 */
+	def buildATestGraph[Rdf<:RDF](using rdf: Rdf): rdf.Graph = {
+		import rdf.*
+		val bbl: URI = URI(bblStr)
+		val bKt: Triple = Triple(bbl, URI(knows), URI(timStr))
 		import compiletime.asMatchable
 		bKt.asMatchable match
-			case rdf.Triple(sub,rel,obj) => assertEquals(sub,bbl)
+			case Triple(sub,URI(rel),obj) =>
+				assertEquals(sub,bbl)
+				assertEquals(rel,knows)
 			case _ => fail("triple did not match")
-		assertEquals(bKt.subj,bbl)
-		rdf.mkGraph(Seq(bKt))
+		assertEquals(Triple(bKt.subj,bKt.rel,bKt.obj), bKt)
+		Graph(bKt)
 	}
 
 	test("Build a graph in Jena") {
 		given rdf: JenaRdf.type = JenaRdf
-		val g: rdf.Graph = buildGraph[JenaRdf.type]
+		val g: rdf.Graph = buildATestGraph[JenaRdf.type]
 	}
 
 	test("Build a graph with Simple") {
 		given rdf: Simple.type = Simple
-		val g: rdf.Graph = buildGraph[Simple.type]
+		val g: rdf.Graph = buildATestGraph[Simple.type]
 	}
 
 //	enum NodeType:
