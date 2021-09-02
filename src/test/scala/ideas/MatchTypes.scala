@@ -57,7 +57,7 @@ object MatchTypes {
 			def asString(uri: URI): String
 		}
 
-//		implicit def uriTT: TypeTest[Any,URI]
+		given uriTT: TypeTest[Any,URI]
 
 		object URI {
 			//todo: this will throw an exception
@@ -112,12 +112,13 @@ object MatchTypes {
 			override inline def objectOf(triple: Triple): Node  = triple.getObject()
 		}
 
-//		given uriTT: TypeTest[Any,URI] with {
-//			import compiletime.asMatchable
-//			override def unapply(s: Any): Option[s.type & URI] = s.asMatchable match
-//				case x: (s.type & URI) => Some(x)
-//				case _ => None
-//		}
+		given uriTT: TypeTest[Any,URI] with {
+			import compiletime.asMatchable
+			override def unapply(s: Any): Option[s.type & jena.Node_URI] = s.asMatchable match
+				//note: this does not compile if we use URI instead of jena.Node_URI
+				case x: (s.type & jena.Node_URI) => Some(x)
+				case _ => None
+		}
 
 		given uriOps : URIOps with {
 			//todo: this will throw an exception, should return Option
@@ -165,12 +166,13 @@ object MatchTypes {
 			override inline def objectOf(triple: Triple): Node = triple._3
 		}
 
-//		given uriTT: TypeTest[Any,URI] with {
-//			import compiletime.asMatchable
-//			override def unapply(s: Any): Option[s.type & URI] = s.asMatchable match
-//				case x: (s.type & URI) => Some(x)
-//				case _ => None
-//		}
+		given uriTT: TypeTest[Any,URI] with {
+			import compiletime.asMatchable
+			override def unapply(s: Any): Option[s.type & URI] = s.asMatchable match
+				//note: this does now compile if we use URI instead of java.net.URI
+				case x: (s.type & java.net.URI) => Some(x)
+				case _ => None
+		}
 
 		given uriOps : URIOps with {
 			//todo: this will throw an exception, should return Option
@@ -260,10 +262,11 @@ class MatchTypes extends munit.FunSuite {
 		val bKt: Triple = Triple(bbl, URI(knows), URI(timStr))
 		import compiletime.asMatchable
 		bKt.asMatchable match
-			case Triple(sub,rel,obj) =>
+			case Triple(sub: URI,rel,obj: URI) =>
 				assertEquals(sub,bbl)
-				assertEquals(rel,URI(knows))
-			//case _ => fail("triple did not match")
+				assertEquals(rel, URI(knows))
+				assertEquals(obj, URI(timStr))
+			case _ => fail("subject and objects of this triple must be URIs")
 		assertEquals(Triple(bKt.subj,bKt.rel,bKt.obj), bKt)
 		Graph(bKt)
 	}
