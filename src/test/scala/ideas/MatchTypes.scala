@@ -4,6 +4,7 @@ import org.apache.jena.graph.{Factory, NodeFactory}
 import org.apache.jena.sparql.resultset.ResultSetCompare.BNodeIso
 
 import scala.util.Try
+import scala.reflect.TypeTest
 
 /**
  * following an idea by Neko-kai https://twitter.com/kai_nyasha
@@ -25,26 +26,35 @@ object MatchTypes {
 		type BNode <: Node
 		type Literal <: Node
 
-		val Triple : TripleOps
-		trait TripleOps {
-			def apply(subj: Node, rel: URI, obj: Node): Triple
-			def unapply(triple: Triple): Option[(Node,URI,Node)]
+		//we need all implementations to have a given TripleI available
+		implicit def tripleI: TripleI
+
+		/** Triple interface */
+		trait TripleI {
+			def tuple(sibj: Node, rel: URI, obj: Node): Triple
+			def untuple(t: Triple): (Node, URI, Node)
 			def subjectOf(triple: Triple): Node
 			def relationOf(triple: Triple): URI
 			def objectOf(triple: Triple): Node
 		}
 
-		extension (triple: Triple)
-			def subj: Node = Triple.subjectOf(triple)
-			def rel: URI = Triple.relationOf(triple)
-			def obj: Node = Triple.objectOf(triple)
+		object Triple {
+			def apply(subj: Node, rel: URI, obj: Node)(using tripleI: TripleI): Triple =
+				tripleI.tuple(subj,rel,obj)
+			def unapply(t: Triple)(using tripleI: TripleI): Some[(Node, URI, Node)] =
+				Some(tripleI.untuple(t))
+		}
+
+		extension (triple: Triple)(using tripleI: TripleI)
+			def subj: Node = tripleI.subjectOf(triple)
+			def rel: URI = tripleI.relationOf(triple)
+			def obj: Node = tripleI.objectOf(triple)
 
 		//		val Node : Node
 		val URI : URIOps
 		trait URIOps {
 			//todo: this will throw an exception, should return Option
 			def apply(uriStr: String): URI
-			def unapply(uri: URI): Option[String]
 			def mkUri(iriStr: String): Try[URI]
 		}
 //		val BNode : BNode
@@ -75,12 +85,11 @@ object MatchTypes {
 		override opaque type BNode <: Node = jena.Node_Blank
 		override opaque type Literal <: Node = jena.Node_Literal
 
-		override val Triple: TripleOps = new TripleOps {
-			override inline def apply(subj: Node, rel: URI, obj: Node): Triple =
+		/*private*/ given tripleI : TripleI with {
+			override def untuple(t: Triple): (Node, URI, Node) =
+				(t.getSubject, t.getPredicate.asInstanceOf[URI], t.getObject)
+			override def tuple(subj: Node, rel: URI, obj: Node): Triple =
 				jena.Triple.create(subj, rel, obj)
-			override def unapply(triple: Triple): Some[(Node, URI, Node)] =
-				Some((triple.getSubject,triple.getPredicate.asInstanceOf[URI],triple.getObject))
-
 			override inline def subjectOf(triple: Triple): Node = triple.getSubject()
 			override inline def relationOf(triple: Triple): URI = triple.getPredicate().asInstanceOf[URI]
 			override inline def objectOf(triple: Triple): Node  = triple.getObject()
@@ -89,7 +98,6 @@ object MatchTypes {
 		val URI : URIOps = new URIOps {
 			//todo: this will throw an exception, should return Option
 			override inline def apply(uriStr: String): URI = NodeFactory.createURI(uriStr).asInstanceOf[URI]
-			override inline def unapply(uri: URI): Option[String] = Some(uri.getURI)
 			override inline def mkUri(iriStr: String): Try[URI] = Try(NodeFactory.createURI(iriStr).asInstanceOf[URI])
 		}
 
@@ -100,21 +108,17 @@ object MatchTypes {
 		val Graph = new GraphOps {
 			override inline def empty: Graph = Factory.empty()
 			override inline def apply(triples: Triple*): Graph =
-				val seq : Seq[Triple] = triples
-				seq.foldLeft(empty){(gr, tr) =>
-					gr.add(tr)
-					gr
+				val graph = Factory.createDefaultGraph
+				triples.foreach { triple =>
+					graph.add(triple)
 				}
+				graph
+
 			import scala.jdk.CollectionConverters.{given,*}
 			def triplesIn(graph: Graph): Iterable[Triple] =
 				import org.apache.jena.graph.Node.ANY
 				graph.find(ANY, ANY, ANY).asScala.to(Iterable)
 		}
-		override inline
-		def mkGraph(triples: Iterable[Triple]): Graph =
-			val g = Factory.createDefaultGraph()
-			triples.foreach(t => g.add(t))
-			g
 	}
 
 	object Simple extends RDF {
@@ -125,19 +129,19 @@ object MatchTypes {
 		override opaque type Literal <: Node = String
 		override opaque type Graph = Set[Triple]
 
-		override val Triple: TripleOps = new TripleOps {
-			override inline def apply(subj: Node, rel: URI, obj: Node): (Node, URI, Node) = (subj, rel, obj)
+		given tripleI : TripleI with {
+			override inline def untuple(t: (Triple & Matchable)): (Node, URI, Node) = t
+			override inline def tuple(subj: Node, rel: URI, obj: Node): Triple = (subj, rel, obj)
 			override inline def subjectOf(triple: Triple): Node = triple._1
 			override inline def relationOf(triple: Triple): URI = triple._2
 			override inline def objectOf(triple: Triple): Node = triple._3
-			override inline def unapply(triple: Triple): Option[(Node, URI, Node)] = Some(triple)
 		}
 
 		val URI : URIOps = new URIOps {
 			//todo: this will throw an exception, should return Option
 			// note: this implementation also parses the URI which Jena does not (I think).
 			override inline def apply(uriStr: String): URI = new java.net.URI(uriStr)
-			override inline def unapply(uri: URI): Option[String] = Some(uri.toString)
+			//override inline def unapply(uri: URI): Option[String] = Some(uri.toString)
 			override inline def mkUri(iriStr: String): Try[URI] = Try(new java.net.URI(iriStr))
 		}
 
@@ -147,7 +151,7 @@ object MatchTypes {
 		override val Graph = new GraphOps {
 			override inline def empty: Graph = Set[Triple]()
 			override inline def apply(triples: Triple*): Graph = Set(triples*)
-			override inline def triplesIn(graph: Graph): Iterable[Triple] = graph.seq
+			override inline def triplesIn(graph: Graph): Iterable[Triple] = graph
 		}
 
 	}
@@ -217,15 +221,15 @@ class MatchTypes extends munit.FunSuite {
 	 * @return an rdf.Graph (note: returning an RDF.Graph[Rdf] does not work).
 	 */
 	def buildATestGraph[Rdf<:RDF](using rdf: Rdf): rdf.Graph = {
-		import rdf.*
+		import rdf.{given,*}
 		val bbl: URI = URI(bblStr)
 		val bKt: Triple = Triple(bbl, URI(knows), URI(timStr))
 		import compiletime.asMatchable
 		bKt.asMatchable match
-			case Triple(sub,URI(rel),obj) =>
+			case Triple(sub,rel,obj) =>
 				assertEquals(sub,bbl)
-				assertEquals(rel,knows)
-			case _ => fail("triple did not match")
+				assertEquals(rel,URI(knows))
+			//case _ => fail("triple did not match")
 		assertEquals(Triple(bKt.subj,bKt.rel,bKt.obj), bKt)
 		Graph(bKt)
 	}
