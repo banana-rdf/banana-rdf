@@ -26,11 +26,11 @@ object MatchTypes {
 		type BNode <: Node
 		type Literal <: Node
 
-		//we need all implementations to have a given TripleI available
-		implicit def tripleI: TripleI
+		//we need all implementations to have a given tripleOps available
+		implicit def tripleOps: TripleOps
 
 		/** Triple interface */
-		trait TripleI {
+		trait TripleOps {
 			def tuple(sibj: Node, rel: URI, obj: Node): Triple
 			def untuple(t: Triple): (Node, URI, Node)
 			def subjectOf(triple: Triple): Node
@@ -39,22 +39,30 @@ object MatchTypes {
 		}
 
 		object Triple {
-			def apply(subj: Node, rel: URI, obj: Node)(using tripleI: TripleI): Triple =
-				tripleI.tuple(subj,rel,obj)
-			def unapply(t: Triple)(using tripleI: TripleI): Some[(Node, URI, Node)] =
-				Some(tripleI.untuple(t))
+			def apply(subj: Node, rel: URI, obj: Node)(using tripleOps: TripleOps): Triple =
+				tripleOps.tuple(subj,rel,obj)
+			def unapply(t: Triple)(using tripleOps: TripleOps): Some[(Node, URI, Node)] =
+				Some(tripleOps.untuple(t))
 		}
 
-		extension (triple: Triple)(using tripleI: TripleI)
-			def subj: Node = tripleI.subjectOf(triple)
-			def rel: URI = tripleI.relationOf(triple)
-			def obj: Node = tripleI.objectOf(triple)
+		extension (triple: Triple)(using tripleOps: TripleOps)
+			def subj: Node = tripleOps.subjectOf(triple)
+			def rel: URI = tripleOps.relationOf(triple)
+			def obj: Node = tripleOps.objectOf(triple)
 
+		implicit def uriOps: URIOps
 		//		val Node : Node
-		val URI : URIOps
 		trait URIOps {
-			//todo: this will throw an exception, should return Option
-			def apply(uriStr: String): URI
+			def mkUri(iriStr: String): Try[URI]
+			def asString(uri: URI): String
+		}
+
+//		implicit def uriTT: TypeTest[Any,URI]
+
+		object URI {
+			//todo: this will throw an exception
+			def apply(uriStr: String)(using uriOps: URIOps): URI = uriOps.mkUri(uriStr).get
+
 			/* it is questionable whether unapply on a URI to get the string is worthwhile.
 			 * Using uri.stringValue or other methods would be a lot more efficient. Also
 			 * other possibilities present themselves: should one return a deconstructed version
@@ -62,14 +70,15 @@ object MatchTypes {
 			 * I only add it here in order to test pattern matching on Triple(subj,URI(u),lit)
 			 * It would make more sense for literals though.
 			 **/
-			def unapply(uri: URI): Option[String]
-			def mkUri(iriStr: String): Try[URI]
+			def unapply(u: URI)(using uriOps: URIOps): Option[String] =
+				Some(uriOps.asString(u))
 		}
 //		val BNode : BNode
 //		val Literal : Literal
 
 		def mkStringLit(str: String): Literal
 
+		// this method allows for multiple implementation of the Graph object
 		val Graph : GraphOps
 		trait GraphOps {
 			def empty: Graph
@@ -93,7 +102,7 @@ object MatchTypes {
 		override opaque type BNode <: Node = jena.Node_Blank
 		override opaque type Literal <: Node = jena.Node_Literal
 
-		/*private*/ given tripleI : TripleI with {
+		/*private*/ given tripleOps : TripleOps with {
 			override def untuple(t: Triple): (Node, URI, Node) =
 				(t.getSubject, t.getPredicate.asInstanceOf[URI], t.getObject)
 			override def tuple(subj: Node, rel: URI, obj: Node): Triple =
@@ -103,9 +112,16 @@ object MatchTypes {
 			override inline def objectOf(triple: Triple): Node  = triple.getObject()
 		}
 
-		val URI : URIOps = new URIOps {
+//		given uriTT: TypeTest[Any,URI] with {
+//			import compiletime.asMatchable
+//			override def unapply(s: Any): Option[s.type & URI] = s.asMatchable match
+//				case x: (s.type & URI) => Some(x)
+//				case _ => None
+//		}
+
+		given uriOps : URIOps with {
 			//todo: this will throw an exception, should return Option
-			override inline def apply(uriStr: String): URI = NodeFactory.createURI(uriStr).asInstanceOf[URI]
+			override inline def asString(uri: URI): String = uri.toString
 			override inline def mkUri(iriStr: String): Try[URI] = Try(NodeFactory.createURI(iriStr).asInstanceOf[URI])
 		}
 
@@ -137,7 +153,11 @@ object MatchTypes {
 		override opaque type Literal <: Node = String
 		override opaque type Graph = Set[Triple]
 
-		given tripleI : TripleI with {
+		// the problem with using inheritd givens is
+		// - that there is no way to speak of overriding
+		// - no error if the implicit tripleOps is not overriden
+		// - the given creates a level of indirection (with methods needing a `using` clause)
+		given tripleOps : TripleOps with {
 			override inline def untuple(t: (Triple & Matchable)): (Node, URI, Node) = t
 			override inline def tuple(subj: Node, rel: URI, obj: Node): Triple = (subj, rel, obj)
 			override inline def subjectOf(triple: Triple): Node = triple._1
@@ -145,11 +165,17 @@ object MatchTypes {
 			override inline def objectOf(triple: Triple): Node = triple._3
 		}
 
-		val URI : URIOps = new URIOps {
+//		given uriTT: TypeTest[Any,URI] with {
+//			import compiletime.asMatchable
+//			override def unapply(s: Any): Option[s.type & URI] = s.asMatchable match
+//				case x: (s.type & URI) => Some(x)
+//				case _ => None
+//		}
+
+		given uriOps : URIOps with {
 			//todo: this will throw an exception, should return Option
 			// note: this implementation also parses the URI which Jena does not (I think).
-			override inline def apply(uriStr: String): URI = new java.net.URI(uriStr)
-			override inline def unapply(uri: URI): Option[String] = Some(uri.toString)
+			override inline def asString(uri: URI): String = uri.toString
 			override inline def mkUri(iriStr: String): Try[URI] = Try(new java.net.URI(iriStr))
 		}
 
@@ -234,9 +260,9 @@ class MatchTypes extends munit.FunSuite {
 		val bKt: Triple = Triple(bbl, URI(knows), URI(timStr))
 		import compiletime.asMatchable
 		bKt.asMatchable match
-			case Triple(sub,URI(relStr),obj) =>
+			case Triple(sub,rel,obj) =>
 				assertEquals(sub,bbl)
-				assertEquals(rel,relStr)
+				assertEquals(rel,URI(knows))
 			//case _ => fail("triple did not match")
 		assertEquals(Triple(bKt.subj,bKt.rel,bKt.obj), bKt)
 		Graph(bKt)
