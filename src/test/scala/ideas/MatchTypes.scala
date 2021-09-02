@@ -55,6 +55,14 @@ object MatchTypes {
 		trait URIOps {
 			//todo: this will throw an exception, should return Option
 			def apply(uriStr: String): URI
+			/* it is questionable whether unapply on a URI to get the string is worthwhile.
+			 * Using uri.stringValue or other methods would be a lot more efficient. Also
+			 * other possibilities present themselves: should one return a deconstructed version
+			 * of the URI (split into scheme, path, etc... )?
+			 * I only add it here in order to test pattern matching on Triple(subj,URI(u),lit)
+			 * It would make more sense for literals though.
+			 **/
+			def unapply(uri: URI): Option[String]
 			def mkUri(iriStr: String): Try[URI]
 		}
 //		val BNode : BNode
@@ -141,7 +149,7 @@ object MatchTypes {
 			//todo: this will throw an exception, should return Option
 			// note: this implementation also parses the URI which Jena does not (I think).
 			override inline def apply(uriStr: String): URI = new java.net.URI(uriStr)
-			//override inline def unapply(uri: URI): Option[String] = Some(uri.toString)
+			override inline def unapply(uri: URI): Option[String] = Some(uri.toString)
 			override inline def mkUri(iriStr: String): Try[URI] = Try(new java.net.URI(iriStr))
 		}
 
@@ -226,9 +234,9 @@ class MatchTypes extends munit.FunSuite {
 		val bKt: Triple = Triple(bbl, URI(knows), URI(timStr))
 		import compiletime.asMatchable
 		bKt.asMatchable match
-			case Triple(sub,rel,obj) =>
+			case Triple(sub,URI(relStr),obj) =>
 				assertEquals(sub,bbl)
-				assertEquals(rel,URI(knows))
+				assertEquals(rel,relStr)
 			//case _ => fail("triple did not match")
 		assertEquals(Triple(bKt.subj,bKt.rel,bKt.obj), bKt)
 		Graph(bKt)
