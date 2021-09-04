@@ -6,6 +6,7 @@ import org.apache.jena.graph.{Factory, NodeFactory}
 import org.apache.jena.sparql.resultset.ResultSetCompare.BNodeIso
 import org.w3.banana.jena.Jena
 
+import scala.annotation.targetName
 import scala.util.Try
 import scala.reflect.TypeTest
 
@@ -100,6 +101,8 @@ object MatchTypes {
 			def dtLiteral(lex: String, dataTp: URI): Literal
 		}
 
+		given literalTT: TypeTest[Any,Literal]
+
 		val Lang: LangOps
 		//todo Lang, should contain all the supported languages, plus an unsafe way of creating new ones
 		trait LangOps {
@@ -107,8 +110,14 @@ object MatchTypes {
 			def label(lang: Lang): String
 		}
 
+		extension (str: String)
+			@targetName("dt")
+			infix def ^^(dtType: URI): Literal = Literal.dtLiteral(str,dtType)
+			@targetName("lang")
+			infix def `@`(lang: Lang): Literal = Literal.langLiteral(str,lang)
+
 		extension (lang: Lang)
-			def label =  Lang.label(lang)
+			def label: String =  Lang.label(lang)
 
 		object LangLit {
 			inline def apply(lex: String, lang: Lang): Literal = Literal.langLiteral(lex, lang)
@@ -182,8 +191,9 @@ object MatchTypes {
 		override val Literal: LiteralOps = new LiteralOps {
 			// TODO the javadoc doesn't say if this is thread safe
 			lazy val mapper: TypeMapper = TypeMapper.getInstance.nn
-			private val __xsdString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string").nn
-			private val __xsdStringURI: URI = URI("http://www.w3.org/2001/XMLSchema#string")
+			private val xsdString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/2001/XMLSchema#string").nn
+//			private val __xsdStringURI: URI = URI("http://www.w3.org/2001/XMLSchema#string")
+			private val xsdLangString: RDFDatatype = mapper.getTypeByName("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString").nn
 			//todo: are we missing a Datatype Type? (check other frameworks)
 			def jenaDatatype(datatype: URI): RDFDatatype =
 				val iriString: String = URI.asString(datatype)
@@ -209,11 +219,19 @@ object MatchTypes {
 				val dt: RDFDatatype | Null = lit.getLiteralDatatype
 				val lang: String | Null = lit.getLiteralLanguage
 				if (lang == null || lang.isEmpty) then
-					if dt == null || dt == __xsdString then Some(Lit.Plain(lex))
+					if dt == null || dt == xsdString then Some(Lit.Plain(lex))
 					else Some(Lit.TypedLit(lex, URI(dt.getURI.nn)))
-				else if dt == __xsdString then
+				else if dt == null || dt == xsdLangString then
 					Some(Lit.LangLit(lex, lang))
 				else None
+		}
+
+		given literalTT: TypeTest[Any,Literal] with {
+			import compiletime.asMatchable
+			override def unapply(s: Any): Option[s.type & Literal] = s.asMatchable match
+				//note: this does not compile if we use URI instead of jena.Node_URI
+				case x: (s.type & jena.Node_Literal) => Some(x)
+				case _ => None
 		}
 
 		override val Lang: LangOps =  new LangOps {
@@ -292,6 +310,14 @@ object MatchTypes {
 			def unapply(lit: Literal): Option[LiteralI] = Some(lit)
 		}
 
+		given literalTT: TypeTest[Any,Literal] with {
+			import compiletime.asMatchable
+			override def unapply(s: Any): Option[s.type & LiteralI] = s.asMatchable match
+				//note: this does not compile if we use URI instead of jena.Node_URI
+				case x: (s.type & LiteralI) => Some(x)
+				case _ => None
+		}
+
 		override val Lang: LangOps =  new LangOps {
 			override inline def apply(lang: String): Lang = lang
 			override inline def label(lang: Lang): String = lang
@@ -308,16 +334,20 @@ object MatchTypes {
 		type Triple[R <: RDF] = R match
 			case GetTriple[t] => t
 
-		type Node[R<:RDF] = R match
+		type Node[R <: RDF] = R match
 			case GetNode[n] => n
 
-		type URI[R<:RDF] = R match
+		type URI[R <: RDF] = R match
 			case GetURI[u] => u
 
 		type Graph[R <: RDF] = R match
 			case GetGraph[g] => g
 
+		type Literal[R <: RDF] = R match
+			case GetLiteral[l] => l
+
 		type GetNode[N] = RDF { type Node = N }
+		type GetLiteral[L] = RDF { type Literal = L }
 		type GetURI[U] = RDF { type URI = U }
 		type GetTriple[T] = RDF { type Triple = T }
 		type GetGraph[G] = RDF { type Graph = G }
@@ -329,10 +359,13 @@ object MatchTypes {
 class MatchTypes extends munit.FunSuite {
 	import MatchTypes.*
 
-	val bblStr = "https://bblfish.net/#i"
+	def bbl(name: String): String = "https://bblfish.net/#" + name
+	val bblStr = bbl("i")
+	val anais = bbl("Anaïs")
 	val timStr = "https://www.w3.org/People/Berners-Lee/card#i"
-	val knows = "http://xmlns.com/foaf/0.1/knows"
-	val name = "http://xmlns.com/foaf/0.1/name"
+	def foaf[Rdf<:RDF](name: String)(using rdf: Rdf): rdf.URI = rdf.URI("http://xmlns.com/foaf/0.1/"+name)
+	val knows = "http://xmlns.com/foaf/0.1/"+"knows"
+	def xsd[Rdf<:RDF](name: String)(using rdf: Rdf): rdf.URI = rdf.URI("http://www.w3.org/2001/XMLSchema#"+name)
 
 	test("Jena and Java instance test") {
 		import MatchTypes.*
@@ -351,13 +384,21 @@ class MatchTypes extends munit.FunSuite {
 		val knowsJava: Triple[Simple] =
 			Simple.Triple(bblJva, Simple.URI(knows), Simple.URI(timStr))
 
+		val henryLit: RDF.Literal[Jena] =
+			JenaRdf.LangLit("Henry",JenaRdf.Lang("en"))
+		val hlDeconstr: Option[JenaRdf.LiteralI] = JenaRdf.Literal.unapply(henryLit)
+		assertEquals(hlDeconstr.get,JenaRdf.LiteralI.LangLit("Henry",JenaRdf.Lang("en")))
+
 		import RDF.Graph
 		val grJena: Graph[Jena] = JenaRdf.Graph(knowsJena)
 		val grJava: Graph[Simple] = Simple.Graph(knowsJava)
 
 		val pgJena: PG[Jena] = PG(bblJna,grJena)
 		val pgJava: PG[Simple] = PG(bblJva,grJava)
+
 	}
+
+
 
 //	import RDF.{Graph,URI}
 
@@ -368,58 +409,70 @@ class MatchTypes extends munit.FunSuite {
 	 * @tparam Rdf A subtype of RDF trait
 	 * @return an rdf.Graph (note: returning an RDF.Graph[Rdf] does not work).
 	 */
-	def buildATestGraph[Rdf<:RDF](using rdf: Rdf): rdf.Graph = {
+	def buildATestGraph[Rdf<:ideas.MatchTypes.RDF](using rdf: Rdf): rdf.Graph = {
 		import rdf.{given,*}
 		val bbl: URI = URI(bblStr)
 		val tim: URI = URI(timStr)
-		val bKt: Triple = Triple(bbl, URI(knows), URI(timStr))
+		val bKt: Triple = Triple(bbl, foaf("knows"), URI(timStr))
 		import compiletime.asMatchable
 		bKt.asMatchable match
 			case Triple(sub: URI,rel,obj: URI) =>
 				assertEquals(sub,bbl)
-				assertEquals(rel, URI(knows))
+				assertEquals(rel, foaf("knows"))
 				assertEquals(obj, URI(timStr))
 			case _ => fail("subject and objects of this triple must be URIs")
 		assertEquals(Triple(bKt.subj,bKt.rel,bKt.obj), bKt)
-		val hname = Triple(bbl,URI(name),LangLit("Henry",Lang("en")))
-		val tname = Triple(tim,URI(name),Literal("Tim"))
-		Graph(bKt,hname,tname)
+		val hname = Triple(bbl,foaf("name"),"Henry" `@` Lang("en"))
+		val tname = Triple(tim,foaf("name"),Literal("Tim"))
+		val anaisAge = Triple(URI(anais),foaf("age"),"7"^^xsd("int"))
+		Graph(bKt,hname,tname,anaisAge)
 	}
 
-	def testGraph[Rdf<:ideas.MatchTypes.RDF](using rdf: Rdf)(name: String, g: rdf.Graph)(using loc: munit.Location): Unit =
+	def testGraph[Rdf <: ideas.MatchTypes.RDF](using rdf: Rdf)(
+		name: String, g : rdf.Graph
+	)(using loc: munit.Location): Unit = {
 		test(name) {
 			import rdf.{given,*}
 			import LiteralI as Lit
 			val Bbl: URI = URI(bblStr)
 			val Tim: URI = URI(timStr)
 			val Knows: URI = URI(knows)
-			val Name: URI = URI(name)
-			g.triples.foreach[Unit] { t =>
+			val Name: URI = foaf("name")
+			g.triples.foreach { t =>
 				import compiletime.asMatchable
 				t.asMatchable match
-				case Triple(Bbl,Knows,Tim) => ()
-				case Triple(Bbl,Name,l) => l.asMatchable match
-					case Lit.LangLit("Henry",lang) if lang.label == "en" => ()
-					case other => fail("literal $l is not of the right type")
-				case Triple(Tim,Name,l)	=> l.asMatchable match
-					case Lit.Plain("Tim") => ()
-					case other => fail("literal $l is not of the right type")
-				case t => fail(s"triple $t does not match")
+					case Triple(Bbl,Knows,Tim) => ()
+					case Triple(Bbl,Name,l: Literal) =>
+						l.asMatchable match
+						case Literal(l) =>
+							l match
+								case Lit.LangLit("Henry",en) => assertEquals(en.label,"en")
+								case other => fail(s"literal $l is not of the right type.")
+					case Triple(Tim,Name,l: Literal)	=> l.asMatchable match
+						case Literal(Lit.Plain("Tim")) => ()
+						case other => fail(s"literal $l is not of the right type. '")
+					case Triple(s,r,o) =>
+						assertEquals(s,URI(anais))
+						assertEquals(r,foaf("age"))
+						assertEquals(o,"7"^^xsd("int"))
+					case t => fail(s"triple $t does not match")
 			}
 		}
-
-	test("Build a graph in Jena") {
-		given rdf: JenaRdf.type = JenaRdf
-		val g: rdf.Graph = buildATestGraph[JenaRdf.type]
-		testGraph("Jena",g)
 	}
+	{
+		given jg: ideas.MatchTypes.RDF  = JenaRdf
+		type J = jg.type
 
-	test("Build a graph with Simple") {
-		given rdf: Simple.type = Simple
-		val g: rdf.Graph = buildATestGraph[Simple.type]
-		testGraph("Simple",g)
+		val g1: jg.Graph = buildATestGraph[J]
+		testGraph[J]("Test graph in Jena", g1)
 	}
+	{
+		given sg: ideas.MatchTypes.RDF  = Simple
+		type S = sg.type
 
+		val g2: sg.Graph = buildATestGraph[S]
+		testGraph[S]("Test graph in Simple", g2)
+	}
 //	enum NodeType:
 //		case Uri, Lit, BN
 //
