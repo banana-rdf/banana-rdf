@@ -28,9 +28,9 @@ class PrefixBuilder[T <: RDFObj](using val rdf2: T)(
   def apply(value: String): rdf.URI = makeUri(prefixIri + value)
 
   def unapply(iri: rdf.URI): Option[String] = {
-    val uriString = fromUri(iri)
+    val uriString: String = fromUri(iri)
     if uriString.startsWith(prefixIri) then
-      Some(uriString.substring(prefixIri.length))
+      Some(uriString.substring(prefixIri.length).nn)
     else
       None
   }

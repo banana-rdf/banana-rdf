@@ -8,13 +8,13 @@ class JenaOps extends RDFOps(Jena): // with JenaMGraphOps with DefaultURIOps[Jen
 
 	// graph
 
-  val emptyGraph: rdf.Graph = Factory.createDefaultGraph
+  val emptyGraph: rdf.Graph = Factory.createDefaultGraph.nn
 
   def makeUri(iriStr: String): rdf.URI = { NodeFactory.createURI(iriStr).asInstanceOf[Node_URI] }
 
   def fromUri(node: rdf.URI): String =
     if node.isURI then
-      node.getURI
+      node.getURI.nn
     else
       throw new RuntimeException("fromUri: " + node.toString() + " must be a URI")
 
