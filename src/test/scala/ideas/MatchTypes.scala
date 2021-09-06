@@ -459,14 +459,14 @@ class MatchTypes extends munit.FunSuite {
 		given jg: ideas.MatchTypes.RDF  = JenaRdf
 		type J = jg.type
 
-		val g1: jg.Graph = buildATestGraph[J]
+		val g1: RDF.Graph[J] = buildATestGraph[J]
 		testGraph[J]("Test graph in Jena", g1)
 	}
 	{
 		given sg: ideas.MatchTypes.RDF  = Simple
 		type S = sg.type
 
-		val g2: sg.Graph = buildATestGraph[S]
+		val g2: RDF.Graph[S] = buildATestGraph[S]
 		testGraph[S]("Test graph in Simple", g2)
 	}
 //	enum NodeType:
