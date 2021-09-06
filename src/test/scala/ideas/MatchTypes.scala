@@ -415,7 +415,7 @@ class MatchTypes extends munit.FunSuite {
 		val tim: URI = URI(timStr)
 		val bKt: Triple = Triple(bbl, foaf("knows"), URI(timStr))
 		import compiletime.asMatchable
-		bKt.asMatchable match
+		bKt match
 			case Triple(sub: URI,rel,obj: URI) =>
 				assertEquals(sub,bbl)
 				assertEquals(rel, foaf("knows"))
@@ -440,7 +440,7 @@ class MatchTypes extends munit.FunSuite {
 			val Name: URI = foaf("name")
 			g.triples.foreach { t =>
 				import compiletime.asMatchable
-				t.asMatchable match
+				t match
 					case Triple(Bbl,Knows,Tim) => ()
 					case Triple(Bbl,Name,Literal(Lit.LangLit("Henry",en))) =>
 						assertEquals(en.label,"en")
