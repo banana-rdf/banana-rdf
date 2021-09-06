@@ -442,12 +442,8 @@ class MatchTypes extends munit.FunSuite {
 				import compiletime.asMatchable
 				t.asMatchable match
 					case Triple(Bbl,Knows,Tim) => ()
-					case Triple(Bbl,Name,l: Literal) =>
-						l.asMatchable match
-						case Literal(l) =>
-							l match
-								case Lit.LangLit("Henry",en) => assertEquals(en.label,"en")
-								case other => fail(s"literal $l is not of the right type.")
+					case Triple(Bbl,Name,Literal(Lit.LangLit("Henry",en))) =>
+						assertEquals(en.label,"en")
 					case Triple(Tim,Name,l: Literal)	=> l.asMatchable match
 						case Literal(Lit.Plain("Tim")) => ()
 						case other => fail(s"literal $l is not of the right type. '")
