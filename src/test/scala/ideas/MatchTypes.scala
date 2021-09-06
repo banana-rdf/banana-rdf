@@ -39,8 +39,8 @@ object MatchTypes {
 		//but that would be one step further in interpretation
 		enum LiteralI(text: String) {
 			case Plain(text: String) extends LiteralI(text)
-			case LangLit(text: String, lang: Lang) extends LiteralI(text)
-			case TypedLit(text: String, dataTp: URI) extends LiteralI(text)
+			case `@`(text: String, lang: Lang) extends LiteralI(text)
+			case ^^(text: String, dataTp: URI) extends LiteralI(text)
 		}
 
 		//we need all implementations to have a given tripleOps available
@@ -90,12 +90,12 @@ object MatchTypes {
 		val Literal: LiteralOps
 
 		trait LiteralOps {
-			import LiteralI as Lit
+			import LiteralI.*
 			def apply(plain: String): Literal
 			def apply(lit: LiteralI): Literal = lit match
-				case Lit.Plain(text) => apply(text)
-				case Lit.LangLit(text,lang) => langLiteral(text,lang)
-				case Lit.TypedLit(text,tp) => dtLiteral(text,tp)
+				case Plain(text) => apply(text)
+				case `@`(text,lang) => langLiteral(text,lang)
+				case `^^`(text,tp) => dtLiteral(text,tp)
 			def unapply(lit: Literal): Option[LiteralI]
 			def langLiteral(lex: String, lang: Lang): Literal
 			def dtLiteral(lex: String, dataTp: URI): Literal
@@ -110,11 +110,14 @@ object MatchTypes {
 			def label(lang: Lang): String
 		}
 
-		extension (str: String)
-			@targetName("dt")
-			infix def ^^(dtType: URI): Literal = Literal.dtLiteral(str,dtType)
-			@targetName("lang")
-			infix def `@`(lang: Lang): Literal = Literal.langLiteral(str,lang)
+		//this can be an external import
+		object LiteralSyntax:
+			extension (str: String)
+				@targetName("dt")
+				infix def ^^(dtType: URI): Literal = Literal.dtLiteral(str,dtType)
+				@targetName("lang")
+				infix def `@`(lang: Lang): Literal = Literal.langLiteral(str,lang)
+		end LiteralSyntax
 
 		extension (lang: Lang)
 			def label: String =  Lang.label(lang)
@@ -214,15 +217,15 @@ object MatchTypes {
 				NodeFactory.createLiteral(lex, lang).nn.asInstanceOf[Literal]
 
 			def unapply(lit: Literal): Option[LiteralI] =
-				import LiteralI as Lit
+				import LiteralI.*
 				val lex: String = lit.getLiteralLexicalForm.nn
 				val dt: RDFDatatype | Null = lit.getLiteralDatatype
 				val lang: String | Null = lit.getLiteralLanguage
 				if (lang == null || lang.isEmpty) then
-					if dt == null || dt == xsdString then Some(Lit.Plain(lex))
-					else Some(Lit.TypedLit(lex, URI(dt.getURI.nn)))
+					if dt == null || dt == xsdString then Some(Plain(lex))
+					else Some(^^(lex, URI(dt.getURI.nn)))
 				else if dt == null || dt == xsdLangString then
-					Some(Lit.LangLit(lex, lang))
+					Some(`@`(lex, lang))
 				else None
 		}
 
@@ -303,10 +306,10 @@ object MatchTypes {
 		}
 
 		override val Literal: LiteralOps = new LiteralOps {
-			import LiteralI as Lit
-			def apply(plain: String): Literal = Lit.Plain(plain)
-			def langLiteral(plain: String, lang: Lang): Literal = Lit.LangLit(plain, lang)
-			def dtLiteral(lex: String, dataTp: URI): Literal = Lit.TypedLit(lex, dataTp)
+			import LiteralI.*
+			def apply(plain: String): Literal = Plain(plain)
+			def langLiteral(plain: String, lang: Lang): Literal = `@`(plain, lang)
+			def dtLiteral(lex: String, dataTp: URI): Literal = `^^`(lex, dataTp)
 			def unapply(lit: Literal): Option[LiteralI] = Some(lit)
 		}
 
@@ -387,7 +390,7 @@ class MatchTypes extends munit.FunSuite {
 		val henryLit: RDF.Literal[Jena] =
 			JenaRdf.LangLit("Henry",JenaRdf.Lang("en"))
 		val hlDeconstr: Option[JenaRdf.LiteralI] = JenaRdf.Literal.unapply(henryLit)
-		assertEquals(hlDeconstr.get,JenaRdf.LiteralI.LangLit("Henry",JenaRdf.Lang("en")))
+		assertEquals(hlDeconstr.get,JenaRdf.LiteralI.`@`("Henry", JenaRdf.Lang("en")))
 
 		import RDF.Graph
 		val grJena: Graph[Jena] = JenaRdf.Graph(knowsJena)
@@ -415,6 +418,7 @@ class MatchTypes extends munit.FunSuite {
 		val tim: URI = URI(timStr)
 		val bKt: Triple = Triple(bbl, foaf("knows"), URI(timStr))
 		import compiletime.asMatchable
+		import rdf.LiteralSyntax.*
 		bKt match
 			case Triple(sub: URI,rel,obj: URI) =>
 				assertEquals(sub,bbl)
@@ -433,24 +437,23 @@ class MatchTypes extends munit.FunSuite {
 	)(using loc: munit.Location): Unit = {
 		test(name) {
 			import rdf.{given,*}
-			import LiteralI as Lit
+			import LiteralI.*
 			val Bbl: URI = URI(bblStr)
 			val Tim: URI = URI(timStr)
 			val Knows: URI = URI(knows)
 			val Name: URI = foaf("name")
+			val XsdInt: URI = xsd("int")
 			g.triples.foreach { t =>
 				import compiletime.asMatchable
+				println("t="+t)
 				t match
 					case Triple(Bbl,Knows,Tim) => ()
-					case Triple(Bbl,Name,Literal(Lit.LangLit("Henry",en))) =>
+					case Triple(Bbl,Name,Literal("Henry" `@` en)) =>
 						assertEquals(en.label,"en")
-					case Triple(Tim,Name,l: Literal)	=> l.asMatchable match
-						case Literal(Lit.Plain("Tim")) => ()
-						case other => fail(s"literal $l is not of the right type. '")
-					case Triple(s,r,o) =>
+					case Triple(Tim,Name,Literal(Plain("Tim")))	=> ()
+					case Triple(s,r,Literal("7" `^^` XsdInt)) =>
 						assertEquals(s,URI(anais))
 						assertEquals(r,foaf("age"))
-						assertEquals(o,"7"^^xsd("int"))
 					case t => fail(s"triple $t does not match")
 			}
 		}
