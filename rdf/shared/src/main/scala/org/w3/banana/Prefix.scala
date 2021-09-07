@@ -18,7 +18,7 @@ object Prefix {
     new PrefixBuilder[Rdf](prefixName, prefixIri)
 }
 
-class PrefixBuilder[Rdf <: RDF](
+open class PrefixBuilder[Rdf <: RDF](
   val prefixName: String,
   val prefixIri: String
 )(using override val rdf: Rdf) extends Prefix[Rdf] {
