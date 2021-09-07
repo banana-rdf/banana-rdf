@@ -4,8 +4,6 @@ import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.impl.LiteralLabelFactory
 import org.apache.jena.graph.{Factory, NodeFactory}
 import org.apache.jena.sparql.resultset.ResultSetCompare.BNodeIso
-import org.w3.banana.RDF
-import org.w3.banana.jena.Jena
 
 import scala.annotation.targetName
 import scala.util.Try

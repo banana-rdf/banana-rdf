@@ -1,9 +1,6 @@
 package org.w3.banana
 
-import org.w3.banana.jena.Jena
-
 class Test1 extends munit.FunSuite {
-  import org.w3.banana.jena.JenaModule.{*,given}
 
   test("tests work") {
     assertEquals(true,true)
