@@ -1,179 +1,137 @@
-package org.w3.banana
+package org.w3.banana.prefixes
 
-import scala.util.*
-
-trait Prefix[T <: RDFObj](using val rdf: T) {
-  def prefixName: String
-  def prefixIri: String
-  def apply(value: String): rdf.URI
-  def unapply(iri: rdf.URI): Option[String]
-}
-
-object Prefix {
-  def apply[T <: RDFObj](using rdf: T)(
-    prefixName: String,
-    prefixIri: String
-  )(using ops: RDFOps[rdf.type]): Prefix[rdf.type] =
-    new PrefixBuilder[T]()(prefixName, prefixIri).asInstanceOf[Prefix[rdf.type]]
-}
-
-class PrefixBuilder[T <: RDFObj](using val rdf2: T)(
-  val prefixName: String,
-  val prefixIri: String
-)(using val ops: RDFOps[rdf2.type]) extends Prefix[rdf2.type](using rdf2) {
-  import ops.*
-
-  override def toString: String = "Prefix(" + prefixName + ")"
-
-  def apply(value: String): rdf.URI = makeUri(prefixIri + value)
-
-  def unapply(iri: rdf.URI): Option[String] = {
-    val uriString: String = fromUri(iri)
-    if uriString.startsWith(prefixIri) then
-      Some(uriString.substring(prefixIri.length).nn)
-    else
-      None
-  }
-
-  def getLocalName(iri: rdf.URI): Try[String] =
-    unapply(iri) match {
-      case Some(localname) => Success(localname)
-      case _: None.type => Failure(Exception(this.toString + " couldn't extract localname for " + iri))
-    }
-
-}
+import org.w3.banana.{PrefixBuilder, RDF}
 
 object RDFSPrefix {
-  def apply[T <: RDFObj](using rdf: T)(using ops: RDFOps[rdf.type]) = new RDFSPrefix()
+	def apply[T <: RDF](using rdf: T) = new RDFSPrefix()
 }
 
-class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[rdf3.type])
-  extends PrefixBuilder[rdf3.type](using rdf3)("rdfs", "http://www.w3.org/2000/01/rdf-schema#") {
-  val Class = apply("Class")
-  val Container = apply("Container")
-  val ContainerMembershipProperty = apply("ContainerMembershipProperty")
-  val Datatype = apply("Datatype")
-  val Literal = apply("Literal")
-  val Resource = apply("Resource")
-  val comment = apply("comment")
-  val domain = apply("domain")
-  val isDefinedBy = apply("isDefinedBy")
-  val label = apply("label")
-  val member = apply("member")
-  val range = apply("range")
-  val seeAlso = apply("seeAlso")
-  val subClassOf = apply("subClassOf")
-  val subPropertyOf = apply("subPropertyOf")
+class RDFSPrefix[Rdf <: RDF](using override val rdf: Rdf)
+	extends PrefixBuilder[Rdf]("rdfs", "http://www.w3.org/2000/01/rdf-schema#") {
+	val Class = apply("Class")
+	val Container = apply("Container")
+	val ContainerMembershipProperty = apply("ContainerMembershipProperty")
+	val Datatype = apply("Datatype")
+	val Literal = apply("Literal")
+	val Resource = apply("Resource")
+	val comment = apply("comment")
+	val domain = apply("domain")
+	val isDefinedBy = apply("isDefinedBy")
+	val label = apply("label")
+	val member = apply("member")
+	val range = apply("range")
+	val seeAlso = apply("seeAlso")
+	val subClassOf = apply("subClassOf")
+	val subPropertyOf = apply("subPropertyOf")
+}
+
+object RDFPrefix {
+  def apply[Rdf <: RDF](using rdf: Rdf) = new RDFPrefix()
+}
+
+class RDFPrefix[Rdf <: RDF](using override val rdf: Rdf)
+  extends PrefixBuilder[Rdf]("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#") {
+  val langString = apply("langString") //todo: does not exist in ontology
+  val nil = apply("nil")
+  val typ = apply("type")
+  val Alt = apply("Alt")
+  val Bag = apply("Bag")
+  val List = apply("List")
+  val PlainLiteral = apply("PlainLiteral")
+  val Property = apply("Property")
+  val Seq = apply("Seq")
+  val Statement = apply("Statement")
+  val XMLLiteral = apply("XMLLiteral")
+  val first = apply("first")
+  val langRange = apply("langRange")
+  val obj = apply("object")
+  val predicate = apply("predicate")
+  val rest = apply("rest")
+  val subject = apply("subject")
+  val `type` = apply("type")
+  val value = apply("value")
+}
+
+object XSDPrefix {
+  def apply[Rdf <: RDF](using rdf: Rdf) = new XSDPrefix[Rdf]
+}
+
+class XSDPrefix[Rdf <: RDF](using override val rdf: Rdf)
+  extends PrefixBuilder[Rdf]("xsd", "http://www.w3.org/2001/XMLSchema#") {
+
+  // http://www.w3.org/TR/owl-rdf-based-semantics
+  // Table 3.3 Datatypes of the OWL 2 RDF-Based Semantics
+
+  // http://www.w3.org/TR/owl2-syntax/
+  // Table 3 Reserved VOcabulary of OWL 2 with Special Treatment
+  import rdf.LiteralSyntax.*
+  val anyURI = apply("anyURI")
+  val base64Binary = apply("base64Binary")
+  val boolean = apply("boolean")
+  val `true` = "true" ^^ boolean
+  val `false` = "false" ^^ boolean
+  val byte = apply("byte")
+  val dateTime = apply("dateTime")
+  val dateTimeStamp = apply("dateTimeStamp")
+  val decimal = apply("decimal")
+  val double = apply("double")
+  val float = apply("float")
+  val hexBinary = apply("hexBinary")
+  val int = apply("int")
+  val integer = apply("integer")
+  val language = apply("language")
+  val long = apply("long")
+  val maxExclusive = apply("maxExclusive")
+  val maxInclusive = apply("maxInclusive")
+  val maxLength = apply("maxLength")
+  val minExclusive = apply("minExclusive")
+  val minInclusive = apply("minInclusive")
+  val minLength = apply("minLength")
+  val Name = apply("Name")
+  val NCName = apply("NCName")
+  val negativeInteger = apply("negativeInteger")
+  val NMToken = apply("NMToken")
+  val nonNegativeInteger = apply("nonNegativeInteger")
+  val nonPositiveInteger = apply("nonPositiveInteger")
+  val normalizedString = apply("normalizedString")
+  val pattern = apply("pattern")
+  val PlainLiteral = apply("PlainLiteral")
+  val positiveInteger = apply("positiveInteger")
+  val short = apply("short")
+  val string = apply("string")
+  val token = apply("token")
+  val unsignedByte = apply("unsignedByte")
+  val unsignedInt = apply("unsignedInt")
+  val unsignedLong = apply("unsignedLong")
+  val unsignedShort = apply("unsignedShort")
 }
 //
-//object RDFPrefix {
-//  def apply[T <: RDFObj](using rdf: T)(implicit ops: RDFOps[rdf.type]) = new RDFPrefix()
-//}
-//
-//class RDFPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]()("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#")(ops) {
-//  val langString = apply("langString") //todo: does not exist in ontology
-//  val nil = apply("nil")
-//  val typ = apply("type")
-//  val Alt = apply("Alt")
-//  val Bag = apply("Bag")
-//  val List = apply("List")
-//  val PlainLiteral = apply("PlainLiteral")
-//  val Property = apply("Property")
-//  val Seq = apply("Seq")
-//  val Statement = apply("Statement")
-//  val XMLLiteral = apply("XMLLiteral")
-//  val first = apply("first")
-//  val langRange = apply("langRange")
-//  val obj = apply("object")
-//  val predicate = apply("predicate")
-//  val rest = apply("rest")
-//  val subject = apply("subject")
-//  val `type` = apply("type")
-//  val value = apply("value")
-//}
-//
-//object XSDPrefix {
-//  def apply[T <: RDFObj](implicit ops: RDFOps[Rdf]) = new XSDPrefix[Rdf](ops)
-//}
-//
-//class XSDPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("xsd", "http://www.w3.org/2001/XMLSchema#")(ops) {
-//  import ops._
-//
-//  // http://www.w3.org/TR/owl-rdf-based-semantics
-//  // Table 3.3 Datatypes of the OWL 2 RDF-Based Semantics 
-//
-//  // http://www.w3.org/TR/owl2-syntax/
-//  // Table 3 Reserved VOcabulary of OWL 2 with Special Treatment
-//
-//  val anyURI = apply("anyURI")
-//  val base64Binary = apply("base64Binary")
-//  val boolean = apply("boolean")
-//  val `true` = makeLiteral("true", boolean)
-//  val `false` = makeLiteral("false", boolean)
-//  val byte = apply("byte")
-//  val dateTime = apply("dateTime")
-//  val dateTimeStamp = apply("dateTimeStamp")
-//  val decimal = apply("decimal")
-//  val double = apply("double")
-//  val float = apply("float")
-//  val hexBinary = apply("hexBinary")
-//  val int = apply("int")
-//  val integer = apply("integer")
-//  val language = apply("language")
-//  val long = apply("long")
-//  val maxExclusive = apply("maxExclusive")
-//  val maxInclusive = apply("maxInclusive")
-//  val maxLength = apply("maxLength")
-//  val minExclusive = apply("minExclusive")
-//  val minInclusive = apply("minInclusive")
-//  val minLength = apply("minLength")
-//  val Name = apply("Name")
-//  val NCName = apply("NCName")
-//  val negativeInteger = apply("negativeInteger")
-//  val NMToken = apply("NMToken")
-//  val nonNegativeInteger = apply("nonNegativeInteger")
-//  val nonPositiveInteger = apply("nonPositiveInteger")
-//  val normalizedString = apply("normalizedString")
-//  val pattern = apply("pattern")
-//  val PlainLiteral = apply("PlainLiteral")
-//  val positiveInteger = apply("positiveInteger")
-//  val short = apply("short")
-//  val string = apply("string")
-//  val token = apply("token")
-//  val unsignedByte = apply("unsignedByte")
-//  val unsignedInt = apply("unsignedInt")
-//  val unsignedLong = apply("unsignedLong")
-//  val unsignedShort = apply("unsignedShort")
-//}
-//
 //object DCPrefix {
-//  def apply[T <: RDFObj](using ops: RDFOps[T]) = new DCPrefix()
+//  def apply[T <: RDF](using ops: RDFOps[T]) = new DCPrefix()
 //}
 //
-//class DCPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("dc", "http://purl.org/dc/elements/1.1/")(ops) {
+//class DCPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("dc", "http://purl.org/dc/elements/1.1/") {
 //  val language = apply("language")
 //
 //}
 //
 //object DCTPrefix {
-//  def apply[T <: RDFObj](implicit ops: RDFOps[T]) = new DCTPrefix()
+//  def apply[T <: RDF](implicit ops: RDFOps[T]) = new DCTPrefix()
 //}
 //
-//class DCTPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("dc", "http://purl.org/dc/terms/")(ops) {
+//class DCTPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("dc", "http://purl.org/dc/terms/") {
 //  val title = apply("title")
 //
 //}
 //
 //object FOAFPrefix {
-//  def apply[T <: RDFObj](implicit ops: RDFOps[T]) = new FOAFPrefix()
+//  def apply[T <: RDF](implicit ops: RDFOps[T]) = new FOAFPrefix()
 //}
 //
-//class FOAFPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("foaf", "http://xmlns.com/foaf/0.1/")(ops) {
+//class FOAFPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("foaf", "http://xmlns.com/foaf/0.1/") {
 //  //todo: remove these relations as they don't exist in foaf
 //  val height = apply("height")
 //  val publication = apply("publication")
@@ -260,11 +218,11 @@ class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[
 //}
 //
 //object LDPPrefix {
-//  def apply[T <: RDFObj](implicit ops: RDFOps[T]) = new LDPPrefix(ops)
+//  def apply[T <: RDF](implicit ops: RDFOps[T]) = new LDPPrefix
 //}
 //
-//class LDPPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("ldp", "http://www.w3.org/ns/ldp#")(ops) {
+//class LDPPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("ldp", "http://www.w3.org/ns/ldp#") {
 //  val AggregateContainer = apply("AggregateContainer")
 //  val CompositeContainer = apply("CompositeContainer")
 //  val Container = apply("Container")
@@ -279,15 +237,15 @@ class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[
 //}
 //
 //object IANALinkPrefix {
-//  def apply[T <: RDFObj](implicit ops: RDFOps[T]) = new IANALinkPrefix()
+//  def apply[T <: RDF](implicit ops: RDFOps[T]) = new IANALinkPrefix()
 //}
 //
 ///**
 // * The Iana Link Relations are not linked data so these URLs are currently invented ones, and need
 // * not reflect what may be used if ever such URIs are coined.
 // */
-//class IANALinkPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("link", "http://www.iana.org/assignments/link-relations/#")(ops) {
+//class IANALinkPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("link", "http://www.iana.org/assignments/link-relations/#") {
 //  val about = apply("about")
 //  val acl = apply("acl") //needs to be registered
 //  val alternate = apply("alternate")
@@ -359,7 +317,7 @@ class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[
 //
 //}
 //
-//trait CommonPrefixes[T <: RDFObj](using val rdf: T) { this: RDFOps[T] =>
+//trait CommonPrefixes[T <: RDF](using val rdf: T) { this: RDFOps[T] =>
 //
 //  lazy val xsd = XSDPrefix()(this)
 //  lazy val rdf = RDFPrefix()(this)
@@ -367,11 +325,11 @@ class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[
 //}
 //
 //object WebACLPrefix {
-//  def apply[T <: RDFObj](implicit ops: RDFOps[T]) = new WebACLPrefix(ops)
+//  def apply[T <: RDF](implicit ops: RDFOps[T]) = new WebACLPrefix
 //}
 //
-//class WebACLPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("acl", "http://www.w3.org/ns/auth/acl#")(ops) {
+//class WebACLPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("acl", "http://www.w3.org/ns/auth/acl#") {
 //  val Authorization = apply("Authorization")
 //  val agent = apply("agent")
 //  val agentClass = apply("agentClass")
@@ -394,11 +352,11 @@ class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[
 //}
 //
 //object CertPrefix {
-//  def apply[T <: RDFObj](using ops: RDFOps[T]) = new CertPrefix()
+//  def apply[T <: RDF](using ops: RDFOps[T]) = new CertPrefix()
 //}
 //
-//class CertPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("cert", "http://www.w3.org/ns/auth/cert#")(ops) {
+//class CertPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("cert", "http://www.w3.org/ns/auth/cert#") {
 //  val key = apply("key")
 //  val RSAKey = apply("RSAKey")
 //  val RSAPublicKey = apply("RSAPublicKey")
@@ -407,11 +365,11 @@ class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[
 //}
 //
 //object OWLPrefix {
-//  def apply[T <: RDFObj](using ops: RDFOps[T]) = new OWLPrefix()
+//  def apply[T <: RDF](using ops: RDFOps[T]) = new OWLPrefix()
 //}
 //
-//class OWLPrefix[T <: RDFObj](using val rdf: T)(using val ops: RDFOps[rdf.type])
-//  extends PrefixBuilder[rdf.type]("owl", "http://www.w3.org/2002/07/owl#")(ops) {
+//class OWLPrefix[T <: RDF](using val rdf: T)
+//  extends PrefixBuilder[Rdf]("owl", "http://www.w3.org/2002/07/owl#") {
 //
 //  // http://www.w3.org/TR/owl2-rdf-based-semantics/
 //  // table 3.2: OWL 2 RDF-Based Vocabulary
@@ -494,3 +452,4 @@ class RDFSPrefix[T <: RDFObj](using val rdf3: T)(using override val ops: RDFOps[
 //  val versionIRI = apply("versionIRI")
 //  val withRestrictions = apply("withRestrictions")
 //}
+

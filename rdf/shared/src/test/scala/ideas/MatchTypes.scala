@@ -4,6 +4,7 @@ import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.impl.LiteralLabelFactory
 import org.apache.jena.graph.{Factory, NodeFactory}
 import org.apache.jena.sparql.resultset.ResultSetCompare.BNodeIso
+import org.w3.banana.RDF
 import org.w3.banana.jena.Jena
 
 import scala.annotation.targetName
@@ -21,6 +22,7 @@ import scala.reflect.TypeTest
  *
  */
 object MatchTypes {
+	type RDFObj = RDF & Singleton
 
 	trait RDF {
 		type Graph
@@ -267,10 +269,6 @@ object MatchTypes {
 		override opaque type Graph = Set[Triple]
 		override opaque type Lang = String
 
-		// the problem with using inherited givens is
-		// - that there is no way to speak of overriding
-		// - no error if the implicit tripleOps is not overridden
-		// - the given creates a level of indirection (with methods needing a `using` clause)
 		override val Triple: TripleOps = new TripleOps {
 			override inline def apply(subj: Node, rel: URI, obj: Node): Triple = (subj, rel, obj)
 			override inline def untuple(t: Triple): (Node, URI, Node) = t

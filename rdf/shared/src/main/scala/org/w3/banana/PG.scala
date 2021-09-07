@@ -1,4 +1,7 @@
-//package org.w3.banana
+package org.w3.banana
+
+import org.w3.banana.RDF
+//
 //
 //trait RDFOps2[T <: RDFObj](using val rdf: T) {
 //  def emptyGraph: rdf.Graph
@@ -10,3 +13,5 @@
 //  def pointer: Rdf#Node
 //  def graph: Rdf#Graph
 //}
+
+final case class PG[Rdf <: RDF](uri: RDF.Node[Rdf], graph: RDF.Graph[Rdf])

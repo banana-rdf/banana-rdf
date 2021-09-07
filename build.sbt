@@ -1,12 +1,15 @@
-lazy val root = project
-  .in(file("."))
-  .settings(
+import Dependencies.{jenaLibs, munit}
+import sbt.Keys.description
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+
+lazy val commonSettings = Seq(
 	  name := "banana-play",
 	  version := "0.1.0",
-
-	  scalaVersion := Scala3Version,
+	  description := "RDF framework for Scala",
+	  startYear := Some(2012),
+	  scalaVersion := "3.0.2",
 	  libraryDependencies ++= Seq(
-		  "org.apache.jena" % "apache-jena-libs" % "4.1.0",
+		  jenaLibs,
 		  munit
 	  ),
 	  scalacOptions := Seq(
@@ -30,7 +33,29 @@ lazy val root = project
 		  // "-Xmigration",                       // Warn about constructs whose behavior may have changed since version.
 		  // "-Ysafe-init",                       // Warn on field access before initialization
 		  "-Yexplicit-nulls"                  // For explicit nulls behavior.
-	  )
-  )
-val Scala3Version = "3.0.2-RC1"
-val munit = "org.scalameta" %% "munit" % "0.7.28" % Test
+	  ),
+		updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
+)
+
+lazy val rdf = crossProject(JVMPlatform) /*JSPlatform,*/
+	.crossType(CrossType.Full)
+	.in(file("rdf")) //websim api
+	.settings(commonSettings: _*)
+	.settings(
+		name := "banana-rdf",
+	)
+	.jvmSettings(
+		libraryDependencies ++= Seq(),
+	)
+
+lazy val rdfJVM = rdf.jvm
+
+lazy val jena = project.in(file("jena"))
+	.settings(commonSettings: _*)
+	.settings(
+		name := "banana-jena",
+		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
+		libraryDependencies ++= Seq(jenaLibs) //, slf4jNop, aalto )
+	).dependsOn(rdfJVM) //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
+
+
