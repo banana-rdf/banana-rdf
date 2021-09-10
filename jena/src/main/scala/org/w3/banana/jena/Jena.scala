@@ -12,8 +12,8 @@ object JenaRdf extends RDF {
 	import org.apache.jena.graph.{NodeFactory, Factory}
 
 	override opaque type Graph = jena.Graph
-	override opaque type Triple = jena.Triple
-	override opaque type Node = jena.Node
+	override opaque type Triple <: Matchable = jena.Triple
+	override opaque type Node <: Matchable = jena.Node
 	override opaque type URI <: Node = jena.Node_URI
 	override opaque type BNode <: Node = jena.Node_Blank
 	override opaque type Literal <: Node = jena.Node_Literal
@@ -34,8 +34,8 @@ object JenaRdf extends RDF {
 	}
 
 	given uriTT: TypeTest[Node,URI] with {
-		import compiletime.asMatchable
-		override def unapply(s: Node): Option[s.type & jena.Node_URI] = s.asMatchable match
+		override def unapply(s: Node): Option[s.type & jena.Node_URI] =
+			s match
 			//note: this does not compile if we use URI instead of jena.Node_URI
 			case x: (s.type & jena.Node_URI) => Some(x)
 			case _ => None
@@ -88,8 +88,8 @@ object JenaRdf extends RDF {
 	}
 
 	given literalTT: TypeTest[Node,Literal] with {
-		import compiletime.asMatchable
-		override def unapply(s: Node): Option[s.type & Literal] = s.asMatchable match
+		override def unapply(s: Node): Option[s.type & Literal] =
+			s match
 			//note: this does not compile if we use URI instead of jena.Node_URI
 			case x: (s.type & jena.Node_Literal) => Some(x)
 			case _ => None

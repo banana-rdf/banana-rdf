@@ -13,8 +13,8 @@ import scala.util.Try
 trait RDF:
   // types related to the RDF datamodel
 	type Graph
-	type Triple
-	type Node
+	type Triple <: Matchable
+	type Node <: Matchable
 	type URI <: Node
 	type BNode <: Node
 	type Literal <: Node
