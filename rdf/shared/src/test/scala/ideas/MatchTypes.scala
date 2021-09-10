@@ -24,8 +24,8 @@ object MatchTypes {
 
 	trait RDF {
 		type Graph
-		type Triple
-		type Node
+		type Triple <: Matchable
+		type Node <: Matchable
 		type URI <: Node
 		type BNode <: Node
 		type Literal <: Node
@@ -144,8 +144,8 @@ object MatchTypes {
 		import org.apache.jena.graph.{NodeFactory, Factory}
 
 		override opaque type Graph = jena.Graph
-		override opaque type Triple = jena.Triple
-		override opaque type Node = jena.Node
+		override opaque type Triple <: Matchable = jena.Triple
+		override opaque type Node <: Matchable = jena.Node
 		override opaque type URI <: Node = jena.Node_URI
 		override opaque type BNode <: Node = jena.Node_Blank
 		override opaque type Literal <: Node = jena.Node_Literal
@@ -166,8 +166,7 @@ object MatchTypes {
 		}
 
 		given uriTT: TypeTest[Node,URI] with {
-			import compiletime.asMatchable
-			override def unapply(s: Node): Option[s.type & jena.Node_URI] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & jena.Node_URI] = s match
 				//note: this does not compile if we use URI instead of jena.Node_URI
 				case x: (s.type & jena.Node_URI) => Some(x)
 				case _ => None
@@ -220,8 +219,7 @@ object MatchTypes {
 		}
 
 		given literalTT: TypeTest[Node,Literal] with {
-			import compiletime.asMatchable
-			override def unapply(s: Node): Option[s.type & Literal] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & Literal] = s match
 				//note: this does not compile if we use URI instead of jena.Node_URI
 				case x: (s.type & jena.Node_Literal) => Some(x)
 				case _ => None
@@ -249,8 +247,8 @@ object MatchTypes {
 	}
 
 	object Simple extends RDF {
-		override opaque type Triple = Tuple3[Node,URI,Node]
-		override opaque type Node = java.net.URI|LiteralI|Int
+		override opaque type Triple <: Matchable = Tuple3[Node,URI,Node]
+		override opaque type Node <: Matchable = java.net.URI|LiteralI|Int
 		override opaque type URI <: Node = java.net.URI
 		override opaque type BNode <: Node = Int
 		override opaque type Literal <: Node = LiteralI
@@ -267,8 +265,7 @@ object MatchTypes {
 
 
 		given uriTT: TypeTest[Node,URI] with {
-			import compiletime.asMatchable
-			override def unapply(s: Node): Option[s.type & URI] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & URI] = s match
 				//note: this does now compile if we use URI instead of java.net.URI
 				case x: (s.type & java.net.URI) => Some(x)
 				case _ => None
@@ -290,8 +287,7 @@ object MatchTypes {
 		}
 
 		given literalTT: TypeTest[Node,Literal] with {
-			import compiletime.asMatchable
-			override def unapply(s: Node): Option[s.type & LiteralI] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & LiteralI] = s match
 				//note: this does not compile if we use URI instead of jena.Node_URI
 				case x: (s.type & LiteralI) => Some(x)
 				case _ => None
@@ -360,11 +356,21 @@ class MatchTypes extends munit.FunSuite {
 		import RDF.Triple
 		val knowsJena: Triple[Jena] =
 			JenaRdf.Triple(bblJna, JenaRdf.URI(knows), JenaRdf.URI(timStr))
+		knowsJena match
+			case JenaRdf.Triple(sub,k,obj) =>
+				assertEquals(sub,bblJna)
+				assertEquals(k,JenaRdf.URI(knows))
+
 		val knowsJava: Triple[Simple] =
 			Simple.Triple(bblJva, Simple.URI(knows), Simple.URI(timStr))
 
-		val henryLit: RDF.Literal[Jena] =
-			JenaRdf.LangLit("Henry",JenaRdf.Lang("en"))
+		val henryLit: RDF.Literal[Jena] = JenaRdf.LangLit("Henry",JenaRdf.Lang("en"))
+		//we don't want to allow any access to the opaque types, even though they  are matchable
+		val err = compileErrors(
+		"""JenaRdf.LangLit("Henry",JenaRdf.Lang("en")) match
+			  case lit: JenaRdf.Literal => lit.getLiteralDatatypeURI()""")
+		assert(err.contains("value getLiteralDatatypeURI is not a member of ideas.MatchTypes.JenaRdf.Literal"))
+
 		val hlDeconstr: Option[JenaRdf.LiteralI] = JenaRdf.Literal.unapply(henryLit)
 		assertEquals(hlDeconstr.get,JenaRdf.LiteralI.`@`("Henry", JenaRdf.Lang("en")))
 
@@ -393,7 +399,6 @@ class MatchTypes extends munit.FunSuite {
 		val bbl: URI = URI(bblStr)
 		val tim: URI = URI(timStr)
 		val bKt: Triple = Triple(bbl, foaf("knows"), URI(timStr))
-		import compiletime.asMatchable
 		import rdf.LiteralSyntax.*
 		bKt match
 			case Triple(sub: URI,rel,obj: URI) =>
@@ -420,7 +425,6 @@ class MatchTypes extends munit.FunSuite {
 			val Name: URI = foaf("name")
 			val XsdInt: URI = xsd("int")
 			g.triples.foreach { t =>
-				import compiletime.asMatchable
 				println("t="+t)
 				t match
 					case Triple(Bbl,Knows,Tim) => ()
