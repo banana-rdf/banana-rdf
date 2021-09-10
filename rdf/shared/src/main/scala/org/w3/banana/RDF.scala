@@ -148,19 +148,20 @@ end RDF
 //  type Solutions
 
 object RDF {
-	type Triple[R <: RDF] = R match
+	type RDFObj = RDF & Singleton
+	type Triple[R <: RDFObj] = R match
 		case GetTriple[t] => t
 
-	type Node[R <: RDF] = R match
+	type Node[R <: RDFObj] = R match
 		case GetNode[n] => n
 
-	type URI[R <: RDF] = R match
+	type URI[R <: RDFObj] = R match
 		case GetURI[u] => u
 
-	type Graph[R <: RDF] = R match
+	type Graph[R <: RDFObj] = R match
 		case GetGraph[g] => g
 
-	type Literal[R <: RDF] = R match
+	type Literal[R <: RDFObj] = R match
 		case GetLiteral[l] => l
 
 	type GetNode[N] = RDF { type Node = N }
