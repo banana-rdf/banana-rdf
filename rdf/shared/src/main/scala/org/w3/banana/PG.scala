@@ -1,6 +1,6 @@
-package org.w3.banana
+//package org.w3.banana
 
-import org.w3.banana.RDF
+//import org.w3.banana.RDF
 //
 //
 //trait RDFOps2[T <: RDFObj](using val rdf: T) {
@@ -13,5 +13,19 @@ import org.w3.banana.RDF
 //  def pointer: Rdf#Node
 //  def graph: Rdf#Graph
 //}
-
-final case class PG[Rdf <: RDF](uri: RDF.Node[Rdf], graph: RDF.Graph[Rdf])
+//import RDF.*
+//
+//trait PG[Rdf <: RDF](val pointer: Node[Rdf], val graph: Graph[Rdf])
+//
+//object PG:
+//	def apply[Rdf <: RDF](_pointer: Node[Rdf], _graph: Graph[Rdf]): PG[Rdf] =
+//		new PG[Rdf] {
+//			val pointer = _pointer
+//			val graph = _graph
+//		}
+//
+//	def apply[Rdf <: RDF](node: Node[Rdf])(using rdf: Rdf): PG[Rdf] =
+//		PG(node, rdf.Graph.empty)
+//
+//	def unapply[Rdf <: RDF](pg: PG[Rdf]): Option[(Node[Rdf], Graph[Rdf])] =
+//		Some((pg.pointer, pg.graph))

@@ -46,9 +46,6 @@ object MatchTypes {
 		//we need all implementations to have a given tripleOps available
 		val Triple: TripleOps
 
-		// does not work with Simple implementation below
-		//given tripleTT: TypeTest[Any,Triple]
-
 		/** Triple interface */
 		trait TripleOps {
 			def apply(subj: Node, rel: URI, obj: Node): Triple
@@ -84,7 +81,7 @@ object MatchTypes {
 			//and then a lot of other methods to get path, domain, etc...
 
 
-		given uriTT: TypeTest[Any,URI]
+		given uriTT: TypeTest[Node,URI]
 
 //		val BNode : BNode
 		val Literal: LiteralOps
@@ -101,7 +98,7 @@ object MatchTypes {
 			def dtLiteral(lex: String, dataTp: URI): Literal
 		}
 
-		given literalTT: TypeTest[Any,Literal]
+		given literalTT: TypeTest[Node,Literal]
 
 		val Lang: LangOps
 		//todo Lang, should contain all the supported languages, plus an unsafe way of creating new ones
@@ -168,16 +165,9 @@ object MatchTypes {
 			def objectOf(triple: Triple): Node  = triple.getObject().nn
 		}
 
-//		given tripleTT: TypeTest[Any,Triple] with {
-//			import compiletime.asMatchable
-//			override def unapply(s: Any): Option[s.type & Triple] = s.asMatchable match
-//				case x: (s.type & jena.Triple) => Some(x)
-//				case _ => None
-//		}
-
-		given uriTT: TypeTest[Any,URI] with {
+		given uriTT: TypeTest[Node,URI] with {
 			import compiletime.asMatchable
-			override def unapply(s: Any): Option[s.type & jena.Node_URI] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & jena.Node_URI] = s.asMatchable match
 				//note: this does not compile if we use URI instead of jena.Node_URI
 				case x: (s.type & jena.Node_URI) => Some(x)
 				case _ => None
@@ -229,9 +219,9 @@ object MatchTypes {
 				else None
 		}
 
-		given literalTT: TypeTest[Any,Literal] with {
+		given literalTT: TypeTest[Node,Literal] with {
 			import compiletime.asMatchable
-			override def unapply(s: Any): Option[s.type & Literal] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & Literal] = s.asMatchable match
 				//note: this does not compile if we use URI instead of jena.Node_URI
 				case x: (s.type & jena.Node_Literal) => Some(x)
 				case _ => None
@@ -275,20 +265,10 @@ object MatchTypes {
 			override inline def objectOf(triple: Triple): Node = triple._3
 		}
 
-		// this does not compile
-//		given tripleTT: TypeTest[Any,Triple] with {
-//			import compiletime.asMatchable
-//			type N = java.net.URI|LiteralI|Int
-//			import java.net.URI
-//			override def unapply(s: Any): Option[s.type & Triple] =
-//				s.asMatchable match
-//				case x: (s.type & (N, java.net.URI, N)) => Some(x)
-//				case _ => None
-//		}
 
-		given uriTT: TypeTest[Any,URI] with {
+		given uriTT: TypeTest[Node,URI] with {
 			import compiletime.asMatchable
-			override def unapply(s: Any): Option[s.type & URI] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & URI] = s.asMatchable match
 				//note: this does now compile if we use URI instead of java.net.URI
 				case x: (s.type & java.net.URI) => Some(x)
 				case _ => None
@@ -309,9 +289,9 @@ object MatchTypes {
 			def unapply(lit: Literal): Option[LiteralI] = Some(lit)
 		}
 
-		given literalTT: TypeTest[Any,Literal] with {
+		given literalTT: TypeTest[Node,Literal] with {
 			import compiletime.asMatchable
-			override def unapply(s: Any): Option[s.type & LiteralI] = s.asMatchable match
+			override def unapply(s: Node): Option[s.type & LiteralI] = s.asMatchable match
 				//note: this does not compile if we use URI instead of jena.Node_URI
 				case x: (s.type & LiteralI) => Some(x)
 				case _ => None

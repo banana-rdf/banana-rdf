@@ -72,7 +72,7 @@ trait RDF:
 	//and then a lot of other methods to get path, domain, etc...
 
 
-	given uriTT: TypeTest[Any,URI]
+	given uriTT: TypeTest[Node,URI]
 
 	//		val BNode : BNode
 	val Literal: LiteralOps
@@ -89,7 +89,7 @@ trait RDF:
 		def dtLiteral(lex: String, dataTp: URI): Literal
 	}
 
-	given literalTT: TypeTest[Any,Literal]
+	given literalTT: TypeTest[Node,Literal]
 
 	val Lang: LangOps
 	//todo Lang, should contain all the supported languages, plus an unsafe way of creating new ones

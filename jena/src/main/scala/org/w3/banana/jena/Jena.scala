@@ -33,16 +33,9 @@ object JenaRdf extends RDF {
 		def objectOf(triple: Triple): Node  = triple.getObject().nn
 	}
 
-	//		given tripleTT: TypeTest[Any,Triple] with {
-	//			import compiletime.asMatchable
-	//			override def unapply(s: Any): Option[s.type & Triple] = s.asMatchable match
-	//				case x: (s.type & jena.Triple) => Some(x)
-	//				case _ => None
-	//		}
-
-	given uriTT: TypeTest[Any,URI] with {
+	given uriTT: TypeTest[Node,URI] with {
 		import compiletime.asMatchable
-		override def unapply(s: Any): Option[s.type & jena.Node_URI] = s.asMatchable match
+		override def unapply(s: Node): Option[s.type & jena.Node_URI] = s.asMatchable match
 			//note: this does not compile if we use URI instead of jena.Node_URI
 			case x: (s.type & jena.Node_URI) => Some(x)
 			case _ => None
@@ -94,9 +87,9 @@ object JenaRdf extends RDF {
 			else None
 	}
 
-	given literalTT: TypeTest[Any,Literal] with {
+	given literalTT: TypeTest[Node,Literal] with {
 		import compiletime.asMatchable
-		override def unapply(s: Any): Option[s.type & Literal] = s.asMatchable match
+		override def unapply(s: Node): Option[s.type & Literal] = s.asMatchable match
 			//note: this does not compile if we use URI instead of jena.Node_URI
 			case x: (s.type & jena.Node_Literal) => Some(x)
 			case _ => None
