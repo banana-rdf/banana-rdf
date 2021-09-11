@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-import org.w3.banana.{RDF, RDFOps}
+import org.w3.banana.{RDF, Ops}
 
 import scala.reflect.TypeTest
 import scala.util.Try
@@ -119,7 +119,7 @@ object JenaRdf extends RDF {
 			graph.size()
 	}
 
-	given rdfOps: RDFOps[R] with {
+	given ops: Ops[R] with {
 		val rdf = JenaRdf
 		override def empty: RDF.Graph[R] = Graph.empty
 		override def mkGraph(triples: RDF.Triple[R]*): RDF.Graph[R] = Graph(triples*)

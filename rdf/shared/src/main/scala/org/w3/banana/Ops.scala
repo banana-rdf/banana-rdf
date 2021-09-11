@@ -1,7 +1,6 @@
 package org.w3.banana
 
-
-trait RDFOps[Rdf <: RDF & Singleton]:
+trait Ops[Rdf <: RDF.RDFObj]:
 	val rdf: Rdf
 
 	//Graph

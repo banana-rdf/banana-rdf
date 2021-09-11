@@ -9,7 +9,7 @@ class PG[Rdf <: RDFObj](val pointer: Node[Rdf], val graph: Graph[Rdf])
 object PG:
 	def apply[Rdf <: RDFObj](pointer: Node[Rdf], graph: Graph[Rdf]): PG[Rdf] =
 		new PG[Rdf](pointer, graph)
-	def apply[Rdf <: RDFObj](node: Node[Rdf])(using ops: RDFOps[Rdf]): PG[Rdf] =
+	def apply[Rdf <: RDFObj](node: Node[Rdf])(using ops: Ops[Rdf]): PG[Rdf] =
 		new PG[Rdf](node, ops.empty)
 
 	def unapply[Rdf <: RDFObj](pg: PG[Rdf]): Option[(Node[Rdf], Graph[Rdf])] =

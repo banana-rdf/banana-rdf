@@ -127,7 +127,7 @@ trait RDF:
 		def graphSize(graph: Graph): Int
 	}
 
-	given rdfOps: RDFOps[R]
+	given ops: Ops[R]
 
 	extension (graph: Graph)
 		def triples: Iterable[Triple] = Graph.triplesIn(graph)
@@ -157,7 +157,7 @@ end RDF
  * https://github.com/lampepfl/dotty/issues/13416
  */
 object RDF {
-	type RDFObj = RDF & Singleton
+	type RDFObj = RDF //& Singleton // Is the "& Singleton" of use?
 	type Triple[R <: RDFObj] = R match
 		case GetTriple[t] => t
 
