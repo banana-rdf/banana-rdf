@@ -4,8 +4,9 @@ import org.w3.banana.RDF
 import RDF.*
 
 open class PGTest[Rdf<:RDFObj](using ops: Ops[Rdf]) extends munit.FunSuite {
-	import ops.*
+	import ops.{given,*}
 	import TestConstants.*
+	import scala.language.implicitConversions
 
 	test("PG Creation") {
 		assertEquals(Graph.graphSize(Graph.empty),0)

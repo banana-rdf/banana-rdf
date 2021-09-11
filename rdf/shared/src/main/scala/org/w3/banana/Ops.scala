@@ -5,6 +5,11 @@ import scala.util.Try
 
 trait Ops[Rdf <: RDF]:
 	val rdf: Rdf
+	import scala.language.implicitConversions
+
+	given Conversion[RDF.URI[Rdf],RDF.Node[Rdf]] = u => u.asInstanceOf[RDF.Node[Rdf]]
+	given Conversion[RDF.Literal[Rdf],RDF.Node[Rdf]] = lit => lit.asInstanceOf[RDF.Node[Rdf]]
+
 
 	val Graph: GraphOps
 	trait GraphOps:
