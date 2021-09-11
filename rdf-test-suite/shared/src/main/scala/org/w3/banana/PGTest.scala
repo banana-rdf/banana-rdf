@@ -12,7 +12,8 @@ open class PGTest[Rdf<:RDFObj](using ops: Ops[Rdf]) extends munit.FunSuite {
 		assertEquals(Graph.graphSize(Graph.empty),0)
 		val timbl: URI[Rdf] = URI(tim("i"))
 		val timEmpty: PG[Rdf] = PG(timbl)
-//		assertEquals(timbl,timEmpty.pointer)
-//		assertEquals(timEmpty.graph,Graph.empty)
+		//note: in order for the implicit conversion to take hold we need to specify the upper bound
+		assertEquals[RDF.Node[Rdf],RDF.Node[Rdf]](timEmpty.pointer,timbl)
+		assertEquals(timEmpty.graph,Graph.empty)
 	}
 }
