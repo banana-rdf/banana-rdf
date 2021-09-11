@@ -7,8 +7,12 @@ trait Ops[Rdf <: RDF]:
 	val rdf: Rdf
 	import scala.language.implicitConversions
 
-	given Conversion[RDF.URI[Rdf],RDF.Node[Rdf]] = u => u.asInstanceOf[RDF.Node[Rdf]]
-	given Conversion[RDF.Literal[Rdf],RDF.Node[Rdf]] = lit => lit.asInstanceOf[RDF.Node[Rdf]]
+	// using implicits as Conversion requires library users to
+	// 1. `import ops.{given,*}`
+	// 2. import scala.lang.implicitConversions
+	// where this transformation should really be automatically handled.
+	implicit def lit2Node(lit: RDF.Literal[Rdf]): RDF.Node[Rdf] = lit.asInstanceOf[RDF.Node[Rdf]]
+	implicit def uri2Node(uri: RDF.URI[Rdf]): RDF.Node[Rdf] = uri.asInstanceOf[RDF.Node[Rdf]]
 
 
 	val Graph: GraphOps
