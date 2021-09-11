@@ -11,6 +11,7 @@ import scala.util.Try
  *   be using opaque types
  */
 trait RDF:
+	type R <: RDF & Singleton
   // types related to the RDF datamodel
 	type Graph
 	type Triple <: Matchable
@@ -123,12 +124,16 @@ trait RDF:
 		def empty: Graph
 		def apply(triples: Triple*): Graph
 		def triplesIn(graph: Graph): Iterable[Triple]
+		def graphSize(graph: Graph): Int
 	}
+
+	given rdfOps: RDFOps[R]
 
 	extension (graph: Graph)
 		def triples: Iterable[Triple] = Graph.triplesIn(graph)
 
 end RDF
+
 
 // remain to be done:
 //  // mutable graphs
@@ -147,6 +152,10 @@ end RDF
 //  type Solution
 //  type Solutions
 
+/**
+ * The idea of using match types by @neko-kai
+ * https://github.com/lampepfl/dotty/issues/13416
+ */
 object RDF {
 	type RDFObj = RDF & Singleton
 	type Triple[R <: RDFObj] = R match

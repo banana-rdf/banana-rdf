@@ -10,7 +10,7 @@ lazy val commonSettings = Seq(
 	  scalaVersion := "3.1.0-RC1",
 	  libraryDependencies ++= Seq(
 		  jenaLibs,
-		  munit
+		  munit % Test
 	  ),
 	  scalacOptions := Seq(
 		  // "-classpath", "foo:bar:...",         // Add to the classpath.
@@ -56,6 +56,17 @@ lazy val jena = project.in(file("jena"))
 		name := "banana-jena",
 		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
 		libraryDependencies ++= Seq(jenaLibs) //, slf4jNop, aalto )
-	).dependsOn(rdfJVM) //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
+	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
+lazy val rdfTestSuite = crossProject(JVMPlatform) //, JSPlatform
+	.crossType(CrossType.Full)
+	.in(file("rdf-test-suite"))
+	.settings(commonSettings: _*)
+	.settings(
+		name := "banana-test",
+		libraryDependencies ++= Seq(munit)
+	//	Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
+	)
+	.dependsOn(rdf)
 
+lazy val rdfTestSuiteJVM = rdfTestSuite.jvm

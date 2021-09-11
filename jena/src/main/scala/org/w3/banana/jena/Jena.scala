@@ -1,13 +1,13 @@
 package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-
-import org.w3.banana.RDF
+import org.w3.banana.{RDF, RDFOps}
 
 import scala.reflect.TypeTest
 import scala.util.Try
 
 object JenaRdf extends RDF {
+	type R = JenaRdf.type
 	import org.apache.jena.graph as jena
 	import org.apache.jena.graph.{NodeFactory, Factory}
 
@@ -110,8 +110,26 @@ object JenaRdf extends RDF {
 			graph
 
 		import scala.jdk.CollectionConverters.{given,*}
-		def triplesIn(graph: Graph): Iterable[Triple] =
+		override def triplesIn(graph: Graph): Iterable[Triple] =
 			import org.apache.jena.graph.Node.ANY
 			graph.find(ANY, ANY, ANY).nn.asScala.to(Iterable)
+
+		override inline
+		def graphSize(graph: Graph): Int =
+			graph.size()
+	}
+
+	given rdfOps: RDFOps[R] with {
+		val rdf = JenaRdf
+		override def empty: RDF.Graph[R] = Graph.empty
+		override def mkGraph(triples: RDF.Triple[R]*): RDF.Graph[R] = Graph(triples*)
+		override def iterate(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] = Graph.triplesIn(graph)
+		def graphSize(graph: RDF.Graph[R]): Int = rdf.Graph.graphSize(graph)
+
+		override def makeTriple(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
+			Triple(s,p,o)
+
+//		override def fromTriple(triple: RDF.Triple[R]): (RDF.Node[R], RDF.Node[R], RDF.Node[R]) =
+//			???
 	}
 }

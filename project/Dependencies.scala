@@ -9,6 +9,6 @@ object Dependencies {
 	 */
 	val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.1.0"
 
-	val munit = "org.scalameta" %% "munit" % "0.7.28" % Test
+	val munit = "org.scalameta" %% "munit" % "0.7.28"
 
 }
