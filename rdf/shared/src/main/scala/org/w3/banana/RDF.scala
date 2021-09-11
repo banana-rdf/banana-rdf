@@ -129,9 +129,6 @@ trait RDF:
 
 	given ops: Ops[R]
 
-	extension (graph: Graph)
-		def triples: Iterable[Triple] = Graph.triplesIn(graph)
-
 end RDF
 
 
@@ -173,11 +170,15 @@ object RDF {
 	type Literal[R <: RDFObj] = R match
 		case GetLiteral[l] => l
 
+	type Lang[R <: RDFObj] = R match
+		case GetLang[l] => l
+
 	type GetNode[N] = RDF { type Node = N }
 	type GetLiteral[L] = RDF { type Literal = L }
 	type GetURI[U] = RDF { type URI = U }
 	type GetTriple[T] = RDF { type Triple = T }
 	type GetGraph[G] = RDF { type Graph = G }
+	type GetLang[L] = RDF { type Lang = L }
 }
 
 

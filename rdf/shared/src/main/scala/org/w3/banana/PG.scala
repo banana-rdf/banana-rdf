@@ -10,7 +10,7 @@ object PG:
 	def apply[Rdf <: RDFObj](pointer: Node[Rdf], graph: Graph[Rdf]): PG[Rdf] =
 		new PG[Rdf](pointer, graph)
 	def apply[Rdf <: RDFObj](node: Node[Rdf])(using ops: Ops[Rdf]): PG[Rdf] =
-		new PG[Rdf](node, ops.empty)
+		new PG[Rdf](node, ops.Graph.empty)
 
 	def unapply[Rdf <: RDFObj](pg: PG[Rdf]): Option[(Node[Rdf], Graph[Rdf])] =
 		Some((pg.pointer, pg.graph))

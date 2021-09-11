@@ -1,7 +1,8 @@
 package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-import org.w3.banana.{RDF, Ops}
+import org.apache.jena.graph.Node.ANY
+import org.w3.banana.{Ops, RDF}
 
 import scala.reflect.TypeTest
 import scala.util.Try
@@ -121,15 +122,34 @@ object JenaRdf extends RDF {
 
 	given ops: Ops[R] with {
 		val rdf = JenaRdf
-		override def empty: RDF.Graph[R] = Graph.empty
-		override def mkGraph(triples: RDF.Triple[R]*): RDF.Graph[R] = Graph(triples*)
-		override def iterate(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] = Graph.triplesIn(graph)
-		def graphSize(graph: RDF.Graph[R]): Int = rdf.Graph.graphSize(graph)
 
-		override def makeTriple(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
-			Triple(s,p,o)
+		val Graph = new GraphOps {
+			def empty: RDF.Graph[R] = rdf.Graph.empty
+			def apply(triples: RDF.Triple[R]*): RDF.Graph[R] = rdf.Graph(triples*)
+			def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] = rdf.Graph.triplesIn(graph)
+			def graphSize(graph: RDF.Graph[R]): Int = rdf.Graph.graphSize(graph)
+		}
 
-//		override def fromTriple(triple: RDF.Triple[R]): (RDF.Node[R], RDF.Node[R], RDF.Node[R]) =
-//			???
+		val Triple = new TripleOps {
+			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
+				rdf.Triple(s, p, o)
+		}
+
+		val Literal = new LiteralOps {
+			import LiteralI.*
+			def apply(plain: String): RDF.Literal[R] = rdf.Literal(plain)
+			def apply(lit: LiteralI): RDF.Literal[R] = lit match
+				case Plain(text) => apply(text)
+				case `@`(text,lang) => langLiteral(text,lang)
+				case `^^`(text,tp) => dtLiteral(text,tp)
+			def unapply(lit: RDF.Literal[R]): Option[LiteralI] = rdf.Literal.unapply(lit)
+			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] = rdf.Literal.langLiteral(lex,lang)
+			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] = rdf.Literal.dtLiteral(lex,dataTp)
+		}
+
+		val URI = new URIOps {
+			def mkUri(iriStr: String): Try[RDF.URI[R]] = rdf.URI.mkUri(iriStr)
+			def asString(uri: RDF.URI[R]): String = rdf.URI.asString(uri)
+		}
 	}
 }
