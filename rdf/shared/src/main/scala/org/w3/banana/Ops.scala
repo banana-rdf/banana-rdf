@@ -14,13 +14,15 @@ trait Ops[Rdf <: RDF]:
 	implicit def lit2Node(lit: RDF.Literal[Rdf]): RDF.Node[Rdf] = lit.asInstanceOf[RDF.Node[Rdf]]
 	implicit def uri2Node(uri: RDF.URI[Rdf]): RDF.Node[Rdf] = uri.asInstanceOf[RDF.Node[Rdf]]
 
-
 	val Graph: GraphOps
 	trait GraphOps:
 		def empty: RDF.Graph[Rdf]
 		def apply(triples: RDF.Triple[Rdf]*): RDF.Graph[Rdf]
 		def triplesIn(graph: RDF.Graph[Rdf]): Iterable[RDF.Triple[Rdf]]
 		def graphSize(graph: RDF.Graph[Rdf]): Int
+		def union(graphs: Seq[RDF.Graph[Rdf]]): RDF.Graph[Rdf]
+		def diff(g1: RDF.Graph[Rdf], g2: RDF.Graph[Rdf]): RDF.Graph[Rdf]
+		def isomorphism(left: RDF.Graph[Rdf], right: RDF.Graph[Rdf]): Boolean
 
 	val Triple: TripleOps
 	trait TripleOps:

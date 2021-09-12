@@ -1,11 +1,15 @@
 package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-import org.apache.jena.graph.Node.ANY
+import org.apache.jena.graph.GraphUtil
+import org.apache.jena.graph.Node.ANY as JenaANY
 import org.w3.banana.{Ops, RDF}
 
 import scala.reflect.TypeTest
 import scala.util.Try
+import scala.util.Using
+import scala.util.Using.Releasable
+import org.apache.jena.util.iterator.ExtendedIterator
 
 object JenaRdf extends RDF {
 	type R = JenaRdf.type
@@ -19,6 +23,10 @@ object JenaRdf extends RDF {
 	override opaque type BNode <: Node = jena.Node_Blank
 	override opaque type Literal <: Node = jena.Node_Literal
 	override opaque type Lang = String
+
+	given [T]: Releasable[ExtendedIterator[T]] with {
+		def release(resource: ExtendedIterator[T]): Unit = resource.close()
+	}
 
 	override val Triple: TripleOps = new TripleOps  {
 		def apply(subj: Node, rel: URI, obj: Node): Triple =
@@ -111,15 +119,42 @@ object JenaRdf extends RDF {
 			graph
 
 		import scala.jdk.CollectionConverters.{given,*}
+		//how should one pass on the information that the Iterable is closeable?
+		// https://stackoverflow.com/questions/69153609/is-there-a-cross-platform-autocloseable-iterable-solution-for-scala
 		override def triplesIn(graph: Graph): Iterable[Triple] =
-			import org.apache.jena.graph.Node.ANY
-			graph.find(ANY, ANY, ANY).nn.asScala.to(Iterable)
+			graph.find(JenaANY, JenaANY, JenaANY).nn.asScala.to(Iterable)
 
 		override inline
 		def graphSize(graph: Graph): Int =
 			graph.size()
+
+		def union(graphs: Seq[Graph]): Graph =
+			val g = Factory.createDefaultGraph.nn
+			graphs.foreach { graph =>
+				Using.resource(graph.find(JenaANY, JenaANY, JenaANY).nn) { it =>
+					while it.hasNext do g.add(it.next)
+				}
+			}
+			g
+
+		def diff(g1: Graph, g2: Graph): Graph =
+			val g = Factory.createDefaultGraph.nn
+			GraphUtil.addInto(g, g1)
+			GraphUtil.delete(g, g2.find(JenaANY, JenaANY, JenaANY))
+			g
+
+		override inline
+		def isomorphism(left: Graph, right: Graph): Boolean =
+			left.isIsomorphicWith(right)
 	}
 
+	/**
+	 * Here we build up the methods functions allowing RDF.Graph[R] notation to be used.
+	 *
+	 * This will be the same code in every singleton implementation of RDF.
+	 * I did not succeed in removing the duplication, as there are Match Type compilation problems.
+	 * It does not work to place here the implementations of rdf which can be placed above,
+	 * as the RDF.Graph[R] type hides the implementation type (of `graph` field for example) **/
 	given ops: Ops[R] with {
 		val rdf = JenaRdf
 
@@ -128,6 +163,10 @@ object JenaRdf extends RDF {
 			def apply(triples: RDF.Triple[R]*): RDF.Graph[R] = rdf.Graph(triples*)
 			def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] = rdf.Graph.triplesIn(graph)
 			def graphSize(graph: RDF.Graph[R]): Int = rdf.Graph.graphSize(graph)
+			def union(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] = rdf.Graph.union(graphs)
+			def diff(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] = rdf.Graph.diff(g1,g2)
+			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
+				rdf.Graph.isomorphism(left,right)
 		}
 
 		val Triple = new TripleOps {

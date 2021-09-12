@@ -125,6 +125,15 @@ trait RDF:
 		def apply(triples: Triple*): Graph
 		def triplesIn(graph: Graph): Iterable[Triple]
 		def graphSize(graph: Graph): Int
+		def union(graphs: Seq[Graph]): Graph
+		def diff(g1: Graph, g2: Graph): Graph
+		def isomorphism(left: Graph, right: Graph): Boolean
+
+//		def ANY: NodeAny
+//		implicit def toConcreteNodeMatch(node: Rdf#Node): Rdf#NodeMatch
+//		def foldNodeMatch[T](nodeMatch: Rdf#NodeMatch)(funANY: => T, funNode: Rdf#Node => T): T
+//		def find(graph: Rdf#Graph, subject: Rdf#NodeMatch, predicate: Rdf#NodeMatch, objectt: Rdf#NodeMatch): Iterator[Rdf#Triple]
+
 	}
 
 	given ops: Ops[R]
