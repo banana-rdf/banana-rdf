@@ -11,30 +11,30 @@ trait Ops[Rdf <: RDF]:
 	// 1. `import ops.{given,*}`
 	// 2. import scala.lang.implicitConversions
 	// where this transformation should really be automatically handled.
-	implicit def lit2Node(lit: RDF.Literal[Rdf]): RDF.Node[Rdf] = lit.asInstanceOf[RDF.Node[Rdf]]
-	implicit def uri2Node(uri: RDF.URI[Rdf]): RDF.Node[Rdf] = uri.asInstanceOf[RDF.Node[Rdf]]
+	implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
+	implicit def uri2Node(uri: URI[Rdf]): Node[Rdf] = uri.asInstanceOf[Node[Rdf]]
 
 	val Graph: GraphOps
 	trait GraphOps:
-		def empty: RDF.Graph[Rdf]
-		def apply(triples: RDF.Triple[Rdf]*): RDF.Graph[Rdf]
-		def triplesIn(graph: RDF.Graph[Rdf]): Iterable[RDF.Triple[Rdf]]
-		def graphSize(graph: RDF.Graph[Rdf]): Int
-		def union(graphs: Seq[RDF.Graph[Rdf]]): RDF.Graph[Rdf]
-		def diff(g1: RDF.Graph[Rdf], g2: RDF.Graph[Rdf]): RDF.Graph[Rdf]
-		def isomorphism(left: RDF.Graph[Rdf], right: RDF.Graph[Rdf]): Boolean
+		def empty: Graph[Rdf]
+		def apply(triples: Triple[Rdf]*): Graph[Rdf]
+		def triplesIn(graph: Graph[Rdf]): Iterable[Triple[Rdf]]
+		def graphSize(graph: Graph[Rdf]): Int
+		def union(graphs: Seq[Graph[Rdf]]): Graph[Rdf]
+		def diff(g1: Graph[Rdf], g2: Graph[Rdf]): Graph[Rdf]
+		def isomorphism(left: Graph[Rdf], right: Graph[Rdf]): Boolean
 
 	val Triple: TripleOps
 	trait TripleOps:
-		def apply(s: RDF.Node[Rdf], p: RDF.URI[Rdf], o: RDF.Node[Rdf]): RDF.Triple[Rdf]
+		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
 
 	val Literal: LiteralOps
 	trait LiteralOps {
-		def apply(plain: String): RDF.Literal[Rdf]
-		def apply(lit: rdf.LiteralI): RDF.Literal[Rdf]
-		def unapply(lit: RDF.Literal[Rdf]): Option[rdf.LiteralI]
-		def langLiteral(lex: String, lang: RDF.Lang[Rdf]): RDF.Literal[Rdf]
-		def dtLiteral(lex: String, dataTp: RDF.URI[Rdf]): RDF.Literal[Rdf]
+		def apply(plain: String): Literal[Rdf]
+		def apply(lit: rdf.LiteralI): Literal[Rdf]
+		def unapply(lit: Literal[Rdf]): Option[rdf.LiteralI]
+		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
+		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
 	}
 
 	val URI: URIOps
@@ -44,7 +44,7 @@ trait Ops[Rdf <: RDF]:
 		 * varying quality jobs at that (check).
 		 * Need to look at how capability based exceptions could help
 		 * https://github.com/lampepfl/dotty/pull/11721/files */
-		def apply(uriStr: String): RDF.URI[Rdf] = mkUri(uriStr).get
-		def mkUri(iriStr: String): Try[RDF.URI[Rdf]]
-		def asString(uri: RDF.URI[Rdf]): String
+		def apply(uriStr: String): URI[Rdf] = mkUri(uriStr).get
+		def mkUri(iriStr: String): Try[URI[Rdf]]
+		def asString(uri: URI[Rdf]): String
 	}
