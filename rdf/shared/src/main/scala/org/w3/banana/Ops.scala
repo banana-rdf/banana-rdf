@@ -7,10 +7,7 @@ trait Ops[Rdf <: RDF]:
 	val rdf: Rdf
 	import scala.language.implicitConversions
 
-	// using implicits as Conversion requires library users to
-	// 1. `import ops.{given,*}`
-	// 2. import scala.lang.implicitConversions
-	// where this transformation should really be automatically handled.
+	// todo: this transformation should really be automatically handled by compiler. Report back.
 	implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
 	implicit def uri2Node(uri: URI[Rdf]): Node[Rdf] = uri.asInstanceOf[Node[Rdf]]
 

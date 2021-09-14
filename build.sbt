@@ -58,6 +58,27 @@ lazy val jena = project.in(file("jena"))
 		libraryDependencies ++= Seq(jenaLibs) //, slf4jNop, aalto )
 	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
+import Dependencies.{RDF4J => rj}
+lazy val rdf4j = Project("rdf4j", file("rdf4j"))
+	.settings(commonSettings: _*)
+	.settings(
+		name := "banana-rdf4j",
+		libraryDependencies ++= Seq(
+			rj.QueryAlgebra,
+			rj.QueryParser,
+			rj.QueryResult,
+			rj.RioTurtle,
+			rj.RioRdfxml,
+			rj.RioJsonLd,
+			rj.SailMemory,
+			rj.SailNativeRdf,
+			rj.RepositorySail,
+			Dependencies.slf4jNop,
+			Dependencies.jsonldJava
+		)
+	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //ntriplesJVM,
+
+
 lazy val rdfTestSuite = crossProject(JVMPlatform) //, JSPlatform
 	.crossType(CrossType.Full)
 	.in(file("rdf-test-suite"))

@@ -16,6 +16,7 @@ object JenaRdf extends RDF {
 	import org.apache.jena.graph as jena
 	import org.apache.jena.graph.{NodeFactory, Factory}
 
+	//jena.Graph is modifiable, but we provide no altering methods and always produce new graphs
 	override opaque type Graph = jena.Graph
 	override opaque type Triple <: Matchable = jena.Triple
 	override opaque type Node <: Matchable = jena.Node
