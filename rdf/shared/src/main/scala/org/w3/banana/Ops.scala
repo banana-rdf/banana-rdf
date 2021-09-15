@@ -45,22 +45,20 @@ trait Ops[Rdf <: RDF]:
 
 
 	val Literal: LiteralOps
-	trait LiteralOps {
+	trait LiteralOps:
 		def apply(plain: String): Literal[Rdf]
 		def apply(lit: rdf.LiteralI): Literal[Rdf]
 		def unapply(lit: Literal[Rdf]): Option[rdf.LiteralI]
 		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
-	}
 
 	val rURI: rURIOps
-	trait rURIOps {
+	trait rURIOps:
 		def apply(uriStr: String): rURI[Rdf]
 		def asString(uri: rURI[Rdf]): String
-	}
 
 	val URI: URIOps
-	trait URIOps {
+	trait URIOps:
 		/** (can) throw an exception (depending on implementation of URI)
 		 * different implementations decide to parse at different points, and do
 		 * varying quality jobs at that (check).
@@ -69,4 +67,3 @@ trait Ops[Rdf <: RDF]:
 		def apply(uriStr: String): URI[Rdf] = mkUri(uriStr).get
 		def mkUri(iriStr: String): Try[URI[Rdf]]
 		def asString(uri: URI[Rdf]): String
-	}
