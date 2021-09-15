@@ -188,36 +188,35 @@ end RDF
  * https://github.com/lampepfl/dotty/issues/13416
  */
 object RDF {
-	type RDFObj = RDF //& Singleton // Is the "& Singleton" of use?
 
-	type rTriple[R <: RDFObj] = R match
+	type rTriple[R <: RDF] = R match
 		case GetRelTriple[t] => t
 
-	type Triple[R <: RDFObj] = R match
+	type Triple[R <: RDF] = R match
 		case GetTriple[t] => t
 
-	type rNode[R <: RDFObj] = R match
+	type rNode[R <: RDF] = R match
 		case GetRelNode[n] => n
 
-	type Node[R <: RDFObj] = R match
+	type Node[R <: RDF] = R match
 		case GetNode[n] => n
 
-	type rURI[R <: RDFObj] = R match
+	type rURI[R <: RDF] = R match
 		case GetRelURI[ru] => ru
 
-	type URI[R <: RDFObj] = R match
+	type URI[R <: RDF] = R match
 		case GetURI[u] => u
 
-	type rGraph[R <: RDFObj] = R match
+	type rGraph[R <: RDF] = R match
 		case GetRelGraph[g] => g
 
-	type Graph[R <: RDFObj] = R match
+	type Graph[R <: RDF] = R match
 		case GetGraph[g] => g
 
-	type Literal[R <: RDFObj] = R match
+	type Literal[R <: RDF] = R match
 		case GetLiteral[l] => l
 
-	type Lang[R <: RDFObj] = R match
+	type Lang[R <: RDF] = R match
 		case GetLang[l] => l
 
 	type GetRelURI[U] = RDF { type rURI = U }

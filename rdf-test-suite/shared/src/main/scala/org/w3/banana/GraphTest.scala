@@ -3,7 +3,7 @@ package org.w3.banana
 import org.w3.banana.RDF.*
 import org.w3.banana.TestConstants.tim
 
-open class GraphTest[Rdf<:RDFObj](using ops: Ops[Rdf]) extends munit.FunSuite {
+open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite {
 	import ops.*
 	import TestConstants.*
 	import org.w3.banana.syntax.*
