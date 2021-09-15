@@ -18,8 +18,8 @@ lazy val commonSettings = Seq(
 		  "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
 		  "-unchecked",                        // Enable additional warnings where generated code depends on assumptions.
 		  "-feature",                          // Emit warning and location for usages of features that should be imported explicitly.
-		  "-explain",                          // Explain errors in more detail.
-		  "-explain-types",                    // Explain type errors in more detail.
+		  //"-explain",                          // Explain errors in more detail.
+		  //"-explain-types",                    // Explain type errors in more detail.
 		  "-indent",                           // Together with -rewrite, remove {...} syntax when possible due to significant indentation.
 		  // "-no-indent",                        // Require classical {...} syntax, indentation is not significant.
 		  "-new-syntax",                       // Require `then` and `do` in control expressions.
@@ -59,7 +59,7 @@ lazy val jena = project.in(file("jena"))
 	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
 import Dependencies.{RDF4J => rj}
-lazy val rdf4j = Project("rdf4j", file("rdf4j"))
+lazy val rdf4j = project.in(file("rdf4j"))
 	.settings(commonSettings: _*)
 	.settings(
 		name := "banana-rdf4j",

@@ -8,20 +8,30 @@ import scala.util.Try
  * Main RDF types.
  * Implementations will mostly use opaque types, so we need to provide the operations too.
  * todo: how can one modularise this, while taking into account that implementations will
- *   be using opaque types
+ *   be using opaque types?
+ *
+ * rURI, rTriple, rGraph are all possibly relative versions of respectively a URI, Triple and Graph.
+ * Relative Graphs have fewer applicable methods: they cannot be unioned with another graph for example.
  */
 trait RDF:
 	type R <: RDF & Singleton
-  // types related to the RDF datamodel
-	type Graph
-	type Triple <: Matchable
+
+	type rGraph 					// graphs with triples with relative URLs
+	type rTriple					// triples with relative URLs
+	type rNode = rURI | Node  	// relative node
+	type rURI 					   // relative URLs
+
+	type Graph     			   // graphs with no triples with relative URLs
+	type Triple  <: Matchable	// triples with no relative URLs
 	type Node <: Matchable
 	type URI <: Node
 	type BNode <: Node
 	type Literal <: Node
 	type Lang
+
 	//interface types: the way we use to present the types for pattern matching
 	type TripleI = (Node, URI, Node)
+	type rTripleI = (rNode, rURI, rNode)
 
 	// pre-interpreted literal type for pattern matching
 	// it would also be reasonable to have an interpreted types to Int, Long, BigInt, etc...
@@ -30,6 +40,15 @@ trait RDF:
 		case Plain(text: String) extends LiteralI(text)
 		case `@`(text: String, lang: Lang) extends LiteralI(text)
 		case ^^(text: String, dataTp: URI) extends LiteralI(text)
+	}
+
+	val rTriple : rTripleOps
+
+	trait rTripleOps {
+		def apply(sub: rNode, rel: rURI, obj: rNode): rTriple
+		def subjectOf(triple: rTriple): rNode
+		def relationOf(triple: rTriple): rURI
+		def objectOf(triple: rTriple): rNode
 	}
 
 	//we need all implementations to have a given tripleOps available
@@ -48,15 +67,16 @@ trait RDF:
 		def objectOf(triple: Triple): Node
 	}
 
-	extension (triple: Triple)
-		def subj: Node = Triple.subjectOf(triple)
-		def rel: URI = Triple.relationOf(triple)
-		def obj: Node = Triple.objectOf(triple)
+	val rURI: rURIOps
+
+	trait rURIOps {
+		def apply(rUriStr: String): rURI
+		def asString(uri: rURI): String
+	}
 
 	//todo: we should add Relative URI type
 	val URI: URIOps
 
-	//		val Node : Node
 	trait URIOps {
 		/** (can) throw an exception (depending on implementation of URI)
 		 * different implementations decide to parse at different points, and do
@@ -118,7 +138,13 @@ trait RDF:
 		inline def apply(lex: String, dataTp: URI): Literal = Literal.dtLiteral(lex, dataTp)
 	}
 
-	// this method allows for multiple implementation of the Graph object
+	val rGraph : rGraphOps
+	trait rGraphOps {
+		def apply(triples: rTriple*): rGraph
+		def triplesIn(graph: rGraph): Iterable[rTriple]
+		def graphSize(graph: rGraph): Int
+	}
+
 	val Graph : GraphOps
 	trait GraphOps {
 		def empty: Graph
@@ -128,13 +154,12 @@ trait RDF:
 		def union(graphs: Seq[Graph]): Graph
 		def diff(g1: Graph, g2: Graph): Graph
 		def isomorphism(left: Graph, right: Graph): Boolean
-
+	}
 //		def ANY: NodeAny
 //		implicit def toConcreteNodeMatch(node: Rdf#Node): Rdf#NodeMatch
 //		def foldNodeMatch[T](nodeMatch: Rdf#NodeMatch)(funANY: => T, funNode: Rdf#Node => T): T
 //		def find(graph: Rdf#Graph, subject: Rdf#NodeMatch, predicate: Rdf#NodeMatch, objectt: Rdf#NodeMatch): Iterator[Rdf#Triple]
 
-	}
 
 	given ops: Ops[R]
 
@@ -164,14 +189,27 @@ end RDF
  */
 object RDF {
 	type RDFObj = RDF //& Singleton // Is the "& Singleton" of use?
+
+	type rTriple[R <: RDFObj] = R match
+		case GetRelTriple[t] => t
+
 	type Triple[R <: RDFObj] = R match
 		case GetTriple[t] => t
+
+	type rNode[R <: RDFObj] = R match
+		case GetRelNode[n] => n
 
 	type Node[R <: RDFObj] = R match
 		case GetNode[n] => n
 
+	type rURI[R <: RDFObj] = R match
+		case GetRelURI[ru] => ru
+
 	type URI[R <: RDFObj] = R match
 		case GetURI[u] => u
+
+	type rGraph[R <: RDFObj] = R match
+		case GetRelGraph[g] => g
 
 	type Graph[R <: RDFObj] = R match
 		case GetGraph[g] => g
@@ -182,12 +220,16 @@ object RDF {
 	type Lang[R <: RDFObj] = R match
 		case GetLang[l] => l
 
+	type GetRelURI[U] = RDF { type rURI = U }
+	type GetURI[U] = RDF { type URI = U }
+	type GetRelNode[N] = RDF { type rNode = N }
 	type GetNode[N] = RDF { type Node = N }
 	type GetLiteral[L] = RDF { type Literal = L }
-	type GetURI[U] = RDF { type URI = U }
-	type GetTriple[T] = RDF { type Triple = T }
-	type GetGraph[G] = RDF { type Graph = G }
 	type GetLang[L] = RDF { type Lang = L }
+	type GetRelTriple[T] = RDF { type rTriple = T }
+	type GetTriple[T] = RDF { type Triple = T }
+	type GetRelGraph[G] = RDF { type rGraph = G }
+	type GetGraph[G] = RDF { type Graph = G }
 }
 
 

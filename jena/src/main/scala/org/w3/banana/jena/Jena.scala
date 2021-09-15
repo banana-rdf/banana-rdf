@@ -17,6 +17,12 @@ object JenaRdf extends RDF {
 	import org.apache.jena.graph.{NodeFactory, Factory}
 
 	//jena.Graph is modifiable, but we provide no altering methods and always produce new graphs
+	//todo? provide jena traits for rNode and rTriple
+	override opaque type rGraph = jena.Graph
+	override opaque type rTriple = jena.Triple
+	// type rNode =  rURI | Node == jena.Node
+	override opaque type rURI = jena.Node_URI
+
 	override opaque type Graph = jena.Graph
 	override opaque type Triple <: Matchable = jena.Triple
 	override opaque type Node <: Matchable = jena.Node
@@ -29,7 +35,17 @@ object JenaRdf extends RDF {
 		def release(resource: ExtendedIterator[T]): Unit = resource.close()
 	}
 
+	override val rTriple = new rTripleOps {
+		override inline
+		def apply(subj: rNode, rel: rURI, obj: rNode): rTriple =
+			jena.Triple.create(subj, rel, obj).nn
+		def subjectOf(triple: rTriple): rNode = Triple.subjectOf(triple)
+		def relationOf(triple: rTriple): rURI = Triple.relationOf(triple)
+		def objectOf(triple: rTriple): rNode = Triple.objectOf(triple)
+	}
+
 	override val Triple: TripleOps = new TripleOps  {
+		override inline
 		def apply(subj: Node, rel: URI, obj: Node): Triple =
 			jena.Triple.create(subj, rel, obj).nn
 		override inline
@@ -49,6 +65,12 @@ object JenaRdf extends RDF {
 			//note: this does not compile if we use URI instead of jena.Node_URI
 			case x: (s.type & jena.Node_URI) => Some(x)
 			case _ => None
+	}
+
+	override val rURI = new rURIOps {
+		override def apply(rUriStr: String): rURI =
+			NodeFactory.createURI(rUriStr).nn.asInstanceOf[URI]
+		override def asString(u: rURI): String = u.toString
 	}
 
 	override val URI : URIOps = new URIOps  {
@@ -108,6 +130,14 @@ object JenaRdf extends RDF {
 	override val Lang: LangOps =  new LangOps {
 		override inline def apply(lang: String): Lang = lang
 		override inline def label(lang: Lang): String = lang
+	}
+
+	val rGraph = new rGraphOps {
+		def apply(triples: rTriple*): rGraph = Graph(triples*)
+		def triplesIn(graph: rGraph): Iterable[rTriple] =
+			Graph.triplesIn(graph)
+		def graphSize(graph: rGraph): Int =
+			Graph.graphSize(graph)
 	}
 
 	override val Graph: GraphOps = new GraphOps {
@@ -170,9 +200,31 @@ object JenaRdf extends RDF {
 				rdf.Graph.isomorphism(left,right)
 		}
 
+		val rGraph = new rGraphOps:
+			def apply(triples: RDF.rTriple[R]*): RDF.rGraph[R] =
+				rdf.rGraph(triples*)
+			def triplesIn(graph: RDF.rGraph[R]): Iterable[RDF.rTriple[R]] =
+				rdf.rGraph.triplesIn(graph)
+			def graphSize(graph: RDF.rGraph[R]): Int =
+				rdf.rGraph.graphSize(graph)
+
+
+		val rTriple = new rTripleOps:
+			def apply(s: RDF.rNode[R], p: RDF.rURI[R], o: RDF.rNode[R]): RDF.rTriple[R] =
+				rdf.rTriple(s, p, o)
+			def subjectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
+				rdf.rTriple.subjectOf(t)
+			def relationOf(t: RDF.rTriple[R]): RDF.rURI[R] =
+				rdf.rTriple.relationOf(t)
+			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
+				rdf.rTriple.objectOf(t)
+
 		val Triple = new TripleOps {
 			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
 				rdf.Triple(s, p, o)
+			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] = rdf.Triple.subjectOf(t)
+			def relationOf(t: RDF.Triple[R]): RDF.URI[R] = rdf.Triple.relationOf(t)
+			def objectOf(t: RDF.Triple[R]): RDF.Node[R] = rdf.Triple.objectOf(t)
 		}
 
 		val Literal = new LiteralOps {
@@ -186,6 +238,10 @@ object JenaRdf extends RDF {
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] = rdf.Literal.langLiteral(lex,lang)
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] = rdf.Literal.dtLiteral(lex,dataTp)
 		}
+
+		val rURI = new rURIOps:
+			def apply(uriStr: String): RDF.rURI[R] = rdf.rURI(uriStr)
+			def asString(uri: RDF.rURI[R]): String = rdf.rURI.asString(uri)
 
 		val URI = new URIOps {
 			def mkUri(iriStr: String): Try[RDF.URI[R]] = rdf.URI.mkUri(iriStr)

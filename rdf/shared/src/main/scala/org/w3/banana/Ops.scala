@@ -10,6 +10,8 @@ trait Ops[Rdf <: RDF]:
 	// todo: this transformation should really be automatically handled by compiler. Report back.
 	implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
 	implicit def uri2Node(uri: URI[Rdf]): Node[Rdf] = uri.asInstanceOf[Node[Rdf]]
+	implicit def uri2rUri(uri: URI[Rdf]): rURI[Rdf] = uri.asInstanceOf[rURI[Rdf]]
+	implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
 
 	val Graph: GraphOps
 	trait GraphOps:
@@ -21,9 +23,26 @@ trait Ops[Rdf <: RDF]:
 		def diff(g1: Graph[Rdf], g2: Graph[Rdf]): Graph[Rdf]
 		def isomorphism(left: Graph[Rdf], right: Graph[Rdf]): Boolean
 
+	val rGraph: rGraphOps
+	trait rGraphOps:
+		def apply(triples: rTriple[Rdf]*): rGraph[Rdf]
+		def triplesIn(graph: rGraph[Rdf]): Iterable[rTriple[Rdf]]
+		def graphSize(graph: rGraph[Rdf]): Int
+
 	val Triple: TripleOps
 	trait TripleOps:
 		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
+		def subjectOf(s: Triple[Rdf]): Node[Rdf]
+		def relationOf(s: Triple[Rdf]): URI[Rdf]
+		def objectOf(s: Triple[Rdf]): Node[Rdf]
+
+	val rTriple: rTripleOps
+	trait rTripleOps:
+		def apply(s: rNode[Rdf], p: rURI[Rdf], o: rNode[Rdf]): rTriple[Rdf]
+		def subjectOf(s: rTriple[Rdf]): rNode[Rdf]
+		def relationOf(s: rTriple[Rdf]): rURI[Rdf]
+		def objectOf(s: rTriple[Rdf]): rNode[Rdf]
+
 
 	val Literal: LiteralOps
 	trait LiteralOps {
@@ -32,6 +51,12 @@ trait Ops[Rdf <: RDF]:
 		def unapply(lit: Literal[Rdf]): Option[rdf.LiteralI]
 		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
+	}
+
+	val rURI: rURIOps
+	trait rURIOps {
+		def apply(uriStr: String): rURI[Rdf]
+		def asString(uri: rURI[Rdf]): String
 	}
 
 	val URI: URIOps

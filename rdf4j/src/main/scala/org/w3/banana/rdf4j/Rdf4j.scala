@@ -16,6 +16,11 @@ object Rdf4j extends RDF {
 	lazy val valueFactory: ValueFactory = SimpleValueFactory.getInstance().nn
 
 	//rdf4j.Model is modifiable, but we provide no altering methods and always produce new graphs
+	override opaque type rGraph = Model
+	override opaque type rTriple = Statement
+	//type rNode = rjIRI
+	override opaque type rURI = rjIRI
+
 	override opaque type Graph = Model
 	override opaque type Triple <: Matchable = Statement
 	override opaque type Node <: Matchable = Value
@@ -23,6 +28,13 @@ object Rdf4j extends RDF {
 	override opaque type BNode <: Node = rjBNode
 	override opaque type Literal <: Node = rjLiteral
 	override opaque type Lang = String
+
+	override val rTriple = new rTripleOps {
+		def apply(subj: rNode, rel: rURI, obj: rNode): rTriple = Triple(subj,rel,obj)
+		def subjectOf(triple: rTriple): rNode = Triple.subjectOf(triple)
+		def relationOf(triple: rTriple): rURI = Triple.relationOf(triple)
+		def objectOf(triple: rTriple): rNode = Triple.objectOf(triple)
+	}
 
 	override val Triple: TripleOps = new TripleOps  {
 
@@ -51,6 +63,11 @@ object Rdf4j extends RDF {
 				//note: using rjIRI won't compile
 				case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
 				case _ => None
+	}
+
+	override val rURI = new rURIOps {
+		def apply(rUriStr: String): rURI = URI(rUriStr)
+		def asString(u: rURI): String = u.toString
 	}
 
 	override val URI : URIOps = new URIOps  {
@@ -126,6 +143,12 @@ object Rdf4j extends RDF {
 		override inline def label(lang: Lang): String = lang
 	}
 
+	override val rGraph = new rGraphOps {
+		def apply(triples: rTriple*): rGraph = Graph(triples*)
+		def triplesIn(graph: rGraph): Iterable[rTriple] = Graph.triplesIn(graph)
+		def graphSize(graph: rGraph): Int = Graph.graphSize(graph)
+	}
+
 	override val Graph: GraphOps = new GraphOps {
 		private val emptyGr: Graph = new LinkedHashModel(0).unmodifiable().nn
 		override inline def empty: Graph = emptyGr
@@ -177,7 +200,7 @@ object Rdf4j extends RDF {
 	given ops: Ops[R] with {
 		val rdf = Rdf4j
 
-		val Graph = new GraphOps {
+		val Graph = new GraphOps:
 			def empty: RDF.Graph[R] = rdf.Graph.empty
 			def apply(triples: RDF.Triple[R]*): RDF.Graph[R] = rdf.Graph(triples*)
 			def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] = rdf.Graph.triplesIn(graph)
@@ -186,14 +209,30 @@ object Rdf4j extends RDF {
 			def diff(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] = rdf.Graph.diff(g1,g2)
 			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
 				rdf.Graph.isomorphism(left,right)
-		}
 
-		val Triple = new TripleOps {
+		val rGraph = new rGraphOps:
+			def apply(triples: RDF.rTriple[R]*): RDF.rGraph[R] =
+				rdf.rGraph(triples*)
+			def triplesIn(graph: RDF.rGraph[R]): Iterable[RDF.rTriple[R]] =
+				rdf.rGraph.triplesIn(graph)
+			def graphSize(graph: RDF.rGraph[R]): Int =
+				rdf.rGraph.graphSize(graph)
+
+		val Triple = new TripleOps:
 			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
 				rdf.Triple(s, p, o)
-		}
+			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] = rdf.Triple.subjectOf(t)
+			def relationOf(t: RDF.Triple[R]): RDF.URI[R] = rdf.Triple.relationOf(t)
+			def objectOf(t: RDF.Triple[R]): RDF.Node[R] = rdf.Triple.objectOf(t)
 
-		val Literal = new LiteralOps {
+		val rTriple = new rTripleOps:
+			def apply(s: RDF.rNode[R], p: RDF.rURI[R], o: RDF.rNode[R]): RDF.rTriple[R] =
+				rdf.rTriple(s, p, o)
+			def subjectOf(t: RDF.rTriple[R]): RDF.rNode[R] = rdf.rTriple.subjectOf(t)
+			def relationOf(t: RDF.rTriple[R]): RDF.rURI[R] = rdf.rTriple.relationOf(t)
+			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] = rdf.rTriple.objectOf(t)
+
+		val Literal = new LiteralOps:
 			import LiteralI.*
 			def apply(plain: String): RDF.Literal[R] = rdf.Literal(plain)
 			def apply(lit: LiteralI): RDF.Literal[R] = lit match
@@ -203,12 +242,15 @@ object Rdf4j extends RDF {
 			def unapply(lit: RDF.Literal[R]): Option[LiteralI] = rdf.Literal.unapply(lit)
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] = rdf.Literal.langLiteral(lex,lang)
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] = rdf.Literal.dtLiteral(lex,dataTp)
-		}
 
-		val URI = new URIOps {
+		val rURI = new rURIOps:
+			def apply(uriStr: String): RDF.rURI[R] = rdf.rURI(uriStr)
+			def asString(uri: RDF.rURI[R]): String = rdf.rURI.asString(uri)
+
+		val URI = new URIOps:
 			def mkUri(iriStr: String): Try[RDF.URI[R]] = rdf.URI.mkUri(iriStr)
 			def asString(uri: RDF.URI[R]): String = rdf.URI.asString(uri)
-		}
+
 	}
 
 	// mutable graphs

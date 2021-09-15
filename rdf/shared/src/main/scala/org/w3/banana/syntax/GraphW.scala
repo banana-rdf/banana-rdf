@@ -16,4 +16,7 @@ extension [Rdf<:RDF](graph: Graph[Rdf])(using ops: Ops[Rdf])
 //		select(sub,rel,obj).hasNext
 //	}
 
+extension [Rdf<:RDF](graph: rGraph[Rdf])(using ops: Ops[Rdf])
+	def rtriples: Iterable[rTriple[Rdf]] = ops.rGraph.triplesIn(graph)
+	def rsize: Int = ops.rGraph.graphSize(graph)
 
