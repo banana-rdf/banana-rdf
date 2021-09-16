@@ -91,3 +91,16 @@ lazy val rdfTestSuite = crossProject(JVMPlatform) //, JSPlatform
 	.dependsOn(rdf)
 
 lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
+
+lazy val scratch = crossProject(JVMPlatform)
+	.crossType(CrossType.Full)
+	.in(file("scratch"))
+	.settings(commonSettings: _*)
+	.settings(
+		name := "scratch",
+		//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
+		libraryDependencies ++= Seq(jenaLibs)
+	)
+	.dependsOn(rdf)
+
+lazy val scratchJVM = scratch.jvm
