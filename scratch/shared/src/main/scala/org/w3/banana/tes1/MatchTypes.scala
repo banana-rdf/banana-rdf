@@ -6,8 +6,8 @@ import org.apache.jena.graph.{Factory, NodeFactory}
 import org.apache.jena.sparql.resultset.ResultSetCompare.BNodeIso
 
 import scala.annotation.targetName
-import scala.util.Try
 import scala.reflect.TypeTest
+import scala.util.Try
 
 /**
  * following an idea by Neko-kai https://twitter.com/kai_nyasha
@@ -141,7 +141,7 @@ object MatchTypes {
 
 	object JenaRdf extends RDF {
 		import org.apache.jena.graph as jena
-		import org.apache.jena.graph.{NodeFactory, Factory}
+		import org.apache.jena.graph.{Factory, NodeFactory}
 
 		override opaque type Graph = jena.Graph
 		override opaque type Triple <: Matchable = jena.Triple
@@ -239,7 +239,7 @@ object MatchTypes {
 				}
 				graph
 
-			import scala.jdk.CollectionConverters.{given,*}
+			import scala.jdk.CollectionConverters.*
 			def triplesIn(graph: Graph): Iterable[Triple] =
 				import org.apache.jena.graph.Node.ANY
 				graph.find(ANY, ANY, ANY).nn.asScala.to(Iterable)
@@ -254,6 +254,7 @@ object MatchTypes {
 		override opaque type Literal <: Node = LiteralI
 		override opaque type Graph = Set[Triple]
 		override opaque type Lang = String
+		import LiteralI.*
 
 		override val Triple: TripleOps = new TripleOps {
 			override inline def apply(subj: Node, rel: URI, obj: Node): Triple = (subj, rel, obj)
@@ -279,7 +280,6 @@ object MatchTypes {
 		}
 
 		override val Literal: LiteralOps = new LiteralOps {
-			import LiteralI.*
 			def apply(plain: String): Literal = Plain(plain)
 			def langLiteral(plain: String, lang: Lang): Literal = `@`(plain, lang)
 			def dtLiteral(lex: String, dataTp: URI): Literal = `^^`(lex, dataTp)
@@ -369,7 +369,8 @@ class MatchTypes extends munit.FunSuite {
 		val err = compileErrors(
 		"""JenaRdf.LangLit("Henry",JenaRdf.Lang("en")) match
 			  case lit: JenaRdf.Literal => lit.getLiteralDatatypeURI()""")
-		assert(err.contains("value getLiteralDatatypeURI is not a member of ideas.MatchTypes.JenaRdf.Literal"))
+		println("err"+err)
+		assert(err.contains("value getLiteralDatatypeURI is not a member of"))
 
 		val hlDeconstr: Option[JenaRdf.LiteralI] = JenaRdf.Literal.unapply(henryLit)
 		assertEquals(hlDeconstr.get,JenaRdf.LiteralI.`@`("Henry", JenaRdf.Lang("en")))
@@ -395,7 +396,7 @@ class MatchTypes extends munit.FunSuite {
 	 * @return an rdf.Graph (note: returning an RDF.Graph[Rdf] does not work).
 	 */
 	def buildATestGraph[Rdf<:ideas.MatchTypes.RDF](using rdf: Rdf): rdf.Graph = {
-		import rdf.{given,*}
+		import rdf.*
 		val bbl: URI = URI(bblStr)
 		val tim: URI = URI(timStr)
 		val bKt: Triple = Triple(bbl, foaf("knows"), URI(timStr))
@@ -417,7 +418,7 @@ class MatchTypes extends munit.FunSuite {
 		name: String, g : rdf.Graph
 	)(using loc: munit.Location): Unit = {
 		test(name) {
-			import rdf.{given,*}
+			import rdf.*
 			import LiteralI.*
 			val Bbl: URI = URI(bblStr)
 			val Tim: URI = URI(timStr)

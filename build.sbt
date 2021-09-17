@@ -99,7 +99,7 @@ lazy val scratch = crossProject(JVMPlatform)
 	.settings(
 		name := "scratch",
 		//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
-		libraryDependencies ++= Seq(jenaLibs)
+		libraryDependencies ++= Seq(jenaLibs, munit)
 	)
 	.dependsOn(rdf)
 
