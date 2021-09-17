@@ -1,11 +1,10 @@
 package org.w3.banana
-import RDF.*
 
 import scala.util.Try
 
 trait Ops[Rdf <: RDF]:
-	val rdf: Rdf
 	import scala.language.implicitConversions
+	import RDF.*
 
 	// todo: this transformation should really be automatically handled by compiler. Report back.
 	implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
@@ -32,6 +31,7 @@ trait Ops[Rdf <: RDF]:
 	val Triple: TripleOps
 	trait TripleOps:
 		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
+		def untuple(t: RDF.Triple[Rdf]): TripleI[Rdf]
 		def subjectOf(s: Triple[Rdf]): Node[Rdf]
 		def relationOf(s: Triple[Rdf]): URI[Rdf]
 		def objectOf(s: Triple[Rdf]): Node[Rdf]
@@ -39,16 +39,25 @@ trait Ops[Rdf <: RDF]:
 	val rTriple: rTripleOps
 	trait rTripleOps:
 		def apply(s: rNode[Rdf], p: rURI[Rdf], o: rNode[Rdf]): rTriple[Rdf]
+		def untuple(t: RDF.Triple[Rdf]): rTripleI[Rdf]
 		def subjectOf(s: rTriple[Rdf]): rNode[Rdf]
 		def relationOf(s: rTriple[Rdf]): rURI[Rdf]
 		def objectOf(s: rTriple[Rdf]): rNode[Rdf]
 
+	object LangLit {
+		inline def apply(lex: String, lang: Lang[Rdf]): Literal[Rdf] =
+			Literal.langLiteral(lex, lang)
+	}
+	object TypedLit {
+		inline def apply(lex: String, dataTp: URI[Rdf]): Literal[Rdf] =
+			Literal.dtLiteral(lex, dataTp)
+	}
 
 	val Literal: LiteralOps
 	trait LiteralOps:
 		def apply(plain: String): Literal[Rdf]
-		def apply(lit: rdf.LiteralI): Literal[Rdf]
-		def unapply(lit: Literal[Rdf]): Option[rdf.LiteralI]
+		def apply(lit: LiteralI[Rdf]): Literal[Rdf]
+		def unapply(lit: Literal[Rdf]): Option[LiteralI[Rdf]]
 		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
 
@@ -56,6 +65,9 @@ trait Ops[Rdf <: RDF]:
 	trait rURIOps:
 		def apply(uriStr: String): rURI[Rdf]
 		def asString(uri: rURI[Rdf]): String
+
+	val xsdStr: String = "http://www.w3.org/2001/XMLSchema#string"
+	val xsdLangStr: String = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
 
 	val URI: URIOps
 	trait URIOps:
@@ -67,3 +79,9 @@ trait Ops[Rdf <: RDF]:
 		def apply(uriStr: String): URI[Rdf] = mkUri(uriStr).get
 		def mkUri(iriStr: String): Try[URI[Rdf]]
 		def asString(uri: URI[Rdf]): String
+
+	val Lang: LangOps
+	trait LangOps:
+		def apply(lang: String): Lang[Rdf]
+		def label(lang: Lang[Rdf]): String
+

@@ -1,12 +1,13 @@
 package org.w3.banana.prefixes
 
-import org.w3.banana.{PrefixBuilder, RDF}
+import org.w3.banana.{PrefixBuilder, RDF, Ops}
+import org.w3.banana.syntax.*
 
 object RDFSPrefix {
-	def apply[T <: RDF](using rdf: T) = new RDFSPrefix()
+	def apply[T <: RDF](using Ops[T]) = new RDFSPrefix()
 }
 
-class RDFSPrefix[Rdf <: RDF](using override val rdf: Rdf)
+class RDFSPrefix[Rdf <: RDF](using Ops[Rdf])
 	extends PrefixBuilder[Rdf]("rdfs", "http://www.w3.org/2000/01/rdf-schema#") {
 	val Class = apply("Class")
 	val Container = apply("Container")
@@ -26,10 +27,10 @@ class RDFSPrefix[Rdf <: RDF](using override val rdf: Rdf)
 }
 
 object RDFPrefix {
-  def apply[Rdf <: RDF](using rdf: Rdf) = new RDFPrefix()
+  def apply[Rdf <: RDF](using Ops[Rdf]) = new RDFPrefix()
 }
 
-class RDFPrefix[Rdf <: RDF](using override val rdf: Rdf)
+class RDFPrefix[Rdf <: RDF](using Ops[Rdf])
   extends PrefixBuilder[Rdf]("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#") {
   val langString = apply("langString") //todo: does not exist in ontology
   val nil = apply("nil")
@@ -53,23 +54,22 @@ class RDFPrefix[Rdf <: RDF](using override val rdf: Rdf)
 }
 
 object XSDPrefix {
-  def apply[Rdf <: RDF](using rdf: Rdf) = new XSDPrefix[Rdf]
+  def apply[Rdf <: RDF](using Ops[Rdf]) = new XSDPrefix[Rdf]
 }
 
-class XSDPrefix[Rdf <: RDF](using override val rdf: Rdf)
+class XSDPrefix[Rdf <: RDF](using Ops[Rdf])
   extends PrefixBuilder[Rdf]("xsd", "http://www.w3.org/2001/XMLSchema#") {
-
   // http://www.w3.org/TR/owl-rdf-based-semantics
   // Table 3.3 Datatypes of the OWL 2 RDF-Based Semantics
 
   // http://www.w3.org/TR/owl2-syntax/
   // Table 3 Reserved VOcabulary of OWL 2 with Special Treatment
-  import rdf.LiteralSyntax.*
+
   val anyURI = apply("anyURI")
   val base64Binary = apply("base64Binary")
   val boolean = apply("boolean")
-  val `true` = "true" ^^ boolean
-  val `false` = "false" ^^ boolean
+  val `true` = RDF.LiteralI.^^("true", boolean)
+  val `false` = RDF.LiteralI.^^("false",boolean)
   val byte = apply("byte")
   val dateTime = apply("dateTime")
   val dateTimeStamp = apply("dateTimeStamp")

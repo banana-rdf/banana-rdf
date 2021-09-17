@@ -7,7 +7,7 @@ lazy val commonSettings = Seq(
 	  version := "0.1.0",
 	  description := "RDF framework for Scala",
 	  startYear := Some(2012),
-	  scalaVersion := "3.1.0-RC1",
+	  scalaVersion := "3.1.0-RC2",
 	  libraryDependencies ++= Seq(
 		  jenaLibs,
 		  munit % Test

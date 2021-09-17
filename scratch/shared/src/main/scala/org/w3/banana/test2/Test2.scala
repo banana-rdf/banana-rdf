@@ -1,6 +1,8 @@
+import banana.Ops
+import banana.RDF.Triple
 //two imaginary RDF frameworks very differently implemented
 //a J-framework and an O-framework
-package J: //an O-framework
+package J:
 	enum Node:
 		case BNode(n: Int)
 		case Uri(u: String)
@@ -19,6 +21,7 @@ package banana:
 		def mkTriple(s: RDF.Node[R], r: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R]
 		def mkURI(u: String): RDF.URI[R]
 		def mkLiteral(lit: String): RDF.Literal[R]
+		def getSubject(t: RDF.Triple[R]): RDF.Node[R]
 		import scala.language.implicitConversions
 		implicit def lit2Node(lit: RDF.Literal[R]): RDF.Node[R] = lit.asInstanceOf[RDF.Node[R]]
 		implicit def uri2Node(uri: RDF.URI[R]): RDF.Node[R] = uri.asInstanceOf[RDF.Node[R]]
@@ -74,6 +77,8 @@ package banana.JRDF:
 				J.Triple(s,r,o)
 			def mkURI(u: String): RDF.URI[R] = J.Node.Uri(u)
 			def mkLiteral(lit: String): RDF.Literal[R] = J.Node.Literal(lit)
+			def getSubject(t: RDF.Triple[R]): RDF.Node[R] = t.subj
+
 
 package banana.ORDF:
 
@@ -88,22 +93,34 @@ package banana.ORDF:
 		opaque type Triple = O.Triple
 		opaque type Graph = O.Graph
 
-		given ops: banana.Ops[ORdf.type] with
-			def empty: banana.RDF.Graph[ORdf.type] = Set()
+		given ops: Ops[ORdf.type] with
+			def empty: RDF.Graph[R] = Set()
 			def mkTriple(s: RDF.Node[R], r: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
 				(s,r,o)
 			def mkURI(u: String): RDF.URI[R] = java.net.URI(u)
 			def mkLiteral(lit: String): RDF.Literal[R] = lit
+			def getSubject(t: RDF.Triple[R]): RDF.Node[R] = t._1
 
+import banana.{RDF,Ops}
+def main(args: Array[String]): Unit = {
+	{  import banana.ORDF.ORdf
+		given oo: Ops[ORdf.type] = ORdf.ops
+		println(write[ORdf.type](simpleTest[ORdf.type]))
+	}
+	{  import banana.JRDF.JRdf
+		given oo: Ops[JRdf.type] = JRdf.ops
+		println(write[JRdf.type](simpleTest[JRdf.type]))
+	}
 
-def main(args: Array[String]): Unit =
-	println("jrdf="+simpleTest(using banana.JRDF.JRdf.ops))
-	println("ordf="+simpleTest(using banana.ORDF.ORdf.ops))
+}
 
-def simpleTest[Rdf<:banana.RDF](using ops: banana.Ops[Rdf]) =
+def simpleTest[Rdf<:RDF](using ops: Ops[Rdf]) =
 	import ops.*
 	val bbl = ops.mkURI("https://bblfish.net/#i")
 	val name = ops.mkURI("https://xmlns.com/foaf/0.1/name")
 	val henry = ops.mkLiteral("Henry")
 	ops.mkTriple(bbl,name,henry)
+
+def write[Rdf<:RDF](t: RDF.Triple[Rdf])(using ops: Ops[Rdf]): String =
+	s"triple $t has subj = ${ops.getSubject(t)}"
 
