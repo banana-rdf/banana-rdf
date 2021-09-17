@@ -12,6 +12,10 @@ object LiteralW:
 		@targetName("lang")
 		infix def `@`(lang: RDF.Lang[Rdf]): RDF.Literal[Rdf] =
 			ops.Literal.langLiteral(str, lang)
+
+//	extension [Rdf<:RDF](lit: Literal[Rdf])(using ops: Ops[Rdf])
+
+
 end LiteralW
 
 object LangW:

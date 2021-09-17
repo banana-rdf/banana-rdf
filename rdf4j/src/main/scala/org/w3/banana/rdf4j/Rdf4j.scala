@@ -25,7 +25,7 @@ object Rdf4j extends RDF {
 	override opaque type URI <: Node = rjIRI
 	override opaque type BNode <: Node = rjBNode
 	override opaque type Literal <: Node = rjLiteral
-	override opaque type Lang = String
+	override opaque type Lang <: Matchable = String
 
 
 //	given uriTT: TypeTest[Node,URI] with {
@@ -91,7 +91,15 @@ object Rdf4j extends RDF {
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph)
 
-		val Triple = new TripleOps:
+		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
+			override def unapply(s: Matchable): Option[s.type & Triple] =
+				s match
+					//note: this does not compile if we use URI instead of jena.Node_URI
+					case x: (s.type & Triple) => Some(x)
+					case _ => None
+		}
+
+		object Triple extends TripleOps:
 			//todo: we should have two types of triples: strict and non-strict (for reasoning)
 			//todo: The method that takes a node as subject should not throw an exception, but should
 			//   potentially return 1 or two strict triples.
@@ -100,46 +108,59 @@ object Rdf4j extends RDF {
 				s match
 					case r: Resource => valueFactory.createStatement(r, p, o).nn
 					case p => throw new RuntimeException("makeTriple: in RDF4J, subject " + p.toString + " must be a either URI or BlankNode")
-			def untuple(t: RDF.Triple[R]): RDF.TripleI[R] =
-					RDF.TripleI(subjectOf(t), relationOf(t), objectOf(t))
+			def untuple(t: RDF.Triple[R]): TripleI =
+					(subjectOf(t), relationOf(t), objectOf(t))
 			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] = t.getSubject.nn
 			def relationOf(t: RDF.Triple[R]): RDF.URI[R] = t.getPredicate.nn
 			def objectOf(t: RDF.Triple[R]): RDF.Node[R] = t.getObject.nn
+		end Triple
 
 		val rTriple = new rTripleOps:
 			def apply(s: RDF.rNode[R], p: RDF.rURI[R], o: RDF.rNode[R]): RDF.rTriple[R] =
 				Triple(s, p, o)
-			def untuple(t: RDF.rTriple[R]): RDF.rTripleI[R] =
-				RDF.rTripleI(subjectOf(t), relationOf(t), objectOf(t))
+			def untuple(t: RDF.rTriple[R]): rTripleI =
+				(subjectOf(t), relationOf(t), objectOf(t))
 			def subjectOf(t: RDF.rTriple[R]): RDF.rNode[R] = Triple.subjectOf(t)
 			def relationOf(t: RDF.rTriple[R]): RDF.rURI[R] = Triple.relationOf(t)
 			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] = Triple.objectOf(t)
 
-		val Literal = new LiteralOps:
+		object Literal extends LiteralOps:
 			private val xsdString = valueFactory.createIRI(xsdStr).nn
 			private val xsdLangString = valueFactory.createIRI(xsdLangStr).nn
-			import RDF.LiteralI as Lit
+			import LiteralI as Lit
 			def apply(plain: String): RDF.Literal[R] =
 				valueFactory.createLiteral(plain).nn
-			def apply(lit: Lit[R]): RDF.Literal[R] = lit match
+			def apply(lit: Lit): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => apply(text)
 				case Lit.`@`(text,lang) => Literal.langLiteral(text,Lang.label(lang))
 				case Lit.`^^`(text,tp) => Literal.dtLiteral(text,tp)
-			def unapply(lit: RDF.Literal[R]): Option[Lit[R]] =
-				val lex: String = lit.getLabel.nn
-				val dt: RDF.URI[R] = lit.getDatatype.nn
-				val lang: java.util.Optional[String] = lit.getLanguage.nn
-				if (lang.isEmpty) then
-				//todo: this comparison could be costly, check
-					if dt == xsdString then Some(Lit.Plain(lex))
-					else Some(Lit.^^(lex, dt))
-				else if dt == xsdLangString then
-					Some(Lit.`@`(lex, Lang(lang.get().nn)))
+			def unapply(node: RDF.Node[R]): Option[Lit] =
+				if node.isInstanceOf[Literal] then
+					val lit = node.asInstanceOf[Literal]
+					val lex: String = lit.getLabel.nn
+					val dt: RDF.URI[R] = lit.getDatatype.nn
+					val lang: java.util.Optional[String] = lit.getLanguage.nn
+					if (lang.isEmpty) then
+					//todo: this comparison could be costly, check
+						if dt == xsdString then Some(Lit.Plain(lex))
+						else Some(Lit.^^(lex, dt))
+					else if dt == xsdLangString then
+						Some(Lit.`@`(lex, Lang(lang.get().nn)))
+					else None
 				else None
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, lang).nn
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, dataTp).nn
+		end Literal
+
+		given literalTT: TypeTest[RDF.Node[R], RDF.Literal[R]] with {
+			override def unapply(s: Node): Option[s.type & Literal] =
+				s match
+					//note: this does not compile if we use URI instead of jena.Node_URI
+					case x: (s.type & org.eclipse.rdf4j.model.Literal) => Some(x)
+					case _ => None
+		}
 
 		val Lang = new LangOps:
 			def apply(lang: String): RDF.Lang[R] = lang

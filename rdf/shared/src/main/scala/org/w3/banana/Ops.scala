@@ -1,16 +1,29 @@
 package org.w3.banana
 
+import scala.reflect.TypeTest
 import scala.util.Try
 
 trait Ops[Rdf <: RDF]:
 	import scala.language.implicitConversions
 	import RDF.*
 
+   // needed to help inferencing
 	// todo: this transformation should really be automatically handled by compiler. Report back.
 	implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
 	implicit def uri2Node(uri: URI[Rdf]): Node[Rdf] = uri.asInstanceOf[Node[Rdf]]
 	implicit def uri2rUri(uri: URI[Rdf]): rURI[Rdf] = uri.asInstanceOf[rURI[Rdf]]
 	implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
+
+	// interpretation types to help consistent pattern matching across implementations
+
+	enum LiteralI(text: String):
+		case Plain(text: String) extends LiteralI(text)
+		case `@`(text: String, lang: Lang[Rdf]) extends LiteralI(text)
+		case ^^(text: String, dataTp: URI[Rdf]) extends LiteralI(text)
+	type TripleI = (Node[Rdf], URI[Rdf], Node[Rdf])
+	type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
+
+	//implementations
 
 	val Graph: GraphOps
 	trait GraphOps:
@@ -28,10 +41,13 @@ trait Ops[Rdf <: RDF]:
 		def triplesIn(graph: rGraph[Rdf]): Iterable[rTriple[Rdf]]
 		def graphSize(graph: rGraph[Rdf]): Int
 
+	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
+
 	val Triple: TripleOps
 	trait TripleOps:
 		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
-		def untuple(t: RDF.Triple[Rdf]): TripleI[Rdf]
+		def unapply(t: RDF.Triple[Rdf]): Option[TripleI] = Some(untuple(t))
+		def untuple(t: RDF.Triple[Rdf]): TripleI
 		def subjectOf(s: Triple[Rdf]): Node[Rdf]
 		def relationOf(s: Triple[Rdf]): URI[Rdf]
 		def objectOf(s: Triple[Rdf]): Node[Rdf]
@@ -39,7 +55,8 @@ trait Ops[Rdf <: RDF]:
 	val rTriple: rTripleOps
 	trait rTripleOps:
 		def apply(s: rNode[Rdf], p: rURI[Rdf], o: rNode[Rdf]): rTriple[Rdf]
-		def untuple(t: RDF.Triple[Rdf]): rTripleI[Rdf]
+		def unapply(t: RDF.Triple[Rdf]): Option[rTripleI] = Some(untuple(t))
+		def untuple(t: RDF.Triple[Rdf]): rTripleI
 		def subjectOf(s: rTriple[Rdf]): rNode[Rdf]
 		def relationOf(s: rTriple[Rdf]): rURI[Rdf]
 		def objectOf(s: rTriple[Rdf]): rNode[Rdf]
@@ -56,10 +73,12 @@ trait Ops[Rdf <: RDF]:
 	val Literal: LiteralOps
 	trait LiteralOps:
 		def apply(plain: String): Literal[Rdf]
-		def apply(lit: LiteralI[Rdf]): Literal[Rdf]
-		def unapply(lit: Literal[Rdf]): Option[LiteralI[Rdf]]
+		def apply(lit: LiteralI): Literal[Rdf]
+		def unapply(lit: Node[Rdf]): Option[LiteralI]
 		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
+
+	given literalTT: TypeTest[Node[Rdf], Literal[Rdf]]
 
 	val rURI: rURIOps
 	trait rURIOps:
@@ -82,6 +101,9 @@ trait Ops[Rdf <: RDF]:
 
 	val Lang: LangOps
 	trait LangOps:
-		def apply(lang: String): Lang[Rdf]
+		def apply(name: String): Lang[Rdf]
+		def unapply(lang: Lang[Rdf]): Option[String] = Some(label(lang))
 		def label(lang: Lang[Rdf]): String
+
+end Ops
 

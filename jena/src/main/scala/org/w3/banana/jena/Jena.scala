@@ -28,28 +28,11 @@ object JenaRdf extends RDF {
 	override opaque type URI <: Node = jena.Node_URI
 	override opaque type BNode <: Node = jena.Node_Blank
 	override opaque type Literal <: Node = jena.Node_Literal
-	override opaque type Lang = String
+	override opaque type Lang <: Matchable = String
 
 	given [T]: Releasable[ExtendedIterator[T]] with {
 		def release(resource: ExtendedIterator[T]): Unit = resource.close()
 	}
-
-	given uriTT: TypeTest[Node,URI] with {
-		override def unapply(s: Node): Option[s.type & jena.Node_URI] =
-			s match
-			//note: this does not compile if we use URI instead of jena.Node_URI
-			case x: (s.type & jena.Node_URI) => Some(x)
-			case _ => None
-	}
-
-	given literalTT: TypeTest[Node,Literal] with {
-		override def unapply(s: Node): Option[s.type & Literal] =
-			s match
-			//note: this does not compile if we use URI instead of jena.Node_URI
-			case x: (s.type & jena.Node_Literal) => Some(x)
-			case _ => None
-	}
-
 
 	/**
 	 * Here we build up the methods functions allowing RDF.Graph[R] notation to be used.
@@ -99,12 +82,11 @@ object JenaRdf extends RDF {
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph)
 
-
 		val rTriple = new rTripleOps:
 			def apply(s: RDF.rNode[R], p: RDF.rURI[R], o: RDF.rNode[R]): RDF.rTriple[R] =
 				Triple(s, p, o)
-			def untuple(t: RDF.Triple[R]): RDF.rTripleI[R] =
-					RDF.rTripleI(subjectOf(t),relationOf(t),objectOf(t))
+			def untuple(t: RDF.Triple[R]): rTripleI =
+				(subjectOf(t),relationOf(t),objectOf(t))
 			def subjectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
 				Triple.subjectOf(t)
 			def relationOf(t: RDF.rTriple[R]): RDF.rURI[R] =
@@ -112,11 +94,19 @@ object JenaRdf extends RDF {
 			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
 				Triple.objectOf(t)
 
+		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
+			override def unapply(s: Matchable): Option[s.type & Triple] =
+				s match
+					//note: this does not compile if we use URI instead of jena.Node_URI
+					case x: (s.type & Triple) => Some(x)
+					case _ => None
+		}
+
 		val Triple = new TripleOps {
 			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
 				jena.Triple.create(s, p, o).nn
-			def untuple(t: RDF.Triple[R]): RDF.TripleI[R] =
-					RDF.TripleI(subjectOf(t), relationOf(t), objectOf(t))
+			def untuple(t: RDF.Triple[R]): TripleI =
+					(subjectOf(t), relationOf(t), objectOf(t))
 			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] =
 				t.getSubject().nn
 			def relationOf(t: RDF.Triple[R]): RDF.URI[R] =
@@ -125,7 +115,7 @@ object JenaRdf extends RDF {
 				t.getObject().nn
 		}
 
-		val Literal = new LiteralOps {
+		object Literal extends LiteralOps:
 			private val xsdString: RDFDatatype = mapper.getTypeByName(xsdStr).nn
 			private val xsdLangString: RDFDatatype = mapper.getTypeByName(xsdLangStr).nn
 			//todo? are we missing a Datatype Type? (check other frameworks)
@@ -139,30 +129,42 @@ object JenaRdf extends RDF {
 					datatype
 				else typ
 
-			import RDF.LiteralI as Lit
+			import LiteralI as Lit
 			lazy val mapper: TypeMapper = TypeMapper.getInstance.nn
 
 			def apply(plain: String): RDF.Literal[R] =
 				NodeFactory.createLiteral(plain).nn.asInstanceOf[Literal]
 
-			def apply(lit: Lit[R]): RDF.Literal[R] = lit match
+			def apply(lit: Lit): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => NodeFactory.createLiteral(text).nn.asInstanceOf[Literal]
 				case Lit.`@`(text,lang) => Literal.langLiteral(text,lang)
 				case Lit.`^^`(text,tp) => Literal.dtLiteral(text,tp)
-			def unapply(lit: RDF.Literal[R]): Option[Lit[R]] =
-				val lex: String = lit.getLiteralLexicalForm.nn
-				val dt: RDFDatatype | Null = lit.getLiteralDatatype
-				val lang: String | Null = lit.getLiteralLanguage
-				if (lang == null || lang.isEmpty) then
-					if dt == null || dt == xsdString then Some(Lit.Plain(lex))
-					else Some(Lit.^^[R](lex, URI(dt.getURI.nn)))
-				else if dt == null || dt == xsdLangString then
-					Some(Lit.`@`(lex, Lang(lang)))
+
+			def unapply(node: RDF.Node[R]): Option[Lit] =
+				if node.isInstanceOf[Literal] then
+					val lit = node.asInstanceOf[Literal]
+					val lex: String = lit.getLiteralLexicalForm.nn
+					val dt: RDFDatatype | Null = lit.getLiteralDatatype
+					val lang: String | Null = lit.getLiteralLanguage
+					if (lang == null || lang.isEmpty) then
+						if dt == null || dt == xsdString then Some(Lit.Plain(lex))
+						else Some(Lit.^^(lex, URI(dt.getURI.nn)))
+					else if dt == null || dt == xsdLangString then
+						Some(Lit.`@`(lex, Lang(lang)))
+					else None
 				else None
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
 				NodeFactory.createLiteral(lex, lang).nn.asInstanceOf[Literal]
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
 				NodeFactory.createLiteral(lex, jenaDatatype(dataTp)).nn.asInstanceOf[Literal]
+		end Literal
+
+		given literalTT: TypeTest[RDF.Node[R],RDF.Literal[R]] with {
+			override def unapply(s: RDF.Node[R]): Option[s.type & jena.Node_Literal] =
+				s match
+					//note: this does not compile if we use URI instead of jena.Node_URI
+					case x: (s.type & jena.Node_Literal) => Some(x)
+					case _ => None
 		}
 
 		val Lang = new LangOps:
@@ -182,5 +184,14 @@ object JenaRdf extends RDF {
 			def asString(uri: RDF.URI[R]): String =
 				uri.getURI().nn
 		}
+
+		given uriTT: TypeTest[Node,URI] with {
+			override def unapply(s: Node): Option[s.type & jena.Node_URI] =
+				s match
+					//note: this does not compile if we use URI instead of jena.Node_URI
+					case x: (s.type & jena.Node_URI) => Some(x)
+					case _ => None
+		}
+
 	}
 }

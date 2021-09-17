@@ -23,12 +23,12 @@ trait RDF:
 	type rURI 					   // relative URLs
 
 	type Graph     			   // graphs with no triples with relative URLs
-	type Triple  <: Matchable	// triples with no relative URLs
+	type Triple <: Matchable	// triples with no relative URLs
 	type Node <: Matchable
 	type URI <: Node
 	type BNode <: Node
 	type Literal <: Node
-	type Lang
+	type Lang <: Matchable
 
 
 //		def ANY: NodeAny
@@ -68,13 +68,13 @@ object RDF {
 	type rTriple[R <: RDF] = R match
 		case GetRelTriple[t] => t
 
-	type Triple[R <: RDF] = R match
+	type Triple[R <: RDF] <: Matchable = R match
 		case GetTriple[t] => t
 
-	type rNode[R <: RDF] = R match
+	type rNode[R <: RDF] <: Matchable = R match
 		case GetRelNode[n] => n
 
-	type Node[R <: RDF] = R match
+	type Node[R <: RDF] <: Matchable = R match
 		case GetNode[n] => n
 
 	type rURI[R <: RDF] = R match
@@ -89,33 +89,22 @@ object RDF {
 	type Graph[R <: RDF] = R match
 		case GetGraph[g] => g
 
-	type Literal[R <: RDF] = R match
+	type Literal[R <: RDF] <: Matchable = R match
 		case GetLiteral[l] => l
 
-	type Lang[R <: RDF] = R match
+	type Lang[R <: RDF] <: Matchable = R match
 		case GetLang[l] => l
 
 	type GetRelURI[U] = RDF { type rURI = U }
 	type GetURI[U] = RDF { type URI = U }
-	type GetRelNode[N] = RDF { type rNode = N }
-	type GetNode[N] = RDF { type Node = N }
-	type GetLiteral[L] = RDF { type Literal = L }
-	type GetLang[L] = RDF { type Lang = L }
+	type GetRelNode[N <: Matchable] = RDF { type rNode = N }
+	type GetNode[N <: Matchable] = RDF { type Node = N }
+	type GetLiteral[L <: Matchable] = RDF { type Literal = L }
+	type GetLang[L <: Matchable] = RDF { type Lang = L }
 	type GetRelTriple[T] = RDF { type rTriple = T }
-	type GetTriple[T] = RDF { type Triple = T }
+	type GetTriple[T <: Matchable] = RDF { type Triple = T }
 	type GetRelGraph[G] = RDF { type rGraph = G }
 	type GetGraph[G] = RDF { type Graph = G }
-
-	// pre-interpreted literal type for pattern matching
-	// it would also be reasonable to have an interpreted types to Int, Long, BigInt, etc...
-	//but that would be one step further in interpretation
-	enum LiteralI[Rdf <: RDF](text: String):
-		case Plain(text: String) extends LiteralI[Rdf](text)
-		case `@`(text: String, lang: Lang[Rdf]) extends LiteralI[Rdf](text)
-		case ^^(text: String, dataTp: URI[Rdf]) extends LiteralI[Rdf](text)
-
-	case class TripleI[Rdf <: RDF](s: Node[Rdf], r: URI[Rdf], o: Node[Rdf])
-	case class rTripleI[Rdf <: RDF](s: rNode[Rdf], r: rURI[Rdf], o: rNode[Rdf])
 
 }
 

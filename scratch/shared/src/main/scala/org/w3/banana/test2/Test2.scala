@@ -1,5 +1,5 @@
 import banana.Ops
-import banana.RDF.Triple
+import banana.RDF.{Literal, Triple, URI}
 //two imaginary RDF frameworks very differently implemented
 //a J-framework and an O-framework
 package J:
@@ -116,9 +116,9 @@ def main(args: Array[String]): Unit = {
 
 def simpleTest[Rdf<:RDF](using ops: Ops[Rdf]) =
 	import ops.*
-	val bbl = ops.mkURI("https://bblfish.net/#i")
-	val name = ops.mkURI("https://xmlns.com/foaf/0.1/name")
-	val henry = ops.mkLiteral("Henry")
+	val bbl: URI[Rdf] = ops.mkURI("https://bblfish.net/#i")
+	val name: URI[Rdf] = ops.mkURI("https://xmlns.com/foaf/0.1/name")
+	val henry: Literal[Rdf] = ops.mkLiteral("Henry")
 	ops.mkTriple(bbl,name,henry)
 
 def write[Rdf<:RDF](t: RDF.Triple[Rdf])(using ops: Ops[Rdf]): String =
