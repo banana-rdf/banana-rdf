@@ -2,6 +2,8 @@ import Dependencies.{jenaLibs, munit}
 import sbt.Keys.description
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
+scalaVersion := "3.1.0-RC2"
+
 lazy val commonSettings = Seq(
 	  name := "banana-play",
 	  version := "0.1.0",
@@ -29,7 +31,7 @@ lazy val commonSettings = Seq(
 		  // "-rewrite",                          // Attempt to fix code automatically. Use with -indent and ...-migration.
 		  // "-scalajs",                          // Compile in Scala.js mode (requires scalajs-library.jar on the classpath).
 		  "-source:future",                       // Choices: future and future-migration. I use this to force future deprecation warnings, etc.
-		  "-Xfatal-warnings",                  // Fail on warnings, not just errors
+		 // "-Xfatal-warnings",                  // Fail on warnings, not just errors
 		  // "-Xmigration",                       // Warn about constructs whose behavior may have changed since version.
 		  // "-Ysafe-init",                       // Warn on field access before initialization
 		  "-Yexplicit-nulls"                  // For explicit nulls behavior.

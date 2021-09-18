@@ -63,7 +63,7 @@ end RDF
  * The idea of using match types by @neko-kai
  * https://github.com/lampepfl/dotty/issues/13416
  */
-object RDF {
+object RDF:
 
 	type rTriple[R <: RDF] = R match
 		case GetRelTriple[t] => t
@@ -105,7 +105,6 @@ object RDF {
 	type GetTriple[T <: Matchable] = RDF { type Triple = T }
 	type GetRelGraph[G] = RDF { type rGraph = G }
 	type GetGraph[G] = RDF { type Graph = G }
-
-}
+end RDF
 
 

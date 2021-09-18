@@ -5,20 +5,20 @@ import RDF.*
 import scala.util.*
 import org.w3.banana.syntax.*
 
-trait Prefix[Rdf <: RDF](using Ops[Rdf]) {
+trait Prefix[Rdf <: RDF](using Ops[Rdf]):
   def prefixName: String
   def prefixIri: String
   def apply(value: String): URI[Rdf]
   def unapply(iri: URI[Rdf]): Option[String]
-}
+end Prefix
 
-object Prefix {
+object Prefix:
   def apply[Rdf <: RDF](
     prefixName: String,
     prefixIri: String
   )(using Ops[Rdf]): Prefix[Rdf] =
     new PrefixBuilder[Rdf](prefixName, prefixIri)
-}
+end Prefix
 
 open class PrefixBuilder[Rdf <: RDF](
   val prefixName: String,

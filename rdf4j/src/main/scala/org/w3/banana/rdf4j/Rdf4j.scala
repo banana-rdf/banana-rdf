@@ -91,13 +91,13 @@ object Rdf4j extends RDF {
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph)
 
-		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
-			override def unapply(s: Matchable): Option[s.type & Triple] =
-				s match
-					//note: this does not compile if we use URI instead of jena.Node_URI
-					case x: (s.type & Triple) => Some(x)
-					case _ => None
-		}
+//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
+//			override def unapply(s: Matchable): Option[s.type & Triple] =
+//				s match
+//					//note: this does not compile if we use URI instead of jena.Node_URI
+//					case x: (s.type & Triple) => Some(x)
+//					case _ => None
+//		}
 
 		object Triple extends TripleOps:
 			//todo: we should have two types of triples: strict and non-strict (for reasoning)
@@ -134,9 +134,9 @@ object Rdf4j extends RDF {
 				case Lit.Plain(text) => apply(text)
 				case Lit.`@`(text,lang) => Literal.langLiteral(text,Lang.label(lang))
 				case Lit.`^^`(text,tp) => Literal.dtLiteral(text,tp)
-			def unapply(node: RDF.Node[R]): Option[Lit] =
-				if node.isInstanceOf[Literal] then
-					val lit = node.asInstanceOf[Literal]
+			def unapply(x: Matchable): Option[Lit] =
+				x match
+				case lit: Literal =>
 					val lex: String = lit.getLabel.nn
 					val dt: RDF.URI[R] = lit.getDatatype.nn
 					val lang: java.util.Optional[String] = lit.getLanguage.nn
@@ -147,15 +147,18 @@ object Rdf4j extends RDF {
 					else if dt == xsdLangString then
 						Some(Lit.`@`(lex, Lang(lang.get().nn)))
 					else None
-				else None
+				case _ => None
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, lang).nn
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, dataTp).nn
+
+			extension (lit: RDF.Literal[R])
+				def text: String = lit.getLabel.nn
 		end Literal
 
-		given literalTT: TypeTest[RDF.Node[R], RDF.Literal[R]] with {
-			override def unapply(s: Node): Option[s.type & Literal] =
+		override given literalTT: TypeTest[Matchable, RDF.Literal[R]] with {
+			override def unapply(s: Matchable): Option[s.type & RDF.Literal[R]] =
 				s match
 					//note: this does not compile if we use URI instead of jena.Node_URI
 					case x: (s.type & org.eclipse.rdf4j.model.Literal) => Some(x)

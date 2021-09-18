@@ -94,13 +94,13 @@ object JenaRdf extends RDF {
 			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
 				Triple.objectOf(t)
 
-		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
-			override def unapply(s: Matchable): Option[s.type & Triple] =
-				s match
-					//note: this does not compile if we use URI instead of jena.Node_URI
-					case x: (s.type & Triple) => Some(x)
-					case _ => None
-		}
+//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
+//			override def unapply(s: Matchable): Option[s.type & Triple] =
+//				s match
+//					//note: this does not compile if we use URI instead of jena.Node_URI
+//					case x: (s.type & Triple) => Some(x)
+//					case _ => None
+//		}
 
 		val Triple = new TripleOps {
 			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
@@ -140,9 +140,9 @@ object JenaRdf extends RDF {
 				case Lit.`@`(text,lang) => Literal.langLiteral(text,lang)
 				case Lit.`^^`(text,tp) => Literal.dtLiteral(text,tp)
 
-			def unapply(node: RDF.Node[R]): Option[Lit] =
-				if node.isInstanceOf[Literal] then
-					val lit = node.asInstanceOf[Literal]
+			def unapply(x: Matchable): Option[Lit] =
+				x match
+				case lit: Literal =>
 					val lex: String = lit.getLiteralLexicalForm.nn
 					val dt: RDFDatatype | Null = lit.getLiteralDatatype
 					val lang: String | Null = lit.getLiteralLanguage
@@ -152,15 +152,18 @@ object JenaRdf extends RDF {
 					else if dt == null || dt == xsdLangString then
 						Some(Lit.`@`(lex, Lang(lang)))
 					else None
-				else None
+				case _ => None
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
 				NodeFactory.createLiteral(lex, lang).nn.asInstanceOf[Literal]
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
 				NodeFactory.createLiteral(lex, jenaDatatype(dataTp)).nn.asInstanceOf[Literal]
+
+			extension (lit: RDF.Literal[R])
+				def text: String = lit.getLiteralLexicalForm.nn
 		end Literal
 
-		given literalTT: TypeTest[RDF.Node[R],RDF.Literal[R]] with {
-			override def unapply(s: RDF.Node[R]): Option[s.type & jena.Node_Literal] =
+		given literalTT: TypeTest[Matchable,RDF.Literal[R]] with {
+			override def unapply(s: Matchable): Option[s.type & jena.Node_Literal] =
 				s match
 					//note: this does not compile if we use URI instead of jena.Node_URI
 					case x: (s.type & jena.Node_Literal) => Some(x)

@@ -3,7 +3,7 @@ package  org.w3.banana
 import org.w3.banana.RDF
 import RDF.*
 
-open class PGTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite {
+open class PGTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	import ops.*
 	import TestConstants.*
 
@@ -15,4 +15,4 @@ open class PGTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite {
 		assertEquals[RDF.Node[Rdf],RDF.Node[Rdf]](timEmpty.pointer,timbl)
 		assertEquals(timEmpty.graph,Graph.empty)
 	}
-}
+end PGTest

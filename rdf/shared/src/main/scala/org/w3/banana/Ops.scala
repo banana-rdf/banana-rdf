@@ -6,6 +6,7 @@ import scala.util.Try
 trait Ops[Rdf <: RDF]:
 	import scala.language.implicitConversions
 	import RDF.*
+	export LiteralI.*
 
    // needed to help inferencing
 	// todo: this transformation should really be automatically handled by compiler. Report back.
@@ -16,10 +17,10 @@ trait Ops[Rdf <: RDF]:
 
 	// interpretation types to help consistent pattern matching across implementations
 
-	enum LiteralI(text: String):
-		case Plain(text: String) extends LiteralI(text)
-		case `@`(text: String, lang: Lang[Rdf]) extends LiteralI(text)
-		case ^^(text: String, dataTp: URI[Rdf]) extends LiteralI(text)
+	enum LiteralI(val text: String):
+		case Plain(override val text: String) extends LiteralI(text)
+		case `@`(override val text: String, lang: Lang[Rdf]) extends LiteralI(text)
+		case ^^(override val text: String, dataTp: URI[Rdf]) extends LiteralI(text)
 	type TripleI = (Node[Rdf], URI[Rdf], Node[Rdf])
 	type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
 
@@ -41,13 +42,13 @@ trait Ops[Rdf <: RDF]:
 		def triplesIn(graph: rGraph[Rdf]): Iterable[rTriple[Rdf]]
 		def graphSize(graph: rGraph[Rdf]): Int
 
-	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
+//	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
 
 	val Triple: TripleOps
 	trait TripleOps:
 		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
-		def unapply(t: RDF.Triple[Rdf]): Option[TripleI] = Some(untuple(t))
-		def untuple(t: RDF.Triple[Rdf]): TripleI
+		def unapply(t: Triple[Rdf]): Option[TripleI] = Some(untuple(t))
+		def untuple(t: Triple[Rdf]): TripleI
 		def subjectOf(s: Triple[Rdf]): Node[Rdf]
 		def relationOf(s: Triple[Rdf]): URI[Rdf]
 		def objectOf(s: Triple[Rdf]): Node[Rdf]
@@ -74,11 +75,13 @@ trait Ops[Rdf <: RDF]:
 	trait LiteralOps:
 		def apply(plain: String): Literal[Rdf]
 		def apply(lit: LiteralI): Literal[Rdf]
-		def unapply(lit: Node[Rdf]): Option[LiteralI]
+		def unapply(lit: Matchable): Option[LiteralI]
 		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
+		extension (lit: Literal[Rdf])
+			def text: String
 
-	given literalTT: TypeTest[Node[Rdf], Literal[Rdf]]
+	given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
 
 	val rURI: rURIOps
 	trait rURIOps:
