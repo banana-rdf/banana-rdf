@@ -13,6 +13,7 @@ trait Ops[Rdf <: RDF]:
 	// todo: this transformation should really be automatically handled by compiler. Report back.
 	implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
 	implicit def uri2Node(uri: URI[Rdf]): Node[Rdf] = uri.asInstanceOf[Node[Rdf]]
+	implicit def bnode2Node(bn: BNode[Rdf]): Node[Rdf] = bn.asInstanceOf[Node[Rdf]]
 	implicit def uri2rUri(uri: URI[Rdf]): rURI[Rdf] = uri.asInstanceOf[rURI[Rdf]]
 	implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
 
@@ -155,7 +156,7 @@ trait Ops[Rdf <: RDF]:
 		def mkUri(iriStr: String): Try[URI[Rdf]]
 		def asString(uri: URI[Rdf]): String
 		extension (uri: URI[Rdf])
-			def toString: String = asString(uri)
+			def string: String = asString(uri)
 
 
 	given Lang: LangOps

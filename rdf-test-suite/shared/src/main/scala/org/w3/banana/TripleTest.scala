@@ -73,7 +73,7 @@ open class TripleTest[R<:RDF](using ops: Ops[R])
 				assertEquals(y, "999")
 				assertEquals(t, xsd.integer)
 			case _ => fail(s"can not match $age as a datatype ")
-		val dtEx = List(timLit,hname,age," 2001-10-26T21:32:52+02:00"^^xsd.dateTime)
+		val dtEx = List(timLit,hname,age,"2001-10-26T21:32:52+02:00"^^xsd.dateTime)
 		val trans = dtEx.map{
 			case Literal(li) =>
 				li match
@@ -92,7 +92,26 @@ open class TripleTest[R<:RDF](using ops: Ops[R])
 	}
 
 	test("Node Tests") {
-
+		val nodes: Seq[Node[R]] = List(
+			BNode("b1"),
+			bblf,timbl,foaf.knows,
+			"2001-10-26T21:32:52+02:00"^^xsd.dateTime,
+			Literal("hello"),
+			"Tim"`@`Lang("en")
+		)
+		val nodeStrings = nodes.map(_.fold(
+			bn => bn.label,
+			uri => uri.string,
+			lit => lit.fold(
+				identity,
+				(t,l) =>  t+":"+l,
+				(t,dt) => if dt == xsd.integer then "#"+t else t
+			)
+		))
+		assertEquals(nodeStrings, List(
+			"b1",
+			bbl("i"),tim("i"),foaf.knows.string,
+			"2001-10-26T21:32:52+02:00","hello","Tim:en"))
 	}
 
 	test("triple tests") {
