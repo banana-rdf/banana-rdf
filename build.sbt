@@ -20,7 +20,7 @@ lazy val commonSettings = Seq(
 		  "-deprecation",                      // Emit warning and location for usages of deprecated APIs.
 		  "-unchecked",                        // Enable additional warnings where generated code depends on assumptions.
 		  "-feature",                          // Emit warning and location for usages of features that should be imported explicitly.
-		  "-explain",                          // Explain errors in more detail.
+		  //"-explain",                          // Explain errors in more detail.
 		  //"-explain-types",                    // Explain type errors in more detail.
 		  "-indent",                           // Together with -rewrite, remove {...} syntax when possible due to significant indentation.
 		  // "-no-indent",                        // Require classical {...} syntax, indentation is not significant.

@@ -1,5 +1,6 @@
 package org.w3.banana.rdf4j
 
+import org.apache.jena.graph.Node_Blank
 import org.eclipse.rdf4j.model.{BNode as rjBNode, IRI as rjIRI, Literal as rjLiteral, *}
 import org.eclipse.rdf4j.model.impl.*
 import org.eclipse.rdf4j.model.util.Models
@@ -99,7 +100,7 @@ object Rdf4j extends RDF {
 //					case _ => None
 //		}
 
-		object Triple extends TripleOps:
+		given Triple: TripleOps with
 			//todo: we should have two types of triples: strict and non-strict (for reasoning)
 			//todo: The method that takes a node as subject should not throw an exception, but should
 			//   potentially return 1 or two strict triples.
@@ -123,39 +124,70 @@ object Rdf4j extends RDF {
 			def subjectOf(t: RDF.rTriple[R]): RDF.rNode[R] = Triple.subjectOf(t)
 			def relationOf(t: RDF.rTriple[R]): RDF.rURI[R] = Triple.relationOf(t)
 			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] = Triple.objectOf(t)
+		end rTriple
 
-		object Literal extends LiteralOps:
+		given Node: NodeOps with
+			extension (node: RDF.Node[R])
+				def fold[A](
+					bnF: RDF.BNode[R] => A,
+					uriF: RDF.URI[R] => A,
+					litF: RDF.Literal[R] => A
+				): A =
+					if node.isBNode() then
+						bnF(node.asInstanceOf[rjBNode])
+					else if node.isIRI() then
+						uriF(node.asInstanceOf[rjIRI])
+					else if node.isLiteral() then
+						litF(node.asInstanceOf[rjLiteral])
+					else throw new IllegalArgumentException(
+						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
+					)
+
+		given BNode: BNodeOps with
+			def apply(s: String): RDF.BNode[R] = valueFactory.createBNode(s).nn
+			def apply(): RDF.BNode[R] =  valueFactory.createBNode().nn
+			extension (bn: RDF.BNode[R])
+				def label: String = bn.getID().nn
+		end BNode
+
+		given Literal: LiteralOps with {
 			private val xsdString = valueFactory.createIRI(xsdStr).nn
 			private val xsdLangString = valueFactory.createIRI(xsdLangStr).nn
+
 			import LiteralI as Lit
+
 			def apply(plain: String): RDF.Literal[R] =
 				valueFactory.createLiteral(plain).nn
+
 			def apply(lit: Lit): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => apply(text)
-				case Lit.`@`(text,lang) => Literal.langLiteral(text,Lang.label(lang))
-				case Lit.`^^`(text,tp) => Literal.dtLiteral(text,tp)
+				case Lit.`@`(text, lang) => Literal.langLiteral(text, Lang.label(lang))
+				case Lit.`^^`(text, tp) => Literal.dtLiteral(text, tp)
+
 			def unapply(x: Matchable): Option[Lit] =
 				x match
-				case lit: Literal =>
-					val lex: String = lit.getLabel.nn
-					val dt: RDF.URI[R] = lit.getDatatype.nn
-					val lang: java.util.Optional[String] = lit.getLanguage.nn
-					if (lang.isEmpty) then
-					//todo: this comparison could be costly, check
-						if dt == xsdString then Some(Lit.Plain(lex))
-						else Some(Lit.^^(lex, dt))
-					else if dt == xsdLangString then
-						Some(Lit.`@`(lex, Lang(lang.get().nn)))
-					else None
-				case _ => None
+					case lit: Literal =>
+						val lex: String = lit.getLabel.nn
+						val dt: RDF.URI[R] = lit.getDatatype.nn
+						val lang: java.util.Optional[String] = lit.getLanguage.nn
+						if (lang.isEmpty) then
+						//todo: this comparison could be costly, check
+							if dt == xsdString then Some(Lit.Plain(lex))
+							else Some(Lit.^^(lex, dt))
+						else if dt == xsdLangString then
+							Some(Lit.`@`(lex, Lang(lang.get().nn)))
+						else None
+					case _ => None
+
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, lang).nn
+
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, dataTp).nn
 
 			extension (lit: RDF.Literal[R])
 				def text: String = lit.getLabel.nn
-		end Literal
+		}
 
 		override given literalTT: TypeTest[Matchable, RDF.Literal[R]] with {
 			override def unapply(s: Matchable): Option[s.type & RDF.Literal[R]] =
@@ -165,9 +197,11 @@ object Rdf4j extends RDF {
 					case _ => None
 		}
 
-		val Lang = new LangOps:
+		given Lang: LangOps with {
 			def apply(lang: String): RDF.Lang[R] = lang
-			def label(lang: RDF.Lang[R]): String = lang
+			extension (lang: RDF.Lang[R])
+				def label: String =  lang
+		}
 
 		val rURI = new rURIOps:
 			def apply(iriStr: String): RDF.rURI[R] =
@@ -182,13 +216,12 @@ object Rdf4j extends RDF {
 				}
 			def asString(uri: RDF.rURI[R]): String = uri.toString
 
-		val URI = new URIOps:
+		given URI: URIOps with
 			//this does throw an exception on non relative URLs!
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
 				Try(valueFactory.createIRI(iriStr).nn)
-
-			def asString(uri: RDF.URI[R]): String =
-				uri.toString
+			def asString(uri: RDF.URI[R]): String = uri.toString
+		end URI
 
 	}
 

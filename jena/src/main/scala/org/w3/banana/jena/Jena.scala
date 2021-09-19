@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-import org.apache.jena.graph.GraphUtil
+import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_URI, Node_Literal}
 import org.apache.jena.graph.Node.ANY as JenaANY
 import org.w3.banana.{Ops, RDF}
 
@@ -94,7 +94,8 @@ object JenaRdf extends RDF {
 			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
 				Triple.objectOf(t)
 
-//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
+
+		//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
 //			override def unapply(s: Matchable): Option[s.type & Triple] =
 //				s match
 //					//note: this does not compile if we use URI instead of jena.Node_URI
@@ -102,7 +103,7 @@ object JenaRdf extends RDF {
 //					case _ => None
 //		}
 
-		val Triple = new TripleOps {
+		given Triple: TripleOps with {
 			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
 				jena.Triple.create(s, p, o).nn
 			def untuple(t: RDF.Triple[R]): TripleI =
@@ -115,7 +116,38 @@ object JenaRdf extends RDF {
 				t.getObject().nn
 		}
 
-		object Literal extends LiteralOps:
+		given Node: NodeOps with
+			extension (node: RDF.Node[R])
+				def fold[A](
+					bnF:  RDF.BNode[R] => A,
+					uriF: RDF.URI[R] => A,
+					litF: RDF.Literal[R] => A
+				): A =
+					//considered Jena Visitor, but for some reason it deconstructs the types,
+					//annulling potential speed advantage
+					if node.isBlank then
+						bnF(node.asInstanceOf[Node_Blank])
+					else if node.isURI then
+						uriF(node.asInstanceOf[Node_URI])
+					else if node.isLiteral then
+						litF(node.asInstanceOf[Node_Literal])
+					else throw new IllegalArgumentException(
+						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
+					)
+		end Node
+
+		given BNode: BNodeOps with
+			def apply(label: String): RDF.BNode[R] =
+				val id = BlankNodeId.create(label).nn
+				NodeFactory.createBlankNode(id).asInstanceOf[Node_Blank]
+			def apply(): RDF.BNode[R] =
+				NodeFactory.createBlankNode().asInstanceOf[Node_Blank]
+			extension (bn: RDF.BNode[R])
+				def label: String = bn.getBlankNodeLabel().nn
+		end BNode
+
+
+		given Literal: LiteralOps with {
 			private val xsdString: RDFDatatype = mapper.getTypeByName(xsdStr).nn
 			private val xsdLangString: RDFDatatype = mapper.getTypeByName(xsdLangStr).nn
 			//todo? are we missing a Datatype Type? (check other frameworks)
@@ -130,6 +162,7 @@ object JenaRdf extends RDF {
 				else typ
 
 			import LiteralI as Lit
+
 			lazy val mapper: TypeMapper = TypeMapper.getInstance.nn
 
 			def apply(plain: String): RDF.Literal[R] =
@@ -137,30 +170,32 @@ object JenaRdf extends RDF {
 
 			def apply(lit: Lit): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => NodeFactory.createLiteral(text).nn.asInstanceOf[Literal]
-				case Lit.`@`(text,lang) => Literal.langLiteral(text,lang)
-				case Lit.`^^`(text,tp) => Literal.dtLiteral(text,tp)
+				case Lit.`@`(text, lang) => Literal.langLiteral(text, lang)
+				case Lit.`^^`(text, tp) => Literal.dtLiteral(text, tp)
 
 			def unapply(x: Matchable): Option[Lit] =
 				x match
-				case lit: Literal =>
-					val lex: String = lit.getLiteralLexicalForm.nn
-					val dt: RDFDatatype | Null = lit.getLiteralDatatype
-					val lang: String | Null = lit.getLiteralLanguage
-					if (lang == null || lang.isEmpty) then
-						if dt == null || dt == xsdString then Some(Lit.Plain(lex))
-						else Some(Lit.^^(lex, URI(dt.getURI.nn)))
-					else if dt == null || dt == xsdLangString then
-						Some(Lit.`@`(lex, Lang(lang)))
-					else None
-				case _ => None
+					case lit: Literal =>
+						val lex: String = lit.getLiteralLexicalForm.nn
+						val dt: RDFDatatype | Null = lit.getLiteralDatatype
+						val lang: String | Null = lit.getLiteralLanguage
+						if (lang == null || lang.isEmpty) then
+							if dt == null || dt == xsdString then Some(Lit.Plain(lex))
+							else Some(Lit.^^(lex, URI(dt.getURI.nn)))
+						else if dt == null || dt == xsdLangString then
+							Some(Lit.`@`(lex, Lang(lang)))
+						else None
+					case _ => None
+
 			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
 				NodeFactory.createLiteral(lex, lang).nn.asInstanceOf[Literal]
+
 			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
 				NodeFactory.createLiteral(lex, jenaDatatype(dataTp)).nn.asInstanceOf[Literal]
 
 			extension (lit: RDF.Literal[R])
 				def text: String = lit.getLiteralLexicalForm.nn
-		end Literal
+		}
 
 		given literalTT: TypeTest[Matchable,RDF.Literal[R]] with {
 			override def unapply(s: Matchable): Option[s.type & jena.Node_Literal] =
@@ -170,9 +205,11 @@ object JenaRdf extends RDF {
 					case _ => None
 		}
 
-		val Lang = new LangOps:
+		given Lang:  LangOps with
 			def apply(lang: String): RDF.Lang[R] = lang
-			def label(lang: RDF.Lang[R]): String = lang
+			extension (lang: RDF.Lang[R])
+				def label: String =  lang
+		end Lang
 
 		val rURI = new rURIOps:
 			def apply(uriStr: String): RDF.rURI[R] =
@@ -180,13 +217,13 @@ object JenaRdf extends RDF {
 			def asString(uri: RDF.rURI[R]): String =
 				uri.getURI().nn
 
-		val URI = new URIOps {
+		given URI: URIOps with
 			//todo: this never fails to parse. Need to find a way to align behaviors
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
 				Try(NodeFactory.createURI(iriStr).asInstanceOf[URI])
 			def asString(uri: RDF.URI[R]): String =
 				uri.getURI().nn
-		}
+		end URI
 
 		given uriTT: TypeTest[Node,URI] with {
 			override def unapply(s: Node): Option[s.type & jena.Node_URI] =

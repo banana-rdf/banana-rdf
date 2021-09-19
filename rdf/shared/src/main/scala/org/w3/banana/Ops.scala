@@ -1,5 +1,6 @@
 package org.w3.banana
 
+import scala.annotation.targetName
 import scala.reflect.TypeTest
 import scala.util.Try
 
@@ -26,6 +27,7 @@ trait Ops[Rdf <: RDF]:
 
 	//implementations
 
+
 	val Graph: GraphOps
 	trait GraphOps:
 		def empty: Graph[Rdf]
@@ -44,7 +46,7 @@ trait Ops[Rdf <: RDF]:
 
 //	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
 
-	val Triple: TripleOps
+	given Triple: TripleOps
 	trait TripleOps:
 		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
 		def unapply(t: Triple[Rdf]): Option[TripleI] = Some(untuple(t))
@@ -52,6 +54,10 @@ trait Ops[Rdf <: RDF]:
 		def subjectOf(s: Triple[Rdf]): Node[Rdf]
 		def relationOf(s: Triple[Rdf]): URI[Rdf]
 		def objectOf(s: Triple[Rdf]): Node[Rdf]
+		extension (triple: Triple[Rdf])
+			def subj: Node[Rdf] = subjectOf(triple)
+			def rel: URI[Rdf]   = relationOf(triple)
+			def obj: Node[Rdf]  = objectOf(triple)
 
 	val rTriple: rTripleOps
 	trait rTripleOps:
@@ -61,6 +67,12 @@ trait Ops[Rdf <: RDF]:
 		def subjectOf(s: rTriple[Rdf]): rNode[Rdf]
 		def relationOf(s: rTriple[Rdf]): rURI[Rdf]
 		def objectOf(s: rTriple[Rdf]): rNode[Rdf]
+		//todo? should we only have the extension functions?
+		extension (rtriple: rTriple[Rdf])
+			def rsubj: rNode[Rdf] = subjectOf(rtriple)
+			def rrel: rURI[Rdf]   = relationOf(rtriple)
+			def robj: rNode[Rdf]  = objectOf(rtriple)
+	end rTripleOps
 
 	object LangLit {
 		inline def apply(lex: String, lang: Lang[Rdf]): Literal[Rdf] =
@@ -71,15 +83,56 @@ trait Ops[Rdf <: RDF]:
 			Literal.dtLiteral(lex, dataTp)
 	}
 
-	val Literal: LiteralOps
+	given Node: NodeOps
+	trait NodeOps:
+		extension (node: Node[Rdf])
+			def fold[A](
+				bnF:  BNode[Rdf] => A,
+				uriF: URI[Rdf] => A,
+				litF: Literal[Rdf] => A
+			): A
+	end NodeOps
+
+	//todo? should a BNode be part of a Graph (or DataSet) as per Benjamin Braatz's thesis?
+	given BNode: BNodeOps
+	trait BNodeOps:
+		def apply(s: String): BNode[Rdf]
+		def apply(): BNode[Rdf]
+		extension (bn: BNode[Rdf])
+			def label: String
+	end BNodeOps
+
+	given Literal: LiteralOps
 	trait LiteralOps:
 		def apply(plain: String): Literal[Rdf]
 		def apply(lit: LiteralI): Literal[Rdf]
 		def unapply(lit: Matchable): Option[LiteralI]
 		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
+
 		extension (lit: Literal[Rdf])
 			def text: String
+			// this can be implemented more efficiently in individual subclasses by
+			//avoiding going through the intermdiate LiteralI type. Indeed the
+			//unapply should be implemented in terms of this function
+			def fold[A](
+				plainF: String => A,
+				langF: (String, Lang[Rdf]) => A,
+				dtTypeF: (String, URI[Rdf]) => A
+			): A =
+				unapply(lit).get match
+				case Plain(t) => plainF(t)
+				case t `@` lang => langF(t,lang)
+				case t ^^ dt => dtTypeF(t,dt)
+
+		extension (str: String)
+			@targetName("dt")
+			infix def ^^(dtType: URI[Rdf]): Literal[Rdf] =
+				dtLiteral(str, dtType)
+			@targetName("lang")
+			infix def `@`(lang: Lang[Rdf]): Literal[Rdf] =
+				langLiteral(str, lang)
+	end LiteralOps
 
 	given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
 
@@ -91,7 +144,7 @@ trait Ops[Rdf <: RDF]:
 	val xsdStr: String = "http://www.w3.org/2001/XMLSchema#string"
 	val xsdLangStr: String = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
 
-	val URI: URIOps
+	given URI: URIOps
 	trait URIOps:
 		/** (can) throw an exception (depending on implementation of URI)
 		 * different implementations decide to parse at different points, and do
@@ -101,12 +154,17 @@ trait Ops[Rdf <: RDF]:
 		def apply(uriStr: String): URI[Rdf] = mkUri(uriStr).get
 		def mkUri(iriStr: String): Try[URI[Rdf]]
 		def asString(uri: URI[Rdf]): String
+		extension (uri: URI[Rdf])
+			def toString: String = asString(uri)
 
-	val Lang: LangOps
+
+	given Lang: LangOps
 	trait LangOps:
 		def apply(name: String): Lang[Rdf]
-		def unapply(lang: Lang[Rdf]): Option[String] = Some(label(lang))
-		def label(lang: Lang[Rdf]): String
+		def unapply(lang: Lang[Rdf]): Option[String] = Some(lang.label)
+		extension (lang: RDF.Lang[Rdf])
+			def label: String
+
 
 end Ops
 

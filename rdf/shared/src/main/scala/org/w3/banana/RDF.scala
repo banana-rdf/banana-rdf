@@ -77,6 +77,9 @@ object RDF:
 	type Node[R <: RDF] <: Matchable = R match
 		case GetNode[n] => n
 
+	type BNode[R <: RDF] = R match
+		case GetBNode[bn] => bn
+
 	type rURI[R <: RDF] = R match
 		case GetRelURI[ru] => ru
 
@@ -99,6 +102,7 @@ object RDF:
 	type GetURI[U] = RDF { type URI = U }
 	type GetRelNode[N <: Matchable] = RDF { type rNode = N }
 	type GetNode[N <: Matchable] = RDF { type Node = N }
+	type GetBNode[N <: Matchable] = RDF { type BNode = N }
 	type GetLiteral[L <: Matchable] = RDF { type Literal = L }
 	type GetLang[L <: Matchable] = RDF { type Lang = L }
 	type GetRelTriple[T] = RDF { type rTriple = T }

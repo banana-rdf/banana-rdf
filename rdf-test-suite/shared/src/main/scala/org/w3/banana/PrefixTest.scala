@@ -3,7 +3,7 @@ package org.w3.banana
 import org.w3.banana.prefix.{FOAF, RDFPrefix, XSD}
 
 open class PrefixTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
-	import ops.*
+	import ops.{given,*}
 	import TestConstants.*
 	val foaf = FOAF[Rdf]
 	val xsd = XSD[Rdf]

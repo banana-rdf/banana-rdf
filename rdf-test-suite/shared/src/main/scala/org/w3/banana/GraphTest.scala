@@ -9,8 +9,6 @@ open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	import ops.{given,*}
 	import org.w3.banana.prefix.{FOAF,XSD}
 	import org.w3.banana.syntax.*
-	import org.w3.banana.syntax.LiteralW.*
-	import org.w3.banana.syntax.LangW.*
 
 	val timbl: URI[Rdf] = URI(tim("i"))
 	val bblf: URI[Rdf] = URI(bbl("i"))
