@@ -28,9 +28,9 @@ trait PlantainURIOps extends URIOps[Plantain] {
   /** TODO: avoid going through Java
    * for implementation algorithm, see [[https://github.com/stain/cxf/blob/trunk/rt/frontend/jaxrs/src/main/java/org/apache/cxf/jaxrs/utils/HttpUtils.java  HttpUtils.java]]
    */
-  def relativize(uri: Plantain#URI, other: Plantain#URI): Plantain#URI = {
+  def relativize(base: Plantain#URI, other: Plantain#URI): Plantain#URI = {
     import java.net.{URI => jURI}
-    val juri = new jURI(uri.toString).relativize(new jURI(other.toString))
+    val juri = new jURI(base.toString).relativize(new jURI(other.toString))
     Uri(juri.toString)
   }
 

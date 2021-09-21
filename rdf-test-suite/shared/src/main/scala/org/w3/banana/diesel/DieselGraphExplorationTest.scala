@@ -12,23 +12,29 @@ class DieselGraphExplorationTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends 
   import ops._
 
   val foaf = FOAFPrefix[Rdf]
+  val alex = URI("http://bertails.org/#betehess")
+  val henry = URI("http://bblfish.net/#hjs")
 
   val betehess: PointedGraph[Rdf] = (
-    URI("http://bertails.org/#betehess").a(foaf.Person)
+    alex.a(foaf.Person)
     -- foaf.name ->- "Alexandre".lang("fr")
     -- foaf.name ->- "Alexander".lang("en")
     -- foaf.age ->- 29
     -- foaf("foo") ->- List(1, 2, 3)
     -- foaf.knows ->- (
-      URI("http://bblfish.net/#hjs").a(foaf.Person)
+      henry.a(foaf.Person)
       -- foaf.name ->- "Henry Story"
       -- foaf.currentProject ->- URI("http://webid.info/")
+      -- foaf.knows ->- (BNode("t").a(foaf.Person) -- foaf.name ->- "Tim")
     )
   )
 
   "'/' method must traverse the graph" in {
     val names = betehess / foaf.name
-    names.map(_.pointer).toSet shouldEqual Set(Literal.tagged("Alexandre", Lang("fr")), Literal.tagged("Alexander", Lang("en")))
+    names.map(_.pointer).toSet shouldEqual Set(
+      Literal.tagged("Alexandre", Lang("fr")),
+      Literal.tagged("Alexander", Lang("en"))
+    )
   }
 
   "'/' method must work with uris and bnodes" in {
@@ -37,6 +43,21 @@ class DieselGraphExplorationTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends 
 
     name.head.pointer shouldEqual Literal("Henry Story")
 
+  }
+
+  "'/-' backward search method" in {
+    val ppl: PointedGraphs[Rdf] = PointedGraph(foaf.Person,betehess.graph)/-rdf.`type`
+    ppl.nodes.toSet shouldEqual Set[Rdf#Node](alex,henry,BNode("t"))
+    val names: Set[Rdf#Node] = (ppl/foaf.name).nodes.toSet
+    names shouldEqual  Set[Rdf#Node](
+      Literal.tagged("Alexandre", Lang("fr")),
+      Literal.tagged("Alexander", Lang("en")),
+      Literal("Henry Story"),
+      Literal("Tim")
+    )
+    //also search backward on PointedGraphs
+    (ppl/-rdf.`type`).nodes.toSet shouldEqual(Set())
+    (ppl/-foaf.knows).nodes.toSet shouldEqual Set(henry,alex)
   }
 
   "we must be able to project nodes to Scala types" in {
@@ -108,7 +129,7 @@ class DieselGraphExplorationTest[Rdf <: RDF](implicit ops: RDFOps[Rdf]) extends 
 
     val persons = betehess.graph.getAllInstancesOf(foaf.Person).nodes
 
-    persons.toSet shouldEqual Set(URI("http://bertails.org/#betehess"), URI("http://bblfish.net/#hjs"))
+    persons.toSet shouldEqual Set(URI("http://bertails.org/#betehess"), URI("http://bblfish.net/#hjs"), BNode("t"))
 
   }
 

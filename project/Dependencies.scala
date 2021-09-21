@@ -17,29 +17,29 @@ object Dependencies {
    * @see https://joda-time.sourceforge.net
    * @see https://repo1.maven.org/maven2/joda-time/joda-time/
    */
-  val jodaTime = "joda-time" % "joda-time" % "2.9.6"
+  val jodaTime = "joda-time" % "joda-time" % "2.10.10"
 
   /**
    * joda-convert
    * @see https://joda-convert.sourceforge.net
    * @see https://repo1.maven.org/maven2/org/joda/joda-convert
    */
-  val jodaConvert = "org.joda" % "joda-convert" % "1.8.1"
+  val jodaConvert = "org.joda" % "joda-convert" % "2.2.1"
 
   /**
    * scalatest
    * @see https://www.scalatest.org
    * @see https://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.8")
+  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.9")
 
   /**
    * Akka Http Core
    * @see https://akka.io
    * @see https://repo1.maven.org/maven2/com/typesafe/akka
    */
-  val akkaHttpCore = ("com.typesafe.akka" %% "akka-http-core" % "10.2.4") cross CrossVersion.for3Use2_13
-  val akka = ("com.typesafe.akka" %% "akka-actor-typed" % "2.6.14") cross CrossVersion.for3Use2_13
+  val akkaHttpCore = ("com.typesafe.akka" %% "akka-http-core" % "10.2.6") cross CrossVersion.for3Use2_13
+  val akka = ("com.typesafe.akka" %% "akka-actor-typed" % "2.6.16") cross CrossVersion.for3Use2_13
 
   /**
    * jena
@@ -52,21 +52,21 @@ object Dependencies {
    * slf4j-nop. Test dependency for logging.
    * @see https://www.slf4j.org
    */
-  val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.7.21" % Test
+  val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.7.32" % Test
 
   /**
    * Aalto
    * @see https://wiki.fasterxml.com/AaltoHome
    * @see https://repo1.maven.org/maven2/com/fasterxml/aalto-xml
    */
-  val aalto = "com.fasterxml" % "aalto-xml" % "1.0.0"
+  val aalto = "com.fasterxml" % "aalto-xml" % "1.3.0"
 
   /**
    * RDF4J
    * @see https://www.rdf4j.org/
    * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
    */
-  val rdf4jVersion = "3.6.3"
+  val rdf4jVersion = "3.7.1"
 
   val rdf4jQueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % rdf4jVersion
   val rdf4jQueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % rdf4jVersion
@@ -83,7 +83,7 @@ object Dependencies {
    * @see https://github.com/jsonld-java/jsonld-java
    * @see https://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-tools
    */
-  val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.13.2"
+  val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.13.3"
 
   /**
    * parboiled

@@ -4,6 +4,7 @@ package util
 import scalaz.{ Monad, Comonad }
 import scala.util.Try
 
+//todo: these should only be in the test suite, if there
 object tryInstances {
   implicit final val TryInstance: Monad[Try] with Comonad[Try] = new Monad[Try] with Comonad[Try] {
     def point[A](a: => A): Try[A] = Try[A](a)

@@ -25,7 +25,6 @@ class JenaOps extends RDFOps[Jena] with JenaMGraphOps with DefaultURIOps[Jena] {
     graph.find(JenaNode.ANY, JenaNode.ANY, JenaNode.ANY).asScala.to(Iterable)
 
   // triple
-
   def makeTriple(s: Jena#Node, p: Jena#URI, o: Jena#Node): Jena#Triple = {
     JenaTriple.create(s, p, o)
   }
@@ -78,7 +77,7 @@ class JenaOps extends RDFOps[Jena] with JenaMGraphOps with DefaultURIOps[Jena] {
   // TODO the javadoc doesn't say if this is thread safe
   lazy val mapper = TypeMapper.getInstance
 
-  def jenaDatatype(datatype: Jena#URI) = {
+  def jenaDatatype(datatype: Jena#URI): RDFDatatype = {
     val iriString = fromUri(datatype)
     val typ = mapper.getTypeByName(iriString)
     if (typ == null) {
@@ -118,9 +117,9 @@ class JenaOps extends RDFOps[Jena] with JenaMGraphOps with DefaultURIOps[Jena] {
 
   // lang
 
-  def makeLang(langString: String) = langString
+  def makeLang(langString: String): Jena#Lang = langString
 
-  def fromLang(lang: Jena#Lang) = lang
+  def fromLang(lang: Jena#Lang): String = lang
 
   // graph traversal
 
