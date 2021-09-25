@@ -76,9 +76,9 @@ trait Ops[Rdf <: RDF]:
 		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
 		def unapply(t: Triple[Rdf]): Option[TripleI] = Some(untuple(t))
 		def untuple(t: Triple[Rdf]): TripleI
-		def subjectOf(s: Triple[Rdf]): Node[Rdf]
-		def relationOf(s: Triple[Rdf]): URI[Rdf]
-		def objectOf(s: Triple[Rdf]): Node[Rdf]
+		protected def subjectOf(s: Triple[Rdf]): Node[Rdf]
+		protected def relationOf(s: Triple[Rdf]): URI[Rdf]
+		protected def objectOf(s: Triple[Rdf]): Node[Rdf]
 		extension (triple: Triple[Rdf])
 			def subj: Node[Rdf] = subjectOf(triple)
 			def rel: URI[Rdf]   = relationOf(triple)
@@ -101,15 +101,6 @@ trait Ops[Rdf <: RDF]:
 			def rrel: rURI[Rdf]   = relationOf(rtriple)
 			def robj: rNode[Rdf]  = objectOf(rtriple)
 	end rTripleOps
-
-	object LangLit {
-		inline def apply(lex: String, lang: Lang[Rdf]): Literal[Rdf] =
-			Literal(lex, lang)
-	}
-	object TypedLit {
-		inline def apply(lex: String, dataTp: URI[Rdf]): Literal[Rdf] =
-			Literal(lex, dataTp)
-	}
 
 	given Node: NodeOps
 	trait NodeOps:
@@ -139,6 +130,7 @@ trait Ops[Rdf <: RDF]:
 		def apply(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		@targetName("dataTypeLit")
 		def apply(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
+
 		lazy val langTp: URI[Rdf] = URI(xsdLangStr)
 		lazy val stringTp: URI[Rdf] = URI(xsdStr)
 
@@ -187,7 +179,7 @@ trait Ops[Rdf <: RDF]:
 		 * https://github.com/lampepfl/dotty/pull/11721/files */
 		def apply(uriStr: String): URI[Rdf] = mkUri(uriStr).get
 		def mkUri(iriStr: String): Try[URI[Rdf]]
-		def asString(uri: URI[Rdf]): String
+		protected def asString(uri: URI[Rdf]): String
 		extension (uri: URI[Rdf])
 			def string: String = asString(uri)
 
