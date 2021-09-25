@@ -58,7 +58,6 @@ trait Ops[Rdf <: RDF]:
 			def union(graphs: Graph[Rdf]*): Graph[Rdf] = Graph.union(graph +: graphs )
 			def +(triple: Triple[Rdf]): Graph[Rdf] = Graph.union(Seq(graph, Graph(triple)))
 
-
 	val rGraph: rGraphOps
 	trait rGraphOps:
 		def empty: rGraph[Rdf]
@@ -89,8 +88,11 @@ trait Ops[Rdf <: RDF]:
 		def apply(s: rNode[Rdf], p: rURI[Rdf], o: rNode[Rdf]): rTriple[Rdf]
 		def unapply(t: RDF.Triple[Rdf]): Option[rTripleI] = Some(untuple(t))
 		def untuple(t: RDF.Triple[Rdf]): rTripleI
+		protected
 		def subjectOf(s: rTriple[Rdf]): rNode[Rdf]
+		protected
 		def relationOf(s: rTriple[Rdf]): rURI[Rdf]
+		protected
 		def objectOf(s: rTriple[Rdf]): rNode[Rdf]
 		//todo? should we only have the extension functions?
 		extension (rtriple: rTriple[Rdf])
