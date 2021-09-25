@@ -8,6 +8,7 @@ import org.eclipse.rdf4j.query.*
 import org.eclipse.rdf4j.query.parser.*
 import org.w3.banana.*
 
+import scala.annotation.targetName
 import scala.util.{Success, Try}
 import scala.reflect.TypeTest
 
@@ -151,7 +152,7 @@ object Rdf4j extends RDF {
 				def label: String = bn.getID().nn
 		end BNode
 
-		given Literal: LiteralOps with {
+		given Literal: LiteralOps with
 			private val xsdString = valueFactory.createIRI(xsdStr).nn
 			private val xsdLangString = valueFactory.createIRI(xsdLangStr).nn
 
@@ -159,11 +160,10 @@ object Rdf4j extends RDF {
 
 			def apply(plain: String): RDF.Literal[R] =
 				valueFactory.createLiteral(plain).nn
-
-			def apply(lit: Lit): RDF.Literal[R] = lit match
+			def apply(lit: LiteralI): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => apply(text)
-				case Lit.`@`(text, lang) => Literal.langLiteral(text, Lang.label(lang))
-				case Lit.`^^`(text, tp) => Literal.dtLiteral(text, tp)
+				case Lit.`@`(text, lang) => Literal(text, Lang.label(lang))
+				case Lit.`^^`(text, tp) => Literal(text, tp)
 
 			def unapply(x: Matchable): Option[Lit] =
 				x match
@@ -180,15 +180,17 @@ object Rdf4j extends RDF {
 						else None
 					case _ => None
 
-			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
+			@targetName("langLit")
+			def apply(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, lang).nn
 
-			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
+			@targetName("dataTypeLit")
+			def apply(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
 				valueFactory.createLiteral(lex, dataTp).nn
 
 			extension (lit: RDF.Literal[R])
 				def text: String = lit.getLabel.nn
-		}
+		end Literal
 
 		override given literalTT: TypeTest[Matchable, RDF.Literal[R]] with {
 			override def unapply(s: Matchable): Option[s.type & RDF.Literal[R]] =

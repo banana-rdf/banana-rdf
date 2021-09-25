@@ -257,8 +257,8 @@ class NTriplesParser[Rdf <: RDF](
 		val lexicalForm = parsePlainLiteral()
 		read() match
 		case -1 => throw EOF("was parsing literal")
-		case '^' => ops.Literal.dtLiteral(lexicalForm, parseDataType())
-		case '@' => ops.Literal.langLiteral(lexicalForm, parseLang())
+		case '^' => ops.Literal(lexicalForm, parseDataType())
+		case '@' => ops.Literal(lexicalForm, parseLang())
 		case x =>
 			rewind.push(x) // this character can be used for later parsing
 			ops.Literal(lexicalForm)

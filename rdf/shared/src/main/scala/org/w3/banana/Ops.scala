@@ -50,6 +50,7 @@ trait Ops[Rdf <: RDF]:
 		protected
 		def isomorphism(left: Graph[Rdf], right: Graph[Rdf]): Boolean
 		extension (graph: Graph[Rdf])
+			@targetName("iso")
 			def ≅ (other: Graph[Rdf]): Boolean = isomorphism(graph,other)
 			infix def isomorphic(other: Graph[Rdf]): Boolean = isomorphism(graph,other)
 			def diff(other: Graph[Rdf]): Graph[Rdf] = difference(graph,other)
@@ -103,11 +104,11 @@ trait Ops[Rdf <: RDF]:
 
 	object LangLit {
 		inline def apply(lex: String, lang: Lang[Rdf]): Literal[Rdf] =
-			Literal.langLiteral(lex, lang)
+			Literal(lex, lang)
 	}
 	object TypedLit {
 		inline def apply(lex: String, dataTp: URI[Rdf]): Literal[Rdf] =
-			Literal.dtLiteral(lex, dataTp)
+			Literal(lex, dataTp)
 	}
 
 	given Node: NodeOps
@@ -134,8 +135,10 @@ trait Ops[Rdf <: RDF]:
 		def apply(plain: String): Literal[Rdf]
 		def apply(lit: LiteralI): Literal[Rdf]
 		def unapply(lit: Matchable): Option[LiteralI]
-		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
-		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
+		@targetName("langLit")
+		def apply(lex: String, lang: Lang[Rdf]): Literal[Rdf]
+		@targetName("dataTypeLit")
+		def apply(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
 		lazy val langTp: URI[Rdf] = URI(xsdLangStr)
 		lazy val stringTp: URI[Rdf] = URI(xsdStr)
 
@@ -159,10 +162,10 @@ trait Ops[Rdf <: RDF]:
 		extension (str: String)
 			@targetName("dt")
 			infix def ^^(dtType: URI[Rdf]): Literal[Rdf] =
-				dtLiteral(str, dtType)
+				apply(str, dtType)
 			@targetName("lang")
 			infix def `@`(lang: Lang[Rdf]): Literal[Rdf] =
-				langLiteral(str, lang)
+				apply(str, lang)
 	end LiteralOps
 
 	given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]

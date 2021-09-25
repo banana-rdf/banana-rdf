@@ -1,7 +1,7 @@
 package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_URI, Node_Literal}
+import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_Literal, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
 import org.w3.banana.{Ops, RDF}
 
@@ -10,6 +10,8 @@ import scala.util.Try
 import scala.util.Using
 import scala.util.Using.Releasable
 import org.apache.jena.util.iterator.ExtendedIterator
+
+import scala.annotation.targetName
 
 object JenaRdf extends RDF {
 	import org.apache.jena.graph as jena
@@ -148,7 +150,7 @@ object JenaRdf extends RDF {
 		end BNode
 
 
-		given Literal: LiteralOps with {
+		given Literal: LiteralOps with
 			private val xsdString: RDFDatatype = mapper.getTypeByName(xsdStr).nn
 			private val xsdLangString: RDFDatatype = mapper.getTypeByName(xsdLangStr).nn
 			//todo? are we missing a Datatype Type? (check other frameworks)
@@ -166,13 +168,23 @@ object JenaRdf extends RDF {
 
 			lazy val mapper: TypeMapper = TypeMapper.getInstance.nn
 
+			override
 			def apply(plain: String): RDF.Literal[R] =
 				NodeFactory.createLiteral(plain).nn.asInstanceOf[Literal]
 
+			override
 			def apply(lit: Lit): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => NodeFactory.createLiteral(text).nn.asInstanceOf[Literal]
-				case Lit.`@`(text, lang) => Literal.langLiteral(text, lang)
-				case Lit.`^^`(text, tp) => Literal.dtLiteral(text, tp)
+				case Lit.`@`(text, lang) => Literal(text, lang)
+				case Lit.`^^`(text, tp) => Literal(text, tp)
+
+			@targetName("langLit") override
+			def apply(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
+				NodeFactory.createLiteral(lex, lang).nn.asInstanceOf[Literal]
+
+			@targetName("dataTypeLit") override
+			def apply(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
+				NodeFactory.createLiteral(lex, jenaDatatype(dataTp)).nn.asInstanceOf[Literal]
 
 			def unapply(x: Matchable): Option[Lit] =
 				x match
@@ -188,15 +200,9 @@ object JenaRdf extends RDF {
 						else None
 					case _ => None
 
-			def langLiteral(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
-				NodeFactory.createLiteral(lex, lang).nn.asInstanceOf[Literal]
-
-			def dtLiteral(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
-				NodeFactory.createLiteral(lex, jenaDatatype(dataTp)).nn.asInstanceOf[Literal]
-
 			extension (lit: RDF.Literal[R])
 				def text: String = lit.getLiteralLexicalForm.nn
-		}
+		end Literal
 
 		given literalTT: TypeTest[Matchable,RDF.Literal[R]] with {
 			override def unapply(s: Matchable): Option[s.type & jena.Node_Literal] =

@@ -79,17 +79,17 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
 		"parse a LangLiteral" in {
 			val lit = ntparser(name + "\"@en ").parseLiteral()
-			lit should equal(Literal.langLiteral(name,Lang("en")))
+			lit should equal(Literal(name,Lang("en")))
 
 			val lit2 = ntparser(name + "\"@en-us ").parseLiteral()
-			lit2 should equal(Literal.langLiteral(name,Lang("en-us")))
+			lit2 should equal(Literal(name,Lang("en-us")))
 
 		}
 
 		"parse an TypedLiteral" in {
 			val litstr = s"""123"^^<${xsd.integer.string}> """
 			val lit = ntparser(litstr).parseLiteral()
-			lit should equal(Literal.dtLiteral("123",xsd.integer))
+			lit should equal(Literal("123",xsd.integer))
 		}
 
 		"parse a Bnode" in {
@@ -122,7 +122,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		"not fail on a triple containing a Literal and a bnode" in {
 			val str = s""":nolate <${foafstr("name")}> "$name"@en."""
 			val p = ntparser(str).parseTriple('_')
-			p should be (Success(Triple(BNode("nolate"),foaf.name,Literal.langLiteral(name,Lang("en")))))
+			p should be (Success(Triple(BNode("nolate"),foaf.name,Literal(name,Lang("en")))))
 		}
 
 		"not fail on a triple containing two bnodes" in {
@@ -149,7 +149,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		"not fail when parsing a document with one triple" in {
 			val str = s"""<$bblfish>     <${foafstr("name")}>      "$name"@de      ."""
 			val graphTry = toGraph(ntparser(str))
-			assert(graphTry.get isomorphic Graph(Triple(URI(bblfish), foaf.name, Literal.langLiteral(name, Lang("de")))))
+			assert(graphTry.get isomorphic Graph(Triple(URI(bblfish), foaf.name, Literal(name, Lang("de")))))
 		}
 
 		"not fail when parsing a document with one triple and whitespace" in {
@@ -180,7 +180,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
           """
 			val graphTry = toGraph(ntparser(str))
 			assert (graphTry.get isomorphic Graph(
-				Triple(URI(bblfish), foaf.name, Literal.langLiteral(name, Lang("en"))),
+				Triple(URI(bblfish), foaf.name, Literal(name, Lang("en"))),
 				Triple(URI(bblfish), foaf.knows, BNode("anton")),
 				Triple(URI(bblfish), foaf.knows, BNode("betehess")),
 				Triple(BNode("anton"), foaf.name, Literal("Anton")),
@@ -260,7 +260,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 			parse( """<http://example/s> <http://example/p> "string"@en .""", 1)()
 			parse( """<http://example/s> <http://example/p> "string"@en-uk .""", 1) { graph =>
 				graph isomorphic Graph(Triple(URI("http://example/s"), URI("http://example/p"),
-					Literal.langLiteral("string", Lang("en-uk"))))
+					Literal("string", Lang("en-uk"))))
 			}
 		}
 
