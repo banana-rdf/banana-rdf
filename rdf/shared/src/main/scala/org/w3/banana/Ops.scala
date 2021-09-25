@@ -38,15 +38,16 @@ trait Ops[Rdf <: RDF]:
 		def apply(head: Triple[Rdf], tail: Triple[Rdf]*): Graph[Rdf] =
 			val it: Iterable[Triple[Rdf]] = Iterable[Triple[Rdf]](tail.prepended(head)*)
 			Graph.apply(it)
-		@deprecated("replace with extension method")
+		//todo: remove all the protected methods after moving code to extension.
+		protected
 		def triplesIn(graph: Graph[Rdf]): Iterable[Triple[Rdf]]
-		@deprecated("replace with extension method")
+		protected
 		def graphSize(graph: Graph[Rdf]): Int
-		@deprecated("replace with extension method")
+		protected
 		def union(graphs: Seq[Graph[Rdf]]): Graph[Rdf]
-		@deprecated("replace with extension method")
+		protected
 		def difference(g1: Graph[Rdf], g2: Graph[Rdf]): Graph[Rdf]
-		@deprecated("replace with extension method")
+		protected
 		def isomorphism(left: Graph[Rdf], right: Graph[Rdf]): Boolean
 		extension (graph: Graph[Rdf])
 			def ≅ (other: Graph[Rdf]): Boolean = isomorphism(graph,other)

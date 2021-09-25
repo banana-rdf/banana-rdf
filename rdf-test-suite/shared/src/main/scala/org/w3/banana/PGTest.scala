@@ -8,7 +8,7 @@ open class PGTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	import TestConstants.*
 
 	test("PG Creation") {
-		assertEquals(Graph.graphSize(Graph.empty),0)
+		assertEquals(Graph.empty.size,0)
 		val timbl: URI[Rdf] = URI(tim("i"))
 		val timEmpty: PG[Rdf] = PG(timbl)
 		//note: in order for the implicit conversion to take hold we need to specify the upper bound
