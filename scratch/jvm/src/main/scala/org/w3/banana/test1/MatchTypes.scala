@@ -1,4 +1,4 @@
-package ideas
+package org.w3.banana.test1
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.impl.LiteralLabelFactory
@@ -395,7 +395,7 @@ class MatchTypes extends munit.FunSuite {
 	 * @tparam Rdf A subtype of RDF trait
 	 * @return an rdf.Graph (note: returning an RDF.Graph[Rdf] does not work).
 	 */
-	def buildATestGraph[Rdf<:ideas.MatchTypes.RDF](using rdf: Rdf): rdf.Graph = {
+	def buildATestGraph[Rdf<:MatchTypes.RDF](using rdf: Rdf): rdf.Graph = {
 		import rdf.*
 		val bbl: URI = URI(bblStr)
 		val tim: URI = URI(timStr)
@@ -414,7 +414,7 @@ class MatchTypes extends munit.FunSuite {
 		Graph(bKt,hname,tname,anaisAge)
 	}
 
-	def testGraph[Rdf <: ideas.MatchTypes.RDF](using rdf: Rdf)(
+	def testGraph[Rdf <: MatchTypes.RDF](using rdf: Rdf)(
 		name: String, g : rdf.Graph
 	)(using loc: munit.Location): Unit = {
 		test(name) {
@@ -440,14 +440,14 @@ class MatchTypes extends munit.FunSuite {
 		}
 	}
 	{
-		given jg: ideas.MatchTypes.RDF  = JenaRdf
+		given jg: MatchTypes.RDF  = JenaRdf
 		type J = jg.type
 
 		val g1: RDF.Graph[J] = buildATestGraph[J]
 		testGraph[J]("Test graph in Jena", g1)
 	}
 	{
-		given sg: ideas.MatchTypes.RDF  = Simple
+		given sg: MatchTypes.RDF  = Simple
 		type S = sg.type
 
 		val g2: RDF.Graph[S] = buildATestGraph[S]

@@ -101,26 +101,26 @@ package banana.ORDF:
 			def mkLiteral(lit: String): RDF.Literal[R] = lit
 			def getSubject(t: RDF.Triple[R]): RDF.Node[R] = t._1
 
-import banana.{RDF,Ops}
-def main(args: Array[String]): Unit = {
-	{  import banana.ORDF.ORdf
-		given oo: Ops[ORdf.type] = ORdf.ops
-		println(write[ORdf.type](simpleTest[ORdf.type]))
-	}
-	{  import banana.JRDF.JRdf
-		given oo: Ops[JRdf.type] = JRdf.ops
-		println(write[JRdf.type](simpleTest[JRdf.type]))
-	}
+object Test2:
+	import banana.{RDF,Ops}
 
-}
+	def main(args: Array[String]): Unit =
+		{  import banana.ORDF.ORdf
+			given oo: Ops[ORdf.type] = ORdf.ops
+			println(write[ORdf.type](simpleTest[ORdf.type]))
+		}
+		{  import banana.JRDF.JRdf
+			given oo: Ops[JRdf.type] = JRdf.ops
+			println(write[JRdf.type](simpleTest[JRdf.type]))
+		}
 
-def simpleTest[Rdf<:RDF](using ops: Ops[Rdf]) =
-	import ops.*
-	val bbl: URI[Rdf] = ops.mkURI("https://bblfish.net/#i")
-	val name: URI[Rdf] = ops.mkURI("https://xmlns.com/foaf/0.1/name")
-	val henry: Literal[Rdf] = ops.mkLiteral("Henry")
-	ops.mkTriple(bbl,name,henry)
+	def simpleTest[Rdf<:RDF](using ops: Ops[Rdf]) =
+		import ops.*
+		val bbl: URI[Rdf] = ops.mkURI("https://bblfish.net/#i")
+		val name: URI[Rdf] = ops.mkURI("https://xmlns.com/foaf/0.1/name")
+		val henry: Literal[Rdf] = ops.mkLiteral("Henry")
+		ops.mkTriple(bbl,name,henry)
 
-def write[Rdf<:RDF](t: RDF.Triple[Rdf])(using ops: Ops[Rdf]): String =
-	s"triple $t has subj = ${ops.getSubject(t)}"
+	def write[Rdf<:RDF](t: RDF.Triple[Rdf])(using ops: Ops[Rdf]): String =
+		s"triple $t has subj = ${ops.getSubject(t)}"
 
