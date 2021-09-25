@@ -43,9 +43,9 @@ object JenaRdf extends RDF {
 	 * as the RDF.Graph[R] type hides the implementation type (of `graph` field for example) **/
 	given ops: Ops[R] with {
 
-		val Graph = new GraphOps {
+		given Graph: GraphOps with {
 			def empty: RDF.Graph[R] = Factory.empty().nn
-			def apply(triples: RDF.Triple[R]*): RDF.Graph[R] =
+			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
 				val graph: Graph = Factory.createDefaultGraph.nn
 				triples.foreach { triple =>
 					graph.add(triple)
@@ -65,7 +65,7 @@ object JenaRdf extends RDF {
 					}
 				}
 				g
-			def diff(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
+			def difference(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
 				val g = Factory.createDefaultGraph.nn
 				GraphUtil.addInto(g, g1)
 				GraphUtil.delete(g, g2.find(JenaANY, JenaANY, JenaANY))
@@ -75,8 +75,9 @@ object JenaRdf extends RDF {
 		}
 
 		val rGraph = new rGraphOps:
-			def apply(triples: RDF.rTriple[R]*): RDF.rGraph[R] =
-				Graph(triples*)
+			def empty: RDF.rGraph[R] = Graph.empty
+			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
+				Graph(triples)
 			def triplesIn(graph: RDF.rGraph[R]): Iterable[RDF.rTriple[R]] =
 				Graph.triplesIn(graph)
 			def graphSize(graph: RDF.rGraph[R]): Int =

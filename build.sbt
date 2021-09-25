@@ -1,4 +1,4 @@
-import Dependencies.{jenaLibs, munit}
+import Dependencies.{TestLibs, jenaLibs}
 import sbt.Keys.description
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
@@ -12,7 +12,7 @@ lazy val commonSettings = Seq(
 	  scalaVersion := "3.1.0-RC2",
 	  libraryDependencies ++= Seq(
 		  jenaLibs,
-		  munit % Test
+		  TestLibs.munit % Test
 	  ),
 	  scalacOptions := Seq(
 		  // "-classpath", "foo:bar:...",         // Add to the classpath.
@@ -39,7 +39,7 @@ lazy val commonSettings = Seq(
 		updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
 )
 
-lazy val rdf = crossProject(JVMPlatform) /*JSPlatform,*/
+lazy val rdf = crossProject(JVMPlatform, JSPlatform)
 	.crossType(CrossType.Full)
 	.in(file("rdf")) //websim api
 	.settings(commonSettings: _*)
@@ -51,6 +51,16 @@ lazy val rdf = crossProject(JVMPlatform) /*JSPlatform,*/
 	)
 
 lazy val rdfJVM = rdf.jvm
+lazy val rdfJS = rdf.js
+
+lazy val ntriples = crossProject(JSPlatform, JVMPlatform)
+	.crossType(CrossType.Full)
+	.settings(commonSettings: _*)
+	.in(file("ntriples"))
+	.dependsOn(rdf)
+
+lazy val ntriplesJS = ntriples.js
+lazy val ntriplesJVM = ntriples.jvm
 
 lazy val jena = project.in(file("jena"))
 	.settings(commonSettings: _*)
@@ -58,7 +68,7 @@ lazy val jena = project.in(file("jena"))
 		name := "banana-jena",
 		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
 		libraryDependencies ++= Seq(jenaLibs) //, slf4jNop, aalto )
-	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
+	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile", ntriplesJVM) //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
 import Dependencies.{RDF4J => rj}
 lazy val rdf4j = project.in(file("rdf4j"))
@@ -87,10 +97,10 @@ lazy val rdfTestSuite = crossProject(JVMPlatform) //, JSPlatform
 	.settings(commonSettings: _*)
 	.settings(
 		name := "banana-test",
-		libraryDependencies ++= Seq(munit)
+		libraryDependencies ++= Seq(TestLibs.munit, TestLibs.scalatest)
 	//	Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
 	)
-	.dependsOn(rdf)
+	.dependsOn(rdf, ntriples)
 
 lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
 
@@ -101,7 +111,7 @@ lazy val scratch = crossProject(JVMPlatform)
 	.settings(
 		name := "scratch",
 		//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
-		libraryDependencies ++= Seq(jenaLibs, munit)
+		libraryDependencies ++= Seq(jenaLibs, TestLibs.munit)
 	)
 	.dependsOn(rdf)
 

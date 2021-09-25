@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.RDF.Graph
+
 import scala.annotation.targetName
 import scala.reflect.TypeTest
 import scala.util.Try
@@ -29,19 +31,40 @@ trait Ops[Rdf <: RDF]:
 	//implementations
 
 
-	val Graph: GraphOps
+	given Graph: GraphOps
 	trait GraphOps:
 		def empty: Graph[Rdf]
-		def apply(triples: Triple[Rdf]*): Graph[Rdf]
+		def apply(triples: Iterable[Triple[Rdf]]): Graph[Rdf]
+		def apply(head: Triple[Rdf], tail: Triple[Rdf]*): Graph[Rdf] =
+			val it: Iterable[Triple[Rdf]] = Iterable[Triple[Rdf]](tail.prepended(head)*)
+			Graph.apply(it)
+		@deprecated("replace with extension method")
 		def triplesIn(graph: Graph[Rdf]): Iterable[Triple[Rdf]]
+		@deprecated("replace with extension method")
 		def graphSize(graph: Graph[Rdf]): Int
+		@deprecated("replace with extension method")
 		def union(graphs: Seq[Graph[Rdf]]): Graph[Rdf]
-		def diff(g1: Graph[Rdf], g2: Graph[Rdf]): Graph[Rdf]
+		@deprecated("replace with extension method")
+		def difference(g1: Graph[Rdf], g2: Graph[Rdf]): Graph[Rdf]
+		@deprecated("replace with extension method")
 		def isomorphism(left: Graph[Rdf], right: Graph[Rdf]): Boolean
+		extension (graph: Graph[Rdf])
+			def ≅ (other: Graph[Rdf]): Boolean = isomorphism(graph,other)
+			infix def isomorphic(other: Graph[Rdf]): Boolean = isomorphism(graph,other)
+			def diff(other: Graph[Rdf]): Graph[Rdf] = difference(graph,other)
+			def size: Int = graphSize(graph)
+			def triples: Iterable[Triple[Rdf]] = triplesIn(graph)
+			def union(graphs: Graph[Rdf]*): Graph[Rdf] = Graph.union(graph +: graphs )
+			def +(triple: Triple[Rdf]): Graph[Rdf] = Graph.union(Seq(graph, Graph(triple)))
+
 
 	val rGraph: rGraphOps
 	trait rGraphOps:
-		def apply(triples: rTriple[Rdf]*): rGraph[Rdf]
+		def empty: rGraph[Rdf]
+		def apply(triples: Iterable[rTriple[Rdf]]): rGraph[Rdf]
+		def apply(head: rTriple[Rdf], tail: rTriple[Rdf]*): rGraph[Rdf] =
+			val it: Iterable[rTriple[Rdf]] = Iterable[rTriple[Rdf]](tail.prepended(head)*)
+			rGraph.apply(it)
 		def triplesIn(graph: rGraph[Rdf]): Iterable[rTriple[Rdf]]
 		def graphSize(graph: rGraph[Rdf]): Int
 
@@ -110,10 +133,12 @@ trait Ops[Rdf <: RDF]:
 		def unapply(lit: Matchable): Option[LiteralI]
 		def langLiteral(lex: String, lang: Lang[Rdf]): Literal[Rdf]
 		def dtLiteral(lex: String, dataTp: URI[Rdf]): Literal[Rdf]
+		lazy val langTp: URI[Rdf] = URI(xsdLangStr)
+		lazy val stringTp: URI[Rdf] = URI(xsdStr)
 
 		extension (lit: Literal[Rdf])
 			def text: String
-			// this can be implemented more efficiently in individual subclasses by
+			//todo: this can be implemented more efficiently in individual subclasses by
 			//avoiding going through the intermdiate LiteralI type. Indeed the
 			//unapply should be implemented in terms of this function
 			def fold[A](
@@ -125,6 +150,8 @@ trait Ops[Rdf <: RDF]:
 				case Plain(t) => plainF(t)
 				case t `@` lang => langF(t,lang)
 				case t ^^ dt => dtTypeF(t,dt)
+			def lang: Option[Lang[Rdf]] = lit.fold(_=>None, (_,l) => Some(l), (_,_) => None)
+			def dataType: URI[Rdf] = lit.fold(_=>stringTp,(_,_)=>langTp,(_,tp)=>tp)
 
 		extension (str: String)
 			@targetName("dt")
@@ -165,7 +192,6 @@ trait Ops[Rdf <: RDF]:
 		def unapply(lang: Lang[Rdf]): Option[String] = Some(lang.label)
 		extension (lang: RDF.Lang[Rdf])
 			def label: String
-
 
 end Ops
 

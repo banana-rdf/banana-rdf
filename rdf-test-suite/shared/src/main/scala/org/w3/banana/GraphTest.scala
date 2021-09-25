@@ -23,7 +23,7 @@ open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 		assertEquals(g1.size,1)
 		val g1x = g1.union(g1)
 		assertEquals(g1x.size,1)
-		assert(g1.isIsomorphicWith(g1x))
+		assert(g1 isomorphic g1x)
 		val tkb = Triple(timbl,foaf.knows,bblf)
 		val g2 = g1 + tkb
 		assertEquals(g2.size,2)
@@ -37,12 +37,11 @@ open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 		assertEquals(glit.size,2)
 		val gbig = glit.union(g2)
 		assertEquals(gbig.size,4)
-		assert(gbig.isIsomorphicWith(g2.union(glit)))
-
+		assert(gbig ≅ g2.union(glit))
 	}
 
 	test("relative graphs") {
-		val rg0 = rGraph()
+		val rg0 = rGraph.empty
 		assertEquals(rg0.rsize,0)
 		val rg1 = rGraph(rTriple(rURI("/#i"),URI(foafPre("homePage")),rURI("/")))
 		assertEquals(rg1.rsize,1)

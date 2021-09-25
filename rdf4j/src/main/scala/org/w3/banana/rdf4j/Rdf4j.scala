@@ -56,10 +56,10 @@ object Rdf4j extends RDF {
 		lazy val valueFactory: ValueFactory = SimpleValueFactory.getInstance().nn
 		import scala.jdk.CollectionConverters.{given,*}
 
-		val Graph = new GraphOps:
+		given Graph: GraphOps with
 			private val emptyGr: RDF.Graph[R] = new LinkedHashModel(0).unmodifiable().nn
 			def empty: RDF.Graph[R] = emptyGr
-			def apply(triples: RDF.Triple[R]*): RDF.Graph[R] =
+			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
 				val graph = new LinkedHashModel
 				triples foreach { t => graph.add(t) }
 				graph
@@ -73,7 +73,7 @@ object Rdf4j extends RDF {
 						val graph = new LinkedHashModel
 						graphs.foreach(graph.addAll(_))
 						graph
-			def diff(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
+			def difference(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
 				val graph = new LinkedHashModel
 				triplesIn(g1) foreach { triple =>
 					if !g2.contains(triple) then graph.add(triple)
@@ -85,8 +85,9 @@ object Rdf4j extends RDF {
 				Models.isomorphic(left, right)
 
 		val rGraph = new rGraphOps:
-			def apply(triples: RDF.rTriple[R]*): RDF.rGraph[R] =
-				Graph(triples*)
+			def empty: RDF.rGraph[R] = Graph.empty
+			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
+				Graph(triples)
 			def triplesIn(graph: RDF.rGraph[R]): Iterable[RDF.rTriple[R]] =
 				Graph.triplesIn(graph)
 			def graphSize(graph: RDF.rGraph[R]): Int =
