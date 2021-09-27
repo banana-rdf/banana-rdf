@@ -1,8 +1,15 @@
 import Dependencies.{TestLibs, jenaLibs}
+import org.scalablytyped.converter.plugin.ScalablyTypedConverterGenSourcePlugin.autoImport.{SourceGenMode, stSourceGenMode}
 import sbt.Keys.description
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
 scalaVersion := "3.1.0-RC2"
+
+ThisBuild / homepage      := Some(url("https://github.com/banana-rdf/banana-rdf"))
+ThisBuild / licenses      += ("MIT", url("https://opensource.org/licenses/mit-license.php"))
+ThisBuild / organization  := "org.scala-js"
+ThisBuild / shellPrompt   := ((s: State) => Project.extract(s).currentRef.project + "> ")
+ThisBuild / versionScheme := Some("early-semver")
 
 val scala3jvmOptions =  Seq(
 	// "-classpath", "foo:bar:...",         // Add to the classpath.
@@ -60,9 +67,9 @@ lazy val commonSettings = Seq(
 	updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
 )
 
-lazy val rdf = crossProject(JVMPlatform)//, JSPlatform)
+lazy val rdf = crossProject(JVMPlatform, JSPlatform)
 	.crossType(CrossType.Full)
-	.in(file("rdf")) //websim api
+	.in(file("rdf"))
 	.settings(commonSettings: _*)
 	.settings(
 		name := "banana-rdf",
@@ -71,14 +78,14 @@ lazy val rdf = crossProject(JVMPlatform)//, JSPlatform)
 		libraryDependencies ++= Seq(),
 		scalacOptions ++= scala3jvmOptions
 	)
-//	.jsSettings(
-//		scalacOptions ++= scala3jsOptions
-//	)
+	.jsSettings(
+		scalacOptions ++= scala3jsOptions
+	)
 
 lazy val rdfJVM = rdf.jvm
-//lazy val rdfJS = rdf.js
+lazy val rdfJS = rdf.js
 
-lazy val ntriples = crossProject(JVMPlatform) //JSPlatform
+lazy val ntriples = crossProject(JVMPlatform,JSPlatform)
 	.crossType(CrossType.Full)
 	.settings(commonSettings: _*)
 	.in(file("ntriples"))
@@ -86,12 +93,12 @@ lazy val ntriples = crossProject(JVMPlatform) //JSPlatform
 	.jvmSettings(
 		scalacOptions ++= scala3jvmOptions
 	)
-//	.jsSettings(
-//		scalacOptions ++= scala3jsOptions
-//	)
+	.jsSettings(
+		scalacOptions ++= scala3jsOptions
+	)
 
-//lazy val ntriplesJS = ntriples.js
 lazy val ntriplesJVM = ntriples.jvm
+lazy val ntriplesJS = ntriples.js
 
 lazy val jena = project.in(file("jena"))
 	.settings(commonSettings: _*)
@@ -102,7 +109,6 @@ lazy val jena = project.in(file("jena"))
 		libraryDependencies ++= Seq(jenaLibs) //, slf4jNop, aalto )
 	)
 	.dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile", ntriplesJVM) //, ntriplesJVM, rdfTestSuiteJVM % "test->compile")
-
 
 import Dependencies.{RDF4J => rj}
 lazy val rdf4j = project.in(file("rdf4j"))
@@ -124,6 +130,27 @@ lazy val rdf4j = project.in(file("rdf4j"))
 			Dependencies.jsonldJava
 		)
 	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //ntriplesJVM,
+
+lazy val rdflibTypes = project.in(file("rdflib.types"))
+	.enablePlugins(ScalaJSBundlerPlugin)
+	//documentation here: https://scalablytyped.org/docs/library-developer
+	// call stImport in sbt to generate new sources
+	.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
+//	.enablePlugins(ScalablyTypedConverterPlugin)
+	.settings(commonSettings: _*)
+	.settings(
+		name := "rdflib-types",
+		scalacOptions ++= scala3jsOptions,
+		Compile / npmDependencies  += "rdflib" -> "2.2.7",
+		useYarn := true,
+		stUseScalaJsDom := true,
+		stOutputPackage := "types",
+		stMinimize := Selection.AllExcept("rdflib"),
+//		stSourceGenMode := SourceGenMode.ResourceGenerator,
+		stSourceGenMode := SourceGenMode.Manual( baseDirectory.value /"src"/"main"/"scala")
+//		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
+	)
+//	.dependsOn(rdfJS, ntriplesJS) // rdfTestSuiteJS % "test->compile",
 
 
 lazy val rdfTestSuite = crossProject(JVMPlatform)//, JSPlatform)
