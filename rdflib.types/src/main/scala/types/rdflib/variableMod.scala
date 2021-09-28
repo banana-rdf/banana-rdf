@@ -24,7 +24,7 @@ object variableMod {
     * Initializes this variable
     * @param name The variable's name
     */
-  class default ()
+  open class default ()
     extends Variable
        with GraphType
        with PredicateType

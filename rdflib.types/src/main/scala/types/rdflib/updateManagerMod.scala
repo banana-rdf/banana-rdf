@@ -25,7 +25,7 @@ object updateManagerMod {
   /**
     * @param  store - The quadstore to store data and metadata. Created if not passed.
     */
-  class default ()
+  open class default ()
     extends StObject
        with UpdateManager {
     def this(store: types.rdflib.storeMod.default) = this()

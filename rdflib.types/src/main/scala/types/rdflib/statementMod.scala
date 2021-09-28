@@ -20,7 +20,7 @@ object statementMod {
   
   @JSImport("rdflib/lib/statement", JSImport.Default)
   @js.native
-  class default[S /* <: SubjectType */, P /* <: PredicateType */, O /* <: ObjectType */, G /* <: GraphType */] protected ()
+  open class default[S /* <: SubjectType */, P /* <: PredicateType */, O /* <: ObjectType */, G /* <: GraphType */] protected ()
     extends StObject
        with Statement[S, P, O, G] {
     /**

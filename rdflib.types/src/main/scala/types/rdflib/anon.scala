@@ -51,13 +51,13 @@ object anon {
       
       inline def setDeleteUndefined: Self = StObject.set(x, "delete", js.undefined)
       
-      inline def setDeleteVarargs(value: (default[SubjectType, PredicateType, ObjectType, GraphType])*): Self = StObject.set(x, "delete", js.Array(value :_*))
+      inline def setDeleteVarargs(value: (default[SubjectType, PredicateType, ObjectType, GraphType])*): Self = StObject.set(x, "delete", js.Array(value*))
       
       inline def setPatch(value: js.Array[default[SubjectType, PredicateType, ObjectType, GraphType]]): Self = StObject.set(x, "patch", value.asInstanceOf[js.Any])
       
       inline def setPatchUndefined: Self = StObject.set(x, "patch", js.undefined)
       
-      inline def setPatchVarargs(value: (default[SubjectType, PredicateType, ObjectType, GraphType])*): Self = StObject.set(x, "patch", js.Array(value :_*))
+      inline def setPatchVarargs(value: (default[SubjectType, PredicateType, ObjectType, GraphType])*): Self = StObject.set(x, "patch", js.Array(value*))
       
       inline def setWhere(value: js.Any): Self = StObject.set(x, "where", value.asInstanceOf[js.Any])
       
@@ -151,7 +151,7 @@ object anon {
       
       inline def setStatementUndefined: Self = StObject.set(x, "statement", js.undefined)
       
-      inline def setStatementVarargs(value: Term*): Self = StObject.set(x, "statement", js.Array(value :_*))
+      inline def setStatementVarargs(value: Term*): Self = StObject.set(x, "statement", js.Array(value*))
       
       inline def setWhere(value: String): Self = StObject.set(x, "where", value.asInstanceOf[js.Any])
     }
@@ -303,13 +303,13 @@ object anon {
       
       inline def setHandlersUndefined: Self = StObject.set(x, "handlers", js.undefined)
       
-      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value :_*))
+      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value*))
       
       inline def setHeaders(value: HeadersInit): Self = StObject.set(x, "headers", value.asInstanceOf[js.Any])
       
       inline def setHeadersUndefined: Self = StObject.set(x, "headers", js.undefined)
       
-      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value :_*))
+      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value*))
       
       inline def setIntegrity(value: String): Self = StObject.set(x, "integrity", value.asInstanceOf[js.Any])
       
@@ -519,13 +519,13 @@ object anon {
       
       inline def setHandlersUndefined: Self = StObject.set(x, "handlers", js.undefined)
       
-      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value :_*))
+      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value*))
       
       inline def setHeaders(value: HeadersInit): Self = StObject.set(x, "headers", value.asInstanceOf[js.Any])
       
       inline def setHeadersUndefined: Self = StObject.set(x, "headers", js.undefined)
       
-      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value :_*))
+      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value*))
       
       inline def setIntegrity(value: String): Self = StObject.set(x, "integrity", value.asInstanceOf[js.Any])
       
@@ -735,13 +735,13 @@ object anon {
       
       inline def setHandlersUndefined: Self = StObject.set(x, "handlers", js.undefined)
       
-      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value :_*))
+      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value*))
       
       inline def setHeaders(value: HeadersInit): Self = StObject.set(x, "headers", value.asInstanceOf[js.Any])
       
       inline def setHeadersUndefined: Self = StObject.set(x, "headers", js.undefined)
       
-      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value :_*))
+      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value*))
       
       inline def setIntegrity(value: String): Self = StObject.set(x, "integrity", value.asInstanceOf[js.Any])
       

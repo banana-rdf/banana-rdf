@@ -35,7 +35,7 @@ object formulaMod {
     * @param opts
     * @param opts.rdfFactory - The rdf factory that should be used by the store
     */
-  class default () extends Formula {
+  open class default () extends Formula {
     def this(statements: js.Array[
             types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
           ]) = this()

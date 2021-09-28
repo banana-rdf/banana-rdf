@@ -41,7 +41,7 @@ object fetcherMod {
   
   @JSImport("rdflib/lib/fetcher", JSImport.Default)
   @js.native
-  class default protected ()
+  open class default protected ()
     extends StObject
        with Fetcher {
     def this(store: types.rdflib.storeMod.default) = this()
@@ -262,11 +262,11 @@ object fetcherMod {
       
       inline def setHandlersUndefined: Self = StObject.set(x, "handlers", js.undefined)
       
-      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value :_*))
+      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value*))
       
       inline def setHeaders(value: HeadersInit): Self = StObject.set(x, "headers", value.asInstanceOf[js.Any])
       
-      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value :_*))
+      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value*))
       
       inline def setMethod(value: HTTPMethods): Self = StObject.set(x, "method", value.asInstanceOf[js.Any])
       
@@ -366,7 +366,7 @@ object fetcherMod {
       `type`: ResponseType,
       url: String
     ): ExtendedResponse = {
-      val __obj = js.Dynamic.literal(arrayBuffer = js.Any.fromFunction0(arrayBuffer), blob = js.Any.fromFunction0(blob), bodyUsed = bodyUsed.asInstanceOf[js.Any], formData = js.Any.fromFunction0(formData), headers = headers.asInstanceOf[js.Any], json = js.Any.fromFunction0(json), ok = ok.asInstanceOf[js.Any], redirected = redirected.asInstanceOf[js.Any], status = status.asInstanceOf[js.Any], statusText = statusText.asInstanceOf[js.Any], text = js.Any.fromFunction0(text), trailer = trailer.asInstanceOf[js.Any], url = url.asInstanceOf[js.Any], body = null)
+      val __obj = js.Dynamic.literal(arrayBuffer = js.Any.fromFunction0(arrayBuffer), blob = js.Any.fromFunction0(blob), bodyUsed = bodyUsed.asInstanceOf[js.Any], formData = js.Any.fromFunction0(formData), headers = headers.asInstanceOf[js.Any], json = js.Any.fromFunction0(json), ok = ok.asInstanceOf[js.Any], redirected = redirected.asInstanceOf[js.Any], status = status.asInstanceOf[js.Any], statusText = statusText.asInstanceOf[js.Any], text = js.Any.fromFunction0(text), trailer = trailer.asInstanceOf[js.Any], url = url.asInstanceOf[js.Any], body = null.asInstanceOf[js.Any])
       __obj.updateDynamic("type")(`type`.asInstanceOf[js.Any])
       __obj.asInstanceOf[ExtendedResponse]
     }
@@ -985,13 +985,13 @@ object fetcherMod {
       
       inline def setHandlersUndefined: Self = StObject.set(x, "handlers", js.undefined)
       
-      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value :_*))
+      inline def setHandlersVarargs(value: Handler*): Self = StObject.set(x, "handlers", js.Array(value*))
       
       inline def setHeaders(value: HeadersInit): Self = StObject.set(x, "headers", value.asInstanceOf[js.Any])
       
       inline def setHeadersUndefined: Self = StObject.set(x, "headers", js.undefined)
       
-      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value :_*))
+      inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value*))
       
       inline def setIntegrity(value: String): Self = StObject.set(x, "integrity", value.asInstanceOf[js.Any])
       

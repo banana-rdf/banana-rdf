@@ -13,7 +13,7 @@ object emptyMod {
   
   @JSImport("rdflib/lib/empty", JSImport.Default)
   @js.native
-  class default ()
+  open class default ()
     extends Empty
        with _ObjectType
   

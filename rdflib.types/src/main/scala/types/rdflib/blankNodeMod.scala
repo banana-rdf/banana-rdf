@@ -22,7 +22,7 @@ object blankNodeMod {
     * Initializes this node
     * @param [id] The identifier for the blank node
     */
-  class default ()
+  open class default ()
     extends BlankNode
        with SubjectType
        with _DefaultFactoryTypes

@@ -37,7 +37,7 @@ object storeMod {
     * @param [opts.rdfArrayRemove] - Function which removes statements from the store
     * @param [opts.dataCallback] - Callback when a statement is added to the store, will not trigger when adding duplicates
     */
-  class default () extends IndexedFormula {
+  open class default () extends IndexedFormula {
     def this(features: FeaturesType) = this()
     def this(features: Unit, opts: FormulaOpts) = this()
     def this(features: FeaturesType, opts: FormulaOpts) = this()

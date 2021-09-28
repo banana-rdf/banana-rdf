@@ -19,7 +19,7 @@ object collectionMod {
   /* import warning: transforms.RemoveMultipleInheritance#findNewParents newComments Dropped parents 
   - types.rdflib.typesMod._FromValueReturns because Already inherited */ @JSImport("rdflib/lib/collection", JSImport.Default)
   @js.native
-  class default[T /* <: types.rdflib.nodeInternalMod.default */] () extends Collection[T] {
+  open class default[T /* <: types.rdflib.nodeInternalMod.default */] () extends Collection[T] {
     def this(initial: js.Array[ValueType]) = this()
   }
   /* static members */

@@ -104,7 +104,7 @@ object RequestInit {
     
     inline def setHeadersUndefined: Self = StObject.set(x, "headers", js.undefined)
     
-    inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value :_*))
+    inline def setHeadersVarargs(value: js.Array[String]*): Self = StObject.set(x, "headers", js.Array(value*))
     
     inline def setIntegrity(value: String): Self = StObject.set(x, "integrity", value.asInstanceOf[js.Any])
     

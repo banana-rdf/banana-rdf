@@ -20,7 +20,7 @@ object namedNodeMod {
   
   @JSImport("rdflib/lib/named-node", JSImport.Default)
   @js.native
-  class default protected ()
+  open class default protected ()
     extends NamedNode
        with GraphType
        with PredicateType

@@ -17,7 +17,7 @@ object literalMod {
   
   @JSImport("rdflib/lib/literal", JSImport.Default)
   @js.native
-  class default protected ()
+  open class default protected ()
     extends Literal
        with _DefaultFactoryTypes
        with _ObjectType {
