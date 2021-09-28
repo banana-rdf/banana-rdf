@@ -1,9 +1,9 @@
-import Dependencies.{TestLibs, jenaLibs}
+import Dependencies.{TestLibs, jenaLibs, Ver}
 import org.scalablytyped.converter.plugin.ScalablyTypedConverterGenSourcePlugin.autoImport.{SourceGenMode, stSourceGenMode}
 import sbt.Keys.description
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 
-scalaVersion := "3.1.0-RC2"
+scalaVersion := Ver.scala3
 
 ThisBuild / homepage      := Some(url("https://github.com/banana-rdf/banana-rdf"))
 ThisBuild / licenses      += ("MIT", url("https://opensource.org/licenses/mit-license.php"))
@@ -63,7 +63,7 @@ lazy val commonSettings = Seq(
 	version := "0.9-SNAPSHOT",
 	description := "RDF framework for Scala",
 	startYear := Some(2012),
-	scalaVersion := "3.1.0-RC2",
+	scalaVersion := Ver.scala3,
 	updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
 )
 
@@ -132,7 +132,7 @@ lazy val rdf4j = project.in(file("rdf4j"))
 	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //ntriplesJVM,
 
 lazy val rdflibTypes = project.in(file("rdflib.types"))
-	.enablePlugins(ScalaJSBundlerPlugin)
+//	.enablePlugins(ScalaJSBundlerPlugin)
 	//documentation here: https://scalablytyped.org/docs/library-developer
 	// call stImport in sbt to generate new sources
 	.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
@@ -151,6 +151,26 @@ lazy val rdflibTypes = project.in(file("rdflib.types"))
 //		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
 	)
 //	.dependsOn(rdfJS, ntriplesJS) // rdfTestSuiteJS % "test->compile",
+
+
+lazy val rdflibScratch =  project.in(file("rdflib.scratch"))
+	// .enablePlugins(ScalaJSBundlerPlugin)
+	//documentation here: https://scalablytyped.org/docs/library-developer
+	// call stImport in sbt to generate new sources
+	//.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
+	.enablePlugins(ScalablyTypedConverterPlugin)
+	.settings(commonSettings: _*)
+	.settings(
+		name := "rdflib-scratch",
+		useYarn := true,
+		scalacOptions ++= scala3jsOptions,
+		scalaJSUseMainModuleInitializer := true,
+		Compile / npmDependencies += "rdflib" -> "2.2.7",
+		stUseScalaJsDom := true,
+		libraryDependencies += "org.scala-js" %%% "rdflib-types" % "0.9-SNAPSHOT",
+		Compile / mainClass := Some( "org.w3.banana.testRdfLib" )
+	)
+
 
 
 lazy val rdfTestSuite = crossProject(JVMPlatform)//, JSPlatform)
@@ -185,11 +205,5 @@ lazy val scratch = crossProject(JVMPlatform,JSPlatform)
 		//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
 		libraryDependencies ++= Seq(jenaLibs, TestLibs.munit)
 	)
-	.jsSettings(
-		scalaJSUseMainModuleInitializer := true,
-		scalacOptions ++= scala3jsOptions,
-		//Compile / mainClass := Some( "hello.World" )
-	)
-
 lazy val scratchJVM = scratch.jvm
 lazy val scratchJS = scratch.js
