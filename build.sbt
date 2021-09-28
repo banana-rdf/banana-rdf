@@ -131,28 +131,6 @@ lazy val rdf4j = project.in(file("rdf4j"))
 		)
 	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //ntriplesJVM,
 
-lazy val rdflibTypes = project.in(file("rdflib.types"))
-//	.enablePlugins(ScalaJSBundlerPlugin)
-	//documentation here: https://scalablytyped.org/docs/library-developer
-	// call stImport in sbt to generate new sources
-	.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
-//	.enablePlugins(ScalablyTypedConverterPlugin)
-	.settings(commonSettings: _*)
-	.settings(
-		name := "rdflib-types",
-		scalacOptions ++= scala3jsOptions,
-		Compile / npmDependencies  += "rdflib" -> "2.2.7",
-		useYarn := true,
-		stUseScalaJsDom := true,
-		stOutputPackage := "types",
-		stMinimize := Selection.AllExcept("rdflib"),
-//		stSourceGenMode := SourceGenMode.ResourceGenerator,
-		stSourceGenMode := SourceGenMode.Manual( baseDirectory.value /"src"/"main"/"scala")
-//		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
-	)
-//	.dependsOn(rdfJS, ntriplesJS) // rdfTestSuiteJS % "test->compile",
-
-
 lazy val rdflibScratch =  project.in(file("rdflib.scratch"))
 	// .enablePlugins(ScalaJSBundlerPlugin)
 	//documentation here: https://scalablytyped.org/docs/library-developer
