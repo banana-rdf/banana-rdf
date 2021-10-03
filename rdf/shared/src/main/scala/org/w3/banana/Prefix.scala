@@ -31,7 +31,7 @@ open class PrefixBuilder[Rdf <: RDF](
 	def apply(value: String): URI[Rdf] = ops.URI(prefixIri + value)
 
 	def unapply(iri: URI[Rdf]): Option[String] =
-		val uriString: String = iri.string
+		val uriString: String = iri.value
 		if uriString.startsWith(prefixIri) then
 			Some(uriString.substring(prefixIri.length).nn)
 		else

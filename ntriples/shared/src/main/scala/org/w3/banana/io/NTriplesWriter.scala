@@ -28,11 +28,11 @@ class NTriplesWriter[Rdf <: RDF](using val ops: Ops[Rdf])
 	 */
 	def node2Str(node: Node[Rdf]): String = node.fold(
 		bn => "_:" + bn.label,
-		url => "<" + url.string + ">",
+		url => "<" + url.value + ">",
 		lit => lit.fold(
 			txt => "\"" + txt + "\"",
 			(txt,lang) => "\"" + txt + "\"" + "@" + lang.label,
-			(txt,tp) => "\"" + txt + "\"" + "^^<" + tp.string + ">"
+			(txt,tp) => "\"" + txt + "\"" + "^^<" + tp.value + ">"
 		)
 	)
 

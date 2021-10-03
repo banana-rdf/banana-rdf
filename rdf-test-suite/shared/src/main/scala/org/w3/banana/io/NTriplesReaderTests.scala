@@ -87,7 +87,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		}
 
 		"parse an TypedLiteral" in {
-			val litstr = s"""123"^^<${xsd.integer.string}> """
+			val litstr = s"""123"^^<${xsd.integer.value}> """
 			val lit = ntparser(litstr).parseLiteral()
 			lit should equal(Literal("123",xsd.integer))
 		}

@@ -56,5 +56,7 @@ object Dependencies {
 	 * @see https://www.slf4j.org
 	 */
 	val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.7.32" % Test
+
+//	val `rdflib-types` = "org.scala-js" %%% "rdflib-types" % "0.1-SNAPSHOT"
 	
 }

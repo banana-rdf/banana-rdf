@@ -29,8 +29,8 @@ open class TripleTest[R<:RDF](using ops: Ops[R])
 	val bblf: URI[R] = URI(bbl("i"))
 
 	test("URI Test") {
-		assertEquals(timbl.toString,tim("i"))
-		assertEquals(bblf.toString, bbl("i"))
+		assertEquals(timbl.value,tim("i"))
+		assertEquals(bblf.value, bbl("i"))
 	}
 
 	test("type test on literal") {
@@ -101,7 +101,7 @@ open class TripleTest[R<:RDF](using ops: Ops[R])
 		)
 		val nodeStrings = nodes.map(_.fold(
 			bn => bn.label,
-			uri => uri.string,
+			uri => uri.value,
 			lit => lit.fold(
 				identity,
 				(t,l) =>  t+":"+l,
@@ -110,7 +110,7 @@ open class TripleTest[R<:RDF](using ops: Ops[R])
 		))
 		assertEquals(nodeStrings, List(
 			"b1",
-			bbl("i"),tim("i"),foaf.knows.string,
+			bbl("i"),tim("i"),foaf.knows.value,
 			"2001-10-26T21:32:52+02:00","hello","Tim:en"))
 	}
 

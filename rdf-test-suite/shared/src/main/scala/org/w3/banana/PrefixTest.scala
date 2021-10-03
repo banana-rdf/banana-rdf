@@ -10,21 +10,20 @@ open class PrefixTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	val rdf = RDFPrefix[Rdf]
 
 	test("FOAF Prefix") {
-		assertEquals(foaf.age,     URI(foafPre("age")))
-		assertEquals(foaf.knows,   URI(foafPre("knows")))
-		assertEquals(foaf.homepage,URI(foafPre("homepage")))
+		assert(foaf.age.===(URI(foafPre("age"))))
+		assert(foaf.knows.===(URI(foafPre("knows"))))
+		assert(foaf.homepage.===(URI(foafPre("homepage"))))
 	}
 
 	test("XSD Prefix") {
-		assertEquals(xsd.int,       URI(xsdPre("int")))
-		assertEquals(xsd.integer,   URI(xsdPre("integer")))
-		assertEquals(xsd.hexBinary, URI(xsdPre("hexBinary")))
-		assertEquals(xsd.string, URI(ops.xsdStr))
-
+		assert(xsd.int === URI(xsdPre("int")))
+		assert(xsd.integer === URI(xsdPre("integer")))
+		assert(xsd.hexBinary === URI(xsdPre("hexBinary")))
+		assert(xsd.string === URI(ops.xsdStr))
 	}
 
 	test("RDF namespace") {
-		assertEquals(rdf.langString, URI(ops.xsdLangStr))
+		assert(rdf.langString === URI(ops.xsdLangStr))
 	}
 
 

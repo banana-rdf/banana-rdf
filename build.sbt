@@ -131,6 +131,28 @@ lazy val rdf4j = project.in(file("rdf4j"))
 		)
 	).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") //ntriplesJVM,
 
+lazy val rdflibJS =  project.in(file("rdflibJS"))
+	// .enablePlugins(ScalaJSBundlerPlugin)
+	//documentation here: https://scalablytyped.org/docs/library-developer
+	// call stImport in sbt to generate new sources
+	//.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
+	.enablePlugins(ScalablyTypedConverterPlugin)
+	.settings(commonSettings: _*)
+	.settings(
+		name := "rdflibJS",
+		useYarn := true,
+		scalacOptions ++= scala3jsOptions,
+		Compile / npmDependencies += "rdflib" -> "2.2.7",
+		stUseScalaJsDom := true,
+		libraryDependencies += "org.w3" %%% "rdflib-types" % "0.1-SNAPSHOT",
+		libraryDependencies += "org.scalameta" %%% "munit" % "0.7.29" % Test,
+		scalaJSUseMainModuleInitializer := true,
+		Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) } //required for munit to run
+		//		Compile / mainClass := Some( "org.w3.banana.testRdfLib" )
+	).dependsOn(rdfJS, rdfTestSuiteJS % "test->compile")
+
+
+
 lazy val rdflibScratch =  project.in(file("rdflib.scratch"))
 	// .enablePlugins(ScalaJSBundlerPlugin)
 	//documentation here: https://scalablytyped.org/docs/library-developer
@@ -142,33 +164,34 @@ lazy val rdflibScratch =  project.in(file("rdflib.scratch"))
 		name := "rdflib-scratch",
 		useYarn := true,
 		scalacOptions ++= scala3jsOptions,
-		scalaJSUseMainModuleInitializer := true,
 		Compile / npmDependencies += "rdflib" -> "2.2.7",
 		stUseScalaJsDom := true,
-		libraryDependencies += "org.scala-js" %%% "rdflib-types" % "0.9-SNAPSHOT",
+		libraryDependencies += "org.w3" %%% "rdflib-types" % "0.1-SNAPSHOT",
+		scalaJSUseMainModuleInitializer := true,
 		Compile / mainClass := Some( "org.w3.banana.testRdfLib" )
 	)
 
-
-
-lazy val rdfTestSuite = crossProject(JVMPlatform)//, JSPlatform)
+lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
 	.crossType(CrossType.Full)
 	.in(file("rdf-test-suite"))
 	.settings(commonSettings: _*)
 	.settings(
 		name := "banana-test",
-		libraryDependencies ++= Seq(TestLibs.munit, TestLibs.scalatest)
+		libraryDependencies += TestLibs.scalatest,
+		libraryDependencies += "org.scalameta" %%% "munit" % "0.7.29" ,
 	//	Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
 	)
 	.dependsOn(rdf, ntriples)
 	.jvmSettings(
 		scalacOptions ++= scala3jvmOptions
 	)
-//	.jsSettings(
-//		scalacOptions ++= scala3jsOptions
-//	)
+	.jsSettings(
+		scalacOptions ++= scala3jsOptions,
+		Test / scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) } //required for munit to run
+	)
 
 lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
+lazy val rdfTestSuiteJS = rdfTestSuite.js
 
 lazy val scratch = crossProject(JVMPlatform,JSPlatform)
 	.crossType(CrossType.Full)
@@ -181,7 +204,7 @@ lazy val scratch = crossProject(JVMPlatform,JSPlatform)
 		name := "scratch",
 		scalacOptions ++= scala3jvmOptions,
 		//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
-		libraryDependencies ++= Seq(jenaLibs, TestLibs.munit)
+//		libraryDependencies ++= Seq(jenaLibs, TestLibs.munit)
 	)
 lazy val scratchJVM = scratch.jvm
 lazy val scratchJS = scratch.js

@@ -30,7 +30,6 @@ trait Ops[Rdf <: RDF]:
 
 	//implementations
 
-
 	given Graph: GraphOps
 	trait GraphOps:
 		def empty: Graph[Rdf]
@@ -181,7 +180,8 @@ trait Ops[Rdf <: RDF]:
 		def mkUri(iriStr: String): Try[URI[Rdf]]
 		protected def asString(uri: URI[Rdf]): String
 		extension (uri: URI[Rdf])
-			def string: String = asString(uri)
+			def value: String = asString(uri)
+			def ===(other: URI[Rdf]): Boolean = uri.equals(other)
 
 
 	given Lang: LangOps

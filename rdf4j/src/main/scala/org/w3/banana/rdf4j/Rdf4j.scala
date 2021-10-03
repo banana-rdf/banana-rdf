@@ -1,6 +1,5 @@
 package org.w3.banana.rdf4j
 
-import org.apache.jena.graph.Node_Blank
 import org.eclipse.rdf4j.model.{BNode as rjBNode, IRI as rjIRI, Literal as rjLiteral, *}
 import org.eclipse.rdf4j.model.impl.*
 import org.eclipse.rdf4j.model.util.Models
@@ -92,7 +91,7 @@ object Rdf4j extends RDF {
 			def triplesIn(graph: RDF.rGraph[R]): Iterable[RDF.rTriple[R]] =
 				Graph.triplesIn(graph)
 			def graphSize(graph: RDF.rGraph[R]): Int =
-				Graph.graphSize(graph)
+				Graph.graphSize(graph).toInt
 
 //		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
 //			override def unapply(s: Matchable): Option[s.type & Triple] =
