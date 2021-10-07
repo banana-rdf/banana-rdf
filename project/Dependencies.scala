@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
 	object Ver {
-		val scala3 = "3.1.0-RC2"
+		val scala3 = "3.1.0-RC3"
 	}
 
 	/**

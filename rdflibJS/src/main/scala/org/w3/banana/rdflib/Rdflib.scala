@@ -1,5 +1,6 @@
 package org.w3.banana.rdflib
 
+import org.w3.banana.rdflib.Rdflib.rlNode
 import types.rdflib.{mod, namedNodeMod}
 import org.w3.banana.{Ops, RDF}
 import types.rdflib.tfTypesMod.{QuadGraph, QuadObject, QuadPredicate, QuadSubject}
@@ -14,7 +15,10 @@ import scala.scalajs.js.undefined
 object Rdflib extends RDF {
 	import types.rdflib.tfTypesMod as rdfTp
 	import types.rdflib.storeMod
-//	type rdfLibNode = types.rdflib.nodeInternalMod.Node
+	type rlNode = types.rdflib.nodeInternalMod.Node
+	type rlNamedNode = types.rdflib.namedNodeMod.NamedNode
+	type rlBlank = types.rdflib.blankNodeMod.BlankNode
+	type rlLiteral = types.rdflib.literalMod.Literal
 	protected type Quad =  rdfTp.Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]
 	//	protected type Quad =  rdfTp.Quad[rdfTp.Term, rdfTp.Term, rdfTp.Term, rdfTp.Term]
 	//I need to check how far rdflib really allows relative URIs.
@@ -22,14 +26,14 @@ object Rdflib extends RDF {
 	// since we anly really want to use them for constructing resources to POST or PUT
 	override opaque type rGraph = storeMod.IndexedFormula
 	override opaque type rTriple = Quad
-	override opaque type rURI = rdfTp.NamedNode
+	override opaque type rURI = types.rdflib.namedNodeMod.NamedNode
 
 	override opaque type Graph = storeMod.IndexedFormula
 	override opaque type Triple <: Matchable = Quad
-	override opaque type Node <: Matchable = rdfTp.Term
-	override opaque type URI <: Node = rdfTp.NamedNode
-	override opaque type BNode <: Node = rdfTp.BlankNode
-	override opaque type Literal <: Node = rdfTp.Literal
+	override opaque type Node <: Matchable = rlNode
+	override opaque type URI <: Node =  rlNamedNode //rdfTp.NamedNode
+	override opaque type BNode <: Node = rlBlank
+	override opaque type Literal <: Node = rlLiteral
 	override opaque type Lang <: Matchable = String
 
 
@@ -129,9 +133,9 @@ object Rdflib extends RDF {
 				else throw new RuntimeException("makeTriple: in rdflib, subject " + s.toString + " must be a either URI or BlankNode")
 			def untuple(t: RDF.Triple[R]): TripleI =
 					(subjectOf(t), relationOf(t), objectOf(t))
-			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] = t.subject.asInstanceOf[rdfTp.Term]
-			def relationOf(t: RDF.Triple[R]): RDF.URI[R] = t.predicate.asInstanceOf[rdfTp.NamedNode]
-			def objectOf(t: RDF.Triple[R]): RDF.Node[R] = t.`object`.asInstanceOf[rdfTp.Term]
+			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] = t.subject.asInstanceOf[rlNode]
+			def relationOf(t: RDF.Triple[R]): RDF.URI[R] = t.predicate.asInstanceOf[rlNamedNode]
+			def objectOf(t: RDF.Triple[R]): RDF.Node[R] = t.`object`.asInstanceOf[rlNode]
 		end Triple
 
 		//todo: see whether this really works! It may be that we need to create a new construct
@@ -153,18 +157,18 @@ object Rdflib extends RDF {
 					litF: RDF.Literal[R] => A
 				): A =
 					if termsMod.isBlankNode(node) then
-						bnF(node.asInstanceOf[rdfTp.BlankNode])
+						bnF(node.asInstanceOf[rlBlank])
 					else if termsMod.isNamedNode(node) then
-						uriF(node.asInstanceOf[rdfTp.NamedNode])
+						uriF(node.asInstanceOf[rlNamedNode])
 					else if termsMod.isBlankNode(node) then
-						litF(node.asInstanceOf[rdfTp.Literal])
+						litF(node.asInstanceOf[rlLiteral])
 					else throw new IllegalArgumentException(
 						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
 					)
 
 		given BNode: BNodeOps with
-			def apply(s: String): RDF.BNode[R] = rdfDF.blankNode(s)
-			def apply(): RDF.BNode[R] = rdfDF.blankNode()
+			def apply(s: String): RDF.BNode[R] = types.rdflib.blankNodeMod.default(s)
+			def apply(): RDF.BNode[R] = types.rdflib.blankNodeMod.default()
 			extension (bn: RDF.BNode[R])
 				def label: String = bn.value
 		end BNode
@@ -175,17 +179,17 @@ object Rdflib extends RDF {
 			import LiteralI as Lit
 
 			def apply(plain: String): RDF.Literal[R] =
-				rdfDF.literal(plain,"")
+				types.rdflib.literalMod.default(plain)
 			def apply(lit: Lit): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => apply(text)
-				case Lit.`@`(text, lang) => rdfDF.literal(text,lang)
-				case Lit.`^^`(text, tp) => rdfDF.literal(text,tp)
+				case Lit.`@`(text, lang) => types.rdflib.literalMod.default(text,lang)
+				case Lit.`^^`(text, tp) => types.rdflib.literalMod.default(text,null,lang)
 
 			def unapply(x: Matchable): Option[LiteralI] =
 				if termsMod.isLiteral(x.asInstanceOf[scalajs.js.Any]) then
-					val lit: rdfTp.Literal = x.asInstanceOf[rdfTp.Literal]
+					val lit: rlLiteral = x.asInstanceOf[rlLiteral]
 					val lex: String = lit.value.nn
-					val dt: RDF.URI[R] = lit.datatype
+					val dt: RDF.URI[R] = lit.datatype.asInstanceOf[rlNamedNode]
 					val lang: String = lit.language.nn
 					if (lang.isEmpty) then
 					//todo: this comparison could be costly, check
@@ -198,11 +202,11 @@ object Rdflib extends RDF {
 
 			@targetName("langLit")
 			def apply(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
-				rdfDF.literal(lex,lang)
+				types.rdflib.literalMod.default(lex,lang)
 
 			@targetName("dataTypeLit")
 			def apply(lex: String, dataTp: RDF.URI[R]): RDF.Literal[R] =
-				rdfDF.literal(lex, dataTp)
+				types.rdflib.literalMod.default(lex,null, lang)
 
 			extension (lit: RDF.Literal[R])
 				def text: String = lit.value
@@ -211,7 +215,7 @@ object Rdflib extends RDF {
 		override given literalTT: TypeTest[Matchable, RDF.Literal[R]] with {
 			override def unapply(s: Matchable): Option[s.type & RDF.Literal[R]] =
 				if termsMod.isLiteral(s.asInstanceOf[scalajs.js.Any]) then
-					Some(s.asInstanceOf[s.type & rdfTp.Literal])
+					Some(s.asInstanceOf[s.type & rlLiteral])
 				else None
 		}
 
@@ -222,21 +226,18 @@ object Rdflib extends RDF {
 		}
 
 		val rURI = new rURIOps:
-			def apply(iriStr: String): RDF.rURI[R] = rdfDF.namedNode(iriStr)
+			def apply(iriStr: String): RDF.rURI[R] = types.rdflib.namedNodeMod.default(iriStr)
 			def asString(uri: RDF.rURI[R]): String = uri.toString
 
 		given URI: URIOps with
 			//this does throw an exception on non relative URLs!
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
-				Try(rdfDF.namedNode(iriStr))
+				Try(new types.rdflib.mod.NamedNode(iriStr))
 			def asString(uri: RDF.URI[R]): String = uri.value
 
-			extension (uri: RDF.URI[R])
-				override def ===(other: RDF.URI[R]): Boolean =
-					println("HELLO in == !!")
-					rdf.equals(uri, other)
+//			extension(uri: RDF.URI[R])
+//				def !=(other: RDF.URI[R]): Boolean = !(uri == other)
 		end URI
-
 
 	}
 
