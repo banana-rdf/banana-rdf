@@ -1,51 +1,39 @@
 package org.w3.banana.rdflib
 
-import org.scalablytyped.runtime.StringDictionary
-import types.rdflib.collectionMod.Collection
-import types.rdflib.factoryTypesMod.Indexable
-import types.rdflib.factoryTypesMod.TFIDFactoryTypes
-import types.rdflib.rdflibStrings.Graph
-import types.rdflib.tfTypesMod.NamedNode
-import types.rdflib.tfTypesMod.Quad
-import types.rdflib.tfTypesMod.QuadGraph
-import types.rdflib.tfTypesMod.QuadObject
-import types.rdflib.tfTypesMod.QuadPredicate
-import types.rdflib.tfTypesMod.QuadSubject
-import types.rdflib.tfTypesMod.RdfJsDataFactory
-import types.rdflib.tfTypesMod.Term
-import types.rdflib.typesMod.GraphType
-import types.rdflib.typesMod.ObjectType
-import types.rdflib.typesMod.PredicateType
-import types.rdflib.typesMod.SubjectType
-import org.scalablytyped.runtime.StObject
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+import scala.scalajs.js.annotation.*
 
 object formulaMod {
 
 	@JSImport("rdflib/lib/formula", JSImport.Default)
 	@js.native
+
 	/**
 	 * Initializes this formula
+	 *
 	 * @constructor
-	 * @param statements - Initial array of statements
-	 * @param constraints - initial array of constraints
+	 * @param statements   - Initial array of statements
+	 * @param constraints  - initial array of constraints
 	 * @param initBindings - initial bindings used in Query
-	 * @param optional - optional
+	 * @param optional     - optional
 	 * @param opts
-	 * @param opts.rdfFactory - The rdf factory that should be used by the store
+	 * @param opts         .rdfFactory - The rdf factory that should be used by the store
 	 */
-	open class default () extends Formula {
-		def this(statements: js.Array[
-			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-		]) = this()
+	open class default() extends Formula {
+		def this(
+			statements: js.Array[
+				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
+			]) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
 			],
 			constraints: js.Array[js.Any]
 		) = this()
+
 		def this(statements: Unit, constraints: js.Array[js.Any]) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -53,6 +41,7 @@ object formulaMod {
 			constraints: js.Array[js.Any],
 			initBindings: js.Array[js.Any]
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -60,8 +49,11 @@ object formulaMod {
 			constraints: Unit,
 			initBindings: js.Array[js.Any]
 		) = this()
+
 		def this(statements: Unit, constraints: js.Array[js.Any], initBindings: js.Array[js.Any]) = this()
+
 		def this(statements: Unit, constraints: Unit, initBindings: js.Array[js.Any]) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -70,6 +62,7 @@ object formulaMod {
 			initBindings: js.Array[js.Any],
 			optional: js.Array[js.Any]
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -78,6 +71,7 @@ object formulaMod {
 			initBindings: Unit,
 			optional: js.Array[js.Any]
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -86,6 +80,7 @@ object formulaMod {
 			initBindings: js.Array[js.Any],
 			optional: js.Array[js.Any]
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -94,15 +89,20 @@ object formulaMod {
 			initBindings: Unit,
 			optional: js.Array[js.Any]
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: js.Array[js.Any],
 			initBindings: js.Array[js.Any],
 			optional: js.Array[js.Any]
 		) = this()
+
 		def this(statements: Unit, constraints: js.Array[js.Any], initBindings: Unit, optional: js.Array[js.Any]) = this()
+
 		def this(statements: Unit, constraints: Unit, initBindings: js.Array[js.Any], optional: js.Array[js.Any]) = this()
+
 		def this(statements: Unit, constraints: Unit, initBindings: Unit, optional: js.Array[js.Any]) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -112,6 +112,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -121,6 +122,7 @@ object formulaMod {
 			optional: Unit,
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -130,6 +132,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -139,6 +142,7 @@ object formulaMod {
 			optional: Unit,
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -148,6 +152,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -157,6 +162,7 @@ object formulaMod {
 			optional: Unit,
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -166,6 +172,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: js.Array[
 				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
@@ -175,6 +182,7 @@ object formulaMod {
 			optional: Unit,
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: js.Array[js.Any],
@@ -182,6 +190,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: js.Array[js.Any],
@@ -189,6 +198,7 @@ object formulaMod {
 			optional: Unit,
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: js.Array[js.Any],
@@ -196,6 +206,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: js.Array[js.Any],
@@ -203,6 +214,7 @@ object formulaMod {
 			optional: Unit,
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: Unit,
@@ -210,6 +222,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: Unit,
@@ -217,6 +230,7 @@ object formulaMod {
 			optional: Unit,
 			opts: FormulaOpts
 		) = this()
+
 		def this(
 			statements: Unit,
 			constraints: Unit,
@@ -224,6 +238,7 @@ object formulaMod {
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
+
 		def this(statements: Unit, constraints: Unit, initBindings: Unit, optional: Unit, opts: FormulaOpts) = this()
 	}
 
@@ -235,139 +250,219 @@ object formulaMod {
 
 		/**
 		 * Transform a collection of NTriple URIs into their URI strings
+		 *
 		 * @param t - Some iterable collection of NTriple URI strings
 		 * @return A collection of the URIs as strings
-		 * todo: explain why it is important to go through NT
+		 *         todo: explain why it is important to go through NT
 		 */
 		def NTtoURI(t: js.Any): js.Object = js.native
 
 		def add(subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]]): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: Unit,
 			`object`: String
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: Unit,
 			`object`: String,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: Unit,
 			`object`: Unit,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: Unit,
 			`object`: Term
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: Unit,
 			`object`: Term,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: QuadPredicate
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: QuadPredicate,
 			`object`: String
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: QuadPredicate,
 			`object`: String,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: QuadPredicate,
 			`object`: Unit,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: QuadPredicate,
 			`object`: Term
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
 			predicate: QuadPredicate,
 			`object`: Term,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		/** Add a statement from its parts
-		 * @param subject - the first part of the statement
+		 *
+		 * @param subject   - the first part of the statement
 		 * @param predicate - the second part of the statement
-		 * @param object - the third part of the statement
-		 * @param graph - the last part of the statement
+		 * @param object    - the third part of the statement
+		 * @param graph     - the last part of the statement
 		 */
 		def add(subject: QuadSubject): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: Unit, `object`: String): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: Unit, `object`: String, graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: Unit, `object`: Unit, graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: Unit, `object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: Unit, `object`: Term, graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: QuadPredicate): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: QuadPredicate, `object`: String): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: QuadPredicate, `object`: String, graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: QuadPredicate, `object`: Unit, graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: QuadPredicate, `object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: QuadSubject, predicate: QuadPredicate, `object`: Term, graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: Unit,
+			`object`: String): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: Unit,
+			`object`: String,
+			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: Unit,
+			`object`: Unit,
+			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: Unit,
+			`object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: Unit,
+			`object`: Term,
+			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: QuadPredicate): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: QuadPredicate,
+			`object`: String): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: QuadPredicate,
+			`object`: String,
+			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: QuadPredicate,
+			`object`: Unit,
+			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: QuadPredicate,
+			`object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: QuadSubject,
+			predicate: QuadPredicate,
+			`object`: Term,
+			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: Unit,
 			`object`: String
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: Unit,
 			`object`: String,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: Unit,
 			`object`: Unit,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph], predicate: Unit, `object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
+			predicate: Unit,
+			`object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: Unit,
 			`object`: Term,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-		def add(subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph], predicate: QuadPredicate): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
+		def add(
+			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
+			predicate: QuadPredicate): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: QuadPredicate,
 			`object`: String
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: QuadPredicate,
 			`object`: String,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: QuadPredicate,
 			`object`: Unit,
 			graph: QuadGraph
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: QuadPredicate,
 			`object`: Term
 		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+
 		def add(
 			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
 			predicate: QuadPredicate,
@@ -377,11 +472,13 @@ object formulaMod {
 
 		/**
 		 * Adds all the statements to this formula
+		 *
 		 * @param statements - A collection of statements
 		 */
 		def addAll(statements: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]]): Unit = js.native
 
 		/** Add a statment object
+		 *
 		 * @param {Statement} statement - An existing constructed statement to add
 		 */
 		def addStatement(statement: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
@@ -407,6 +504,7 @@ object formulaMod {
 
 		/**
 		 * Gets the first JavaScript object equivalent to a node based on the specified pattern
+		 *
 		 * @param s The subject
 		 * @param p The predicate
 		 * @param o The object
@@ -433,6 +531,7 @@ object formulaMod {
 
 		/**
 		 * Gets the value of a node that matches the specified pattern
+		 *
 		 * @param s The subject
 		 * @param p The predicate
 		 * @param o The object
@@ -447,9 +546,11 @@ object formulaMod {
 
 		/**
 		 * Shortcut for adding blankNodes
+		 *
 		 * @param [id]
 		 */
 		def bnode(): types.rdflib.blankNodeMod.default = js.native
+
 		def bnode(id: String): types.rdflib.blankNodeMod.default = js.native
 
 		/**
@@ -457,6 +558,7 @@ object formulaMod {
 		 * These are a set of classes which provide by themselves complete
 		 * information -- the other classes are redundant for those who
 		 * know the class DAG.
+		 *
 		 * @param types A map of the types
 		 */
 		def bottomTypeURIs(types_ : js.Any): js.Any = js.native
@@ -469,12 +571,13 @@ object formulaMod {
 		/** Trace statements which connect directly, or through bnodes
 		 *
 		 * @param subject - The node to start looking for statments
-		 * @param doc - The document to be searched, or null to search all documents
+		 * @param doc     - The document to be searched, or null to search all documents
 		 * @returns an array of statements, duplicate statements are suppresssed.
 		 */
 		def connectedStatements(subject: QuadSubject, doc: QuadGraph): js.Array[
 			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
 		] = js.native
+
 		def connectedStatements(subject: QuadSubject, doc: QuadGraph, excludePredicateURIs: js.Array[String]): js.Array[
 			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
 		] = js.native
@@ -502,6 +605,7 @@ object formulaMod {
 
 		/**
 		 * Test whether this formula is equals to {other}
+		 *
 		 * @param other - The other formula
 		 */
 		def equals(other: Formula): Boolean = js.native
@@ -520,6 +624,7 @@ object formulaMod {
 		 * We don't bother doing subproperty (yet?)as it doesn't seeem to be used
 		 * much.
 		 * Get all the Classes of which we can RDFS-infer the subject is a member
+		 *
 		 * @param subject - A named node
 		 */
 		def findMemberURIs(subject: types.rdflib.nodeInternalMod.default): UriMap = js.native
@@ -531,6 +636,7 @@ object formulaMod {
 		 * We don't bother doing subproperty (yet?)as it doesn't seeem to be used
 		 * much.
 		 * Get all the Classes of which we can RDFS-infer the subject is a member
+		 *
 		 * @return a hash of URIs
 		 */
 		def findMembersNT(thisClass: js.Any): MembersMap = js.native
@@ -546,11 +652,12 @@ object formulaMod {
 
 		/**
 		 * Get all the Classes of which we can RDFS-infer the subject is a subclass
+		 *
 		 * @param {RDFlibNamedNode} subject - The thing whose classes are to be found
 		 * @returns a hash table where key is NT of type and value is statement why we
-		 * think so.
-		 * Does NOT return terms, returns URI strings.
-		 * We use NT representations in this version because they handle blank nodes.
+		 *          think so.
+		 *          Does NOT return terms, returns URI strings.
+		 *          We use NT representations in this version because they handle blank nodes.
 		 */
 		def findSuperClassesNT(subject: types.rdflib.nodeInternalMod.default): StringDictionary[Boolean] = js.native
 
@@ -562,6 +669,7 @@ object formulaMod {
 		 * think so.
 		 * Does NOT return terms, returns URI strings.
 		 * We use NT representations in this version because they handle blank nodes.
+		 *
 		 * @param subject - A subject node
 		 */
 		def findTypeURIs(subject: QuadSubject): UriMap = js.native
@@ -570,10 +678,11 @@ object formulaMod {
 		 * Get all the Classes of which we can RDFS-infer the subject is a member
 		 * todo: This will loop is there is a class subclass loop (Sublass loops are
 		 * not illegal)
+		 *
 		 * @param {RDFlibNamedNode} subject - The thing whose classes are to be found
 		 * @returns a hash table where key is NT of type and value is statement why we think so.
-		 * Does NOT return terms, returns URI strings.
-		 * We use NT representations in this version because they handle blank nodes.
+		 *          Does NOT return terms, returns URI strings.
+		 *          We use NT representations in this version because they handle blank nodes.
 		 */
 		def findTypesNT(subject: js.Any): StringDictionary[Boolean] = js.native
 
@@ -583,6 +692,7 @@ object formulaMod {
 		 * @param _features - Not applicable, but necessary for typing to pass
 		 */
 		def formula(): Formula = js.native
+
 		def formula(_features: js.Array[String]): Formula = js.native
 
 		/**
@@ -595,20 +705,35 @@ object formulaMod {
 
 		/** Returns true if this formula holds the specified statement(s) */
 		def holds(s: js.Any): Boolean = js.native
+
 		def holds(s: js.Any, p: js.Any): Boolean = js.native
+
 		def holds(s: js.Any, p: js.Any, o: js.Any): Boolean = js.native
+
 		def holds(s: js.Any, p: js.Any, o: js.Any, g: js.Any): Boolean = js.native
+
 		def holds(s: js.Any, p: js.Any, o: Unit, g: js.Any): Boolean = js.native
+
 		def holds(s: js.Any, p: Unit, o: js.Any): Boolean = js.native
+
 		def holds(s: js.Any, p: Unit, o: js.Any, g: js.Any): Boolean = js.native
+
 		def holds(s: js.Any, p: Unit, o: Unit, g: js.Any): Boolean = js.native
+
 		def holds(s: js.Array[js.Any]): Boolean = js.native
+
 		def holds(s: js.Array[js.Any], p: js.Any): Boolean = js.native
+
 		def holds(s: js.Array[js.Any], p: js.Any, o: js.Any): Boolean = js.native
+
 		def holds(s: js.Array[js.Any], p: js.Any, o: js.Any, g: js.Any): Boolean = js.native
+
 		def holds(s: js.Array[js.Any], p: js.Any, o: Unit, g: js.Any): Boolean = js.native
+
 		def holds(s: js.Array[js.Any], p: Unit, o: js.Any): Boolean = js.native
+
 		def holds(s: js.Array[js.Any], p: Unit, o: js.Any, g: js.Any): Boolean = js.native
+
 		def holds(s: js.Array[js.Any], p: Unit, o: Unit, g: js.Any): Boolean = js.native
 
 		/**
@@ -629,7 +754,8 @@ object formulaMod {
 
 		/**
 		 * Used by the n3parser to generate list elements
-		 * @param values - The values of the collection
+		 *
+		 * @param values  - The values of the collection
 		 * @param context - The store
 		 * @return {BlankNode|Collection} - The term for the statement
 		 */
@@ -637,19 +763,23 @@ object formulaMod {
 
 		/**
 		 * A namespace for the specified namespace's URI
+		 *
 		 * @param nsuri The URI for the namespace
 		 */
-		def ns(nsuri: String): js.Function1[/* ln */ String, NamedNode] = js.native
-		def ns(nsuri: String, factory: RdfJsDataFactory): js.Function1[/* ln */ String, NamedNode] = js.native
+		def ns(nsuri: String): js.Function1[ /* ln */ String, NamedNode] = js.native
+
+		def ns(nsuri: String, factory: RdfJsDataFactory): js.Function1[ /* ln */ String, NamedNode] = js.native
+
 		/**
 		 * A namespace for the specified namespace's URI
+		 *
 		 * @param nsuri The URI for the namespace
 		 */
 		@JSName("ns")
 		var ns_Original: js.Function2[
 			/* nsuri */ String,
 			/* factory */ js.UndefOr[RdfJsDataFactory],
-			js.Function1[/* ln */ String, NamedNode]
+			js.Function1[ /* ln */ String, NamedNode]
 		] = js.native
 
 		var optional: js.Array[js.Any] = js.native
@@ -659,9 +789,10 @@ object formulaMod {
 
 		/**
 		 * Serializes this formula
-		 * @param base - The base string
+		 *
+		 * @param base        - The base string
 		 * @param contentType - The content type of the syntax to use
-		 * @param provenance - The provenance URI
+		 * @param provenance  - The provenance URI
 		 */
 		def serialize(base: js.Any, contentType: js.Any, provenance: js.Any): js.Any = js.native
 
@@ -673,14 +804,14 @@ object formulaMod {
 		 * Search the Store
 		 * This is really a teaching method as to do this properly you would use IndexedFormula
 		 *
-		 * @param s - A node to search for as subject, or if null, a wildcard
-		 * @param p - A node to search for as predicate, or if null, a wildcard
-		 * @param o - A node to search for as object, or if null, a wildcard
-		 * @param g - A node to search for as graph, or if null, a wildcard
+		 * @param s       - A node to search for as subject, or if null, a wildcard
+		 * @param p       - A node to search for as predicate, or if null, a wildcard
+		 * @param o       - A node to search for as object, or if null, a wildcard
+		 * @param g       - A node to search for as graph, or if null, a wildcard
 		 * @param justOne - flag - stop when found one rather than get all of them?
 		 * @returns {Array<Node>} - An array of nodes which match the wildcard position
 		 */
-		def statementsMatching[JustOne /* <: Boolean */](
+		def statementsMatching[JustOne /* <: Boolean */ ](
 			s: js.UndefOr[QuadSubject | Null],
 			p: js.UndefOr[QuadPredicate | Null],
 			o: js.UndefOr[QuadObject | Null],
@@ -691,6 +822,7 @@ object formulaMod {
 		] = js.native
 
 		def sym(uri: String): types.rdflib.namedNodeMod.default = js.native
+
 		def sym(uri: String, name: js.Any): types.rdflib.namedNodeMod.default = js.native
 
 		@JSName("termType")
@@ -698,6 +830,7 @@ object formulaMod {
 
 		/**
 		 * Gets the node matching the specified pattern. Throws when no match could be made.
+		 *
 		 * @param s - The subject
 		 * @param p - The predicate
 		 * @param o - The object
@@ -714,6 +847,7 @@ object formulaMod {
 		 * Finds the types in the list which have no *stored* supertypes
 		 * We exclude the universal class, owl:Things and rdf:Resource, as it is
 		 * information-free.
+		 *
 		 * @param types - The types
 		 */
 		def topTypeURIs(types_ : StringDictionary[String | types.rdflib.namedNodeMod.default]): StringDictionary[String | types.rdflib.namedNodeMod.default] = js.native
@@ -722,21 +856,28 @@ object formulaMod {
 		 * RDFS Inference
 		 * These are hand-written implementations of a backward-chaining reasoner
 		 * over the RDFS axioms.
-		 * @param seeds - A hash of NTs of classes to start with
+		 *
+		 * @param seeds     - A hash of NTs of classes to start with
 		 * @param predicate - The property to trace though
-		 * @param inverse - Trace inverse direction
+		 * @param inverse   - Trace inverse direction
 		 */
 		def transitiveClosure(seeds: BooleanMap, predicate: QuadPredicate): StringDictionary[Boolean] = js.native
-		def transitiveClosure(seeds: BooleanMap, predicate: QuadPredicate, inverse: Boolean): StringDictionary[Boolean] = js.native
+
+		def transitiveClosure(
+			seeds: BooleanMap,
+			predicate: QuadPredicate,
+			inverse: Boolean): StringDictionary[Boolean] = js.native
 
 		/**
 		 * Gets a new variable
+		 *
 		 * @param name - The variable's name
 		 */
 		def variable(name: String): types.rdflib.variableMod.default = js.native
 
 		/**
 		 * Gets the number of statements in this formula that matches the specified pattern
+		 *
 		 * @param s - The subject
 		 * @param p - The predicate
 		 * @param o - The object
@@ -753,7 +894,7 @@ object formulaMod {
 	trait FormulaOpts extends StObject {
 
 		var dataCallback: js.UndefOr[
-			js.Function1[/* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph], Unit]
+			js.Function1[ /* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph], Unit]
 		] = js.undefined
 
 		var rdfArrayRemove: js.UndefOr[
@@ -766,6 +907,7 @@ object formulaMod {
 
 		var rdfFactory: js.UndefOr[RdfJsDataFactory] = js.undefined
 	}
+
 	object FormulaOpts {
 
 		inline def apply(): FormulaOpts = {
@@ -773,14 +915,14 @@ object formulaMod {
 			__obj.asInstanceOf[FormulaOpts]
 		}
 
-		extension [Self <: FormulaOpts](x: Self) {
+		extension[Self <: FormulaOpts] (x: Self) {
 
 			inline def setDataCallback(value: /* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph] => Unit): Self = StObject.set(x, "dataCallback", js.Any.fromFunction1(value))
 
 			inline def setDataCallbackUndefined: Self = StObject.set(x, "dataCallback", js.undefined)
 
 			inline def setRdfArrayRemove(
-				value: (/* arr */ js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]], /* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]) => Unit
+				value: ( /* arr */ js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]], /* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]) => Unit
 			): Self = StObject.set(x, "rdfArrayRemove", js.Any.fromFunction2(value))
 
 			inline def setRdfArrayRemoveUndefined: Self = StObject.set(x, "rdfArrayRemove", js.undefined)
