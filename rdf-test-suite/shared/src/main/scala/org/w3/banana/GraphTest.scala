@@ -15,9 +15,19 @@ open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	val xsd: XSD[Rdf] = XSD[Rdf]
 	val foaf: FOAF[Rdf] = FOAF[Rdf]
 
-	test("Test Graph syntax methods") {
+	test("empty graph contains no triples") {
 		val g0: Graph[Rdf] = Graph.empty
 		assertEquals(g0.size,0)
+	}
+
+	test("Add a triple to a graph and it becomes one bigger") {
+		val bkt = Triple(bblf,foaf.knows,timbl)
+		val g1 = Graph.empty + bkt
+		assertEquals(g1.size,1)
+	}
+
+	test("Test Graph syntax methods") {
+		val g0: Graph[Rdf] = Graph.empty
 		val bkt = Triple(bblf,foaf.knows,timbl)
 		val g1 = g0 + bkt
 		assertEquals(g1.size,1)

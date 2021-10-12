@@ -100,8 +100,8 @@ open class TripleTest[R<:RDF](using ops: Ops[R])
 			"Tim"`@`Lang("en")
 		)
 		val nodeStrings = nodes.map(_.fold(
-			bn => bn.label,
 			uri => uri.value,
+			bn => bn.label,
 			lit => lit.fold(
 				identity,
 				(t,l) =>  t+":"+l,

@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import java.io.*
 import java.lang.IllegalArgumentException
 
-
+import scala.language.adhocExtensions
 open class NTriplesReaderTests[Rdf <: RDF](using
 	ops: Ops[Rdf],
 	reader: AbsoluteRDFReader[Rdf, Try, NTriples]
@@ -17,6 +17,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 	import RDF.*
 	import ops.{given,*}
 	import NTriplesParser.toGraph
+	import RDF.Statement as St
 
 	val foaf = prefix.FOAF[Rdf]
 	val rdf = prefix.RDFPrefix[Rdf]
@@ -47,59 +48,59 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
 		"parse a URL" in {
 			val iri = ntparser(bblfish+">").parseIRI()
-			iri should equal (URI(bblfish))
+			iri `should` equal (URI(bblfish))
 		}
 
 		"parse a URL with an encoded character \\u" in {
 			val iri = ntparser("""http://example/\u0053>""").parseIRI()
-			iri should equal (URI("http://example/S"))
+			iri `should` equal (URI("http://example/S"))
 		}
 
 		"parse a URL with an encoded character \\U" in {
 			val iri = ntparser("""http://example/\U00000053>""").parseIRI()
-			iri should equal (URI("http://example/S"))
+			iri `should` equal (URI("http://example/S"))
 		}
 
 
 		"parse a plain Literal" in {
 			val lit = ntparser(name + "\"").parsePlainLiteral()
-			lit should equal(name)
+			lit `should` equal(name)
 		}
 
 		"not parse a plain Literal that does not close" in {
 			val nt = ntparser(name)
 			val lit = Try(nt.parseLiteral())
-			lit should be a Symbol("failure")
+			lit `should` be `a` Symbol("failure")
 		}
 
 		"parse a PlainLiteral"  in {
 			val lit = ntparser(name + "\" ").parseLiteral()
-			lit should equal(Literal(name))
+			lit `should` equal(Literal(name))
 		}
 
 		"parse a LangLiteral" in {
 			val lit = ntparser(name + "\"@en ").parseLiteral()
-			lit should equal(Literal(name,Lang("en")))
+			lit `should` equal(Literal(name,Lang("en")))
 
 			val lit2 = ntparser(name + "\"@en-us ").parseLiteral()
-			lit2 should equal(Literal(name,Lang("en-us")))
+			lit2 `should` equal(Literal(name,Lang("en-us")))
 
 		}
 
 		"parse an TypedLiteral" in {
 			val litstr = s"""123"^^<${xsd.integer.value}> """
 			val lit = ntparser(litstr).parseLiteral()
-			lit should equal(Literal("123",xsd.integer))
+			lit `should` equal(Literal("123",xsd.integer))
 		}
 
 		"parse a Bnode" in {
 			val bn = Try (ntparser(":123 ").parseBNode())
-			bn should equal(Success(BNode("123")))
+			bn `should` equal(Success(BNode("123")))
 		}
 
 		"not parse an illegal BNode" in {
 			val bn = Try (ntparser(":-123 ").parseBNode())
-			bn should be a Symbol("failure")
+			bn `should` be `a` Symbol("failure")
 		}
 
 	}
@@ -110,25 +111,25 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		"not fail on a triple containing only URIs" in {
 			val str = s"$bblfish> <$typ> <${foafstr("Person")}> ."
 			val p = ntparser(str).parseTriple('<')
-			p should be (Success(Triple(URI(bblfish),rdf.`type`,foaf.Person)))
+			p `should` be (Success(Triple(URI(bblfish),rdf.`type`,foaf.Person)))
 		}
 
 		"not fail on a triple containing a Literal" in {
 			val str = s"""$bblfish> <${foafstr("name")}> "$name"."""
 			val p = ntparser(str).parseTriple('<')
-			p should be (Success(Triple(URI(bblfish),foaf.name,Literal(name))))
+			p `should` be (Success(Triple(URI(bblfish),foaf.name,Literal(name))))
 		}
 
 		"not fail on a triple containing a Literal and a bnode" in {
 			val str = s""":nolate <${foafstr("name")}> "$name"@en."""
 			val p = ntparser(str).parseTriple('_')
-			p should be (Success(Triple(BNode("nolate"),foaf.name,Literal(name,Lang("en")))))
+			p `should` be (Success(Triple(BNode("nolate"),foaf.name,Literal(name,Lang("en")))))
 		}
 
 		"not fail on a triple containing two bnodes" in {
 			val str = s""":jane <${foafstr("knows")}> _:tarzan ."""
 			val p = ntparser(str).parseTriple('_')
-			p should be (Success(Triple(BNode("jane"),foaf.knows,BNode("tarzan"))))
+			p `should` be (Success(Triple(BNode("jane"),foaf.knows,BNode("tarzan"))))
 		}
 	}
 
@@ -138,12 +139,12 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		"not fail with one triple" in {
 			val str = s"<$bblfish> <$typ> <${foafstr("Person")}> ."
 			val i = ntparser(str)
-			i.hasNext should be(true)
-			i.next() should be(Success(Triple(URI(bblfish), rdf.`type`, foaf.Person)))
+			i.hasNext `should` be(true)
+			i.next() `should` be(Success(Triple(URI(bblfish), rdf.`type`, foaf.Person)))
 			val end = i.next()
-			end.isFailure should be(true)
-			end.failed.get.asInstanceOf[ParseException].character should be (-1)
-			i.hasNext should be(false)
+			end.isFailure `should` be(true)
+			end.failed.get.asInstanceOf[ParseException].character `should` be (-1)
+			i.hasNext `should` be(false)
 		}
 
 		"not fail when parsing a document with one triple" in {
@@ -200,7 +201,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
         _:betehess <${foafstr("homepage")}> <http://bertails.org/> .
           """
 			val graphTry = toGraph(ntparser(str,skip=true))
-			graphTry.get.size should be (3)
+			graphTry.get.size `should` be (3)
 			assert (graphTry.get isomorphic Graph(
 				Triple(URI(bblfish), foaf.name, Literal(name)),
 				Triple(URI(bblfish), foaf.knows, BNode("betehess")),
@@ -218,8 +219,8 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		def parse(s: String, size: Int)(test: Graph[Rdf] => Boolean = _ => true): Unit = {
 			val parseAttempt = ntparse(s)
 			assert(test(parseAttempt.get))
-			parseAttempt should be a Symbol("success")
-			parseAttempt.get.size should be(size)
+			parseAttempt `should` be `a` Symbol("success")
+			parseAttempt.get.size `should` be(size)
 		}
 
 		"verify that empty files parse with success" in {
@@ -266,15 +267,15 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
 		"verify that Literals containing a string escape parse successfully" in {
 			parse( """<http://example/s> <http://example/p> "a\n" .""", 1) { graph =>
-				val Triple(_, _, o) = graph.triples.head
+				val Triple(_, _, o)  = graph.triples.head : @unchecked
 				o == Literal("a\n")
 			}
 			parse( """<http://example/s> <http://example/p> "a\u0020b" .""", 1) { graph =>
-				val Triple(_, _, o) = graph.triples.head
+				val Triple(_, _, o)  = graph.triples.head : @unchecked
 				o == Literal("a b")
 			}
 			parse( """<http://example/s> <http://example/p> "a\U00000020b" .""", 1) { graph =>
-				val Triple(_, _, o) = graph.triples.head
+				val Triple(_, _, o)  = graph.triples.head : @unchecked
 				o == Literal("a b")
 			}
 		}
@@ -395,7 +396,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 			parse(
 				"""<http://a.example/s> <http://a.example/p> "\u0000\u0009\u000b\u000c\u000e\u0026\u0028\u005b\u005d\u007f".""",
 				1){graph=>
-				val Triple(_,_,o) = graph.triples.head
+				val Triple(_,_,o) = graph.triples.head : @unchecked
 				o.fold( _=>false, _=>false, lit=>lit.text.length == 10)
 			}
 		}
@@ -403,7 +404,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		"literal with UTF-8 boundary" in {
 			parse("<http://a.example/s> <http://a.example/p> \"" +
 				"""\uc280\udfbf\ue0a0\u80e0\ubfbf\ue180\u80ec\ubfbf\ued80\u80ed\u9fbf\uee80\u80ef\ubfbd\uf090\u8080\uf0bf\ubfbd\uf180\u8080\uf3bf\ubfbd\uf480\u8080\uf48f\ubfbd" . """,1) { graph =>
-				val Triple(_,_,o) = graph.triples.head
+				val Triple(_,_,o) = graph.triples.head : @unchecked
 				o.fold(_=>false,_=>false,lit=>{
 					val lexical = lit.text
 					lexical.size == 26 &&
@@ -430,74 +431,88 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
 		"literal_with_2_squotes" in {
 			parse( """<http://a.example/s> <http://a.example/p> "x''y" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="x''y")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="x''y")
 			}
 		}
 
 		"literal_with_dquote" in {
 			parse( """<http://a.example/s> <http://a.example/p> "x''y" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="x''y")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="x''y")
 			}
 		}
 		"literal_with_2_dquotes" in {
 			parse( """<http://a.example/s> <http://a.example/p> "x\"\"y" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="""x""y""")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="""x""y""")
 			}
 		}
 		"literal_with_REVERSE_SOLIDUS2" in {
 			parse( """<http://example.org/ns#s> <http://example.org/ns#p1> "test-\\" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="""test-\""")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="""test-\""")
 			}
 		}
 		"literal_with_CHARACTER_TABULATION" in {
 			parse( "<http://a.example/s> <http://a.example/p> \"\\t\" .", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="\t")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="\t")
 			}
 		}
 		"literal_with_BACKSPACE" in {
 			parse( "<http://a.example/s> <http://a.example/p> \"\\b\" .", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="\b")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="\b")
 			}
 		}
 		"literal_with_LINE_FEED" in {
 			parse( "<http://a.example/s> <http://a.example/p> \"\\n\" .", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="\n")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="\n")
 			}
 		}
 		"literal_with_CARRIAGE_RETURN" in {
 			parse( """<http://a.example/s> <http://a.example/p> "\r" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="\r")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="\r")
 			}
 		}
 		"literal_with_FORM_FEED" in {
 			parse( """<http://a.example/s> <http://a.example/p> "\f" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="\f")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="\f")
 			}
 		}
 		"literal_with_REVERSE_SOLIDUS" in {
 			parse( """<http://a.example/s> <http://a.example/p> "\\" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="""\""")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="""\""")
 			}
 		}
 		"literal_with_numeric_escape4" in {
 			parse( """<http://a.example/s> <http://a.example/p> "\u006F" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="\u006F")
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="\u006F")
 			}
 		}
 		"literal_with_numeric_escape8" in {
 			parse( """<http://a.example/s> <http://a.example/p> "\U0000006F" .""", 1){g=>
-				g.triples.head.obj.fold(uri=>false,bn=>false,lit=>lit.text=="\u006F")
+				//todo: it is strange the the aumomatic conversion happens from RDF.Object[R] to Node
+				// if it is made clear like this, but not automtically...
+				val o: RDF.Node[Rdf] = g.triples.head.obj
+				o.fold(uri=>false,bn=>false,lit=>lit.text=="\u006F")
 			}
 		}
 		"langtagged_string" in {
 			parse( """<http://a.example/s> <http://a.example/p> "chat"@en .""", 1){g=>
-				val o = g.triples.head.obj
+				val o: Node[Rdf] = g.triples.head.obj
 				o.fold(uri=>false,bn=>false,lit=>lit.text=="chat" && lit.lang == Some(Lang("en")))
 			}
 		}
 		"langtag_with_subtag" in {
 			parse( """<http://example.org/ex#a> <http://example.org/ex#b> "Cheers"@en-UK .""", 1){g=>
-				val o = g.triples.head.obj
+				val o: Node[Rdf] = g.triples.head.obj
 				o.fold(uri=>false,
 					bn=>false,
 					lit=> lit.text=="Cheers" && lit.lang == Some(Lang("en-UK")))
