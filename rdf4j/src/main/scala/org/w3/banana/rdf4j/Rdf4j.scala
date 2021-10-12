@@ -102,36 +102,43 @@ object Rdf4j extends RDF {
 //		}
 
 		given Triple: TripleOps with
-			//todo: we should have two types of triples: strict and non-strict (for reasoning)
-			//todo: The method that takes a node as subject should not throw an exception, but should
-			//   potentially return 1 or two strict triples.
-			// warning throws an exception
-			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
-				s match
-					case r: Resource => valueFactory.createStatement(r, p, o).nn
-					case p => throw new RuntimeException("makeTriple: in RDF4J, subject " + p.toString + " must be a either URI or BlankNode")
+			import RDF.Statement as St
+			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
+				valueFactory.createStatement(s, p, o).nn
 			def untuple(t: RDF.Triple[R]): TripleI =
 					(subjectOf(t), relationOf(t), objectOf(t))
-			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] = t.getSubject.nn
-			def relationOf(t: RDF.Triple[R]): RDF.URI[R] = t.getPredicate.nn
-			def objectOf(t: RDF.Triple[R]): RDF.Node[R] = t.getObject.nn
+			def subjectOf(t: RDF.Triple[R]): St.Subject[R] =
+				//todo: this asInstanceOf should not be here
+				t.getSubject().nn.asInstanceOf[St.Subject[R]]
+			def relationOf(t: RDF.Triple[R]): St.Relation[R] = t.getPredicate().nn
+			def objectOf(t: RDF.Triple[R]): St.Object[R] =
+				//todo: this asInstanceOf should not be here
+				t.getObject().nn.asInstanceOf[St.Object[R]]
 		end Triple
 
 		val rTriple = new rTripleOps:
-			def apply(s: RDF.rNode[R], p: RDF.rURI[R], o: RDF.rNode[R]): RDF.rTriple[R] =
+			import RDF.rStatement as rSt
+			def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
 				Triple(s, p, o)
 			def untuple(t: RDF.rTriple[R]): rTripleI =
 				(subjectOf(t), relationOf(t), objectOf(t))
-			def subjectOf(t: RDF.rTriple[R]): RDF.rNode[R] = Triple.subjectOf(t)
-			def relationOf(t: RDF.rTriple[R]): RDF.rURI[R] = Triple.relationOf(t)
-			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] = Triple.objectOf(t)
+			def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R] = Triple.subjectOf(t)
+			def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] = Triple.relationOf(t)
+			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] = Triple.objectOf(t)
 		end rTriple
+
+		given Statement: StatementOps with
+			extension (subj: RDF.Statement.Subject[R])
+				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+					if subj.isBNode() then
+						bnFcnt(subj.asInstanceOf[rjBNode])
+					else uriFnct(subj.asInstanceOf[rjIRI])
 
 		given Node: NodeOps with
 			extension (node: RDF.Node[R])
 				def fold[A](
-					bnF: RDF.BNode[R] => A,
 					uriF: RDF.URI[R] => A,
+					bnF: RDF.BNode[R] => A,
 					litF: RDF.Literal[R] => A
 				): A =
 					if node.isBNode() then

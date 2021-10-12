@@ -30,7 +30,6 @@ trait RDF:
 	type Literal <: Node
 	type Lang <: Matchable
 
-
 //		def ANY: NodeAny
 //		implicit def toConcreteNodeMatch(node: Rdf#Node): Rdf#NodeMatch
 //		def foldNodeMatch[T](nodeMatch: Rdf#NodeMatch)(funANY: => T, funNode: Rdf#Node => T): T
@@ -109,6 +108,30 @@ object RDF:
 	type GetTriple[T <: Matchable] = RDF { type Triple = T }
 	type GetRelGraph[G] = RDF { type rGraph = G }
 	type GetGraph[G] = RDF { type Graph = G }
+
+	/**
+	 * these associate a type to the positions in statements (triples or quads)
+	 * These are not agreed to by all frameworks, so it would be useful to find a way to parametrise
+	 * them. Essentially some (Jena?) allow a literal in Subject position (which is useful for reasoning
+	 * and later n3) and others are stricter, which makes them map better to many syntaxes, except N3.
+	 *
+	 * For the moment I will try the strict mode.
+	 **/
+	object Statement:
+		type Subject[R <: RDF] = URI[R] | BNode[R]
+		type Relation[R <: RDF] = URI[R]
+		type Object[R <: RDF] = URI[R] | BNode[R] | Literal[R]
+		type Graph[R <: RDF] = URI[R] | BNode[R]
+	end Statement
+
+	// relative statements
+	object rStatement:
+		type Subject[R <: RDF] = rURI[R] | BNode[R] | URI[R]
+		type Relation[R <: RDF] = rURI[R]
+		type Object[R <: RDF] = rURI[R] | BNode[R] | Literal[R] | URI[R]
+		type Graph[R <: RDF] = rURI[R] | BNode[R] | URI[R]
+	end rStatement
+
 end RDF
 
 

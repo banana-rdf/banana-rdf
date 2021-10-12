@@ -1,12 +1,16 @@
 package org.w3.banana.rdflib
 
+import org.scalablytyped.runtime.StObject
+import org.w3.banana.rdflib.FormulaOpts.FormulaOpts
+import run.cosy.rdfjs.model.{BlankNode, DataFactory, Quad, Term}
+
 import scala.scalajs.js
 import scala.scalajs.js.annotation.*
 
 object formulaMod {
 
-	@JSImport("rdflib/lib/formula", JSImport.Default)
-	@js.native
+	def apply(quads: js.Array[Quad], opts: FormulaOpts): Formula =
+		new default(quads,js.Array(),js.Array(),js.Array(),opts)
 
 	/**
 	 * Initializes this formula
@@ -19,234 +23,23 @@ object formulaMod {
 	 * @param opts
 	 * @param opts         .rdfFactory - The rdf factory that should be used by the store
 	 */
+	@JSImport("rdflib/lib/formula", JSImport.Default)
+	@js.native
 	open class default() extends Formula {
 		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			]) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: js.Array[js.Any]
-		) = this()
-
-		def this(statements: Unit, constraints: js.Array[js.Any]) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: js.Array[js.Any],
-			initBindings: js.Array[js.Any]
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: Unit,
-			initBindings: js.Array[js.Any]
-		) = this()
-
-		def this(statements: Unit, constraints: js.Array[js.Any], initBindings: js.Array[js.Any]) = this()
-
-		def this(statements: Unit, constraints: Unit, initBindings: js.Array[js.Any]) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: js.Array[js.Any],
-			initBindings: js.Array[js.Any],
-			optional: js.Array[js.Any]
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: js.Array[js.Any],
-			initBindings: Unit,
-			optional: js.Array[js.Any]
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: Unit,
-			initBindings: js.Array[js.Any],
-			optional: js.Array[js.Any]
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: Unit,
-			initBindings: Unit,
-			optional: js.Array[js.Any]
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: js.Array[js.Any],
-			initBindings: js.Array[js.Any],
-			optional: js.Array[js.Any]
-		) = this()
-
-		def this(statements: Unit, constraints: js.Array[js.Any], initBindings: Unit, optional: js.Array[js.Any]) = this()
-
-		def this(statements: Unit, constraints: Unit, initBindings: js.Array[js.Any], optional: js.Array[js.Any]) = this()
-
-		def this(statements: Unit, constraints: Unit, initBindings: Unit, optional: js.Array[js.Any]) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
+			statements: js.Array[Quad],
 			constraints: js.Array[js.Any],
 			initBindings: js.Array[js.Any],
 			optional: js.Array[js.Any],
 			opts: FormulaOpts
 		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: js.Array[js.Any],
-			initBindings: js.Array[js.Any],
-			optional: Unit,
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: js.Array[js.Any],
-			initBindings: Unit,
-			optional: js.Array[js.Any],
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: js.Array[js.Any],
-			initBindings: Unit,
-			optional: Unit,
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: Unit,
-			initBindings: js.Array[js.Any],
-			optional: js.Array[js.Any],
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: Unit,
-			initBindings: js.Array[js.Any],
-			optional: Unit,
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: Unit,
-			initBindings: Unit,
-			optional: js.Array[js.Any],
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: js.Array[
-				types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-			],
-			constraints: Unit,
-			initBindings: Unit,
-			optional: Unit,
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: js.Array[js.Any],
-			initBindings: js.Array[js.Any],
-			optional: js.Array[js.Any],
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: js.Array[js.Any],
-			initBindings: js.Array[js.Any],
-			optional: Unit,
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: js.Array[js.Any],
-			initBindings: Unit,
-			optional: js.Array[js.Any],
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: js.Array[js.Any],
-			initBindings: Unit,
-			optional: Unit,
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: Unit,
-			initBindings: js.Array[js.Any],
-			optional: js.Array[js.Any],
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: Unit,
-			initBindings: js.Array[js.Any],
-			optional: Unit,
-			opts: FormulaOpts
-		) = this()
-
-		def this(
-			statements: Unit,
-			constraints: Unit,
-			initBindings: Unit,
-			optional: js.Array[js.Any],
-			opts: FormulaOpts
-		) = this()
-
-		def this(statements: Unit, constraints: Unit, initBindings: Unit, optional: Unit, opts: FormulaOpts) = this()
 	}
 
-	type BooleanMap = StringDictionary[Boolean]
+//	type BooleanMap = StringDictionary[Boolean]
 
 	@js.native
-	trait Formula
-		extends types.rdflib.nodeInternalMod.default {
+	trait Formula extends StObject {
+//		extends nodeInternalMod.default {
 
 		/**
 		 * Transform a collection of NTriple URIs into their URI strings
@@ -255,233 +48,62 @@ object formulaMod {
 		 * @return A collection of the URIs as strings
 		 *         todo: explain why it is important to go through NT
 		 */
-		def NTtoURI(t: js.Any): js.Object = js.native
+//		def NTtoURI(t: js.Any): js.Object = js.native
 
-		def add(subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]]): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
 
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: Unit,
-			`object`: String
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
 
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: Unit,
-			`object`: String,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+//		def add(
+//			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
+//			predicate: Unit,
+//			`object`: Unit,
+//			graph: QuadGraph
+//		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
 
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: Unit,
-			`object`: Unit,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
 
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: Unit,
-			`object`: Term
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+		//this implementatino returns a number (but subimplementation returns a this, so we have to have both!!
+		def add(subject: Quad): this.type | Double = js.native
 
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: Unit,
-			`object`: Term,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+//		def add(
+//			subject: QuadSubject,
+//			predicate: QuadPredicate,
+//			`object`: String): Double = js.native
+//
+//		def add(
+//			subject: QuadSubject,
+//			predicate: QuadPredicate,
+//			`object`: String,
+//			graph: QuadGraph):  Double = js.native
+//
+//		def add(
+//			subject: QuadSubject,
+//			predicate: QuadPredicate,
+//			`object`: Term[?]): Double = js.native
+//
+//		def add(
+//			subject: QuadSubject,
+//			predicate: QuadPredicate,
+//			`object`: Term[?],
+//			graph: QuadGraph): Double = js.native
 
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: QuadPredicate
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+//		def add(
+//			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
+//			predicate: Unit,
+//			`object`: String
+//		):  Double = js.native
 
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: QuadPredicate,
-			`object`: String
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: QuadPredicate,
-			`object`: String,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: QuadPredicate,
-			`object`: Unit,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: QuadPredicate,
-			`object`: Term
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-			predicate: QuadPredicate,
-			`object`: Term,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		/** Add a statement from its parts
-		 *
-		 * @param subject   - the first part of the statement
-		 * @param predicate - the second part of the statement
-		 * @param object    - the third part of the statement
-		 * @param graph     - the last part of the statement
-		 */
-		def add(subject: QuadSubject): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: Unit,
-			`object`: String): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: Unit,
-			`object`: String,
-			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: Unit,
-			`object`: Unit,
-			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: Unit,
-			`object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: Unit,
-			`object`: Term,
-			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: QuadPredicate): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: QuadPredicate,
-			`object`: String): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: QuadPredicate,
-			`object`: String,
-			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: QuadPredicate,
-			`object`: Unit,
-			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: QuadPredicate,
-			`object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: QuadSubject,
-			predicate: QuadPredicate,
-			`object`: Term,
-			graph: QuadGraph): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: Unit,
-			`object`: String
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: Unit,
-			`object`: String,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: Unit,
-			`object`: Unit,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: Unit,
-			`object`: Term): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: Unit,
-			`object`: Term,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: QuadPredicate): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: QuadPredicate,
-			`object`: String
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: QuadPredicate,
-			`object`: String,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: QuadPredicate,
-			`object`: Unit,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: QuadPredicate,
-			`object`: Term
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
-
-		def add(
-			subject: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-			predicate: QuadPredicate,
-			`object`: Term,
-			graph: QuadGraph
-		): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
 
 		/**
 		 * Adds all the statements to this formula
 		 *
 		 * @param statements - A collection of statements
 		 */
-		def addAll(statements: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]]): Unit = js.native
+		def addAll(statements: js.Array[Quad]): Unit = js.native
 
 		/** Add a statment object
 		 *
 		 * @param {Statement} statement - An existing constructed statement to add
 		 */
-		def addStatement(statement: Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]): (types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]) | Null | this.type | Double = js.native
+		def addStatement(statement: Quad): Double = js.native
 
 		/** Follow link from one node, using one wildcard, looking for one
 		 *
@@ -495,12 +117,12 @@ object formulaMod {
 		 * @param g - A node to search for as graph, or if null, a wildcard
 		 * @returns A node which match the wildcard position, or null
 		 */
-		def any(
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null]
-		): types.rdflib.nodeInternalMod.default | Null = js.native
+//		def any(
+//			s: js.UndefOr[QuadSubject | Null],
+//			p: js.UndefOr[QuadPredicate | Null],
+//			o: js.UndefOr[QuadObject | Null],
+//			g: js.UndefOr[QuadGraph | Null]
+//		): types.rdflib.nodeInternalMod.default | Null = js.native
 
 		/**
 		 * Gets the first JavaScript object equivalent to a node based on the specified pattern
@@ -510,24 +132,24 @@ object formulaMod {
 		 * @param o The object
 		 * @param g The graph that contains the statement
 		 */
-		def anyJS(
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null]
-		): js.Any = js.native
+//		def anyJS(
+//			s: js.UndefOr[QuadSubject | Null],
+//			p: js.UndefOr[QuadPredicate | Null],
+//			o: js.UndefOr[QuadObject | Null],
+//			g: js.UndefOr[QuadGraph | Null]
+//		): js.Any = js.native
 
 		/**
 		 * Gets the first statement that matches the specified pattern
 		 */
-		def anyStatementMatching(
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null]
-		): js.UndefOr[
-			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-		] = js.native
+//		def anyStatementMatching(
+//			s: js.UndefOr[QuadSubject | Null],
+//			p: js.UndefOr[QuadPredicate | Null],
+//			o: js.UndefOr[QuadObject | Null],
+//			g: js.UndefOr[QuadGraph | Null]
+//		): js.UndefOr[
+//			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
+//		] = js.native
 
 		/**
 		 * Gets the value of a node that matches the specified pattern
@@ -537,21 +159,21 @@ object formulaMod {
 		 * @param o The object
 		 * @param g The graph that contains the statement
 		 */
-		def anyValue(
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null]
-		): String | Unit = js.native
+//		def anyValue(
+//			s: js.UndefOr[QuadSubject | Null],
+//			p: js.UndefOr[QuadPredicate | Null],
+//			o: js.UndefOr[QuadObject | Null],
+//			g: js.UndefOr[QuadGraph | Null]
+//		): String | Unit = js.native
 
 		/**
 		 * Shortcut for adding blankNodes
 		 *
 		 * @param [id]
 		 */
-		def bnode(): types.rdflib.blankNodeMod.default = js.native
+		def bnode(): BlankNode = js.native
 
-		def bnode(id: String): types.rdflib.blankNodeMod.default = js.native
+		def bnode(id: String): BlankNode = js.native
 
 		/**
 		 * Finds the types in the list which have no *stored* subtypes
@@ -561,12 +183,12 @@ object formulaMod {
 		 *
 		 * @param types A map of the types
 		 */
-		def bottomTypeURIs(types_ : js.Any): js.Any = js.native
+//		def bottomTypeURIs(types_ : js.Any): js.Any = js.native
 
 		/** Creates a new collection */
-		def collection(): types.rdflib.collectionMod.default[
-			types.rdflib.nodeInternalMod.default | types.rdflib.blankNodeMod.default | Collection[js.Any] | types.rdflib.literalMod.default | types.rdflib.variableMod.default
-		] = js.native
+//		def collection(): types.rdflib.collectionMod.default[
+//			types.rdflib.nodeInternalMod.default | types.rdflib.blankNodeMod.default | Collection[js.Any] | types.rdflib.literalMod.default | types.rdflib.variableMod.default
+//		] = js.native
 
 		/** Trace statements which connect directly, or through bnodes
 		 *
@@ -574,15 +196,15 @@ object formulaMod {
 		 * @param doc     - The document to be searched, or null to search all documents
 		 * @returns an array of statements, duplicate statements are suppresssed.
 		 */
-		def connectedStatements(subject: QuadSubject, doc: QuadGraph): js.Array[
-			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-		] = js.native
+//		def connectedStatements(subject: QuadSubject, doc: QuadGraph): js.Array[
+//			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
+//		] = js.native
 
-		def connectedStatements(subject: QuadSubject, doc: QuadGraph, excludePredicateURIs: js.Array[String]): js.Array[
-			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-		] = js.native
+//		def connectedStatements(subject: QuadSubject, doc: QuadGraph, excludePredicateURIs: js.Array[String]): js.Array[
+//			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
+//		] = js.native
 
-		var constraints: js.Array[js.Any] = js.native
+//		var constraints: js.Array[js.Any] = js.native
 
 		/** Follow links from one node, using one wildcard.
 		 *
@@ -597,11 +219,11 @@ object formulaMod {
 		 * @returns {Array<Node>} - An array of nodes which match the wildcard position
 		 */
 		def each(
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null]
-		): js.Array[types.rdflib.nodeInternalMod.default] = js.native
+			s: js.UndefOr[Quad.Subject],
+			p: js.UndefOr[Quad.Predicate],
+			o: js.UndefOr[Quad.Object],
+			g: js.UndefOr[Quad.Graph]
+		): js.Array[Quad] = js.native
 
 		/**
 		 * Test whether this formula is equals to {other}
@@ -615,7 +237,7 @@ object formulaMod {
 		 *
 		 * Is set by the fetcher when initialized.
 		 */
-		var fetcher: js.UndefOr[types.rdflib.fetcherMod.default] = js.native
+//		var fetcher: js.UndefOr[types.rdflib.fetcherMod.default] = js.native
 
 		/**
 		 * For thisClass or any subclass, anything which has it is its type
@@ -627,7 +249,7 @@ object formulaMod {
 		 *
 		 * @param subject - A named node
 		 */
-		def findMemberURIs(subject: types.rdflib.nodeInternalMod.default): UriMap = js.native
+//		def findMemberURIs(subject: types.rdflib.nodeInternalMod.default): UriMap = js.native
 
 		/**
 		 * For thisClass or any subclass, anything which has it is its type
@@ -639,7 +261,7 @@ object formulaMod {
 		 *
 		 * @return a hash of URIs
 		 */
-		def findMembersNT(thisClass: js.Any): MembersMap = js.native
+//		def findMembersNT(thisClass: js.Any): MembersMap = js.native
 
 		/**
 		 * Get all the Classes of which we can RDFS-infer the subject is a superclass
@@ -648,7 +270,7 @@ object formulaMod {
 		 * Does NOT return terms, returns URI strings.
 		 * We use NT representations in this version because they handle blank nodes.
 		 */
-		def findSubClassesNT(subject: types.rdflib.nodeInternalMod.default): StringDictionary[Boolean] = js.native
+//		def findSubClassesNT(subject: types.rdflib.nodeInternalMod.default): StringDictionary[Boolean] = js.native
 
 		/**
 		 * Get all the Classes of which we can RDFS-infer the subject is a subclass
@@ -659,7 +281,7 @@ object formulaMod {
 		 *          Does NOT return terms, returns URI strings.
 		 *          We use NT representations in this version because they handle blank nodes.
 		 */
-		def findSuperClassesNT(subject: types.rdflib.nodeInternalMod.default): StringDictionary[Boolean] = js.native
+//		def findSuperClassesNT(subject: types.rdflib.nodeInternalMod.default): StringDictionary[Boolean] = js.native
 
 		/**
 		 * Get all the Classes of which we can RDFS-infer the subject is a member
@@ -672,7 +294,7 @@ object formulaMod {
 		 *
 		 * @param subject - A subject node
 		 */
-		def findTypeURIs(subject: QuadSubject): UriMap = js.native
+//		def findTypeURIs(subject: QuadSubject): UriMap = js.native
 
 		/**
 		 * Get all the Classes of which we can RDFS-infer the subject is a member
@@ -684,16 +306,16 @@ object formulaMod {
 		 *          Does NOT return terms, returns URI strings.
 		 *          We use NT representations in this version because they handle blank nodes.
 		 */
-		def findTypesNT(subject: js.Any): StringDictionary[Boolean] = js.native
+//		def findTypesNT(subject: js.Any): StringDictionary[Boolean] = js.native
 
 		/**
 		 * Creates a new empty formula
 		 *
 		 * @param _features - Not applicable, but necessary for typing to pass
 		 */
-		def formula(): Formula = js.native
+//		def formula(): Formula = js.native
 
-		def formula(_features: js.Array[String]): Formula = js.native
+//		def formula(_features: js.Array[String]): Formula = js.native
 
 		/**
 		 * Transforms an NTriples string format into a Node.
@@ -701,56 +323,59 @@ object formulaMod {
 		 * for internal work such as storing a blank node id in an HTML attribute.
 		 * This will only parse the strings generated by the various toNT() methods.
 		 */
-		def fromNT(str: js.Any): js.Any = js.native
+//		def fromNT(str: js.Any): js.Any = js.native
 
 		/** Returns true if this formula holds the specified statement(s) */
-		def holds(s: js.Any): Boolean = js.native
-
-		def holds(s: js.Any, p: js.Any): Boolean = js.native
-
-		def holds(s: js.Any, p: js.Any, o: js.Any): Boolean = js.native
-
-		def holds(s: js.Any, p: js.Any, o: js.Any, g: js.Any): Boolean = js.native
-
-		def holds(s: js.Any, p: js.Any, o: Unit, g: js.Any): Boolean = js.native
-
-		def holds(s: js.Any, p: Unit, o: js.Any): Boolean = js.native
-
-		def holds(s: js.Any, p: Unit, o: js.Any, g: js.Any): Boolean = js.native
-
-		def holds(s: js.Any, p: Unit, o: Unit, g: js.Any): Boolean = js.native
-
-		def holds(s: js.Array[js.Any]): Boolean = js.native
-
-		def holds(s: js.Array[js.Any], p: js.Any): Boolean = js.native
-
-		def holds(s: js.Array[js.Any], p: js.Any, o: js.Any): Boolean = js.native
-
-		def holds(s: js.Array[js.Any], p: js.Any, o: js.Any, g: js.Any): Boolean = js.native
-
-		def holds(s: js.Array[js.Any], p: js.Any, o: Unit, g: js.Any): Boolean = js.native
-
-		def holds(s: js.Array[js.Any], p: Unit, o: js.Any): Boolean = js.native
-
-		def holds(s: js.Array[js.Any], p: Unit, o: js.Any, g: js.Any): Boolean = js.native
-
-		def holds(s: js.Array[js.Any], p: Unit, o: Unit, g: js.Any): Boolean = js.native
+//		def holds(s: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Any, p: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Any, p: js.Any, o: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Any, p: js.Any, o: js.Any, g: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Any, p: js.Any, o: Unit, g: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Any, p: Unit, o: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Any, p: Unit, o: js.Any, g: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Any, p: Unit, o: Unit, g: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any]): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any], p: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any], p: js.Any, o: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any], p: js.Any, o: js.Any, g: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any], p: js.Any, o: Unit, g: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any], p: Unit, o: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any], p: Unit, o: js.Any, g: js.Any): Boolean = js.native
+//
+//		def holds(s: js.Array[js.Any], p: Unit, o: Unit, g: js.Any): Boolean = js.native
 
 		/**
 		 * Returns true if this formula holds the specified {statement}
 		 */
-		def holdsStatement(statement: js.Any): Boolean = js.native
+		def holdsStatement(statement: Quad): Boolean = js.native
 
+		type Indexable = Long | String
 		/**
 		 * Returns a unique index-safe identifier for the given term.
-		 *
-		 * Falls back to the rdflib hashString implementation if the given factory doesn't support id.
+		 * Note: rdflib.js returns an Indexable, but we are working with strings
+		 * so we narrow it down. It would actually be better to work with numbers
+		 * as comparisons there can be made in one step.
+		 * todo: later move over to using numbers
 		 */
-		def id(term: TFIDFactoryTypes): Indexable = js.native
-
-		var initBindings: js.Array[js.Any] = js.native
-
-		var isVar: Double = js.native
+		def id(term: Term[?]): String = js.native
+//
+//		var initBindings: js.Array[js.Any] = js.native
+//
+//		var isVar: Double = js.native
 
 		/**
 		 * Used by the n3parser to generate list elements
@@ -766,26 +391,26 @@ object formulaMod {
 		 *
 		 * @param nsuri The URI for the namespace
 		 */
-		def ns(nsuri: String): js.Function1[ /* ln */ String, NamedNode] = js.native
-
-		def ns(nsuri: String, factory: RdfJsDataFactory): js.Function1[ /* ln */ String, NamedNode] = js.native
+//		def ns(nsuri: String): js.Function1[ /* ln */ String, NamedNode] = js.native
+//
+//		def ns(nsuri: String, factory: RdfJsDataFactory): js.Function1[ /* ln */ String, NamedNode] = js.native
 
 		/**
 		 * A namespace for the specified namespace's URI
 		 *
 		 * @param nsuri The URI for the namespace
 		 */
-		@JSName("ns")
-		var ns_Original: js.Function2[
-			/* nsuri */ String,
-			/* factory */ js.UndefOr[RdfJsDataFactory],
-			js.Function1[ /* ln */ String, NamedNode]
-		] = js.native
-
-		var optional: js.Array[js.Any] = js.native
+//		@JSName("ns")
+//		var ns_Original: js.Function2[
+//			/* nsuri */ String,
+//			/* factory */ js.UndefOr[RdfJsDataFactory],
+//			js.Function1[ /* ln */ String, NamedNode]
+//		] = js.native
+//
+//		var optional: js.Array[js.Any] = js.native
 
 		/** The factory used to generate statements and terms */
-		var rdfFactory: js.Any = js.native
+		var rdfFactory: DataFactory = js.native
 
 		/**
 		 * Serializes this formula
@@ -794,11 +419,9 @@ object formulaMod {
 		 * @param contentType - The content type of the syntax to use
 		 * @param provenance  - The provenance URI
 		 */
-		def serialize(base: js.Any, contentType: js.Any, provenance: js.Any): js.Any = js.native
+//		def serialize(base: js.Any, contentType: js.Any, provenance: js.Any): js.Any = js.native
 
-		var statements: js.Array[
-			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-		] = js.native
+		var statements: js.Array[Quad] = js.native
 
 		/**
 		 * Search the Store
@@ -811,22 +434,22 @@ object formulaMod {
 		 * @param justOne - flag - stop when found one rather than get all of them?
 		 * @returns {Array<Node>} - An array of nodes which match the wildcard position
 		 */
-		def statementsMatching[JustOne /* <: Boolean */ ](
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null],
-			justOne: js.UndefOr[Boolean]
-		): js.Array[
-			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-		] = js.native
+//		def statementsMatching[JustOne /* <: Boolean */ ](
+//			s: js.UndefOr[QuadSubject | Null],
+//			p: js.UndefOr[QuadPredicate | Null],
+//			o: js.UndefOr[QuadObject | Null],
+//			g: js.UndefOr[QuadGraph | Null],
+//			justOne: js.UndefOr[Boolean]
+//		): js.Array[
+//			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
+//		] = js.native
 
-		def sym(uri: String): types.rdflib.namedNodeMod.default = js.native
+//		def sym(uri: String): types.rdflib.namedNodeMod.default = js.native
+//
+//		def sym(uri: String, name: js.Any): types.rdflib.namedNodeMod.default = js.native
 
-		def sym(uri: String, name: js.Any): types.rdflib.namedNodeMod.default = js.native
-
-		@JSName("termType")
-		var termType_Formula: Graph = js.native
+//		@JSName("termType")
+//		var termType_Formula: Graph = js.native
 
 		/**
 		 * Gets the node matching the specified pattern. Throws when no match could be made.
@@ -836,12 +459,12 @@ object formulaMod {
 		 * @param o - The object
 		 * @param g - The graph that contains the statement
 		 */
-		def the(
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null]
-		): js.UndefOr[types.rdflib.nodeInternalMod.default | Null] = js.native
+//		def the(
+//			s: js.UndefOr[QuadSubject | Null],
+//			p: js.UndefOr[QuadPredicate | Null],
+//			o: js.UndefOr[QuadObject | Null],
+//			g: js.UndefOr[QuadGraph | Null]
+//		): js.UndefOr[types.rdflib.nodeInternalMod.default | Null] = js.native
 
 		/**
 		 * Finds the types in the list which have no *stored* supertypes
@@ -850,7 +473,7 @@ object formulaMod {
 		 *
 		 * @param types - The types
 		 */
-		def topTypeURIs(types_ : StringDictionary[String | types.rdflib.namedNodeMod.default]): StringDictionary[String | types.rdflib.namedNodeMod.default] = js.native
+//		def topTypeURIs(types_ : StringDictionary[String | types.rdflib.namedNodeMod.default]): StringDictionary[String | types.rdflib.namedNodeMod.default] = js.native
 
 		/**
 		 * RDFS Inference
@@ -861,19 +484,19 @@ object formulaMod {
 		 * @param predicate - The property to trace though
 		 * @param inverse   - Trace inverse direction
 		 */
-		def transitiveClosure(seeds: BooleanMap, predicate: QuadPredicate): StringDictionary[Boolean] = js.native
+//		def transitiveClosure(seeds: BooleanMap, predicate: QuadPredicate): StringDictionary[Boolean] = js.native
 
-		def transitiveClosure(
-			seeds: BooleanMap,
-			predicate: QuadPredicate,
-			inverse: Boolean): StringDictionary[Boolean] = js.native
+//		def transitiveClosure(
+//			seeds: BooleanMap,
+//			predicate: QuadPredicate,
+//			inverse: Boolean): StringDictionary[Boolean] = js.native
 
 		/**
 		 * Gets a new variable
 		 *
 		 * @param name - The variable's name
 		 */
-		def variable(name: String): types.rdflib.variableMod.default = js.native
+//		def variable(name: String): types.rdflib.variableMod.default = js.native
 
 		/**
 		 * Gets the number of statements in this formula that matches the specified pattern
@@ -883,57 +506,15 @@ object formulaMod {
 		 * @param o - The object
 		 * @param g - The graph that contains the statement
 		 */
-		def whether(
-			s: js.UndefOr[QuadSubject | Null],
-			p: js.UndefOr[QuadPredicate | Null],
-			o: js.UndefOr[QuadObject | Null],
-			g: js.UndefOr[QuadGraph | Null]
-		): Double = js.native
+//		def whether(
+//			s: js.UndefOr[QuadSubject | Null],
+//			p: js.UndefOr[QuadPredicate | Null],
+//			o: js.UndefOr[QuadObject | Null],
+//			g: js.UndefOr[QuadGraph | Null]
+//		): Double = js.native
 	}
 
-	trait FormulaOpts extends StObject {
+//	type MembersMap = StringDictionary[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]]
 
-		var dataCallback: js.UndefOr[
-			js.Function1[ /* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph], Unit]
-		] = js.undefined
-
-		var rdfArrayRemove: js.UndefOr[
-			js.Function2[
-				/* arr */ js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]],
-				/* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph],
-				Unit
-			]
-		] = js.undefined
-
-		var rdfFactory: js.UndefOr[RdfJsDataFactory] = js.undefined
-	}
-
-	object FormulaOpts {
-
-		inline def apply(): FormulaOpts = {
-			val __obj = js.Dynamic.literal()
-			__obj.asInstanceOf[FormulaOpts]
-		}
-
-		extension[Self <: FormulaOpts] (x: Self) {
-
-			inline def setDataCallback(value: /* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph] => Unit): Self = StObject.set(x, "dataCallback", js.Any.fromFunction1(value))
-
-			inline def setDataCallbackUndefined: Self = StObject.set(x, "dataCallback", js.undefined)
-
-			inline def setRdfArrayRemove(
-				value: ( /* arr */ js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]], /* q */ Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]) => Unit
-			): Self = StObject.set(x, "rdfArrayRemove", js.Any.fromFunction2(value))
-
-			inline def setRdfArrayRemoveUndefined: Self = StObject.set(x, "rdfArrayRemove", js.undefined)
-
-			inline def setRdfFactory(value: RdfJsDataFactory): Self = StObject.set(x, "rdfFactory", value.asInstanceOf[js.Any])
-
-			inline def setRdfFactoryUndefined: Self = StObject.set(x, "rdfFactory", js.undefined)
-		}
-	}
-
-	type MembersMap = StringDictionary[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]]
-
-	type UriMap = StringDictionary[String]
+//	type UriMap = StringDictionary[String]
 }

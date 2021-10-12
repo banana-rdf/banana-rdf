@@ -27,8 +27,8 @@ class NTriplesWriter[Rdf <: RDF](using val ops: Ops[Rdf])
 	 * @return
 	 */
 	def node2Str(node: Node[Rdf]): String = node.fold(
-		bn => "_:" + bn.label,
 		url => "<" + url.value + ">",
+		bn => "_:" + bn.label,
 		lit => lit.fold(
 			txt => "\"" + txt + "\"",
 			(txt,lang) => "\"" + txt + "\"" + "@" + lang.label,
@@ -38,7 +38,7 @@ class NTriplesWriter[Rdf <: RDF](using val ops: Ops[Rdf])
 
 	override
 	def write(graph: Iterator[Triple[Rdf]], wr: Writer): Try[Unit] = Try {
-		for (triple <- graph) {
+		for triple <- graph do {
 			val line = tripleAsString(triple) + "\r\n"
 			wr.write(line)
 		}

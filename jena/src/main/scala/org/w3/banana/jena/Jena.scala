@@ -36,6 +36,12 @@ object JenaRdf extends RDF {
 		def release(resource: ExtendedIterator[T]): Unit = resource.close()
 	}
 
+	type QuadSubject = Node
+	type QuadRelation = URI
+	type QuadObject = Node
+	type QuadGraph = Graph
+
+
 	/**
 	 * Here we build up the methods functions allowing RDF.Graph[R] notation to be used.
 	 *
@@ -86,16 +92,17 @@ object JenaRdf extends RDF {
 				Graph.graphSize(graph)
 
 		val rTriple = new rTripleOps:
-			def apply(s: RDF.rNode[R], p: RDF.rURI[R], o: RDF.rNode[R]): RDF.rTriple[R] =
-				Triple(s, p, o)
+			import RDF.rStatement as rSt
+			def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
+				jena.Triple.create(s, p, o).nn
 			def untuple(t: RDF.Triple[R]): rTripleI =
 				(subjectOf(t),relationOf(t),objectOf(t))
-			def subjectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
-				Triple.subjectOf(t)
-			def relationOf(t: RDF.rTriple[R]): RDF.rURI[R] =
-				Triple.relationOf(t)
-			def objectOf(t: RDF.rTriple[R]): RDF.rNode[R] =
-				Triple.objectOf(t)
+			def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R] =
+				t.getSubject().asInstanceOf[rSt.Subject[R]].nn
+			def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] =
+				t.getPredicate().asInstanceOf[URI].nn
+			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] =
+				t.getObject().asInstanceOf[rSt.Object[R]].nn
 
 
 		//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
@@ -107,23 +114,33 @@ object JenaRdf extends RDF {
 //		}
 
 		given Triple: TripleOps with {
-			def apply(s: RDF.Node[R], p: RDF.URI[R], o: RDF.Node[R]): RDF.Triple[R] =
+			import RDF.Statement as St
+			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
 				jena.Triple.create(s, p, o).nn
 			def untuple(t: RDF.Triple[R]): TripleI =
 					(subjectOf(t), relationOf(t), objectOf(t))
-			def subjectOf(t: RDF.Triple[R]): RDF.Node[R] =
-				t.getSubject().nn
-			def relationOf(t: RDF.Triple[R]): RDF.URI[R] =
-				t.getPredicate.asInstanceOf[URI].nn
-			def objectOf(t: RDF.Triple[R]): RDF.Node[R] =
-				t.getObject().nn
+			def subjectOf(t: RDF.Triple[R]): St.Subject[R] =
+				t.getSubject().asInstanceOf[St.Subject[R]].nn
+			def relationOf(t: RDF.Triple[R]): St.Relation[R] =
+				t.getPredicate.asInstanceOf[St.Relation[R]].nn
+			def objectOf(t: RDF.Triple[R]): St.Object[R] =
+				t.getObject().asInstanceOf[St.Object[R]].nn
 		}
+
+		given Statement: StatementOps with
+			extension (subj: RDF.Statement.Subject[R])
+				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+					if subj.isBlank then
+						bnFcnt(subj.asInstanceOf[Node_Blank])
+					else
+						uriFnct(subj.asInstanceOf[Node_URI])
+
 
 		given Node: NodeOps with
 			extension (node: RDF.Node[R])
 				def fold[A](
-					bnF:  RDF.BNode[R] => A,
 					uriF: RDF.URI[R] => A,
+					bnF:  RDF.BNode[R] => A,
 					litF: RDF.Literal[R] => A
 				): A =
 					//considered Jena Visitor, but for some reason it deconstructs the types,

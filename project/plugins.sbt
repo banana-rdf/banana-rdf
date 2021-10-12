@@ -13,9 +13,10 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.7.1")
  * @see https://scalacenter.github.io/scalajs-bundler/getting-started.html
  */
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.0-RC1")
+addSbtPlugin("ch.epfl.scala" % "sbt-web-scalajs-bundler" % "0.21.0-RC1")
 
 /**
  * ScalablyTyped plugin: helps convert typescript to scala-js facades
  * https://scalablytyped.org/docs/readme.html
  */
-addSbtPlugin("org.scalablytyped.converter" % "sbt-converter" % "1.0.0-beta36")
+//addSbtPlugin("org.scalablytyped.converter" % "sbt-converter" % "1.0.0-beta36")

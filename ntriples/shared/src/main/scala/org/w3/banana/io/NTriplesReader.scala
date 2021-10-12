@@ -1,10 +1,10 @@
 package org.w3.banana.io
 
 import java.io.Reader
-
-import org.w3.banana.{RDF, Ops}
+import org.w3.banana.{Ops, RDF}
 import org.w3.banana.io.*
 import RDF.*
+import org.w3.banana.RDF.Statement.Subject
 
 import scala.annotation.tailrec
 import scala.util.control.NoStackTrace
@@ -125,6 +125,7 @@ class NTriplesParser[Rdf <: RDF](
 	import ops.*
 	import org.w3.banana.io.NTriplesParser.*
 	var lineNumber = 0
+	import RDF.Statement as St
 
 	import scala.collection.mutable
 	import scala.collection.mutable.StringBuilder.*
@@ -301,13 +302,13 @@ class NTriplesParser[Rdf <: RDF](
 				throw Error(c,s"blank node starts with illegal character in first position 'x0${Integer.toHexString(c)}'")
 		}
 
-	private def parseSubject(c: Char): Node[Rdf] =
+	private def parseSubject(c: Char): St.Subject[Rdf] =
 		c match
 		case '<' => parseIRI()
 		case '_' => parseBNode()
 		case x => throw Error(c,"Subject of Triple must start with a URI or bnode .")
 
-	private def parseObject(c: Int): Node[Rdf] =
+	private def parseObject(c: Int): St.Object[Rdf] =
 		c match
 		case -1 =>  throw EOF("was about to parse object")
 		case '<' => parseIRI()
@@ -324,7 +325,7 @@ class NTriplesParser[Rdf <: RDF](
 
 
 	private[io] def parseTriple(firstChar: Int): Try[Triple[Rdf]] =  Try {
-		val subject = parseObject(firstChar)
+		val subject = parseSubject(firstChar.toChar)
 		nextCharAfterOptionalWhiteSpace() match {
 			case c if c != '<' =>
 				throw Error(c,s"Subject must be followed by predicate URI. Found >$c< . ")

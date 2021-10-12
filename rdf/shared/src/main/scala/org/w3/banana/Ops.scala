@@ -9,6 +9,7 @@ import scala.util.Try
 trait Ops[Rdf <: RDF]:
 	import scala.language.implicitConversions
 	import RDF.*
+	import RDF.Statement as St
 	export LiteralI.*
 
    // needed to help inferencing
@@ -18,6 +19,12 @@ trait Ops[Rdf <: RDF]:
 	implicit def bnode2Node(bn: BNode[Rdf]): Node[Rdf] = bn.asInstanceOf[Node[Rdf]]
 	implicit def uri2rUri(uri: URI[Rdf]): rURI[Rdf] = uri.asInstanceOf[rURI[Rdf]]
 	implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
+
+	//conversions for position types
+	implicit def obj2Node(obj: St.Object[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
+	//note:  if we use the conversion below, then all the code needs to import scala.language.implicitConversions
+	//	given Conversion[St.Object[Rdf],RDF.Node[Rdf]] with
+	//		def apply(obj: St.Object[Rdf]): RDF.Node[Rdf] =  obj.asInstanceOf[Node[Rdf]]
 
 	// interpretation types to help consistent pattern matching across implementations
 
@@ -69,44 +76,56 @@ trait Ops[Rdf <: RDF]:
 		def graphSize(graph: rGraph[Rdf]): Int
 
 //	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
+	val Statement: StatementOps
+	trait StatementOps:
+		extension (subj: St.Subject[Rdf])
+			def fold[A](uriFnct: URI[Rdf] => A, bnFcnt: BNode[Rdf] => A): A
+
+//	extension (obj: Statement.Object[Rdf])
+//		def fold[A](bnFcnt: BNode[Rdf] => A, uriFnct: URI[Rdf] => A, litFnc: Literal[Rdf] => A): A =
+//			obj match
+//			case bn: BNode[Rdf] =>  bnFcnt(bn)
+//			case n: URI[Rdf] => uriFnct(n)
+//			case lit: Literal[Rdf] => litFnc(lit)
 
 	given Triple: TripleOps
 	trait TripleOps:
-		def apply(s: Node[Rdf], p: URI[Rdf], o: Node[Rdf]): Triple[Rdf]
+		def apply(s: St.Subject[Rdf], p: St.Relation[Rdf], o: St.Object[Rdf]): Triple[Rdf]
 		def unapply(t: Triple[Rdf]): Option[TripleI] = Some(untuple(t))
 		def untuple(t: Triple[Rdf]): TripleI
-		protected def subjectOf(s: Triple[Rdf]): Node[Rdf]
-		protected def relationOf(s: Triple[Rdf]): URI[Rdf]
-		protected def objectOf(s: Triple[Rdf]): Node[Rdf]
+		protected def subjectOf(s: Triple[Rdf]): St.Subject[Rdf]
+		protected def relationOf(s: Triple[Rdf]): St.Relation[Rdf]
+		protected def objectOf(s: Triple[Rdf]): St.Object[Rdf]
 		extension (triple: Triple[Rdf])
-			def subj: Node[Rdf] = subjectOf(triple)
-			def rel: URI[Rdf]   = relationOf(triple)
-			def obj: Node[Rdf]  = objectOf(triple)
+			def subj: St.Subject[Rdf] = subjectOf(triple)
+			def rel: St.Relation[Rdf] = relationOf(triple)
+			def obj: St.Object[Rdf] = objectOf(triple)
 
 	val rTriple: rTripleOps
 	trait rTripleOps:
-		def apply(s: rNode[Rdf], p: rURI[Rdf], o: rNode[Rdf]): rTriple[Rdf]
+		import RDF.rStatement as rSt
+		def apply(s: rSt.Subject[Rdf], p: rSt.Relation[Rdf], o: rSt.Object[Rdf]): rTriple[Rdf]
 		def unapply(t: RDF.Triple[Rdf]): Option[rTripleI] = Some(untuple(t))
 		def untuple(t: RDF.Triple[Rdf]): rTripleI
 		protected
-		def subjectOf(s: rTriple[Rdf]): rNode[Rdf]
+		def subjectOf(s: rTriple[Rdf]): rSt.Subject[Rdf]
 		protected
-		def relationOf(s: rTriple[Rdf]): rURI[Rdf]
+		def relationOf(s: rTriple[Rdf]): rSt.Relation[Rdf]
 		protected
-		def objectOf(s: rTriple[Rdf]): rNode[Rdf]
+		def objectOf(s: rTriple[Rdf]): rSt.Object[Rdf]
 		//todo? should we only have the extension functions?
 		extension (rtriple: rTriple[Rdf])
-			def rsubj: rNode[Rdf] = subjectOf(rtriple)
-			def rrel: rURI[Rdf]   = relationOf(rtriple)
-			def robj: rNode[Rdf]  = objectOf(rtriple)
+			def rsubj: rSt.Subject[Rdf] = subjectOf(rtriple)
+			def rrel: rSt.Relation[Rdf]   = relationOf(rtriple)
+			def robj: rSt.Object[Rdf]  = objectOf(rtriple)
 	end rTripleOps
 
 	given Node: NodeOps
 	trait NodeOps:
 		extension (node: Node[Rdf])
 			def fold[A](
-				bnF:  BNode[Rdf] => A,
 				uriF: URI[Rdf] => A,
+				bnF:  BNode[Rdf] => A,
 				litF: Literal[Rdf] => A
 			): A
 	end NodeOps
