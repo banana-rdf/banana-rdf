@@ -99,11 +99,16 @@ object formulaMod {
 		 */
 		def addAll(statements: js.Array[Quad]): Unit = js.native
 
-		/** Add a statment object
+		/** Add a statement object
 		 *
 		 * @param {Statement} statement - An existing constructed statement to add
+		 * @returns a new added quad or null if already in the db.
+		 *
+		 * banana simplification: rdflib.js converts any given quad to their term.
+		 * We just add the given quad. Null is returned if the quad was already given,
+		 * to not diverge too far from the API.
 		 */
-		def addStatement(statement: Quad): Double = js.native
+		def addStatement(statement: Quad): Quad|Null = js.native
 
 		/** Follow link from one node, using one wildcard, looking for one
 		 *

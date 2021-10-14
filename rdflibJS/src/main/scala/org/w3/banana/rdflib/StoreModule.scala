@@ -2,16 +2,80 @@ package org.w3.banana.rdflib
 
 import org.scalablytyped.runtime.StringDictionary
 import org.w3.banana.rdflib.FormulaOpts.FormulaOpts
+import org.w3.banana.rdflib.Test.{add, addStatement, canon}
 import org.w3.banana.rdflib.formulaMod.Formula
 import run.cosy.rdfjs.model.{BlankNode, DataFactory, DefaultGraph, Literal, NamedNode, Quad, Term}
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSImport
+import scala.scalajs.js.annotation.{JSImport, JSName}
+
 
 type Feature = "sameAs" | "InverseFunctionalProperty" | "FunctionalProperty"
 type FeaturesType = js.UndefOr[js.Array[Feature]]
 
 
+object StoreReplacementMethods:
+	import storeMod.IndexedFormula
+
+	val addStatement:  js.ThisFunction1[IndexedFormula,Quad, Quad | Null] =
+		(thisFrmla: IndexedFormula, quad: Quad) =>
+			val predHash = thisFrmla.rdfFactory.id(quad.rel)
+			val actions = thisFrmla.propertyActions.get(predHash).getOrElse(js.Array())
+			import quad.*
+			for act <- actions do
+				act(thisFrmla,subj,rel,obj,graph)
+			if thisFrmla.holdsStatement(quad) then null
+			else
+				val hash: js.Array[String] = js.Array(
+					thisFrmla.id(subj), predHash,
+					thisFrmla.id(obj), thisFrmla.id(graph))
+				val indexArr = thisFrmla.index.asInstanceOf[js.Array[thisFrmla.Index]]
+				hash.zip(indexArr).foreach{ case (h, ix) =>
+					ix.getOrElseUpdate(h,js.Array[Quad]()).append(quad)
+				}
+				//would be faster with a hash map!!
+				thisFrmla.statements.push(quad)
+				for cb <- thisFrmla.dataCallbacks.getOrElse(js.Array()) do cb(quad)
+				quad
+
+
+	val add : js.ThisFunction4[IndexedFormula,
+		Quad.Subject | Quad | js.Array[Quad],
+		js.UndefOr[Quad.Predicate],
+		js.UndefOr[Quad.Object],
+		js.UndefOr[Quad.Graph],
+		IndexedFormula|Quad|Null
+	] =
+		(thisArg: IndexedFormula,
+		 arg1: Quad.Subject | Quad | js.Array[Quad],
+		 arg2: js.UndefOr[Quad.Predicate],
+		 arg3: js.UndefOr[Quad.Object],
+		 arg4: js.UndefOr[Quad.Graph]) =>
+			arg1 match
+				case qs : js.Array[Quad] =>
+					for q <- qs do thisArg.addStatement(q)
+					thisArg
+				case q: Quad =>
+					thisArg.addStatement(q)
+					thisArg
+				case subj : Quad.Subject if arg2.isDefined && arg3.isDefined =>
+					val q = thisArg.rdfFactory.quad(subj,arg2.get,arg3.get,arg4.getOrElse(thisArg.rdfFactory.defaultGraph))
+					thisArg.addStatement(q)
+				case _ => throw new IllegalArgumentException(s"IndexedFormula.add($arg1,$arg2,$arg3,$arg4) has wrong arguments")
+
+	//the rdflib code returns a Node which is a Term with extra methods, and also does something looking at redirects
+	val canon: js.ThisFunction1[IndexedFormula, js.UndefOr[Term[?]],Term[?]|js.Object] =
+		(ixf: IndexedFormula, term: js.UndefOr[Term[?]]) =>
+			println(s"in canon($term)")
+			//todo: add redirections code
+			term.getOrElse(falseEquals)
+
+	/* needed because jslibs `canon` returns undefined which is used to test equality */
+	val falseEquals = new js.Object {
+		@JSName("equals")
+		def equalsTerm(obj: Any): Boolean = false
+	}
+end StoreReplacementMethods
 
 object storeMod {
 	export Quad.*
@@ -20,6 +84,10 @@ object storeMod {
 		println("hello in store mod creating new indexed formual")
 		val ixf = default(js.Array(),opts)
 		println("created ixf")
+		import StoreReplacementMethods as replace
+		ixf.asInstanceOf[js.Dynamic].updateDynamic("add")(replace.add)
+		ixf.asInstanceOf[js.Dynamic].updateDynamic("addStatement")(replace.addStatement)
+		ixf.asInstanceOf[js.Dynamic].updateDynamic("canon")(replace.canon)
 		ixf
 
 //		def add(
@@ -185,7 +253,7 @@ object storeMod {
 		//		def copyTo(template: QuadSubject, target: QuadSubject, flags: js.Array[`two-direction` | delete_]): Unit = js.native
 
 		/** Callbacks which are triggered after a statement has been added to the store */
-		/* private */ var dataCallbacks: js.Array[js.Function1[Quad,Unit]] = js.native
+		/* private */ var dataCallbacks: js.UndefOr[js.Array[js.Function1[Quad,Unit]]] = js.native
 
 		/**
 		 * N3 allows for declaring blank nodes, this function enables that support
