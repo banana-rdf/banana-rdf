@@ -53,7 +53,7 @@ object JenaRdf extends RDF {
 	 * as the RDF.Graph[R] type hides the implementation type (of `graph` field for example) **/
 	given ops: Ops[R] with {
 
-		val ANY: NodeAny[Rdf] = null
+		val `*`: NodeAny[Rdf] = null
 		given Graph: GraphOps with
 			import RDF.Statement as St
 			def empty: RDF.Graph[R] = Factory.empty().nn

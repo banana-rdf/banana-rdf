@@ -36,7 +36,7 @@ trait Ops[Rdf <: RDF]:
 	type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
 
 	//implementations
-	val ANY: NodeAny[Rdf]
+	val `*`: NodeAny[Rdf]
 
 	given Graph: GraphOps
 	trait GraphOps:

@@ -62,7 +62,7 @@ object Rdflib extends RDF {
 		import RDF.Statement as St
 		private val init = nodeMod.default
 
-		val ANY: RDF.NodeAny[R] = null
+		val `*`: RDF.NodeAny[R] = null
 		given Graph: GraphOps with
 			def empty: RDF.Graph[R] = storeMod(opts())
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =

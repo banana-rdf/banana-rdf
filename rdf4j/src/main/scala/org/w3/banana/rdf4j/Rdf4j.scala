@@ -58,7 +58,7 @@ object Rdf4j extends RDF:
 		import scala.jdk.CollectionConverters.{given,*}
 		import RDF.Statement as St
 
-		val ANY: NodeAny[Rdf] = null
+		val `*`: NodeAny[Rdf] = null
 		given Graph: GraphOps with
 			private val emptyGr: RDF.Graph[R] = new LinkedHashModel(0).unmodifiable().nn
 			def empty: RDF.Graph[R] = emptyGr
