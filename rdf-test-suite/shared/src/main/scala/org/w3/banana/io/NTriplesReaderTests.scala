@@ -660,7 +660,6 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 			val t = ntp.next()
 			x = x + 1
 			if t.isFailure then {
-				println(s"\r\ntriple=$t")
 				failures = failures + 1
 			}
 		}

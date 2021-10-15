@@ -32,6 +32,8 @@ object JenaRdf extends RDF {
 	override opaque type Literal <: Node = jena.Node_Literal
 	override opaque type Lang <: Matchable = String
 
+	override type NodeAny = Null
+
 	given [T]: Releasable[ExtendedIterator[T]] with {
 		def release(resource: ExtendedIterator[T]): Unit = resource.close()
 	}
@@ -51,7 +53,9 @@ object JenaRdf extends RDF {
 	 * as the RDF.Graph[R] type hides the implementation type (of `graph` field for example) **/
 	given ops: Ops[R] with {
 
-		given Graph: GraphOps with {
+		val ANY: NodeAny[Rdf] = null
+		given Graph: GraphOps with
+			import RDF.Statement as St
 			def empty: RDF.Graph[R] = Factory.empty().nn
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
 				val graph: Graph = Factory.createDefaultGraph.nn
@@ -80,7 +84,11 @@ object JenaRdf extends RDF {
 				g
 			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
 				left.isIsomorphicWith(right)
-		}
+
+			def findTriples(graph: RDF.Graph[R],
+				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
+			): Iterator[RDF.Triple[R]] = ???
+		end Graph
 
 		val rGraph = new rGraphOps:
 			def empty: RDF.rGraph[R] = Graph.empty

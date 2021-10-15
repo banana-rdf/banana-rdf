@@ -1,10 +1,9 @@
-package org.w3.banana.rdflib
+package org.w3.banana.rdflib.facade
 
 import org.scalablytyped.runtime.StringDictionary
-import org.w3.banana.rdflib.FormulaOpts.FormulaOpts
-import org.w3.banana.rdflib.Test.{add, addStatement, canon}
-import org.w3.banana.rdflib.formulaMod.Formula
-import run.cosy.rdfjs.model.{BlankNode, DataFactory, DefaultGraph, Literal, NamedNode, Quad, Term}
+import FormulaOpts.FormulaOpts
+import formulaMod.Formula
+import run.cosy.rdfjs.model.*
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSImport, JSName}
@@ -16,6 +15,8 @@ type FeaturesType = js.UndefOr[js.Array[Feature]]
 
 object StoreReplacementMethods:
 	import storeMod.IndexedFormula
+	type Index = js.Dictionary[js.Array[Quad]]
+
 
 	val addStatement:  js.ThisFunction1[IndexedFormula,Quad, Quad | Null] =
 		(thisFrmla: IndexedFormula, quad: Quad) =>
@@ -24,14 +25,18 @@ object StoreReplacementMethods:
 			import quad.*
 			for act <- actions do
 				act(thisFrmla,subj,rel,obj,graph)
-			if thisFrmla.holdsStatement(quad) then null
+			//note: the implementation there says it is ineficient but there is none using indexes provider
+			if thisFrmla.statementsMatching(subj,rel,obj,graph,true).length > 0 then null
 			else
 				val hash: js.Array[String] = js.Array(
 					thisFrmla.id(subj), predHash,
 					thisFrmla.id(obj), thisFrmla.id(graph))
-				val indexArr = thisFrmla.index.asInstanceOf[js.Array[thisFrmla.Index]]
+				val indexArr = thisFrmla.index.asInstanceOf[js.Array[Index]]
 				hash.zip(indexArr).foreach{ case (h, ix) =>
-					ix.getOrElseUpdate(h,js.Array[Quad]()).append(quad)
+//					println(s"adding quad $h to index $ix)")
+					val quads: js.Array[Quad] = ix.getOrElseUpdate(h,js.Array[Quad]())
+					quads.push(quad)
+					ix.put(h,quads)
 				}
 				//would be faster with a hash map!!
 				thisFrmla.statements.push(quad)
@@ -64,30 +69,72 @@ object StoreReplacementMethods:
 				case _ => throw new IllegalArgumentException(s"IndexedFormula.add($arg1,$arg2,$arg3,$arg4) has wrong arguments")
 
 	//the rdflib code returns a Node which is a Term with extra methods, and also does something looking at redirects
-	val canon: js.ThisFunction1[IndexedFormula, js.UndefOr[Term[?]],Term[?]|js.Object] =
+	val canon: js.ThisFunction1[IndexedFormula, js.UndefOr[Term[?]],js.UndefOr[Term[?]]] =
 		(ixf: IndexedFormula, term: js.UndefOr[Term[?]]) =>
-			println(s"in canon($term)")
 			//todo: add redirections code
-			term.getOrElse(falseEquals)
+			term
 
-	/* needed because jslibs `canon` returns undefined which is used to test equality */
-	val falseEquals = new js.Object {
-		@JSName("equals")
-		def equalsTerm(obj: Any): Boolean = false
+	val statementsMatching: js.ThisFunction5[IndexedFormula,
+		js.UndefOr[Quad.Subject | Null],
+		js.UndefOr[Quad.Predicate | Null],
+		js.UndefOr[Quad.Object | Null],
+		js.UndefOr[Quad.Graph| Null],
+		js.UndefOr[Boolean],
+		js.Array[Quad]
+	] =  (thisArg: IndexedFormula,
+		s: js.UndefOr[Quad.Subject | Null],
+		p: js.UndefOr[Quad.Predicate | Null],
+		o: js.UndefOr[Quad.Object | Null],
+		g: js.UndefOr[Quad.Graph | Null],
+		justOne: js.UndefOr[Boolean]) =>
+	{
+		import scalajs.js.JSConverters.*
+		val givenIndx: js.Array[(Int, Term[?])] = js.Array(s, p, o, g).zipWithIndex.collect {
+			case (undefOr: js.UndefOr[?], i) if undefOr.isDefined => (i, undefOr.get.asInstanceOf[Term[?]])
+		}
+		val result: js.Array[Quad] =
+			if givenIndx.size == 0 then thisArg.statements
+			//case 1 => thisArg.index(givenIndx.head._1).get(givenIndx.head._2.toString).getOrElse(js.Array())
+			else
+				val r: js.Array[js.Array[Quad]] = givenIndx.map { (i, term) =>
+					thisArg.index(i).get(term.toString).getOrElse(js.Array())
+				}
+				val sorted = r.sort((a1, a2) => a1.size - a2.size)
+				//todo: clearly having the indexes be Sets would be of great benefit
+				sorted.tail.foldRight(sorted.head.toSet){ case (quads, smallestSet) =>
+					smallestSet.intersect(quads.toSet)
+				}.toJSArray
+		if justOne.getOrElse(false) then result
+		else result.slice(0,1)
 	}
+
+	val matchFnct: js.ThisFunction4[IndexedFormula,
+		js.UndefOr[Quad.Subject],
+		js.UndefOr[Quad.Predicate],
+		js.UndefOr[Quad.Object],
+		js.UndefOr[Quad.Graph],
+		js.Array[Quad]
+	] = (thisObj: IndexedFormula,
+		  s: js.UndefOr[Quad.Subject],
+		  p: js.UndefOr[Quad.Predicate],
+		  o: js.UndefOr[Quad.Object],
+		  g: js.UndefOr[Quad.Graph]
+	) => thisObj.statementsMatching(s.getOrElse(null),p.getOrElse(null),o.getOrElse(null),g.getOrElse(null), false)
+
 end StoreReplacementMethods
 
 object storeMod {
 	export Quad.*
+	import StoreReplacementMethods as replace
+	type Index = js.Dictionary[js.Array[Quad]]
 
 	def apply(opts: FormulaOpts): IndexedFormula =
-		println("hello in store mod creating new indexed formual")
 		val ixf = default(js.Array(),opts)
-		println("created ixf")
-		import StoreReplacementMethods as replace
 		ixf.asInstanceOf[js.Dynamic].updateDynamic("add")(replace.add)
 		ixf.asInstanceOf[js.Dynamic].updateDynamic("addStatement")(replace.addStatement)
 		ixf.asInstanceOf[js.Dynamic].updateDynamic("canon")(replace.canon)
+		ixf.asInstanceOf[js.Dynamic].updateDynamic("match")(replace.matchFnct)
+		ixf.asInstanceOf[js.Dynamic].updateDynamic("statementsMatching")(replace.statementsMatching)
 		ixf
 
 //		def add(
@@ -281,8 +328,8 @@ object storeMod {
 		 */
 		//		def formula(features: FeaturesType): IndexedFormula = js.native
 		//An index maps a string representation of a node to the sets of quads that contain that in that position
-		type Index = js.Dictionary[js.Array[Quad]]
-		var index: js.Tuple4[Index, Index, Index, Index] = js.native
+		// an Array of Inexed exactly 4 long
+		var index: js.Array[Index] = js.native
 
 		/**
 		 * @param features
@@ -316,6 +363,15 @@ object storeMod {
 			predicate: js.UndefOr[Quad.Predicate],
 			`object`: js.UndefOr[Quad.Object],
 			graph: js.UndefOr[Quad.Graph]
+		): js.Array[Quad] = js.native
+
+		//the superclass has a bug at this point
+		def statementsMatching(
+			s: js.UndefOr[Quad.Subject | Null],
+			p: js.UndefOr[Quad.Predicate | Null],
+			o: js.UndefOr[Quad.Object | Null],
+			g: js.UndefOr[Quad.Graph | Null],
+			justOne: js.UndefOr[Boolean] = false
 		): js.Array[Quad] = js.native
 
 		/**

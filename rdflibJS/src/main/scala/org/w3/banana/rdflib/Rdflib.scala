@@ -1,13 +1,15 @@
 package org.w3.banana.rdflib
 
 
-import org.w3.banana.rdflib.FormulaOpts.FormulaOpts
-import org.w3.banana.rdflib.storeMod.IndexedFormula
+import org.w3.banana.rdflib.facade.FormulaOpts.FormulaOpts
+import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
+import org.w3.banana.rdflib.facade.*
 import org.w3.banana.{Ops, RDF}
 import run.cosy.rdfjs.model
 import run.cosy.rdfjs.model.DataFactory
 
 import scala.annotation.targetName
+import scala.collection.mutable
 import scala.util.{Success, Try}
 import scala.reflect.TypeTest
 import scala.scalajs.js
@@ -28,10 +30,7 @@ object Rdflib extends RDF {
 	override opaque type Literal <: Node = model.Literal
 	override opaque type Lang <: Matchable = String
 
-	type QuadSubject = model.Quad.Subject
-	type QuadRelation = model.Quad.Predicate
-	type QuadObject = model.Quad.Object
-	type QuadGraph = model.Quad.Graph
+	override type NodeAny = Null
 
 
 	//	given uriTT: TypeTest[Node,URI] with {
@@ -58,8 +57,12 @@ object Rdflib extends RDF {
 	given ops: Ops[R] with {
 		import js.JSConverters.*
 		val df: DataFactory = model.DataFactory()
-		def opts(): FormulaOpts = FormulaOpts().setRdfFactory(df)
+		def opts(): FormulaOpts = facade.FormulaOpts().setRdfFactory(df)
 		import scala.collection.mutable
+		import RDF.Statement as St
+		private val init = nodeMod.default
+
+		val ANY: RDF.NodeAny[R] = null
 		given Graph: GraphOps with
 			def empty: RDF.Graph[R] = storeMod(opts())
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
@@ -81,7 +84,7 @@ object Rdflib extends RDF {
 					case Seq(x) => x
 					case _ =>
 						val newGraph: IndexedFormula = empty
-						graphs.foreach(g => newGraph.addAll( g.`match`(undefined,undefined,undefined,undefined)))
+						graphs.foreach(g => g.statements.foreach(s => newGraph.addStatement(s)))
 						newGraph
 
 			def difference(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
@@ -96,6 +99,13 @@ object Rdflib extends RDF {
 				//  then this is all we need to do. Otherwise we need to strip contexts.
 				//Models.isomorphic(left, right)
 				//todo: no isomorphism in rdflib, use my lib
+
+			def findTriples(graph: RDF.Graph[R],
+				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
+			): Iterator[RDF.Triple[R]] =
+				val sm: mutable.Seq[RDF.Triple[R]] = graph.statementsMatching(s,p,o,df.defaultGraph,false)
+				sm.iterator
+		end Graph
 
 		val rGraph = new rGraphOps:
 			def empty: RDF.rGraph[R] = Graph.empty

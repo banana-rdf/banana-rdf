@@ -36,6 +36,7 @@ trait Ops[Rdf <: RDF]:
 	type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
 
 	//implementations
+	val ANY: NodeAny[Rdf]
 
 	given Graph: GraphOps
 	trait GraphOps:
@@ -55,6 +56,10 @@ trait Ops[Rdf <: RDF]:
 		def difference(g1: Graph[Rdf], g2: Graph[Rdf]): Graph[Rdf]
 		protected
 		def isomorphism(left: Graph[Rdf], right: Graph[Rdf]): Boolean
+		protected
+		def findTriples(graph: Graph[Rdf],
+			s: St.Subject[Rdf]|NodeAny[Rdf], p: St.Relation[Rdf]|NodeAny[Rdf], o: St.Object[Rdf]|NodeAny[Rdf]
+		): Iterator[Triple[Rdf]]
 		extension (graph: Graph[Rdf])
 			@targetName("iso")
 			def ≅ (other: Graph[Rdf]): Boolean = isomorphism(graph,other)
@@ -64,6 +69,11 @@ trait Ops[Rdf <: RDF]:
 			def triples: Iterable[Triple[Rdf]] = triplesIn(graph)
 			def union(graphs: Graph[Rdf]*): Graph[Rdf] = Graph.union(graph +: graphs )
 			def +(triple: Triple[Rdf]): Graph[Rdf] = Graph.union(Seq(graph, Graph(triple)))
+			def find(subj: St.Subject[Rdf]|NodeAny[Rdf],
+				rel: St.Relation[Rdf]|NodeAny[Rdf],
+				obj: St.Object[Rdf]|NodeAny[Rdf]
+			): Iterator[Triple[Rdf]] = findTriples(graph,subj,rel,obj)
+
 
 	val rGraph: rGraphOps
 	trait rGraphOps:

@@ -12,7 +12,7 @@ import scala.util.{Success, Try}
 import scala.reflect.TypeTest
 
 
-object Rdf4j extends RDF {
+object Rdf4j extends RDF:
 
 	//rdf4j.Model is modifiable, but we provide no altering methods and always produce new graphs
 	override opaque type rGraph = Model
@@ -28,6 +28,7 @@ object Rdf4j extends RDF {
 	override opaque type Literal <: Node = rjLiteral
 	override opaque type Lang <: Matchable = String
 
+	override type NodeAny = Null
 
 //	given uriTT: TypeTest[Node,URI] with {
 //		override def unapply(s: Node): Option[s.type & URI] =
@@ -52,10 +53,12 @@ object Rdf4j extends RDF {
 	 * I did not succeed in removing the duplication, as there are Match Type compilation problems.
 	 * It does not work to place here the implementations of rdf which can be placed above,
 	 * as the RDF.Graph[R] type hides the implementation type (of `graph` field for example) **/
-	given ops: Ops[R] with {
+	given ops: Ops[R] with
 		lazy val valueFactory: ValueFactory = SimpleValueFactory.getInstance().nn
 		import scala.jdk.CollectionConverters.{given,*}
+		import RDF.Statement as St
 
+		val ANY: NodeAny[Rdf] = null
 		given Graph: GraphOps with
 			private val emptyGr: RDF.Graph[R] = new LinkedHashModel(0).unmodifiable().nn
 			def empty: RDF.Graph[R] = emptyGr
@@ -83,6 +86,11 @@ object Rdf4j extends RDF {
 				//note: if we make sure that the opaque Graph, never contains contexts,
 				//  then this is all we need to do. Otherwise we need to strip contexts.
 				Models.isomorphic(left, right)
+
+			def findTriples(graph: RDF.Graph[R],
+				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
+			): Iterator[RDF.Triple[R]] = ???
+		end Graph
 
 		val rGraph = new rGraphOps:
 			def empty: RDF.rGraph[R] = Graph.empty
@@ -232,7 +240,8 @@ object Rdf4j extends RDF {
 			def asString(uri: RDF.URI[R]): String = uri.toString
 		end URI
 
-	}
+	end ops
+end Rdf4j
 
 	// mutable graphs
 //	type MGraph = Model
@@ -254,4 +263,3 @@ object Rdf4j extends RDF {
 //	type Solution = BindingSet
 //	// instead of TupleQueryResult so that it's eager instead of lazy
 //	type Solutions = Vector[BindingSet]
-}

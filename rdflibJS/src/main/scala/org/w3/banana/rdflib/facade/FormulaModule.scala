@@ -1,7 +1,7 @@
-package org.w3.banana.rdflib
+package org.w3.banana.rdflib.facade
 
 import org.scalablytyped.runtime.StObject
-import org.w3.banana.rdflib.FormulaOpts.FormulaOpts
+import FormulaOpts.FormulaOpts
 import run.cosy.rdfjs.model.{BlankNode, DataFactory, Quad, Term}
 
 import scala.scalajs.js
@@ -439,15 +439,13 @@ object formulaMod {
 		 * @param justOne - flag - stop when found one rather than get all of them?
 		 * @returns {Array<Node>} - An array of nodes which match the wildcard position
 		 */
-//		def statementsMatching[JustOne /* <: Boolean */ ](
-//			s: js.UndefOr[QuadSubject | Null],
-//			p: js.UndefOr[QuadPredicate | Null],
-//			o: js.UndefOr[QuadObject | Null],
-//			g: js.UndefOr[QuadGraph | Null],
-//			justOne: js.UndefOr[Boolean]
-//		): js.Array[
-//			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
-//		] = js.native
+//		def statementsMatching(
+//			s: js.UndefOr[Quad.Subject | Null],
+//			p: js.UndefOr[Quad.Predicate | Null],
+//			o: js.UndefOr[Quad.Object | Null],
+//			g: js.UndefOr[Quad.Graph | Null],
+//			justOne: js.UndefOr[Boolean] = false
+//		): js.Array[Quad] = js.native
 
 //		def sym(uri: String): types.rdflib.namedNodeMod.default = js.native
 //

@@ -1,4 +1,5 @@
 import Dependencies.{TestLibs, Ver, jenaLibs}
+import org.scalajs.linker.interface.ModuleKind.ESModule
 import org.scalajs.linker.interface.OutputPatterns
 import sbt.Keys.description
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
@@ -146,17 +147,21 @@ lazy val rdflibJS =  project.in(file("rdflibJS"))
 		useYarn := true,
 		scalacOptions ++= scala3jsOptions,
 		Compile / npmDependencies += "rdflib" -> "2.2.7",
+		Test / npmDependencies += "rdflib" -> "2.2.7",
+		useYarn := true,
 		libraryDependencies += "run.cosy" %%% "rdf-model-js" % "0.1-SNAPSHOT",
-		libraryDependencies += "com.lihaoyi" %%% "utest" % "0.7.10" % "test",
-		testFrameworks += new TestFramework("utest.runner.Framework"),
+		libraryDependencies += "org.scalameta" %%% "munit" % "0.7.29" % Test,
 		scalaJSUseMainModuleInitializer := true,
-		Test / scalaJSLinkerConfig ~= {
-			_.withModuleKind(ModuleKind.ESModule)
-				//	nodjs needs .mjs extension. See https://www.scala-js.org/doc/project/module.html
-				.withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
-		}, //required for munit to run
-		Compile / mainClass := Some( "org.w3.banana.rdflib.Test" ),
-		//scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.ESModule) } //wait for later for move to ESModule
+		Test / scalaJSLinkerConfig ~= { //required for munit to run
+			_.withModuleKind(ModuleKind.CommonJSModule)
+		},
+		Compile / mainClass := Some( "org.w3.banana.rdflib.test.Test" ),
+		Compile / scalaJSLinkerConfig ~= {
+			//	nodejs needs .mjs extension. See https://www.scala-js.org/doc/project/module.html
+			_.withModuleKind(ModuleKind.CommonJSModule)
+			// replacing CommonJSModule with what is below creates a linking problem
+			//_.withModuleKind(ModuleKind.ESModule).withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
+		}
 	).dependsOn(rdfJS, rdfTestSuiteJS % "test->compile")
 
 

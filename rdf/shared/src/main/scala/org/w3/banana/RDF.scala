@@ -30,6 +30,9 @@ trait RDF:
 	type Literal <: Node
 	type Lang <: Matchable
 
+	// types for the graph traversal API
+	type NodeAny
+
 //		def ANY: NodeAny
 //		implicit def toConcreteNodeMatch(node: Rdf#Node): Rdf#NodeMatch
 //		def foldNodeMatch[T](nodeMatch: Rdf#NodeMatch)(funANY: => T, funNode: Rdf#Node => T): T
@@ -97,6 +100,10 @@ object RDF:
 	type Lang[R <: RDF] <: Matchable = R match
 		case GetLang[l] => l
 
+	type NodeAny[R <: RDF] = R match
+		case GetNodeAny[m] => m
+
+
 	type GetRelURI[U] = RDF { type rURI = U }
 	type GetURI[U] = RDF { type URI = U }
 	type GetRelNode[N <: Matchable] = RDF { type rNode = N }
@@ -108,6 +115,7 @@ object RDF:
 	type GetTriple[T <: Matchable] = RDF { type Triple = T }
 	type GetRelGraph[G] = RDF { type rGraph = G }
 	type GetGraph[G] = RDF { type Graph = G }
+	type GetNodeAny[M] = RDF { type NodeAny = M }
 
 	/**
 	 * these associate a type to the positions in statements (triples or quads)

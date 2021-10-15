@@ -1,4 +1,4 @@
-package org.w3.banana.rdflib
+package org.w3.banana.rdflib.facade
 
 import org.scalablytyped.runtime.StObject
 import run.cosy.rdfjs.model.{DataFactory, Quad}
