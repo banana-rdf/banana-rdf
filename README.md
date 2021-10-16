@@ -16,6 +16,8 @@ Snapshot releases can be found on [sonatype.org](https://oss.sonatype.org/conten
 resolvers += Resolver.sonatypeRepo("snapshots")
 ```
 
+A Scala3 version is being developed on the [scala-3](https://github.com/banana-rdf/banana-rdf/tree/scala-3) branch of this repository. 
+
 An RDF library in Scala
 -----------------------
 
