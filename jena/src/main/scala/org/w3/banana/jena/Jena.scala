@@ -53,7 +53,7 @@ object JenaRdf extends RDF {
 	 * as the RDF.Graph[R] type hides the implementation type (of `graph` field for example) **/
 	given ops: Ops[R] with {
 
-		val `*`: NodeAny[Rdf] = null
+		val `*`: RDF.NodeAny[R] = null
 		given Graph: GraphOps with
 			import RDF.Statement as St
 			def empty: RDF.Graph[R] = Factory.empty().nn
@@ -87,7 +87,9 @@ object JenaRdf extends RDF {
 
 			def findTriples(graph: RDF.Graph[R],
 				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
-			): Iterator[RDF.Triple[R]] = ???
+			): Iterator[RDF.Triple[R]] =
+				import scala.jdk.CollectionConverters.*
+				graph.find(s, p, o).nn.asScala
 		end Graph
 
 		val rGraph = new rGraphOps:

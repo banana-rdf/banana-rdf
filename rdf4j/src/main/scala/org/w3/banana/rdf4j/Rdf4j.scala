@@ -58,7 +58,7 @@ object Rdf4j extends RDF:
 		import scala.jdk.CollectionConverters.{given,*}
 		import RDF.Statement as St
 
-		val `*`: NodeAny[Rdf] = null
+		val `*`: RDF.NodeAny[R] = null
 		given Graph: GraphOps with
 			private val emptyGr: RDF.Graph[R] = new LinkedHashModel(0).unmodifiable().nn
 			def empty: RDF.Graph[R] = emptyGr
@@ -89,7 +89,9 @@ object Rdf4j extends RDF:
 
 			def findTriples(graph: RDF.Graph[R],
 				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
-			): Iterator[RDF.Triple[R]] = ???
+			): Iterator[RDF.Triple[R]] =
+				import scala.jdk.CollectionConverters.*
+				graph.filter(s, p, o).nn.iterator.nn.asScala
 		end Graph
 
 		val rGraph = new rGraphOps:

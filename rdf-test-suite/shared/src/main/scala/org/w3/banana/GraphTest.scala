@@ -86,7 +86,7 @@ open class GraphSearchTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite
 	test("Test graph with 3 triples") {
 		val g3 = Graph(bkt, tname, bname)
 		assertEquals(g3.find(`*`, `*`, `*`).toSet, g3.triples.toSet)
-		assertEquals(g3.find(bblf, `*`, `*`).toSet, g3.triples.toSet)
+		assertEquals(g3.find(bblf, `*`, `*`).toSet, Set(bkt,bname))
 		assertEquals(g3.find(bblf, foaf.knows, `*`).toSeq, Seq(bkt))
 		assertEquals(g3.find(bblf, foaf.knows, timbl).toSeq, Seq(bkt))
 		assertEquals(g3.find(`*`, foaf.knows, timbl).toSeq, Seq(bkt))
