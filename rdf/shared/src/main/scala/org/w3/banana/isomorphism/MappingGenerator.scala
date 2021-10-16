@@ -41,18 +41,15 @@ object MappingGenerator {
 	}
 
 	/** a function to take a list of layers, and turn it into a lazy stream of branches */
-	def branches[T](layers: List[List[T]]): EphemeralStream[List[T]] = {
-		layers.foldLeft(EphemeralStream(List[T]())) {
+	//todo this used to return a scalaz EphemeralStream.
+	def branches[T](layers: List[List[T]]): LazyList[List[T]] =
+		layers.foldLeft(LazyList(List[T]())) {
 			case (streamOfBranches, layer) =>
-				for (
-					mapping <- EphemeralStream(layer *);
+				for
+					mapping <- LazyList(layer *)
 					branch <- streamOfBranches
-				) yield {
-					mapping :: branch
-				}
+				yield mapping :: branch
 		}
-
-	}
 
 	/**
 	 * transform a ListMap - order is important - into a List of layers of maps

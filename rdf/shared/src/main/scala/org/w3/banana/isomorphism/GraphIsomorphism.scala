@@ -60,7 +60,7 @@ final case class GraphIsomorphism[Rdf <: RDF](
 	 *
 	 * @return A list of possible bnode mappings or a reason for the error
 	 */
-	def possibleMappings(g1: Graph[Rdf], g2: Graph[Rdf]): Try[EphemeralStream[List[(BNode[Rdf], BNode[Rdf])]]] = {
+	def possibleMappings(g1: Graph[Rdf], g2: Graph[Rdf]): Try[LazyList[List[(BNode[Rdf], BNode[Rdf])]]] = {
 		if (g1.size != g2.size)
 			return Failure(MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}"))
 
@@ -108,7 +108,7 @@ final case class GraphIsomorphism[Rdf <: RDF](
 	/*
 	 * @return A Stream of valid bnode mappings or a reason for the error
 	 */
-	def possibleAnswers(g1: Graph[Rdf], g2: Graph[Rdf]): Try[EphemeralStream[List[(BNode[Rdf], BNode[Rdf])]]] =
+	def possibleAnswers(g1: Graph[Rdf], g2: Graph[Rdf]): Try[LazyList[List[(BNode[Rdf], BNode[Rdf])]]] =
 		possibleMappings(g1, g2).map {
 			_.filter(answer => mapVerify(g1, g2, answer).isEmpty)
 		}
@@ -117,7 +117,7 @@ final case class GraphIsomorphism[Rdf <: RDF](
 	def findAnswer(g1: Graph[Rdf], g2: Graph[Rdf]): Try[List[(BNode[Rdf], BNode[Rdf])]] =
 		possibleAnswers(g1, g2).flatMap(_.headOption match {
 			case Some(nodeList) => Success(nodeList)
-			case None => Failure[Nothing](NoMappingException(EphemeralStream()))
+			case None => Failure[Nothing](NoMappingException(LazyList()))
 		})
 
 
@@ -164,7 +164,7 @@ final case class GraphIsomorphism[Rdf <: RDF](
 		//do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
 	}
 
-	case class NoMappingException(val reasons: EphemeralStream[(List[(BNode[Rdf], BNode[Rdf])], List[MappingException])]) extends MappingError {
+	case class NoMappingException(val reasons: LazyList[(List[(BNode[Rdf], BNode[Rdf])], List[MappingException])]) extends MappingError {
 		def msg: String = "No mapping found"
 
 		override def toString(): String = s"NoMappingException($reasons)"
