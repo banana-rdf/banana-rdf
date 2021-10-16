@@ -1,3 +1,4 @@
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import sbt._
 
 object Dependencies {
@@ -58,5 +59,9 @@ object Dependencies {
 	val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.7.32" % Test
 
 //	val `rdflib-types` = "org.scala-js" %%% "rdflib-types" % "0.1-SNAPSHOT"
+
+	object typelevel {
+		val catsCore =  Def.setting("org.typelevel" %%% "cats-core" % "2.6.1")
+	}
 	
 }

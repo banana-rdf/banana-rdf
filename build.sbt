@@ -1,4 +1,4 @@
-import Dependencies.{TestLibs, Ver, jenaLibs}
+import Dependencies.{TestLibs, Ver, jenaLibs, typelevel}
 import org.scalajs.linker.interface.ModuleKind.ESModule
 import org.scalajs.linker.interface.OutputPatterns
 import sbt.Keys.description
@@ -74,9 +74,9 @@ lazy val rdf = crossProject(JVMPlatform, JSPlatform)
 	.settings(commonSettings: _*)
 	.settings(
 		name := "banana-rdf",
+		libraryDependencies ++= Seq(typelevel.catsCore.value),
 	)
 	.jvmSettings(
-		libraryDependencies ++= Seq(),
 		scalacOptions ++= scala3jvmOptions
 	)
 	.jsSettings(
