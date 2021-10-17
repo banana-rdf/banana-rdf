@@ -22,6 +22,7 @@ trait Ops[Rdf <: RDF]:
 
 	//conversions for position types
 	implicit def obj2Node(obj: St.Object[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
+	implicit def sub2Node(obj: St.Subject[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
 	//note:  if we use the conversion below, then all the code needs to import scala.language.implicitConversions
 	//	given Conversion[St.Object[Rdf],RDF.Node[Rdf]] with
 	//		def apply(obj: St.Object[Rdf]): RDF.Node[Rdf] =  obj.asInstanceOf[Node[Rdf]]
@@ -67,8 +68,9 @@ trait Ops[Rdf <: RDF]:
 			def diff(other: Graph[Rdf]): Graph[Rdf] = difference(graph,other)
 			def size: Int = graphSize(graph)
 			def triples: Iterable[Triple[Rdf]] = triplesIn(graph)
-			def union(graphs: Graph[Rdf]*): Graph[Rdf] = Graph.union(graph +: graphs )
+			infix def union(graphs: Graph[Rdf]*): Graph[Rdf] = Graph.union(graph +: graphs )
 			def +(triple: Triple[Rdf]): Graph[Rdf] = Graph.union(Seq(graph, Graph(triple)))
+			def contains(t: Triple[Rdf]): Boolean = find(t.subj,t.rel,t.obj).nonEmpty
 			def find(subj: St.Subject[Rdf]|NodeAny[Rdf],
 				rel: St.Relation[Rdf]|NodeAny[Rdf],
 				obj: St.Object[Rdf]|NodeAny[Rdf]
@@ -137,7 +139,23 @@ trait Ops[Rdf <: RDF]:
 				uriF: URI[Rdf] => A,
 				bnF:  BNode[Rdf] => A,
 				litF: Literal[Rdf] => A
-			): A
+			): A =
+				if node.isURI then uriF(node.asInstanceOf[URI[Rdf]])
+				else if node.isBNode then bnF(node.asInstanceOf[BNode[Rdf]])
+				else if node.isLiteral then litF(node.asInstanceOf[Literal[Rdf]])
+				else //we should never get here, but refactorings could happen...
+					throw IllegalArgumentException(
+					s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
+				)
+
+			def isURI: Boolean
+			def isBNode: Boolean
+			def isLiteral: Boolean
+
+		extension (node: RDF.Statement.Object[Rdf])
+			//todo: find a way to remove this asInstanceOf
+			def asNode: Node[Rdf] = node.asInstanceOf[Node[Rdf]]
+
 	end NodeOps
 
 	//todo? should a BNode be part of a Graph (or DataSet) as per Benjamin Braatz's thesis?

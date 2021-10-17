@@ -1,6 +1,7 @@
 package org.w3.banana.isomorphism
 
 import org.w3.banana.RDF
+import org.w3.banana.RDF.*
 
 import scala.collection.immutable
 import scala.collection.immutable.ListMap

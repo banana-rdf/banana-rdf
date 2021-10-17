@@ -1,6 +1,7 @@
 package org.w3.banana.isomorphism
 
-import org.w3.banana.{Ops, RDF}
+import org.w3.banana.Ops
+import org.w3.banana.RDF
 
 import scala.collection.immutable.ListMap
 import scala.collection.{immutable, mutable}
@@ -14,10 +15,10 @@ import scala.util.Try
  * @param VT the classifier
  * @param maxComplexity the maximum number of solutions to look at, otherwise fails
  */
-final class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(implicit ops: RDFOps[Rdf])
-	extends MappingGenerator[Rdf] {
+final class SimpleMappingGenerator[R <: RDF](VT: () => VerticeCBuilder[R])(using ops: Ops[R])
+	extends MappingGenerator[R] {
 
-	import ops.*
+	import ops.{given,*}
 
 	/**
 	 * generate a list of possible bnode mappings, filtered by applying classification algorithm
@@ -27,27 +28,27 @@ final class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(i
 	 *         they should corresond to
 	 */
 	def bnodeMappings(
-		g1: Graph[Rdf],
-		g2: Graph[Rdf]): Try[immutable.ListMap[BNode[Rdf], immutable.Set[BNode[Rdf]]]] = Try {
+		g1: RDF.Graph[R],
+		g2: RDF.Graph[R]): Try[immutable.ListMap[RDF.BNode[R], immutable.Set[RDF.BNode[R]]]] = Try {
 		val clz1 = bnodeClassify(g1)
 		val clz2 = bnodeClassify(g2)
-		if (clz1.size != clz2.size)
+		if clz1.size != clz2.size then
 			throw ClassificationException("the two graphs don't have the same number of classes.", clz1, clz2)
-		val mappingOpts: mutable.Map[BNode[Rdf], mutable.Set[BNode[Rdf]]] = mutable.HashMap[BNode[Rdf], mutable.Set[BNode[Rdf]]]()
-		for {
+		val mappingOpts: mutable.Map[RDF.BNode[R], mutable.Set[RDF.BNode[R]]] = mutable.HashMap[RDF.BNode[R], mutable.Set[RDF.BNode[R]]]()
+		for
 			(vt, bnds1) <- clz1 // .sortBy { case (vt, bn) => bn.size }
 			bnds2 <- clz2.get(vt)
-		} {
-			if (bnds2.size != bnds1.size)
+		do {
+			if bnds2.size != bnds1.size then
 				throw ClassificationException(s"the two graphs don't have the same number of bindings for type $vt", clz1, clz2)
-			for (bnd <- bnds1) {
-				mappingOpts.get(bnd).orElse(Some(mutable.Set.empty[BNode[Rdf]])).map { bnset =>
+			for bnd <- bnds1 do {
+				mappingOpts.get(bnd).orElse(Some(mutable.Set.empty[RDF.BNode[R]])).map { bnset =>
 					mappingOpts.put(bnd, bnset ++= bnds2)
 				}
 			}
 		}
 		//todo: this transformation to immutable is expensive
-		ListMap(mappingOpts.toSeq.map(l => (l._1, l._2.toSet)).sortBy(_._2.size): _*)
+		ListMap(mappingOpts.toSeq.map(l => (l._1, l._2.toSet)).sortBy(_._2.size)*)
 	}
 
 	/**
@@ -55,40 +56,25 @@ final class SimpleMappingGenerator[Rdf <: RDF](VT: () => VerticeCBuilder[Rdf])(i
 	 *
 	 * @return a classification of bnodes by type, where nodes can only be matched by other nodes of the same type
 	 */
-	def bnodeClassify(graph: Graph[Rdf]): Map[VerticeClassification, Set[BNode[Rdf]]] = {
-		val bnodeClass = mutable.HashMap[BNode[Rdf], VerticeCBuilder[Rdf]]()
-		for (triple <- graph.triples) {
-			triple.subj.fold((_: URI[Rdf]) => (),
-				(bn: BNode[Rdf]) => bnodeClass.get(bn).orElse {
-					val vt = VT()
-					bnodeClass.put(bn, vt)
-					Some(vt)
-				}.map { vt =>
-					vt.setForwardRel(rel, obj)
-				},
-				(_: Literal[Rdf]) => ()
-			)
-
-			triple.obj.fold(
-				(_: URI[Rdf]) => (),
-				(bn: BNode[Rdf]) => bnodeClass.get(bn).orElse {
-					val vt = VT()
-					bnodeClass.put(bn, vt)
-					Some(vt)
-				}.map { vt =>
-					vt.setBackwardRel(rel, subj)
-				},
-				(_: Literal[Rdf]) => ())
+	def bnodeClassify(graph: RDF.Graph[R]): Map[VerticeClassification, Set[RDF.BNode[R]]] =
+		val bnodeClass = mutable.HashMap[RDF.BNode[R], VerticeCBuilder[R]]()
+		for tr <- graph.triples do {
+			if tr.subj.isBNode then
+				val vt = bnodeClass.getOrElseUpdate(tr.subj, VT())
+				vt.setForwardRel(tr.rel, tr.obj)
+			if tr.obj.isBNode then
+				val vt = bnodeClass.getOrElseUpdate(tr.obj, VT())
+				vt.setBackwardRel(tr.rel, tr.subj)
 		}
 		bnodeClass.view.mapValues(_.result).toMap
 			.groupBy(_._2)
 			.view.mapValues(_.keys.toSet).toMap
-	}
+	end bnodeClassify
 
 	case class ClassificationException(
 		msg: String,
-		clz1: Map[VerticeClassification, Set[BNode[Rdf]]],
-		clz2: Map[VerticeClassification, Set[BNode[Rdf]]]) extends MappingError {
+		clz1: Map[VerticeClassification, Set[RDF.BNode[R]]],
+		clz2: Map[VerticeClassification, Set[RDF.BNode[R]]]) extends MappingError(msg) {
 		override def toString() = s"ClassificationException($msg,$clz1,$clz2)"
 	}
 

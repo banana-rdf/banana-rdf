@@ -83,7 +83,7 @@ object Rdf4j extends RDF:
 				}
 				graph
 			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
-				//note: if we make sure that the opaque Graph, never contains contexts,
+				//todo: if we make sure that the opaque Graph, never contains contexts,
 				//  then this is all we need to do. Otherwise we need to strip contexts.
 				Models.isomorphic(left, right)
 
@@ -145,21 +145,11 @@ object Rdf4j extends RDF:
 					else uriFnct(subj.asInstanceOf[rjIRI])
 
 		given Node: NodeOps with
+			private def r4n(node: RDF.Node[R]): Value = node.asInstanceOf[Value]
 			extension (node: RDF.Node[R])
-				def fold[A](
-					uriF: RDF.URI[R] => A,
-					bnF: RDF.BNode[R] => A,
-					litF: RDF.Literal[R] => A
-				): A =
-					if node.isBNode() then
-						bnF(node.asInstanceOf[rjBNode])
-					else if node.isIRI() then
-						uriF(node.asInstanceOf[rjIRI])
-					else if node.isLiteral() then
-						litF(node.asInstanceOf[rjLiteral])
-					else throw new IllegalArgumentException(
-						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
-					)
+				def isURI: Boolean = r4n(node).isIRI
+				def isBNode: Boolean = r4n(node).isBNode
+				def isLiteral: Boolean = r4n(node).isLiteral
 
 		given BNode: BNodeOps with
 			def apply(s: String): RDF.BNode[R] = valueFactory.createBNode(s).nn

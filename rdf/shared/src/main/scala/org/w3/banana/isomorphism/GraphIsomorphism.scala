@@ -5,7 +5,7 @@ import org.w3.banana.{Ops, RDF}
 import scala.collection.mutable
 import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success, Try}
-
+import org.w3.banana.RDF.*
 /**
  * Methods to establish Graph Equivalences
  *
@@ -27,14 +27,13 @@ import scala.util.{Failure, Success, Try}
  * @param mappingGen a mapping generator that knows to find for two graphs the possible mappings of bnodes between
  *                   them. Better mapping generators will find less mappings for the same graphs, without missing out
  *                   on correct ones.
- * @tparam Rdf RDF implementation to work with
+ * @tparam R RDF implementation to work with
  */
-//noinspection ScalaStyle
-final case class GraphIsomorphism[Rdf <: RDF](
-	val mappingGen: MappingGenerator[Rdf], maxComplexity: Int = 65536
-)(implicit ops: Ops[Rdf]) {
+final case class GraphIsomorphism[R <: RDF](
+	val mappingGen: MappingGenerator[R], maxComplexity: Int = 65536
+)(using ops: Ops[R]) {
 
-	import ops.*
+	import ops.{*,given}
 
 	/**
 	 * filter a graphs into two subgraphs the first one containing no blank nodes
@@ -42,37 +41,34 @@ final case class GraphIsomorphism[Rdf <: RDF](
 	 *
 	 * @return a pair of Ground graph and non ground graph
 	 */
-	def groundTripleFilter(graph: Graph[Rdf]): (Graph[Rdf], Graph[Rdf]) = {
-		var ground: Graph[Rdf] = Graph.empty
-		var nonGround: Graph[Rdf] = Graph.empty
-		for (triple <- graph.triples) {
-			triple match {
-				case Triple(s, r, o) if s.isBNode || o.isBNode => nonGround = nonGround + triple
-				case _ => ground = ground + triple
-			}
-		}
-		(ground, nonGround)
+	def groundTripleFilter(graph: RDF.Graph[R]): (RDF.Graph[R], RDF.Graph[R]) =
+		var ground: List[RDF.Triple[R]] = List()
+		var nonGround: List[RDF.Triple[R]] = List()
+		for triple <- graph.triples do
+			if triple.subj.isBNode || triple.obj.isBNode then
+				nonGround = triple::nonGround
+			else ground = triple::ground
+		(Graph(ground), Graph(nonGround))
 
-	}
 
 	/**
 	 * Find possible bnode mappings
 	 *
 	 * @return A list of possible bnode mappings or a reason for the error
 	 */
-	def possibleMappings(g1: Graph[Rdf], g2: Graph[Rdf]): Try[LazyList[List[(BNode[Rdf], BNode[Rdf])]]] = {
-		if (g1.size != g2.size)
+	def possibleMappings(g1: Graph[R], g2: Graph[R]): Try[LazyList[List[(BNode[R], BNode[R])]]] = {
+		if g1.size != g2.size then
 			return Failure(MappingException(s"graphs don't have the same number of triples: g1.size=${g1.size} g2.size=${g2.size}"))
 
 		val (grnd1, nongrnd1) = groundTripleFilter(g1)
 		val (grnd2, nongrnd2) = groundTripleFilter(g2)
-		if (grnd1.size != grnd2.size)
+		if grnd1.size != grnd2.size then
 			return Failure(MappingException("the two graphs don't have the same number of ground triples. " +
 				s"ground(g1).size=${grnd1.size} ground(g2).size=${grnd2.size}"))
 
 		val bnodeMaps = mappingGen.bnodeMappings(nongrnd1, nongrnd2)
 		val complexity = MappingGenerator.complexity(bnodeMaps)
-		if (complexity > maxComplexity)
+		if complexity > maxComplexity then
 			return Failure(MappingException(s"Search space too big. maxComplexity is set to $maxComplexity but the search space is of size $complexity"))
 
 		bnodeMaps map { nodeMapping =>
@@ -101,20 +97,20 @@ final case class GraphIsomorphism[Rdf <: RDF](
 			 * a lazy stream of paths. ( so we can stop as soon as we found one result )
 			 *
 			 */
-			branches[(BNode[Rdf], BNode[Rdf])](treeLevels[BNode[Rdf]](nodeMapping))
+			branches[(BNode[R], BNode[R])](treeLevels[BNode[R]](nodeMapping))
 		}
 	}
 
 	/*
 	 * @return A Stream of valid bnode mappings or a reason for the error
 	 */
-	def possibleAnswers(g1: Graph[Rdf], g2: Graph[Rdf]): Try[LazyList[List[(BNode[Rdf], BNode[Rdf])]]] =
+	def possibleAnswers(g1: Graph[R], g2: Graph[R]): Try[LazyList[List[(BNode[R], BNode[R])]]] =
 		possibleMappings(g1, g2).map {
 			_.filter(answer => mapVerify(g1, g2, answer).isEmpty)
 		}
 
 	/** @return the first answer or the failure that there is no mapping */
-	def findAnswer(g1: Graph[Rdf], g2: Graph[Rdf]): Try[List[(BNode[Rdf], BNode[Rdf])]] =
+	def findAnswer(g1: Graph[R], g2: Graph[R]): Try[List[(BNode[R], BNode[R])]] =
 		possibleAnswers(g1, g2).flatMap(_.headOption match {
 			case Some(nodeList) => Success(nodeList)
 			case None => Failure[Nothing](NoMappingException(LazyList()))
@@ -129,54 +125,56 @@ final case class GraphIsomorphism[Rdf <: RDF](
 	 *
 	 */
 	def mapVerify(
-		graph1: Graph[Rdf],
-		graph2: Graph[Rdf],
-		mapping: List[(BNode[Rdf], BNode[Rdf])]): List[MappingException] = {
-		// verify that both graphs are the same size
-		if (graph1.size != graph2.size)
-			return List(MappingException(s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"))
+		graph1: Graph[R],
+		graph2: Graph[R],
+		mapping: List[(BNode[R], BNode[R])]
+	): List[MappingException] =
 
-		// 1. verify that bnodeBijection is a bijection, fail early
-		val bnodeBijection: mutable.HashMap[BNode[Rdf], BNode[Rdf]] = {
-			val back = new mutable.HashMap[BNode[Rdf], BNode[Rdf]]()
-			val map = new mutable.HashMap[BNode[Rdf], BNode[Rdf]]()
-			for ((from, to) <- mapping) {
-				if (back.put(to, from).fold[Boolean](true)(_ == from)
-					&& map.put(from, to).fold(true)(_ == to)) { //all good
-				} else return List[MappingException](
-					MappingException(s"bnodeBijection is not a bijection: $from already mapped"))
-			}
-			map
-		}
+		import scala.util.control.NonLocalReturns.*
+			// verify that both graphs are the same size
+		if graph1.size != graph2.size then
+			List(MappingException(s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"))
+		else returning {
+			// 1. verify that bnodeBijection is a bijection, fail early
+			val bnodeBijection: mutable.HashMap[BNode[R], BNode[R]] =
+				val back = new mutable.HashMap[BNode[R], BNode[R]]()
+				val map = new mutable.HashMap[BNode[R], BNode[R]]()
+				for (from, to) <- mapping do {
+					if (back.put(to, from).fold[Boolean](true)(_ == from)
+						&& map.put(from, to).fold(true)(_ == to)) then { }
+					else throwReturn(List[MappingException](
+						MappingException(s"bnodeBijection is not a bijection: $from already mapped")))
+				}
+				map
 
-		def bnmap(node: Node[Rdf]): Node[Rdf] = node.fold(
-			(uri: URI[Rdf]) => uri,
-			(bnode: BNode[Rdf]) => bnodeBijection(bnode),
-			(lit: Literal[Rdf]) => lit
-		)
+			def bnmap(node: RDF.Statement.Object[R]): RDF.Statement.Object[R] = node.asNode.fold(
+				(uri: URI[R]) => uri,
+				(bnode: BNode[R]) => bnodeBijection(bnode),
+				(lit: Literal[R]) => lit
+			)
 
-		//2. use the bijection to verify that it maps the triples correctly
-		val mappTriples = for (Triple(sub, rel, obj) <- graph1.triples) yield {
-			makeTriple(bnmap(sub), rel, bnmap(obj))
-		}
-		mappTriples.find(!graph2.contains(_)).toList.map(t => MappingException(s"could not find map for $t"))
-
-		//do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
+			//2. use the bijection to verify that it maps the triples correctly
+			val mappTriples = for triple <- graph1.triples yield Triple(
+				bnmap(triple.subj).asInstanceOf[RDF.Statement.Subject[R]], triple.rel, bnmap(triple.obj)
+			)
+			mappTriples.find(!graph2.contains(_)).toList.map(t => MappingException(s"could not find map for $t"))
 	}
 
-	case class NoMappingException(val reasons: LazyList[(List[(BNode[Rdf], BNode[Rdf])], List[MappingException])]) extends MappingError {
-		def msg: String = "No mapping found"
+		//do I have to test that the mapping goes the other way too? Or is it sufficient if the bnodesmap is a bijection?
+	end mapVerify
 
+	case class NoMappingException(val reasons: LazyList[(List[(BNode[R], BNode[R])], List[MappingException])])
+		extends MappingError("") {
+		def msg: String = "No mapping found"
 		override def toString(): String = s"NoMappingException($reasons)"
 	}
 
 }
 
-trait MappingError extends NoStackTrace {
-	def msg: String
-}
+//problem https://github.com/lampepfl/dotty/issues/13608
+open class MappingError(msg: String) extends Throwable(msg)//,null, true,  false)
 
-case class MappingException(msg: String) extends MappingError {
+case class MappingException(msg: String) extends MappingError(msg) {
 	override def toString(): String = s"MappingException($msg)"
 }
 

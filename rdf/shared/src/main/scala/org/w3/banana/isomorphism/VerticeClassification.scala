@@ -1,6 +1,7 @@
 package org.w3.banana.isomorphism
 
 import org.w3.banana.{Ops, RDF}
+import org.w3.banana.RDF.*
 
 import scala.collection.mutable
 
@@ -75,21 +76,21 @@ case class CountingVC(forwardRels: Int, backwardRels: Int) extends VerticeClassi
  *
  * @param ops needed to calculate the hash of Nodes
  */
-case class SimpleHashVCBuilder[Rdf <: RDF]()(implicit ops: RDFOps[Rdf])
+case class SimpleHashVCBuilder[Rdf <: RDF]()(using ops: Ops[Rdf])
 	extends VerticeCBuilder[Rdf] {
 
 	val forwardRels = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
 	val backwardRels = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
 	val bnodeValue = 2017 // prime number
 
-	import ops.*
+	import ops.{given,*}
 
-	def hashOf(node: Node[Rdf]) = node.fold(_.hashCode, _ => bnodeValue, _.hashCode)
+	def hashOf(node: RDF.Node[Rdf]) = node.fold(_.hashCode, _ => bnodeValue, _.hashCode)
 
-	def setForwardRel(rel: URI[Rdf], obj: Node[Rdf]): Unit =
+	def setForwardRel(rel: RDF.URI[Rdf], obj: RDF.Node[Rdf]): Unit =
 		forwardRels.put(rel, (forwardRels(rel) + hashOf(obj)) % Long.MaxValue)
 
-	def setBackwardRel(rel: URI[Rdf], subj: Node[Rdf]): Unit =
+	def setBackwardRel(rel: RDF.URI[Rdf], subj: RDF.Node[Rdf]): Unit =
 		backwardRels.put(rel, (backwardRels(rel) + hashOf(subj)) % Long.MaxValue)
 
 	override def result: HashVC = HashVC(forwardRels.hashCode(), backwardRels.hashCode())
@@ -100,7 +101,7 @@ case class HashVC(forwardRels: Long, backwardRels: Long) extends VerticeClassifi
 
 object VerticeCBuilder {
 
-	def simpleHash[Rdf <: RDF](implicit ops: Ops[Rdf]) = () => new SimpleHashVCBuilder[Rdf]()
+	def simpleHash[Rdf <: RDF](using ops: Ops[Rdf]) = () => new SimpleHashVCBuilder[Rdf]()
 
 	def counting[Rdf <: RDF] = () => new CountingVCBuilder[Rdf]()
 

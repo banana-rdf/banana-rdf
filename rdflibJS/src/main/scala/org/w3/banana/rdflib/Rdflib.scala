@@ -94,11 +94,12 @@ object Rdflib extends RDF {
 				}
 				newgraph
 
-			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean = ???
-				//note: if we make sure that the opaque Graph, never contains contexts,
-				//  then this is all we need to do. Otherwise we need to strip contexts.
-				//Models.isomorphic(left, right)
-				//todo: no isomorphism in rdflib, use my lib
+			import org.w3.banana.isomorphism.*
+			private val mapGen = new SimpleMappingGenerator[R](VerticeCBuilder.simpleHash[R])
+			private val iso = new GraphIsomorphism[R](mapGen)
+			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
+				val a = iso.findAnswer(left, right)
+				a.isSuccess
 
 			def findTriples(graph: RDF.Graph[R],
 				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
@@ -155,14 +156,19 @@ object Rdflib extends RDF {
 		end rTriple
 
 		given Node: NodeOps with
+			private def rl(node: RDF.Node[R]): model.Term[?] = node.asInstanceOf[model.Term[?]]
 			extension (node: RDF.Node[R])
-				def fold[A](
+				def isURI: Boolean = rl(node).isInstanceOf[model.NamedNode]
+				def isBNode: Boolean = rl(node).isInstanceOf[model.BlankNode]
+				def isLiteral: Boolean = rl(node).isInstanceOf[model.Literal]
+			//we override fold, as we can implement it faster with pattern matching
+				override def fold[A](
 					uriF: RDF.URI[R] => A,
 					bnF: RDF.BNode[R] => A,
 					litF: RDF.Literal[R] => A
 				): A = node match
-					case blank: model.BlankNode => bnF(blank)
 					case nn:  model.NamedNode => uriF(nn)
+					case blank: model.BlankNode => bnF(blank)
 					case lit: model.Literal => litF(lit)
 					case _ => throw IllegalArgumentException(
 						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."

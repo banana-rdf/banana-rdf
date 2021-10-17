@@ -76,8 +76,7 @@ object RDF:
 	type rNode[R <: RDF] <: Matchable = R match
 		case GetRelNode[n] => n
 
-	type Node[R <: RDF] <: Matchable = R match
-		case GetNode[n] => n
+	type Node[R <: RDF] =  URI[R] | BNode[R] | Literal[R] | Graph[R]
 
 	type BNode[R <: RDF] = R match
 		case GetBNode[bn] => bn
@@ -104,18 +103,17 @@ object RDF:
 		case GetNodeAny[m] => m
 
 
-	type GetRelURI[U] = RDF { type rURI = U }
-	type GetURI[U] = RDF { type URI = U }
-	type GetRelNode[N <: Matchable] = RDF { type rNode = N }
-	type GetNode[N <: Matchable] = RDF { type Node = N }
-	type GetBNode[N <: Matchable] = RDF { type BNode = N }
-	type GetLiteral[L <: Matchable] = RDF { type Literal = L }
-	type GetLang[L <: Matchable] = RDF { type Lang = L }
-	type GetRelTriple[T] = RDF { type rTriple = T }
-	type GetTriple[T <: Matchable] = RDF { type Triple = T }
-	type GetRelGraph[G] = RDF { type rGraph = G }
-	type GetGraph[G] = RDF { type Graph = G }
-	type GetNodeAny[M] = RDF { type NodeAny = M }
+	private type GetRelURI[U] = RDF { type rURI = U }
+	private type GetURI[U] = RDF { type URI = U }
+	private type GetRelNode[N <: Matchable] = RDF { type rNode = N }
+	private type GetBNode[N <: Matchable] = RDF { type BNode = N }
+	private type GetLiteral[L <: Matchable] = RDF { type Literal = L }
+	private type GetLang[L <: Matchable] = RDF { type Lang = L }
+	private type GetRelTriple[T] = RDF { type rTriple = T }
+	private type GetTriple[T <: Matchable] = RDF { type Triple = T }
+	private type GetRelGraph[G] = RDF { type rGraph = G }
+	private type GetGraph[G] = RDF { type Graph = G }
+	private type GetNodeAny[M] = RDF { type NodeAny = M }
 
 	/**
 	 * these associate a type to the positions in statements (triples or quads)
@@ -126,6 +124,11 @@ object RDF:
 	 * For the moment I will try the strict mode.
 	 **/
 	object Statement:
+		type DT[A,B,C,R<:RDF,Object[R]] = Object[R] match
+			case URI[R] => A
+			case BNode[R] => B
+			case Literal[R] => C
+
 		type Subject[R <: RDF] = URI[R] | BNode[R]
 		type Relation[R <: RDF] = URI[R]
 		type Object[R <: RDF] = URI[R] | BNode[R] | Literal[R]

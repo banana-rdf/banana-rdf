@@ -147,23 +147,11 @@ object JenaRdf extends RDF {
 
 
 		given Node: NodeOps with
+			private def jn(node: RDF.Node[R]) = node.asInstanceOf[org.apache.jena.graph.Node]
 			extension (node: RDF.Node[R])
-				def fold[A](
-					uriF: RDF.URI[R] => A,
-					bnF:  RDF.BNode[R] => A,
-					litF: RDF.Literal[R] => A
-				): A =
-					//considered Jena Visitor, but for some reason it deconstructs the types,
-					//annulling potential speed advantage
-					if node.isBlank then
-						bnF(node.asInstanceOf[Node_Blank])
-					else if node.isURI then
-						uriF(node.asInstanceOf[Node_URI])
-					else if node.isLiteral then
-						litF(node.asInstanceOf[Node_Literal])
-					else throw new IllegalArgumentException(
-						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
-					)
+				def isURI: Boolean = jn(node).isURI
+				def isBNode: Boolean = jn(node).isBlank
+				def isLiteral: Boolean = jn(node).isLiteral
 		end Node
 
 		given BNode: BNodeOps with

@@ -18,10 +18,10 @@ object Dependencies {
 
 	object TestLibs {
 		/* @see munit docs https://scalameta.org/munit/ */
-		val munit = "org.scalameta" %% "munit" % "0.7.29"
+		val munit = Def.setting("org.scalameta" %% "munit" % "0.7.29")
 
 		/* @see scalatest docs https://www.scalatest.org/install */
-		val scalatest = "org.scalatest" %% "scalatest" % "3.2.10"
+		val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.10")
 		val scalatic  = "org.scalactic" %% "scalactic" % "3.2.10"
 	}
 
