@@ -34,9 +34,7 @@ open class IsomorphismTest[Rdf <: RDF](using ops: Ops[Rdf])
 
 		"list of size 1" in {
 			val g = list(1, "h")
-			println("g="+g)
 			val expected = list(1, "g")
-			println("expected="+expected)
 			(g isomorphic expected) `shouldEqual` true
 		}
 

@@ -137,7 +137,7 @@ lazy val rdf4j = project.in(file("rdf4j"))
 
 lazy val rdflibJS =  project.in(file("rdflibJS"))
 	.enablePlugins(ScalaJSBundlerPlugin)
-//	.enablePlugins(WebScalaJSBundlerPlugin)
+	//	.enablePlugins(WebScalaJSBundlerPlugin)
 	//documentation here: https://scalablytyped.org/docs/library-developer
 	// call stImport in sbt to generate new sources
 	//.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
@@ -148,23 +148,23 @@ lazy val rdflibJS =  project.in(file("rdflibJS"))
 		useYarn := true,
 		scalacOptions ++= scala3jsOptions,
 		Compile / npmDependencies += "rdflib" -> "2.2.7",
-		Test / npmDependencies += "rdflib" -> "2.2.7",
-		useYarn := true,
+//		Test / npmDependencies += "rdflib" -> "2.2.7",
 		libraryDependencies ++= Seq(
 			"run.cosy" %%% "rdf-model-js" % "0.1-SNAPSHOT",
-		 	TestLibs.scalatest.value % Test,
+//		 	TestLibs.scalatest.value % Test,
+//			TestLibs.utest.value % Test,
 			TestLibs.munit.value % Test
 		),
 		scalaJSUseMainModuleInitializer := true,
 		Test / scalaJSLinkerConfig ~= { //required for munit to run
-			_.withModuleKind(ModuleKind.CommonJSModule)
+			_.withModuleKind(ModuleKind.ESModule)
 		},
 		Compile / mainClass := Some( "org.w3.banana.rdflib.test.Test" ),
 		Compile / scalaJSLinkerConfig ~= {
 			//	nodejs needs .mjs extension. See https://www.scala-js.org/doc/project/module.html
-			_.withModuleKind(ModuleKind.CommonJSModule)
+			_.withModuleKind(ModuleKind.ESModule)
 			// replacing CommonJSModule with what is below creates a linking problem
-			//_.withModuleKind(ModuleKind.ESModule).withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
+			.withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
 		}
 	).dependsOn(rdfJS, rdfTestSuiteJS % "test->compile")
 
