@@ -12,4 +12,4 @@ class RdflibPrefixTest extends org.w3.banana.PrefixTest[R]
 
 class RdflibTripleTest extends org.w3.banana.TripleTest[R]
 
-//class RdflibIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
+class RdflibIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
