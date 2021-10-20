@@ -74,7 +74,7 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
   * for easier dependency updates monitoring
   * @see https://github.com/rtimush/sbt-updates
   */
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.2")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.0")
 
 /**
  * sbtsonatype plugin used to publish artifact to maven central via sonatype nexus
