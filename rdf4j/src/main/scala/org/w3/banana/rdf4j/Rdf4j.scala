@@ -6,6 +6,7 @@ import org.eclipse.rdf4j.model.util.Models
 import org.eclipse.rdf4j.query.*
 import org.eclipse.rdf4j.query.parser.*
 import org.w3.banana.*
+import org.w3.banana.operations
 
 import scala.annotation.targetName
 import scala.util.{Success, Try}
@@ -59,7 +60,7 @@ object Rdf4j extends RDF:
 		import RDF.Statement as St
 
 		val `*`: RDF.NodeAny[R] = null
-		given Graph: GraphOps with
+		given Graph: operations.Graph[R] with
 			private val emptyGr: RDF.Graph[R] = new LinkedHashModel(0).unmodifiable().nn
 			def empty: RDF.Graph[R] = emptyGr
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
@@ -69,7 +70,7 @@ object Rdf4j extends RDF:
 			def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] =
 				graph.asScala.to(Iterable)
 			def graphSize(graph: RDF.Graph[R]): Int = graph.size()
-			def union(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
+			def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
 				graphs match
 					case Seq(x) => x
 					case _ =>
@@ -111,7 +112,7 @@ object Rdf4j extends RDF:
 //					case _ => None
 //		}
 
-		given Triple: TripleOps with
+		given Triple: operations.Triple[R] with
 			import RDF.Statement as St
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
 				valueFactory.createStatement(s, p, o).nn

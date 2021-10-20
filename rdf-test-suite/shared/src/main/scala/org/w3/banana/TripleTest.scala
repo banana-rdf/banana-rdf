@@ -35,7 +35,7 @@ open class TripleTest[R<:RDF](using ops: Ops[R])
 
 	test("type test on literal") {
 		// this gives a warning: "cannot call the type test at runtime"!
-		import ops.given TypeTest[Matchable, RDF.Literal[R]]
+		import operations.given TypeTest[Matchable, RDF.Literal[R]]
 		val timNode: RDF.Node[R] = Literal("Tim")
 		timNode match
 		case t : RDF.Literal[R] =>

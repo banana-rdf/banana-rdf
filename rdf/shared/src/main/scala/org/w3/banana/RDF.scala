@@ -30,6 +30,9 @@ trait RDF:
 	type Literal <: Node
 	type Lang <: Matchable
 
+	type DataSet
+	type Quad <: Matchable
+
 	// types for the graph traversal API
 	type NodeAny
 

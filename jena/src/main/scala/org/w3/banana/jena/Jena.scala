@@ -4,6 +4,7 @@ import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_Literal, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
 import org.w3.banana.{Ops, RDF}
+import org.w3.banana.operations
 
 import scala.reflect.TypeTest
 import scala.util.Try
@@ -54,7 +55,7 @@ object JenaRdf extends RDF {
 	given ops: Ops[R] with {
 
 		val `*`: RDF.NodeAny[R] = null
-		given Graph: GraphOps with
+		given Graph: operations.Graph[R] with
 			import RDF.Statement as St
 			def empty: RDF.Graph[R] = Factory.empty().nn
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
@@ -69,7 +70,7 @@ object JenaRdf extends RDF {
 				import collection.JavaConverters.asScalaIteratorConverter
 				graph.find(JenaANY, JenaANY, JenaANY).nn.asScala.to(Iterable)
 			def graphSize(graph: RDF.Graph[R]): Int = graph.size()
-			def union(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
+			def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
 				val g = Factory.createDefaultGraph.nn
 				graphs.foreach { graph =>
 					Using.resource(graph.find(JenaANY, JenaANY, JenaANY).nn) { it =>
@@ -123,7 +124,7 @@ object JenaRdf extends RDF {
 //					case _ => None
 //		}
 
-		given Triple: TripleOps with {
+		given Triple: operations.Triple[R] with {
 			import RDF.Statement as St
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
 				jena.Triple.create(s, p, o).nn

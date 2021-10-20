@@ -4,7 +4,7 @@ package org.w3.banana.rdflib
 import org.w3.banana.rdflib.facade.FormulaOpts.FormulaOpts
 import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
 import org.w3.banana.rdflib.facade.*
-import org.w3.banana.{Ops, RDF}
+import org.w3.banana.{Ops, RDF, operations}
 import run.cosy.rdfjs.model
 import run.cosy.rdfjs.model.DataFactory
 
@@ -63,7 +63,7 @@ object Rdflib extends RDF {
 		private val init = nodeMod.default
 
 		val `*`: RDF.NodeAny[R] = null
-		given Graph: GraphOps with
+		given Graph: operations.Graph[R] with
 			def empty: RDF.Graph[R] = storeMod(opts())
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
 				val graph: storeMod.IndexedFormula = empty
@@ -79,7 +79,7 @@ object Rdflib extends RDF {
 
 			//If one modelled Graphs as Named Graphs, then union could just be unioning the names
 			//this type of union is very inefficient
-			def union(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
+			def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
 				graphs match
 					case Seq(x) => x
 					case _ =>
@@ -125,7 +125,7 @@ object Rdflib extends RDF {
 //					case _ => None
 //		}
 
-		given Triple: TripleOps with
+		given Triple: operations.Triple[R] with
 			import RDF.Statement as St
 			//todo: check whether it really is not legal in rdflib to have a literal as subject
 			// warning throws an exception

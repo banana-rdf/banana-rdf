@@ -1,6 +1,7 @@
 package org.w3.banana
 
 import org.w3.banana.RDF.Graph
+import org.w3.banana.RDF.Statement.Subject
 
 import scala.annotation.targetName
 import scala.reflect.TypeTest
@@ -33,49 +34,13 @@ trait Ops[Rdf <: RDF]:
 		case Plain(override val text: String) extends LiteralI(text)
 		case `@`(override val text: String, lang: Lang[Rdf]) extends LiteralI(text)
 		case ^^(override val text: String, dataTp: URI[Rdf]) extends LiteralI(text)
-	type TripleI = (Node[Rdf], URI[Rdf], Node[Rdf])
-	type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
 
+	type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
+	type QuadI = (St.Subject[Rdf], St.Relation[Rdf], St.Object[Rdf], St.Graph[Rdf])
 	//implementations
 	val `*`: NodeAny[Rdf]
 
-	given Graph: GraphOps
-	trait GraphOps:
-		def empty: Graph[Rdf]
-		def apply(triples: Iterable[Triple[Rdf]]): Graph[Rdf]
-		def apply(head: Triple[Rdf], tail: Triple[Rdf]*): Graph[Rdf] =
-			val it: Iterable[Triple[Rdf]] = Iterable[Triple[Rdf]](tail.prepended(head)*)
-			Graph.apply(it)
-		//todo: remove all the protected methods after moving code to extension.
-		protected
-		def triplesIn(graph: Graph[Rdf]): Iterable[Triple[Rdf]]
-		protected
-		def graphSize(graph: Graph[Rdf]): Int
-		protected
-		def union(graphs: Seq[Graph[Rdf]]): Graph[Rdf]
-		protected
-		def difference(g1: Graph[Rdf], g2: Graph[Rdf]): Graph[Rdf]
-		protected
-		def isomorphism(left: Graph[Rdf], right: Graph[Rdf]): Boolean
-		protected
-		def findTriples(graph: Graph[Rdf],
-			s: St.Subject[Rdf]|NodeAny[Rdf], p: St.Relation[Rdf]|NodeAny[Rdf], o: St.Object[Rdf]|NodeAny[Rdf]
-		): Iterator[Triple[Rdf]]
-		extension (graph: Graph[Rdf])
-			@targetName("iso")
-			def ≅ (other: Graph[Rdf]): Boolean = isomorphism(graph,other)
-			infix def isomorphic(other: Graph[Rdf]): Boolean = isomorphism(graph,other)
-			def diff(other: Graph[Rdf]): Graph[Rdf] = difference(graph,other)
-			def size: Int = graphSize(graph)
-			def triples: Iterable[Triple[Rdf]] = triplesIn(graph)
-			infix def union(graphs: Graph[Rdf]*): Graph[Rdf] = Graph.union(graph +: graphs )
-			def +(triple: Triple[Rdf]): Graph[Rdf] = Graph.union(Seq(graph, Graph(triple)))
-			def contains(t: Triple[Rdf]): Boolean = find(t.subj,t.rel,t.obj).nonEmpty
-			def find(subj: St.Subject[Rdf]|NodeAny[Rdf],
-				rel: St.Relation[Rdf]|NodeAny[Rdf],
-				obj: St.Object[Rdf]|NodeAny[Rdf]
-			): Iterator[Triple[Rdf]] = findTriples(graph,subj,rel,obj)
-
+	given Graph: operations.Graph[Rdf]
 
 	val rGraph: rGraphOps
 	trait rGraphOps:
@@ -100,18 +65,27 @@ trait Ops[Rdf <: RDF]:
 //			case n: URI[Rdf] => uriFnct(n)
 //			case lit: Literal[Rdf] => litFnc(lit)
 
-	given Triple: TripleOps
-	trait TripleOps:
-		def apply(s: St.Subject[Rdf], p: St.Relation[Rdf], o: St.Object[Rdf]): Triple[Rdf]
-		def unapply(t: Triple[Rdf]): Option[TripleI] = Some(untuple(t))
-		def untuple(t: Triple[Rdf]): TripleI
-		protected def subjectOf(s: Triple[Rdf]): St.Subject[Rdf]
-		protected def relationOf(s: Triple[Rdf]): St.Relation[Rdf]
-		protected def objectOf(s: Triple[Rdf]): St.Object[Rdf]
-		extension (triple: Triple[Rdf])
-			def subj: St.Subject[Rdf] = subjectOf(triple)
-			def rel: St.Relation[Rdf] = relationOf(triple)
-			def obj: St.Object[Rdf] = objectOf(triple)
+	given Triple: operations.Triple[Rdf]
+
+	//	given Quad: QuadOps
+//	trait QuadOps:
+//		def apply(s: St.Subject[Rdf], p: St.Relation[Rdf], o: St.Object[Rdf]): Quad[Rdf]
+//		def apply(
+//			s: St.Subject[Rdf], p: St.Relation[Rdf],
+//			o: St.Object[Rdf], where: St.Graph[Rdf]
+//		): Quad[Rdf]
+//		def unapply(t: Quad[Rdf]): Option[QuadI] = Some(untuple(t))
+//		def untuple(t: Quad[Rdf]): QuadI
+//		protected def subjectOf(s: Quad[Rdf]): St.Subject[Rdf]
+//		protected def relationOf(s: Quad[Rdf]): St.Relation[Rdf]
+//		protected def objectOf(s: Quad[Rdf]): St.Object[Rdf]
+//		protected def graphOf(s: Quad[Rdf]): St.Graph[Rdf]
+//		extension (quad: Quad[Rdf])
+//			def subj: St.Subject[Rdf] = subjectOf(quad)
+//			def rel: St.Relation[Rdf] = relationOf(quad)
+//			def obj: St.Object[Rdf] = objectOf(quad)
+//			def graph: St.Object[Rdf] = graphOf(quad)
+
 
 	val rTriple: rTripleOps
 	trait rTripleOps:
