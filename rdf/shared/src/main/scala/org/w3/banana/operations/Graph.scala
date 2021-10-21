@@ -10,7 +10,7 @@ trait Graph[Rdf<:RDF](using ops: Ops[Rdf]):
 	import ops.given
 
 	def empty: RDF.Graph[Rdf]
-	def apply(triples: Iterable[Triple[Rdf]]): RDF.Graph[Rdf]
+	def apply(triples: Iterable[RDF.Triple[Rdf]]): RDF.Graph[Rdf]
 	def apply(head: RDF.Triple[Rdf], tail: RDF.Triple[Rdf]*): RDF.Graph[Rdf] =
 		val it: Iterable[Triple[Rdf]] = Iterable[Triple[Rdf]](tail.prepended(head)*)
 		apply(it)

@@ -108,7 +108,7 @@ object Rdflib extends RDF {
 				sm.iterator
 		end Graph
 
-		val rGraph = new rGraphOps:
+		val rGraph = new operations.rGraph[R]:
 			def empty: RDF.rGraph[R] = Graph.empty
 			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
 				Graph(triples)
@@ -136,7 +136,7 @@ object Rdflib extends RDF {
 			def objectOf(t: RDF.Triple[R]): St.Object[R] = t.obj
 		end Triple
 
-		given Statement: StatementOps with
+		given Statement: operations.Statement[R] with
 			extension (subj: RDF.Statement.Subject[R])
 				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
 					subj match
@@ -144,7 +144,7 @@ object Rdflib extends RDF {
 					case blank: model.BlankNode => bnFcnt(blank)
 
 		//todo: see whether this really works! It may be that we need to create a new construct
-		val rTriple = new rTripleOps:
+		val rTriple = new operations.rTriple[R]:
 			import RDF.rStatement as rSt
 			def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
 				Triple(s, p, o)
@@ -155,7 +155,7 @@ object Rdflib extends RDF {
 			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] = Triple.objectOf(t)
 		end rTriple
 
-		given Node: NodeOps with
+		given Node: operations.Node[R] with
 			private def rl(node: RDF.Node[R]): model.Term[?] = node.asInstanceOf[model.Term[?]]
 			extension (node: RDF.Node[R])
 				def isURI: Boolean = rl(node).isInstanceOf[model.NamedNode]
@@ -174,14 +174,15 @@ object Rdflib extends RDF {
 						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
 					)
 
-		given BNode: BNodeOps with
+		given BNode: operations.BNode[R] with
 			def apply(s: String): RDF.BNode[R] = df.blankNode(s)
 			def apply(): RDF.BNode[R] = df.blankNode()
 			extension (bn: RDF.BNode[R])
 				def label: String = bn.value
 		end BNode
 
-		given Literal: LiteralOps with
+		given Literal: operations.Literal[R] with
+			import org.w3.banana.operations.URI.*
 			private val xsdString = df.namedNode(xsdStr).nn
 			private val xsdLangString = df.namedNode(xsdLangStr).nn
 			import LiteralI as Lit
@@ -223,17 +224,17 @@ object Rdflib extends RDF {
 					case _ => None
 		}
 
-		given Lang: LangOps with {
+		given Lang: operations.Lang[R] with {
 			def apply(lang: String): RDF.Lang[R] = lang
 			extension (lang: RDF.Lang[R])
 				def label: String =  lang
 		}
 
-		val rURI = new rURIOps:
+		val rURI = new operations.rURI[R]:
 			def apply(iriStr: String): RDF.rURI[R] = df.namedNode(iriStr)
 			def asString(uri: RDF.rURI[R]): String = uri.toString
 
-		given URI: URIOps with
+		given URI: operations.URI[R] with
 			//this does throw an exception on non relative URLs!
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
 				Try(df.namedNode(iriStr))

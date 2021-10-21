@@ -18,12 +18,13 @@ class XSD[Rdf <: RDF](using val ops: Ops[Rdf])
 	// Table 3 Reserved VOcabulary of OWL 2 with Special Treatment
 
 	import ops.*
+	import XSD.this.ops.Literal.*
 
 	val anyURI = apply("anyURI")
 	val base64Binary = apply("base64Binary")
 	val boolean = apply("boolean")
-	val `true` = LiteralI.^^("true", boolean)
-	val `false` = LiteralI.^^("false", boolean)
+	val `true` = "true"^^boolean
+	val `false` = "false"^^boolean
 	val byte = apply("byte")
 	val dateTime = apply("dateTime")
 	val dateTimeStamp = apply("dateTimeStamp")

@@ -3,7 +3,7 @@ package org.w3.banana.operations
 import org.w3.banana.RDF
 import org.w3.banana.RDF.Statement as St
 
-trait Triple[Rdf<:RDF] {
+trait Triple[Rdf<:RDF]:
 	type TripleI = (RDF.Node[Rdf], RDF.URI[Rdf], RDF.Node[Rdf])
 
 	def apply(s: St.Subject[Rdf], p: St.Relation[Rdf], o: St.Object[Rdf]): RDF.Triple[Rdf]
@@ -22,4 +22,4 @@ trait Triple[Rdf<:RDF] {
 		def subj: St.Subject[Rdf] = subjectOf(triple)
 		def rel: St.Relation[Rdf] = relationOf(triple)
 		def obj: St.Object[Rdf] = objectOf(triple)
-}
+

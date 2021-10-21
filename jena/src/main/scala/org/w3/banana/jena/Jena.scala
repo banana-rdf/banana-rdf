@@ -93,7 +93,7 @@ object JenaRdf extends RDF {
 				graph.find(s, p, o).nn.asScala
 		end Graph
 
-		val rGraph = new rGraphOps:
+		val rGraph = new operations.rGraph[R]:
 			def empty: RDF.rGraph[R] = Graph.empty
 			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
 				Graph(triples)
@@ -102,7 +102,7 @@ object JenaRdf extends RDF {
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph)
 
-		val rTriple = new rTripleOps:
+		val rTriple = new operations.rTriple[R]:
 			import RDF.rStatement as rSt
 			def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
 				jena.Triple.create(s, p, o).nn
@@ -138,7 +138,7 @@ object JenaRdf extends RDF {
 				t.getObject().asInstanceOf[St.Object[R]].nn
 		}
 
-		given Statement: StatementOps with
+		given Statement: operations.Statement[R] with
 			extension (subj: RDF.Statement.Subject[R])
 				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
 					if subj.isBlank then
@@ -147,7 +147,7 @@ object JenaRdf extends RDF {
 						uriFnct(subj.asInstanceOf[Node_URI])
 
 
-		given Node: NodeOps with
+		given Node: operations.Node[R] with
 			private def jn(node: RDF.Node[R]) = node.asInstanceOf[org.apache.jena.graph.Node]
 			extension (node: RDF.Node[R])
 				def isURI: Boolean = jn(node).isURI
@@ -155,7 +155,7 @@ object JenaRdf extends RDF {
 				def isLiteral: Boolean = jn(node).isLiteral
 		end Node
 
-		given BNode: BNodeOps with
+		given BNode: operations.BNode[R] with
 			def apply(label: String): RDF.BNode[R] =
 				val id = BlankNodeId.create(label).nn
 				NodeFactory.createBlankNode(id).asInstanceOf[Node_Blank]
@@ -166,7 +166,8 @@ object JenaRdf extends RDF {
 		end BNode
 
 
-		given Literal: LiteralOps with
+		given Literal: operations.Literal[R] with
+			import org.w3.banana.operations.URI.*
 			private val xsdString: RDFDatatype = mapper.getTypeByName(xsdStr).nn
 			private val xsdLangString: RDFDatatype = mapper.getTypeByName(xsdLangStr).nn
 			//todo? are we missing a Datatype Type? (check other frameworks)
@@ -228,19 +229,19 @@ object JenaRdf extends RDF {
 					case _ => None
 		}
 
-		given Lang:  LangOps with
+		given Lang:  operations.Lang[R] with
 			def apply(lang: String): RDF.Lang[R] = lang
 			extension (lang: RDF.Lang[R])
 				def label: String =  lang
 		end Lang
 
-		val rURI = new rURIOps:
+		val rURI = new operations.rURI[R]:
 			def apply(uriStr: String): RDF.rURI[R] =
 				NodeFactory.createURI(uriStr).nn.asInstanceOf[URI]
 			def asString(uri: RDF.rURI[R]): String =
 				uri.getURI().nn
 
-		given URI: URIOps with
+		given URI: operations.URI[R] with
 			//todo: this never fails to parse. Need to find a way to align behaviors
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
 				Try(NodeFactory.createURI(iriStr).asInstanceOf[URI])

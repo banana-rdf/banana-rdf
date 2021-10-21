@@ -95,7 +95,7 @@ object Rdf4j extends RDF:
 				graph.filter(s, p, o).nn.iterator.nn.asScala
 		end Graph
 
-		val rGraph = new rGraphOps:
+		val rGraph = new operations.rGraph[R]:
 			def empty: RDF.rGraph[R] = Graph.empty
 			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
 				Graph(triples)
@@ -127,7 +127,7 @@ object Rdf4j extends RDF:
 				t.getObject().nn.asInstanceOf[St.Object[R]]
 		end Triple
 
-		val rTriple = new rTripleOps:
+		val rTriple = new operations.rTriple[R]:
 			import RDF.rStatement as rSt
 			def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
 				Triple(s, p, o)
@@ -138,28 +138,29 @@ object Rdf4j extends RDF:
 			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] = Triple.objectOf(t)
 		end rTriple
 
-		given Statement: StatementOps with
+		given Statement: operations.Statement[R] with
 			extension (subj: RDF.Statement.Subject[R])
 				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
 					if subj.isBNode() then
 						bnFcnt(subj.asInstanceOf[rjBNode])
 					else uriFnct(subj.asInstanceOf[rjIRI])
 
-		given Node: NodeOps with
+		given Node: operations.Node[R] with
 			private def r4n(node: RDF.Node[R]): Value = node.asInstanceOf[Value]
 			extension (node: RDF.Node[R])
 				def isURI: Boolean = r4n(node).isIRI
 				def isBNode: Boolean = r4n(node).isBNode
 				def isLiteral: Boolean = r4n(node).isLiteral
 
-		given BNode: BNodeOps with
+		given BNode: operations.BNode[R] with
 			def apply(s: String): RDF.BNode[R] = valueFactory.createBNode(s).nn
 			def apply(): RDF.BNode[R] =  valueFactory.createBNode().nn
 			extension (bn: RDF.BNode[R])
 				def label: String = bn.getID().nn
 		end BNode
 
-		given Literal: LiteralOps with
+		given Literal: operations.Literal[R] with
+			import org.w3.banana.operations.URI.*
 			private val xsdString = valueFactory.createIRI(xsdStr).nn
 			private val xsdLangString = valueFactory.createIRI(xsdLangStr).nn
 
@@ -207,13 +208,13 @@ object Rdf4j extends RDF:
 					case _ => None
 		}
 
-		given Lang: LangOps with {
+		given Lang: operations.Lang[R] with {
 			def apply(lang: String): RDF.Lang[R] = lang
 			extension (lang: RDF.Lang[R])
 				def label: String =  lang
 		}
 
-		val rURI = new rURIOps:
+		val rURI = new operations.rURI[R]:
 			def apply(iriStr: String): RDF.rURI[R] =
 				new rjIRI {
 					override def equals(o: Any): Boolean =
@@ -226,7 +227,7 @@ object Rdf4j extends RDF:
 				}
 			def asString(uri: RDF.rURI[R]): String = uri.toString
 
-		given URI: URIOps with
+		given URI: operations.URI[R] with
 			//this does throw an exception on non relative URLs!
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
 				Try(valueFactory.createIRI(iriStr).nn)
