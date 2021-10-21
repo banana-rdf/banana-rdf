@@ -1,10 +1,8 @@
 package org.w3.banana.jena.io
 
 import org.apache.jena.graph.{Node => JenaNode, Triple => JenaTriple, _}
-import org.apache.jena.rdf.model.{RDFReader => _}
 import java.io._
 import java.nio.charset.Charset
-
 import org.apache.commons.io.input.ReaderInputStream
 import org.apache.jena.riot._
 import org.apache.jena.riot.system._

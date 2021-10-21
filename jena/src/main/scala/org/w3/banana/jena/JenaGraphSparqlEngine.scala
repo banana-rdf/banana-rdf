@@ -1,10 +1,8 @@
 package org.w3.banana.jena
 
-import org.apache.jena.graph.{Graph => JenaGraph}
 import org.apache.jena.query._
 import org.apache.jena.rdf.model._
 import org.w3.banana._
-
 import scala.util.Try
 
 /**

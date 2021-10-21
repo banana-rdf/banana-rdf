@@ -10,14 +10,14 @@ object Dependencies {
     * @see https://scalaz.org
     * @see https://repo1.maven.org/maven2/org/scalaz/
     */
-   val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.4.0-M7")
+   val scalaz = Def.setting("org.scalaz" %%% "scalaz-core" % "7.4.0-M8")
 
   /**
    * joda-Time
    * @see https://joda-time.sourceforge.net
    * @see https://repo1.maven.org/maven2/joda-time/joda-time/
    */
-  val jodaTime = "joda-time" % "joda-time" % "2.10.10"
+  val jodaTime = "joda-time" % "joda-time" % "2.10.12"
 
   /**
    * joda-convert
@@ -31,7 +31,7 @@ object Dependencies {
    * @see https://www.scalatest.org
    * @see https://repo1.maven.org/maven2/org/scalatest
    */
-  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.9")
+  val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.10")
 
   /**
    * Akka Http Core
@@ -39,14 +39,14 @@ object Dependencies {
    * @see https://repo1.maven.org/maven2/com/typesafe/akka
    */
   val akkaHttpCore = ("com.typesafe.akka" %% "akka-http-core" % "10.2.6") cross CrossVersion.for3Use2_13
-  val akka = ("com.typesafe.akka" %% "akka-actor-typed" % "2.6.16") cross CrossVersion.for3Use2_13
+  val akka = ("com.typesafe.akka" %% "akka-actor-typed" % "2.6.17") cross CrossVersion.for3Use2_13
 
   /**
    * jena
    * @see https://jena.apache.org/
    * @see https://repo1.maven.org/maven2/org/apache/jena
    */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "3.17.0"
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.2.0"
 
   /**
    * slf4j-nop. Test dependency for logging.
@@ -66,7 +66,7 @@ object Dependencies {
    * @see https://www.rdf4j.org/
    * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
    */
-  val rdf4jVersion = "3.7.1"
+  val rdf4jVersion = "3.7.3"
 
   val rdf4jQueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % rdf4jVersion
   val rdf4jQueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % rdf4jVersion
@@ -97,8 +97,8 @@ object Dependencies {
    * @see https://jena.apache.org/documentation/serving_data
    * @see https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki/
    */
-  val fuseki = "org.apache.jena" % "jena-fuseki-main" % "3.17.0"
+  val fuseki = "org.apache.jena" % "jena-fuseki-main" % "4.2.0"
   
-  val servlet = "javax.servlet" % "javax.servlet-api" % "3.1.0"
+  val servlet = "javax.servlet" % "javax.servlet-api" % "4.0.1"
   val httpComponents = "org.apache.httpcomponents" % "httpclient" % "4.5.13"
 }

@@ -1,12 +1,10 @@
 package org.w3.banana
 
-import org.apache.jena.atlas.lib.FileOps
-import org.apache.jena.fuseki.system.FusekiLogging
-import org.apache.jena.fuseki.jetty.JettyServerConfig
 import org.apache.jena.query.Dataset
 import org.apache.jena.util.FileManager
 import org.apache.jena.fuseki.main.{FusekiServer => JenaFusekiServer}
-import org.apache.jena.riot.RDFDataMgr
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.sparql.core.DatasetGraph
 
 
 /**
@@ -19,8 +17,8 @@ import org.apache.jena.riot.RDFDataMgr
  */
 class FusekiServer(dataset:Dataset, port:Int = 3030, path:String = "/ds", dataFiles:List[String] = List()) {
 
-  val tdb = dataset.asDatasetGraph
-  val model = dataset.getDefaultModel
+  val tdb: DatasetGraph = dataset.asDatasetGraph
+  val model: Model = dataset.getDefaultModel
 
   dataFiles.foreach { file =>
     FileManager.get.readModel(model, file, "N-TRIPLES")
@@ -31,7 +29,7 @@ class FusekiServer(dataset:Dataset, port:Int = 3030, path:String = "/ds", dataFi
                                                  .add(path, dataset, true)
                                                  .build() 
 
-  def start() = server.start
+  def start(): JenaFusekiServer = server.start
 
-  def stop() = server.stop
+  def stop(): Unit = server.stop()
 }

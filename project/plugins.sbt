@@ -26,7 +26,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
   *
   * @see https://github.com/portable-scala/sbt-crossproject
   */
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.1.0")
 
 /**
   * jsdependencies t sbt plugin
@@ -41,7 +41,7 @@ addSbtPlugin("org.scala-js" % "sbt-jsdependencies" % "1.0.2")
   * @see http://www.scala-js.org/
   */
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.6.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.7.1")
 
 
 /**
@@ -74,7 +74,7 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
   * for easier dependency updates monitoring
   * @see https://github.com/rtimush/sbt-updates
   */
-addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.2")
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.0")
 
 /**
  * sbtsonatype plugin used to publish artifact to maven central via sonatype nexus
