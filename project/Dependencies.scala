@@ -13,7 +13,7 @@ object Dependencies {
 	 * @see https://jena.apache.org/
 	 * @see https://repo1.maven.org/maven2/org/apache/jena
 	 */
-	val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.1.0"
+	val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.2.0"
 
 
 	object TestLibs {
@@ -33,7 +33,7 @@ object Dependencies {
 	 * @see https://repo1.maven.org/maven2/org/eclipse/rdf4j/
 	 */
 	object RDF4J {
-		val Version = "3.7.2"
+		val Version = "3.7.3"
 		lazy val QueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % Version
 		lazy val QueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % Version
 		lazy val QueryResult = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % Version
