@@ -80,7 +80,7 @@ addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.0")
  * sbtsonatype plugin used to publish artifact to maven central via sonatype nexus
  * @see https://github.com/xerial/sbt-sonatype
  */
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.7")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.10")
 
 
   /**
