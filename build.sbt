@@ -150,8 +150,9 @@ lazy val rdflibJS =  project.in(file("rdflibJS"))
 		scalacOptions ++= scala3jsOptions,
 		Compile / npmDependencies += "rdflib" -> "2.2.7",
 		Test / npmDependencies += "rdflib" -> "2.2.7",
+		resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 		libraryDependencies ++= Seq(
-			"run.cosy" %%% "rdf-model-js" % "0.1-SNAPSHOT",
+			"net.bblfish.rdf" %%% "rdf-model-js" % "0.1-SNAPSHOT",
 		 	TestLibs.scalatest.value % Test,
 //			TestLibs.utest.value % Test,
 			TestLibs.munit.value % Test
