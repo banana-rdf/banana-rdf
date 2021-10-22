@@ -32,19 +32,17 @@ object JenaRdf extends RDF {
 	override opaque type BNode <: Node = jena.Node_Blank
 	override opaque type Literal <: Node = jena.Node_Literal
 	override opaque type Lang <: Matchable = String
+	override opaque type DefaultGraphNode = org.apache.jena.sparql.core.Quad.defaultGraphIRI.type
 
 	override type NodeAny = Null
+
+	override opaque type Quad <: Matchable = org.apache.jena.sparql.core.Quad
 
 	given [T]: Releasable[ExtendedIterator[T]] with {
 		def release(resource: ExtendedIterator[T]): Unit = resource.close()
 	}
 
-	type QuadSubject = Node
-	type QuadRelation = URI
-	type QuadObject = Node
-	type QuadGraph = Graph
-
-
+	import RDF.Statement as St
 	/**
 	 * Here we build up the methods functions allowing RDF.Graph[R] notation to be used.
 	 *
@@ -114,7 +112,7 @@ object JenaRdf extends RDF {
 				t.getPredicate().asInstanceOf[URI].nn
 			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] =
 				t.getObject().asInstanceOf[rSt.Object[R]].nn
-
+		end rTriple
 
 		//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
 //			override def unapply(s: Matchable): Option[s.type & Triple] =
@@ -124,12 +122,19 @@ object JenaRdf extends RDF {
 //					case _ => None
 //		}
 
+		val Subject = new operations.Subject[R]:
+			extension (subj: RDF.Statement.Subject[R])
+				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+					if subj.isBlank then
+						bnFcnt(subj.asInstanceOf[Node_Blank])
+					else
+						uriFnct(subj.asInstanceOf[Node_URI])
+		end Subject
+
 		given Triple: operations.Triple[R] with {
 			import RDF.Statement as St
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
 				jena.Triple.create(s, p, o).nn
-			def untuple(t: RDF.Triple[R]): TripleI =
-					(subjectOf(t), relationOf(t), objectOf(t))
 			def subjectOf(t: RDF.Triple[R]): St.Subject[R] =
 				t.getSubject().asInstanceOf[St.Subject[R]].nn
 			def relationOf(t: RDF.Triple[R]): St.Relation[R] =
@@ -138,13 +143,25 @@ object JenaRdf extends RDF {
 				t.getObject().asInstanceOf[St.Object[R]].nn
 		}
 
-		given Statement: operations.Statement[R] with
-			extension (subj: RDF.Statement.Subject[R])
-				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
-					if subj.isBlank then
-						bnFcnt(subj.asInstanceOf[Node_Blank])
-					else
-						uriFnct(subj.asInstanceOf[Node_URI])
+		lazy val Quad = new operations.Quad[R](this):
+			import org.apache.jena.sparql.core.Quad as JQuad
+			inline def defaultGraph: RDF.DefaultGraphNode[R] = org.apache.jena.sparql.core.Quad.defaultGraphIRI
+			inline def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
+				new JQuad(defaultGraph, s, p, o)
+			inline def apply(
+				s: St.Subject[R], p: St.Relation[R],
+				o: St.Object[R], where: St.Graph[R]
+			): RDF.Quad[R] = new JQuad(where, s, p, o)
+			inline protected def subjectOf(s: RDF.Quad[R]): St.Subject[R] =
+				s.getSubject().asInstanceOf[St.Subject[R]].nn
+			inline protected def relationOf(s: RDF.Quad[R]): St.Relation[R] =
+				s.getPredicate.asInstanceOf[St.Relation[R]].nn
+			inline protected def objectOf(s: RDF.Quad[R]): St.Object[R] =
+				s.getObject().asInstanceOf[St.Object[R]].nn
+			inline protected def graphOf(s: RDF.Quad[R]): St.Graph[R] =
+				s.getGraph().asInstanceOf[St.Graph[R]].nn
+		end Quad
+
 
 
 		given Node: operations.Node[R] with

@@ -24,11 +24,13 @@ object Rdflib extends RDF {
 
 	override opaque type Graph = storeMod.IndexedFormula
 	override opaque type Triple <: Matchable = model.Quad
+	override opaque type Quad <: Matchable = model.Quad
 	override opaque type Node <: Matchable = model.ValueTerm[?]
 	override opaque type URI <: Node =  model.NamedNode
 	override opaque type BNode <: Node = model.BlankNode
 	override opaque type Literal <: Node = model.Literal
 	override opaque type Lang <: Matchable = String
+	override opaque type DefaultGraphNode <: Node = model.DefaultGraph
 
 	override type NodeAny = Null
 
@@ -116,7 +118,7 @@ object Rdflib extends RDF {
 				Graph.triplesIn(graph)
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph).toInt
-
+		end rGraph
 //		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
 //			override def unapply(s: Matchable): Option[s.type & Triple] =
 //				s match
@@ -125,23 +127,37 @@ object Rdflib extends RDF {
 //					case _ => None
 //		}
 
+		val Subject = new operations.Subject[R]:
+			extension (subj: RDF.Statement.Subject[R])
+				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+					subj match
+						case nn:  model.NamedNode => uriFnct(nn)
+						case blank: model.BlankNode => bnFcnt(blank)
+
+
 		given Triple: operations.Triple[R] with
 			import RDF.Statement as St
 			//todo: check whether it really is not legal in rdflib to have a literal as subject
 			// warning throws an exception
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] = df.quad(s,p,o)
-			def untuple(t: RDF.Triple[R]): TripleI = (t.subj, t.rel, t.obj)
 			def subjectOf(t: RDF.Triple[R]): St.Subject[R] = t.subj
 			def relationOf(t: RDF.Triple[R]): St.Relation[R] = t.rel
 			def objectOf(t: RDF.Triple[R]): St.Object[R] = t.obj
 		end Triple
 
-		given Statement: operations.Statement[R] with
-			extension (subj: RDF.Statement.Subject[R])
-				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
-					subj match
-					case nn:  model.NamedNode => uriFnct(nn)
-					case blank: model.BlankNode => bnFcnt(blank)
+		lazy val Quad = new operations.Quad[R](this):
+			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
+				df.quad(s,p,o)
+			def defaultGraph: RDF.DefaultGraphNode[R] = df.defaultGraph
+			def apply(
+				s: St.Subject[R], p: St.Relation[R],
+				o: St.Object[R], where: St.Graph[R]
+			): RDF.Quad[R] =  df.quad(s,p,o,where)
+			protected def subjectOf(s: RDF.Quad[R]): St.Subject[R] = s.subj
+			protected def relationOf(s: RDF.Quad[R]): St.Relation[R] = s.rel
+			protected def objectOf(s: RDF.Quad[R]): St.Object[R] = s.obj
+			protected def graphOf(s: RDF.Quad[R]): St.Graph[R] = s.graph
+		end Quad
 
 		//todo: see whether this really works! It may be that we need to create a new construct
 		val rTriple = new operations.rTriple[R]:

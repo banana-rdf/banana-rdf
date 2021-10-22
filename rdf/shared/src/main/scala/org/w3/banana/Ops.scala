@@ -29,7 +29,6 @@ trait Ops[Rdf <: RDF]:
 
 	// interpretation types to help consistent pattern matching across implementations
 
-	type QuadI = (St.Subject[Rdf], St.Relation[Rdf], St.Object[Rdf], St.Graph[Rdf])
 	//implementations
 	val `*`: NodeAny[Rdf]
 
@@ -37,8 +36,11 @@ trait Ops[Rdf <: RDF]:
 
 	val rGraph: operations.rGraph[Rdf]
 
+	val Subject: operations.Subject[Rdf]
+
 //	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
-	val Statement: operations.Statement[Rdf]
+	lazy val Quad: operations.Quad[Rdf]
+	given operations.Quad[Rdf] = Quad
 
 //	extension (obj: Statement.Object[Rdf])
 //		def fold[A](bnFcnt: BNode[Rdf] => A, uriFnct: URI[Rdf] => A, litFnc: Literal[Rdf] => A): A =
@@ -48,25 +50,6 @@ trait Ops[Rdf <: RDF]:
 //			case lit: Literal[Rdf] => litFnc(lit)
 
 	given Triple: operations.Triple[Rdf]
-
-	//	given Quad: QuadOps
-//	trait QuadOps:
-//		def apply(s: St.Subject[Rdf], p: St.Relation[Rdf], o: St.Object[Rdf]): Quad[Rdf]
-//		def apply(
-//			s: St.Subject[Rdf], p: St.Relation[Rdf],
-//			o: St.Object[Rdf], where: St.Graph[Rdf]
-//		): Quad[Rdf]
-//		def unapply(t: Quad[Rdf]): Option[QuadI] = Some(untuple(t))
-//		def untuple(t: Quad[Rdf]): QuadI
-//		protected def subjectOf(s: Quad[Rdf]): St.Subject[Rdf]
-//		protected def relationOf(s: Quad[Rdf]): St.Relation[Rdf]
-//		protected def objectOf(s: Quad[Rdf]): St.Object[Rdf]
-//		protected def graphOf(s: Quad[Rdf]): St.Graph[Rdf]
-//		extension (quad: Quad[Rdf])
-//			def subj: St.Subject[Rdf] = subjectOf(quad)
-//			def rel: St.Relation[Rdf] = relationOf(quad)
-//			def obj: St.Object[Rdf] = objectOf(quad)
-//			def graph: St.Object[Rdf] = graphOf(quad)
 
 	val rTriple: operations.rTriple[Rdf]
 

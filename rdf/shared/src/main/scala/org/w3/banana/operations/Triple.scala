@@ -4,13 +4,14 @@ import org.w3.banana.RDF
 import org.w3.banana.RDF.Statement as St
 
 trait Triple[Rdf<:RDF]:
-	type TripleI = (RDF.Node[Rdf], RDF.URI[Rdf], RDF.Node[Rdf])
+	type TripleI = (St.Subject[Rdf], St.Relation[Rdf], St.Object[Rdf])
 
 	def apply(s: St.Subject[Rdf], p: St.Relation[Rdf], o: St.Object[Rdf]): RDF.Triple[Rdf]
 
 	def unapply(t: RDF.Triple[Rdf]): Option[TripleI] = Some(untuple(t))
 
-	def untuple(t: RDF.Triple[Rdf]): TripleI
+	def untuple(t: RDF.Triple[Rdf]): TripleI =
+		(subjectOf(t), relationOf(t), objectOf(t))
 
 	protected def subjectOf(s: RDF.Triple[Rdf]): St.Subject[Rdf]
 

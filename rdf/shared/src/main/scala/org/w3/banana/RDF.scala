@@ -23,15 +23,17 @@ trait RDF:
 	type rURI 					   // relative URLs
 
 	type Graph     			   // graphs with no triples with relative URLs
+	type Quad <: Matchable
 	type Triple <: Matchable	// triples with no relative URLs
 	type Node <: Matchable
 	type URI <: Node
 	type BNode <: Node
 	type Literal <: Node
 	type Lang <: Matchable
+	type DefaultGraphNode
 
-	type DataSet
-	type Quad <: Matchable
+	type MGraph   // a mutable graph
+	type MDataSet // a mutable dataset
 
 	// types for the graph traversal API
 	type NodeAny
@@ -76,6 +78,10 @@ object RDF:
 	type Triple[R <: RDF] <: Matchable = R match
 		case GetTriple[t] => t
 
+	//Quad is a good short name for Statement, but does not give a good understaning of it
+	type Quad[R <: RDF] <: Matchable = R match
+		case GetQuad[t] => t
+
 	type rNode[R <: RDF] <: Matchable = R match
 		case GetRelNode[n] => n
 
@@ -83,6 +89,9 @@ object RDF:
 
 	type BNode[R <: RDF] = R match
 		case GetBNode[bn] => bn
+
+	type DefaultGraphNode[R <: RDF] = R match
+		case GetDefaultGraphNode[n] => n
 
 	type rURI[R <: RDF] = R match
 		case GetRelURI[ru] => ru
@@ -111,9 +120,11 @@ object RDF:
 	private type GetRelNode[N <: Matchable] = RDF { type rNode = N }
 	private type GetBNode[N <: Matchable] = RDF { type BNode = N }
 	private type GetLiteral[L <: Matchable] = RDF { type Literal = L }
+	private type GetDefaultGraphNode[N <: Matchable] = RDF { type DefaultGraphNode = N }
 	private type GetLang[L <: Matchable] = RDF { type Lang = L }
 	private type GetRelTriple[T] = RDF { type rTriple = T }
 	private type GetTriple[T <: Matchable] = RDF { type Triple = T }
+	private type GetQuad[T <: Matchable] = RDF { type Quad = T }
 	private type GetRelGraph[G] = RDF { type rGraph = G }
 	private type GetGraph[G] = RDF { type Graph = G }
 	private type GetNodeAny[M] = RDF { type NodeAny = M }
@@ -135,7 +146,7 @@ object RDF:
 		type Subject[R <: RDF] = URI[R] | BNode[R]
 		type Relation[R <: RDF] = URI[R]
 		type Object[R <: RDF] = URI[R] | BNode[R] | Literal[R]
-		type Graph[R <: RDF] = URI[R] | BNode[R]
+		type Graph[R <: RDF] = URI[R] | BNode[R] | DefaultGraphNode[R]
 	end Statement
 
 	// relative statements

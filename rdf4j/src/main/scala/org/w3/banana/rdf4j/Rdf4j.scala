@@ -23,11 +23,13 @@ object Rdf4j extends RDF:
 
 	override opaque type Graph = Model
 	override opaque type Triple <: Matchable = Statement
+	override opaque type Quad <: Matchable = Statement
 	override opaque type Node <: Matchable = Value
 	override opaque type URI <: Node = rjIRI
 	override opaque type BNode <: Node = rjBNode
 	override opaque type Literal <: Node = rjLiteral
 	override opaque type Lang <: Matchable = String
+	override opaque type DefaultGraphNode = Null
 
 	override type NodeAny = Null
 
@@ -103,6 +105,7 @@ object Rdf4j extends RDF:
 				Graph.triplesIn(graph)
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph).toInt
+		end rGraph
 
 //		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
 //			override def unapply(s: Matchable): Option[s.type & Triple] =
@@ -116,8 +119,6 @@ object Rdf4j extends RDF:
 			import RDF.Statement as St
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
 				valueFactory.createStatement(s, p, o).nn
-			def untuple(t: RDF.Triple[R]): TripleI =
-					(subjectOf(t), relationOf(t), objectOf(t))
 			def subjectOf(t: RDF.Triple[R]): St.Subject[R] =
 				//todo: this asInstanceOf should not be here
 				t.getSubject().nn.asInstanceOf[St.Subject[R]]
@@ -138,12 +139,31 @@ object Rdf4j extends RDF:
 			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] = Triple.objectOf(t)
 		end rTriple
 
-		given Statement: operations.Statement[R] with
+		val Subject = new operations.Subject[R]:
 			extension (subj: RDF.Statement.Subject[R])
 				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
 					if subj.isBNode() then
 						bnFcnt(subj.asInstanceOf[rjBNode])
 					else uriFnct(subj.asInstanceOf[rjIRI])
+		end Subject
+
+		lazy val Quad = new operations.Quad[R](this):
+			def defaultGraph: RDF.DefaultGraphNode[R] = null
+			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
+				valueFactory.createStatement(s, p, o).nn
+			def apply(
+				s: St.Subject[R], p: St.Relation[R],
+				o: St.Object[R], where: St.Graph[R]
+			): RDF.Quad[R] = valueFactory.createStatement(s, p, o, where).nn
+			protected def subjectOf(s: RDF.Quad[R]): St.Subject[R] =
+				s.getSubject().nn.asInstanceOf[St.Subject[R]]
+			protected def relationOf(s: RDF.Quad[R]): St.Relation[R] =
+				s.getPredicate().nn
+			protected def objectOf(s: RDF.Quad[R]): St.Object[R] =
+				s.getObject().nn.asInstanceOf[St.Object[R]]
+			protected def graphOf(s: RDF.Quad[R]): St.Graph[R] =
+				s.getContext().asInstanceOf[St.Graph[R]]
+		end Quad
 
 		given Node: operations.Node[R] with
 			private def r4n(node: RDF.Node[R]): Value = node.asInstanceOf[Value]
