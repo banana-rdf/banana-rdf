@@ -15,7 +15,7 @@ trait AbsoluteRDFReader[Rdf <: RDF, M[_], +S]:
 	 * todo: look into returning an Iterator rather than an M[Graph].
 	 *   Iterators would be better for memory useage, and in any case
 	 *   leave it open to use this to produce a Graph.
-	 * Parses an RDF Graph from an java.io.InputStream
+	 * Parses an rdf Graph from an java.io.InputStream
 	 * returning the value in context M (Try, Future, ...)
 	 * 
 	 * Note: Many libraries prefer to have an intput stream that allows

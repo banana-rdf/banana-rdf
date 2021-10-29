@@ -2,7 +2,6 @@ package org.w3.banana
 
 import org.w3.banana.RDF.*
 import TestConstants.*
-import org.w3.banana.prefix.XSD
 
 open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	//todo: find a way to simplify these imports for end users of the library
@@ -49,8 +48,6 @@ open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 		assertEquals(gbig.size,4)
 		assert(gbig ≅ g2.union(glit))
 	}
-
-
 end GraphTest
 
 open class GraphSearchTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
@@ -63,38 +60,38 @@ open class GraphSearchTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite
 	val bblf: URI[Rdf] = URI(bbl("i"))
 	val xsd: XSD[Rdf] = XSD[Rdf]
 	val foaf: FOAF[Rdf] = FOAF[Rdf]
-	import ops.ANY
+	import ops.`*`
 	val bkt = Triple(bblf,foaf.knows,timbl)
 	val tname = Triple(timbl, foaf.name, "Tim"`@`Lang("en"))
 	val bname = Triple(bblf, foaf.name, "Henry"`@`Lang("en"))
 
 	test("Test Graph with  n <= 1 triples") {
 		val g0: Graph[Rdf] = Graph.empty
-		assertEquals(g0.find(ANY, ANY, ANY).toSeq, Seq())
-		assertEquals(g0.find(bblf, ANY, ANY).toSeq, Seq())
+		assertEquals(g0.find(`*`, `*`, `*`).toSeq, Seq())
+		assertEquals(g0.find(bblf, `*`, `*`).toSeq, Seq())
 		val g1 = g0 + bkt
-		assertEquals(g1.find(ANY, ANY, ANY).toSeq, Seq(bkt))
-		assertEquals(g1.find(bblf, ANY, ANY).toSeq, Seq(bkt))
-		assertEquals(g1.find(bblf, foaf.knows, ANY).toSeq, Seq(bkt))
+		assertEquals(g1.find(`*`, `*`, `*`).toSeq, Seq(bkt))
+		assertEquals(g1.find(bblf, `*`, `*`).toSeq, Seq(bkt))
+		assertEquals(g1.find(bblf, foaf.knows, `*`).toSeq, Seq(bkt))
 		assertEquals(g1.find(bblf, foaf.knows, timbl).toSeq, Seq(bkt))
-		assertEquals(g1.find(ANY, foaf.knows, timbl).toSeq, Seq(bkt))
-		assertEquals(g1.find(ANY, ANY, timbl).toSeq, Seq(bkt))
-		assertEquals(g1.find(ANY, foaf.knows, ANY).toSeq, Seq(bkt))
-		assertEquals(g1.find(timbl, ANY, ANY).toSeq, Seq())
+		assertEquals(g1.find(`*`, foaf.knows, timbl).toSeq, Seq(bkt))
+		assertEquals(g1.find(`*`, `*`, timbl).toSeq, Seq(bkt))
+		assertEquals(g1.find(`*`, foaf.knows, `*`).toSeq, Seq(bkt))
+		assertEquals(g1.find(timbl, `*`, `*`).toSeq, Seq())
 	}
 
 	test("Test graph with 3 triples") {
 		val g3 = Graph(bkt, tname, bname)
-		assertEquals(g3.find(ANY, ANY, ANY).toSet, g3.triples.toSet)
-		assertEquals(g3.find(bblf, ANY, ANY).toSet, g3.triples.toSet)
-		assertEquals(g3.find(bblf, foaf.knows, ANY).toSeq, Seq(bkt))
+		assertEquals(g3.find(`*`, `*`, `*`).toSet, g3.triples.toSet)
+		assertEquals(g3.find(bblf, `*`, `*`).toSet, Set(bkt,bname))
+		assertEquals(g3.find(bblf, foaf.knows, `*`).toSeq, Seq(bkt))
 		assertEquals(g3.find(bblf, foaf.knows, timbl).toSeq, Seq(bkt))
-		assertEquals(g3.find(ANY, foaf.knows, timbl).toSeq, Seq(bkt))
-		assertEquals(g3.find(ANY, foaf.knows, timbl).toSeq, Seq(bkt))
-		assertEquals(g3.find(ANY, ANY, timbl).toSeq, Seq(bkt))
-		assertEquals(g3.find(ANY, foaf.knows, ANY).toSeq, Seq(bkt))
-		assertEquals(g3.find(timbl, ANY, ANY).toSeq, Seq(tname))
-		assertEquals(g3.find(ANY, timbl, ANY).toSeq, Seq())
+		assertEquals(g3.find(`*`, foaf.knows, timbl).toSeq, Seq(bkt))
+		assertEquals(g3.find(`*`, foaf.knows, timbl).toSeq, Seq(bkt))
+		assertEquals(g3.find(`*`, `*`, timbl).toSeq, Seq(bkt))
+		assertEquals(g3.find(`*`, foaf.knows, `*`).toSeq, Seq(bkt))
+		assertEquals(g3.find(timbl, `*`, `*`).toSeq, Seq(tname))
+		assertEquals(g3.find(`*`, timbl, `*`).toSeq, Seq())
 	}
 
 

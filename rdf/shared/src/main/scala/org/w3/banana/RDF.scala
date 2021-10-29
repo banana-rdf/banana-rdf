@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.RDF.NodeAny
+
 import scala.annotation.targetName
 import scala.reflect.TypeTest
 import scala.util.Try
@@ -23,43 +25,30 @@ trait RDF:
 	type rURI 					   // relative URLs
 
 	type Graph     			   // graphs with no triples with relative URLs
+	type Quad <: Matchable
 	type Triple <: Matchable	// triples with no relative URLs
 	type Node <: Matchable
 	type URI <: Node
 	type BNode <: Node
 	type Literal <: Node
 	type Lang <: Matchable
+	type DefaultGraphNode
+
+	type MGraph   // a mutable graph
+	type DataSet
+
+	// Stores are complicated enough  that it is not clear that they
+	// need to be represented here. They tend to be very heavy objects,
+	// so that wrapping them in another object is quasi free.
+	type Store // a mutable dataset
 
 	// types for the graph traversal API
 	type NodeAny
-
-//		def ANY: NodeAny
-//		implicit def toConcreteNodeMatch(node: Rdf#Node): Rdf#NodeMatch
-//		def foldNodeMatch[T](nodeMatch: Rdf#NodeMatch)(funANY: => T, funNode: Rdf#Node => T): T
-//		def find(graph: Rdf#Graph, subject: Rdf#NodeMatch, predicate: Rdf#NodeMatch, objectt: Rdf#NodeMatch): Iterator[Rdf#Triple]
-
 
 	given ops: Ops[R]
 
 end RDF
 
-
-// remain to be done:
-//  // mutable graphs
-//  type MGraph <: AnyRef
-//
-//  // types for the graph traversal API
-//  type NodeMatch
-//  type NodeAny <: NodeMatch
-//
-//  // types related to Sparql
-//  type Query
-//  type SelectQuery <: Query
-//  type ConstructQuery <: Query
-//  type AskQuery <: Query
-//  type UpdateQuery
-//  type Solution
-//  type Solutions
 
 /**
  * The idea of using match types by @neko-kai
@@ -73,14 +62,20 @@ object RDF:
 	type Triple[R <: RDF] <: Matchable = R match
 		case GetTriple[t] => t
 
+	//Quad is a good short name for Statement, but does not give a good understaning of it
+	type Quad[R <: RDF] <: Matchable = R match
+		case GetQuad[t] => t
+
 	type rNode[R <: RDF] <: Matchable = R match
 		case GetRelNode[n] => n
 
-	type Node[R <: RDF] <: Matchable = R match
-		case GetNode[n] => n
+	type Node[R <: RDF] =  URI[R] | BNode[R] | Literal[R] | Graph[R]
 
 	type BNode[R <: RDF] = R match
 		case GetBNode[bn] => bn
+
+	type DefaultGraphNode[R <: RDF] = R match
+		case GetDefaultGraphNode[n] => n
 
 	type rURI[R <: RDF] = R match
 		case GetRelURI[ru] => ru
@@ -94,6 +89,9 @@ object RDF:
 	type Graph[R <: RDF] = R match
 		case GetGraph[g] => g
 
+	type Store[R <: RDF] = R match
+		case GetStore[s] => s
+
 	type Literal[R <: RDF] <: Matchable = R match
 		case GetLiteral[l] => l
 
@@ -103,19 +101,20 @@ object RDF:
 	type NodeAny[R <: RDF] = R match
 		case GetNodeAny[m] => m
 
-
-	type GetRelURI[U] = RDF { type rURI = U }
-	type GetURI[U] = RDF { type URI = U }
-	type GetRelNode[N <: Matchable] = RDF { type rNode = N }
-	type GetNode[N <: Matchable] = RDF { type Node = N }
-	type GetBNode[N <: Matchable] = RDF { type BNode = N }
-	type GetLiteral[L <: Matchable] = RDF { type Literal = L }
-	type GetLang[L <: Matchable] = RDF { type Lang = L }
-	type GetRelTriple[T] = RDF { type rTriple = T }
-	type GetTriple[T <: Matchable] = RDF { type Triple = T }
-	type GetRelGraph[G] = RDF { type rGraph = G }
-	type GetGraph[G] = RDF { type Graph = G }
-	type GetNodeAny[M] = RDF { type NodeAny = M }
+	private type GetRelURI[U] = RDF { type rURI = U }
+	private type GetURI[U] = RDF { type URI = U }
+	private type GetRelNode[N <: Matchable] = RDF { type rNode = N }
+	private type GetBNode[N <: Matchable] = RDF { type BNode = N }
+	private type GetLiteral[L <: Matchable] = RDF { type Literal = L }
+	private type GetDefaultGraphNode[N <: Matchable] = RDF { type DefaultGraphNode = N }
+	private type GetLang[L <: Matchable] = RDF { type Lang = L }
+	private type GetRelTriple[T] = RDF { type rTriple = T }
+	private type GetTriple[T <: Matchable] = RDF { type Triple = T }
+	private type GetQuad[T <: Matchable] = RDF { type Quad = T }
+	private type GetRelGraph[G] = RDF { type rGraph = G }
+	private type GetGraph[G] = RDF { type Graph = G }
+	private type GetStore[S] = RDF { type Store = S }
+	private type GetNodeAny[M] = RDF { type NodeAny = M }
 
 	/**
 	 * these associate a type to the positions in statements (triples or quads)
@@ -126,10 +125,15 @@ object RDF:
 	 * For the moment I will try the strict mode.
 	 **/
 	object Statement:
+		type DT[A,B,C,R<:RDF,Object[R]] = Object[R] match
+			case URI[R] => A
+			case BNode[R] => B
+			case Literal[R] => C
+
 		type Subject[R <: RDF] = URI[R] | BNode[R]
 		type Relation[R <: RDF] = URI[R]
 		type Object[R <: RDF] = URI[R] | BNode[R] | Literal[R]
-		type Graph[R <: RDF] = URI[R] | BNode[R]
+		type Graph[R <: RDF] = URI[R] | BNode[R] | DefaultGraphNode[R]
 	end Statement
 
 	// relative statements

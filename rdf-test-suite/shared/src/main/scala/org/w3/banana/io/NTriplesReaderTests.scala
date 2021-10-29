@@ -70,7 +70,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		"not parse a plain Literal that does not close" in {
 			val nt = ntparser(name)
 			val lit = Try(nt.parseLiteral())
-			lit `should` be `a` Symbol("failure")
+			assertResult(false)(lit.isSuccess)
 		}
 
 		"parse a PlainLiteral"  in {
@@ -100,7 +100,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
 		"not parse an illegal BNode" in {
 			val bn = Try (ntparser(":-123 ").parseBNode())
-			bn `should` be `a` Symbol("failure")
+			assertResult(false)(bn.isSuccess)
 		}
 
 	}
@@ -219,8 +219,8 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 		def parse(s: String, size: Int)(test: Graph[Rdf] => Boolean = _ => true): Unit = {
 			val parseAttempt = ntparse(s)
 			assert(test(parseAttempt.get))
-			parseAttempt `should` be `a` Symbol("success")
-			parseAttempt.get.size `should` be(size)
+			assertResult(true)(parseAttempt.isSuccess)
+			assertResult(size)(parseAttempt.get.size)
 		}
 
 		"verify that empty files parse with success" in {

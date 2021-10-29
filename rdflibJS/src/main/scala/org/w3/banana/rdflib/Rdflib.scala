@@ -1,10 +1,11 @@
 package org.w3.banana.rdflib
 
 
+import org.w3.banana.operations.StoreFactory
 import org.w3.banana.rdflib.facade.FormulaOpts.FormulaOpts
 import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
 import org.w3.banana.rdflib.facade.*
-import org.w3.banana.{Ops, RDF}
+import org.w3.banana.{Ops, RDF, operations}
 import run.cosy.rdfjs.model
 import run.cosy.rdfjs.model.DataFactory
 
@@ -22,13 +23,16 @@ object Rdflib extends RDF {
 	override opaque type rTriple = model.Quad
 	override opaque type rURI = model.NamedNode
 
+	override opaque type Store = storeMod.IndexedFormula
 	override opaque type Graph = storeMod.IndexedFormula
 	override opaque type Triple <: Matchable = model.Quad
+	override opaque type Quad <: Matchable = model.Quad
 	override opaque type Node <: Matchable = model.ValueTerm[?]
 	override opaque type URI <: Node =  model.NamedNode
 	override opaque type BNode <: Node = model.BlankNode
 	override opaque type Literal <: Node = model.Literal
 	override opaque type Lang <: Matchable = String
+	override opaque type DefaultGraphNode <: Node = model.DefaultGraph
 
 	override type NodeAny = Null
 
@@ -62,8 +66,48 @@ object Rdflib extends RDF {
 		import RDF.Statement as St
 		private val init = nodeMod.default
 
-		val ANY: RDF.NodeAny[R] = null
-		given Graph: GraphOps with
+		val `*`: RDF.NodeAny[R] = null
+
+		given basicStoreFactory: StoreFactory[R] with
+			override def makeStore(): RDF.Store[R] = ???
+
+		given Store: operations.Store[R] with
+			import scala.jdk.CollectionConverters.given
+			//todo: need to integrate locking functionality
+			extension (store: RDF.Store[R])
+				override
+				def add(qs: RDF.Quad[R]*): store.type =
+					store.addAll(qs.toJSArray)
+					store
+
+				override
+				def remove(qs: RDF.Quad[R]*): store.type =
+					store.remove(qs.toJSArray)
+					store
+
+				override
+				def find(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): Iterator[RDF.Quad[R]] =
+				//todo: note, we loose the try exception failure here
+					val res: scala.collection.mutable.Seq[RDF.Quad[R]] = store.statementsMatching(s,p,o,g,false)
+					res.iterator
+
+				override
+				def remove(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): store.type = store.remove(store.statementsMatching(s,p,o,g,false)).nn
+
+		end Store
+
+
+		given Graph: operations.Graph[R] with
 			def empty: RDF.Graph[R] = storeMod(opts())
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
 				val graph: storeMod.IndexedFormula = empty
@@ -79,7 +123,7 @@ object Rdflib extends RDF {
 
 			//If one modelled Graphs as Named Graphs, then union could just be unioning the names
 			//this type of union is very inefficient
-			def union(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
+			def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
 				graphs match
 					case Seq(x) => x
 					case _ =>
@@ -94,11 +138,12 @@ object Rdflib extends RDF {
 				}
 				newgraph
 
-			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean = ???
-				//note: if we make sure that the opaque Graph, never contains contexts,
-				//  then this is all we need to do. Otherwise we need to strip contexts.
-				//Models.isomorphic(left, right)
-				//todo: no isomorphism in rdflib, use my lib
+			import org.w3.banana.isomorphism.*
+			private val mapGen = new SimpleMappingGenerator[R](VerticeCBuilder.simpleHash[R])
+			private val iso = new GraphIsomorphism[R](mapGen)
+			def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
+				val a = iso.findAnswer(left, right)
+				a.isSuccess
 
 			def findTriples(graph: RDF.Graph[R],
 				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
@@ -107,7 +152,7 @@ object Rdflib extends RDF {
 				sm.iterator
 		end Graph
 
-		val rGraph = new rGraphOps:
+		val rGraph = new operations.rGraph[R]:
 			def empty: RDF.rGraph[R] = Graph.empty
 			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
 				Graph(triples)
@@ -115,7 +160,7 @@ object Rdflib extends RDF {
 				Graph.triplesIn(graph)
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph).toInt
-
+		end rGraph
 //		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
 //			override def unapply(s: Matchable): Option[s.type & Triple] =
 //				s match
@@ -124,26 +169,40 @@ object Rdflib extends RDF {
 //					case _ => None
 //		}
 
-		given Triple: TripleOps with
+		val Subject = new operations.Subject[R]:
+			extension (subj: RDF.Statement.Subject[R])
+				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+					subj match
+						case nn:  model.NamedNode => uriFnct(nn)
+						case blank: model.BlankNode => bnFcnt(blank)
+
+
+		given Triple: operations.Triple[R] with
 			import RDF.Statement as St
 			//todo: check whether it really is not legal in rdflib to have a literal as subject
 			// warning throws an exception
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] = df.quad(s,p,o)
-			def untuple(t: RDF.Triple[R]): TripleI = (t.subj, t.rel, t.obj)
 			def subjectOf(t: RDF.Triple[R]): St.Subject[R] = t.subj
 			def relationOf(t: RDF.Triple[R]): St.Relation[R] = t.rel
 			def objectOf(t: RDF.Triple[R]): St.Object[R] = t.obj
 		end Triple
 
-		given Statement: StatementOps with
-			extension (subj: RDF.Statement.Subject[R])
-				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
-					subj match
-					case nn:  model.NamedNode => uriFnct(nn)
-					case blank: model.BlankNode => bnFcnt(blank)
+		lazy val Quad = new operations.Quad[R](this):
+			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
+				df.quad(s,p,o)
+			def defaultGraph: RDF.DefaultGraphNode[R] = df.defaultGraph
+			def apply(
+				s: St.Subject[R], p: St.Relation[R],
+				o: St.Object[R], where: St.Graph[R]
+			): RDF.Quad[R] =  df.quad(s,p,o,where)
+			protected def subjectOf(s: RDF.Quad[R]): St.Subject[R] = s.subj
+			protected def relationOf(s: RDF.Quad[R]): St.Relation[R] = s.rel
+			protected def objectOf(s: RDF.Quad[R]): St.Object[R] = s.obj
+			protected def graphOf(s: RDF.Quad[R]): St.Graph[R] = s.graph
+		end Quad
 
 		//todo: see whether this really works! It may be that we need to create a new construct
-		val rTriple = new rTripleOps:
+		val rTriple = new operations.rTriple[R]:
 			import RDF.rStatement as rSt
 			def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
 				Triple(s, p, o)
@@ -154,28 +213,34 @@ object Rdflib extends RDF {
 			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] = Triple.objectOf(t)
 		end rTriple
 
-		given Node: NodeOps with
+		given Node: operations.Node[R] with
+			private def rl(node: RDF.Node[R]): model.Term[?] = node.asInstanceOf[model.Term[?]]
 			extension (node: RDF.Node[R])
-				def fold[A](
+				def isURI: Boolean = rl(node).isInstanceOf[model.NamedNode]
+				def isBNode: Boolean = rl(node).isInstanceOf[model.BlankNode]
+				def isLiteral: Boolean = rl(node).isInstanceOf[model.Literal]
+			//we override fold, as we can implement it faster with pattern matching
+				override def fold[A](
 					uriF: RDF.URI[R] => A,
 					bnF: RDF.BNode[R] => A,
 					litF: RDF.Literal[R] => A
 				): A = node match
-					case blank: model.BlankNode => bnF(blank)
 					case nn:  model.NamedNode => uriF(nn)
+					case blank: model.BlankNode => bnF(blank)
 					case lit: model.Literal => litF(lit)
 					case _ => throw IllegalArgumentException(
 						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
 					)
 
-		given BNode: BNodeOps with
+		given BNode: operations.BNode[R] with
 			def apply(s: String): RDF.BNode[R] = df.blankNode(s)
 			def apply(): RDF.BNode[R] = df.blankNode()
 			extension (bn: RDF.BNode[R])
 				def label: String = bn.value
 		end BNode
 
-		given Literal: LiteralOps with
+		given Literal: operations.Literal[R] with
+			import org.w3.banana.operations.URI.*
 			private val xsdString = df.namedNode(xsdStr).nn
 			private val xsdLangString = df.namedNode(xsdLangStr).nn
 			import LiteralI as Lit
@@ -217,17 +282,17 @@ object Rdflib extends RDF {
 					case _ => None
 		}
 
-		given Lang: LangOps with {
+		given Lang: operations.Lang[R] with {
 			def apply(lang: String): RDF.Lang[R] = lang
 			extension (lang: RDF.Lang[R])
 				def label: String =  lang
 		}
 
-		val rURI = new rURIOps:
+		val rURI = new operations.rURI[R]:
 			def apply(iriStr: String): RDF.rURI[R] = df.namedNode(iriStr)
 			def asString(uri: RDF.rURI[R]): String = uri.toString
 
-		given URI: URIOps with
+		given URI: operations.URI[R] with
 			//this does throw an exception on non relative URLs!
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
 				Try(df.namedNode(iriStr))

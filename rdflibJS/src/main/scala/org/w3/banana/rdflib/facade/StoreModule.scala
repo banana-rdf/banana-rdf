@@ -104,8 +104,8 @@ object StoreReplacementMethods:
 				sorted.tail.foldRight(sorted.head.toSet){ case (quads, smallestSet) =>
 					smallestSet.intersect(quads.toSet)
 				}.toJSArray
-		if justOne.getOrElse(false) then result
-		else result.slice(0,1)
+		if justOne.getOrElse(false) then result.slice(0,1)
+		else result
 	}
 
 	val matchFnct: js.ThisFunction4[IndexedFormula,

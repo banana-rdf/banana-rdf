@@ -3,17 +3,22 @@ package org.w3.banana.jena
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_Literal, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
+import org.apache.jena.query.DatasetFactory
+import org.apache.jena.sparql.core.DatasetGraphFactory
+import org.apache.jena.tdb.{TDB, TDBFactory}
 import org.w3.banana.{Ops, RDF}
+import org.w3.banana.operations
 
 import scala.reflect.TypeTest
 import scala.util.Try
 import scala.util.Using
 import scala.util.Using.Releasable
 import org.apache.jena.util.iterator.ExtendedIterator
+import org.w3.banana.operations.{Quad, StoreFactory}
 
 import scala.annotation.targetName
 
-object JenaRdf extends RDF {
+object JenaRdf extends org.w3.banana.RDF {
 	import org.apache.jena.graph as jena
 	import org.apache.jena.graph.{NodeFactory, Factory}
 
@@ -31,18 +36,17 @@ object JenaRdf extends RDF {
 	override opaque type BNode <: Node = jena.Node_Blank
 	override opaque type Literal <: Node = jena.Node_Literal
 	override opaque type Lang <: Matchable = String
+	override opaque type DefaultGraphNode = org.apache.jena.sparql.core.Quad.defaultGraphIRI.type
 
 	override type NodeAny = Null
+	override opaque type Store <: Matchable = org.apache.jena.sparql.core.DatasetGraph // a mutable dataset
+	override opaque type Quad <: Matchable = org.apache.jena.sparql.core.Quad
 
 	given [T]: Releasable[ExtendedIterator[T]] with {
 		def release(resource: ExtendedIterator[T]): Unit = resource.close()
 	}
 
-	type QuadSubject = Node
-	type QuadRelation = URI
-	type QuadObject = Node
-	type QuadGraph = Graph
-
+	import RDF.Statement as St
 
 	/**
 	 * Here we build up the methods functions allowing RDF.Graph[R] notation to be used.
@@ -53,8 +57,45 @@ object JenaRdf extends RDF {
 	 * as the RDF.Graph[R] type hides the implementation type (of `graph` field for example) **/
 	given ops: Ops[R] with {
 
-		val ANY: NodeAny[Rdf] = null
-		given Graph: GraphOps with
+		val `*`: RDF.NodeAny[R] = null
+
+		given basicStoreFactory: StoreFactory[R] with
+			override def makeStore(): RDF.Store[R] = DatasetGraphFactory.createGeneral().nn
+
+		given Store: operations.Store[R] with
+			import scala.jdk.CollectionConverters.given
+			//todo: need to integrate locking functionality
+			extension (store: RDF.Store[R])
+				override
+				def add(qs: RDF.Quad[R]*): store.type =
+					for q <- qs do store.add(q)
+					store
+
+				override
+				def remove(qs: RDF.Quad[R]*): store.type =
+					for q <- qs do store.delete(q)
+					store
+
+				override
+				def find(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): Iterator[RDF.Quad[R]] = store.find(s,p,o,g).nn.asScala
+
+				override
+				def remove(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): store.type =
+					for q <- store.find(s,p,o,g).nn.asScala do remove(q)
+					store
+		end Store
+
+		given Graph: operations.Graph[R] with
 			import RDF.Statement as St
 			def empty: RDF.Graph[R] = Factory.empty().nn
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
@@ -69,7 +110,7 @@ object JenaRdf extends RDF {
 				import collection.JavaConverters.asScalaIteratorConverter
 				graph.find(JenaANY, JenaANY, JenaANY).nn.asScala.to(Iterable)
 			def graphSize(graph: RDF.Graph[R]): Int = graph.size()
-			def union(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
+			def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
 				val g = Factory.createDefaultGraph.nn
 				graphs.foreach { graph =>
 					Using.resource(graph.find(JenaANY, JenaANY, JenaANY).nn) { it =>
@@ -87,10 +128,21 @@ object JenaRdf extends RDF {
 
 			def findTriples(graph: RDF.Graph[R],
 				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
-			): Iterator[RDF.Triple[R]] = ???
+			): Iterator[RDF.Triple[R]] =
+				import scala.jdk.CollectionConverters.*
+				graph.find(s, p, o).nn.asScala
 		end Graph
 
-		val rGraph = new rGraphOps:
+
+//		def tdbGraphStore(dir: String) = new operations.StoreFactory[R]:
+//			override def makeStore(q: operations.Quad*): RDF.Store[R] =
+//				val dataset = TDBFactory.createDataset(dir)
+//				dataset.getContext().set(TDB.symUnionDefaultGraph, false)
+//				dataset
+
+
+		
+		val rGraph = new operations.rGraph[R]:
 			def empty: RDF.rGraph[R] = Graph.empty
 			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
 				Graph(triples)
@@ -99,7 +151,7 @@ object JenaRdf extends RDF {
 			def graphSize(graph: RDF.rGraph[R]): Int =
 				Graph.graphSize(graph)
 
-		val rTriple = new rTripleOps:
+		val rTriple = new operations.rTriple[R]:
 			import RDF.rStatement as rSt
 			def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
 				jena.Triple.create(s, p, o).nn
@@ -111,7 +163,7 @@ object JenaRdf extends RDF {
 				t.getPredicate().asInstanceOf[URI].nn
 			def objectOf(t: RDF.rTriple[R]): rSt.Object[R] =
 				t.getObject().asInstanceOf[rSt.Object[R]].nn
-
+		end rTriple
 
 		//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
 //			override def unapply(s: Matchable): Option[s.type & Triple] =
@@ -121,12 +173,19 @@ object JenaRdf extends RDF {
 //					case _ => None
 //		}
 
-		given Triple: TripleOps with {
+		val Subject = new operations.Subject[R]:
+			extension (subj: RDF.Statement.Subject[R])
+				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+					if subj.isBlank then
+						bnFcnt(subj.asInstanceOf[Node_Blank])
+					else
+						uriFnct(subj.asInstanceOf[Node_URI])
+		end Subject
+
+		given Triple: operations.Triple[R] with {
 			import RDF.Statement as St
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
 				jena.Triple.create(s, p, o).nn
-			def untuple(t: RDF.Triple[R]): TripleI =
-					(subjectOf(t), relationOf(t), objectOf(t))
 			def subjectOf(t: RDF.Triple[R]): St.Subject[R] =
 				t.getSubject().asInstanceOf[St.Subject[R]].nn
 			def relationOf(t: RDF.Triple[R]): St.Relation[R] =
@@ -135,36 +194,36 @@ object JenaRdf extends RDF {
 				t.getObject().asInstanceOf[St.Object[R]].nn
 		}
 
-		given Statement: StatementOps with
-			extension (subj: RDF.Statement.Subject[R])
-				def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
-					if subj.isBlank then
-						bnFcnt(subj.asInstanceOf[Node_Blank])
-					else
-						uriFnct(subj.asInstanceOf[Node_URI])
+		lazy val Quad = new operations.Quad[R](this):
+			import org.apache.jena.sparql.core.Quad as JQuad
+			inline def defaultGraph: RDF.DefaultGraphNode[R] = org.apache.jena.sparql.core.Quad.defaultGraphIRI
+			inline def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
+				new JQuad(defaultGraph, s, p, o)
+			inline def apply(
+				s: St.Subject[R], p: St.Relation[R],
+				o: St.Object[R], where: St.Graph[R]
+			): RDF.Quad[R] = new JQuad(where, s, p, o)
+			inline protected def subjectOf(s: RDF.Quad[R]): St.Subject[R] =
+				s.getSubject().asInstanceOf[St.Subject[R]].nn
+			inline protected def relationOf(s: RDF.Quad[R]): St.Relation[R] =
+				s.getPredicate.asInstanceOf[St.Relation[R]].nn
+			inline protected def objectOf(s: RDF.Quad[R]): St.Object[R] =
+				s.getObject().asInstanceOf[St.Object[R]].nn
+			inline protected def graphOf(s: RDF.Quad[R]): St.Graph[R] =
+				s.getGraph().asInstanceOf[St.Graph[R]].nn
+		end Quad
 
 
-		given Node: NodeOps with
+
+		given Node: operations.Node[R] with
+			private def jn(node: RDF.Node[R]) = node.asInstanceOf[org.apache.jena.graph.Node]
 			extension (node: RDF.Node[R])
-				def fold[A](
-					uriF: RDF.URI[R] => A,
-					bnF:  RDF.BNode[R] => A,
-					litF: RDF.Literal[R] => A
-				): A =
-					//considered Jena Visitor, but for some reason it deconstructs the types,
-					//annulling potential speed advantage
-					if node.isBlank then
-						bnF(node.asInstanceOf[Node_Blank])
-					else if node.isURI then
-						uriF(node.asInstanceOf[Node_URI])
-					else if node.isLiteral then
-						litF(node.asInstanceOf[Node_Literal])
-					else throw new IllegalArgumentException(
-						s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
-					)
+				def isURI: Boolean = jn(node).isURI
+				def isBNode: Boolean = jn(node).isBlank
+				def isLiteral: Boolean = jn(node).isLiteral
 		end Node
 
-		given BNode: BNodeOps with
+		given BNode: operations.BNode[R] with
 			def apply(label: String): RDF.BNode[R] =
 				val id = BlankNodeId.create(label).nn
 				NodeFactory.createBlankNode(id).asInstanceOf[Node_Blank]
@@ -175,7 +234,8 @@ object JenaRdf extends RDF {
 		end BNode
 
 
-		given Literal: LiteralOps with
+		given Literal: operations.Literal[R] with
+			import org.w3.banana.operations.URI.*
 			private val xsdString: RDFDatatype = mapper.getTypeByName(xsdStr).nn
 			private val xsdLangString: RDFDatatype = mapper.getTypeByName(xsdLangStr).nn
 			//todo? are we missing a Datatype Type? (check other frameworks)
@@ -237,19 +297,19 @@ object JenaRdf extends RDF {
 					case _ => None
 		}
 
-		given Lang:  LangOps with
+		given Lang:  operations.Lang[R] with
 			def apply(lang: String): RDF.Lang[R] = lang
 			extension (lang: RDF.Lang[R])
 				def label: String =  lang
 		end Lang
 
-		val rURI = new rURIOps:
+		val rURI = new operations.rURI[R]:
 			def apply(uriStr: String): RDF.rURI[R] =
 				NodeFactory.createURI(uriStr).nn.asInstanceOf[URI]
 			def asString(uri: RDF.rURI[R]): String =
 				uri.getURI().nn
 
-		given URI: URIOps with
+		given URI: operations.URI[R] with
 			//todo: this never fails to parse. Need to find a way to align behaviors
 			def mkUri(iriStr: String): Try[RDF.URI[R]] =
 				Try(NodeFactory.createURI(iriStr).asInstanceOf[URI])

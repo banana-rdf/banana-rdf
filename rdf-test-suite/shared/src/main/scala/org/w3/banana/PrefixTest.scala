@@ -5,6 +5,7 @@ import org.w3.banana.prefix.{FOAF, RDFPrefix, XSD}
 open class PrefixTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	import ops.{given,*}
 	import TestConstants.*
+	import org.w3.banana.operations.URI.*
 	val foaf = FOAF[Rdf]
 	val xsd = XSD[Rdf]
 	val rdf = RDFPrefix[Rdf]
@@ -20,11 +21,11 @@ open class PrefixTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 		assertEquals(xsd.int, URI(xsdPre("int")))
 		assertEquals(xsd.integer, URI(xsdPre("integer")))
 		assertEquals(xsd.hexBinary, URI(xsdPre("hexBinary")))
-		assertEquals(xsd.string, URI(ops.xsdStr))
+		assertEquals(xsd.string, URI(xsdStr))
 	}
 
 	test("RDF namespace") {
-		assertEquals(rdf.langString, URI(ops.xsdLangStr))
+		assertEquals(rdf.langString, URI(xsdLangStr))
 	}
 
 
