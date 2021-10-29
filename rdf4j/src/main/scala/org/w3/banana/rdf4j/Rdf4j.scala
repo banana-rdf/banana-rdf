@@ -5,11 +5,16 @@ import org.eclipse.rdf4j.model.impl.*
 import org.eclipse.rdf4j.model.util.Models
 import org.eclipse.rdf4j.query.*
 import org.eclipse.rdf4j.query.parser.*
+import org.eclipse.rdf4j.repository.{Repository, RepositoryConnection}
+import org.eclipse.rdf4j.repository.sail.SailRepository
+import org.eclipse.rdf4j.sail.memory.MemoryStore
 import org.w3.banana.*
 import org.w3.banana.operations
+import org.w3.banana.operations.StoreFactory
 
+import java.lang
 import scala.annotation.targetName
-import scala.util.{Success, Try}
+import scala.util.{Success, Try, Using}
 import scala.reflect.TypeTest
 
 
@@ -29,11 +34,15 @@ object Rdf4j extends RDF:
 	override opaque type BNode <: Node = rjBNode
 	override opaque type Literal <: Node = rjLiteral
 	override opaque type Lang <: Matchable = String
-	override opaque type DefaultGraphNode = Null
+	override opaque type DefaultGraphNode = defaultGraphNode.type
 
 	override type NodeAny = Null
 
-//	given uriTT: TypeTest[Node,URI] with {
+	type Store = Repository
+
+	import org.eclipse.rdf4j.model.vocabulary.RDF4J
+	val defaultGraphNode: RDF4J.NIL.type = RDF4J.NIL
+	//	given uriTT: TypeTest[Node,URI] with {
 //		override def unapply(s: Node): Option[s.type & URI] =
 //			s match
 //				//note: using rjIRI won't compile
@@ -62,6 +71,75 @@ object Rdf4j extends RDF:
 		import RDF.Statement as St
 
 		val `*`: RDF.NodeAny[R] = null
+
+		given basicStoreFactory: StoreFactory[R] with
+			//todo: note that by returning a Repository every request has to
+			// open a connection. But if we pass a connection then it would
+			// require us dealing with the connection lifecycle. Is there a better way?
+			override def makeStore(): RDF.Store[R] =
+				val sr = new SailRepository(new MemoryStore)
+				sr.init()
+				sr
+
+		given Store: operations.Store[R] with
+			import scala.jdk.CollectionConverters.given
+			val emptyQuadArray: Array[Resource] = new Array[Resource](0)
+			//todo: need to integrate locking functionality
+			extension (store: RDF.Store[R])
+				override
+				def add(qs: RDF.Quad[R]*): store.type =
+					Using(store.getConnection().nn) { (conn: RepositoryConnection) =>
+						val qit : Iterable[RDF.Quad[R]]  = qs.nn
+						val jqit: lang.Iterable[RDF.Quad[R]] = qit.asJava
+						println(s"in add($qs)")
+						conn.add(jqit, emptyQuadArray*)
+					}
+					//todo: we loose the try exception failure here
+					store
+
+				override
+				def remove(qs: RDF.Quad[R]*): store.type =
+					Using(store.getConnection().nn) { conn =>
+						conn.remove(qs.asJava)
+					}
+					//todo: note, we loose the try exception failure here
+					store
+
+				override
+				def find(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): Iterator[RDF.Quad[R]] =
+				//todo: the big problem here is that if we work with a Repository then
+				// when we close the connection, that releases the connection and the Iterator stops working,
+				// so we need to load all the results of the iterator into memory, which is a very bad idea.
+				//todo: note, need to deal with exceptions thrown here (and elsewhere)
+					Using.resource(store.getConnection().nn){  (conn: RepositoryConnection) =>
+						val rres = g match
+							case `*` => conn.getStatements(s, p, o, true, emptyQuadArray*).nn
+							case g: St.Graph[R] => conn.getStatements(s, p, o, true, g).nn
+						//todo: when we release the connection we loose the iterator
+						val list: List[RDF.Quad[R]] = rres.iterator().nn.asScala.toList
+						list.iterator
+					}
+
+				override
+				def remove(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): store.type =
+					Using(store.getConnection().nn) { conn =>
+						val it = conn.getStatements(s,p,o, org.eclipse.rdf4j.model.vocabulary.RDF4J.NIL)
+						conn.remove(it)
+					}
+					store
+		end Store
+
+
 		given Graph: operations.Graph[R] with
 			private val emptyGr: RDF.Graph[R] = new LinkedHashModel(0).unmodifiable().nn
 			def empty: RDF.Graph[R] = emptyGr
@@ -148,7 +226,7 @@ object Rdf4j extends RDF:
 		end Subject
 
 		lazy val Quad = new operations.Quad[R](this):
-			def defaultGraph: RDF.DefaultGraphNode[R] = null
+			def defaultGraph: RDF.DefaultGraphNode[R] = defaultGraphNode
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
 				valueFactory.createStatement(s, p, o).nn
 			def apply(

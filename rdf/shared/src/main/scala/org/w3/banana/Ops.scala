@@ -2,6 +2,7 @@ package org.w3.banana
 
 import org.w3.banana.RDF.Graph
 import org.w3.banana.RDF.Statement.Subject
+import org.w3.banana.operations.StoreFactory
 
 import scala.annotation.targetName
 import scala.reflect.TypeTest
@@ -28,11 +29,12 @@ trait Ops[Rdf <: RDF]:
 	//		def apply(obj: St.Object[Rdf]): RDF.Node[Rdf] =  obj.asInstanceOf[Node[Rdf]]
 
 	// interpretation types to help consistent pattern matching across implementations
-
-	//implementations
-	val `*`: NodeAny[Rdf]
+	val `*`: RDF.NodeAny[Rdf]
 
 	given Graph: operations.Graph[Rdf]
+
+	given basicStoreFactory: StoreFactory[Rdf]
+	given Store: operations.Store[Rdf]
 
 	val rGraph: operations.rGraph[Rdf]
 

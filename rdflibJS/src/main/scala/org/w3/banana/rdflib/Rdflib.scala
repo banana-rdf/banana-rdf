@@ -1,6 +1,7 @@
 package org.w3.banana.rdflib
 
 
+import org.w3.banana.operations.StoreFactory
 import org.w3.banana.rdflib.facade.FormulaOpts.FormulaOpts
 import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
 import org.w3.banana.rdflib.facade.*
@@ -22,6 +23,7 @@ object Rdflib extends RDF {
 	override opaque type rTriple = model.Quad
 	override opaque type rURI = model.NamedNode
 
+	override opaque type Store = storeMod.IndexedFormula
 	override opaque type Graph = storeMod.IndexedFormula
 	override opaque type Triple <: Matchable = model.Quad
 	override opaque type Quad <: Matchable = model.Quad
@@ -65,6 +67,46 @@ object Rdflib extends RDF {
 		private val init = nodeMod.default
 
 		val `*`: RDF.NodeAny[R] = null
+
+		given basicStoreFactory: StoreFactory[R] with
+			override def makeStore(): RDF.Store[R] = ???
+
+		given Store: operations.Store[R] with
+			import scala.jdk.CollectionConverters.given
+			//todo: need to integrate locking functionality
+			extension (store: RDF.Store[R])
+				override
+				def add(qs: RDF.Quad[R]*): store.type =
+					store.addAll(qs.toJSArray)
+					store
+
+				override
+				def remove(qs: RDF.Quad[R]*): store.type =
+					store.remove(qs.toJSArray)
+					store
+
+				override
+				def find(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): Iterator[RDF.Quad[R]] =
+				//todo: note, we loose the try exception failure here
+					val res: scala.collection.mutable.Seq[RDF.Quad[R]] = store.statementsMatching(s,p,o,g,false)
+					res.iterator
+
+				override
+				def remove(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): store.type = store.remove(store.statementsMatching(s,p,o,g,false)).nn
+
+		end Store
+
+
 		given Graph: operations.Graph[R] with
 			def empty: RDF.Graph[R] = storeMod(opts())
 			def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =

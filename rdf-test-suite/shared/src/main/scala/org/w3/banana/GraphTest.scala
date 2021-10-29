@@ -2,7 +2,6 @@ package org.w3.banana
 
 import org.w3.banana.RDF.*
 import TestConstants.*
-import org.w3.banana.prefix.XSD
 
 open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 	//todo: find a way to simplify these imports for end users of the library
@@ -49,8 +48,6 @@ open class GraphTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 		assertEquals(gbig.size,4)
 		assert(gbig ≅ g2.union(glit))
 	}
-
-
 end GraphTest
 
 open class GraphSearchTest[Rdf<:RDF](using ops: Ops[Rdf]) extends munit.FunSuite:

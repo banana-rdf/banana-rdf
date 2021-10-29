@@ -38,6 +38,7 @@ trait Quad[Rdf<:RDF](ops: org.w3.banana.Ops[Rdf]):
 		def rel: St.Relation[Rdf] = relationOf(quad)
 		def obj: St.Object[Rdf] = objectOf(quad)
 		def graph: St.Graph[Rdf] = graphOf(quad)
+		def at(g: St.Graph[Rdf]) = apply(quad.subj,quad.rel,quad.obj, g)
 
 	extension (graphNode: St.Graph[Rdf])
 		def isDefault: Boolean = graphNode == defaultGraph

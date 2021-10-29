@@ -3,6 +3,9 @@ package org.w3.banana.jena
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_Literal, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
+import org.apache.jena.query.DatasetFactory
+import org.apache.jena.sparql.core.DatasetGraphFactory
+import org.apache.jena.tdb.{TDB, TDBFactory}
 import org.w3.banana.{Ops, RDF}
 import org.w3.banana.operations
 
@@ -11,10 +14,11 @@ import scala.util.Try
 import scala.util.Using
 import scala.util.Using.Releasable
 import org.apache.jena.util.iterator.ExtendedIterator
+import org.w3.banana.operations.{Quad, StoreFactory}
 
 import scala.annotation.targetName
 
-object JenaRdf extends RDF {
+object JenaRdf extends org.w3.banana.RDF {
 	import org.apache.jena.graph as jena
 	import org.apache.jena.graph.{NodeFactory, Factory}
 
@@ -35,7 +39,7 @@ object JenaRdf extends RDF {
 	override opaque type DefaultGraphNode = org.apache.jena.sparql.core.Quad.defaultGraphIRI.type
 
 	override type NodeAny = Null
-
+	override opaque type Store <: Matchable = org.apache.jena.sparql.core.DatasetGraph // a mutable dataset
 	override opaque type Quad <: Matchable = org.apache.jena.sparql.core.Quad
 
 	given [T]: Releasable[ExtendedIterator[T]] with {
@@ -43,6 +47,7 @@ object JenaRdf extends RDF {
 	}
 
 	import RDF.Statement as St
+
 	/**
 	 * Here we build up the methods functions allowing RDF.Graph[R] notation to be used.
 	 *
@@ -53,6 +58,43 @@ object JenaRdf extends RDF {
 	given ops: Ops[R] with {
 
 		val `*`: RDF.NodeAny[R] = null
+
+		given basicStoreFactory: StoreFactory[R] with
+			override def makeStore(): RDF.Store[R] = DatasetGraphFactory.createGeneral().nn
+
+		given Store: operations.Store[R] with
+			import scala.jdk.CollectionConverters.given
+			//todo: need to integrate locking functionality
+			extension (store: RDF.Store[R])
+				override
+				def add(qs: RDF.Quad[R]*): store.type =
+					for q <- qs do store.add(q)
+					store
+
+				override
+				def remove(qs: RDF.Quad[R]*): store.type =
+					for q <- qs do store.delete(q)
+					store
+
+				override
+				def find(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): Iterator[RDF.Quad[R]] = store.find(s,p,o,g).nn.asScala
+
+				override
+				def remove(
+					s: St.Subject[R] | RDF.NodeAny[R],
+					p: St.Relation[R] | RDF.NodeAny[R],
+					o: St.Object[R] | RDF.NodeAny[R],
+					g: St.Graph[R] | RDF.NodeAny[R]
+				): store.type =
+					for q <- store.find(s,p,o,g).nn.asScala do remove(q)
+					store
+		end Store
+
 		given Graph: operations.Graph[R] with
 			import RDF.Statement as St
 			def empty: RDF.Graph[R] = Factory.empty().nn
@@ -91,6 +133,15 @@ object JenaRdf extends RDF {
 				graph.find(s, p, o).nn.asScala
 		end Graph
 
+
+//		def tdbGraphStore(dir: String) = new operations.StoreFactory[R]:
+//			override def makeStore(q: operations.Quad*): RDF.Store[R] =
+//				val dataset = TDBFactory.createDataset(dir)
+//				dataset.getContext().set(TDB.symUnionDefaultGraph, false)
+//				dataset
+
+
+		
 		val rGraph = new operations.rGraph[R]:
 			def empty: RDF.rGraph[R] = Graph.empty
 			def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =

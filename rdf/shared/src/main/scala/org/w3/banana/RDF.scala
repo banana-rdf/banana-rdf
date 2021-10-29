@@ -1,5 +1,7 @@
 package org.w3.banana
 
+import org.w3.banana.RDF.NodeAny
+
 import scala.annotation.targetName
 import scala.reflect.TypeTest
 import scala.util.Try
@@ -33,38 +35,20 @@ trait RDF:
 	type DefaultGraphNode
 
 	type MGraph   // a mutable graph
-	type MDataSet // a mutable dataset
+	type DataSet
+
+	// Stores are complicated enough  that it is not clear that they
+	// need to be represented here. They tend to be very heavy objects,
+	// so that wrapping them in another object is quasi free.
+	type Store // a mutable dataset
 
 	// types for the graph traversal API
 	type NodeAny
-
-//		def ANY: NodeAny
-//		implicit def toConcreteNodeMatch(node: Rdf#Node): Rdf#NodeMatch
-//		def foldNodeMatch[T](nodeMatch: Rdf#NodeMatch)(funANY: => T, funNode: Rdf#Node => T): T
-//		def find(graph: Rdf#Graph, subject: Rdf#NodeMatch, predicate: Rdf#NodeMatch, objectt: Rdf#NodeMatch): Iterator[Rdf#Triple]
-
 
 	given ops: Ops[R]
 
 end RDF
 
-
-// remain to be done:
-//  // mutable graphs
-//  type MGraph <: AnyRef
-//
-//  // types for the graph traversal API
-//  type NodeMatch
-//  type NodeAny <: NodeMatch
-//
-//  // types related to Sparql
-//  type Query
-//  type SelectQuery <: Query
-//  type ConstructQuery <: Query
-//  type AskQuery <: Query
-//  type UpdateQuery
-//  type Solution
-//  type Solutions
 
 /**
  * The idea of using match types by @neko-kai
@@ -105,6 +89,9 @@ object RDF:
 	type Graph[R <: RDF] = R match
 		case GetGraph[g] => g
 
+	type Store[R <: RDF] = R match
+		case GetStore[s] => s
+
 	type Literal[R <: RDF] <: Matchable = R match
 		case GetLiteral[l] => l
 
@@ -113,7 +100,6 @@ object RDF:
 
 	type NodeAny[R <: RDF] = R match
 		case GetNodeAny[m] => m
-
 
 	private type GetRelURI[U] = RDF { type rURI = U }
 	private type GetURI[U] = RDF { type URI = U }
@@ -127,6 +113,7 @@ object RDF:
 	private type GetQuad[T <: Matchable] = RDF { type Quad = T }
 	private type GetRelGraph[G] = RDF { type rGraph = G }
 	private type GetGraph[G] = RDF { type Graph = G }
+	private type GetStore[S] = RDF { type Store = S }
 	private type GetNodeAny[M] = RDF { type NodeAny = M }
 
 	/**
