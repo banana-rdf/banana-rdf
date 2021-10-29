@@ -3,10 +3,10 @@ banana-rdf
 
 [![Build Status](https://secure.travis-ci.org/w3c/banana-rdf.png)](http://travis-ci.org/w3c/banana-rdf) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w3c/banana-rdf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-The current published version 0.8.5 for scala 2.13.5 is to be found on Maven Central under groupId [net/bblfish/rdf/](https://repo1.maven.org/maven2/net/bblfish/rdf/banana_2.13/0.8.5/).
+The current published version 0.8.6, compiled with scala 2.13.6, is to be found on Maven Central under groupId [net/bblfish/rdf/](https://repo1.maven.org/maven2/net/bblfish/rdf/).
 
 ```scala
-val banana = (name: String) => "net.bblfish.rdf" %% name % "0.8.5" excludeAll (ExclusionRule(organization = "org.scala-stm"))
+val banana = (name: String) => "net.bblfish.rdf" %% name % "0.8.6" excludeAll (ExclusionRule(organization = "org.scala-stm"))
 
 //choose the packages you need for your dependencies
 val bananaDeps = Seq("banana", "banana-rdf", "banana-rdf4j").map(banana)
