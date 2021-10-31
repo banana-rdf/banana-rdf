@@ -91,7 +91,6 @@ object Rdf4j extends RDF:
 					Using(store.getConnection().nn) { (conn: RepositoryConnection) =>
 						val qit : Iterable[RDF.Quad[R]]  = qs.nn
 						val jqit: lang.Iterable[RDF.Quad[R]] = qit.asJava
-						println(s"in add($qs)")
 						conn.add(jqit, emptyQuadArray*)
 					}
 					//todo: we loose the try exception failure here
@@ -228,7 +227,7 @@ object Rdf4j extends RDF:
 		lazy val Quad = new operations.Quad[R](this):
 			def defaultGraph: RDF.DefaultGraphNode[R] = defaultGraphNode
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
-				valueFactory.createStatement(s, p, o).nn
+				valueFactory.createStatement(s, p, o, defaultGraphNode).nn
 			def apply(
 				s: St.Subject[R], p: St.Relation[R],
 				o: St.Object[R], where: St.Graph[R]
