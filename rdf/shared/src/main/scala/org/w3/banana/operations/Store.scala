@@ -34,6 +34,14 @@ trait Store[Rdf<:RDF]:
 			s: St.Subject[Rdf] | RDF.NodeAny[Rdf],
 			p: St.Relation[Rdf] | RDF.NodeAny[Rdf],
 			o: St.Object[Rdf] | RDF.NodeAny[Rdf],
+		): Iterator[RDF.Quad[Rdf]] = find(s,p,o,default)
+
+		def find(
+			s: St.Subject[Rdf] | RDF.NodeAny[Rdf],
+			p: St.Relation[Rdf] | RDF.NodeAny[Rdf],
+			o: St.Object[Rdf] | RDF.NodeAny[Rdf],
 			g: St.Graph[Rdf] | RDF.NodeAny[Rdf]
 		): Iterator[RDF.Quad[Rdf]]
+
+		def default: St.Graph[Rdf]
 end Store

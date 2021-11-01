@@ -161,12 +161,12 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
 	}
 
 	test("quad tests") {
+		val store: org.w3.banana.RDF.Store[R] = Store()
 		val tkb = Quad(timbl, foaf.knows, bblf)
 		assertEquals(tkb.subj, timbl)
 		assertEquals(tkb.rel, foaf.knows)
 		assertEquals(tkb.obj, bblf)
-		assertEquals(tkb.graph, Quad.defaultGraph)
-		assertEquals(tkb.graph.isDefault, true)
+		assertEquals(tkb.graph, store.default)
 		assertEquals(tkb.triple, Triple(timbl, foaf.knows, bblf))
 
 		val tcard = URI(tim(""))
@@ -177,6 +177,11 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
 		assertNotEquals(timSaysTkB,fishSaysTkB,
 			"The same triple stated by two different docs are not the same statements"
 		)
+
+		store.add(tkb, timSaysTkB, fishSaysTkB)
+		val answers = store.find(`*`,`*`,`*`).toList
+		assertEquals(answers, List(tkb))
 	}
+
 
 end TripleTest

@@ -19,7 +19,6 @@ import org.w3.banana.RDF.Statement as St
  **/
 trait Quad[Rdf<:RDF](ops: org.w3.banana.Ops[Rdf]):
 	type QuadI = (St.Subject[Rdf], St.Relation[Rdf], St.Object[Rdf], St.Graph[Rdf])
-	def defaultGraph: RDF.DefaultGraphNode[Rdf]
 	def apply(s: St.Subject[Rdf], p: St.Relation[Rdf], o: St.Object[Rdf]): RDF.Quad[Rdf]
 	def apply(
 		s: St.Subject[Rdf], p: St.Relation[Rdf],
@@ -40,6 +39,4 @@ trait Quad[Rdf<:RDF](ops: org.w3.banana.Ops[Rdf]):
 		def graph: St.Graph[Rdf] = graphOf(quad)
 		def at(g: St.Graph[Rdf]) = apply(quad.subj,quad.rel,quad.obj, g)
 
-	extension (graphNode: St.Graph[Rdf])
-		def isDefault: Boolean = graphNode == defaultGraph
 end Quad

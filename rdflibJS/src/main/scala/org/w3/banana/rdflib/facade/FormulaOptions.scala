@@ -7,7 +7,6 @@ import scala.scalajs.js
 
 object FormulaOpts {
 
-
 	trait FormulaOpts extends StObject {
 		var dataCallback: js.UndefOr[js.Function1[Quad, Unit]] = js.undefined
 		var rdfArrayRemove: js.UndefOr[js.Function2[js.Array[Quad], Quad, Unit]] = js.undefined

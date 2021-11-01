@@ -65,11 +65,15 @@ object Rdflib extends RDF {
 		import scala.collection.mutable
 		import RDF.Statement as St
 		private val init = nodeMod.default
+		val defaulGraph: RDF.DefaultGraphNode[R] = df.defaultGraph
 
 		val `*`: RDF.NodeAny[R] = null
 
 		given basicStoreFactory: StoreFactory[R] with
-			override def makeStore(): RDF.Store[R] = ???
+			override def makeStore(): RDF.Store[R] = 
+				val fopts = org.w3.banana.rdflib.facade.FormulaOpts()
+				fopts.setRdfFactory(model.DataFactory())
+				org.w3.banana.rdflib.facade.storeMod(fopts)
 
 		given Store: operations.Store[R] with
 			import scala.jdk.CollectionConverters.given
@@ -77,7 +81,7 @@ object Rdflib extends RDF {
 			extension (store: RDF.Store[R])
 				override
 				def add(qs: RDF.Quad[R]*): store.type =
-					store.addAll(qs.toJSArray)
+					for q <- qs do store.addStatement(q)
 					store
 
 				override
@@ -104,6 +108,9 @@ object Rdflib extends RDF {
 					g: St.Graph[R] | RDF.NodeAny[R]
 				): store.type = store.remove(store.statementsMatching(s,p,o,g,false)).nn
 
+				override
+				def default: St.Graph[R] = defaulGraph
+	
 		end Store
 
 
@@ -190,7 +197,6 @@ object Rdflib extends RDF {
 		lazy val Quad = new operations.Quad[R](this):
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
 				df.quad(s,p,o)
-			def defaultGraph: RDF.DefaultGraphNode[R] = df.defaultGraph
 			def apply(
 				s: St.Subject[R], p: St.Relation[R],
 				o: St.Object[R], where: St.Graph[R]

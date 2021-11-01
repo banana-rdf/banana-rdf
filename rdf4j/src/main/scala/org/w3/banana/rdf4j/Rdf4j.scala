@@ -136,6 +136,9 @@ object Rdf4j extends RDF:
 						conn.remove(it)
 					}
 					store
+
+				override
+				def default: St.Graph[R] = defaultGraphNode
 		end Store
 
 

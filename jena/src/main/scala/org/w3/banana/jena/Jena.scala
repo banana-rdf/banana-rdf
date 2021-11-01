@@ -58,6 +58,7 @@ object JenaRdf extends org.w3.banana.RDF {
 	given ops: Ops[R] with {
 
 		val `*`: RDF.NodeAny[R] = null
+		private val defaultGraph: RDF.URI[R] = org.apache.jena.sparql.core.Quad.defaultGraphIRI.asInstanceOf[URI]
 
 		given basicStoreFactory: StoreFactory[R] with
 			override def makeStore(): RDF.Store[R] = DatasetGraphFactory.createGeneral().nn
@@ -82,7 +83,7 @@ object JenaRdf extends org.w3.banana.RDF {
 					p: St.Relation[R] | RDF.NodeAny[R],
 					o: St.Object[R] | RDF.NodeAny[R],
 					g: St.Graph[R] | RDF.NodeAny[R]
-				): Iterator[RDF.Quad[R]] = store.find(s,p,o,g).nn.asScala
+				): Iterator[RDF.Quad[R]] = store.find(g, s, p, o).nn.asScala
 
 				override
 				def remove(
@@ -93,6 +94,9 @@ object JenaRdf extends org.w3.banana.RDF {
 				): store.type =
 					for q <- store.find(s,p,o,g).nn.asScala do remove(q)
 					store
+
+				override
+				def default: St.Graph[R] = defaultGraph
 		end Store
 
 		given Graph: operations.Graph[R] with
