@@ -25,7 +25,7 @@ object StoreReplacementMethods:
 			import quad.*
 			for act <- actions do
 				act(thisFrmla,subj,rel,obj,graph)
-			//note: the implementation there says it is ineficient but there is none using indexes provider
+			//note: the implementation there says it is inefficient but there is none using indexes provider
 			if thisFrmla.statementsMatching(subj,rel,obj,graph,true).length > 0 then null
 			else
 				val hash: js.Array[String] = js.Array(
@@ -36,13 +36,21 @@ object StoreReplacementMethods:
 //					println(s"adding quad $h to index $ix)")
 					val quads: js.Array[Quad] = ix.getOrElseUpdate(h,js.Array[Quad]())
 					quads.push(quad)
-					ix.put(h,quads)
 				}
 				//would be faster with a hash map!!
 				thisFrmla.statements.push(quad)
 				for cb <- thisFrmla.dataCallbacks.getOrElse(js.Array()) do cb(quad)
 				quad
 
+	val removeStatement: js.ThisFunction1[IndexedFormula, Quad, IndexedFormula] =
+		(thisFrmla: IndexedFormula,
+			quad: Quad) =>
+			import quad.*
+			js.Array[Term[?]](subj, rel, obj, graph).zip(thisFrmla.index).foreach{ case (t, ix) =>
+				ix.get(thisFrmla.id(t)).map(_.subtractOne(quad))
+			}
+			thisFrmla.statements.subtractOne(quad)
+			thisFrmla
 
 	val add : js.ThisFunction4[IndexedFormula,
 		Quad.Subject | Quad | js.Array[Quad],
@@ -135,6 +143,7 @@ object storeMod {
 		ixf.asInstanceOf[js.Dynamic].updateDynamic("canon")(replace.canon)
 		ixf.asInstanceOf[js.Dynamic].updateDynamic("match")(replace.matchFnct)
 		ixf.asInstanceOf[js.Dynamic].updateDynamic("statementsMatching")(replace.statementsMatching)
+		ixf.asInstanceOf[js.Dynamic].updateDynamic("removeStatement")(replace.removeStatement)
 		ixf
 
 //		def add(
@@ -328,7 +337,7 @@ object storeMod {
 		 */
 		//		def formula(features: FeaturesType): IndexedFormula = js.native
 		//An index maps a string representation of a node to the sets of quads that contain that in that position
-		// an Array of Inexed exactly 4 long
+		// an Array of Indexes exactly 4 long
 		var index: js.Array[Index] = js.native
 
 		/**

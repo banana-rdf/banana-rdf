@@ -41,7 +41,7 @@ trait Ops[Rdf <: RDF]:
 	val Subject: operations.Subject[Rdf]
 
 //	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
-	lazy val Quad: operations.Quad[Rdf]
+	val Quad: operations.Quad[Rdf]
 	given operations.Quad[Rdf] = Quad
 
 //	extension (obj: Statement.Object[Rdf])

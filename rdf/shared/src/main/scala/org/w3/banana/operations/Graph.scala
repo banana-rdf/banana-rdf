@@ -39,7 +39,7 @@ trait Graph[Rdf<:RDF](using ops: Ops[Rdf]):
 		infix def union(graphs: RDF.Graph[Rdf]*): RDF.Graph[Rdf] = gunion(graph +: graphs )
 		def +(triple: RDF.Triple[Rdf]): RDF.Graph[Rdf] = gunion(Seq(graph, apply(triple)))
 		def contains(t: RDF.Triple[Rdf]): Boolean = find(t.subj,t.rel,t.obj).nonEmpty
-		def find(subj: St.Subject[Rdf]|NodeAny[Rdf],
-			rel: St.Relation[Rdf]|RDF.NodeAny[Rdf],
-			obj: St.Object[Rdf]|RDF.NodeAny[Rdf]
+		def find(subj: St.Subject[Rdf] | RDF.NodeAny[Rdf],
+			rel: St.Relation[Rdf] | RDF.NodeAny[Rdf],
+			obj: St.Object[Rdf] | RDF.NodeAny[Rdf]
 		): Iterator[RDF.Triple[Rdf]] = findTriples(graph,subj,rel,obj)

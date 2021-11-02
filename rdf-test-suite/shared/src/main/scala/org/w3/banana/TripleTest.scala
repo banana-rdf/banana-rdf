@@ -162,25 +162,67 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
 
 	test("quad tests") {
 		val store: org.w3.banana.RDF.Store[R] = Store()
-		val tkb = Quad(timbl, foaf.knows, bblf)
-		assertEquals(tkb.subj, timbl)
-		assertEquals(tkb.rel, foaf.knows)
-		assertEquals(tkb.obj, bblf)
-		assertEquals(tkb.graph, store.default)
-		assertEquals(tkb.triple, Triple(timbl, foaf.knows, bblf))
+		val tkb4 = Quad(timbl, foaf.knows, bblf)
+		assertEquals(tkb4.subj, timbl)
+		assertEquals(tkb4.rel, foaf.knows)
+		assertEquals(tkb4.obj, bblf)
+		assertEquals(tkb4.graph, store.default)
+		assertEquals(tkb4.triple, Triple(timbl, foaf.knows, bblf))
 
 		val tcard = URI(tim(""))
 		val bcard = URI(bbl(""))
-		val timSaysTkB = Quad(timbl, foaf.knows, bblf, tcard)
+		val timSaysTkB4 = Quad(timbl, foaf.knows, bblf, tcard)
 		//bbl says tkb
-		val fishSaysTkB = Quad(timbl, foaf.knows, bblf, bcard)
-		assertNotEquals(timSaysTkB,fishSaysTkB,
+		val fishSaysTkB4 = Quad(timbl, foaf.knows, bblf, bcard)
+		assertNotEquals(timSaysTkB4,fishSaysTkB4,
 			"The same triple stated by two different docs are not the same statements"
 		)
 
-		store.add(tkb, timSaysTkB, fishSaysTkB)
-		val answers = store.find(`*`,`*`,`*`).toList
-		assertEquals(answers, List(tkb))
+		store.add(tkb4, timSaysTkB4, fishSaysTkB4)
+	
+		store.add(tkb4, timSaysTkB4, fishSaysTkB4)
+		assertEquals(store.find(`*`,`*`,`*`).toSet,       Set(tkb4))
+		assertEquals(store.find(`*`,`*`,`*`,`*`).toSet,   Set(tkb4,fishSaysTkB4,timSaysTkB4))
+		assertEquals(store.find(`*`,`*`,`*`,tcard).toSet, Set(timSaysTkB4))
+		assertEquals(store.find(`*`,`*`,`*`,bcard).toSet, Set(fishSaysTkB4))
+	
+		//add it all again, we get the same
+		store.add(tkb4, timSaysTkB4, fishSaysTkB4)
+		assertEquals(store.find(`*`,`*`,`*`).toSet,       Set(tkb4))
+		assertEquals(store.find(`*`,`*`,`*`,`*`).toSet,   Set(tkb4,fishSaysTkB4,timSaysTkB4))
+		assertEquals(store.find(`*`,`*`,`*`,`*`).toList.size, 3)
+		assertEquals(store.find(`*`,`*`,`*`,tcard).toSet, Set(timSaysTkB4))
+		assertEquals(store.find(`*`,`*`,`*`,bcard).toSet, Set(fishSaysTkB4))
+
+		//add graphs
+		val timName3 = Triple(timbl, foaf.name, Literal("Tim"))
+		val w3c = URI("https://w3.org/")
+		val timWorkPlace3 = Triple(timbl, foaf.workplaceHomepage, w3c)
+		val timGr = Graph(timWorkPlace3, timName3)
+
+		val bblName3 = Triple(bblf,foaf.name,Literal("Henry"))
+		val cosy = URI("https://co-operating.systems/")
+		val bblWork3 = Triple(bblf, foaf.workplaceHomepage, cosy)
+		val bblGr = Graph(bblName3, bblWork3)
+
+		//test triple to quad
+		val timName4 = timName3.at(tcard)
+		assertEquals(timName4, Quad(timName3.subj,timName3.rel, timName3.obj, tcard))
+		val timWorkPlace4 = timWorkPlace3.at(tcard)
+		assertEquals(timWorkPlace4, Quad(timbl, foaf.workplaceHomepage, w3c, tcard))
+		val bblWork4 = bblWork3.at(tcard)
+		assertEquals(bblWork4, Quad(bblWork3.subj, bblWork3.rel, bblWork3.obj, tcard))
+
+		//test adding graphs to store
+		store.add(timGr,tcard)
+		assertEquals(store.find(`*`,`*`,`*`,tcard).toSet,  Set(timWorkPlace4, timName4, timSaysTkB4))
+		assertEquals(store.find(`*`,`*`,`*`,bcard).toSet,  Set(fishSaysTkB4))
+		assertEquals(store.find(`*`,`*`,`*`).toSet,        Set(tkb4))
+
+		store.set(timGr)
+		assertEquals(store.find(`*`,`*`,`*`).map(_.triple).toSet,   timGr.triples.toSet)
+
+
 	}
 
 

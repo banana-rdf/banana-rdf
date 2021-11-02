@@ -194,7 +194,7 @@ object Rdflib extends RDF {
 			def objectOf(t: RDF.Triple[R]): St.Object[R] = t.obj
 		end Triple
 
-		lazy val Quad = new operations.Quad[R](this):
+		override val Quad = new operations.Quad[R](this):
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
 				df.quad(s,p,o)
 			def apply(

@@ -92,7 +92,7 @@ object JenaRdf extends org.w3.banana.RDF {
 					o: St.Object[R] | RDF.NodeAny[R],
 					g: St.Graph[R] | RDF.NodeAny[R]
 				): store.type =
-					for q <- store.find(s,p,o,g).nn.asScala do remove(q)
+					store.deleteAny(g,s,p,o)
 					store
 
 				override
@@ -198,7 +198,7 @@ object JenaRdf extends org.w3.banana.RDF {
 				t.getObject().asInstanceOf[St.Object[R]].nn
 		}
 
-		lazy val Quad = new operations.Quad[R](this):
+		override val Quad = new operations.Quad[R](this):
 			import org.apache.jena.sparql.core.Quad as JQuad
 			inline def defaultGraph: RDF.DefaultGraphNode[R] = org.apache.jena.sparql.core.Quad.defaultGraphIRI
 			inline def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =

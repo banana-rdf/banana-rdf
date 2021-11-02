@@ -227,7 +227,8 @@ object Rdf4j extends RDF:
 					else uriFnct(subj.asInstanceOf[rjIRI])
 		end Subject
 
-		lazy val Quad = new operations.Quad[R](this):
+		override
+		val Quad = new operations.Quad[R](this):
 			def defaultGraph: RDF.DefaultGraphNode[R] = defaultGraphNode
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
 				valueFactory.createStatement(s, p, o, defaultGraphNode).nn
