@@ -3,6 +3,7 @@ import org.scalajs.linker.interface.ModuleKind.ESModule
 import org.scalajs.linker.interface.OutputPatterns
 import sbt.Keys.description
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+import org.scalajs.jsenv.nodejs.NodeJSEnv
 
 scalaVersion := Ver.scala3
 
@@ -150,6 +151,8 @@ lazy val rdflibJS =  project.in(file("rdflibJS"))
 		scalacOptions ++= scala3jsOptions,
 		Compile / npmDependencies += "rdflib" -> "2.2.8",
 		Test / npmDependencies += "rdflib" -> "2.2.8",
+		// https://github.com/scala-js/scala-js-js-envs/issues/12
+		jsEnv := new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--dns-result-order=ipv4first"))),
 		resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 		libraryDependencies ++= Seq(
 			"net.bblfish.rdf" %%% "rdf-model-js" % "0.1-SNAPSHOT",
