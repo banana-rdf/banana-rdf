@@ -72,7 +72,7 @@ object StoreReplacementMethods:
 					thisArg.addStatement(q)
 					thisArg
 				case subj : Quad.Subject if arg2.isDefined && arg3.isDefined =>
-					val q = thisArg.rdfFactory.quad(subj,arg2.get,arg3.get,arg4.getOrElse(thisArg.rdfFactory.defaultGraph))
+					val q = thisArg.rdfFactory.quad(subj,arg2.get,arg3.get,arg4.getOrElse(thisArg.rdfFactory.defaultGraph()))
 					thisArg.addStatement(q)
 				case _ => throw new IllegalArgumentException(s"IndexedFormula.add($arg1,$arg2,$arg3,$arg4) has wrong arguments")
 

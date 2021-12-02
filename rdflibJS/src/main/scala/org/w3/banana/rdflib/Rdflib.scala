@@ -36,6 +36,9 @@ object Rdflib extends RDF {
 
 	override type NodeAny = Null
 
+	override type MGraph = storeMod.IndexedFormula   // a mutable graph
+
+
 
 	//	given uriTT: TypeTest[Node,URI] with {
 //		override def unapply(s: Node): Option[s.type & URI] =
@@ -65,7 +68,7 @@ object Rdflib extends RDF {
 		import scala.collection.mutable
 		import RDF.Statement as St
 		private val init = nodeMod.default
-		val defaulGraph: RDF.DefaultGraphNode[R] = df.defaultGraph
+		val defaulGraph: RDF.DefaultGraphNode[R] = df.defaultGraph()
 
 		val `*`: RDF.NodeAny[R] = null
 
@@ -155,7 +158,7 @@ object Rdflib extends RDF {
 			def findTriples(graph: RDF.Graph[R],
 				s: St.Subject[R]|RDF.NodeAny[R], p: St.Relation[R]|RDF.NodeAny[R], o: St.Object[R]|RDF.NodeAny[R]
 			): Iterator[RDF.Triple[R]] =
-				val sm: mutable.Seq[RDF.Triple[R]] = graph.statementsMatching(s,p,o,df.defaultGraph,false)
+				val sm: mutable.Seq[RDF.Triple[R]] = graph.statementsMatching(s,p,o,df.defaultGraph(),false)
 				sm.iterator
 		end Graph
 
@@ -188,7 +191,8 @@ object Rdflib extends RDF {
 			import RDF.Statement as St
 			//todo: check whether it really is not legal in rdflib to have a literal as subject
 			// warning throws an exception
-			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] = df.quad(s,p,o)
+			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
+				df.quad(s,p,o,df.defaultGraph())
 			def subjectOf(t: RDF.Triple[R]): St.Subject[R] = t.subj
 			def relationOf(t: RDF.Triple[R]): St.Relation[R] = t.rel
 			def objectOf(t: RDF.Triple[R]): St.Object[R] = t.obj
@@ -196,7 +200,7 @@ object Rdflib extends RDF {
 
 		override val Quad = new operations.Quad[R](this):
 			def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Quad[R] =
-				df.quad(s,p,o)
+				df.quad(s,p,o,df.defaultGraph())
 			def apply(
 				s: St.Subject[R], p: St.Relation[R],
 				o: St.Object[R], where: St.Graph[R]
@@ -240,7 +244,7 @@ object Rdflib extends RDF {
 
 		given BNode: operations.BNode[R] with
 			def apply(s: String): RDF.BNode[R] = df.blankNode(s)
-			def apply(): RDF.BNode[R] = df.blankNode()
+			def apply(): RDF.BNode[R] = df.blankNode(js.undefined)
 			extension (bn: RDF.BNode[R])
 				def label: String = bn.value
 		end BNode
@@ -251,7 +255,7 @@ object Rdflib extends RDF {
 			private val xsdLangString = df.namedNode(xsdLangStr).nn
 			import LiteralI as Lit
 
-			def apply(plain: String): RDF.Literal[R] = df.literal(plain)
+			def apply(plain: String): RDF.Literal[R] = df.literal(plain, js.undefined)
 			def apply(lit: Lit): RDF.Literal[R] = lit match
 				case Lit.Plain(text) => apply(text)
 				case Lit.`@`(text, lang) => df.literal(text,lang)

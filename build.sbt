@@ -4,12 +4,10 @@ import org.scalajs.linker.interface.OutputPatterns
 import sbt.Keys.description
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 import org.scalajs.jsenv.nodejs.NodeJSEnv
+import sbt.ThisBuild
 
 scalaVersion := Ver.scala3
 
-ThisBuild / homepage      := Some(url("https://github.com/banana-rdf/banana-rdf"))
-ThisBuild / licenses      += ("MIT", url("https://opensource.org/licenses/mit-license.php"))
-ThisBuild / organization  := "org.scala-js"
 ThisBuild / shellPrompt   := ((s: State) => Project.extract(s).currentRef.project + "> ")
 ThisBuild / versionScheme := Some("early-semver")
 
@@ -62,11 +60,13 @@ val scala3jsOptions =  Seq(
 
 
 lazy val commonSettings = Seq(
-	name := "banana-rdf",
+	organization  := "net.bblfish.rdf",
 	version := "0.9-SNAPSHOT",
 	description := "RDF framework for Scala",
 	startYear := Some(2012),
 	scalaVersion := Ver.scala3,
+	homepage      := Some(url("https://github.com/banana-rdf/banana-rdf")),
+	licenses      += ("MIT", url("https://opensource.org/licenses/mit-license.php")),
 	updateOptions := updateOptions.value.withCachedResolution(true) //to speed up dependency resolution
 )
 
@@ -155,7 +155,7 @@ lazy val rdflibJS =  project.in(file("rdflibJS"))
 		jsEnv := new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--dns-result-order=ipv4first"))),
 		resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 		libraryDependencies ++= Seq(
-			"net.bblfish.rdf" %%% "rdf-model-js" % "0.1-SNAPSHOT",
+			"net.bblfish.rdf" %%% "rdf-model-js" % "0.1a-SNAPSHOT",
 		 	TestLibs.scalatest.value % Test,
 //			TestLibs.utest.value % Test,
 			TestLibs.munit.value % Test
