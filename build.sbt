@@ -31,7 +31,7 @@ enablePlugins(TypelevelSonatypePlugin)
 ThisBuild / tlCiReleaseBranches := Seq("scala3")
 ThisBuild / tlCiReleaseTags     := false // don't publish artifacts on github
 
-ThisBuild / crossScalaVersions := Seq("3.1.1", "2.13.8")
+ThisBuild / crossScalaVersions := Seq("3.1.1") //, "2.13.8")
 //scalaVersion := Ver.scala3
 
 ThisBuild / shellPrompt := ((s: State) => Project.extract(s).currentRef.project + "> ")
@@ -256,7 +256,7 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
 lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
 lazy val rdfTestSuiteJS  = rdfTestSuite.js
 
-val scala3jvmOptions = Seq(
+lazy val scala3jvmOptions = Seq(
   // "-classpath", "foo:bar:...",         // Add to the classpath.
   // "-encoding", "utf-8",                // Specify character encoding used by source files.
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
@@ -280,7 +280,7 @@ val scala3jvmOptions = Seq(
   "-Yexplicit-nulls" // For explicit nulls behavior.
 )
 
-val scala3jsOptions = Seq(
+lazy val scala3jsOptions = Seq(
   "-indent", // Together with -rewrite, remove {...} syntax when possible due to significant indentation.
   "-new-syntax", // Require `then` and `do` in control expressions.
   "-source:future", // Choices: future and future-migration. I use this to force future deprecation warnings, etc.
