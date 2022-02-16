@@ -23,6 +23,7 @@ ThisBuild / developers := List(
   tlGitHubDev("bblfish", "Henry Story"),
   tlGitHubDev("betehess", "Alexandre Bertails")
 )
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 
 enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)
