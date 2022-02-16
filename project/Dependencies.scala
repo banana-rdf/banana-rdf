@@ -19,6 +19,10 @@ object Dependencies {
     */
   val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.2.0"
 
+  object fish {
+    val rdf_model_js = Def.setting("net.bblfish.rdf" %%% "rdf-model-js" % "0.2-b9b9656-SNAPSHOT")
+  }
+
   object TestLibs {
     /* @see munit docs https://scalameta.org/munit/ */
     val munit = Def.setting("org.scalameta" %%% "munit" % "1.0.0-M1")

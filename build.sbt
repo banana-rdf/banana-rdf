@@ -1,4 +1,4 @@
-import Dependencies.{TestLibs, Ver, jenaLibs, typelevel}
+import Dependencies.{TestLibs, Ver, fish, jenaLibs, typelevel}
 import JSEnv.{Chrome, Firefox, NodeJS}
 import org.scalajs.linker.interface.ModuleKind.ESModule
 import org.scalajs.linker.interface.OutputPatterns
@@ -194,7 +194,7 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
     Test / npmDependencies += "rdflib"    -> "2.2.8",
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     libraryDependencies ++= Seq(
-      "net.bblfish.rdf"      %%% "rdf-model-js" % "0.1a-SNAPSHOT",
+      fish.rdf_model_js.value,
       TestLibs.scalatest.value % Test,
 //			TestLibs.utest.value % Test,
       TestLibs.munit.value % Test
