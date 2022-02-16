@@ -39,11 +39,20 @@ ThisBuild / homepage := Some(url("https://github.com/bblfish/banana-rdf"))
 ThisBuild / scmInfo := Some(
   ScmInfo(url("https://github.com/bblfish/banana-rdf"), "git@github.com:bblfish/banana-rdf.git")
 )
-val w3cLicence = Some(HeaderLicense.Custom(
-  """SPDX-License-Identifier: W3C-20150513""".stripMargin
+def w3cLicence(yearStart: Int, yearEnd: Option[Int] = None) = Some(HeaderLicense.Custom(
+  s""" Copyright (c) $yearStart ${yearEnd.map(", " + _).getOrElse("")} W3C Members
+     |
+     | See the NOTICE file(s) distributed with this work for additional
+     | information regarding copyright ownership.
+     |
+     | This program and the accompanying materials are made available under
+     | the W3C Software Notice and Document License (2015-05-13) which is available at
+     | https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document.
+     |
+     | SPDX-License-Identifier: W3C-20150513""".stripMargin
 ))
 
-ThisBuild / headerLicense := w3cLicence
+ThisBuild / headerLicense := w3cLicence(2021)
 
 tlReplaceCommandAlias("ciJS", List(CI.NodeJS.toString, CI.Chrome, CI.Firefox).mkString)
 addCommandAlias("ciNode", CI.NodeJS.toString)
@@ -84,7 +93,7 @@ lazy val commonSettings = Seq(
   organization  := "net.bblfish.rdf",
   version       := "0.9-SNAPSHOT",
   description   := "RDF framework for Scala",
-  headerLicense := w3cLicence,
+  headerLicense := w3cLicence(2012, Some(2021)),
   startYear     := Some(2012),
   scalaVersion  := Ver.scala3,
   homepage      := Some(url("https://github.com/banana-rdf/banana-rdf")),
@@ -102,7 +111,7 @@ lazy val rdf = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(typelevel.catsCore.value)
   )
   .jvmSettings(
-    scalacOptions ++= scala3jvmOptions
+    scalacOptions := scala3jvmOptions
   )
   .jsSettings(
     scalacOptions ++= scala3jsOptions
@@ -115,12 +124,12 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .settings(commonSettings*)
   .settings(
-    headerLicense := Some(HeaderLicense.MIT("2016", "W3C"))
+    headerLicense := w3cLicence(2016)
   )
   .in(file("ntriples"))
   .dependsOn(rdf)
   .jvmSettings(
-    scalacOptions ++= scala3jvmOptions
+    scalacOptions := scala3jvmOptions
     //	scalacOptions += "-rewrite"
   )
   .jsSettings(
@@ -134,8 +143,8 @@ lazy val ntriplesJS  = ntriples.js
 lazy val jena = project.in(file("jena"))
   .settings(commonSettings*)
   .settings(
-    name := "banana-jena",
-    scalacOptions ++= scala3jvmOptions,
+    name                               := "banana-jena",
+    scalacOptions                      := scala3jvmOptions,
     Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
     libraryDependencies ++= Seq(jenaLibs) // , slf4jNop, aalto )
   )
@@ -145,22 +154,22 @@ lazy val jena = project.in(file("jena"))
     ntriplesJVM
   ) // , ntriplesJVM, rdfTestSuiteJVM % "test->compile")
 
-import Dependencies.{RDF4J as rj}
+import Dependencies.RDF4J
 lazy val rdf4j = project.in(file("rdf4j"))
   .settings(commonSettings*)
   .settings(
-    name := "banana-rdf4j",
-    scalacOptions ++= scala3jvmOptions,
+    name          := "banana-rdf4j",
+    scalacOptions := scala3jvmOptions,
     libraryDependencies ++= Seq(
-      rj.QueryAlgebra,
-      rj.QueryParser,
-      rj.QueryResult,
-      rj.RioTurtle,
-      rj.RioRdfxml,
-      rj.RioJsonLd,
-      rj.SailMemory,
-      rj.SailNativeRdf,
-      rj.RepositorySail,
+      RDF4J.QueryAlgebra,
+      RDF4J.QueryParser,
+      RDF4J.QueryResult,
+      RDF4J.RioTurtle,
+      RDF4J.RioRdfxml,
+      RDF4J.RioJsonLd,
+      RDF4J.SailMemory,
+      RDF4J.SailNativeRdf,
+      RDF4J.RepositorySail,
       Dependencies.slf4jNop,
       Dependencies.jsonldJava
     )
@@ -234,7 +243,7 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   )
   .dependsOn(rdf, ntriples)
   .jvmSettings(
-    scalacOptions ++= scala3jvmOptions
+    scalacOptions := scala3jvmOptions
   )
   .jsSettings(
     scalacOptions ++= scala3jsOptions,
@@ -271,25 +280,9 @@ val scala3jvmOptions = Seq(
 )
 
 val scala3jsOptions = Seq(
-  // "-classpath", "foo:bar:...",         // Add to the classpath.
-  // "-encoding", "utf-8",                // Specify character encoding used by source files.
-  "-deprecation", // Emit warning and location for usages of deprecated APIs.
-  "-unchecked",   // Enable additional warnings where generated code depends on assumptions.
-  "-feature", // Emit warning and location for usages of features that should be imported explicitly.
-  // "-explain",                          // Explain errors in more detail.
-  // "-explain-types",                    // Explain type errors in more detail.
   "-indent", // Together with -rewrite, remove {...} syntax when possible due to significant indentation.
-  // "-no-indent",                        // Require classical {...} syntax, indentation is not significant.
   "-new-syntax", // Require `then` and `do` in control expressions.
-  // "-old-syntax",                       // Require `(...)` around conditions.
-  // "-language:Scala2",                  // Compile Scala 2 code, highlight what needs updating
-  // "-language:strictEquality",          // Require +derives Eql+ for using == or != comparisons
-  // "-rewrite",                          // Attempt to fix code automatically. Use with -indent and ...-migration.
-  // "-scalajs",                          // Compile in Scala.js mode (requires scalajs-library.jar on the classpath).
   "-source:future", // Choices: future and future-migration. I use this to force future deprecation warnings, etc.
-  // "-Xfatal-warnings",                  // Fail on warnings, not just errors
-  // "-Xmigration",                       // Warn about constructs whose behavior may have changed since version.
-  // "-Ysafe-init",                       // Warn on field access before initialization
   "-Yexplicit-nulls" // For explicit nulls behavior.
 )
 
