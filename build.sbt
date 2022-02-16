@@ -18,7 +18,7 @@ ThisBuild / tlUntaggedAreSnapshots := true
 
 ThisBuild / organization     := "net.bblfish.rdf"
 ThisBuild / organizationName := "Henry Story"
-ThisBuild / startYear        := Some(2021)
+ThisBuild / startYear        := Some(2012)
 ThisBuild / developers := List(
   tlGitHubDev("bblfish", "Henry Story"),
   tlGitHubDev("betehess", "Alexandre Bertails")
@@ -34,7 +34,7 @@ ThisBuild / tlCiReleaseTags     := false // don't publish artifacts on github
 ThisBuild / crossScalaVersions := Seq("3.1.1") //, "2.13.8")
 //scalaVersion := Ver.scala3
 
-ThisBuild / shellPrompt := ((s: State) => Project.extract(s).currentRef.project + "> ")
+//ThisBuild / shellPrompt := ((s: State) => Project.extract(s).currentRef.project + "> ")
 
 ThisBuild / homepage := Some(url("https://github.com/bblfish/banana-rdf"))
 ThisBuild / scmInfo := Some(
@@ -191,8 +191,6 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
     scalacOptions ++= scala3jsOptions,
     Compile / npmDependencies += "rdflib" -> "2.2.8",
     Test / npmDependencies += "rdflib"    -> "2.2.8",
-    // https://github.com/scala-js/scala-js-js-envs/issues/12
-    jsEnv := new NodeJSEnv(NodeJSEnv.Config().withArgs(List("--dns-result-order=ipv4first"))),
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     libraryDependencies ++= Seq(
       "net.bblfish.rdf"      %%% "rdf-model-js" % "0.1a-SNAPSHOT",
