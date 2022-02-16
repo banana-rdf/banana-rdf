@@ -290,20 +290,19 @@ object Rdf4j extends RDF:
             case Lit.`@`(text, lang) => Literal(text, Lang.label(lang))
             case Lit.`^^`(text, tp)  => Literal(text, tp)
 
-         def unapply(x: Matchable): Option[Lit] =
-           x match
-              case lit: Literal =>
-                val lex: String                      = lit.getLabel.nn
-                val dt: RDF.URI[R]                   = lit.getDatatype.nn
-                val lang: java.util.Optional[String] = lit.getLanguage.nn
-                if (lang.isEmpty) then
-                   // todo: this comparison could be costly, check
-                   if dt == xsdString then Some(Lit.Plain(lex))
-                   else Some(Lit.^^(lex, dt))
-                else if dt == xsdLangString then
-                   Some(Lit.`@`(lex, Lang(lang.get().nn)))
-                else None
-              case _ => None
+         def unapply(x: Matchable): Option[Lit] = x match
+            case lit: Literal =>
+              val lex: String                      = lit.getLabel.nn
+              val dt: RDF.URI[R]                   = lit.getDatatype.nn
+              val lang: java.util.Optional[String] = lit.getLanguage.nn
+              if lang.isEmpty then
+                 // todo: this comparison could be costly, check
+                 if dt == xsdString then Some(Lit.Plain(lex))
+                 else Some(Lit.^^(lex, dt))
+              else if dt == xsdLangString then
+                 Some(Lit.`@`(lex, Lang(lang.get().nn)))
+              else None
+            case _ => None
 
          @targetName("langLit")
          def apply(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
