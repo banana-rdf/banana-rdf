@@ -24,6 +24,7 @@ ThisBuild / developers := List(
   tlGitHubDev("betehess", "Alexandre Bertails")
 )
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
+ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
 
 enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)

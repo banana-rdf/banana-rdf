@@ -3,6 +3,9 @@ import sbt.*
 
 object Dependencies {
 
+  lazy val sonatypeSNAPSHOT: MavenRepository =
+    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
   object Ver {
     val scala3 = "3.1.0"
   }
