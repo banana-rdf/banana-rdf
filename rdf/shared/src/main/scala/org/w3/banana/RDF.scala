@@ -95,7 +95,7 @@ object RDF:
    type rGraph[R <: RDF] = R match
       case GetRelGraph[g] => g
 
-   type Graph[R <: RDF] = R match
+   type Graph[R <: RDF] <: Matchable = R match
       case GetGraph[g] => g
 
    type Store[R <: RDF] = R match
@@ -121,7 +121,7 @@ object RDF:
    private type GetTriple[T <: Matchable]           = RDF { type Triple = T }
    private type GetQuad[T <: Matchable]             = RDF { type Quad = T }
    private type GetRelGraph[G]                      = RDF { type rGraph = G }
-   private type GetGraph[G]                         = RDF { type Graph = G }
+   private type GetGraph[G <: Matchable]            = RDF { type Graph = G }
    private type GetStore[S]                         = RDF { type Store = S }
    private type GetNodeAny[M]                       = RDF { type NodeAny = M }
 
