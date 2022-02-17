@@ -35,7 +35,7 @@ object Rdflib extends RDF:
    override opaque type rURI    = model.NamedNode
 
    override opaque type Store                    = storeMod.IndexedFormula
-   override opaque type Graph                    = storeMod.IndexedFormula
+   override opaque type Graph  <: Matchable      = storeMod.IndexedFormula
    override opaque type Triple <: Matchable      = model.Quad
    override opaque type Quad <: Matchable        = model.Quad
    override opaque type Node <: Matchable        = model.ValueTerm[?]
@@ -257,7 +257,7 @@ object Rdflib extends RDF:
            def label: String = bn.value
       end BNode
 
-      given bnodeTT: TypeTest[Matchable, RDF.BNode[R]] with
+      override given bnodeTT: TypeTest[Matchable, RDF.BNode[R]] with
          def unapply(s: Matchable): Option[s.type & RDF.BNode[R]] =
            s match
               // note: this does not compile if we use URI instead of jena.Node_URI
