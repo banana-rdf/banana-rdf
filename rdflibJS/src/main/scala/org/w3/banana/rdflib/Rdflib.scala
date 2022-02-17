@@ -252,7 +252,7 @@ object Rdflib extends RDF:
 
       given BNode: operations.BNode[R] with
          def apply(s: String): RDF.BNode[R] = df.blankNode(s)
-         def apply(): RDF.BNode[R]          = df.blankNode(js.undefined)
+         def apply(): RDF.BNode[R]          = df.blankNode()
          extension (bn: RDF.BNode[R])
            def label: String = bn.value
       end BNode
@@ -270,7 +270,7 @@ object Rdflib extends RDF:
          private val xsdLangString = df.namedNode(xsdLangStr).nn
          import LiteralI as Lit
 
-         def apply(plain: String): RDF.Literal[R] = df.literal(plain, js.undefined)
+         def apply(plain: String): RDF.Literal[R] = df.literal(plain)
          def apply(lit: Lit): RDF.Literal[R] = lit match
             case Lit.Plain(text)     => apply(text)
             case Lit.`@`(text, lang) => df.literal(text, lang)

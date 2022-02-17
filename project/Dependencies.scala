@@ -29,8 +29,8 @@ object Dependencies {
     // https://github.com/com-lihaoyi/utest
     val utest = Def.setting("com.lihaoyi" %%% "utest" % "0.7.10")
     /* @see scalatest docs https://www.scalatest.org/install */
-    val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.10")
-    val scalatic  = "org.scalactic" %% "scalactic" % "3.2.10"
+    val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.11")
+    val scalatic  = "org.scalactic" %% "scalactic" % "3.2.11"
   }
 
   /** RDF4J
