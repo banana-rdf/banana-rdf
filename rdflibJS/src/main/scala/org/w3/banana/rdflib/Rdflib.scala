@@ -35,7 +35,7 @@ object Rdflib extends RDF:
    override opaque type rURI    = model.NamedNode
 
    override opaque type Store                    = storeMod.IndexedFormula
-   override opaque type Graph  <: Matchable      = storeMod.IndexedFormula
+   override opaque type Graph <: Matchable       = storeMod.IndexedFormula
    override opaque type Triple <: Matchable      = model.Quad
    override opaque type Quad <: Matchable        = model.Quad
    override opaque type Node <: Matchable        = model.ValueTerm[?]
