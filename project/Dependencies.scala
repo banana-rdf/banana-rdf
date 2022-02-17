@@ -20,7 +20,7 @@ object Dependencies {
   val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.2.0"
 
   object fish {
-    val rdf_model_js = Def.setting("net.bblfish.rdf" %%% "rdf-model-js" % "0.2-b9b9656-SNAPSHOT")
+    val rdf_model_js = Def.setting("net.bblfish.rdf" %%% "rdf-model-js" % "0.2-2bb92a5-SNAPSHOT")
   }
 
   object TestLibs {

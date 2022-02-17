@@ -29,7 +29,7 @@ ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
 enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)
 
-ThisBuild / tlCiReleaseBranches := Seq("scala3")
+ThisBuild / tlCiReleaseBranches := Seq() // "scala3" if github were to do the releases
 ThisBuild / tlCiReleaseTags     := false // don't publish artifacts on github
 
 ThisBuild / crossScalaVersions := Seq("3.1.1") //, "2.13.8")
