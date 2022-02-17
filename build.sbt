@@ -56,7 +56,7 @@ def w3cLicence(yearStart: Int, yearEnd: Option[Int] = None) = Some(HeaderLicense
 
 ThisBuild / headerLicense := w3cLicence(2021)
 
-tlReplaceCommandAlias("ciJS", List(CI.NodeJS.toString, CI.Chrome, CI.Firefox).mkString)
+tlReplaceCommandAlias("ciJS", List(CI.NodeJS, CI.Chrome, CI.Firefox).mkString)
 addCommandAlias("ciNode", CI.NodeJS.toString)
 addCommandAlias("ciFirefox", CI.Firefox.toString)
 addCommandAlias("ciChrome", CI.Chrome.toString)
