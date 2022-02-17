@@ -93,7 +93,6 @@ addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/he
 
 lazy val commonSettings = Seq(
   organization  := "net.bblfish.rdf",
-  version       := "0.9-SNAPSHOT",
   description   := "RDF framework for Scala",
   headerLicense := w3cLicence(2012, Some(2021)),
   startYear     := Some(2012),
@@ -126,7 +125,8 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .settings(commonSettings*)
   .settings(
-    headerLicense := w3cLicence(2016)
+    headerLicense := w3cLicence(2016),
+    description   := "Blocking NTriples Parser"
   )
   .in(file("ntriples"))
   .dependsOn(rdf)
@@ -146,6 +146,7 @@ lazy val jena = project.in(file("jena"))
   .settings(commonSettings*)
   .settings(
     name                               := "banana-jena",
+    description                        := "Jena implementation of banana-rdf",
     scalacOptions                      := scala3jvmOptions,
     Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
     libraryDependencies ++= Seq(jenaLibs) // , slf4jNop, aalto )
@@ -161,6 +162,7 @@ lazy val rdf4j = project.in(file("rdf4j"))
   .settings(commonSettings*)
   .settings(
     name          := "banana-rdf4j",
+    description   := "RDF4J implementation of banana-rdf",
     scalacOptions := scala3jvmOptions,
     libraryDependencies ++= Seq(
       RDF4J.QueryAlgebra,
@@ -187,8 +189,9 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
   //	.enablePlugins(ScalablyTypedConverterPlugin)
   .settings(commonSettings*)
   .settings(
-    name    := "rdflibJS",
-    useYarn := true,
+    name        := "rdflibJS",
+    description := "rdflib.js implementation of banana-rdf",
+    useYarn     := true,
     scalacOptions ++= scala3jsOptions,
     Compile / npmDependencies += "rdflib" -> "2.2.8",
     Test / npmDependencies += "rdflib"    -> "2.2.8",
@@ -233,7 +236,8 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   .in(file("rdf-test-suite"))
   .settings(commonSettings*)
   .settings(
-    name := "banana-test",
+    name        := "banana-test",
+    description := "Generic tests to be run on each banana-rdf implementation",
     libraryDependencies ++= Seq(
       TestLibs.scalatest.value,
       TestLibs.munit.value,
