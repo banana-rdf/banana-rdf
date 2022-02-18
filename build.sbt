@@ -183,9 +183,10 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
   //	.enablePlugins(ScalablyTypedConverterPlugin)
   .settings(commonSettings*)
   .settings(
-    name        := "rdflibJS",
-    description := "rdflib.js implementation of banana-rdf",
-    useYarn     := true,
+    tlFatalWarningsInCi := false, // todo: we need to update rdflib
+    name                := "rdflibJS",
+    description         := "rdflib.js implementation of banana-rdf",
+    useYarn             := true,
     scalacOptions ++= scala3jsOptions,
     Compile / npmDependencies += "rdflib" -> "2.2.8",
     Test / npmDependencies += "rdflib"    -> "2.2.8",
