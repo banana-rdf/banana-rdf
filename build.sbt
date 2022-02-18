@@ -84,7 +84,8 @@ lazy val root = tlCrossRootProject.aggregate(
   ntriples,
   jena,
   rdf4j,
-  rdflibJS
+  rdflibJS,
+  rdfTestSuite
 )
 
 lazy val commonSettings = Seq(
