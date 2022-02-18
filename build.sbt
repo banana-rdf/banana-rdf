@@ -49,7 +49,7 @@ def w3cLicence(yearStart: Int, yearEnd: Option[Int] = None) = Some(HeaderLicense
 
 ThisBuild / headerLicense := w3cLicence(2021)
 
-tlReplaceCommandAlias("ciJS", List(CI.NodeJS, CI.Chrome, CI.Firefox).mkString)
+tlReplaceCommandAlias("ciJS", List(CI.Chrome, CI.Firefox, CI.NodeJS).mkString)
 addCommandAlias("ciNode", CI.NodeJS.toString)
 addCommandAlias("ciFirefox", CI.Firefox.toString)
 addCommandAlias("ciChrome", CI.Chrome.toString)
@@ -115,9 +115,6 @@ lazy val rdf = crossProject(JVMPlatform, JSPlatform)
     scalacOptions ++= scala3jsOptions
   )
 
-lazy val rdfJVM = rdf.jvm
-lazy val rdfJS  = rdf.js
-
 lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .settings(commonSettings*)
@@ -146,7 +143,7 @@ lazy val jena = project.in(file("jena"))
     libraryDependencies ++= Seq(jenaLibs) // , slf4jNop, aalto )
   )
   .dependsOn(
-    rdfJVM,
+    rdf.jvm,
     rdfTestSuite.jvm % "test->compile",
     ntriples.jvm
   )
@@ -171,7 +168,7 @@ lazy val rdf4j = project.in(file("rdf4j"))
       Dependencies.slf4jNop,
       Dependencies.jsonldJava
     )
-  ).dependsOn(rdfJVM, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
+  ).dependsOn(rdf.jvm, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
 
 lazy val rdflibJS = project.in(file("rdflibJS"))
   .enablePlugins(ScalaJSPlugin)
@@ -205,7 +202,7 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
 //			// replacing CommonJSModule with what is below creates a linking problem
 //			.withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
 //		}
-  ).dependsOn(rdfJS, rdfTestSuite.js % "test->compile")
+  ).dependsOn(rdf.js, rdfTestSuite.js % "test->compile")
 
 lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
