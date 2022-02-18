@@ -6,6 +6,7 @@ import sbt.ThisBuild
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
 import Dependencies.*
 import JSEnv.{Chrome, Firefox, NodeJS}
+import org.typelevel.sbt.TypelevelPlugin.autoImport.tlFatalWarningsInCi
 
 name                               := "banana-rdf"
 ThisBuild / tlBaseVersion          := "0.9"
@@ -173,6 +174,9 @@ lazy val rdf4j = project.in(file("rdf4j"))
     )
   ).dependsOn(rdf.jvm, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
 
+// todo: we need to update rdflib.js so that outdated dependencies don't kill build
+ThisBuild / tlFatalWarningsInCi := false
+
 lazy val rdflibJS = project.in(file("rdflibJS"))
   .enablePlugins(ScalaJSPlugin)
   .enablePlugins(ScalaJSBundlerPlugin)
@@ -183,10 +187,9 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
   //	.enablePlugins(ScalablyTypedConverterPlugin)
   .settings(commonSettings*)
   .settings(
-    tlFatalWarningsInCi := false, // todo: we need to update rdflib
-    name                := "rdflibJS",
-    description         := "rdflib.js implementation of banana-rdf",
-    useYarn             := true,
+    name        := "rdflibJS",
+    description := "rdflib.js implementation of banana-rdf",
+    useYarn     := true,
     scalacOptions ++= scala3jsOptions,
     Compile / npmDependencies += "rdflib" -> "2.2.8",
     Test / npmDependencies += "rdflib"    -> "2.2.8",
