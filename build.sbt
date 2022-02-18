@@ -177,7 +177,7 @@ lazy val rdf4j = project.in(file("rdf4j"))
       Dependencies.slf4jNop,
       Dependencies.jsonldJava
     )
-  ).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") // ntriplesJVM,
+  ).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile", ntriplesJVM)
 
 lazy val rdflibJS = project.in(file("rdflibJS"))
 //	.enablePlugins(ScalaJSPlugin)
