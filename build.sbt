@@ -213,23 +213,6 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
 //		}
   ).dependsOn(rdfJS, rdfTestSuiteJS % "test->compile")
 
-//lazy val rdflibScratch =  project.in(file("rdflib.scratch"))
-//	// .enablePlugins(ScalaJSBundlerPlugin)
-//	//documentation here: https://scalablytyped.org/docs/library-developer
-//	// call stImport in sbt to generate new sources
-//	//.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
-//	.enablePlugins(ScalablyTypedConverterPlugin)
-//	.settings(commonSettings: _*)
-//	.settings(
-//		name := "rdflib-scratch",
-//		useYarn := true,
-//		scalacOptions ++= scala3jsOptions,
-//		Compile / npmDependencies += "rdflib" -> "2.2.7",
-//		stUseScalaJsDom := true,
-//		libraryDependencies += "org.w3" %%% "rdflib-types" % "0.1-SNAPSHOT",
-//		scalaJSUseMainModuleInitializer := true,
-//		Compile / mainClass := Some( "org.w3.banana.testRdfLib" ),
-//	)
 
 lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
