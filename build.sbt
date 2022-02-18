@@ -1,5 +1,5 @@
 import Dependencies.{TestLibs, Ver, fish, jenaLibs, typelevel}
-import JSEnv.{Chrome, Firefox, NodeJS}
+import JSEnv.*
 import org.scalajs.linker.interface.ModuleKind.ESModule
 import org.scalajs.linker.interface.OutputPatterns
 import sbt.Keys.description
@@ -155,7 +155,7 @@ lazy val jena = project.in(file("jena"))
     rdfJVM,
     rdfTestSuiteJVM % "test->compile",
     ntriplesJVM
-  ) // , ntriplesJVM, rdfTestSuiteJVM % "test->compile")
+  )
 
 import Dependencies.RDF4J
 lazy val rdf4j = project.in(file("rdf4j"))
@@ -250,10 +250,10 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
     scalacOptions := scala3jvmOptions
   )
   .jsSettings(
-    scalacOptions ++= scala3jsOptions,
-    Test / scalaJSLinkerConfig ~= {
-      _.withModuleKind(ModuleKind.CommonJSModule)
-    } // required for munit to run
+    scalacOptions ++= scala3jsOptions
+//    Test / scalaJSLinkerConfig ~= {
+//      _.withModuleKind(ModuleKind.CommonJSModule)
+//    } // required for munit to run
   )
 
 lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
