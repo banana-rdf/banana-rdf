@@ -17,6 +17,7 @@ on:
 env:
   PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
   SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+  SONATYPE_CREDENTIAL_HOST: ${{ secrets.SONATYPE_CREDENTIAL_HOST }}
   SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
   PGP_SECRET: ${{ secrets.PGP_SECRET }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -63,9 +64,9 @@ jobs:
         if: matrix.java == 'temurin@17'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
-      - name: fastOptJS
+      - name: scalaJSLink
         if: matrix.project == 'rootJS'
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' Test/fastOptJS
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' Test/scalaJSLinkerResult
 
       - name: Test
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
