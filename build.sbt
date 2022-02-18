@@ -1,16 +1,11 @@
-import Dependencies.{TestLibs, Ver, fish, jenaLibs, typelevel}
-import JSEnv.*
-import org.scalajs.linker.interface.ModuleKind.ESModule
-import org.scalajs.linker.interface.OutputPatterns
-import sbt.Keys.description
-import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
-import org.scalajs.jsenv.nodejs.NodeJSEnv
-import sbt.ThisBuild
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
-import org.openqa.selenium.firefox.{FirefoxOptions, FirefoxProfile}
-import org.openqa.selenium.remote.server.{DriverFactory, DriverProvider}
+import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.firefox.FirefoxOptions
 import org.scalajs.jsenv.selenium.SeleniumJSEnv
+import sbt.Keys.description
+import sbt.ThisBuild
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+import Dependencies.*
+import JSEnv.{Chrome, Firefox, NodeJS}
 
 name                               := "banana-rdf"
 ThisBuild / tlBaseVersion          := "0.9"
@@ -23,8 +18,6 @@ ThisBuild / developers := List(
   tlGitHubDev("bblfish", "Henry Story"),
   tlGitHubDev("betehess", "Alexandre Bertails")
 )
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
-ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
 
 enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)
@@ -61,6 +54,11 @@ addCommandAlias("ciNode", CI.NodeJS.toString)
 addCommandAlias("ciFirefox", CI.Firefox.toString)
 addCommandAlias("ciChrome", CI.Chrome.toString)
 
+addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/headerCreate")
+
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
+ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
+
 lazy val useJSEnv =
   settingKey[JSEnv]("Use Node.js or a headless browser for running Scala.js tests")
 Global / useJSEnv := JSEnv.NodeJS
@@ -88,8 +86,6 @@ lazy val root = tlCrossRootProject.aggregate(
   rdf4j,
   rdflibJS
 )
-
-addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/headerCreate")
 
 lazy val commonSettings = Seq(
   organization  := "net.bblfish.rdf",
