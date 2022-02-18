@@ -59,6 +59,9 @@ addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/he
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
 
+ThisBuild / githubWorkflowBuildMatrixAdditions += "browser" -> List("Chrome", "Firefox")
+ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.browser }}"
+
 lazy val useJSEnv =
   settingKey[JSEnv]("Use Node.js or a headless browser for running Scala.js tests")
 Global / useJSEnv := JSEnv.NodeJS
@@ -259,19 +262,3 @@ lazy val scala3jsOptions = Seq(
   "-source:future", // Choices: future and future-migration. I use this to force future deprecation warnings, etc.
   "-Yexplicit-nulls" // For explicit nulls behavior.
 )
-
-//lazy val scratch = crossProject(JVMPlatform,JSPlatform)
-//	.crossType(CrossType.Full)
-//	.in(file("scratch"))
-//	.settings(commonSettings: _*)
-//	.settings(
-//		libraryDependencies += TestLibs.munit
-//	)
-//	.jvmSettings(
-//		name := "scratch",
-//		scalacOptions ++= scala3jvmOptions,
-//		//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
-////		libraryDependencies ++= Seq(jenaLibs, TestLibs.munit)
-//	)
-//lazy val scratchJVM = scratch.jvm
-//lazy val scratchJS = scratch.js
