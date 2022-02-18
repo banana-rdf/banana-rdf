@@ -136,9 +136,6 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
     //	scalacOptions += "-rewrite"
   )
 
-lazy val ntriplesJVM = ntriples.jvm
-lazy val ntriplesJS  = ntriples.js
-
 lazy val jena = project.in(file("jena"))
   .settings(commonSettings*)
   .settings(
@@ -150,8 +147,8 @@ lazy val jena = project.in(file("jena"))
   )
   .dependsOn(
     rdfJVM,
-    rdfTestSuiteJVM % "test->compile",
-    ntriplesJVM
+    rdfTestSuite.jvm % "test->compile",
+    ntriples.jvm
   )
 
 import Dependencies.RDF4J
@@ -174,10 +171,10 @@ lazy val rdf4j = project.in(file("rdf4j"))
       Dependencies.slf4jNop,
       Dependencies.jsonldJava
     )
-  ).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile", ntriplesJVM)
+  ).dependsOn(rdfJVM, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
 
 lazy val rdflibJS = project.in(file("rdflibJS"))
-//	.enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSPlugin)
   .enablePlugins(ScalaJSBundlerPlugin)
   //	.enablePlugins(WebScalaJSBundlerPlugin)
   // documentation here: https://scalablytyped.org/docs/library-developer
@@ -208,7 +205,7 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
 //			// replacing CommonJSModule with what is below creates a linking problem
 //			.withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
 //		}
-  ).dependsOn(rdfJS, rdfTestSuiteJS % "test->compile")
+  ).dependsOn(rdfJS, rdfTestSuite.js % "test->compile")
 
 lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -234,9 +231,6 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
 //      _.withModuleKind(ModuleKind.CommonJSModule)
 //    } // required for munit to run
   )
-
-lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
-lazy val rdfTestSuiteJS  = rdfTestSuite.js
 
 lazy val scala3jvmOptions = Seq(
   // "-classpath", "foo:bar:...",         // Add to the classpath.
