@@ -191,6 +191,7 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
     Test / npmDependencies += "rdflib"    -> "2.2.8",
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     libraryDependencies ++= Seq(
+      "com.google.guava" % "guava" % "31.0.1-jre" % Test,
       fish.rdf_model_js.value,
       TestLibs.scalatest.value % Test,
 //			TestLibs.utest.value % Test,
@@ -226,10 +227,10 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
     scalacOptions := scala3jvmOptions
   )
   .jsSettings(
-    scalacOptions ++= scala3jsOptions
-//    Test / scalaJSLinkerConfig ~= {
-//      _.withModuleKind(ModuleKind.CommonJSModule)
-//    } // required for munit to run
+    scalacOptions ++= scala3jsOptions,
+    Test / scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.CommonJSModule)
+    } // required for munit to run
   )
 
 lazy val scala3jvmOptions = Seq(

@@ -1,6 +1,10 @@
 //selenium testing
 libraryDependencies += "org.scala-js" %% "scalajs-env-selenium" % "1.1.1"
 
+// problem with guava clashses when using selenium for in browser tests
+// this seems to fix it. todo: remove later
+libraryDependencies += "com.google.guava" % "guava" % "31.0.1-jre"
+
 //for sbt-typelevel when using SNAPSHOTS
 resolvers += Resolver.sonatypeRepo("snapshots")
 
