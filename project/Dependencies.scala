@@ -7,7 +7,7 @@ object Dependencies {
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
   object Ver {
-    val scala3 = "3.1.0"
+    val scala3 = "3.1.1"
   }
 
   /** Jena
