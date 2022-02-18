@@ -213,7 +213,6 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
 //		}
   ).dependsOn(rdfJS, rdfTestSuiteJS % "test->compile")
 
-
 lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("rdf-test-suite"))
