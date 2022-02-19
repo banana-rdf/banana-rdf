@@ -31,7 +31,12 @@ jobs:
         scala: [3.1.1]
         java: [temurin@17]
         project: [rootJS, rootJVM]
-        browser: [Chrome, Firefox]
+        jsenv: [NodeJS, Chrome, Firefox]
+        exclude:
+          - project: rootJVM
+            jsenv: Chrome
+          - project: rootJVM
+            jsenv: Firefox
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -58,24 +63,30 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
+      - name: Setup NodeJS v14 LTS
+        if: matrix.project == 'rootJS' && matrix.jsenv == 'NodeJS'
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: 14
+
       - name: Check that workflows are up to date
-        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.browser }}'' ''project /'' githubWorkflowCheck'
+        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.jsenv }}'' ''project /'' githubWorkflowCheck'
 
       - name: Check headers and formatting
         if: matrix.java == 'temurin@17'
-        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.browser }}'' headerCheckAll scalafmtCheckAll ''project /'' scalafmtSbtCheck'
+        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.jsenv }}'' headerCheckAll scalafmtCheckAll ''project /'' scalafmtSbtCheck'
 
       - name: scalaJSLink
         if: matrix.project == 'rootJS'
-        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.browser }}'' Test/scalaJSLinkerResult'
+        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.jsenv }}'' Test/scalaJSLinkerResult'
 
       - name: Test
-        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.browser }}'' test'
+        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.jsenv }}'' test'
 
       - name: Check binary compatibility
         if: matrix.java == 'temurin@17'
-        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.browser }}'' mimaReportBinaryIssues'
+        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.jsenv }}'' mimaReportBinaryIssues'
 
       - name: Generate API documentation
         if: matrix.java == 'temurin@17'
-        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.browser }}'' doc'
+        run: 'sbt ''project ${{ matrix.project }}'' ''++${{ matrix.scala }}'' ''set Global / useJSEnv := JSEnv.${{ matrix.jsenv }}'' doc'

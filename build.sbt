@@ -27,6 +27,30 @@ ThisBuild / tlCiReleaseBranches := Seq() // "scala3" if github were to do the re
 ThisBuild / tlCiReleaseTags     := false // don't publish artifacts on github
 
 ThisBuild / crossScalaVersions := Seq("3.1.1") //, "2.13.8")
+
+ThisBuild / githubWorkflowBuildPreamble ++= Seq(
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v2.4.0"),
+    name = Some("Setup NodeJS v14 LTS"),
+    params = Map("node-version" -> "14"),
+    cond = Some("matrix.project == 'rootJS' && matrix.jsenv == 'NodeJS'")
+  )
+)
+val jsenvs = List(NodeJS, Chrome, Firefox).map(_.toString)
+ThisBuild / githubWorkflowBuildMatrixAdditions += "jsenv" -> jsenvs
+ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.jsenv }}"
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    scala <- (ThisBuild / crossScalaVersions).value.init
+    jsenv <- jsenvs.tail
+  } yield MatrixExclude(Map("scala" -> scala, "jsenv" -> jsenv))
+}
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    jsenv <- jsenvs.tail
+  } yield MatrixExclude(Map("project" -> "rootJVM", "jsenv" -> jsenv))
+}
+
 //scalaVersion := Ver.scala3
 
 //ThisBuild / shellPrompt := ((s: State) => Project.extract(s).currentRef.project + "> ")
@@ -59,9 +83,6 @@ addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/he
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
-
-ThisBuild / githubWorkflowBuildMatrixAdditions += "browser" -> List("Chrome", "Firefox")
-ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.browser }}"
 
 lazy val useJSEnv =
   settingKey[JSEnv]("Use Node.js or a headless browser for running Scala.js tests")
