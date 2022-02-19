@@ -10,9 +10,6 @@ name: Continuous Integration
 on:
   pull_request:
     branches: ['**']
-  push:
-    branches: ['**']
-    tags: [v*]
 
 env:
   PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
