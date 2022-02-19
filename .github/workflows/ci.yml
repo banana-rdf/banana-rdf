@@ -36,6 +36,8 @@ jobs:
           - project: rootJVM
             jsenv: Chrome
           - project: rootJVM
+            jsenv: NodeJS 
+          - project: rootJVM
             jsenv: Firefox
     runs-on: ${{ matrix.os }}
     steps:
