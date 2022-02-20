@@ -19,7 +19,7 @@ import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
 import org.w3.banana.rdflib.facade.*
 import org.w3.banana.{Ops, RDF, operations}
 import run.cosy.rdfjs.model
-import run.cosy.rdfjs.model.DataFactory
+import run.cosy.rdfjs.model.{DataFactory, Term}
 
 import scala.annotation.targetName
 import scala.collection.mutable
@@ -232,7 +232,7 @@ object Rdflib extends RDF:
       end rTriple
 
       given Node: operations.Node[R] with
-         private def rl(node: RDF.Node[R]): model.Term[?] = node.asInstanceOf[model.Term[?]]
+         private def rl(node: RDF.Node[R]): Term[?] = node.asInstanceOf[Term[?]]
          extension (node: RDF.Node[R])
             def isURI: Boolean     = rl(node).isInstanceOf[model.NamedNode]
             def isBNode: Boolean   = rl(node).isInstanceOf[model.BlankNode]

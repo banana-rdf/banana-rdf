@@ -7,7 +7,7 @@ object Dependencies {
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
   object Ver {
-    val scala3 = "3.1.0"
+    val scala3 = "3.1.1"
   }
 
   /** Jena
@@ -41,7 +41,7 @@ object Dependencies {
     *   https://repo1.maven.org/maven2/org/eclipse/rdf4j/
     */
   object RDF4J {
-    val Version             = "3.7.3"
+    val Version             = "3.7.4"
     lazy val QueryAlgebra   = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation"  % Version
     lazy val QueryParser    = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql"       % Version
     lazy val QueryResult    = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % Version

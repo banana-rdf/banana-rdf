@@ -11,12 +11,14 @@
  *  SPDX-License-Identifier: W3C-20150513
  */
 
-package org.w3.banana
+package org.w3.banana.rdf4j.io
 
-object TestConstants:
-   def bbl(id: String): String = "https://bblfish.net/" + (if id == "" then "" else "#" + id)
-   def tim(id: String): String =
-     "https://www.w3.org/People/Berners-Lee/card" + (if id == "" then "" else "#" + id)
+import org.w3.banana.rdf4j.Rdf4j.R
+import org.w3.banana.io.{AbsoluteRDFReader, NTriples}
 
-   def foafPre(id: String): String = "http://xmlns.com/foaf/0.1/" + id
-   def xsdPre(id: String): String  = "http://www.w3.org/2001/XMLSchema#" + id
+import scala.util.Try
+
+//todo: move this to the library
+given gg: AbsoluteRDFReader[R, Try, NTriples] = org.w3.banana.io.NTriplesReader[R]
+
+class Rdf4jNTripleReaderTests extends org.w3.banana.io.NTriplesReaderTests[R]

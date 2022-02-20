@@ -1,16 +1,12 @@
-import Dependencies.{TestLibs, Ver, fish, jenaLibs, typelevel}
-import JSEnv.{Chrome, Firefox, NodeJS}
-import org.scalajs.linker.interface.ModuleKind.ESModule
-import org.scalajs.linker.interface.OutputPatterns
-import sbt.Keys.description
-import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
-import org.scalajs.jsenv.nodejs.NodeJSEnv
-import sbt.ThisBuild
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
-import org.openqa.selenium.firefox.{FirefoxOptions, FirefoxProfile}
-import org.openqa.selenium.remote.server.{DriverFactory, DriverProvider}
+import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.firefox.FirefoxOptions
 import org.scalajs.jsenv.selenium.SeleniumJSEnv
+import sbt.Keys.description
+import sbt.ThisBuild
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+import Dependencies.*
+import JSEnv.{Chrome, Firefox, NodeJS}
+import org.typelevel.sbt.TypelevelPlugin.autoImport.tlFatalWarningsInCi
 
 name                               := "banana-rdf"
 ThisBuild / tlBaseVersion          := "0.9"
@@ -23,19 +19,36 @@ ThisBuild / developers := List(
   tlGitHubDev("bblfish", "Henry Story"),
   tlGitHubDev("betehess", "Alexandre Bertails")
 )
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
-ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
 
-enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)
 
 ThisBuild / tlCiReleaseBranches := Seq() // "scala3" if github were to do the releases
 ThisBuild / tlCiReleaseTags     := false // don't publish artifacts on github
 
 ThisBuild / crossScalaVersions := Seq("3.1.1") //, "2.13.8")
-//scalaVersion := Ver.scala3
 
-//ThisBuild / shellPrompt := ((s: State) => Project.extract(s).currentRef.project + "> ")
+ThisBuild / githubWorkflowBuildPreamble ++= Seq(
+  WorkflowStep.Use(
+    UseRef.Public("actions", "setup-node", "v2.4.0"),
+    name = Some("Setup NodeJS v14 LTS"),
+    params = Map("node-version" -> "14"),
+    cond = Some("matrix.project == 'rootJS' && matrix.jsenv == 'NodeJS'")
+  )
+)
+val jsenvs = List(NodeJS).map(_.toString) //add Chrome, Firefox later
+ThisBuild / githubWorkflowBuildMatrixAdditions += "jsenv" -> jsenvs
+ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.jsenv }}"
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    scala <- (ThisBuild / crossScalaVersions).value.init
+    jsenv <- jsenvs.tail
+  } yield MatrixExclude(Map("scala" -> scala, "jsenv" -> jsenv))
+}
+ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
+  for {
+    jsenv <- jsenvs.tail
+  } yield MatrixExclude(Map("project" -> "rootJVM", "jsenv" -> jsenv))
+}
 
 ThisBuild / homepage := Some(url("https://github.com/bblfish/banana-rdf"))
 ThisBuild / scmInfo := Some(
@@ -56,10 +69,8 @@ def w3cLicence(yearStart: Int, yearEnd: Option[Int] = None) = Some(HeaderLicense
 
 ThisBuild / headerLicense := w3cLicence(2021)
 
-tlReplaceCommandAlias("ciJS", List(CI.NodeJS, CI.Chrome, CI.Firefox).mkString)
-addCommandAlias("ciNode", CI.NodeJS.toString)
-addCommandAlias("ciFirefox", CI.Firefox.toString)
-addCommandAlias("ciChrome", CI.Chrome.toString)
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
+ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
 
 lazy val useJSEnv =
   settingKey[JSEnv]("Use Node.js or a headless browser for running Scala.js tests")
@@ -86,14 +97,12 @@ lazy val root = tlCrossRootProject.aggregate(
   ntriples,
   jena,
   rdf4j,
-  rdflibJS
+  rdflibJS,
+  rdfTestSuite
 )
-
-addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/headerCreate")
 
 lazy val commonSettings = Seq(
   organization  := "net.bblfish.rdf",
-  version       := "0.9-SNAPSHOT",
   description   := "RDF framework for Scala",
   headerLicense := w3cLicence(2012, Some(2021)),
   startYear     := Some(2012),
@@ -119,14 +128,12 @@ lazy val rdf = crossProject(JVMPlatform, JSPlatform)
     scalacOptions ++= scala3jsOptions
   )
 
-lazy val rdfJVM = rdf.jvm
-lazy val rdfJS  = rdf.js
-
 lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .settings(commonSettings*)
   .settings(
-    headerLicense := w3cLicence(2016)
+    headerLicense := w3cLicence(2016),
+    description   := "Blocking NTriples Parser"
   )
   .in(file("ntriples"))
   .dependsOn(rdf)
@@ -139,28 +146,27 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
     //	scalacOptions += "-rewrite"
   )
 
-lazy val ntriplesJVM = ntriples.jvm
-lazy val ntriplesJS  = ntriples.js
-
 lazy val jena = project.in(file("jena"))
   .settings(commonSettings*)
   .settings(
     name                               := "banana-jena",
+    description                        := "Jena implementation of banana-rdf",
     scalacOptions                      := scala3jvmOptions,
     Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
     libraryDependencies ++= Seq(jenaLibs) // , slf4jNop, aalto )
   )
   .dependsOn(
-    rdfJVM,
-    rdfTestSuiteJVM % "test->compile",
-    ntriplesJVM
-  ) // , ntriplesJVM, rdfTestSuiteJVM % "test->compile")
+    rdf.jvm,
+    rdfTestSuite.jvm % "test->compile",
+    ntriples.jvm
+  )
 
 import Dependencies.RDF4J
 lazy val rdf4j = project.in(file("rdf4j"))
   .settings(commonSettings*)
   .settings(
     name          := "banana-rdf4j",
+    description   := "RDF4J implementation of banana-rdf",
     scalacOptions := scala3jvmOptions,
     libraryDependencies ++= Seq(
       RDF4J.QueryAlgebra,
@@ -175,10 +181,13 @@ lazy val rdf4j = project.in(file("rdf4j"))
       Dependencies.slf4jNop,
       Dependencies.jsonldJava
     )
-  ).dependsOn(rdfJVM, rdfTestSuiteJVM % "test->compile") // ntriplesJVM,
+  ).dependsOn(rdf.jvm, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
+
+// todo: we need to update rdflib.js so that outdated dependencies don't kill build
+ThisBuild / tlFatalWarningsInCi := false
 
 lazy val rdflibJS = project.in(file("rdflibJS"))
-//	.enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSPlugin)
   .enablePlugins(ScalaJSBundlerPlugin)
   //	.enablePlugins(WebScalaJSBundlerPlugin)
   // documentation here: https://scalablytyped.org/docs/library-developer
@@ -187,8 +196,9 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
   //	.enablePlugins(ScalablyTypedConverterPlugin)
   .settings(commonSettings*)
   .settings(
-    name    := "rdflibJS",
-    useYarn := true,
+    name        := "rdflibJS",
+    description := "rdflib.js implementation of banana-rdf",
+    useYarn     := true,
     scalacOptions ++= scala3jsOptions,
     Compile / npmDependencies += "rdflib" -> "2.2.8",
     Test / npmDependencies += "rdflib"    -> "2.2.8",
@@ -208,32 +218,15 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
 //			// replacing CommonJSModule with what is below creates a linking problem
 //			.withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
 //		}
-  ).dependsOn(rdfJS, rdfTestSuiteJS % "test->compile")
-
-//lazy val rdflibScratch =  project.in(file("rdflib.scratch"))
-//	// .enablePlugins(ScalaJSBundlerPlugin)
-//	//documentation here: https://scalablytyped.org/docs/library-developer
-//	// call stImport in sbt to generate new sources
-//	//.enablePlugins(ScalablyTypedConverterGenSourcePlugin)
-//	.enablePlugins(ScalablyTypedConverterPlugin)
-//	.settings(commonSettings: _*)
-//	.settings(
-//		name := "rdflib-scratch",
-//		useYarn := true,
-//		scalacOptions ++= scala3jsOptions,
-//		Compile / npmDependencies += "rdflib" -> "2.2.7",
-//		stUseScalaJsDom := true,
-//		libraryDependencies += "org.w3" %%% "rdflib-types" % "0.1-SNAPSHOT",
-//		scalaJSUseMainModuleInitializer := true,
-//		Compile / mainClass := Some( "org.w3.banana.testRdfLib" ),
-//	)
+  ).dependsOn(rdf.js, rdfTestSuite.js % "test->compile")
 
 lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("rdf-test-suite"))
   .settings(commonSettings*)
   .settings(
-    name := "banana-test",
+    name        := "banana-test",
+    description := "Generic tests to be run on each banana-rdf implementation",
     libraryDependencies ++= Seq(
       TestLibs.scalatest.value,
       TestLibs.munit.value,
@@ -246,14 +239,11 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
     scalacOptions := scala3jvmOptions
   )
   .jsSettings(
-    scalacOptions ++= scala3jsOptions,
-    Test / scalaJSLinkerConfig ~= {
-      _.withModuleKind(ModuleKind.CommonJSModule)
-    } // required for munit to run
+    scalacOptions ++= scala3jsOptions
+//    Test / scalaJSLinkerConfig ~= {
+//      _.withModuleKind(ModuleKind.CommonJSModule)
+//    } // required for munit to run
   )
-
-lazy val rdfTestSuiteJVM = rdfTestSuite.jvm
-lazy val rdfTestSuiteJS  = rdfTestSuite.js
 
 lazy val scala3jvmOptions = Seq(
   // "-classpath", "foo:bar:...",         // Add to the classpath.
@@ -285,19 +275,3 @@ lazy val scala3jsOptions = Seq(
   "-source:future", // Choices: future and future-migration. I use this to force future deprecation warnings, etc.
   "-Yexplicit-nulls" // For explicit nulls behavior.
 )
-
-//lazy val scratch = crossProject(JVMPlatform,JSPlatform)
-//	.crossType(CrossType.Full)
-//	.in(file("scratch"))
-//	.settings(commonSettings: _*)
-//	.settings(
-//		libraryDependencies += TestLibs.munit
-//	)
-//	.jvmSettings(
-//		name := "scratch",
-//		scalacOptions ++= scala3jvmOptions,
-//		//Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
-////		libraryDependencies ++= Seq(jenaLibs, TestLibs.munit)
-//	)
-//lazy val scratchJVM = scratch.jvm
-//lazy val scratchJS = scratch.js
