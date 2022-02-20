@@ -10,6 +10,9 @@ name: Continuous Integration
 on:
   pull_request:
     branches: ['**']
+  push:
+    branches: ['**']
+    tags: [v*]
 
 env:
   PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
@@ -32,8 +35,6 @@ jobs:
         exclude:
           - project: rootJVM
             jsenv: Chrome
-          - project: rootJVM
-            jsenv: NodeJS 
           - project: rootJVM
             jsenv: Firefox
     runs-on: ${{ matrix.os }}

@@ -20,7 +20,6 @@ ThisBuild / developers := List(
   tlGitHubDev("betehess", "Alexandre Bertails")
 )
 
-enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)
 
 ThisBuild / tlCiReleaseBranches := Seq() // "scala3" if github were to do the releases
@@ -51,10 +50,6 @@ ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
   } yield MatrixExclude(Map("project" -> "rootJVM", "jsenv" -> jsenv))
 }
 
-//scalaVersion := Ver.scala3
-
-//ThisBuild / shellPrompt := ((s: State) => Project.extract(s).currentRef.project + "> ")
-
 ThisBuild / homepage := Some(url("https://github.com/bblfish/banana-rdf"))
 ThisBuild / scmInfo := Some(
   ScmInfo(url("https://github.com/bblfish/banana-rdf"), "git@github.com:bblfish/banana-rdf.git")
@@ -73,13 +68,6 @@ def w3cLicence(yearStart: Int, yearEnd: Option[Int] = None) = Some(HeaderLicense
 ))
 
 ThisBuild / headerLicense := w3cLicence(2021)
-
-tlReplaceCommandAlias("ciJS", List(CI.Chrome, CI.Firefox, CI.NodeJS).mkString)
-addCommandAlias("ciNode", CI.NodeJS.toString)
-addCommandAlias("ciFirefox", CI.Firefox.toString)
-addCommandAlias("ciChrome", CI.Chrome.toString)
-
-addCommandAlias("prePR", "; root/clean; scalafmtSbt; +root/scalafmtAll; +root/headerCreate")
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
