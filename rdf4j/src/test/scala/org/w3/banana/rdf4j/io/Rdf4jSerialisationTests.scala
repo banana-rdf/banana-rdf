@@ -11,16 +11,14 @@
  *  SPDX-License-Identifier: W3C-20150513
  */
 
-//package org.w3.banana.prefixes
-//
-//import org.w3.banana.syntax.*
-//import org.w3.banana.{Ops, PrefixBuilder, RDF}
+package org.w3.banana.rdf4j.io
 
-//
-//trait CommonPrefixes[T <: RDF]{ this: Ops[T] =>
-//
-//  lazy val xsd = XSDPrefix()(this)
-//  lazy val rdf = RDFPrefix()(this)
-//
-//}
-//
+import org.w3.banana.rdf4j.Rdf4j.R
+import org.w3.banana.io.{AbsoluteRDFReader, NTriples}
+
+import scala.util.Try
+
+//todo: move this to the library
+given gg: AbsoluteRDFReader[R, Try, NTriples] = org.w3.banana.io.NTriplesReader[R]
+
+class Rdf4jNTripleReaderTests extends org.w3.banana.io.NTriplesReaderTests[R]
