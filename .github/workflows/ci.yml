@@ -31,12 +31,7 @@ jobs:
         scala: [3.1.1]
         java: [temurin@17]
         project: [rootJS, rootJVM]
-        jsenv: [NodeJS, Chrome, Firefox]
-        exclude:
-          - project: rootJVM
-            jsenv: Chrome
-          - project: rootJVM
-            jsenv: Firefox
+        jsenv: [NodeJS]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)

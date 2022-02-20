@@ -35,7 +35,7 @@ ThisBuild / githubWorkflowBuildPreamble ++= Seq(
     cond = Some("matrix.project == 'rootJS' && matrix.jsenv == 'NodeJS'")
   )
 )
-val jsenvs = List(NodeJS, Chrome, Firefox).map(_.toString)
+val jsenvs = List(NodeJS).map(_.toString) //add Chrome, Firefox later
 ThisBuild / githubWorkflowBuildMatrixAdditions += "jsenv" -> jsenvs
 ThisBuild / githubWorkflowBuildSbtStepPreamble += s"set Global / useJSEnv := JSEnv.$${{ matrix.jsenv }}"
 ThisBuild / githubWorkflowBuildMatrixExclusions ++= {
