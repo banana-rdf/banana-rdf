@@ -1,0 +1,7 @@
+.bloop/
+.bsp
+.metals/
+.vscode/
+metals.sbt
+target
+yarn.lock

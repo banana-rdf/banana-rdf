@@ -1,0 +1,26 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.205.2/containers/java
+{
+	"name": "Scala (Community)",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"args": {
+			// Update the VARIANT arg to pick a Java version: 11, 17
+			// Append -bullseye or -buster to pin to an OS version.
+			// Use the -bullseye variants on local arm64/Apple Silicon.
+			"VARIANT": "17",
+			// Options
+			"INSTALL_MILL": "false",
+			"INSTALL_SBT": "true",
+			"NODE_VERSION": "lts/*"
+		}
+	},
+	"settings": {
+		"java.jdt.ls.java.home": "/docker-java-home"
+	},
+	"extensions": [
+		"vscjava.vscode-java-pack",
+		"scala-lang.scala",
+		"scalameta.metals"
+	]
+}
