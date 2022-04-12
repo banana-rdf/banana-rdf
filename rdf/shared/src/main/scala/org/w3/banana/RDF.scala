@@ -147,7 +147,7 @@ object RDF:
    // relative statements
    object rStatement:
       type Subject[R <: RDF]  = rURI[R] | BNode[R] | URI[R]
-      type Relation[R <: RDF] = rURI[R]
+      type Relation[R <: RDF] = rURI[R] | URI[R]
       type Object[R <: RDF]   = rURI[R] | BNode[R] | Literal[R] | URI[R]
       type Graph[R <: RDF]    = rURI[R] | BNode[R] | URI[R]
    end rStatement
