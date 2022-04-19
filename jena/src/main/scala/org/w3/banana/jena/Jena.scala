@@ -13,6 +13,8 @@
 
 package org.w3.banana.jena
 
+import java.net.URL
+
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_Literal, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
@@ -31,6 +33,9 @@ import org.apache.jena.util.iterator.ExtendedIterator
 import org.w3.banana.operations.{Quad, StoreFactory}
 
 import scala.annotation.targetName
+import org.w3.banana.SparqlEngine
+import org.apache.jena.query.QueryExecution
+import org.apache.jena.query.QueryExecutionFactory
 
 object JenaRdf extends org.w3.banana.RDF:
    import org.apache.jena.graph as jena
@@ -351,4 +356,31 @@ object JenaRdf extends org.w3.banana.RDF:
               case x: (s.type & jena.Node_URI) => Some(x)
               case _                           => None
 
+      given SparqlEngine[R, Try, URL] with
+         val querySolution = org.w3.banana.jena.util.QuerySolution[R]
+
+         extension (endpoint: URL)
+            def executeSelect(
+                query: RDF.SelectQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ) = Try { qexec(query, bindings).execSelect().nn }
+
+            def executeConstruct(
+                query: RDF.ConstructQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ) = Try { qexec(query, bindings).execConstruct().nn.getGraph().nn }
+
+            def executeAsk(
+                query: RDF.AskQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ) = Try { qexec(query, bindings).execAsk().nn }
+
+            def qexec(
+                query: RDF.Query[R],
+                bindings: Map[String, RDF.Node[R]]
+            ): QueryExecution =
+               val qe = QueryExecutionFactory.sparqlService(endpoint.toString, query).nn
+               if bindings.nonEmpty then
+                  qe.setInitialBinding(querySolution.getMap(bindings))
+               qe
 end JenaRdf
