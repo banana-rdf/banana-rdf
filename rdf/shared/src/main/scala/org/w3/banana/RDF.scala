@@ -57,6 +57,14 @@ trait RDF:
    // types for the graph traversal API
    type NodeAny
 
+   type Query
+   type SelectQuery <: Query
+   type ConstructQuery <: Query
+   type AskQuery <: Query
+   type UpdateQuery
+   type Solution
+   type Solutions
+
    given ops: Ops[R]
 
 end RDF
@@ -110,6 +118,27 @@ object RDF:
    type NodeAny[R <: RDF] = R match
       case GetNodeAny[m] => m
 
+   type Query[R <: RDF] = R match
+      case GetQuery[q] => q
+
+   type SelectQuery[R <: RDF] = R match
+      case GetSelectQuery[q] => q
+
+   type ConstructQuery[R <: RDF] = R match
+      case GetConstructQuery[q] => q
+
+   type AskQuery[R <: RDF] = R match
+      case GetAskQuery[q] => q
+
+   type UpdateQuery[R <: RDF] = R match
+      case GetUpdateQuery[q] => q
+
+   type Solution[R <: RDF] = R match
+      case GetSolution[s] => s
+
+   type Solutions[R <: RDF] = R match
+      case GetSolutions[s] => s
+
    private type GetRelURI[U <: Matchable]           = RDF { type rURI = U }
    private type GetURI[U <: Matchable]              = RDF { type URI = U }
    private type GetRelNode[N <: Matchable]          = RDF { type rNode = N }
@@ -124,6 +153,13 @@ object RDF:
    private type GetGraph[G <: Matchable]            = RDF { type Graph = G }
    private type GetStore[S]                         = RDF { type Store = S }
    private type GetNodeAny[M]                       = RDF { type NodeAny = M }
+   private type GetQuery[Q]                         = RDF { type Query = Q }
+   private type GetSelectQuery[Q]                   = RDF { type SelectQuery = Q }
+   private type GetConstructQuery[Q]                = RDF { type ConstructQuery = Q }
+   private type GetAskQuery[Q]                      = RDF { type AskQuery = Q }
+   private type GetUpdateQuery[Q]                   = RDF { type UpdateQuery = Q }
+   private type GetSolution[S]                      = RDF { type Solution = S }
+   private type GetSolutions[S]                     = RDF { type Solutions = S }
 
    /** these associate a type to the positions in statements (triples or quads) These are not agreed
      * to by all frameworks, so it would be useful to find a way to parametrise them. Essentially

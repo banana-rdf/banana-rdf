@@ -16,7 +16,8 @@ package org.w3.banana.jena
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
 import org.apache.jena.graph.{BlankNodeId, GraphUtil, Node_Blank, Node_Literal, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
-import org.apache.jena.query.DatasetFactory
+import org.apache.jena.query.{DatasetFactory, QuerySolution, ResultSet, Query as JenaQuery}
+import org.apache.jena.update.UpdateRequest
 import org.apache.jena.sparql.core.DatasetGraphFactory
 import org.apache.jena.tdb.{TDB, TDBFactory}
 import org.w3.banana.{Ops, RDF}
@@ -55,6 +56,14 @@ object JenaRdf extends org.w3.banana.RDF:
    override opaque type Store <: Matchable =
      org.apache.jena.sparql.core.DatasetGraph // a mutable dataset
    override opaque type Quad <: Matchable = org.apache.jena.sparql.core.Quad
+
+   override opaque type Query                   = JenaQuery
+   override opaque type SelectQuery <: Query    = JenaQuery
+   override opaque type ConstructQuery <: Query = JenaQuery
+   override opaque type AskQuery <: Query       = JenaQuery
+   override opaque type UpdateQuery             = UpdateRequest
+   override opaque type Solution                = QuerySolution
+   override opaque type Solutions               = ResultSet
 
    given [T]: Releasable[ExtendedIterator[T]] with
       def release(resource: ExtendedIterator[T]): Unit = resource.close()

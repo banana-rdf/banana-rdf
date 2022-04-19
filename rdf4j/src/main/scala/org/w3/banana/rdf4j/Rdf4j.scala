@@ -30,6 +30,8 @@ import scala.annotation.targetName
 import scala.util.{Success, Try, Using}
 import scala.reflect.TypeTest
 
+case class Rdf4jParseUpdate(query: String)
+
 object Rdf4j extends RDF:
 
    // rdf4j.Model is modifiable, but we provide no altering methods and always produce new graphs
@@ -51,6 +53,18 @@ object Rdf4j extends RDF:
    override type NodeAny = Null
 
    type Store = Repository
+
+   override opaque type Query                   = ParsedQuery
+   override opaque type SelectQuery <: Query    = ParsedTupleQuery
+   override opaque type ConstructQuery <: Query = ParsedGraphQuery
+   override opaque type AskQuery <: Query       = ParsedBooleanQuery
+
+   // FIXME Can't use ParsedUpdate because of https://openrdf.atlassian.net/browse/SES-1847
+   override opaque type UpdateQuery = Rdf4jParseUpdate
+
+   override opaque type Solution = BindingSet
+   // instead of TupleQueryResult so that it's eager instead of lazy
+   override opaque type Solutions = Vector[BindingSet]
 
    import org.eclipse.rdf4j.model.vocabulary.RDF4J
    val defaultGraphNode: RDF4J.NIL.type = RDF4J.NIL
