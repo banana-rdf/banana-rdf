@@ -156,7 +156,7 @@ final case class GraphIsomorphism[R <: RDF](
                     ))
               map
 
-           def bnmap(node: RDF.Statement.Object[R]): RDF.Statement.Object[R] = node.asNode.fold(
+           def bnmap(node: RDF.Statement.Object[R]): RDF.Statement.Object[R] = node.fold(
              (uri: URI[R]) => uri,
              (bnode: BNode[R]) => bnodeBijection(bnode),
              (lit: Literal[R]) => lit

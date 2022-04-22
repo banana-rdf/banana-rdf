@@ -33,8 +33,4 @@ trait Node[Rdf <: RDF]:
       def isURI: Boolean
       def isBNode: Boolean
       def isLiteral: Boolean
-
-   extension (node: RDF.Statement.Object[Rdf])
-     // todo: find a way to remove this asInstanceOf
-     def asNode: RDF.Node[Rdf] = node.asInstanceOf[RDF.Node[Rdf]]
 end Node
