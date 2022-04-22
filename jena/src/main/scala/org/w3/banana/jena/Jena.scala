@@ -33,9 +33,10 @@ import org.apache.jena.util.iterator.ExtendedIterator
 import org.w3.banana.operations.{Quad, StoreFactory}
 
 import scala.annotation.targetName
-import org.w3.banana.SparqlEngine
-import org.apache.jena.query.QueryExecution
-import org.apache.jena.query.QueryExecutionFactory
+import org.w3.banana.{Prefix, SparqlEngine, VarNotFound}
+import org.apache.jena.query.{QueryExecution, QueryExecutionFactory}
+import org.apache.jena.query.QueryFactory
+import scala.util.{Failure, Success}
 
 object JenaRdf extends org.w3.banana.RDF:
    import org.apache.jena.graph as jena
@@ -358,6 +359,20 @@ object JenaRdf extends org.w3.banana.RDF:
 
       given SparqlEngine[R, Try, URL] with
          val querySolution = org.w3.banana.jena.util.QuerySolution[R]
+         var jenaUtil      = JenaUtil()
+
+         extension (solutions: RDF.Solutions[R])
+           def iterator: Iterator[RDF.Solution[R]] =
+              import scala.jdk.CollectionConverters.*
+              solutions.asScala
+
+         extension (solution: RDF.Solution[R])
+           def apply(variable: String): Try[RDF.Node[R]] =
+              val node = solution.get(variable)
+              if node == null then
+                 Failure(VarNotFound(s"var $variable not found in QuerySolution $solution"))
+              else
+                 Success(jenaUtil.toNode(node))
 
          extension (endpoint: URL)
             def executeSelect(
@@ -383,4 +398,33 @@ object JenaRdf extends org.w3.banana.RDF:
                if bindings.nonEmpty then
                   qe.setInitialBinding(querySolution.getMap(bindings))
                qe
+
+         extension (query: String)
+            def asSelect(
+                prefixes: Seq[Prefix[R]] = Seq.empty
+            ): Try[RDF.SelectQuery[R]] =
+              Try {
+                val parsedQuery = QueryFactory.create(withPrefixes(query, prefixes)).nn
+                assert(parsedQuery.isSelectType)
+                parsedQuery
+              }
+
+            def asAsk(
+                prefixes: Seq[Prefix[R]] = Seq.empty
+            ): Try[RDF.SelectQuery[R]] =
+              Try {
+                val parsedQuery = QueryFactory.create(withPrefixes(query, prefixes)).nn
+                assert(parsedQuery.isAskType)
+                parsedQuery
+              }
+
+            def asConstruct(
+                prefixes: Seq[Prefix[R]] = Seq.empty
+            ): Try[RDF.SelectQuery[R]] =
+              Try {
+                val parsedQuery = QueryFactory.create(withPrefixes(query, prefixes)).nn
+                assert(parsedQuery.isConstructType)
+                parsedQuery
+              }
+
 end JenaRdf
