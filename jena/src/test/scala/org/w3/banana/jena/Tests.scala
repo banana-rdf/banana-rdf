@@ -32,4 +32,4 @@ class JenaTripleTest extends org.w3.banana.TripleTest[R]
 class JenaIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
 
 class JenaHttpSparqlEngineTest
-    extends org.w3.banana.SparqlEngineTest[R, URL](URL("http://dbpedia.org/sparql/"))
+    extends org.w3.banana.SparqlEngineSyntaxTest[R, URL](URL("http://dbpedia.org/sparql/"))
