@@ -367,12 +367,16 @@ object JenaRdf extends org.w3.banana.RDF:
               solutions.asScala
 
          extension (solution: RDF.Solution[R])
-           def apply(variable: String): Try[RDF.Node[R]] =
-              val node = solution.get(variable)
-              if node == null then
-                 Failure(VarNotFound(s"var $variable not found in QuerySolution $solution"))
-              else
-                 Success(jenaUtil.toNode(node))
+            def apply(variable: String): Try[RDF.Node[R]] =
+               val node = solution.get(variable)
+               if node == null then
+                  Failure(VarNotFound(s"var $variable not found in QuerySolution $solution"))
+               else
+                  Success(jenaUtil.toNode(node))
+
+            def variableNames: Set[String] =
+               import scala.jdk.CollectionConverters.*
+               solution.varNames.nn.asScala.toSet
 
          extension (endpoint: URL)
             def executeSelect(

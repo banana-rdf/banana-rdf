@@ -5,15 +5,16 @@ import scala.util.Try
 trait SparqlEngine[Rdf <: RDF, M[_], A]:
    import RDF.*
 
-   extension (solutions: RDF.Solutions[Rdf])
-     def iterator: Iterator[RDF.Solution[Rdf]]
+   extension (solutions: Solutions[Rdf])
+     def iterator: Iterator[Solution[Rdf]]
 
-   extension (solution: RDF.Solution[Rdf])
-     def apply(variable: String): Try[RDF.Node[Rdf]]
+   extension (solution: Solution[Rdf])
+      def apply(variable: String): Try[Node[Rdf]]
+      def variableNames: Set[String]
 
    extension (a: A)
       def executeSelect(
-          query: RDF.SelectQuery[Rdf],
+          query: SelectQuery[Rdf],
           bindings: Map[String, Node[Rdf]] = Map.empty
       ): M[Solutions[Rdf]]
 
@@ -30,15 +31,15 @@ trait SparqlEngine[Rdf <: RDF, M[_], A]:
    extension (query: String)
       def asSelect(
           prefixes: Seq[Prefix[Rdf]]
-      ): Try[RDF.SelectQuery[Rdf]]
+      ): Try[SelectQuery[Rdf]]
 
       def asAsk(
           prefixes: Seq[Prefix[Rdf]]
-      ): Try[RDF.SelectQuery[Rdf]]
+      ): Try[AskQuery[Rdf]]
 
       def asConstruct(
           prefixes: Seq[Prefix[Rdf]]
-      ): Try[RDF.SelectQuery[Rdf]]
+      ): Try[ConstructQuery[Rdf]]
 
    protected def withPrefixes[Rdf <: RDF](query: String, prefixes: Seq[Prefix[Rdf]]): String =
      (prefixes.map(p => s"prefix ${p.prefixName}: <${p.prefixIri}>") :+ query).mkString("\n")
