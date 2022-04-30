@@ -6,9 +6,9 @@ import org.w3.banana.RDF.*
 
 import scala.util.Try
 
-open class SparqlEngineSyntaxTest[Rdf <: RDF, A](store: A)(using
+open class SparqlEngineSyntaxTest[Rdf <: RDF](using
     ops: Ops[Rdf],
-    engine: SparqlEngine[Rdf, Try, A]
+    engine: SparqlEngine[Rdf, Try, ?]
 ) extends munit.FunSuite:
    import ops.{given, *}
 
