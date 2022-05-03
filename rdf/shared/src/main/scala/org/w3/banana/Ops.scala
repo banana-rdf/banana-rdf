@@ -62,4 +62,10 @@ trait Ops[Rdf <: RDF]:
 
    given Lang: operations.Lang[Rdf]
 
+   given Solution: operations.Solution[Rdf]
+
+   given Solutions: operations.Solutions[Rdf]
+
+   given Query: operations.Query[Rdf]
+
 end Ops

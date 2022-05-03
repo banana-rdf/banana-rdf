@@ -325,6 +325,12 @@ object Rdflib extends RDF:
 //				def !=(other: RDF.URI[R]): Boolean = !(uri == other)
       end URI
 
+      given Solutions: operations.Solutions[R] = ???
+
+      given Solution: operations.Solution[R] = ???
+
+      given Query: operations.Query[R] = ???
+
    // mutable graphs
 //	type MGraph = Model
 //

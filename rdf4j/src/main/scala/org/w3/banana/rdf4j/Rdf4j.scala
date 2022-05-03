@@ -18,6 +18,7 @@ import org.eclipse.rdf4j.model.impl.*
 import org.eclipse.rdf4j.model.util.Models
 import org.eclipse.rdf4j.query.*
 import org.eclipse.rdf4j.query.parser.*
+import org.eclipse.rdf4j.query.parser.sparql.SPARQLParserFactory
 import org.eclipse.rdf4j.repository.{Repository, RepositoryConnection}
 import org.eclipse.rdf4j.repository.sail.SailRepository
 import org.eclipse.rdf4j.sail.memory.MemoryStore
@@ -29,6 +30,7 @@ import java.lang
 import scala.annotation.targetName
 import scala.util.{Success, Try, Using}
 import scala.reflect.TypeTest
+import scala.util.Failure
 
 case class Rdf4jParseUpdate(query: String)
 
@@ -361,26 +363,51 @@ object Rdf4j extends RDF:
          def asString(uri: RDF.URI[R]): String = uri.toString
       end URI
 
+      given Solutions: operations.Solutions[R] with
+         extension (solutions: RDF.Solutions[R])
+           def iterator: Iterator[RDF.Solution[R]] =
+             solutions.iterator
+      end Solutions
+
+      given Solution: operations.Solution[R] with
+         extension (solution: RDF.Solution[R])
+            def apply(variable: String): Try[RDF.Node[R]] =
+               val node = solution.getValue(variable)
+               if node == null then
+                  Failure(
+                    VarNotFound("var " + variable + " not found in BindingSet " + solution.toString)
+                  )
+               else
+                  Success(node)
+
+            def variableNames: Set[String] =
+              solution.getBindingNames.nn.asScala.toSet
+      end Solution
+
+      given Query: operations.Query[R] with
+         val p = SPARQLParserFactory().getParser().nn
+
+         extension (query: String)
+            def asSelect(
+                prefixes: Seq[Prefix[R]] = Seq.empty
+            ): Try[RDF.SelectQuery[R]] =
+              Try {
+                p.parseQuery(withPrefixes(query, prefixes), "http://todo.example/").asInstanceOf
+              }
+
+            def asAsk(
+                prefixes: Seq[Prefix[R]] = Seq.empty
+            ): Try[RDF.AskQuery[R]] =
+              Try {
+                p.parseQuery(withPrefixes(query, prefixes), "http://todo.example/").asInstanceOf
+              }
+
+            def asConstruct(
+                prefixes: Seq[Prefix[R]] = Seq.empty
+            ): Try[RDF.ConstructQuery[R]] =
+              Try {
+                p.parseQuery(withPrefixes(query, prefixes), "http://todo.example/").asInstanceOf
+              }
+      end Query
    end ops
 end Rdf4j
-
-// mutable graphs
-//	type MGraph = Model
-//
-//	// types for the graph traversal API
-//	type NodeMatch = Value
-//	type NodeAny = Null
-//	type NodeConcrete = Value
-//
-//	// types related to Sparql
-//	type Query = ParsedQuery
-//	type SelectQuery = ParsedTupleQuery
-//	type ConstructQuery = ParsedGraphQuery
-//	type AskQuery = ParsedBooleanQuery
-//
-//	//FIXME Can't use ParsedUpdate because of https://openrdf.atlassian.net/browse/SES-1847
-//	type UpdateQuery = Rdf4jParseUpdate
-//
-//	type Solution = BindingSet
-//	// instead of TupleQueryResult so that it's eager instead of lazy
-//	type Solutions = Vector[BindingSet]

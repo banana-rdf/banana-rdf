@@ -17,6 +17,8 @@ import java.net.URL
 
 import org.w3.banana.jena.JenaRdf.{R, given}
 import org.w3.banana.jena.JenaRdf.ops.given
+import org.apache.jena.sparql.core.DatasetGraph
+import org.apache.jena.query.{Dataset, DatasetFactory}
 
 class JenaGraphTest       extends org.w3.banana.GraphTest[R]
 class JenaGraphSearchTest extends org.w3.banana.GraphSearchTest[R]
@@ -32,3 +34,6 @@ class JenaTripleTest extends org.w3.banana.TripleTest[R]
 class JenaIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
 
 class JenaSparqlEngineSyntaxTest extends org.w3.banana.SparqlEngineSyntaxTest[R]
+
+// class JenaSparqlEngineGraphTest
+//     extends org.w3.banana.SparqlEngineTest[R, Dataset](DatasetFactory.createGeneral().nn)

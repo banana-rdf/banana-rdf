@@ -142,6 +142,7 @@ object RDF:
    private type GetRelURI[U <: Matchable]           = RDF { type rURI = U }
    private type GetURI[U <: Matchable]              = RDF { type URI = U }
    private type GetRelNode[N <: Matchable]          = RDF { type rNode = N }
+   private type GetNode[N <: Matchable]             = RDF { type Node = N }
    private type GetBNode[N <: Matchable]            = RDF { type BNode = N }
    private type GetLiteral[L <: Matchable]          = RDF { type Literal = L }
    private type GetDefaultGraphNode[N <: Matchable] = RDF { type DefaultGraphNode = N }
