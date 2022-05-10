@@ -86,7 +86,9 @@ object RDF:
    type rNode[R <: RDF] <: Matchable = R match
       case GetRelNode[n] => n
 
-   type Node[R <: RDF] = URI[R] | BNode[R] | Literal[R] | Graph[R]
+   type Node[R <: RDF] = URI[R] | BNode[R] | Literal[R]
+   // type Node[R <: RDF] <: Matchable = R match
+   //    case GetNode[n] => n
 
    type BNode[R <: RDF] <: Matchable = R match
       case GetBNode[bn] => bn

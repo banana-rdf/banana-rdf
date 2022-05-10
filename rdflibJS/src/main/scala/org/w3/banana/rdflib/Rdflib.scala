@@ -330,24 +330,5 @@ object Rdflib extends RDF:
       given Solution: operations.Solution[R] = ???
 
       given Query: operations.Query[R] = ???
-
-   // mutable graphs
-//	type MGraph = Model
-//
-//	// types for the graph traversal API
-//	type NodeMatch = Value
-//	type NodeAny = Null
-//	type NodeConcrete = Value
-//
-//	// types related to Sparql
-//	type Query = ParsedQuery
-//	type SelectQuery = ParsedTupleQuery
-//	type ConstructQuery = ParsedGraphQuery
-//	type AskQuery = ParsedBooleanQuery
-//
-//	//FIXME Can't use ParsedUpdate because of https://openrdf.atlassian.net/browse/SES-1847
-//	type UpdateQuery = Rdf4jParseUpdate
-//
-//	type Solution = BindingSet
-//	// instead of TupleQueryResult so that it's eager instead of lazy
-//	type Solutions = Vector[BindingSet]
+   end ops
+end Rdflib

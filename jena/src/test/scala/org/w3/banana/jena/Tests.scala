@@ -35,5 +35,5 @@ class JenaIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
 
 class JenaSparqlEngineSyntaxTest extends org.w3.banana.SparqlEngineSyntaxTest[R]
 
-// class JenaSparqlEngineGraphTest
-//     extends org.w3.banana.SparqlEngineTest[R, Dataset](DatasetFactory.createGeneral().nn)
+class JenaSparqlEngineDatasetTest
+    extends org.w3.banana.SparqlEngineTest[R, Dataset](DatasetFactory.createGeneral().nn)

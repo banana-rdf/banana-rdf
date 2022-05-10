@@ -378,7 +378,7 @@ object Rdf4j extends RDF:
                     VarNotFound("var " + variable + " not found in BindingSet " + solution.toString)
                   )
                else
-                  Success(node)
+                  Success(node.asInstanceOf[RDF.Node[R]])
 
             def variableNames: Set[String] =
               solution.getBindingNames.nn.asScala.toSet

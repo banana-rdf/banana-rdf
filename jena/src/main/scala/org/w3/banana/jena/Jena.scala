@@ -38,6 +38,8 @@ import org.apache.jena.query.{QueryExecution, QueryExecutionFactory}
 import org.apache.jena.query.QueryFactory
 import scala.util.{Failure, Success}
 import scala.jdk.CollectionConverters.*
+import org.apache.jena.rdf.model.{Model, ModelFactory}
+import org.apache.jena.query.Dataset
 
 object JenaRdf extends org.w3.banana.RDF:
    import org.apache.jena.graph as jena
@@ -438,5 +440,81 @@ object JenaRdf extends org.w3.banana.RDF:
                   qe.setInitialBinding(querySolution.getMap(bindings))
                qe
       end sparqlHttp
+
+      given sparqlGraph: operations.SparqlEngine[R, Try, RDF.Graph[R]] with
+         val querySolution = org.w3.banana.jena.util.QuerySolution[R]
+
+         extension (graph: RDF.Graph[R])
+            def executeSelect(
+                query: RDF.SelectQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ) = Try { qexec(query, bindings).execSelect().nn }
+
+            def executeConstruct(
+                query: RDF.ConstructQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ) = Try { qexec(query, bindings).execConstruct().nn.getGraph().nn }
+
+            def executeAsk(
+                query: RDF.AskQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ) = Try { qexec(query, bindings).execAsk().nn }
+
+            def qexec(
+                query: RDF.Query[R],
+                bindings: Map[String, RDF.Node[R]]
+            ): QueryExecution =
+               val model: Model = ModelFactory.createModelForGraph(graph).nn
+               if bindings.isEmpty then
+                  QueryExecutionFactory.create(query, model).nn
+               else
+                  QueryExecutionFactory.create(query, model, querySolution.getMap(bindings)).nn
+      end sparqlGraph
+
+      given rdfStore: operations.SparqlEngine[R, Try, Dataset] with
+         val querySolution = org.w3.banana.jena.util.QuerySolution[R]
+
+         extension (dataset: Dataset)
+            def executeSelect(
+                query: RDF.SelectQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ): Try[RDF.Solutions[R]] = Try {
+              val qexec: QueryExecution =
+                if bindings.isEmpty then
+                   QueryExecutionFactory.create(query, dataset).nn
+                else
+                   QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings)).nn
+              val solutions = qexec.execSelect().nn
+              solutions
+            }
+
+            /** Executes a Construct query. */
+            def executeConstruct(
+                query: RDF.ConstructQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ): Try[RDF.Graph[R]] = Try {
+              val qexec: QueryExecution =
+                if bindings.isEmpty then
+                   QueryExecutionFactory.create(query, dataset).nn
+                else
+                   QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings)).nn
+              val result = qexec.execConstruct().nn
+              result.getGraph().nn
+            }
+
+            /** Executes a Ask query. */
+            def executeAsk(
+                query: RDF.AskQuery[R],
+                bindings: Map[String, RDF.Node[R]]
+            ): Try[Boolean] = Try {
+              val qexec: QueryExecution =
+                if bindings.isEmpty then
+                   QueryExecutionFactory.create(query, dataset).nn
+                else
+                   QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings)).nn
+              val result = qexec.execAsk().nn
+              result
+            }
+      end rdfStore
    end ops
 end JenaRdf
