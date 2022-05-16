@@ -15,10 +15,12 @@ package org.w3.banana.jena
 
 import java.net.URL
 
+import org.w3.banana.RDF
 import org.w3.banana.jena.JenaRdf.{R, given}
 import org.w3.banana.jena.JenaRdf.ops.given
 import org.apache.jena.sparql.core.DatasetGraph
 import org.apache.jena.query.{Dataset, DatasetFactory}
+import org.w3.banana.prefix.FOAF
 
 class JenaGraphTest       extends org.w3.banana.GraphTest[R]
 class JenaGraphSearchTest extends org.w3.banana.GraphSearchTest[R]
@@ -36,4 +38,34 @@ class JenaIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
 class JenaSparqlEngineSyntaxTest extends org.w3.banana.SparqlEngineSyntaxTest[R]
 
 class JenaSparqlEngineDatasetTest
-    extends org.w3.banana.SparqlEngineTest[R, Dataset](DatasetFactory.createGeneral().nn)
+    extends org.w3.banana.SparqlEngineTest[R, RDF.Store[R]](
+      basicStoreFactory.makeStore()
+    )
+
+val graph1: RDF.Graph[R] =
+  Graph(
+    Triple(BNode("bethess"), FOAF[R].name, Literal("Alexandre", Lang("fr"))),
+    Triple(BNode("bethess"), FOAF[R].title, Literal("Mr"))
+  )
+
+val graph2: RDF.Graph[R] =
+  Graph(
+    Triple(BNode("bethess"), FOAF[R].name, Literal("Alexandre", Lang("fr"))),
+    Triple(BNode("bethess"), FOAF[R].title, Literal("Mr"))
+  )
+
+// val graph1: RDF.Graph[R] = (
+//     bnode("betehess")
+//     -- foaf.name ->- "Alexandre".lang("fr")
+//     -- foaf.title ->- "Mr"
+//     ).graph
+
+// val graph2: RDF.Graph[R] = (
+//     bnode("betehess")
+//     -- foaf.name ->- "Alexandre".lang("fr")
+//     -- foaf.knows ->- (
+//         URI("http://bblfish.net/#hjs")
+//         -- foaf.name ->- "Henry Story"
+//         -- foaf.currentProject ->- URI("http://webid.info/")
+//     )
+//     ).graph

@@ -471,19 +471,23 @@ object JenaRdf extends org.w3.banana.RDF:
                   QueryExecutionFactory.create(query, model, querySolution.getMap(bindings)).nn
       end sparqlGraph
 
-      given rdfStore: operations.SparqlEngine[R, Try, Dataset] with
+      given rdfStore: operations.SparqlEngine[R, Try, RDF.Store[R]] with
          val querySolution = org.w3.banana.jena.util.QuerySolution[R]
 
-         extension (dataset: Dataset)
+         extension (qe: QueryExecution)
+           def withInitialBinding(bindings: Map[String, RDF.Node[R]]) =
+              if bindings.nonEmpty then
+                 qe.setInitialBinding(querySolution.getMap(bindings))
+              qe
+
+         extension (dataset: RDF.Store[R])
             def executeSelect(
                 query: RDF.SelectQuery[R],
                 bindings: Map[String, RDF.Node[R]]
             ): Try[RDF.Solutions[R]] = Try {
               val qexec: QueryExecution =
-                if bindings.isEmpty then
-                   QueryExecutionFactory.create(query, dataset).nn
-                else
-                   QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings)).nn
+                QueryExecutionFactory.create(query, dataset).nn
+                  .withInitialBinding(bindings)
               val solutions = qexec.execSelect().nn
               solutions
             }
@@ -494,10 +498,8 @@ object JenaRdf extends org.w3.banana.RDF:
                 bindings: Map[String, RDF.Node[R]]
             ): Try[RDF.Graph[R]] = Try {
               val qexec: QueryExecution =
-                if bindings.isEmpty then
-                   QueryExecutionFactory.create(query, dataset).nn
-                else
-                   QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings)).nn
+                QueryExecutionFactory.create(query, dataset).nn
+                  .withInitialBinding(bindings)
               val result = qexec.execConstruct().nn
               result.getGraph().nn
             }
@@ -508,10 +510,8 @@ object JenaRdf extends org.w3.banana.RDF:
                 bindings: Map[String, RDF.Node[R]]
             ): Try[Boolean] = Try {
               val qexec: QueryExecution =
-                if bindings.isEmpty then
-                   QueryExecutionFactory.create(query, dataset).nn
-                else
-                   QueryExecutionFactory.create(query, dataset, querySolution.getMap(bindings)).nn
+                QueryExecutionFactory.create(query, dataset).nn
+                  .withInitialBinding(bindings)
               val result = qexec.execAsk().nn
               result
             }
