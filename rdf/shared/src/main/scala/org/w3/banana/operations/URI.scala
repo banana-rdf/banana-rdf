@@ -51,17 +51,17 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
          Failure(URIException(s"Expected Absolute URI, but received protocol Relative URL: $prel"))
        case good => Try(mkUriUnsafe(good.toString))
      }
-     
+
    extension (uri: RDF.URI[Rdf])
       def value: String = ops.rURI.stringValue(uri)
-      //def value: String <- we use rURI implementation everywhere
-      /** return _1 the relativized url relativized _2 if a change was made true else false
-        * todo: follow https://github.com/lemonlabsuk/scala-uri/issues/466
+      // def value: String <- we use rURI implementation everywhere
+      /** return _1 the relativized url relativized _2 if a change was made true else false todo:
+        * follow https://github.com/lemonlabsuk/scala-uri/issues/466
         */
       def relativizeAgainst(base: AbsoluteUrl): (RDF.rURI[Rdf], Boolean) =
-         val juri1: jURI = new jURI(ops.rURI.stringValue(uri))
-         val juri2: jURI = juri1.normalize().nn
-         val baseJuri = new jURI(base.normalize().toString)
+         val juri1: jURI   = new jURI(ops.rURI.stringValue(uri))
+         val juri2: jURI   = juri1.normalize().nn
+         val baseJuri      = new jURI(base.normalize().toString)
          val relJuri: jURI = baseJuri.relativize(juri2).nn
          if (juri2 eq relJuri) && (juri1 eq juri2) then (uri.asInstanceOf[RDF.rURI[Rdf]], false)
          else (rURI(relJuri.toString), true)

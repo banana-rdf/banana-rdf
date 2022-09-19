@@ -9,7 +9,7 @@ object Dependencies {
   object Ver {
     val scala3 = "3.2.0"
   }
-  
+
   // https://github.com/lemonlabsuk/scala-uri
   val scalaUri = Def.setting("io.lemonlabs" %%% "scala-uri" % "4.0.2")
 

@@ -45,11 +45,11 @@ trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
         */
       def resolveLenient(base: AbsoluteUrl): (RDF.Triple[Rdf], Boolean) =
          val (s, sChange): (St.Subject[Rdf], Boolean) = rtriple.rsubj.fold(
-              bn  => (bn, false),
-              uri => ops.rURI.resolveUri(uri, base).get
-           )
+           bn => (bn, false),
+           uri => ops.rURI.resolveUri(uri, base).get
+         )
          val (r, rChange): (St.Relation[Rdf], Boolean) = rtriple.rrel.asUri.resolveUrlLenient(base)
-         val (o, oChange): (St.Object[Rdf], Boolean) = rtriple.robj.asNode.resolveLenient(base)
+         val (o, oChange): (St.Object[Rdf], Boolean)   = rtriple.robj.asNode.resolveLenient(base)
          if sChange || rChange || oChange
          then (ops.Triple(s, r, o), true)
          else (rtriple.asInstanceOf[RDF.Triple[Rdf]], false)

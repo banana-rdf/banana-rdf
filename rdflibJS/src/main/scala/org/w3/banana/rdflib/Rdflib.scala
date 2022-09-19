@@ -47,7 +47,7 @@ object Rdflib extends RDF:
    override opaque type Lang <: Top              = String
    override opaque type DefaultGraphNode <: Node = model.DefaultGraph
 
-   override type NodeAny = Null                                                   
+   override type NodeAny = Null
 
    override type MGraph = storeMod.IndexedFormula // a mutable graph
 
@@ -172,7 +172,7 @@ object Rdflib extends RDF:
             sm.iterator
       end Graph
 
-      given rGraph:  operations.rGraph[R] with
+      given rGraph: operations.rGraph[R] with
          def empty: RDF.rGraph[R] = Graph.empty
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
            Graph(triples)
@@ -189,7 +189,7 @@ object Rdflib extends RDF:
                 case nn: model.NamedNode    => uriFnct(nn)
                 case blank: model.BlankNode => bnFcnt(blank)
       end Subject
-      
+
       given Triple: operations.Triple[R] with
          import RDF.Statement as St
          // todo: check whether it really is not legal in rdflib to have a literal as subject
@@ -217,7 +217,7 @@ object Rdflib extends RDF:
       end Quad
 
       // todo: see whether this really works! It may be that we need to create a new construct
-      given rTriple:  operations.rTriple[R] with
+      given rTriple: operations.rTriple[R] with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
            Triple(s, p, o)
@@ -252,7 +252,7 @@ object Rdflib extends RDF:
             def isURI: Boolean     = rl(rnode).isInstanceOf[model.NamedNode]
             def isBNode: Boolean   = rl(rnode).isInstanceOf[model.BlankNode]
             def isLiteral: Boolean = rl(rnode).isInstanceOf[model.Literal]
-            
+
       end rNode
 
       given BNode: operations.BNode[R] with
@@ -269,7 +269,7 @@ object Rdflib extends RDF:
               case x: (s.type & run.cosy.rdfjs.model.BlankNode) => Some(x)
               case _                                            => None
 
-      val Literal = new operations.Literal[R] :
+      val Literal = new operations.Literal[R]:
          import org.w3.banana.operations.URI.*
          private val xsdString     = df.namedNode(xsdStr).nn
          private val xsdLangString = df.namedNode(xsdLangStr).nn
@@ -319,14 +319,15 @@ object Rdflib extends RDF:
          override protected def mkUriUnsafe(uriStr: String): RDF.rURI[R] =
            df.namedNode(uriStr)
          override def apply(iriStr: String): RDF.rURI[R] = mkUriUnsafe(iriStr)
-         override def stringValue(uri: RDF.rURI[R]): String = uri.asInstanceOf[model.NamedNode].value
+         override def stringValue(uri: RDF.rURI[R]): String =
+           uri.asInstanceOf[model.NamedNode].value
       end rURI
 
       given URI: operations.URI[R] with
          // this does throw an exception on non relative URLs!
          override protected def mkUriUnsafe(iriStr: String): RDF.URI[R] = df.namedNode(iriStr)
       end URI
-      
+
       given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & model.NamedNode] =
            if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.NamedNode
@@ -344,17 +345,16 @@ object Rdflib extends RDF:
            if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.NamedNode
            then Some(s.asInstanceOf[s.type & model.NamedNode])
            else None
-           
+
       given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & model.BlankNode] =
            if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.BlankNode
            then Some(s.asInstanceOf[s.type & model.BlankNode])
            else None
-      
-end Rdflib
-   
 
-   // mutable graphs
+end Rdflib
+
+// mutable graphs
 //	type MGraph = Model
 //
 //	// types for the graph traversal API

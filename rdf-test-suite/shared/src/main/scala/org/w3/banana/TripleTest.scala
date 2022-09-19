@@ -187,9 +187,9 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
 
    import _root_.io.lemonlabs.uri as ll
    val card: ll.AbsoluteUrl = ll.AbsoluteUrl.parse("https://bblfish.net/people/henry/card")
-   
+
    test("resolving relative triples") {
-     val tr1                  = rTriple(BNode("me"), foaf.name, Literal("Tim Berners-Lee"))
+     val tr1 = rTriple(BNode("me"), foaf.name, Literal("Tim Berners-Lee"))
      assertEquals(tr1.resolveLenient(card), (tr1.asInstanceOf[RDF.Triple[R]], false))
      assertEquals(
        rTriple(rURI("#me"), foaf.name, Literal("Henry Story")).resolveLenient(card),
@@ -203,21 +203,23 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
      )
 
    }
-   
+
    test("relativizing plain triples") {
-     val tr1                  = Triple(BNode("me"), foaf.name, Literal("Tim Berners-Lee"))
-     assertEquals(tr1.relativizeAgainst(card),(tr1.asInstanceOf[RDF.rTriple[R]], false))
+     val tr1 = Triple(BNode("me"), foaf.name, Literal("Tim Berners-Lee"))
+     assertEquals(tr1.relativizeAgainst(card), (tr1.asInstanceOf[RDF.rTriple[R]], false))
      assertEquals(
        Triple(henry, foaf.name, Literal("Henry Story")).relativizeAgainst(card),
-         (rTriple(rURI("#me"), foaf.name, Literal("Henry Story")), true)
+       (rTriple(rURI("#me"), foaf.name, Literal("Henry Story")), true)
      )
      val ppl: ll.AbsoluteUrl = ll.AbsoluteUrl.parse("https://bblfish.net/people/")
-     val rbbl     = rTriple(rURI("henry/card#me"), foaf.knows, rURI("tini/card#i"))
+     val rbbl                = rTriple(rURI("henry/card#me"), foaf.knows, rURI("tini/card#i"))
      assertEquals(
-       Triple(henry, foaf.knows, URI("https://bblfish.net/people/tini/card#i")).relativizeAgainst(ppl),
+       Triple(henry, foaf.knows, URI("https://bblfish.net/people/tini/card#i")).relativizeAgainst(
+         ppl
+       ),
        (rbbl, true)
      )
-     
+
    }
 
    test("quad tests") {

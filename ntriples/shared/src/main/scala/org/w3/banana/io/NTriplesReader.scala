@@ -159,10 +159,10 @@ class NTriplesParser[Rdf <: RDF](
            else true
          case Failure(_) =>
            if skipBrokenLines then
-             parseComment()
-             false
+              parseComment()
+              false
            else true
-         case _          => false
+         case _ => false
       result
 
    private val rewind = mutable.Stack[Int]()

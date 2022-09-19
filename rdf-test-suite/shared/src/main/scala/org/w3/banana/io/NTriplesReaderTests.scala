@@ -592,7 +592,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
         assert(test(resultList))
         assert(resultList.filter {
           case Failure(ParseException(_, -1, _)) => false
-          case _                                    => true
+          case _                                 => true
         }.size == erros)
 
      "nt-syntax-bad-uri-01" in {

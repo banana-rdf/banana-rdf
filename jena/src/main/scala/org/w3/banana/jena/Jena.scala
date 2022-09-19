@@ -155,16 +155,16 @@ object JenaRdf extends org.w3.banana.RDF:
 //				dataset.getContext().set(TDB.symUnionDefaultGraph, false)
 //				dataset
 
-      given rGraph : operations.rGraph[R] with
+      given rGraph: operations.rGraph[R] with
          def empty: RDF.rGraph[R] = Graph.empty
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
            Graph(triples)
          extension (graph: RDF.rGraph[R])
-           def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(graph)
-           def size: Int = Graph.graphSize(graph)
+            def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(graph)
+            def size: Int                         = Graph.graphSize(graph)
       end rGraph
 
-      given rTriple:  operations.rTriple[R] with
+      given rTriple: operations.rTriple[R] with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
            jenaTp.Triple.create(s, p, o).nn
@@ -256,7 +256,7 @@ object JenaRdf extends org.w3.banana.RDF:
               case _                               => None
       end bnodeTT
 
-      val Literal = new operations.Literal[R] :
+      val Literal = new operations.Literal[R]:
          import org.w3.banana.operations.URI.*
          private val xsdString: RDFDatatype     = mapper.getTypeByName(xsdStr).nn
          private val xsdLangString: RDFDatatype = mapper.getTypeByName(xsdLangStr).nn
@@ -321,14 +321,14 @@ object JenaRdf extends org.w3.banana.RDF:
            def label: String = lang
       end Lang
 
-      given rURI :  operations.rURI[R] with
+      given rURI: operations.rURI[R] with
          import java.net.URI as jURI
 
          override protected def mkUriUnsafe(uriStr: String): RDF.rURI[R] =
            NodeFactory.createURI(uriStr).nn.asInstanceOf[Node_URI]
-           
+
          override def apply(uriStr: String): RDF.rURI[R] = mkUriUnsafe(uriStr)
-           
+
          override def stringValue(uri: RDF.rURI[R]): String = uri.getURI().nn
       end rURI
 
@@ -337,7 +337,6 @@ object JenaRdf extends org.w3.banana.RDF:
          override def mkUriUnsafe(iriStr: String): RDF.URI[R] =
            NodeFactory.createURI(iriStr).asInstanceOf[URI]
       end URI
-     
 
       given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_URI] =

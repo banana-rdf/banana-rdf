@@ -129,21 +129,21 @@ lazy val rdf = crossProject(JVMPlatform, JSPlatform)
   )
 
 /** IO interfaces related to blocking IO */
-lazy val rdf_io_sync =  crossProject(JVMPlatform, JSPlatform)
-	.crossType(CrossType.Full)
-	.in(file("rdfIO-sync"))
-	.settings(commonSettings*)
-	.settings(
-		name := "rdfIO-sync",
-		description := "interfaces of IO (serialisation and deserialisation) using blocking libraries"
-	)
-	.dependsOn(rdf)
-	.jvmSettings(
-		scalacOptions := scala3jvmOptions
-	)
-	.jsSettings(
-		scalacOptions ++= scala3jsOptions
-	)
+lazy val rdf_io_sync = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("rdfIO-sync"))
+  .settings(commonSettings*)
+  .settings(
+    name        := "rdfIO-sync",
+    description := "interfaces of IO (serialisation and deserialisation) using blocking libraries"
+  )
+  .dependsOn(rdf)
+  .jvmSettings(
+    scalacOptions := scala3jvmOptions
+  )
+  .jsSettings(
+    scalacOptions ++= scala3jsOptions
+  )
 
 lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -179,17 +179,17 @@ lazy val jena = project.in(file("jena"))
   )
 
 lazy val jenaIOSync = project.in(file("jenaIO-sync"))
-	.settings(commonSettings*)
-	.settings(
-		name                               := "banana-jena-IO-Sync",
-		description                        := "Blocking IO libraries for Jena",
-		scalacOptions                      := scala3jvmOptions,
-		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
-	)
-	.dependsOn(
-		jena,
-		rdf_io_sync.jvm
-	)
+  .settings(commonSettings*)
+  .settings(
+    name                               := "banana-jena-IO-Sync",
+    description                        := "Blocking IO libraries for Jena",
+    scalacOptions                      := scala3jvmOptions,
+    Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
+  )
+  .dependsOn(
+    jena,
+    rdf_io_sync.jvm
+  )
 
 import Dependencies.RDF4J
 lazy val rdf4j = project.in(file("rdf4j"))

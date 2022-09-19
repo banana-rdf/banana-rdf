@@ -77,11 +77,10 @@ trait Ops[Rdf <: RDF]:
 
    val Literal: operations.Literal[Rdf]
    export Literal.LiteralI.*
-  
+
    given operations.Literal[Rdf] = Literal
 
    given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
- 
 
    given subjToURITT: TypeTest[RDF.Statement.Subject[Rdf], RDF.URI[Rdf]]
    given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[Rdf], RDF.BNode[Rdf]]

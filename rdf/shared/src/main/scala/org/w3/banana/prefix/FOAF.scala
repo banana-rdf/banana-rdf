@@ -17,7 +17,7 @@ import org.w3.banana.{RDF, Ops, PrefixBuilder}
 import io.lemonlabs.uri.*
 
 object FOAF:
-  
+
    def apply[Rdf <: RDF](using ops: Ops[Rdf]) = new FOAF()
 
 class FOAF[Rdf <: RDF](using ops: Ops[Rdf])

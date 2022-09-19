@@ -51,11 +51,11 @@ trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
       infix def union(graphs: RDF.Graph[Rdf]*): RDF.Graph[Rdf] = gunion(graph +: graphs)
       def +(triple: RDF.Triple[Rdf]): RDF.Graph[Rdf]           = gunion(Seq(graph, apply(triple)))
       def contains(t: RDF.Triple[Rdf]): Boolean                = find(t.subj, t.rel, t.obj).nonEmpty
-      
-      //todo: optimize by using info about what has changed, eg. if nothing return same
-      def relativizeAgainst(base: AbsoluteUrl): RDF.rGraph[Rdf]  =
-        ops.rGraph(triples.map((t: RDF.Triple[Rdf]) => t.relativizeAgainst(base)._1 ))
-      
+
+      // todo: optimize by using info about what has changed, eg. if nothing return same
+      def relativizeAgainst(base: AbsoluteUrl): RDF.rGraph[Rdf] =
+        ops.rGraph(triples.map((t: RDF.Triple[Rdf]) => t.relativizeAgainst(base)._1))
+
       def find(
           subj: St.Subject[Rdf] | RDF.NodeAny[Rdf],
           rel: St.Relation[Rdf] | RDF.NodeAny[Rdf],

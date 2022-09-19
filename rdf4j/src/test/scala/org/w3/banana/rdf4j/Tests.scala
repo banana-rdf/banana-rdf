@@ -15,7 +15,7 @@ package org.w3.banana.rdf4j
 
 import org.w3.banana.rdf4j.Rdf4j.{R, given}
 
-class Rdf4jUriTest extends org.w3.banana.URITest[R]
+class Rdf4jUriTest         extends org.w3.banana.URITest[R]
 class Rdf4jGraphTest       extends org.w3.banana.GraphTest[R]
 class Rdf4jGraphSearchTest extends org.w3.banana.GraphSearchTest[R]
 

@@ -42,23 +42,22 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
       def at(g: St.Graph[Rdf]): RDF.Quad[Rdf] = ops.Quad(triple.subj, triple.rel, triple.obj, g)
 
       def relativizeAgainst(base: AbsoluteUrl): (RDF.rTriple[Rdf], Boolean) =
-         val (sRz, sChg): (RDF.rStatement.Subject[Rdf],Boolean) = triple.subj.foldSubj(
+         val (sRz, sChg): (RDF.rStatement.Subject[Rdf], Boolean) = triple.subj.foldSubj(
            (u: RDF.URI[Rdf]) => u.relativizeAgainst(base),
-           (bn: RDF.BNode[Rdf]) => (bn , false)
+           (bn: RDF.BNode[Rdf]) => (bn, false)
          )
-         val (rRz, rChg): (RDF.rStatement.Relation[Rdf],Boolean) =
+         val (rRz, rChg): (RDF.rStatement.Relation[Rdf], Boolean) =
            triple.rel.asUri.relativizeAgainst(base)
-         val (oRz, oChg): (RDF.rStatement.Object[Rdf],Boolean) =
-            triple.obj.asNode.fold(
-              uri => uri.relativizeAgainst(base),
-              bn => (bn, false),
-              lit => (lit, false)
-            )
+         val (oRz, oChg): (RDF.rStatement.Object[Rdf], Boolean) =
+           triple.obj.asNode.fold(
+             uri => uri.relativizeAgainst(base),
+             bn => (bn, false),
+             lit => (lit, false)
+           )
          if sChg || rChg || oChg
          then (ops.rTriple(sRz, rRz, oRz), true)
          else (triple.asInstanceOf[RDF.rTriple[Rdf]], false)
       end relativizeAgainst
-      
 
    extension (rsubj: RDF.Statement.Subject[Rdf])
       // todo: find a way to remove this asInstanceOf

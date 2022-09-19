@@ -31,23 +31,23 @@ import scala.util.{Success, Try, Using}
 
 object Rdf4j extends RDF:
 
-   type Top  = java.lang.Object
+   type Top = java.lang.Object
 
 // rdf4j.Model is modifiable, but we provide no altering methods and always produce new graphs
    override opaque type rGraph <: Top  = Model
    override opaque type rTriple <: Top = Statement
-   override opaque type rNode <: Top = Value
+   override opaque type rNode <: Top   = Value
    override opaque type rURI <: rNode  = rjIRI
 
-   override opaque type Graph <: rGraph  = Model
-   override opaque type Triple <: rTriple = Statement
-   override opaque type Quad <: Top   = Statement
-   override opaque type Node <: rNode   = Value
-   override opaque type URI <: Node & rURI  = rjIRI
-   override opaque type BNode <: Node       = rjBNode
-   override opaque type Literal <: Node     = rjLiteral
-   override opaque type Lang <: Top   = String
-   override opaque type DefaultGraphNode    = defaultGraphNode.type
+   override opaque type Graph <: rGraph    = Model
+   override opaque type Triple <: rTriple  = Statement
+   override opaque type Quad <: Top        = Statement
+   override opaque type Node <: rNode      = Value
+   override opaque type URI <: Node & rURI = rjIRI
+   override opaque type BNode <: Node      = rjBNode
+   override opaque type Literal <: Node    = rjLiteral
+   override opaque type Lang <: Top        = String
+   override opaque type DefaultGraphNode   = defaultGraphNode.type
 
    override type NodeAny = Null
 
@@ -188,7 +188,7 @@ object Rdf4j extends RDF:
             graph.filter(s, p, o).nn.iterator.nn.asScala
       end Graph
 
-      given rGraph : operations.rGraph[R] with
+      given rGraph: operations.rGraph[R] with
          def empty: RDF.rGraph[R] = Graph.empty
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
            Graph(triples)
@@ -220,7 +220,7 @@ object Rdf4j extends RDF:
            t.getObject().nn.asInstanceOf[St.Object[R]]
       end Triple
 
-      given rTriple : operations.rTriple[R] with
+      given rTriple: operations.rTriple[R] with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
            Triple(s, p, o)
@@ -231,7 +231,7 @@ object Rdf4j extends RDF:
          def objectOf(t: RDF.rTriple[R]): rSt.Object[R]     = Triple.objectOf(t)
       end rTriple
 
-      given Subject : operations.Subject[R] with
+      given Subject: operations.Subject[R] with
          extension (subj: RDF.Statement.Subject[R])
            def foldSubj[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
              if subj.isBNode() then
@@ -272,7 +272,7 @@ object Rdf4j extends RDF:
          extension (bn: RDF.BNode[R])
            def label: String = bn.getID().nn
       end BNode
-      
+
       given bnodeTT: TypeTest[Matchable, RDF.BNode[R]] with
          def unapply(s: Matchable): Option[s.type & RDF.BNode[R]] =
            s match
@@ -280,14 +280,14 @@ object Rdf4j extends RDF:
               case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
               case _                                           => None
 
-      override val Literal = new operations.Literal[R] :
+      override val Literal = new operations.Literal[R]:
          import org.w3.banana.operations.URI.*
          private val xsdString     = valueFactory.createIRI(xsdStr).nn
          private val xsdLangString = valueFactory.createIRI(xsdLangStr).nn
 
          def apply(plain: String): RDF.Literal[R] =
            valueFactory.createLiteral(plain).nn
-           
+
          def apply(lit: LiteralI): RDF.Literal[R] = lit match
             case LiteralI.Plain(text)     => apply(text)
             case LiteralI.`@`(text, lang) => Literal(text, Lang.label(lang))
@@ -334,30 +334,34 @@ object Rdf4j extends RDF:
             override def isBNode: Boolean   = jn(rnode).isBNode
             override def isLiteral: Boolean = jn(rnode).isLiteral
       end rNode
-      
-      given rSubjToURITT : TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
-         override def unapply(s: RDF.rStatement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.IRI] =
+
+      given rSubjToURITT: TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
+         override def unapply(s: RDF.rStatement.Subject[R])
+             : Option[s.type & org.eclipse.rdf4j.model.IRI] =
            s match
               case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
-              case _                   => None
-              
-      given  rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.rStatement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.BNode] =
+              case _                                         => None
+
+      given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
+         override def unapply(s: RDF.rStatement.Subject[R])
+             : Option[s.type & org.eclipse.rdf4j.model.BNode] =
            s match
               case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
-              case _                               => None
+              case _                                           => None
 
-      given  subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
-         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.IRI] =
+      given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
+         override def unapply(s: RDF.Statement.Subject[R])
+             : Option[s.type & org.eclipse.rdf4j.model.IRI] =
            s match
-              case x: (s.type & org.eclipse.rdf4j.model.IRI ) => Some(x)
-              case _                   => None
+              case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
+              case _                                         => None
 
-      given  subjtoBNodeTT: TypeTest[RDF.Statement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.BNode] =
+      given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[R], RDF.BNode[R]] with
+         override def unapply(s: RDF.Statement.Subject[R])
+             : Option[s.type & org.eclipse.rdf4j.model.BNode] =
            s match
               case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
-              case _                     => None
+              case _                                           => None
 
       given Lang: operations.Lang[R] with
          def apply(lang: String): RDF.Lang[R] = lang
@@ -374,7 +378,7 @@ object Rdf4j extends RDF:
               override def hashCode: Int    = iriStr.hashCode
               override def toString: String = iriStr
               def stringValue: String       = iriStr
-              
+
          override def stringValue(uri: RDF.rURI[R]): String = uri.stringValue.nn
       end rURI
 

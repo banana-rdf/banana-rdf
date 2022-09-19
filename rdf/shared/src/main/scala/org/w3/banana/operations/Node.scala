@@ -16,7 +16,7 @@ package org.w3.banana.operations
 import org.w3.banana.RDF
 
 trait Node[Rdf <: RDF]:
-  
+
    extension (node: RDF.Node[Rdf])
       // todo: could we do with just the rNode fold?
       def fold[A](
@@ -35,5 +35,5 @@ trait Node[Rdf <: RDF]:
       def isURI: Boolean
       def isBNode: Boolean
       def isLiteral: Boolean
-  
+
 end Node
