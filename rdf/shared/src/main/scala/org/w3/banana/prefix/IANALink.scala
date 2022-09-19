@@ -21,10 +21,10 @@ object IANALink:
 /** The Iana Link Relations are not linked data so these URLs are currently invented ones, and need
   * not reflect what may be used if ever such URIs are coined.
   */
-class IANALink[T <: RDF](using Ops[T])
+class IANALink[T <: RDF](using ops: Ops[T])
     extends PrefixBuilder[T](
       "link",
-      "http://www.iana.org/assignments/link-relations/#"
+      ops.URI("http://www.iana.org/assignments/link-relations/#")
     ):
    val about               = apply("about")
    val acl                 = apply("acl")  // needs to be registered

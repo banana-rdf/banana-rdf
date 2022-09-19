@@ -45,3 +45,5 @@ trait RDFWriter[Rdf <: RDF, M[_], +T]: // extends Writer[Rdf#Graph,M,T] {
        wr: Writer,
        prefixes: Set[Prefix[Rdf]] = Set()
    ): M[Unit]
+
+//todo: an rdf writer that outputs relative URLs correctly

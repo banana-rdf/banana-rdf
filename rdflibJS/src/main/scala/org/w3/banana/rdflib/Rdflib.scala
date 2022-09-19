@@ -14,38 +14,40 @@
 package org.w3.banana.rdflib
 
 import org.w3.banana.operations.StoreFactory
+import org.w3.banana.rdflib.facade.*
 import org.w3.banana.rdflib.facade.FormulaOpts.FormulaOpts
 import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
-import org.w3.banana.rdflib.facade.*
 import org.w3.banana.{Ops, RDF, operations}
 import run.cosy.rdfjs.model
 import run.cosy.rdfjs.model.{DataFactory, Term}
 
 import scala.annotation.targetName
 import scala.collection.mutable
-import scala.util.{Success, Try}
 import scala.reflect.TypeTest
 import scala.scalajs.js
 import scala.scalajs.js.undefined
+import scala.util.{Success, Try}
 
 object Rdflib extends RDF:
+   type Top = AnyRef
 
-   override opaque type rGraph  = storeMod.IndexedFormula
-   override opaque type rTriple = model.Quad
-   override opaque type rURI    = model.NamedNode
+   override opaque type rGraph <: Top  = storeMod.IndexedFormula
+   override opaque type rTriple <: Top = model.Quad
+   override opaque type rNode <: Top   = model.ValueTerm[?]
+   override opaque type rURI <: rNode  = model.NamedNode
 
    override opaque type Store                    = storeMod.IndexedFormula
-   override opaque type Graph <: Matchable       = storeMod.IndexedFormula
-   override opaque type Triple <: Matchable      = model.Quad
-   override opaque type Quad <: Matchable        = model.Quad
-   override opaque type Node <: Matchable        = model.ValueTerm[?]
-   override opaque type URI <: Node              = model.NamedNode
+   override opaque type Graph <: rGraph          = storeMod.IndexedFormula
+   override opaque type Triple <: rTriple        = model.Quad
+   override opaque type Quad <: Top              = model.Quad
+   override opaque type Node <: rNode            = model.ValueTerm[?]
+   override opaque type URI <: Node & rURI       = model.NamedNode
    override opaque type BNode <: Node            = model.BlankNode
    override opaque type Literal <: Node          = model.Literal
-   override opaque type Lang <: Matchable        = String
+   override opaque type Lang <: Top              = String
    override opaque type DefaultGraphNode <: Node = model.DefaultGraph
 
-   override type NodeAny = Null
+   override type NodeAny = Null                                                   
 
    override type MGraph = storeMod.IndexedFormula // a mutable graph
 
@@ -73,8 +75,9 @@ object Rdflib extends RDF:
       import js.JSConverters.*
       val df: DataFactory     = model.DataFactory()
       def opts(): FormulaOpts = facade.FormulaOpts().setRdfFactory(df)
-      import scala.collection.mutable
       import RDF.Statement as St
+
+      import scala.collection.mutable
       private val init                         = nodeMod.default
       val defaulGraph: RDF.DefaultGraphNode[R] = df.defaultGraph()
 
@@ -127,8 +130,8 @@ object Rdflib extends RDF:
             graph.addAll(triples.toJSArray)
             graph
          def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] =
-            val iFrm = graph.asInstanceOf[IndexedFormula]
-            iFrm.`match`(undefined, undefined, undefined, undefined).toIterable
+            val iFrm: org.w3.banana.rdflib.facade.storeMod.IndexedFormula = graph
+            iFrm.`match`(undefined, undefined, undefined, undefined)
 
          // note the graph size may be bigger as we are using a quad store
          def graphSize(graph: RDF.Graph[R]): Int =
@@ -169,30 +172,24 @@ object Rdflib extends RDF:
             sm.iterator
       end Graph
 
-      val rGraph = new operations.rGraph[R]:
+      given rGraph:  operations.rGraph[R] with
          def empty: RDF.rGraph[R] = Graph.empty
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
            Graph(triples)
-         def triplesIn(graph: RDF.rGraph[R]): Iterable[RDF.rTriple[R]] =
-           Graph.triplesIn(graph)
-         def graphSize(graph: RDF.rGraph[R]): Int =
-           Graph.graphSize(graph).toInt
-      end rGraph
-//		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
-//			override def unapply(s: Matchable): Option[s.type & Triple] =
-//				s match
-//					//note: this does not compile if we use URI instead of jena.Node_URI
-//					case x: (s.type & Triple) => Some(x)
-//					case _ => None
-//		}
 
-      val Subject = new operations.Subject[R]:
+         extension (rGraph: RDF.rGraph[R])
+            override def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(rGraph)
+            override def size: Int                         = Graph.graphSize(rGraph)
+      end rGraph
+
+      given Subject: operations.Subject[R] with
          extension (subj: RDF.Statement.Subject[R])
-           def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+           def foldSubj[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
              subj match
                 case nn: model.NamedNode    => uriFnct(nn)
                 case blank: model.BlankNode => bnFcnt(blank)
-
+      end Subject
+      
       given Triple: operations.Triple[R] with
          import RDF.Statement as St
          // todo: check whether it really is not legal in rdflib to have a literal as subject
@@ -220,15 +217,15 @@ object Rdflib extends RDF:
       end Quad
 
       // todo: see whether this really works! It may be that we need to create a new construct
-      val rTriple = new operations.rTriple[R]:
+      given rTriple:  operations.rTriple[R] with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
            Triple(s, p, o)
          def untuple(t: RDF.rTriple[R]): rTripleI =
-           (subjectOf(t), relationOf(t), objectOf(t))
-         def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R]   = Triple.subjectOf(t)
-         def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] = Triple.relationOf(t)
-         def objectOf(t: RDF.rTriple[R]): rSt.Object[R]     = Triple.objectOf(t)
+           (subjectOf(t).widenToNode, relationOf(t), objectOf(t).asNode)
+         protected def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R]   = Triple.subjectOf(t)
+         protected def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] = Triple.relationOf(t)
+         protected def objectOf(t: RDF.rTriple[R]): rSt.Object[R]     = Triple.objectOf(t)
       end rTriple
 
       given Node: operations.Node[R] with
@@ -246,9 +243,17 @@ object Rdflib extends RDF:
                case nn: model.NamedNode    => uriF(nn)
                case blank: model.BlankNode => bnF(blank)
                case lit: model.Literal     => litF(lit)
-               case _ => throw IllegalArgumentException(
-                   s"node.fold() received `$node` which is neither a BNode, URI or Literal. Please report."
-                 )
+      end Node
+
+      given rNode: operations.rNode[R] with
+         private def rl(node: RDF.rNode[R]): Term[?] = node.asInstanceOf[Term[?]]
+
+         extension (rnode: RDF.rNode[R])
+            def isURI: Boolean     = rl(rnode).isInstanceOf[model.NamedNode]
+            def isBNode: Boolean   = rl(rnode).isInstanceOf[model.BlankNode]
+            def isLiteral: Boolean = rl(rnode).isInstanceOf[model.Literal]
+            
+      end rNode
 
       given BNode: operations.BNode[R] with
          def apply(s: String): RDF.BNode[R] = df.blankNode(s)
@@ -264,17 +269,16 @@ object Rdflib extends RDF:
               case x: (s.type & run.cosy.rdfjs.model.BlankNode) => Some(x)
               case _                                            => None
 
-      given Literal: operations.Literal[R] with
+      val Literal = new operations.Literal[R] :
          import org.w3.banana.operations.URI.*
          private val xsdString     = df.namedNode(xsdStr).nn
          private val xsdLangString = df.namedNode(xsdLangStr).nn
-         import LiteralI as Lit
 
          def apply(plain: String): RDF.Literal[R] = df.literal(plain, undefined)
-         def apply(lit: Lit): RDF.Literal[R] = lit match
-            case Lit.Plain(text)     => apply(text)
-            case Lit.`@`(text, lang) => df.literal(text, lang)
-            case Lit.`^^`(text, tp)  => df.literal(text, tp)
+         def apply(lit: LiteralI): RDF.Literal[R] = lit match
+            case LiteralI.Plain(text)     => apply(text)
+            case LiteralI.`@`(text, lang) => df.literal(text, lang)
+            case LiteralI.`^^`(text, tp)  => df.literal(text, tp)
 
          def unapply(x: Matchable): Option[LiteralI] = x match
             case lit: model.Literal =>
@@ -283,10 +287,10 @@ object Rdflib extends RDF:
               val lang: String   = lit.language
               if (lang.isEmpty) then
                  // todo: this comparison could be costly, check
-                 if dt == xsdString then Some(Lit.Plain(lex))
-                 else Some(Lit.^^(lex, dt))
+                 if dt == xsdString then Some(LiteralI.Plain(lex))
+                 else Some(LiteralI.^^(lex, dt))
               else if dt == xsdLangString then
-                 Some(Lit.`@`(lex, Lang(lang)))
+                 Some(LiteralI.`@`(lex, Lang(lang)))
               else None
             case _ => None
 
@@ -311,19 +315,44 @@ object Rdflib extends RDF:
          extension (lang: RDF.Lang[R])
            def label: String = lang
 
-      val rURI = new operations.rURI[R]:
-         def apply(iriStr: String): RDF.rURI[R] = df.namedNode(iriStr)
-         def asString(uri: RDF.rURI[R]): String = uri.toString
+      given rURI: operations.rURI[R] with
+         override protected def mkUriUnsafe(uriStr: String): RDF.rURI[R] =
+           df.namedNode(uriStr)
+         override def apply(iriStr: String): RDF.rURI[R] = mkUriUnsafe(iriStr)
+         override def stringValue(uri: RDF.rURI[R]): String = uri.asInstanceOf[model.NamedNode].value
+      end rURI
 
       given URI: operations.URI[R] with
          // this does throw an exception on non relative URLs!
-         def mkUri(iriStr: String): Try[RDF.URI[R]] =
-           Try(df.namedNode(iriStr))
-         def asString(uri: RDF.URI[R]): String = uri.value
-
-//			extension(uri: RDF.URI[R])
-//				def !=(other: RDF.URI[R]): Boolean = !(uri == other)
+         override protected def mkUriUnsafe(iriStr: String): RDF.URI[R] = df.namedNode(iriStr)
       end URI
+      
+      given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
+         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & model.NamedNode] =
+           if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.NamedNode
+           then Some(s.asInstanceOf[s.type & model.NamedNode])
+           else None
+
+      given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[R], RDF.BNode[R]] with
+         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & model.BlankNode] =
+           if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.BlankNode
+           then Some(s.asInstanceOf[s.type & model.BlankNode])
+           else None
+
+      given rSubjToURITT: TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
+         override def unapply(s: RDF.rStatement.Subject[R]): Option[s.type & model.NamedNode] =
+           if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.NamedNode
+           then Some(s.asInstanceOf[s.type & model.NamedNode])
+           else None
+           
+      given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
+         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & model.BlankNode] =
+           if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.BlankNode
+           then Some(s.asInstanceOf[s.type & model.BlankNode])
+           else None
+      
+end Rdflib
+   
 
    // mutable graphs
 //	type MGraph = Model

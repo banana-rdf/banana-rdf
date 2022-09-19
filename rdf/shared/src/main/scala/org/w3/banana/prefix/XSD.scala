@@ -21,7 +21,7 @@ object XSD:
 class XSD[Rdf <: RDF](using val ops: Ops[Rdf])
     extends PrefixBuilder[Rdf](
       "xsd",
-      "http://www.w3.org/2001/XMLSchema#"
+      ops.URI("http://www.w3.org/2001/XMLSchema#")
     ):
    // http://www.w3.org/TR/owl-rdf-based-semantics
    // Table 3.3 Datatypes of the OWL 2 RDF-Based Semantics
@@ -29,7 +29,7 @@ class XSD[Rdf <: RDF](using val ops: Ops[Rdf])
    // http://www.w3.org/TR/owl2-syntax/
    // Table 3 Reserved VOcabulary of OWL 2 with Special Treatment
 
-   import ops.*
+   import ops.given
    import XSD.this.ops.Literal.*
 
    val anyURI             = apply("anyURI")

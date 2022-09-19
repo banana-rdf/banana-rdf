@@ -18,10 +18,10 @@ import org.w3.banana.{RDF, Ops, PrefixBuilder}
 object RDFS:
    def apply[T <: RDF](using Ops[T]) = new RDFS()
 
-class RDFS[Rdf <: RDF](using Ops[Rdf])
+class RDFS[Rdf <: RDF](using ops: Ops[Rdf])
     extends PrefixBuilder[Rdf](
       "rdfs",
-      "http://www.w3.org/2000/01/rdf-schema#"
+      ops.URI("http://www.w3.org/2000/01/rdf-schema#")
     ):
    val Class                       = apply("Class")
    val Container                   = apply("Container")

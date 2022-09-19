@@ -49,9 +49,9 @@ trait Ops[Rdf <: RDF]:
    given basicStoreFactory: StoreFactory[Rdf]
    given Store: operations.Store[Rdf]
 
-   val rGraph: operations.rGraph[Rdf]
+   given rGraph: operations.rGraph[Rdf]
 
-   val Subject: operations.Subject[Rdf]
+   given Subject: operations.Subject[Rdf]
 
 //	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
    val Quad: operations.Quad[Rdf]
@@ -66,9 +66,10 @@ trait Ops[Rdf <: RDF]:
 
    given Triple: operations.Triple[Rdf]
 
-   val rTriple: operations.rTriple[Rdf]
+   given rTriple: operations.rTriple[Rdf]
 
    given Node: operations.Node[Rdf]
+   given rNode: operations.rNode[Rdf]
 
    // todo? should a BNode be part of a Graph (or DataSet) as per Benjamin Braatz's thesis?
    given BNode: operations.BNode[Rdf]
@@ -76,11 +77,18 @@ trait Ops[Rdf <: RDF]:
 
    val Literal: operations.Literal[Rdf]
    export Literal.LiteralI.*
+  
    given operations.Literal[Rdf] = Literal
 
    given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
+ 
 
-   val rURI: operations.rURI[Rdf]
+   given subjToURITT: TypeTest[RDF.Statement.Subject[Rdf], RDF.URI[Rdf]]
+   given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[Rdf], RDF.BNode[Rdf]]
+   given rSubjToURITT: TypeTest[RDF.rStatement.Subject[Rdf], RDF.rURI[Rdf]]
+   given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[Rdf], RDF.BNode[Rdf]]
+
+   given rURI: operations.rURI[Rdf]
 
    given URI: operations.URI[Rdf]
 

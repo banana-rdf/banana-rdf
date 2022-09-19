@@ -15,13 +15,12 @@ package org.w3.banana
 
 import org.w3.banana.RDF
 import org.w3.banana.RDF.*
-import org.w3.banana.syntax.*
 
 import scala.util.*
 
 trait Prefix[Rdf <: RDF](using Ops[Rdf]):
    def prefixName: String
-   def prefixIri: String
+   def prefixIri: RDF.URI[Rdf]
    def apply(value: String): URI[Rdf]
    def unapply(iri: URI[Rdf]): Option[String]
 end Prefix
@@ -30,23 +29,25 @@ object Prefix:
    def apply[Rdf <: RDF](
        prefixName: String,
        prefixIri: String
-   )(using Ops[Rdf]): Prefix[Rdf] =
-     new PrefixBuilder[Rdf](prefixName, prefixIri)
+   )(using ops: Ops[Rdf]): Prefix[Rdf] =
+     new PrefixBuilder[Rdf](prefixName, ops.URI(prefixIri))
 end Prefix
 
+// todo: should we have a version with a relativePrefixIRI that creates rIRIs?
 open class PrefixBuilder[Rdf <: RDF](
     val prefixName: String,
-    val prefixIri: String
+    val prefixIri: RDF.URI[Rdf]
 )(using ops: Ops[Rdf]) extends Prefix[Rdf]:
-   import ops.given
+   import ops.{*,given}
    override def toString: String = "Prefix(" + prefixName + ")"
+   lazy val prefixVal = ops.rURI.stringValue(prefixIri)
 
-   def apply(value: String): URI[Rdf] = ops.URI(prefixIri + value)
+   def apply(value: String): RDF.URI[Rdf] = ops.URI(prefixIri.value + value)
 
-   def unapply(iri: URI[Rdf]): Option[String] =
+   def unapply(iri: RDF.URI[Rdf]): Option[String] =
       val uriString: String = iri.value
-      if uriString.startsWith(prefixIri) then
-         Some(uriString.substring(prefixIri.length).nn)
+      if uriString.startsWith(prefixVal) then
+         Some(uriString.substring(prefixVal.length).nn)
       else
          None
 

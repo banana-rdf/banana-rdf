@@ -157,9 +157,9 @@ final case class GraphIsomorphism[R <: RDF](
               map
 
            def bnmap(node: RDF.Statement.Object[R]): RDF.Statement.Object[R] = node.asNode.fold(
-             (uri: URI[R]) => uri,
-             (bnode: BNode[R]) => bnodeBijection(bnode),
-             (lit: Literal[R]) => lit
+             (uri: RDF.URI[R]) => uri,
+             (bnode: RDF.BNode[R]) => bnodeBijection(bnode),
+             (lit: RDF.Literal[R]) => lit
            )
 
            // 2. use the bijection to verify that it maps the triples correctly
@@ -184,6 +184,8 @@ final case class GraphIsomorphism[R <: RDF](
    )]) extends MappingError(""):
       def msg: String                 = "No mapping found"
       override def toString(): String = s"NoMappingException($reasons)"
+
+end GraphIsomorphism
 
 //problem https://github.com/lampepfl/dotty/issues/13608
 open class MappingError(msg: String) extends Throwable(msg) // ,null, true,  false)

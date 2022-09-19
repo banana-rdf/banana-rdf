@@ -592,9 +592,6 @@ open class NTriplesReaderTests[Rdf <: RDF](using
         assert(test(resultList))
         assert(resultList.filter {
           case Failure(ParseException(_, -1, _)) => false
-          // remove failures that come from extra tests builtinto RDF libraries
-          // In this case only Rdf4J when creating language tags.
-          case Failure(e: IllegalArgumentException) => false
           case _                                    => true
         }.size == erros)
 

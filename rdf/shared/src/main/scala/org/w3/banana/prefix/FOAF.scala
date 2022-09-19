@@ -14,12 +14,14 @@
 package org.w3.banana.prefix
 
 import org.w3.banana.{RDF, Ops, PrefixBuilder}
+import io.lemonlabs.uri.*
 
 object FOAF:
+  
    def apply[Rdf <: RDF](using ops: Ops[Rdf]) = new FOAF()
 
-class FOAF[Rdf <: RDF](using Ops[Rdf])
-    extends PrefixBuilder[Rdf]("foaf", "http://xmlns.com/foaf/0.1/"):
+class FOAF[Rdf <: RDF](using ops: Ops[Rdf])
+    extends PrefixBuilder[Rdf]("foaf", ops.URI("http://xmlns.com/foaf/0.1/")):
    // todo: remove these relations as they don't exist in foaf
    val height      = apply("height")
    val publication = apply("publication")

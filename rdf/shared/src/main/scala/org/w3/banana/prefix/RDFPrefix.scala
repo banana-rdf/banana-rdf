@@ -18,10 +18,10 @@ import org.w3.banana.{RDF, Ops, PrefixBuilder}
 object RDFPrefix:
    def apply[Rdf <: RDF](using Ops[Rdf]) = new RDFPrefix()
 
-class RDFPrefix[Rdf <: RDF](using Ops[Rdf])
+class RDFPrefix[Rdf <: RDF](using ops: Ops[Rdf])
     extends PrefixBuilder[Rdf](
       "rdf",
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+      ops.URI("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
     ):
    val langString   = apply("langString") // todo: does not exist in ontology
    val nil          = apply("nil")

@@ -13,6 +13,7 @@
 
 package org.w3.banana.operations
 
+import io.lemonlabs.uri.AbsoluteUrl
 import org.w3.banana.RDF
 import org.w3.banana.RDF.{NodeAny, Triple, Statement as St}
 import org.w3.banana.Ops
@@ -39,6 +40,7 @@ trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
        p: St.Relation[Rdf] | RDF.NodeAny[Rdf],
        o: St.Object[Rdf] | RDF.NodeAny[Rdf]
    ): Iterator[RDF.Triple[Rdf]]
+
    extension (graph: RDF.Graph[Rdf])
       @targetName("iso")
       def ≅(other: RDF.Graph[Rdf]): Boolean                    = isomorphism(graph, other)
@@ -49,6 +51,11 @@ trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
       infix def union(graphs: RDF.Graph[Rdf]*): RDF.Graph[Rdf] = gunion(graph +: graphs)
       def +(triple: RDF.Triple[Rdf]): RDF.Graph[Rdf]           = gunion(Seq(graph, apply(triple)))
       def contains(t: RDF.Triple[Rdf]): Boolean                = find(t.subj, t.rel, t.obj).nonEmpty
+      
+      //todo: optimize by using info about what has changed, eg. if nothing return same
+      def relativizeAgainst(base: AbsoluteUrl): RDF.rGraph[Rdf]  =
+        ops.rGraph(triples.map((t: RDF.Triple[Rdf]) => t.relativizeAgainst(base)._1 ))
+      
       def find(
           subj: St.Subject[Rdf] | RDF.NodeAny[Rdf],
           rel: St.Relation[Rdf] | RDF.NodeAny[Rdf],

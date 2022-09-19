@@ -20,7 +20,6 @@ open class GraphTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    // todo: find a way to simplify these imports for end users of the library
    import ops.{given, *}
    import org.w3.banana.prefix.{FOAF, XSD}
-   import org.w3.banana.syntax.*
 
    val timbl: URI[Rdf] = URI(tim("i"))
    val bblf: URI[Rdf]  = URI(bbl("i"))
@@ -72,7 +71,6 @@ open class GraphSearchTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSui
    // todo: find a way to simplify these imports for end users of the library
    import ops.{given, *}
    import org.w3.banana.prefix.{FOAF, XSD}
-   import org.w3.banana.syntax.*
 
    val timbl: URI[Rdf] = URI(tim("i"))
    val bblf: URI[Rdf]  = URI(bbl("i"))

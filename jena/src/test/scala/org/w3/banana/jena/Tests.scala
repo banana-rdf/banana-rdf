@@ -15,6 +15,8 @@ package org.w3.banana.jena
 
 import org.w3.banana.jena.JenaRdf.{R, given}
 
+class JenaUriTest extends org.w3.banana.URITest[R]
+
 class JenaGraphTest       extends org.w3.banana.GraphTest[R]
 class JenaGraphSearchTest extends org.w3.banana.GraphSearchTest[R]
 

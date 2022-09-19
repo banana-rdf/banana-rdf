@@ -7,8 +7,11 @@ object Dependencies {
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
   object Ver {
-    val scala3 = "3.1.1"
+    val scala3 = "3.2.0"
   }
+  
+  // https://github.com/lemonlabsuk/scala-uri
+  val scalaUri = Def.setting("io.lemonlabs" %%% "scala-uri" % "4.0.2")
 
   /** Jena
     *
@@ -17,7 +20,7 @@ object Dependencies {
     * @see
     *   https://repo1.maven.org/maven2/org/apache/jena
     */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.2.0"
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.6.1"
 
   object fish {
     val rdf_model_js = Def.setting("net.bblfish.rdf" %%% "rdf-model-js" % "0.2-dbfa81d-SNAPSHOT")
@@ -25,11 +28,11 @@ object Dependencies {
 
   object TestLibs {
     /* @see munit docs https://scalameta.org/munit/ */
-    val munit = Def.setting("org.scalameta" %%% "munit" % "1.0.0-M1")
+    val munit = Def.setting("org.scalameta" %%% "munit" % "1.0.0-M6")
     // https://github.com/com-lihaoyi/utest
-    val utest = Def.setting("com.lihaoyi" %%% "utest" % "0.7.10")
+    val utest = Def.setting("com.lihaoyi" %%% "utest" % "0.8.1")
     /* @see scalatest docs https://www.scalatest.org/install */
-    val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.11")
+    val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.13")
     val scalatic  = "org.scalactic" %% "scalactic" % "3.2.11"
   }
 
@@ -41,7 +44,7 @@ object Dependencies {
     *   https://repo1.maven.org/maven2/org/eclipse/rdf4j/
     */
   object RDF4J {
-    val Version             = "3.7.4"
+    val Version             = "4.1.3"
     lazy val QueryAlgebra   = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation"  % Version
     lazy val QueryParser    = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql"       % Version
     lazy val QueryResult    = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % Version
@@ -71,7 +74,7 @@ object Dependencies {
 //	val `rdflib-types` = "org.scala-js" %%% "rdflib-types" % "0.1-SNAPSHOT"
 
   object typelevel {
-    val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.6.1")
+    val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.8.0")
   }
 
 }

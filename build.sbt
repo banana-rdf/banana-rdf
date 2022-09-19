@@ -25,7 +25,7 @@ enablePlugins(TypelevelSonatypePlugin)
 ThisBuild / tlCiReleaseBranches := Seq() // "scala3" if github were to do the releases
 ThisBuild / tlCiReleaseTags     := false // don't publish artifacts on github
 
-ThisBuild / crossScalaVersions := Seq("3.1.1") //, "2.13.8")
+ThisBuild / crossScalaVersions := Seq(Ver.scala3) //, "2.13.8")
 
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
@@ -119,7 +119,7 @@ lazy val rdf = crossProject(JVMPlatform, JSPlatform)
   .settings(commonSettings*)
   .settings(
     name := "banana-rdf",
-    libraryDependencies ++= Seq(typelevel.catsCore.value)
+    libraryDependencies ++= Seq(typelevel.catsCore.value, scalaUri.value)
   )
   .jvmSettings(
     scalacOptions := scala3jvmOptions
@@ -127,6 +127,23 @@ lazy val rdf = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     scalacOptions ++= scala3jsOptions
   )
+
+/** IO interfaces related to blocking IO */
+lazy val rdf_io_sync =  crossProject(JVMPlatform, JSPlatform)
+	.crossType(CrossType.Full)
+	.in(file("rdfIO-sync"))
+	.settings(commonSettings*)
+	.settings(
+		name := "rdfIO-sync",
+		description := "interfaces of IO (serialisation and deserialisation) using blocking libraries"
+	)
+	.dependsOn(rdf)
+	.jvmSettings(
+		scalacOptions := scala3jvmOptions
+	)
+	.jsSettings(
+		scalacOptions ++= scala3jsOptions
+	)
 
 lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
@@ -136,7 +153,7 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
     description   := "Blocking NTriples Parser"
   )
   .in(file("ntriples"))
-  .dependsOn(rdf)
+  .dependsOn(rdf_io_sync)
   .jvmSettings(
     scalacOptions := scala3jvmOptions
     //	scalacOptions += "-rewrite"
@@ -160,6 +177,19 @@ lazy val jena = project.in(file("jena"))
     rdfTestSuite.jvm % "test->compile",
     ntriples.jvm
   )
+
+lazy val jenaIOSync = project.in(file("jenaIO-sync"))
+	.settings(commonSettings*)
+	.settings(
+		name                               := "banana-jena-IO-Sync",
+		description                        := "Blocking IO libraries for Jena",
+		scalacOptions                      := scala3jvmOptions,
+		Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
+	)
+	.dependsOn(
+		jena,
+		rdf_io_sync.jvm
+	)
 
 import Dependencies.RDF4J
 lazy val rdf4j = project.in(file("rdf4j"))
@@ -228,9 +258,10 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
     name        := "banana-test",
     description := "Generic tests to be run on each banana-rdf implementation",
     libraryDependencies ++= Seq(
+      scalaUri.value,
       TestLibs.scalatest.value,
-      TestLibs.munit.value,
-      TestLibs.utest.value
+      TestLibs.munit.value
+//      TestLibs.utest.value
     )
     //	Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
   )

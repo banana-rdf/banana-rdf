@@ -17,10 +17,10 @@ import org.w3.banana.{RDF, Ops, PrefixBuilder}
 object OWL:
    def apply[T <: RDF](using Ops[T]) = new OWL()
 
-class OWL[T <: RDF](using Ops[T])
+class OWL[T <: RDF](using ops: Ops[T])
     extends PrefixBuilder[T](
       "owl",
-      "http://www.w3.org/2002/07/owl#"
+      ops.URI("http://www.w3.org/2002/07/owl#")
     ):
 
    // http://www.w3.org/TR/owl2-rdf-based-semantics/

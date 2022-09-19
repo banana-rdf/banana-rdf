@@ -13,7 +13,7 @@
 
 package org.w3.banana
 
-import org.w3.banana.TestConstants.{bbl, foafPre, tim}
+import org.w3.banana.TestConstants.{bbl, bfsh, foafPre, tim}
 import org.w3.banana.prefix.{FOAF, XSD}
 import org.w3.banana.{Ops, RDF}
 
@@ -25,8 +25,7 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
     extends munit.FunSuite:
 
    import RDF.*
-   import ops.{given, *}
-   import org.w3.banana.syntax.*
+   import ops.{*, given}
 
    test("BNode test") {
      val bn  = BNode()
@@ -39,6 +38,7 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
    val foaf: FOAF[R] = FOAF[R]
    val timbl: URI[R] = URI(tim("i"))
    val bblf: URI[R]  = URI(bbl("i"))
+   val henry: URI[R] = URI(bfsh("people/henry/card", "me"))
 
    test("URI Test") {
      assertEquals(timbl.value, tim("i"))
@@ -183,6 +183,41 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
           assertEquals[Node[R], Node[R]](s, bblf)
           assertEquals(yearStr, "1967")
         case _ => fail("pattern did not match")
+   }
+
+   import _root_.io.lemonlabs.uri as ll
+   val card: ll.AbsoluteUrl = ll.AbsoluteUrl.parse("https://bblfish.net/people/henry/card")
+   
+   test("resolving relative triples") {
+     val tr1                  = rTriple(BNode("me"), foaf.name, Literal("Tim Berners-Lee"))
+     assertEquals(tr1.resolveLenient(card), (tr1.asInstanceOf[RDF.Triple[R]], false))
+     assertEquals(
+       rTriple(rURI("#me"), foaf.name, Literal("Henry Story")).resolveLenient(card),
+       (Triple(henry, foaf.name, Literal("Henry Story")), true)
+     )
+     val rbbl     = rTriple(rURI("#me"), foaf.knows, rURI("../tini/card#i"))
+     val resolved = rbbl.resolveLenient(card)
+     assertEquals(
+       resolved,
+       (Triple(henry, foaf.knows, URI("https://bblfish.net/people/tini/card#i")), true)
+     )
+
+   }
+   
+   test("relativizing plain triples") {
+     val tr1                  = Triple(BNode("me"), foaf.name, Literal("Tim Berners-Lee"))
+     assertEquals(tr1.relativizeAgainst(card),(tr1.asInstanceOf[RDF.rTriple[R]], false))
+     assertEquals(
+       Triple(henry, foaf.name, Literal("Henry Story")).relativizeAgainst(card),
+         (rTriple(rURI("#me"), foaf.name, Literal("Henry Story")), true)
+     )
+     val ppl: ll.AbsoluteUrl = ll.AbsoluteUrl.parse("https://bblfish.net/people/")
+     val rbbl     = rTriple(rURI("henry/card#me"), foaf.knows, rURI("tini/card#i"))
+     assertEquals(
+       Triple(henry, foaf.knows, URI("https://bblfish.net/people/tini/card#i")).relativizeAgainst(ppl),
+       (rbbl, true)
+     )
+     
    }
 
    test("quad tests") {

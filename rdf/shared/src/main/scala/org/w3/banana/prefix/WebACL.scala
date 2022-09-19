@@ -18,10 +18,10 @@ import org.w3.banana.{Ops, PrefixBuilder, RDF}
 object WebACL:
    def apply[R <: RDF](using Ops[R]) = new WebACL[R]()
 
-class WebACL[R <: RDF](using Ops[R])
+class WebACL[R <: RDF](using ops: Ops[R])
     extends PrefixBuilder[R](
       "acl",
-      "http://www.w3.org/ns/auth/acl#"
+      ops.URI("http://www.w3.org/ns/auth/acl#")
     ):
    val Authorization = apply("Authorization")
    val agent         = apply("agent")

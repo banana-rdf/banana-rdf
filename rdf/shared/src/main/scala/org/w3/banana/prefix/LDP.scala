@@ -17,10 +17,10 @@ import org.w3.banana.{RDF, Ops, PrefixBuilder}
 object LDP:
    def apply[T <: RDF](using Ops[T]) = new LDP[T]
 
-class LDP[R <: RDF](using Ops[R])
+class LDP[R <: RDF](using ops: Ops[R])
     extends PrefixBuilder[R](
       "ldp",
-      "http://www.w3.org/ns/ldp#"
+      ops.URI("http://www.w3.org/ns/ldp#")
     ):
    val AggregateContainer      = apply("AggregateContainer")
    val CompositeContainer      = apply("CompositeContainer")

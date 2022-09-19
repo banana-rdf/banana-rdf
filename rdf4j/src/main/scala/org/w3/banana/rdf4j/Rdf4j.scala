@@ -13,39 +13,40 @@
 
 package org.w3.banana.rdf4j
 
-import org.eclipse.rdf4j.model.{BNode as rjBNode, IRI as rjIRI, Literal as rjLiteral, *}
 import org.eclipse.rdf4j.model.impl.*
 import org.eclipse.rdf4j.model.util.Models
+import org.eclipse.rdf4j.model.{BNode as rjBNode, IRI as rjIRI, Literal as rjLiteral, *}
 import org.eclipse.rdf4j.query.*
 import org.eclipse.rdf4j.query.parser.*
-import org.eclipse.rdf4j.repository.{Repository, RepositoryConnection}
 import org.eclipse.rdf4j.repository.sail.SailRepository
+import org.eclipse.rdf4j.repository.{Repository, RepositoryConnection}
 import org.eclipse.rdf4j.sail.memory.MemoryStore
 import org.w3.banana.*
-import org.w3.banana.operations
 import org.w3.banana.operations.StoreFactory
 
 import java.lang
 import scala.annotation.targetName
-import scala.util.{Success, Try, Using}
 import scala.reflect.TypeTest
+import scala.util.{Success, Try, Using}
 
 object Rdf4j extends RDF:
 
-   // rdf4j.Model is modifiable, but we provide no altering methods and always produce new graphs
-   override opaque type rGraph  = Model
-   override opaque type rTriple = Statement
-   // type rNode = rjIRI
-   override opaque type rURI = rjIRI
+   type Top  = java.lang.Object
 
-   override opaque type Graph <: Matchable  = Model
-   override opaque type Triple <: Matchable = Statement
-   override opaque type Quad <: Matchable   = Statement
-   override opaque type Node <: Matchable   = Value
-   override opaque type URI <: Node         = rjIRI
+// rdf4j.Model is modifiable, but we provide no altering methods and always produce new graphs
+   override opaque type rGraph <: Top  = Model
+   override opaque type rTriple <: Top = Statement
+   override opaque type rNode <: Top = Value
+   override opaque type rURI <: rNode  = rjIRI
+
+   override opaque type Graph <: rGraph  = Model
+   override opaque type Triple <: rTriple = Statement
+   override opaque type Quad <: Top   = Statement
+   override opaque type Node <: rNode   = Value
+   override opaque type URI <: Node & rURI  = rjIRI
    override opaque type BNode <: Node       = rjBNode
    override opaque type Literal <: Node     = rjLiteral
-   override opaque type Lang <: Matchable   = String
+   override opaque type Lang <: Top   = String
    override opaque type DefaultGraphNode    = defaultGraphNode.type
 
    override type NodeAny = Null
@@ -79,8 +80,9 @@ object Rdf4j extends RDF:
      */
    given ops: Ops[R] with
       lazy val valueFactory: ValueFactory = SimpleValueFactory.getInstance().nn
-      import scala.jdk.CollectionConverters.{given, *}
       import RDF.Statement as St
+
+      import scala.jdk.CollectionConverters.{*, given}
 
       val `*` : RDF.NodeAny[R] = null
 
@@ -186,14 +188,15 @@ object Rdf4j extends RDF:
             graph.filter(s, p, o).nn.iterator.nn.asScala
       end Graph
 
-      val rGraph = new operations.rGraph[R]:
+      given rGraph : operations.rGraph[R] with
          def empty: RDF.rGraph[R] = Graph.empty
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
            Graph(triples)
-         def triplesIn(graph: RDF.rGraph[R]): Iterable[RDF.rTriple[R]] =
-           Graph.triplesIn(graph)
-         def graphSize(graph: RDF.rGraph[R]): Int =
-           Graph.graphSize(graph).toInt
+
+         extension (rGraph: RDF.rGraph[R])
+            override def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(rGraph)
+            override def size: Int                         = Graph.graphSize(rGraph)
+
       end rGraph
 
 //		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
@@ -217,20 +220,20 @@ object Rdf4j extends RDF:
            t.getObject().nn.asInstanceOf[St.Object[R]]
       end Triple
 
-      val rTriple = new operations.rTriple[R]:
+      given rTriple : operations.rTriple[R] with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
            Triple(s, p, o)
          def untuple(t: RDF.rTriple[R]): rTripleI =
-           (subjectOf(t), relationOf(t), objectOf(t))
+           (subjectOf(t).widenToNode, relationOf(t), objectOf(t).asNode)
          def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R]   = Triple.subjectOf(t)
          def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] = Triple.relationOf(t)
          def objectOf(t: RDF.rTriple[R]): rSt.Object[R]     = Triple.objectOf(t)
       end rTriple
 
-      val Subject = new operations.Subject[R]:
+      given Subject : operations.Subject[R] with
          extension (subj: RDF.Statement.Subject[R])
-           def fold[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
+           def foldSubj[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
              if subj.isBNode() then
                 bnFcnt(subj.asInstanceOf[rjBNode])
              else uriFnct(subj.asInstanceOf[rjIRI])
@@ -269,6 +272,7 @@ object Rdf4j extends RDF:
          extension (bn: RDF.BNode[R])
            def label: String = bn.getID().nn
       end BNode
+      
       given bnodeTT: TypeTest[Matchable, RDF.BNode[R]] with
          def unapply(s: Matchable): Option[s.type & RDF.BNode[R]] =
            s match
@@ -276,31 +280,30 @@ object Rdf4j extends RDF:
               case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
               case _                                           => None
 
-      given Literal: operations.Literal[R] with
+      override val Literal = new operations.Literal[R] :
          import org.w3.banana.operations.URI.*
          private val xsdString     = valueFactory.createIRI(xsdStr).nn
          private val xsdLangString = valueFactory.createIRI(xsdLangStr).nn
 
-         import LiteralI as Lit
-
          def apply(plain: String): RDF.Literal[R] =
            valueFactory.createLiteral(plain).nn
+           
          def apply(lit: LiteralI): RDF.Literal[R] = lit match
-            case Lit.Plain(text)     => apply(text)
-            case Lit.`@`(text, lang) => Literal(text, Lang.label(lang))
-            case Lit.`^^`(text, tp)  => Literal(text, tp)
+            case LiteralI.Plain(text)     => apply(text)
+            case LiteralI.`@`(text, lang) => Literal(text, Lang.label(lang))
+            case LiteralI.`^^`(text, tp)  => Literal(text, tp)
 
-         def unapply(x: Matchable): Option[Lit] = x match
+         def unapply(x: Matchable): Option[LiteralI] = x match
             case lit: Literal =>
               val lex: String                      = lit.getLabel.nn
               val dt: RDF.URI[R]                   = lit.getDatatype.nn
               val lang: java.util.Optional[String] = lit.getLanguage.nn
               if lang.isEmpty then
                  // todo: this comparison could be costly, check
-                 if dt == xsdString then Some(Lit.Plain(lex))
-                 else Some(Lit.^^(lex, dt))
+                 if dt == xsdString then Some(LiteralI.Plain(lex))
+                 else Some(LiteralI.^^(lex, dt))
               else if dt == xsdLangString then
-                 Some(Lit.`@`(lex, Lang(lang.get().nn)))
+                 Some(LiteralI.`@`(lex, Lang(lang.get().nn)))
               else None
             case _ => None
 
@@ -323,13 +326,46 @@ object Rdf4j extends RDF:
               case x: (s.type & org.eclipse.rdf4j.model.Literal) => Some(x)
               case _                                             => None
 
+      given rNode: org.w3.banana.operations.rNode[R] with
+         private def jn(node: RDF.rNode[R]): Value = node
+
+         extension (rnode: RDF.rNode[R])
+            override def isURI: Boolean     = jn(rnode).isIRI
+            override def isBNode: Boolean   = jn(rnode).isBNode
+            override def isLiteral: Boolean = jn(rnode).isLiteral
+      end rNode
+      
+      given rSubjToURITT : TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
+         override def unapply(s: RDF.rStatement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.IRI] =
+           s match
+              case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
+              case _                   => None
+              
+      given  rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
+         override def unapply(s: RDF.rStatement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.BNode] =
+           s match
+              case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
+              case _                               => None
+
+      given  subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
+         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.IRI] =
+           s match
+              case x: (s.type & org.eclipse.rdf4j.model.IRI ) => Some(x)
+              case _                   => None
+
+      given  subjtoBNodeTT: TypeTest[RDF.Statement.Subject[R], RDF.BNode[R]] with
+         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & org.eclipse.rdf4j.model.BNode] =
+           s match
+              case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
+              case _                     => None
+
       given Lang: operations.Lang[R] with
          def apply(lang: String): RDF.Lang[R] = lang
          extension (lang: RDF.Lang[R])
            def label: String = lang
 
-      val rURI = new operations.rURI[R]:
-         def apply(iriStr: String): RDF.rURI[R] =
+      given rURI: operations.rURI[R] with
+         override def mkUriUnsafe(iriStr: String): RDF.rURI[R] =
            new rjIRI:
               override def equals(o: Any): Boolean =
                 o.isInstanceOf[rjIRI] && o.asInstanceOf[rjIRI].toString.equals(iriStr)
@@ -338,13 +374,14 @@ object Rdf4j extends RDF:
               override def hashCode: Int    = iriStr.hashCode
               override def toString: String = iriStr
               def stringValue: String       = iriStr
-         def asString(uri: RDF.rURI[R]): String = uri.toString
+              
+         override def stringValue(uri: RDF.rURI[R]): String = uri.stringValue.nn
+      end rURI
 
       given URI: operations.URI[R] with
          // this does throw an exception on non relative URLs!
-         def mkUri(iriStr: String): Try[RDF.URI[R]] =
-           Try(valueFactory.createIRI(iriStr).nn)
-         def asString(uri: RDF.URI[R]): String = uri.toString
+         override protected def mkUriUnsafe(iriStr: String): RDF.URI[R] =
+           valueFactory.createIRI(iriStr).nn
       end URI
 
    end ops

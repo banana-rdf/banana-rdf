@@ -157,7 +157,11 @@ class NTriplesParser[Rdf <: RDF](
               if c != '\n' && c != '\r' then parseComment()
               false
            else true
-         case Failure(_) => !skipBrokenLines
+         case Failure(_) =>
+           if skipBrokenLines then
+             parseComment()
+             false
+           else true
          case _          => false
       result
 
@@ -322,6 +326,7 @@ class NTriplesParser[Rdf <: RDF](
 
    private def parseSubject(c: Char): St.Subject[Rdf] =
      c match
+        case -1  => throw EOF("was about to parse subject")
         case '<' => parseIRI()
         case '_' => parseBNode()
         case x   => throw Error(c, "Subject of Triple must start with a URI or bnode .")
@@ -334,7 +339,7 @@ class NTriplesParser[Rdf <: RDF](
         case '_' => parseBNode()
         case other => throw Error(
             other,
-            "illegal character to start triple entity ( subject, relation, or object)"
+            s"illegal character '${c.toChar}' to start object part of triple"
           )
 
    private def endOfSentence(): Unit = read() match

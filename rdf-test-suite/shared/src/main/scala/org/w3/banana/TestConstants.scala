@@ -13,8 +13,14 @@
 
 package org.w3.banana
 
+import org.w3.banana.TestConstants.foafPre
+
+import org.w3.banana.RDF.*
+import TestConstants.*
+
 object TestConstants:
    def bbl(id: String): String = "https://bblfish.net/" + (if id == "" then "" else "#" + id)
+   def bfsh(path: String, id: String): String = "https://bblfish.net/" + path + "#" + id
    def tim(id: String): String =
      "https://www.w3.org/People/Berners-Lee/card" + (if id == "" then "" else "#" + id)
 

@@ -22,13 +22,12 @@ import TestConstants.*
   */
 class RelativeGraphTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    import ops.{given, *}
-   import org.w3.banana.syntax.*
 
    test("relative graphs") {
      val rg0 = rGraph.empty
-     assertEquals(rg0.rsize, 0)
+     assertEquals(rg0.size, 0)
      val rg1 = rGraph(rTriple(rURI("/#i"), URI(foafPre("homePage")), rURI("/")))
-     assertEquals(rg1.rsize, 1)
+     assertEquals(rg1.size, 1)
 
      // tests to check that opaque types work: we cannot just cast rX down to X
      val err1 = compileErrors(
@@ -49,3 +48,4 @@ class RelativeGraphTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
      assert(err3.contains("Required: org.w3.banana.RDF.Graph[Rdf]"))
 
    }
+end RelativeGraphTest
