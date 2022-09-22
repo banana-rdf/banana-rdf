@@ -36,9 +36,9 @@ trait rGraph[Rdf <: RDF](using ops: Ops[Rdf]):
 
       /** resolve the relative graph with a base URI
         *
-        * todo: optimize by splitting triples into those that are changed and those that are not.
-        *       If nothing changed return original graph, or construct new graph - could be by
-        *       removing triples if less to remove than add....
+        * todo: optimize by splitting triples into those that are changed and those that are not. If
+        * nothing changed return original graph, or construct new graph - could be by removing
+        * triples if less to remove than add....
         */
       def resolveAgainst(base: AbsoluteUrl): RDF.Graph[Rdf] =
         ops.Graph(triples.map((t: RDF.rTriple[Rdf]) => t.resolveAgainst(base)._1))
