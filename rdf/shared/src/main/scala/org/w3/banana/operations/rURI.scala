@@ -72,10 +72,7 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
       def resolveAgainst(base: ll.AbsoluteUrl): (RDF.URI[Rdf], Boolean) =
         resolveUri(uri, base) match
            case Success(p) => p
-           case Failure(e) => {
-             println("error " + e)
-             (uri.asInstanceOf[RDF.URI[Rdf]], false)
-           }
+           case Failure(e) => (uri.asInstanceOf[RDF.URI[Rdf]], false)
 
       /** Return the resolved URL, and whether the result is new * */
       def resolveAgainstUrl(base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] = resolveUri(uri, base)

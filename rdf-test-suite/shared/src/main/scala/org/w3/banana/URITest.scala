@@ -131,18 +131,18 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    test("resolve relativeURLs to absolute ones") {
      val bbls = "https://bblfish.net"
      val bbl  = AbsoluteUrl.parse(bbls)
-     assertEquals(ops.rURI("people").resolveLenient(bbl), (ops.URI(bbls + "/people"), true))
+     assertEquals(ops.rURI("people").resolveAgainst(bbl), (ops.URI(bbls + "/people"), true))
      assertEquals(
-       ops.rURI("/people/henry").resolveLenient(bbl),
+       ops.rURI("/people/henry").resolveAgainst(bbl),
        (ops.URI(bbls + "/people/henry"), true)
      )
      assertEquals(
-       ops.rURI("/people/henry/card#me").resolveLenient(bbl),
+       ops.rURI("/people/henry/card#me").resolveAgainst(bbl),
        (ops.URI(bbls + "/people/henry/card#me"), true)
      )
      // sadly java.net.URI does not normalize default port numbers away, so we have this for the moment...
      assertEquals(
-       ops.rURI("https://bblfish.net:443/people/henry/card").resolveLenient(bbl),
+       ops.rURI("https://bblfish.net:443/people/henry/card").resolveAgainst(bbl),
        (ops.URI("https://bblfish.net:443/people/henry/card"), false)
      )
    }

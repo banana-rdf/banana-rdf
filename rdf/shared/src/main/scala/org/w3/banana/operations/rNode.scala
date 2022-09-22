@@ -45,7 +45,7 @@ trait rNode[Rdf <: RDF](using ops: Ops[Rdf]):
       /** return the resolved node if it a relative URI or the original URL. Specify in second
         * position is true if a new object was created
         */
-      def resolveLenient(base: AbsoluteUrl): (RDF.Node[Rdf], Boolean) =
+      def resolveNodeAgainst(base: AbsoluteUrl): (RDF.Node[Rdf], Boolean) =
         rnode.fold(
           rUri => rUri.resolveAgainst(base),
           bn => (bn, false),
