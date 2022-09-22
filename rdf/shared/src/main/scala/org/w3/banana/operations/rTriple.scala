@@ -43,17 +43,17 @@ trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
       /** implementations built with clear relative URL types should optimise. resolve relative URLs
         * in triple with base. result._2 is true if a new object was created
         */
-      def resolveLenient(base: AbsoluteUrl): (RDF.Triple[Rdf], Boolean) =
+      def resolveAgainst(base: AbsoluteUrl): (RDF.Triple[Rdf], Boolean) =
          val (s, sChange): (St.Subject[Rdf], Boolean) = rtriple.rsubj.fold(
            bn => (bn, false),
-           uri => ops.rURI.resolveUri(uri, base).get
+           uri => uri.resolveAgainst(base)
          )
-         val (r, rChange): (St.Relation[Rdf], Boolean) = rtriple.rrel.asUri.resolveUrlLenient(base)
-         val (o, oChange): (St.Object[Rdf], Boolean)   = rtriple.robj.asNode.resolveLenient(base)
+         val (r, rChange): (St.Relation[Rdf], Boolean) = rtriple.rrel.asUri.resolveAgainst(base)
+         val (o, oChange): (St.Object[Rdf], Boolean)   = rtriple.robj.asNode.resolveAgainst(base)
          if sChange || rChange || oChange
          then (ops.Triple(s, r, o), true)
          else (rtriple.asInstanceOf[RDF.Triple[Rdf]], false)
-      end resolveLenient
+      end resolveAgainst
 
    extension (rsubj: RDF.rStatement.Subject[Rdf])
       // todo: find a way to remove this asInstanceOf

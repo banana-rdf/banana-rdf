@@ -26,8 +26,8 @@ import scala.util.Try
   * @tparam Rdf
   *   class with Rdf types
   */
-class NTriplesWriter[Rdf <: RDF](using val ops: Ops[Rdf])
-    extends AbsoluteRDFWriter[Rdf, Try, NTriples]:
+class NTriplesIterWriter[Rdf <: RDF](using val ops: Ops[Rdf])
+    extends AbsoluteRDFIterWriter[Rdf, Try, NTriples]:
 
    import ops.{given, *}
 

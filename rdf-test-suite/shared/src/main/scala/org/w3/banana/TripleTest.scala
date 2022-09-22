@@ -190,13 +190,13 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
 
    test("resolving relative triples") {
      val tr1 = rTriple(BNode("me"), foaf.name, Literal("Tim Berners-Lee"))
-     assertEquals(tr1.resolveLenient(card), (tr1.asInstanceOf[RDF.Triple[R]], false))
+     assertEquals(tr1.resolveAgainst(card), (tr1.asInstanceOf[RDF.Triple[R]], false))
      assertEquals(
-       rTriple(rURI("#me"), foaf.name, Literal("Henry Story")).resolveLenient(card),
+       rTriple(rURI("#me"), foaf.name, Literal("Henry Story")).resolveAgainst(card),
        (Triple(henry, foaf.name, Literal("Henry Story")), true)
      )
      val rbbl     = rTriple(rURI("#me"), foaf.knows, rURI("../tini/card#i"))
-     val resolved = rbbl.resolveLenient(card)
+     val resolved = rbbl.resolveAgainst(card)
      assertEquals(
        resolved,
        (Triple(henry, foaf.knows, URI("https://bblfish.net/people/tini/card#i")), true)

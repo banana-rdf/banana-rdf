@@ -13,7 +13,7 @@
 
 package org.w3.banana.operations
 
-import io.lemonlabs.uri.*
+import io.lemonlabs.uri as ll
 import org.w3.banana.{Ops, RDF}
 import org.w3.banana.exceptions.*
 
@@ -36,29 +36,36 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
      */
    def apply(uriStr: String): RDF.URI[Rdf] = mkUri(uriStr).get
    // todo: make the type of absoluteUrl generic, because akka urls or http4s urls could also be good candidates
-   def apply(absUrl: AbsoluteUrl): RDF.URI[Rdf] =
+   def apply(absUrl: ll.AbsoluteUrl): RDF.URI[Rdf] =
      mkUriUnsafe(absUrl.toString) // todo: or toStringRaw?
-   def apply(urn: Urn): RDF.URI[Rdf] = mkUriUnsafe(urn.toString)
+   def apply(urn: ll.Urn): RDF.URI[Rdf] = mkUriUnsafe(urn.toString)
 
    /** we verify the string is good using lemonlabs. Implementations may directly use implementation
      * if it gives the same results (requires serious testing)
      */
    def mkUri(iriStr: String): Try[RDF.URI[Rdf]] =
-     Uri.parseTry(iriStr).flatMap {
-       case rel: RelativeUrl =>
+     ll.Uri.parseTry(iriStr).flatMap {
+       case rel: ll.RelativeUrl =>
          Failure(URIException(s"Expected Absolute URI, but received Relative URL: $rel"))
-       case prel: ProtocolRelativeUrl =>
+       case prel: ll.ProtocolRelativeUrl =>
          Failure(URIException(s"Expected Absolute URI, but received protocol Relative URL: $prel"))
        case good => Try(mkUriUnsafe(good.toString))
      }
 
    extension (uri: RDF.URI[Rdf])
       def value: String = ops.rURI.stringValue(uri)
+     
+      // if URL then add fragment, or else return original URN
+      def withFragment(frag: String): RDF.URI[Rdf] =
+        ll.Uri.parseTry(uri.value).collect{
+          case url: ll.Url => ops.URI(url.withFragment(frag).toString)
+        }.getOrElse(uri)
+        
       // def value: String <- we use rURI implementation everywhere
       /** return _1 the relativized url relativized _2 if a change was made true else false todo:
         * follow https://github.com/lemonlabsuk/scala-uri/issues/466
         */
-      def relativizeAgainst(base: AbsoluteUrl): (RDF.rURI[Rdf], Boolean) =
+      def relativizeAgainst(base: ll.AbsoluteUrl): (RDF.rURI[Rdf], Boolean) =
          val juri1: jURI   = new jURI(ops.rURI.stringValue(uri))
          val juri2: jURI   = juri1.normalize().nn
          val baseJuri      = new jURI(base.normalize().toString)

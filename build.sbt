@@ -163,7 +163,7 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
     //	scalacOptions += "-rewrite"
   )
 
-lazy val jena = project.in(file("jena"))
+lazy val jena: sbt.Project = project.in(file("jena"))
   .settings(commonSettings*)
   .settings(
     name                               := "banana-jena",
@@ -174,8 +174,7 @@ lazy val jena = project.in(file("jena"))
   )
   .dependsOn(
     rdf.jvm,
-    rdfTestSuite.jvm % "test->compile",
-    ntriples.jvm
+    rdfTestSuite.jvm % "test->compile"
   )
 
 lazy val jenaIOSync = project.in(file("jenaIO-sync"))
@@ -188,7 +187,9 @@ lazy val jenaIOSync = project.in(file("jenaIO-sync"))
   )
   .dependsOn(
     jena,
-    rdf_io_sync.jvm
+    rdf_io_sync.jvm,
+    ntriples.jvm,
+    rdfTestSuite.jvm % "test->compile"
   )
 
 import Dependencies.RDF4J
@@ -265,7 +266,7 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
     )
     //	Test / resourceDirectory  := baseDirectory.value / "src/main/resources"
   )
-  .dependsOn(rdf, ntriples)
+  .dependsOn(rdf, ntriples, rdf_io_sync)
   .jvmSettings(
     scalacOptions := scala3jvmOptions
   )

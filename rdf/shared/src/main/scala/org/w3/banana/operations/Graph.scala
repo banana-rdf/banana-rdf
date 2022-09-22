@@ -20,6 +20,11 @@ import org.w3.banana.Ops
 
 import scala.annotation.targetName
 
+// todo: we may want a slightly richer notion of graph, namely one that
+//     can keep track of namespaces and optional base.
+//    - Jena keeps track of those
+//    - Rdf4j ? 
+//    - other ?
 trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
    import ops.given
 

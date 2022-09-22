@@ -47,7 +47,7 @@ trait rNode[Rdf <: RDF](using ops: Ops[Rdf]):
         */
       def resolveLenient(base: AbsoluteUrl): (RDF.Node[Rdf], Boolean) =
         rnode.fold(
-          rUri => rUri.resolveUrlLenient(base),
+          rUri => rUri.resolveAgainst(base),
           bn => (bn, false),
           lit => (lit, false)
         )

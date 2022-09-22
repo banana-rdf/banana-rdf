@@ -47,6 +47,8 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
      ll.Uri.parseTry(iriStr).flatMap(_ => Try(mkUriUnsafe(iriStr)))
 
    def stringValue(uri: RDF.rURI[Rdf]): String
+   /** resolve url with base, but fail if URL parsing fails, or if the Url is schema relative - since that cannot
+     * be resolved. */
    def resolveUri(uri: RDF.rURI[Rdf], base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] =
      ll.Uri.parseTry(stringValue(uri)).flatMap { llUri =>
        llUri match
@@ -67,7 +69,7 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
         * @return
         *   (a resolved URL, true if the result is new)
         */
-      def resolveUrlLenient(base: ll.AbsoluteUrl): (RDF.URI[Rdf], Boolean) =
+      def resolveAgainst(base: ll.AbsoluteUrl): (RDF.URI[Rdf], Boolean) =
         resolveUri(uri, base) match
            case Success(p) => p
            case Failure(e) => {
@@ -76,6 +78,6 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
            }
 
       /** Return the resolved URL, and whether the result is new * */
-      def resolve(base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] = resolveUri(uri, base)
+      def resolveAgainstUrl(base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] = resolveUri(uri, base)
 
 end rURI

@@ -15,7 +15,69 @@ package org.w3.banana
 package io
 import RDF.*
 
+import _root_.io.lemonlabs.uri.AbsoluteUrl
 import java.io.Writer
+import cats.Functor
+import cats.syntax.all.toFunctorOps
+
+trait AbsoluteRDFWriter[Rdf <: RDF, M[_]: Functor, +S]:
+   /** Write the triples of a graph to an java.io.Writer in a format that does not take relative URLs.
+     */
+   def write(triples: RDF.Graph[Rdf], os: Writer): M[Unit]
+
+/**  a Writer that can serialise an RDF graph in a format that allows relative URLs  */
+trait RDFWriter[Rdf <: RDF, M[_]: Functor, +T]:
+   /** write out the Relative Graph to java.io.Writer Passing the graph as an
+     * iterator of Triples allows one to specify the order of writing these out and also to
+     * relativise any URIs to be written given the base
+     */
+   def write(
+       graph: Graph[Rdf],
+       wr: Writer,
+       base: Option[AbsoluteUrl] = None,
+       prefixes: Set[Prefix[Rdf]] = Set()
+   ): M[Unit]
+   
+   def asString(
+       graph: Graph[Rdf],
+       base: Option[AbsoluteUrl] = None,
+       prefixes: Set[Prefix[Rdf]] = Set()
+   ): M[String] =
+     val outs = java.io.StringWriter()
+     write(graph, outs, base, prefixes).map(_ => outs.toString)
+   
+end RDFWriter
+
+/** An Writer that can accept a relative Graph  for a format that allows relative URLs */
+trait RDFrWriter[Rdf <:RDF, M[_]: Functor, +T]:
+  
+   /** write out the relative Graph to java.io.Writer Passing the graph as an
+     * iterator of Triples allows one to specify the order of writing these out and also to
+     * relativise any URIs to be written given the base. No need to specify the base, as we
+     * assume the graph is already correctly set to relative.
+     */
+    def rgWrite(
+       graph: rGraph[Rdf],
+       wr: Writer,
+       prefixes: Set[Prefix[Rdf]] = Set()
+   ): M[Unit]
+   
+    def asString(
+       graph: rGraph[Rdf],
+       prefixes: Set[Prefix[Rdf]] = Set()
+   ): M[String] =
+     val outs = java.io.StringWriter()
+     rgWrite(graph,outs, prefixes).map(_ => outs.toString)
+   
+end RDFrWriter
+
+
+//    I don't think that existing implementations really provide output functions that
+//    take Iterator[Triple] .
+//    ( And it would not even be that great given that java.io is blocking )
+//    But we can write our own such as NTriplesWriter
+//
+
 
 /** serialise an RDF Graph into a syntax S that does not admit relative URLs.
   * @tparam Rdf
@@ -25,8 +87,10 @@ import java.io.Writer
   * @tparam S
   *   Syntax phantom marker trait
   */
-trait AbsoluteRDFWriter[Rdf <: RDF, M[_], +S]:
+trait AbsoluteRDFIterWriter[Rdf <: RDF, M[_], +S]:
    /** Write the triples of a graph to an java.io.Writer
+     * note: this Iterator output would be very nice to have, but do existing implementations even provide this capability?
+     * note: (nice to have apart from the fact that java.io.* is blocking)
      */
    def write(triples: Iterator[Triple[Rdf]], os: Writer): M[Unit]
 
@@ -35,10 +99,12 @@ trait AbsoluteRDFWriter[Rdf <: RDF, M[_], +S]:
   * @tparam M
   * @tparam T
   */
-trait RDFWriter[Rdf <: RDF, M[_], +T]: // extends Writer[Rdf#Graph,M,T] {
-   /** write out the Reltaive Triples from a graph to wr: java.io.Writer Passing the graph as an
-     * interator of Triples allows one to specify the order of writing these out and also to
+trait RDFIterWriter[Rdf <: RDF, M[_], +T]: // extends Writer[Rdf#Graph,M,T] {
+   /** write out the Relative Triples from a graph to wr: java.io.Writer Passing the graph as an
+     * iterator of Triples allows one to specify the order of writing these out and also to
      * relativise any URIs to be written
+     * note: this Iterator output would be very nice to have, but do existing implementations even provide this capability?
+     * note: (nice to have apart from the fact that java.io.* is blocking)
      */
    def write(
        graph: Iterator[rTriple[Rdf]],
