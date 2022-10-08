@@ -96,6 +96,8 @@ lazy val root = tlCrossRootProject.aggregate(
   rdf,
   ntriples,
   jena,
+  jenaIOSync,
+  rdf_io_sync,
   rdf4j,
   rdflibJS,
   rdfTestSuite

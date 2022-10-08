@@ -33,10 +33,21 @@ class JenaRelativeTurtleTestSuite extends org.w3.banana.io.RelativeTurtleTestSui
 
 //class JenaRelativeJsonLDTestSuite extends org.w3.banana.io.RelativeJsonLDTestSuite[R]
 
-
 class JenaRdfXMLTestSuite extends org.w3.banana.io.RdfXMLTestSuite[R]
 
-class JenaJsonLDTestSuite extends org.w3.banana.io.JsonLDTestSuite[R, JsonLdCompacted]
+class JenaJsonLDTestSuite extends org.w3.banana.io.JsonLDTestSuite[R, JsonLdCompacted]:
+   import _root_.io.lemonlabs.uri as ll
+   import org.w3.banana.{Ops, RDF, Prefix}
+   val ops = summon[Ops[R]]
+   import ops.{*, given}
+
+   /** the Titanium JSON-LD implementation that Jena Uses over-relativizes urls, and so to have
+     * tests pass we need to take into account that the root of the w3c will also be relativized.
+     * Todo: we need a way to distinguish these behaviors
+     */
+   override def w3root(prefix: Prefix[R]): RDF.URI[R] =
+      val root = ll.RelativeUrl(ll.UrlPath.slash, ll.QueryString.empty, None)
+      prefix.prefixIri.baseFor(root)
 
 class JenaPrefixTestSuite extends org.w3.banana.io.PrefixTestSuite[R]
 

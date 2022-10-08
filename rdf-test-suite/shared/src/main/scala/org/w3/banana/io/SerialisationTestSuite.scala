@@ -44,19 +44,25 @@ abstract class SerialisationTestSuite[Rdf <: RDF, Sin, Sout](
    import RDF.*
    import ops.{*, given}
 
+   /** Most parsers relativize a graph with a base minimally. That is they only change URIs directly
+     * tied to the base. But others relativize agressively, even using ../../.. type paths todo:
+     * find a way to clearly distinguish these behaviors, as it can lead to very different test
+     * resuls. By default the root w3 url is fixed.
+     */
+   def w3root(prefix: Prefix[Rdf]): RDF.URI[Rdf] = URI("http://www.w3.org/")
+
    def graphBuilder(prefix: Prefix[Rdf]): Graph[Rdf] =
       val ntriplesDoc = prefix("ntriples/")
       val creator     = URI("http://purl.org/dc/elements/1.1/creator")
       val publisher   = URI("http://purl.org/dc/elements/1.1/publisher")
       val dave        = Literal("Dave Beckett")
       val art         = Literal("Art Barstow")
-
-      val w3org = URI("http://www.w3.org/")
       Graph(
         Triple(ntriplesDoc, creator, dave),
         Triple(ntriplesDoc, creator, art),
-        Triple(ntriplesDoc, publisher, w3org)
+        Triple(ntriplesDoc, publisher, w3root(prefix))
       )
+   end graphBuilder
 
    val rdfCore: Option[String] = Some("http://www.w3.org/2001/sw/RDFCore/")
    val rdfCoreUrl: Option[ll.AbsoluteUrl] =
@@ -65,7 +71,9 @@ abstract class SerialisationTestSuite[Rdf <: RDF, Sin, Sout](
    val referenceGraph = graphBuilder(rdfCorePrefix)
 
    // TODO: there is a bug in Sesame with hash uris as prefix
-   val foo       = "http://example.com/foo/"
+   // note: some parsers compact urls to ../../../ in which case the foo URL has
+   // to be of the same depth as the new one written to. Hence foo/bar/baz
+   val foo       = "http://example.com/foo/bar/baz/"
    val fooPrefix = Prefix("foo", foo)
    val fooGraph  = graphBuilder(fooPrefix)
 
@@ -114,7 +122,7 @@ abstract class SerialisationTestSuite[Rdf <: RDF, Sin, Sout](
             println("computedFooGr=" + computedFooGraph)
             println("fooGraph=" + fooGraph)
             computedFooGraph
-       assert(fooGraph isomorphic bar.get)
+       assert(fooGraph isomorphic bar.get, (fooGraph, bar))
      }
 
      """not be created just by taking URIs in absolute graphs and cutting the characters leading up to the base.

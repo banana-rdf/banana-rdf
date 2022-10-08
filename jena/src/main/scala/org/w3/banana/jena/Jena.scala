@@ -344,22 +344,22 @@ object JenaRdf extends org.w3.banana.RDF:
               case x: (s.type & jenaTp.Node_URI) => Some(x)
               case _                             => None
 
-      given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_Blank] =
-           s match
-              case x: (s.type & jenaTp.Node_Blank) => Some(x)
-              case _                               => None
-
       given rSubjToURITT: TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_URI] =
            s match
               case x: (s.type & jenaTp.Node_URI) => Some(x)
               case _                             => None
 
-      given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_Blank] =
+      given objToURITT: TypeTest[RDF.Statement.Object[R], RDF.URI[R]] with
+         override def unapply(s: RDF.Statement.Object[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & jenaTp.Node_Blank) => Some(x)
-              case _                               => None
+              case x: (s.type & jenaTp.Node_URI) => Some(x)
+              case _                             => None
+
+      given rObjToURITT: TypeTest[RDF.rStatement.Object[R], RDF.rURI[R]] with
+         override def unapply(s: RDF.rStatement.Object[R]): Option[s.type & jenaTp.Node_URI] =
+           s match
+              case x: (s.type & jenaTp.Node_URI) => Some(x)
+              case _                             => None
 
 end JenaRdf

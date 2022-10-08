@@ -83,9 +83,9 @@ trait Ops[Rdf <: RDF]:
    given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
 
    given subjToURITT: TypeTest[RDF.Statement.Subject[Rdf], RDF.URI[Rdf]]
-   given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[Rdf], RDF.BNode[Rdf]]
    given rSubjToURITT: TypeTest[RDF.rStatement.Subject[Rdf], RDF.rURI[Rdf]]
-   given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[Rdf], RDF.BNode[Rdf]]
+   given objToURITT: TypeTest[RDF.Statement.Object[Rdf], RDF.URI[Rdf]]
+   given rObjToURITT: TypeTest[RDF.rStatement.Object[Rdf], RDF.rURI[Rdf]]
 
    given rURI: operations.rURI[Rdf]
 

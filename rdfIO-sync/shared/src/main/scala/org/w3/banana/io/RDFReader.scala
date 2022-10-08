@@ -32,7 +32,7 @@ trait AbsoluteRDFReader[Rdf <: RDF, M[_], +S]:
      * Note: Many libraries prefer to have an intput stream that allows the parser to switch
      * encoding and syntax for when the mime type was wrong. But that indicates that those should be
      * called before this.
-     **/
+     */
    def read(is: InputStream): M[Graph[Rdf]] =
      read(new InputStreamReader(is))
 
@@ -66,7 +66,6 @@ trait RDFReader[Rdf <: RDF, M[_], +S]:
 
 end RDFReader
 
-
 /** traits to be implemented by Syntaxes S that can contain relative URLs, for Rdf implementations
   * that can return relative graphs.
   *
@@ -79,11 +78,9 @@ end RDFReader
   */
 trait RelRDFReader[Rdf <: RDF, M[_], +S]:
 
-   /**
-     * Tries parsing an RDF Graph from an java.io.InputStream, but
-     * does not resolve relative URLs, result thus in an rGraph, ie.
-     * a graph which could contain relative URLs and so cannot be merged
-     * with others.
+   /** Tries parsing an RDF Graph from an java.io.InputStream, but does not resolve relative URLs,
+     * result thus in an rGraph, ie. a graph which could contain relative URLs and so cannot be
+     * merged with others.
      */
    def read(is: InputStream): M[rGraph[Rdf]]
 
@@ -92,5 +89,5 @@ trait RelRDFReader[Rdf <: RDF, M[_], +S]:
      *   the base URI to use, to resolve relative URLs found in the InputStream
      */
    def read(reader: Reader): M[rGraph[Rdf]]
-   
+
 end RelRDFReader

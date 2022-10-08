@@ -61,6 +61,11 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
           case url: ll.Url => ops.URI(url.withFragment(frag).toString)
         }.getOrElse(uri)
 
+      def baseFor(rel: ll.RelativeUrl): RDF.URI[Rdf] =
+        ll.Uri.parse(ops.rURI.stringValue(uri)) match
+           case us: ll.UrlWithScheme => apply(rel.resolve(us, true).toString)
+           case _                    => uri
+
       // def value: String <- we use rURI implementation everywhere
       /** return _1 the relativized url relativized _2 if a change was made true else false todo:
         * follow https://github.com/lemonlabsuk/scala-uri/issues/466

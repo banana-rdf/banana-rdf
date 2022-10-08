@@ -336,32 +336,28 @@ object Rdf4j extends RDF:
       end rNode
 
       given rSubjToURITT: TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
-         override def unapply(s: RDF.rStatement.Subject[R])
-             : Option[s.type & org.eclipse.rdf4j.model.IRI] =
+         override def unapply(s: RDF.rStatement.Subject[R]): Option[s.type & rjIRI] =
            s match
               case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
               case _                                         => None
-
-      given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.rStatement.Subject[R])
-             : Option[s.type & org.eclipse.rdf4j.model.BNode] =
-           s match
-              case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
-              case _                                           => None
 
       given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
-         override def unapply(s: RDF.Statement.Subject[R])
-             : Option[s.type & org.eclipse.rdf4j.model.IRI] =
+         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & rjIRI] =
            s match
               case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
               case _                                         => None
 
-      given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.Statement.Subject[R])
-             : Option[s.type & org.eclipse.rdf4j.model.BNode] =
+      given objToURITT: TypeTest[RDF.Statement.Object[R], RDF.URI[R]] with
+         override def unapply(s: RDF.Statement.Object[R]): Option[s.type & rjIRI] =
            s match
-              case x: (s.type & org.eclipse.rdf4j.model.BNode) => Some(x)
-              case _                                           => None
+              case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
+              case _                                         => None
+
+      given rObjToURITT: TypeTest[RDF.rStatement.Object[R], RDF.rURI[R]] with
+         override def unapply(o: RDF.rStatement.Object[R]): Option[o.type & rjIRI] =
+           o match
+              case x: (o.type & org.eclipse.rdf4j.model.IRI) => Some(x)
+              case _                                         => None
 
       given Lang: operations.Lang[R] with
          def apply(lang: String): RDF.Lang[R] = lang

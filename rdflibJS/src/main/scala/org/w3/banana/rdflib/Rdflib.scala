@@ -334,22 +334,22 @@ object Rdflib extends RDF:
            then Some(s.asInstanceOf[s.type & model.NamedNode])
            else None
 
-      given subjtoBNodeTT: TypeTest[RDF.Statement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & model.BlankNode] =
-           if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.BlankNode
-           then Some(s.asInstanceOf[s.type & model.BlankNode])
-           else None
-
       given rSubjToURITT: TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
          override def unapply(s: RDF.rStatement.Subject[R]): Option[s.type & model.NamedNode] =
            if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.NamedNode
            then Some(s.asInstanceOf[s.type & model.NamedNode])
            else None
 
-      given rSubjtoBNodeTT: TypeTest[RDF.rStatement.Subject[R], RDF.BNode[R]] with
-         override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & model.BlankNode] =
-           if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.BlankNode
-           then Some(s.asInstanceOf[s.type & model.BlankNode])
+      given objToURITT: TypeTest[RDF.Statement.Object[R], RDF.URI[R]] with
+         override def unapply(s: RDF.Statement.Object[R]): Option[s.type & model.NamedNode] =
+           if s.asInstanceOf[model.ValueTerm[?]].termType eq Term.NamedNode
+           then Some(s.asInstanceOf[s.type & model.NamedNode])
+           else None
+
+      given rObjToURITT: TypeTest[RDF.rStatement.Object[R], RDF.rURI[R]] with
+         override def unapply(o: RDF.rStatement.Object[R]): Option[o.type & model.NamedNode] =
+           if o.asInstanceOf[model.ValueTerm[?]].termType eq Term.NamedNode
+           then Some(o.asInstanceOf[o.type & model.NamedNode])
            else None
 
 end Rdflib

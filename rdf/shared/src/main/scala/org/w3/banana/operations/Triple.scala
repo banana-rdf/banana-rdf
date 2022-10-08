@@ -26,6 +26,11 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
 
    def unapply(t: RDF.Triple[Rdf]): Option[TripleI] = Some(untuple(t))
 
+   // note we are here using a generalised RDF representation
+   // https://www.w3.org/TR/rdf11-concepts/#section-generalized-rdf
+   // todo: it would be better to return here the correctly typed triple,
+   //  and instead have a gTriple and gGraph types when reasoning. (since
+   // that can easily make a literal subject become an object
    def untuple(t: RDF.Triple[Rdf]): TripleI =
      (subjectOf(t), relationOf(t), objectOf(t))
 
