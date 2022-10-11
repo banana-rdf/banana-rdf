@@ -19,13 +19,15 @@ import scala.util.Try
 abstract class RelativeTurtleTestSuite[Rdf <: RDF](using
     ops: Ops[Rdf],
     reader: RDFReader[Rdf, Try, Turtle],
-    val writer: RDFrWriter[Rdf, Try, Turtle]
+    relReader: RelRDFReader[Rdf, Try, Turtle],
+    val writer: RelRDFWriter[Rdf, Try, Turtle]
 ) extends RelativeGraphSerialisationTestSuite[Rdf, Turtle, Turtle]("Turtle", "ttl") {}
 
 abstract class RelativeJsonLDTestSuite[Rdf <: RDF](using
     ops: Ops[Rdf],
     reader: RDFReader[Rdf, Try, JsonLdCompacted],
-    val writer: RDFrWriter[Rdf, Try, JsonLdCompacted]
+    relReader: RelRDFReader[Rdf, Try, JsonLdCompacted],
+    val writer: RelRDFWriter[Rdf, Try, JsonLdCompacted]
 ) extends RelativeGraphSerialisationTestSuite[Rdf, JsonLdCompacted, JsonLdCompacted](
       "JsonLd",
       "jsonld_1.1"

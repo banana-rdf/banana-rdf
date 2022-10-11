@@ -54,7 +54,6 @@ object JenaRDFWriter:
    import org.w3.banana.jena.JenaRdf.*
    import JenaRdf.Jena
    import JenaRdf.ops.{*, given}
-   type RDFWriterTry[T] = RDFWriter[Jena, Try, T] & RDFrWriter[Jena, Try, T]
 
    given rdfxmlWriter: RDFWriter[Jena, Try, RDFXML] with
       def write(
@@ -72,7 +71,7 @@ object JenaRDFWriter:
       }
    end rdfxmlWriter
 
-   given rdfxmlRelWriter: RDFrWriter[Jena, Try, RDFXML] with
+   given rdfxmlRelWriter: RelRDFWriter[Jena, Try, RDFXML] with
       def rgWrite(
           graph: RDF.rGraph[Jena],
           wr: Writer,
@@ -90,8 +89,8 @@ object JenaRDFWriter:
    given turtleWriter: RDFWriter[Jena, Try, Turtle] =
      makeRDFWriter(RDFFormat.TURTLE_PRETTY.nn)(builder => builder.set(RIOT.symTurtleOmitBase, true))
 
-   given turtleRelWriter: RDFrWriter[Jena, Try, Turtle] =
-     makeRDFRelWriter(RDFFormat.TURTLE_PRETTY.nn)
+   given turtleRelWriter: RelRDFWriter[Jena, Try, Turtle] =
+     makeRelRDFWriter(RDFFormat.TURTLE_PRETTY.nn)
 
 // I doubt these are really N3 Writers. They would need something supporting rules
 //   given n3Writer: RDFWriter[Jena,Try,N3] = makeRDFWriter[N3](RDFLanguages.N3.nn)
@@ -195,8 +194,8 @@ object JenaRDFWriter:
         }
    end makeRDFWriter
 
-   private[JenaRDFWriter] def makeRDFRelWriter[S](format: RDFFormat): RDFrWriter[Jena, Try, S] =
-     new RDFrWriter[Jena, Try, S]:
+   private[JenaRDFWriter] def makeRelRDFWriter[S](format: RDFFormat): RelRDFWriter[Jena, Try, S] =
+     new RelRDFWriter[Jena, Try, S]:
         def rgWrite(
             graph: RDF.rGraph[Jena],
             wr: Writer,
@@ -205,12 +204,14 @@ object JenaRDFWriter:
           import scala.language.unsafeNulls
           val jg: jenaTp.Graph = graph.asInstanceOf[jenaTp.Graph]
           val pmap             = jg.getPrefixMapping
+          pmap.clearNsPrefixMap()
           for p <- prefixes do pmap.setNsPrefix(p.prefixName, p.prefixIri.value)
           val wrb: RDFWriterBuilder = RioWriter.source(jg)
           wrb.format(format)
+            .base(null)
           val rioWr: RioWriter = wrb.build()
           rioWr.output(wr)
         }
-   end makeRDFRelWriter
+   end makeRelRDFWriter
 
 end JenaRDFWriter

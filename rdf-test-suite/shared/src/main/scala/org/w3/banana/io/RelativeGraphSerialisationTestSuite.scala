@@ -47,8 +47,9 @@ abstract class RelativeGraphSerialisationTestSuite[Rdf <: RDF, Sin, Sout](
     extension: String
 )(using
     ops: Ops[Rdf],
+    relReader: RelRDFReader[Rdf, Try, Sin],
     reader: RDFReader[Rdf, Try, Sin],
-    writer: RDFrWriter[Rdf, Try, Sout]
+    writer: RelRDFWriter[Rdf, Try, Sout]
 ) extends AnyWordSpec with Matchers:
 
    import org.w3.banana.prefix.*
@@ -124,19 +125,32 @@ abstract class RelativeGraphSerialisationTestSuite[Rdf <: RDF, Sin, Sout](
      "result in isomorphic graphs root container acl" in {
        // 1. we build a serialisation with relative URLs
        val rootACLStr: String = writer.asString(rootACL).get
+
        // 2. after PUTing it to the acl location, we fetch it and parse it with the relative URL location.
        val reconstructedGraph: RDF.Graph[Rdf] =
          reader.read(
            new StringReader(rootACLStr),
            ll.AbsoluteUrl.parse("https://www.w3.org/.acl")
          ).get
-       val absoluteRootACLGr = rootACL.resolveAgainst(ll.AbsoluteUrl.parse(w3c.value))
+
+       val absoluteRootACLGr: RDF.Graph[Rdf] =
+         rootACL.resolveAgainst(ll.AbsoluteUrl.parse(w3c.value))
        // 3. we compare the result with the absolutized graph we should have received
        assert(
          reconstructedGraph isomorphic absoluteRootACLGr,
          s"both graphs be isomorphic:\nresult=$reconstructedGraph\nshouldBe=$absoluteRootACLGr"
        )
+       // now we also want to parse the relative graph again as an rGraph
 
+       val newRelGraph: Try[RDF.rGraph[Rdf]] = relReader.read(new StringReader(rootACLStr))
+       val absNewRelGr: RDF.Graph[Rdf] =
+         newRelGraph.get.resolveAgainst(ll.AbsoluteUrl.parse(w3c.value))
+
+       assert(
+         absNewRelGr isomorphic absoluteRootACLGr,
+         "the parsed relative graph after resolution should be isomorphic to the graph read in with base"
+           + s":\nresult=$absNewRelGr \nshouldBe=$absoluteRootACLGr"
+       )
      }
 
      "result in isomorphic graph for TimBL's card" in {

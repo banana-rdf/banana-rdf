@@ -50,7 +50,7 @@ trait RDFWriter[Rdf <: RDF, M[_]: Functor, +T]:
 end RDFWriter
 
 /** An Writer that can accept a relative Graph  for a format that allows relative URLs */
-trait RDFrWriter[Rdf <: RDF, M[_]: Functor, +T]:
+trait RelRDFWriter[Rdf <: RDF, M[_]: Functor, +T]:
 
    /** write out the relative Graph to java.io.Writer Passing the graph as an iterator of Triples
      * allows one to specify the order of writing these out and also to relativise any URIs to be
@@ -70,7 +70,7 @@ trait RDFrWriter[Rdf <: RDF, M[_]: Functor, +T]:
       val outs = java.io.StringWriter()
       rgWrite(graph, outs, prefixes).map(_ => outs.toString)
 
-end RDFrWriter
+end RelRDFWriter
 
 //    I don't think that existing implementations really provide output functions that
 //    take Iterator[Triple] .
