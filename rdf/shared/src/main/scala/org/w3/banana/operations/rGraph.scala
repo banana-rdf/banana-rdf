@@ -78,10 +78,11 @@ trait rGraph[Rdf <: RDF](using ops: Ops[Rdf]):
         */
       def resolveAgainst(base: AbsoluteUrl): RDF.Graph[Rdf] =
         ops.Graph(triples.map((t: RDF.rTriple[Rdf]) => t.resolveAgainst(base)._1))
-     
+
       /** A graph needs a complex isomorphism implementation just because there is no order to the
         * triples. In any case one must assume that both graphs are in the same context, ie have the
-        * same base */
+        * same base
+        */
       infix def isomorphic(other: RDF.rGraph[Rdf]): Boolean
 
 end rGraph

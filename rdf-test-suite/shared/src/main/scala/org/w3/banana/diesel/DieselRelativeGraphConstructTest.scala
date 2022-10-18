@@ -1,170 +1,186 @@
+/*
+ *  Copyright (c) 2012 , 2021 W3C Members
+ *
+ *  See the NOTICE file(s) distributed with this work for additional
+ *  information regarding copyright ownership.
+ *
+ *  This program and the accompanying materials are made available under
+ *  the W3C Software Notice and Document License (2015-05-13) which is available at
+ *  https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document.
+ *
+ *  SPDX-License-Identifier: W3C-20150513
+ */
+
 package org.w3.banana.diesel
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import org.w3.banana.*
-import org.w3.banana.diesel.{given,*}
+import org.w3.banana.diesel.{given, *}
 //import org.w3.banana.syntax._
 //import scalaz.Scalaz.{none, some}
 import scala.language.implicitConversions
 
-/** test to build relative graphs using our DSL.
-  * Building relative graphs should be more common. Graphs with full URLs are more likely
-  * downloaded from the web.
-  * TODO: build a DSL for non-relative graphs.
-  **/
+/** test to build relative graphs using our DSL. Building relative graphs should be more common.
+  * Graphs with full URLs are more likely downloaded from the web. TODO: build a DSL for
+  * non-relative graphs.
+  */
 class DieselRelativeGraphConstructTest[Rdf <: RDF](using ops: Ops[Rdf])
-  extends AnyWordSpec with Matchers:
+    extends AnyWordSpec with Matchers:
 
-  import ops.{given,*}
+   import ops.{given, *}
 
-  val foaf = prefix.FOAF[Rdf]
-  val fr = Lang("fr") //todo, put together a list of Lang constants
-  
-  
-  "Diesel must accept a GraphNode in the object position" in {
+   val foaf = prefix.FOAF[Rdf]
+   val fr   = Lang("fr") // todo, put together a list of Lang constants
 
-    val g: PointedRelGraph[Rdf] = (
-      (rURI("#b") -- foaf.name ->- "Alexandre".lang(fr)) -- foaf.title ->- "Mr"
-    )
+   "Diesel must accept a GraphNode in the object position" in {
 
-    val expectedGraph =
-      rGraph(
-        rTriple(BNode("#b"), foaf.name, Literal("Alexandre", fr)),
-        rTriple(BNode("#b"), foaf.title, Literal("Mr"))
-      )
+     val g: PointedRelGraph[Rdf] =
+       (
+         (rURI("#b") -- foaf.name ->- "Alexandre".lang(fr)) -- foaf.title ->- "Mr"
+       )
 
-    (g.graph isomorphic expectedGraph)  shouldEqual true
+     val expectedGraph =
+       rGraph(
+         rTriple(BNode("#b"), foaf.name, Literal("Alexandre", fr)),
+         rTriple(BNode("#b"), foaf.title, Literal("Mr"))
+       )
 
-  }
+     (g.graph isomorphic expectedGraph) shouldEqual true
 
-  "Diesel must construct a simple Graph" in {
+   }
 
-    val g: PointedGraph[Rdf] = (
-      (BNode("betehess") -- foaf.name ->- "Alexandre".lang(fr)) -- foaf.knows ->- (
-        (URI("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story") -- foaf.currentProject ->- URI("http://webid.info/")
-      )
-    )
+   "Diesel must construct a simple Graph" in {
 
-    val expectedGraph =
-      Graph(
-        Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr"))),
-        Triple(BNode("betehess"), foaf.knows, URI("http://bblfish.net/#hjs")),
-        Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story")),
-        Triple(URI("http://bblfish.net/#hjs"), foaf.currentProject, URI("http://webid.info/"))
-      )
+     val g: PointedGraph[Rdf] =
+       (
+         (BNode("betehess") -- foaf.name ->- "Alexandre".lang(fr)) -- foaf.knows ->- (
+           (URI(
+             "http://bblfish.net/#hjs"
+           ) -- foaf.name ->- "Henry Story") -- foaf.currentProject ->- URI("http://webid.info/")
+         )
+       )
 
-    (g.graph isomorphic expectedGraph)  shouldEqual true
-  }
+     val expectedGraph =
+       Graph(
+         Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr"))),
+         Triple(BNode("betehess"), foaf.knows, URI("http://bblfish.net/#hjs")),
+         Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story")),
+         Triple(URI("http://bblfish.net/#hjs"), foaf.currentProject, URI("http://webid.info/"))
+       )
 
-  "Diesel must accept triples written in the inverse order o-p-s using <--" in {
+     (g.graph isomorphic expectedGraph) shouldEqual true
+   }
 
-    val g: PointedGraph[Rdf] = (
-      BNode("betehess")
-      -- foaf.name ->- "Alexandre".lang("fr")
-      -<- foaf.knows -- (
-        URI("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story"
-      )
-    )
+   "Diesel must accept triples written in the inverse order o-p-s using <--" in {
 
-    val expectedGraph =
-      Graph(
-        Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr"))),
-        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, BNode("betehess")),
-        Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
-      )
+     val g: PointedGraph[Rdf] = (
+       BNode("betehess")
+         -- foaf.name ->- "Alexandre".lang("fr")
+         -<- foaf.knows -- (
+           URI("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story"
+         )
+     )
 
-    (g.graph isomorphic expectedGraph) shouldEqual true
-  }
+     val expectedGraph =
+       Graph(
+         Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr"))),
+         Triple(URI("http://bblfish.net/#hjs"), foaf.knows, BNode("betehess")),
+         Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
+       )
 
-  "Diesel must allow easy use of rdf:type through the method 'a'" in {
+     (g.graph isomorphic expectedGraph) shouldEqual true
+   }
 
-    val g: PointedGraph[Rdf] = (
-      BNode("betehess").a(foaf.Person)
-        -- foaf.name ->- "Alexandre".lang("fr")
-    )
+   "Diesel must allow easy use of rdf:type through the method 'a'" in {
 
-    val expectedGraph =
-      Graph(
-        Triple(BNode("betehess"), rdfPfx.`type`, foaf.Person),
-        Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr")))
-      )
+     val g: PointedGraph[Rdf] = (
+       BNode("betehess").a(foaf.Person)
+         -- foaf.name ->- "Alexandre".lang("fr")
+     )
 
-    (g.graph isomorphic expectedGraph)  shouldEqual true
-  }
+     val expectedGraph =
+       Graph(
+         Triple(BNode("betehess"), rdfPfx.`type`, foaf.Person),
+         Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr")))
+       )
 
-  "Diesel must allow objectList definition with simple syntax" in {
+     (g.graph isomorphic expectedGraph) shouldEqual true
+   }
 
-    val g: PointedGraph[Rdf] =
-      BNode("betehess") -- foaf.name ->- ("Alexandre".lang("fr"), "Alexander".lang("en"))
+   "Diesel must allow objectList definition with simple syntax" in {
 
-    val expectedGraph =
-      Graph(
-        Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr"))),
-        Triple(BNode("betehess"), foaf.name, Literal("Alexander", Lang("en")))
-      )
+     val g: PointedGraph[Rdf] =
+       BNode("betehess") -- foaf.name ->- ("Alexandre".lang("fr"), "Alexander".lang("en"))
 
-    (g.graph isomorphic expectedGraph)  shouldEqual true
-  }
+     val expectedGraph =
+       Graph(
+         Triple(BNode("betehess"), foaf.name, Literal("Alexandre", Lang("fr"))),
+         Triple(BNode("betehess"), foaf.name, Literal("Alexander", Lang("en")))
+       )
 
-  "Diesel must allow explicit objectList definition" in {
-    val alexs = Seq(
-      BNode("a") -- foaf.name ->- "Alexandre".lang("fr"),
-      BNode("b") -- foaf.name ->- "Alexander".lang("en")
-    )
+     (g.graph isomorphic expectedGraph) shouldEqual true
+   }
 
-    val g = (
-      URI("http://bblfish.net/#hjs")
-        -- foaf.name ->- "Henry Story"
-        -- foaf.knows ->- ObjectList(alexs)
-    )
+   "Diesel must allow explicit objectList definition" in {
+     val alexs = Seq(
+       BNode("a") -- foaf.name ->- "Alexandre".lang("fr"),
+       BNode("b") -- foaf.name ->- "Alexander".lang("en")
+     )
 
-    val expectedGraph =
-      Graph(
-        Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story")),
-        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, BNode("a")),
-        Triple(URI("http://bblfish.net/#hjs"), foaf.knows, BNode("b")),
-        Triple(BNode("a"), foaf.name, Literal("Alexander", Lang("en"))),
-        Triple(BNode("b"), foaf.name, Literal("Alexandre", Lang("fr")))
-      )
+     val g = (
+       URI("http://bblfish.net/#hjs")
+         -- foaf.name ->- "Henry Story"
+         -- foaf.knows ->- ObjectList(alexs)
+     )
 
-    (g.graph isomorphic expectedGraph)  shouldEqual true
-  }
+     val expectedGraph =
+       Graph(
+         Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story")),
+         Triple(URI("http://bblfish.net/#hjs"), foaf.knows, BNode("a")),
+         Triple(URI("http://bblfish.net/#hjs"), foaf.knows, BNode("b")),
+         Triple(BNode("a"), foaf.name, Literal("Alexander", Lang("en"))),
+         Triple(BNode("b"), foaf.name, Literal("Alexandre", Lang("fr")))
+       )
 
-  "Diesel with empty explicit objectList definition" in {
-    val g = (
-      (URI("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story")
-        -- foaf.knows ->- ObjectList(Seq.empty[Int])
-    )
+     (g.graph isomorphic expectedGraph) shouldEqual true
+   }
 
-    val expectedGraph = Graph(
-      Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
-    )
+   "Diesel with empty explicit objectList definition" in {
+     val g =
+       (
+         (URI("http://bblfish.net/#hjs") -- foaf.name ->- "Henry Story")
+           -- foaf.knows ->- ObjectList(Seq.empty[Int])
+       )
 
-    (g.graph isomorphic expectedGraph)  shouldEqual true
-  }
+     val expectedGraph = Graph(
+       Triple(URI("http://bblfish.net/#hjs"), foaf.name, Literal("Henry Story"))
+     )
 
-  "Diesel must understand Scala's native types" in {
+     (g.graph isomorphic expectedGraph) shouldEqual true
+   }
 
-    val g = (
-      BNode("betehess")
-      -- foaf.name ->- "Alexandre"
-      -- foaf.age ->- 29
-      -- foaf.height ->- 1.80
-    ).graph
+   "Diesel must understand Scala's native types" in {
 
-    val expectedGraph =
-      Graph(
-        Triple(BNode("betehess"), foaf.name, Literal("Alexandre", xsd.string)),
-        Triple(BNode("betehess"), foaf.age, Literal("29", xsd.integer)),
-        Triple(BNode("betehess"), foaf.height, Literal("1.8", xsd.double))
-      )
+     val g = (
+       BNode("betehess")
+         -- foaf.name ->- "Alexandre"
+         -- foaf.age ->- 29
+         -- foaf.height ->- 1.80
+     ).graph
 
-    (g isomorphic expectedGraph)
-  }
+     val expectedGraph =
+       Graph(
+         Triple(BNode("betehess"), foaf.name, Literal("Alexandre", xsd.string)),
+         Triple(BNode("betehess"), foaf.age, Literal("29", xsd.integer)),
+         Triple(BNode("betehess"), foaf.height, Literal("1.8", xsd.double))
+       )
+
+     (g isomorphic expectedGraph)
+   }
 
 //todo: uncomment the rest
-  
+
 //  "Diesel must support RDF collections" in {
 //
 //    val g: PointedRelGraph[Rdf] = (
@@ -306,4 +322,3 @@ class DieselRelativeGraphConstructTest[Rdf <: RDF](using ops: Ops[Rdf])
 //
 //    (pg.graph isIsomorphicWith expectedGraph) shouldEqual true
 //  }
-

@@ -132,7 +132,7 @@ abstract class RelativeGraphSerialisationTestSuite[Rdf <: RDF, Sin, Sout](
            new StringReader(rootACLStr),
            ll.AbsoluteUrl.parse("https://www.w3.org/.acl")
          ).get
-        
+
        val absoluteRootACLGr: RDF.Graph[Rdf] =
          rootACL.resolveAgainst(ll.AbsoluteUrl.parse(w3c.value))
        // 3. we compare the result with the absolutized graph we should have received

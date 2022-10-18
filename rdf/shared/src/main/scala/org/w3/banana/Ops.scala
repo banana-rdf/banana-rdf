@@ -30,19 +30,19 @@ trait Ops[Rdf <: RDF]:
 
    // needed to help inferencing
    // todo: this transformation should really be automatically handled by compiler. Report back.
-   given Conversion[Literal[Rdf],rNode[Rdf]] with
+   given Conversion[Literal[Rdf], rNode[Rdf]] with
       def apply(lit: Literal[Rdf]): rNode[Rdf] = lit.asInstanceOf[rNode[Rdf]]
-      
+
    given Conversion[URI[Rdf], Node[Rdf]] with
-     def apply(uri: URI[Rdf]): Node[Rdf]     = uri.asInstanceOf[Node[Rdf]]
+      def apply(uri: URI[Rdf]): Node[Rdf] = uri.asInstanceOf[Node[Rdf]]
    given Conversion[BNode[Rdf], Node[Rdf]] with
-     def apply(bn: BNode[Rdf]): Node[Rdf]  = bn.asInstanceOf[Node[Rdf]]
+      def apply(bn: BNode[Rdf]): Node[Rdf] = bn.asInstanceOf[Node[Rdf]]
    given Conversion[BNode[Rdf], rNode[Rdf]] with
-     def apply(bn: BNode[Rdf]): rNode[Rdf]  = bn.asInstanceOf[rNode[Rdf]]
+      def apply(bn: BNode[Rdf]): rNode[Rdf] = bn.asInstanceOf[rNode[Rdf]]
 ///   given Conversion[URI[Rdf], rURI[Rdf]] with
 //    def apply(uri: URI[Rdf]): rURI[Rdf]     = uri.asInstanceOf[rURI[Rdf]]
    given Conversion[Node[Rdf], rNode[Rdf]] with
-      def apply(node: Node[Rdf]): rNode[Rdf]     = node.asInstanceOf[rNode[Rdf]]
+      def apply(node: Node[Rdf]): rNode[Rdf] = node.asInstanceOf[rNode[Rdf]]
    implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
 
    // conversions for position types
@@ -56,7 +56,7 @@ trait Ops[Rdf <: RDF]:
    val `*`: RDF.NodeAny[Rdf]
 
    lazy val rdfPfx: RDFPrefix[Rdf] = prefix.RDFPrefix[Rdf](using ops)
-   lazy val xsd: XSD[Rdf] = prefix.XSD[Rdf](using ops)
+   lazy val xsd: XSD[Rdf]          = prefix.XSD[Rdf](using ops)
 
    given Graph: operations.Graph[Rdf]
 

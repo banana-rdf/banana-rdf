@@ -187,7 +187,7 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
 
    import _root_.io.lemonlabs.uri as ll
    val card: ll.AbsoluteUrl = ll.AbsoluteUrl.parse("https://bblfish.net/people/henry/card")
-   
+
    // implicit conversion for foaf.name
    import scala.language.implicitConversions
 

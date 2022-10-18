@@ -37,7 +37,7 @@ object PointedGraph:
      )
 
 object PointedRelGraph:
-  
+
    def apply[R <: RDF](
        node: rNode[R]
    )(using ops: Ops[R]): PointedRelGraph[R] =
@@ -45,4 +45,3 @@ object PointedRelGraph:
        node,
        ops.rGraph.empty
      )
-

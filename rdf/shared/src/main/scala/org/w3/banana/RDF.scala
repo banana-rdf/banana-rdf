@@ -92,7 +92,6 @@ trait RDF:
 
    given ops: Ops[R]
 
-
 end RDF
 
 /** The idea of using match types by @neko-kai https://github.com/lampepfl/dotty/issues/13416
@@ -109,13 +108,13 @@ object RDF:
    type Quad[R <: RDF] <: Matchable = R match
       case GetQuad[t] => t
 
-   type rNode[R <: RDF] <: Matchable = //rURI[R] | BNode[R] | Literal[R]
+   type rNode[R <: RDF] <: Matchable = // rURI[R] | BNode[R] | Literal[R]
      R match
         case GetRelNode[n] => n
 
-   type Node[R <: RDF] = //URI[R] | BNode[R] | Literal[R]
+   type Node[R <: RDF] = // URI[R] | BNode[R] | Literal[R]
      R match
-      case GetNode[n] => n
+        case GetNode[n] => n
 
    type BNode[R <: RDF] <: Node[R] = R match
       case GetBNode[R, bn] => bn
@@ -123,7 +122,7 @@ object RDF:
    type DefaultGraphNode[R <: RDF] = R match
       case GetDefaultGraphNode[n] => n
 
-   type rURI[R <: RDF] <: rNode[R]  = R match
+   type rURI[R <: RDF] <: rNode[R] = R match
       case GetRelURI[R, ru] => ru
 
    type URI[R <: RDF] <: (Node[R] & rURI[R]) = R match
@@ -147,21 +146,21 @@ object RDF:
    type NodeAny[R <: RDF] = R match
       case GetNodeAny[m] => m
 
-   private type GetRelURI[R <: RDF, U <: rNode[R]]           = RDF { type rURI = U }
-   private type GetURI[R <: RDF, U <: (Node[R] & rURI[R])]              = RDF { type URI = U }
-   private type GetRelNode[N <: Matchable]          = RDF { type rNode = N }
-   private type GetNode[N]       = RDF { type Node = N }
-   private type GetBNode[R <: RDF, N <: Node[R]]            = RDF { type BNode = N }
-   private type GetLiteral[R <: RDF, L <: Node[R]]          = RDF { type Literal = L }
-   private type GetDefaultGraphNode[N <: Matchable] = RDF { type DefaultGraphNode = N }
-   private type GetLang[L <: Matchable]             = RDF { type Lang = L }
-   private type GetRelTriple[T]                     = RDF { type rTriple = T }
-   private type GetTriple[T <: Matchable]           = RDF { type Triple = T }
-   private type GetQuad[T <: Matchable]             = RDF { type Quad = T }
-   private type GetRelGraph[G]                      = RDF { type rGraph = G }
-   private type GetGraph[G <: Matchable]            = RDF { type Graph = G }
-   private type GetStore[S]                         = RDF { type Store = S }
-   private type GetNodeAny[M]                       = RDF { type NodeAny = M }
+   private type GetRelURI[R <: RDF, U <: rNode[R]]         = RDF { type rURI = U }
+   private type GetURI[R <: RDF, U <: (Node[R] & rURI[R])] = RDF { type URI = U }
+   private type GetRelNode[N <: Matchable]                 = RDF { type rNode = N }
+   private type GetNode[N]                                 = RDF { type Node = N }
+   private type GetBNode[R <: RDF, N <: Node[R]]           = RDF { type BNode = N }
+   private type GetLiteral[R <: RDF, L <: Node[R]]         = RDF { type Literal = L }
+   private type GetDefaultGraphNode[N <: Matchable]        = RDF { type DefaultGraphNode = N }
+   private type GetLang[L <: Matchable]                    = RDF { type Lang = L }
+   private type GetRelTriple[T]                            = RDF { type rTriple = T }
+   private type GetTriple[T <: Matchable]                  = RDF { type Triple = T }
+   private type GetQuad[T <: Matchable]                    = RDF { type Quad = T }
+   private type GetRelGraph[G]                             = RDF { type rGraph = G }
+   private type GetGraph[G <: Matchable]                   = RDF { type Graph = G }
+   private type GetStore[S]                                = RDF { type Store = S }
+   private type GetNodeAny[M]                              = RDF { type NodeAny = M }
 
    /** these associate a type to the positions in statements (triples or quads) These are not agreed
      * to by all frameworks, so it would be useful to find a way to parametrise them. Essentially
