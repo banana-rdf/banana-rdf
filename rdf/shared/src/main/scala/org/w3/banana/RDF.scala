@@ -92,6 +92,7 @@ trait RDF:
 
    given ops: Ops[R]
 
+
 end RDF
 
 /** The idea of using match types by @neko-kai https://github.com/lampepfl/dotty/issues/13416
@@ -108,25 +109,25 @@ object RDF:
    type Quad[R <: RDF] <: Matchable = R match
       case GetQuad[t] => t
 
-   type rNode[R <: RDF] = rURI[R] | BNode[R] | Literal[R]
-//     R match
-//      case GetRelNode[n] => n
+   type rNode[R <: RDF] <: Matchable = //rURI[R] | BNode[R] | Literal[R]
+     R match
+        case GetRelNode[n] => n
 
-   type Node[R <: RDF] = URI[R] | BNode[R] | Literal[R]
-//     R match
-//      case GetNode[n] => n
+   type Node[R <: RDF] = //URI[R] | BNode[R] | Literal[R]
+     R match
+      case GetNode[n] => n
 
-   type BNode[R <: RDF] <: Matchable = R match
-      case GetBNode[bn] => bn
+   type BNode[R <: RDF] <: Node[R] = R match
+      case GetBNode[R, bn] => bn
 
    type DefaultGraphNode[R <: RDF] = R match
       case GetDefaultGraphNode[n] => n
 
-   type rURI[R <: RDF] <: Matchable = R match
-      case GetRelURI[ru] => ru
+   type rURI[R <: RDF] <: rNode[R]  = R match
+      case GetRelURI[R, ru] => ru
 
-   type URI[R <: RDF] <: Matchable = R match
-      case GetURI[u] => u
+   type URI[R <: RDF] <: (Node[R] & rURI[R]) = R match
+      case GetURI[R, u] => u
 
    type rGraph[R <: RDF] = R match
       case GetRelGraph[g] => g
@@ -137,8 +138,8 @@ object RDF:
    type Store[R <: RDF] = R match
       case GetStore[s] => s
 
-   type Literal[R <: RDF] <: Matchable = R match
-      case GetLiteral[l] => l
+   type Literal[R <: RDF] <: Node[R] = R match
+      case GetLiteral[R, l] => l
 
    type Lang[R <: RDF] <: Matchable = R match
       case GetLang[l] => l
@@ -146,12 +147,12 @@ object RDF:
    type NodeAny[R <: RDF] = R match
       case GetNodeAny[m] => m
 
-   private type GetRelURI[U <: Matchable]           = RDF { type rURI = U }
-   private type GetURI[U <: Matchable]              = RDF { type URI = U }
+   private type GetRelURI[R <: RDF, U <: rNode[R]]           = RDF { type rURI = U }
+   private type GetURI[R <: RDF, U <: (Node[R] & rURI[R])]              = RDF { type URI = U }
    private type GetRelNode[N <: Matchable]          = RDF { type rNode = N }
-   private type GetNode[N <: Matchable]             = RDF { type Node = N }
-   private type GetBNode[N <: Matchable]            = RDF { type BNode = N }
-   private type GetLiteral[L <: Matchable]          = RDF { type Literal = L }
+   private type GetNode[N]       = RDF { type Node = N }
+   private type GetBNode[R <: RDF, N <: Node[R]]            = RDF { type BNode = N }
+   private type GetLiteral[R <: RDF, L <: Node[R]]          = RDF { type Literal = L }
    private type GetDefaultGraphNode[N <: Matchable] = RDF { type DefaultGraphNode = N }
    private type GetLang[L <: Matchable]             = RDF { type Lang = L }
    private type GetRelTriple[T]                     = RDF { type rTriple = T }

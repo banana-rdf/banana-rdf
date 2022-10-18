@@ -283,6 +283,7 @@ lazy val scala3jvmOptions = Seq(
   // "-classpath", "foo:bar:...",         // Add to the classpath.
   // "-encoding", "utf-8",                // Specify character encoding used by source files.
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
+//  "-explain", //useful for type errors, but gives huge explanations
   "-unchecked",   // Enable additional warnings where generated code depends on assumptions.
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   // "-explain",                          // Explain errors in more detail.

@@ -39,8 +39,11 @@ open class PrefixBuilder[Rdf <: RDF](
     val prefixIri: RDF.URI[Rdf]
 )(using ops: Ops[Rdf]) extends Prefix[Rdf]:
    import ops.{*, given}
+   
    override def toString: String = "Prefix(" + prefixName + ")"
-   lazy val prefixVal            = ops.rURI.stringValue(prefixIri)
+   lazy val prefixVal            =
+     import scala.language.implicitConversions
+     ops.rURI.stringValue(prefixIri.asInstanceOf[RDF.rURI[Rdf]])
 
    def apply(value: String): RDF.URI[Rdf] = ops.URI(prefixIri.value + value)
 

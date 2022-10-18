@@ -93,7 +93,8 @@ object JenaRDFReader:
    given turtleRelReader: RelReaderT[Turtle] = makeRDFRelReader[Turtle](Lang.TURTLE.nn)
 
    // given n3Reader: RDFReaders[N3] = makeRDFReader[N3](Lang.N3.nn)
-
+   /** Jena uses [[https://github.com/filip26/titanium-json-ld Titanium Parser]]
+     * This needs to fetch resources on the web. (In its own threads!) */
    given jsonLdReader: RDFReaderT[JsonLdCompacted] =
      makeRDFReader[JsonLdCompacted](Lang.JSONLD11.nn)
    given jsonLdRelReader: RelReaderT[JsonLdCompacted] =

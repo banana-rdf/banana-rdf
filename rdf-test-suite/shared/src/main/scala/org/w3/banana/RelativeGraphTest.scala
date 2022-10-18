@@ -26,7 +26,7 @@ class RelativeGraphTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    test("relative graphs") {
      val rg0 = rGraph.empty
      assertEquals(rg0.size, 0)
-     val rg1 = rGraph(rTriple(rURI("/#i"), URI(foafPre("homePage")), rURI("/")))
+     val rg1 = rGraph(rTriple(rURI("/#i"), rURI(foafPre("homePage")), rURI("/")))
      assertEquals(rg1.size, 1)
 
      // tests to check that opaque types work: we cannot just cast rX down to X
