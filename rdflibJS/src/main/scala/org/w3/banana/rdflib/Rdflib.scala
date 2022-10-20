@@ -155,6 +155,8 @@ object Rdflib extends RDF:
             newgraph
 
          import org.w3.banana.isomorphism.*
+         // todo: set preferences to be higher
+         // todo: perhaps have isomorphism be an external object?
          private val mapGen = new SimpleMappingGenerator[R](VerticeCBuilder.simpleHash[R])
          private val iso    = new GraphIsomorphism[R](mapGen)
          def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
@@ -177,9 +179,25 @@ object Rdflib extends RDF:
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
            Graph(triples)
 
+         import org.w3.banana.isomorphism.*
+         private val mapGen = new SimpleMappingGenerator[R](VerticeCBuilder.simpleHash[R])
+         private val iso    = new GraphIsomorphism[R](mapGen)
+
          extension (rGraph: RDF.rGraph[R])
             override def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(rGraph)
             override def size: Int                         = Graph.graphSize(rGraph)
+
+            infix def ++(triples: Seq[RDF.rTriple[R]]): RDF.rGraph[R] =
+              if triples.isEmpty then rGraph
+              else
+                 val newGraph: IndexedFormula = empty
+                 rGraph.triples.foreach(t => newGraph.addStatement(t))
+                 triples.foreach(s => newGraph.addStatement(s))
+                 newGraph
+
+            infix def isomorphic(other: RDF.rGraph[R]): Boolean =
+               val a = iso.findAnswer(rGraph, other)
+               a.isSuccess
       end rGraph
 
       given Subject: operations.Subject[R] with
@@ -220,12 +238,12 @@ object Rdflib extends RDF:
       given rTriple: operations.rTriple[R] with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
-           Triple(s, p, o)
+           df.quad(s, p, o, df.defaultGraph())
          def untuple(t: RDF.rTriple[R]): rTripleI =
            (subjectOf(t).widenToNode, relationOf(t), objectOf(t).asNode)
-         protected def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R]   = Triple.subjectOf(t)
-         protected def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] = Triple.relationOf(t)
-         protected def objectOf(t: RDF.rTriple[R]): rSt.Object[R]     = Triple.objectOf(t)
+         protected def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R]   = t.subj
+         protected def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] = t.rel
+         protected def objectOf(t: RDF.rTriple[R]): rSt.Object[R]     = t.obj
       end rTriple
 
       given Node: operations.Node[R] with
@@ -322,6 +340,12 @@ object Rdflib extends RDF:
          override def stringValue(uri: RDF.rURI[R]): String =
            uri.asInstanceOf[model.NamedNode].value
       end rURI
+
+      given rUriTT: reflect.TypeTest[Matchable, org.w3.banana.RDF.rURI[R]] with
+         override def unapply(s: Matchable): Option[s.type & RDF.rURI[R]] =
+           s match
+              case x: (s.type & model.NamedNode) => Some(x)
+              case _                             => None
 
       given URI: operations.URI[R] with
          // this does throw an exception on non relative URLs!

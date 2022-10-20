@@ -7,7 +7,7 @@ object Dependencies {
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
   object Ver {
-    val scala3 = "3.1.3"
+    val scala3 = "3.2.0"
   }
 
   // https://github.com/lemonlabsuk/scala-uri
@@ -32,8 +32,8 @@ object Dependencies {
     // https://github.com/com-lihaoyi/utest
     val utest = Def.setting("com.lihaoyi" %%% "utest" % "0.8.1")
     /* @see scalatest docs https://www.scalatest.org/install */
-    val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.13")
-    val scalatic  = "org.scalactic" %% "scalactic" % "3.2.11"
+    val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.14")
+    val scalatic  = "org.scalactic" %% "scalactic" % "3.2.14"
   }
 
   /** RDF4J

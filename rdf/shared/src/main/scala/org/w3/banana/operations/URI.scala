@@ -26,7 +26,8 @@ object URI:
 
 trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
    import ops.{rURI, given}
-
+   import scala.language.implicitConversions
+   import ops.given
    // This will create the URI with minimal verification, assuming the uriStr is already well formed
    protected def mkUriUnsafe(uriStr: String): RDF.URI[Rdf]
 
@@ -53,12 +54,13 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
      }
 
    extension (uri: RDF.URI[Rdf])
-      def value: String = ops.rURI.stringValue(uri)
+      def value: String =
+        ops.rURI.stringValue(uri)
 
       // if URL then add fragment, or else return original URN
       def withFragment(frag: String): RDF.URI[Rdf] =
         ll.Uri.parseTry(uri.value).collect {
-          case url: ll.Url => ops.URI(url.withFragment(frag).toString)
+          case url: ll.Url => apply(url.withFragment(frag).toString)
         }.getOrElse(uri)
 
       def baseFor(rel: ll.RelativeUrl): RDF.URI[Rdf] =

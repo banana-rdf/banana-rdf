@@ -39,15 +39,19 @@ trait Ops[Rdf <: RDF]:
       def apply(bn: BNode[Rdf]): Node[Rdf] = bn.asInstanceOf[Node[Rdf]]
    given Conversion[BNode[Rdf], rNode[Rdf]] with
       def apply(bn: BNode[Rdf]): rNode[Rdf] = bn.asInstanceOf[rNode[Rdf]]
-///   given Conversion[URI[Rdf], rURI[Rdf]] with
-//    def apply(uri: URI[Rdf]): rURI[Rdf]     = uri.asInstanceOf[rURI[Rdf]]
-   given Conversion[Node[Rdf], rNode[Rdf]] with
-      def apply(node: Node[Rdf]): rNode[Rdf] = node.asInstanceOf[rNode[Rdf]]
-   implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
+   given Conversion[URI[Rdf], rURI[Rdf]] with
+      def apply(uri: URI[Rdf]): rURI[Rdf] = uri.asInstanceOf[rURI[Rdf]]
+//   given Conversion[Node[Rdf], rNode[Rdf]] with
+//      def apply(node: Node[Rdf]): rNode[Rdf] = node.asInstanceOf[rNode[Rdf]]
+   given Conversion[Graph[Rdf], rGraph[Rdf]] with
+      def apply(lit: Graph[Rdf]): rGraph[Rdf] = lit.asInstanceOf[rGraph[Rdf]]
 
    // conversions for position types
-   implicit def obj2Node(obj: St.Object[Rdf]): Node[Rdf]  = obj.asInstanceOf[Node[Rdf]]
-   implicit def sub2Node(obj: St.Subject[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
+   given Conversion[St.Object[Rdf], Node[Rdf]] with
+      def apply(obj: St.Object[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
+
+   given Conversion[St.Subject[Rdf], Node[Rdf]] with
+      def apply(obj: St.Subject[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
    // note:  if we use the conversion below, then all the code needs to import scala.language.implicitConversions
    //	given Conversion[St.Object[Rdf],RDF.Node[Rdf]] with
    //		def apply(obj: St.Object[Rdf]): RDF.Node[Rdf] =  obj.asInstanceOf[Node[Rdf]]
@@ -55,8 +59,8 @@ trait Ops[Rdf <: RDF]:
    // interpretation types to help consistent pattern matching across implementations
    val `*`: RDF.NodeAny[Rdf]
 
-   lazy val rdfPfx: RDFPrefix[Rdf] = prefix.RDFPrefix[Rdf](using ops)
-   lazy val xsd: XSD[Rdf]          = prefix.XSD[Rdf](using ops)
+   lazy val rdf: RDFPrefix[Rdf] = prefix.RDFPrefix[Rdf](using ops)
+   lazy val xsd: XSD[Rdf]       = prefix.XSD[Rdf](using ops)
 
    given Graph: operations.Graph[Rdf]
 
@@ -95,6 +99,9 @@ trait Ops[Rdf <: RDF]:
    given operations.Literal[Rdf] = Literal
 
    given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
+
+   given rUriTT: TypeTest[Matchable, RDF.rURI[Rdf]]
+   // we could type test for full uri, but that would require parsing
 
    given subjToURITT: TypeTest[RDF.Statement.Subject[Rdf], RDF.URI[Rdf]]
    given rSubjToURITT: TypeTest[RDF.rStatement.Subject[Rdf], RDF.rURI[Rdf]]

@@ -29,3 +29,6 @@ class JenaPrefixTest extends org.w3.banana.PrefixTest[R]
 class JenaTripleTest extends org.w3.banana.TripleTest[R]
 
 class JenaIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
+
+class JenaDiesaelRelGraphConstructionTest
+    extends org.w3.banana.diesel.DieselRelativeGraphConstructTest[R]

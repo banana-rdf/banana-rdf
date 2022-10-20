@@ -156,7 +156,7 @@ object Rdf4j extends RDF:
          def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
             val graph = new LinkedHashModel
             triples foreach { t => graph.add(t) }
-            graph
+            graph.unmodifiable().nn
          def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] =
            graph.asScala.to(Iterable)
          def graphSize(graph: RDF.Graph[R]): Int = graph.size()
@@ -166,13 +166,13 @@ object Rdf4j extends RDF:
               case _ =>
                 val graph = new LinkedHashModel
                 graphs.foreach(graph.addAll(_))
-                graph
+                graph.unmodifiable().nn
          def difference(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
             val graph = new LinkedHashModel
             triplesIn(g1) foreach { triple =>
               if !g2.contains(triple) then graph.add(triple)
             }
-            graph
+            graph.unmodifiable().nn
          def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
            // todo: if we make sure that the opaque Graph, never contains contexts,
            //  then this is all we need to do. Otherwise we need to strip contexts.
@@ -191,12 +191,22 @@ object Rdf4j extends RDF:
       given rGraph: operations.rGraph[R] with
          def empty: RDF.rGraph[R] = Graph.empty
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
-           Graph(triples)
+            val graph = new LinkedHashModel
+            triples foreach { t => graph.add(t) }
+            graph.unmodifiable().nn
 
          extension (rGraph: RDF.rGraph[R])
-            override def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(rGraph)
-            override def size: Int                         = Graph.graphSize(rGraph)
-
+            override def triples: Iterable[RDF.rTriple[R]] =
+              rGraph.asScala.to(Iterable)
+            override def size: Int =
+              rGraph.size
+            override infix def ++(triples: Seq[RDF.rTriple[R]]): RDF.rGraph[R] =
+               val graph = new LinkedHashModel
+               triples foreach { t => graph.add(t) }
+               Graph.triplesIn(rGraph).foreach { t => graph.add(t) }
+               graph.unmodifiable().nn
+            override infix def isomorphic(other: RDF.rGraph[R]): Boolean =
+              Models.isomorphic(rGraph, other)
       end rGraph
 
 //		given tripleTT: TypeTest[Matchable, RDF.Triple[R]] with {
@@ -325,6 +335,13 @@ object Rdf4j extends RDF:
               // note: this does not compile if we use URI instead of jena.Node_URI
               case x: (s.type & org.eclipse.rdf4j.model.Literal) => Some(x)
               case _                                             => None
+
+      given rUriTT: TypeTest[Matchable, RDF.rURI[R]] with
+         override def unapply(s: Matchable): Option[s.type & RDF.rURI[R]] =
+           s match
+              // note: this does not compile if we use URI instead of jena.Node_URI
+              case x: (s.type & org.eclipse.rdf4j.model.IRI) => Some(x)
+              case _                                         => None
 
       given rNode: org.w3.banana.operations.rNode[R] with
          private def jn(node: RDF.rNode[R]): Value = node

@@ -16,14 +16,16 @@ package org.w3.banana.diesel
 import org.w3.banana.*
 //import org.w3.banana.binder._
 
-class PointedGraphPredicate[Rdf <: RDF](pointed: PointedRelGraph[Rdf], p: RDF.rURI[Rdf]):
+class PointedGraphPredicate[Rdf <: RDF](pointed: PointedSubjRGraph[Rdf], p: RDF.rURI[Rdf]):
 
-   infix def ->-(pointedObject: PointedRelGraph[Rdf])(using ops: Ops[Rdf]): PointedRelGraph[Rdf] =
+   infix def ->-(pointedObject: PointedRGraph[Rdf])(using ops: Ops[Rdf]): PointedSubjRGraph[Rdf] =
       import ops.{given, *}
       import pointed.{graph as acc, pointer as s}
       import pointedObject.{graph as graphObject, pointer as o}
-      val newGraph = acc ++ (rTriple(s, p, o) +: graphObject.triples.toSeq)
-      PointedRelGraph(s, newGraph)
+      val newTr: RDF.rTriple[Rdf]      = rTriple(s, p, o)
+      val trSeq: Seq[RDF.rTriple[Rdf]] = newTr +: graphObject.triples.toSeq
+      val newGraph                     = acc ++ trSeq
+      PointedSubjRGraph(s, newGraph)
 
 // For more general transformations we need ToPG
 // let's first see how far we get without.

@@ -13,56 +13,82 @@
 
 package org.w3.banana.diesel
 
-import org.w3.banana.{Ops, PointedRelGraph, RDF}
+import org.w3.banana.{Ops, RDF}
+
 import scala.language.implicitConversions
 
 /** Needed for code like BNode() -- foaf.knows ->- tim */
 given rNodeToPointedGraph[Rdf <: RDF](using
     Ops[Rdf]
-): Conversion[RDF.rNode[Rdf], PointedRelGraph[Rdf]] with
-   def apply(node: RDF.rNode[Rdf]): PointedRelGraph[Rdf] =
-     PointedRelGraph(node)
+): Conversion[RDF.rNode[Rdf], PointedRGraph[Rdf]] with
+   def apply(node: RDF.rNode[Rdf]): PointedRGraph[Rdf] =
+     PointedRGraph(node)
 
 given literalToPointedGraph[Rdf <: RDF](using
     ops: Ops[Rdf]
-): Conversion[RDF.Literal[Rdf], PointedRelGraph[Rdf]] with
-   def apply(node: RDF.Literal[Rdf]): PointedRelGraph[Rdf] =
+): Conversion[RDF.Literal[Rdf], PointedRGraph[Rdf]] with
+   def apply(node: RDF.Literal[Rdf]): PointedLitRGraph[Rdf] =
       import ops.given
-      PointedRelGraph(node)
+      PointedLitRGraph(node)
 
-given rNodeToPointedGraphW[Rdf <: RDF](using
+given subjToPointedGraphW[Rdf <: RDF](using
     ops: Ops[Rdf]
-): Conversion[RDF.rNode[Rdf], PointedRelGraphW[Rdf]] with
-   def apply(node: RDF.rNode[Rdf]): PointedRelGraphW[Rdf] =
-     new PointedRelGraphW[Rdf](PointedRelGraph(node))
+): Conversion[RDF.rStatement.Subject[Rdf], PointedRGraphW[Rdf]] with
+   def apply(subj: RDF.rStatement.Subject[Rdf]): PointedRGraphW[Rdf] =
+     new PointedRGraphW[Rdf](PointedSubjRGraph(subj))
 
 given bNodeToPointedGraphW[Rdf <: RDF](using
     ops: Ops[Rdf]
-): Conversion[RDF.BNode[Rdf], PointedRelGraphW[Rdf]] with
-   def apply(node: RDF.BNode[Rdf]): PointedRelGraphW[Rdf] =
+): Conversion[RDF.BNode[Rdf], PointedRGraphW[Rdf]] with
+   def apply(node: RDF.BNode[Rdf]): PointedRGraphW[Rdf] =
       import ops.given
-      new PointedRelGraphW[Rdf](PointedRelGraph(node))
+      new PointedRGraphW[Rdf](PointedSubjRGraph(node))
 
-given [Rdf <: RDF]: Conversion[PointedRelGraph[Rdf], PointedRelGraphW[Rdf]] with
-   def apply(pg: PointedRelGraph[Rdf]): PointedRelGraphW[Rdf] =
-     new PointedRelGraphW[Rdf](pg)
-
-given strToPG[Rdf <: RDF](using ops: Ops[Rdf]): Conversion[String, PointedRelGraph[Rdf]] with
-   import ops.given
-   def apply(str: String): PointedRelGraph[Rdf] = PointedRelGraph(ops.Literal(str))
-
-given nodeToPG[Rdf <: RDF](using ops: Ops[Rdf]): Conversion[RDF.Node[Rdf], PointedRelGraph[Rdf]]
-  with
-   def apply(node: RDF.Node[Rdf]): PointedRelGraph[Rdf] =
-      import ops.given
-      PointedRelGraph(node)
-
-given nodeToPointedRelGraphW[Rdf <: RDF](using
+given rURIToPointedGraphW[Rdf <: RDF](using
     ops: Ops[Rdf]
-): Conversion[RDF.Node[Rdf], PointedRelGraphW[Rdf]] with
+): Conversion[RDF.rURI[Rdf], PointedRGraphW[Rdf]] with
+   def apply(node: RDF.rURI[Rdf]): PointedRGraphW[Rdf] =
+      import ops.given
+      new PointedRGraphW[Rdf](PointedSubjRGraph(node))
+
+given rURIToPointedGraphWInv[Rdf <: RDF](using
+    ops: Ops[Rdf]
+): Conversion[RDF.rURI[Rdf], PointedRGraphWInv[Rdf]] with
+   def apply(uri: RDF.rURI[Rdf]): PointedRGraphWInv[Rdf] =
+      import ops.given
+      new PointedRGraphWInv[Rdf](PointedSubjRGraph(uri))
+
+given literalToPointedGraphWInv[Rdf <: RDF](using
+    ops: Ops[Rdf]
+): Conversion[RDF.Literal[Rdf], PointedRGraphWInv[Rdf]] with
+   def apply(literal: RDF.Literal[Rdf]): PointedRGraphWInv[Rdf] =
+      import ops.given
+      new PointedRGraphWInv[Rdf](PointedLitRGraph(literal))
+
+given bNodeToPointedGraphWInv[Rdf <: RDF](using
+    ops: Ops[Rdf]
+): Conversion[RDF.BNode[Rdf], PointedRGraphWInv[Rdf]] with
+   def apply(bn: RDF.BNode[Rdf]): PointedRGraphWInv[Rdf] =
+      import ops.given
+      new PointedRGraphWInv[Rdf](PointedSubjRGraph(bn))
+
+given [Rdf <: RDF]: Conversion[PointedSubjRGraph[Rdf], PointedRGraphW[Rdf]] with
+   def apply(pg: PointedSubjRGraph[Rdf]): PointedRGraphW[Rdf] =
+     new PointedRGraphW[Rdf](pg)
+
+given [Rdf <: RDF]: Conversion[PointedSubjRGraph[Rdf], PointedRGraphWInv[Rdf]] with
+   def apply(pg: PointedSubjRGraph[Rdf]): PointedRGraphWInv[Rdf] =
+     new PointedRGraphWInv[Rdf](pg)
+
+given strToPG[Rdf <: RDF](using ops: Ops[Rdf]): Conversion[String, PointedRGraph[Rdf]] with
    import ops.given
-   def apply(node: RDF.Node[Rdf]): PointedRelGraphW[Rdf] =
-     new PointedRelGraphW[Rdf](PointedRelGraph(node))
+   def apply(str: String): PointedRGraph[Rdf] = PointedRGraph(ops.Literal(str))
+
+//given nodeToPG[Rdf <: RDF](using ops: Ops[Rdf]): Conversion[RDF.Node[Rdf], PointedRGraph[Rdf]]
+//  with
+//   def apply(node: RDF.Node[Rdf]): PointedRGraph[Rdf] =
+//      import ops.given
+//      PointedRGraph(node)
 
 extension [Rdf <: RDF](str: String)(using ops: Ops[Rdf])
   def lang(lang: RDF.Lang[Rdf]): RDF.Literal[Rdf] = ops.Literal(str, lang)

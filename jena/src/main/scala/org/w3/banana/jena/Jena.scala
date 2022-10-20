@@ -18,6 +18,7 @@ import org.apache.jena.graph.{GraphUtil, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.sparql.core.DatasetGraphFactory
+import org.apache.jena.sparql.graph.GraphReadOnly
 import org.apache.jena.tdb.{TDB, TDBFactory}
 import org.apache.jena.util.iterator.ExtendedIterator
 import org.w3.banana.operations.{Quad, StoreFactory, rGraph}
@@ -111,35 +112,41 @@ object JenaRdf extends org.w3.banana.RDF:
       given Graph: operations.Graph[R] with
          import RDF.Statement as St
          def empty: RDF.Graph[R] = Factory.empty().nn
+
          def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
             val graph: Graph = Factory.createDefaultGraph.nn
             triples.foreach { triple =>
               graph.add(triple)
             }
-            graph
+            new GraphReadOnly(graph)
+
          // note: how should one pass on the information that the Iterable is closeable?
          // https://stackoverflow.com/questions/69153609/is-there-a-cross-platform-autocloseable-iterable-
-         def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] =
+         override protected def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] =
             import collection.JavaConverters.asScalaIteratorConverter
             graph.find(JenaANY, JenaANY, JenaANY).nn.asScala.to(Iterable)
-         def graphSize(graph: RDF.Graph[R]): Int = graph.size()
-         def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
+
+         override protected def graphSize(graph: RDF.Graph[R]): Int = graph.size()
+
+         override protected def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
             val g = Factory.createDefaultGraph.nn
             graphs.foreach { graph =>
               Using.resource(graph.find(JenaANY, JenaANY, JenaANY).nn) { it =>
                 while it.hasNext do g.add(it.next)
               }
             }
-            g
-         def difference(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
+            new GraphReadOnly(g)
+
+         override protected def difference(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
             val g = Factory.createDefaultGraph.nn
             GraphUtil.addInto(g, g1)
             GraphUtil.delete(g, g2.find(JenaANY, JenaANY, JenaANY))
-            g
-         def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
+            GraphReadOnly(g)
+
+         override protected def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
            left.isIsomorphicWith(right)
 
-         def findTriples(
+         override protected def findTriples(
              graph: RDF.Graph[R],
              s: St.Subject[R] | RDF.NodeAny[R],
              p: St.Relation[R] | RDF.NodeAny[R],
@@ -160,8 +167,23 @@ object JenaRdf extends org.w3.banana.RDF:
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
            Graph(triples)
          extension (graph: RDF.rGraph[R])
-            def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(graph)
-            def size: Int                         = Graph.graphSize(graph)
+            override def triples: Iterable[RDF.rTriple[R]] =
+               import collection.JavaConverters.asScalaIteratorConverter
+               graph.find(JenaANY, JenaANY, JenaANY).nn.asScala.to(Iterable)
+            override def size: Int =
+              graph.size()
+            // note: the reason why we may want rGraphs to be based on Seq rather than graphs is
+            // to be seen here. Most libs are mutable, and doing addition on these graphs
+            // requiring as it does the copy of all triples is likely to be inefficient
+            override infix def ++(triples: Seq[RDF.rTriple[R]]): RDF.rGraph[R] =
+               val g = Factory.createDefaultGraph.nn
+               Using.resource(graph.find(JenaANY, JenaANY, JenaANY).nn) { it =>
+                 while it.hasNext do g.add(it.next)
+               }
+               triples.foreach(tr => g.add(tr))
+               g
+            override infix def isomorphic(other: RDF.rGraph[R]): Boolean =
+              graph.isIsomorphicWith(other)
       end rGraph
 
       given rTriple: operations.rTriple[R] with
@@ -331,6 +353,13 @@ object JenaRdf extends org.w3.banana.RDF:
 
          override def stringValue(uri: RDF.rURI[R]): String = uri.getURI().nn
       end rURI
+
+      given rUriTT: reflect.TypeTest[Matchable, org.w3.banana.RDF.rURI[R]] with
+         def unapply(s: Matchable): Option[s.type & RDF.rURI[R]] =
+           s match
+              // note: this does not compile if we use URI instead of jenaTp.Node_URI
+              case x: (s.type & jenaTp.Node_URI) => Some(x)
+              case _                             => None
 
       given URI: operations.URI[R] with
          import java.net.URI as jURI

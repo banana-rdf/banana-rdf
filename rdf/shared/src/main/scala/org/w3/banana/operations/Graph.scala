@@ -48,7 +48,7 @@ trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
 
    extension (graph: RDF.Graph[Rdf])
       @targetName("iso")
-      def ≅(other: RDF.Graph[Rdf]): Boolean                    = isomorphism(graph, other)
+      infix def ≅(other: RDF.Graph[Rdf]): Boolean              = isomorphism(graph, other)
       infix def isomorphic(other: RDF.Graph[Rdf]): Boolean     = isomorphism(graph, other)
       def diff(other: RDF.Graph[Rdf]): RDF.Graph[Rdf]          = difference(graph, other)
       def size: Int                                            = graphSize(graph)

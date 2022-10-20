@@ -28,17 +28,19 @@ import scala.util.*
   * We remove the search capabilities we had in banana 0.8.x and should add those to a different
   * extension, typeclass as those pragmatically require the triples to be indexed.
   */
-class PointedRelGraphW[Rdf <: RDF](val pointed: PointedRelGraph[Rdf]) extends AnyVal:
+class PointedRGraphW[Rdf <: RDF](val pointed: PointedSubjRGraph[Rdf]) extends AnyVal:
 
    import pointed.graph
 
-   def a(clazz: rURI[Rdf])(using ops: Ops[Rdf]): PointedRelGraph[Rdf] =
+   def a(clazz: rURI[Rdf])(using ops: Ops[Rdf]): PointedSubjRGraph[Rdf] =
       import ops.{given, *}
-      val newGraph = graph + rTriple(pointed.pointer, rdfPfx.`type`, clazz)
-      PointedRelGraph(pointed.pointer, newGraph)
+      val newGraph: RDF.rGraph[Rdf] = graph + rTriple(pointed.pointer, rdf.`type`, clazz)
+      PointedSubjRGraph(pointed.pointer, newGraph)
 
    infix def --(p: rURI[Rdf]): PointedGraphPredicate[Rdf] =
      new PointedGraphPredicate[Rdf](pointed, p)
 
-   infix def -<-(p: rURI[Rdf]): PredicatePointedRelGraph[Rdf] =
-     new PredicatePointedRelGraph[Rdf](p, pointed)
+class PointedRGraphWInv[Rdf <: RDF](val pointed: PointedRGraph[Rdf]) extends AnyVal:
+
+   infix def -<-(rel: rURI[Rdf])(using ops: Ops[Rdf]): PredicatePointedRGraph[Rdf] =
+     new PredicatePointedRGraph[Rdf](rel, pointed)

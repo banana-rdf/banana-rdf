@@ -20,6 +20,7 @@ import org.w3.banana.*
 import java.io.StringReader
 import scala.util.Try
 import _root_.io.lemonlabs.uri as ll
+import scala.language.implicitConversions
 
 /** Not all formats allow serialisation of graphs with Relative URLs, so here we place tests
   * designed to stress test the implementations of those syntaxes.

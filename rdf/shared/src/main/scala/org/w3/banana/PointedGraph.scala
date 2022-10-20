@@ -21,12 +21,6 @@ case class PointedGraph[Rdf <: RDF](
     graph: Graph[Rdf]
 )
 
-/** pointed Relative Graph, especially useful when constructing graphs usnig the DSL */
-case class PointedRelGraph[Rdf <: RDF](
-    pointer: rNode[Rdf],
-    graph: rGraph[Rdf]
-)
-
 object PointedGraph:
    def apply[R <: RDF](
        node: Node[R]
@@ -34,14 +28,4 @@ object PointedGraph:
      new PointedGraph[R](
        node,
        ops.Graph.empty
-     )
-
-object PointedRelGraph:
-
-   def apply[R <: RDF](
-       node: rNode[R]
-   )(using ops: Ops[R]): PointedRelGraph[R] =
-     new PointedRelGraph[R](
-       node,
-       ops.rGraph.empty
      )

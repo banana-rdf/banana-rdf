@@ -64,11 +64,13 @@ trait rGraph[Rdf <: RDF](using ops: Ops[Rdf]):
       def triples: Iterable[RDF.rTriple[Rdf]]
       def size: Int
 
+      /** return a new graph with one triple added */
+      infix def +(triple: RDF.rTriple[Rdf]): RDF.rGraph[Rdf] = rGraph ++ Seq(triple)
+
       /** Add a relative triple to the graph. Blank nodes are not standardised apart. Todo: could
         * one type blank nodes so that they are forced to belong to a graph?
         */
-      def +(triple: RDF.rTriple[Rdf]): RDF.rGraph[Rdf]
-      def ++(triples: Seq[RDF.rTriple[Rdf]]): RDF.rGraph[Rdf]
+      infix def ++(triples: Seq[RDF.rTriple[Rdf]]): RDF.rGraph[Rdf]
 
       /** resolve the relative graph with a base URI
         *
