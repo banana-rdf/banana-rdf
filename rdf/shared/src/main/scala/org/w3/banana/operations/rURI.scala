@@ -46,13 +46,13 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
    def mkUri(iriStr: String): Try[RDF.rURI[Rdf]] =
      ll.Uri.parseTry(iriStr).flatMap(_ => Try(mkUriUnsafe(iriStr)))
 
-   def stringValue(uri: RDF.rURI[Rdf]): String
+   protected def stringVal(uri: RDF.rURI[Rdf]): String
 
    /** resolve url with base, but fail if URL parsing fails, or if the Url is schema relative -
      * since that cannot be resolved.
      */
    def resolveUri(uri: RDF.rURI[Rdf], base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] =
-     ll.Uri.parseTry(stringValue(uri)).flatMap { llUri =>
+     ll.Uri.parseTry(uri.value).flatMap { llUri =>
        llUri match
           case _: ll.Urn =>
             Success((uri.asInstanceOf[RDF.URI[Rdf]], false)) // urns are always absolute
@@ -62,7 +62,7 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
      }
 
    extension (uri: RDF.rURI[Rdf])
-      def value: String = stringValue(uri)
+      def value: String = stringVal(uri)
 
       /** Returns resolved URL, and whether the result is new. If the URL is relative but cannot be
         * resolved, be lenient and keep the original. //todo: pass a logger

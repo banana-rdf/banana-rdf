@@ -54,7 +54,7 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
          val (rRz, rChg): (RDF.rStatement.Relation[Rdf], Boolean) =
            triple.rel.asUri.relativizeAgainst(base)
          val (oRz, oChg): (RDF.rStatement.Object[Rdf], Boolean) =
-           triple.obj.asNode.fold(
+           triple.obj.fold(
              uri => uri.relativizeAgainst(base),
              bn => (bn, false),
              lit => (lit, false)

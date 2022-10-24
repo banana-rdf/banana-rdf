@@ -76,44 +76,44 @@ object RDF:
    type rTriple[R <: RDF] <: Matchable = R match
       case GetRelTriple[t] => t
 
-   type Triple[R <: RDF] <: Matchable = R match
-      case GetTriple[t] => t
+   type Triple[R <: RDF] <: rTriple[R] = R match
+      case GetTriple[t] => t & rTriple[R]
 
    // Quad is a good short name for Statement, but does not give a good understaning of it
    type Quad[R <: RDF] <: Matchable = R match
       case GetQuad[t] => t
 
-   type rNode[R <: RDF] = rURI[R] | BNode[R] | Literal[R]
-//     R match
-//      case GetRelNode[n] => n
+   type rNode[R <: RDF] <: Matchable =
+     R match
+        case GetRelNode[n] => n & Matchable
 
-   type Node[R <: RDF] = URI[R] | BNode[R] | Literal[R]
-//     R match
-//      case GetNode[n] => n
+   type Node[R <: RDF] <: rNode[R] =
+     R match
+        case GetNode[n] => n & rNode[R]
 
-   type BNode[R <: RDF] <: Matchable = R match
-      case GetBNode[bn] => bn
+   type BNode[R <: RDF] <: Node[R] = R match
+      case GetBNode[bn] => bn & Node[R]
 
    type DefaultGraphNode[R <: RDF] = R match
       case GetDefaultGraphNode[n] => n
 
-   type rURI[R <: RDF] <: Matchable = R match
-      case GetRelURI[ru] => ru
+   type rURI[R <: RDF] <: rNode[R] = R match
+      case GetRelURI[ru] => ru & rNode[R]
 
-   type URI[R <: RDF] <: Matchable = R match
-      case GetURI[u] => u
+   type URI[R <: RDF] <: Node[R] & rURI[R] = R match
+      case GetURI[u] => u & Node[R] & rURI[R]
 
    type rGraph[R <: RDF] = R match
       case GetRelGraph[g] => g
 
-   type Graph[R <: RDF] = R match
-      case GetGraph[g] => g
+   type Graph[R <: RDF] <: rGraph[R] = R match
+      case GetGraph[g] => g & rGraph[R]
 
    type Store[R <: RDF] = R match
       case GetStore[s] => s
 
-   type Literal[R <: RDF] <: Matchable = R match
-      case GetLiteral[l] => l
+   type Literal[R <: RDF] <: Node[R] = R match
+      case GetLiteral[l] => l & Node[R]
 
    type Lang[R <: RDF] <: Matchable = R match
       case GetLang[l] => l
@@ -121,22 +121,22 @@ object RDF:
    type NodeAny[R <: RDF] = R match
       case GetNodeAny[m] => m
 
-   private type GetRelURI[U <: Matchable]           = RDF { type rURI = U }
-   private type GetURI[U <: Matchable]              = RDF { type URI = U }
-   private type GetRelNode[N <: Matchable]          = RDF { type rNode = N }
-   private type GetNode[N <: Matchable]             = RDF { type Node = N }
-   private type GetBNode[N <: Matchable]            = RDF { type BNode = N }
-   private type GetLiteral[L <: Matchable]          = RDF { type Literal = L }
-   private type GetDefaultGraphNode[N <: Matchable] = RDF { type DefaultGraphNode = N }
-   private type GetLang[L <: Matchable]             = RDF { type Lang = L }
-   private type GetRelTriple[T <: Matchable]        = RDF { type rTriple = T }
-   private type GetTriple[T <: Matchable]           = RDF { type Triple = T }
-   private type GetQuad[T <: Matchable]             = RDF { type Quad = T }
-   private type GetRelGraph[G]                      = RDF { type rGraph = G }
-   private type GetGraph[G <: Matchable]            = RDF { type Graph = G }
-   private type GetStore[S]                         = RDF { type Store = S }
-   private type GetNodeAny[M]                       = RDF { type NodeAny = M }
-
+   private type GetRelURI[U]                 = RDF { type rURI = U }
+   private type GetURI[U]                    = RDF { type URI = U }
+   private type GetRelNode[N <: Matchable]                = RDF { type rNode = N }
+   private type GetNode[N]                   = RDF { type Node = N }
+   private type GetBNode[N]                  = RDF { type BNode = N }
+   private type GetLiteral[L]                = RDF { type Literal = L }
+   private type GetDefaultGraphNode[N]       = RDF { type DefaultGraphNode = N }
+   private type GetLang[L <: Matchable]      = RDF { type Lang = L }
+   private type GetRelTriple[T <: Matchable] = RDF { type rTriple = T }
+   private type GetTriple[T]                 = RDF { type Triple = T }
+   private type GetQuad[T <: Matchable]      = RDF { type Quad = T }
+   private type GetRelGraph[G]               = RDF { type rGraph = G }
+   private type GetGraph[G]                  = RDF { type Graph = G }
+   private type GetStore[S]                  = RDF { type Store = S }
+   private type GetNodeAny[M]                = RDF { type NodeAny = M }
+   
    /** these associate a type to the positions in statements (triples or quads) These are not agreed
      * to by all frameworks, so it would be useful to find a way to parametrise them. Essentially
      * some (Jena?) allow a literal in Subject position (which is useful for reasoning and later n3)

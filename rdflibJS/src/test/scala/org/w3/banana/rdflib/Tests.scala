@@ -32,4 +32,4 @@ class RdflibTripleTest extends org.w3.banana.TripleTest[R]
 class RdflibIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
 
 class RdflibDieselRelGraphConstructionTest
-  extends org.w3.banana.diesel.DieselRelativeGraphConstructTest[R]
+    extends org.w3.banana.diesel.DieselRelativeGraphConstructTest[R]

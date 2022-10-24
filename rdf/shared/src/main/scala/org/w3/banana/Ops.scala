@@ -24,37 +24,8 @@ import scala.util.Try
 
 trait Ops[Rdf <: RDF]:
    ops =>
-   import scala.language.implicitConversions
    import RDF.*
    import RDF.Statement as St
-
-   // needed to help inferencing
-   // todo: this transformation should really be automatically handled by compiler. Report back.
-   given Conversion[Literal[Rdf], rNode[Rdf]] with
-      def apply(lit: Literal[Rdf]): rNode[Rdf] = lit.asInstanceOf[rNode[Rdf]]
-
-   given Conversion[URI[Rdf], Node[Rdf]] with
-      def apply(uri: URI[Rdf]): Node[Rdf] = uri.asInstanceOf[Node[Rdf]]
-   given Conversion[BNode[Rdf], Node[Rdf]] with
-      def apply(bn: BNode[Rdf]): Node[Rdf] = bn.asInstanceOf[Node[Rdf]]
-   given Conversion[BNode[Rdf], rNode[Rdf]] with
-      def apply(bn: BNode[Rdf]): rNode[Rdf] = bn.asInstanceOf[rNode[Rdf]]
-   given Conversion[URI[Rdf], rURI[Rdf]] with
-      def apply(uri: URI[Rdf]): rURI[Rdf] = uri.asInstanceOf[rURI[Rdf]]
-//   given Conversion[Node[Rdf], rNode[Rdf]] with
-//      def apply(node: Node[Rdf]): rNode[Rdf] = node.asInstanceOf[rNode[Rdf]]
-   given Conversion[Graph[Rdf], rGraph[Rdf]] with
-      def apply(lit: Graph[Rdf]): rGraph[Rdf] = lit.asInstanceOf[rGraph[Rdf]]
-
-   // conversions for position types
-   given Conversion[St.Object[Rdf], Node[Rdf]] with
-      def apply(obj: St.Object[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
-
-   given Conversion[St.Subject[Rdf], Node[Rdf]] with
-      def apply(obj: St.Subject[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
-   // note:  if we use the conversion below, then all the code needs to import scala.language.implicitConversions
-   //	given Conversion[St.Object[Rdf],RDF.Node[Rdf]] with
-   //		def apply(obj: St.Object[Rdf]): RDF.Node[Rdf] =  obj.asInstanceOf[Node[Rdf]]
 
    // interpretation types to help consistent pattern matching across implementations
    val `*`: RDF.NodeAny[Rdf]

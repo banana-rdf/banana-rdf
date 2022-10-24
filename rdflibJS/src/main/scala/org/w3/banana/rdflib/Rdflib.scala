@@ -77,6 +77,10 @@ object Rdflib extends RDF:
       def opts(): FormulaOpts = facade.FormulaOpts().setRdfFactory(df)
       import RDF.Statement as St
 
+//      given [T]:  Conversion[T, scala.scalajs.js.UndefOr[T]] with
+//         def apply(x: T): scala.scalajs.js.UndefOr[T] =
+//           x.asInstanceOf[scala.scalajs.js.UndefOr[T]]
+//
       import scala.collection.mutable
       private val init                         = nodeMod.default
       val defaulGraph: RDF.DefaultGraphNode[R] = df.defaultGraph()
@@ -89,7 +93,7 @@ object Rdflib extends RDF:
             fopts.setRdfFactory(model.DataFactory())
             org.w3.banana.rdflib.facade.storeMod(fopts)
 
-      given Store: operations.Store[R] with
+      given Store: operations.Store[R](using ops) with
          import scala.jdk.CollectionConverters.given
          // todo: need to integrate locking functionality
          extension (store: RDF.Store[R])
@@ -108,8 +112,11 @@ object Rdflib extends RDF:
                 g: St.Graph[R] | RDF.NodeAny[R]
             ): Iterator[RDF.Quad[R]] =
                // todo: note, we loose the try exception failure here
+               val oUndef =
+                 o.asInstanceOf[scala.scalajs.js.UndefOr[run.cosy.rdfjs.model.Quad.Object | Null]]
+
                val res: scala.collection.mutable.Seq[RDF.Quad[R]] =
-                 store.statementsMatching(s, p, o, g, false)
+                 store.statementsMatching(s, p, oUndef, g, false)
                res.iterator
 
             override def remove(
@@ -337,7 +344,7 @@ object Rdflib extends RDF:
          override protected def mkUriUnsafe(uriStr: String): RDF.rURI[R] =
            df.namedNode(uriStr)
          override def apply(iriStr: String): RDF.rURI[R] = mkUriUnsafe(iriStr)
-         override def stringValue(uri: RDF.rURI[R]): String =
+         override protected def stringVal(uri: RDF.rURI[R]): String =
            uri.asInstanceOf[model.NamedNode].value
       end rURI
 
@@ -350,6 +357,8 @@ object Rdflib extends RDF:
       given URI: operations.URI[R] with
          // this does throw an exception on non relative URLs!
          override protected def mkUriUnsafe(iriStr: String): RDF.URI[R] = df.namedNode(iriStr)
+         override protected def stringVal(uri: org.w3.banana.RDF.URI[R]): String =
+           uri.asInstanceOf[model.NamedNode].value
       end URI
 
       given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with

@@ -53,9 +53,10 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
        case good => Try(mkUriUnsafe(good.toString))
      }
 
+   protected def stringVal(uri: RDF.URI[Rdf]): String
+
    extension (uri: RDF.URI[Rdf])
-      def value: String =
-        ops.rURI.stringValue(uri)
+      def value: String = stringVal(uri)
 
       // if URL then add fragment, or else return original URN
       def withFragment(frag: String): RDF.URI[Rdf] =
@@ -64,7 +65,7 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
         }.getOrElse(uri)
 
       def baseFor(rel: ll.RelativeUrl): RDF.URI[Rdf] =
-        ll.Uri.parse(ops.rURI.stringValue(uri)) match
+        ll.Uri.parse(uri.value) match
            case us: ll.UrlWithScheme => apply(rel.resolve(us, true).toString)
            case _                    => uri
 
@@ -73,7 +74,7 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
         * follow https://github.com/lemonlabsuk/scala-uri/issues/466
         */
       def relativizeAgainst(base: ll.AbsoluteUrl): (RDF.rURI[Rdf], Boolean) =
-         val juri1: jURI   = new jURI(ops.rURI.stringValue(uri))
+         val juri1: jURI   = new jURI(uri.value)
          val juri2: jURI   = juri1.normalize().nn
          val baseJuri      = new jURI(base.normalize().toString)
          val relJuri: jURI = baseJuri.relativize(juri2).nn

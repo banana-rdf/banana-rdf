@@ -33,8 +33,7 @@ object JenaRdf extends org.w3.banana.RDF:
    import org.apache.jena.graph as jenaTp
    import org.apache.jena.graph.{Factory, NodeFactory}
 
-   type Jena = JenaRdf.type
-   type Top  = java.lang.Object
+   type Top = java.lang.Object
 
    // we hack jena.{Graph, Triple, URI} to allow relative URLs.
    override opaque type rGraph <: Top  = jenaTp.Graph
@@ -45,6 +44,7 @@ object JenaRdf extends org.w3.banana.RDF:
    override opaque type Graph <: rGraph = jenaTp.Graph
    // todo: Quad missing
    override opaque type Triple <: rTriple  = jenaTp.Triple
+   override opaque type Quad <: Top        = org.apache.jena.sparql.core.Quad
    override opaque type Node <: rNode      = jenaTp.Node
    override opaque type URI <: Node & rURI = jenaTp.Node_URI
    override opaque type BNode <: Node      = jenaTp.Node_Blank
@@ -52,10 +52,9 @@ object JenaRdf extends org.w3.banana.RDF:
    override opaque type Lang <: Top        = String
    override opaque type DefaultGraphNode   = org.apache.jena.sparql.core.Quad.defaultGraphIRI.type
 
-   override type NodeAny = Null
-   override opaque type Store <: Matchable =
+   override opaque type NodeAny = Null
+   override opaque type Store =
      org.apache.jena.sparql.core.DatasetGraph // a mutable dataset
-   override opaque type Quad <: Top = org.apache.jena.sparql.core.Quad
 
    given [T]: Releasable[ExtendedIterator[T]] with
       def release(resource: ExtendedIterator[T]): Unit = resource.close()
@@ -78,7 +77,7 @@ object JenaRdf extends org.w3.banana.RDF:
       given basicStoreFactory: StoreFactory[R] with
          override def makeStore(): RDF.Store[R] = DatasetGraphFactory.createGeneral().nn
 
-      given Store: operations.Store[R] with
+      given Store: operations.Store[R](using ops) with
          import scala.jdk.CollectionConverters.given
          // todo: need to integrate locking functionality
          extension (store: RDF.Store[R])
@@ -109,7 +108,7 @@ object JenaRdf extends org.w3.banana.RDF:
             override def default: St.Graph[R] = defaultGraph
       end Store
 
-      given Graph: operations.Graph[R] with
+      given Graph: operations.Graph[R](using ops) with
          import RDF.Statement as St
          def empty: RDF.Graph[R] = Factory.empty().nn
 
@@ -285,7 +284,7 @@ object JenaRdf extends org.w3.banana.RDF:
          // todo? are we missing a Datatype Type? (check other frameworks)
 
          def jenaDatatype(datatype: RDF.URI[R]): RDFDatatype =
-            val iriString: String       = rURI.stringValue(datatype)
+            val iriString: String       = datatype.getURI.nn
             val typ: RDFDatatype | Null = mapper.getTypeByName(iriString)
             if typ == null then
                val datatype = new BaseDatatype(iriString)
@@ -351,7 +350,7 @@ object JenaRdf extends org.w3.banana.RDF:
 
          override def apply(uriStr: String): RDF.rURI[R] = mkUriUnsafe(uriStr)
 
-         override def stringValue(uri: RDF.rURI[R]): String = uri.getURI().nn
+         override protected def stringVal(uri: RDF.rURI[R]): String = uri.getURI().nn
       end rURI
 
       given rUriTT: reflect.TypeTest[Matchable, org.w3.banana.RDF.rURI[R]] with
@@ -363,6 +362,8 @@ object JenaRdf extends org.w3.banana.RDF:
 
       given URI: operations.URI[R] with
          import java.net.URI as jURI
+         override protected def stringVal(uri: RDF.URI[R]): String =
+           uri.getURI().nn
          override def mkUriUnsafe(iriStr: String): RDF.URI[R] =
            NodeFactory.createURI(iriStr).asInstanceOf[URI]
       end URI

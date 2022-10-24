@@ -17,7 +17,8 @@ import org.w3.banana.RDF.{rGraph, rNode, rURI, Literal, BNode, rStatement}
 
 /** pointed Relative Graph, especially useful when constructing graphs usnig the DSL */
 sealed trait PointedRGraph[R <: RDF]:
-   type Pointer <: rURI[R] | BNode[R] | Literal[R]
+   type Pointer <: RDF.rStatement.Object[R]
+
    def pointer: Pointer
    def graph: rGraph[R]
 
