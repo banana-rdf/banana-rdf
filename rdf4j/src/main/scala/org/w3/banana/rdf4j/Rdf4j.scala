@@ -35,7 +35,7 @@ object Rdf4j extends RDF:
    import org.eclipse.rdf4j.model.ValueFactory
 //   import org.eclipse.rdf4j.model.{BNode as rjBNode, IRI as rjIRI, Literal as rjLiteral, *}
 
-   type Top = java.lang.Object
+   override type Top = Matchable
 
 // rdf4j.Model is modifiable, but we provide no altering methods and always produce new graphs
    override opaque type rGraph <: Top  = r4j.Model
@@ -83,15 +83,11 @@ object Rdf4j extends RDF:
      * hides the implementation type (of `graph` field for example) *
      */
    given ops: Ops[R] with
+      val `*` : RDF.NodeAny[R] = null
       lazy val valueFactory: r4j.ValueFactory = r4j.impl.SimpleValueFactory.getInstance().nn
       import RDF.Statement as St
 
-      given Conversion[RDF.rNode[R], Matchable] with
-        def apply(x: RDF.rNode[R]): Matchable = x.asInstanceOf[Matchable]
-     
       import scala.jdk.CollectionConverters.{*, given}
-
-      val `*` : RDF.NodeAny[R] = null
 
       given basicStoreFactory: StoreFactory[R] with
          // todo: note that by returning a Repository every request has to
@@ -238,7 +234,7 @@ object Rdf4j extends RDF:
            t.getObject().nn.asInstanceOf[St.Object[R]]
       end Triple
 
-      given rTriple: operations.rTriple[R] with
+      given rTriple: operations.rTriple[R](using ops) with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
            Triple(s, p, o)
@@ -406,7 +402,7 @@ object Rdf4j extends RDF:
 
       end rURI
 
-      given URI: operations.URI[R] with
+      given URI: operations.URI[R](using ops) with
          override protected def stringVal(uri: RDF.URI[R]): String =
            uri.stringValue.nn
          // this does throw an exception on non relative URLs!

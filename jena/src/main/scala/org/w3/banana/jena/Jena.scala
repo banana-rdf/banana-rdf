@@ -33,7 +33,7 @@ object JenaRdf extends org.w3.banana.RDF:
    import org.apache.jena.graph as jenaTp
    import org.apache.jena.graph.{Factory, NodeFactory}
 
-   type Top = java.lang.Object
+   override type Top = java.lang.Object
 
    // we hack jena.{Graph, Triple, URI} to allow relative URLs.
    override opaque type rGraph <: Top  = jenaTp.Graph
@@ -185,7 +185,7 @@ object JenaRdf extends org.w3.banana.RDF:
               graph.isIsomorphicWith(other)
       end rGraph
 
-      given rTriple: operations.rTriple[R] with
+      given rTriple: operations.rTriple[R](using ops) with
          import RDF.rStatement as rSt
          def apply(s: rSt.Subject[R], p: rSt.Relation[R], o: rSt.Object[R]): RDF.rTriple[R] =
            jenaTp.Triple.create(s, p, o).nn
