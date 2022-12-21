@@ -19,7 +19,7 @@ ThisBuild / developers := List(
   tlGitHubDev("bblfish", "Henry Story"),
   tlGitHubDev("betehess", "Alexandre Bertails")
 )
-
+enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)
 
 ThisBuild / tlCiReleaseBranches := Seq() // "scala3" if github were to do the releases
@@ -29,9 +29,9 @@ ThisBuild / crossScalaVersions := Seq(Ver.scala3) //, "2.13.8")
 
 ThisBuild / githubWorkflowBuildPreamble ++= Seq(
   WorkflowStep.Use(
-    UseRef.Public("actions", "setup-node", "v2.4.0"),
-    name = Some("Setup NodeJS v14 LTS"),
-    params = Map("node-version" -> "14"),
+    UseRef.Public("actions", "setup-node", "v3"),
+    name = Some("Setup NodeJS v16 LTS"),
+    params = Map("node-version" -> "16"),
     cond = Some("matrix.project == 'rootJS' && matrix.jsenv == 'NodeJS'")
   )
 )
