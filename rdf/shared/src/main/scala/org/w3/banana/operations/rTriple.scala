@@ -23,7 +23,7 @@ import org.w3.banana.{Ops, RDF}
   * @tparam Rdf
   */
 trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
-   import ops.{*,given}
+   import ops.{*, given}
    type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
    import RDF.{Statement as St, rStatement as rSt}
 
@@ -49,7 +49,8 @@ trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
            uri => uri.resolveAgainst(base)
          )
          val (r, rChange): (St.Relation[Rdf], Boolean) = rtriple.rrel.asUri.resolveAgainst(base)
-         val (o, oChange): (St.Object[Rdf], Boolean) = rtriple.robj.asNode.resolveNodeAgainst(base): @unchecked
+         val (o, oChange): (St.Object[Rdf], Boolean) =
+           rtriple.robj.asNode.resolveNodeAgainst(base): @unchecked
          if sChange || rChange || oChange
          then (ops.Triple(s, r, o), true)
          else (rtriple.asInstanceOf[RDF.Triple[Rdf]], false)

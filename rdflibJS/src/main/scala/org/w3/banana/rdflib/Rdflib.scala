@@ -134,7 +134,7 @@ object Rdflib extends RDF:
          def empty: RDF.Graph[R] = storeMod(opts())
          def apply(triples: Iterable[RDF.Triple[R]]): RDF.Graph[R] =
             val graph: storeMod.IndexedFormula = empty
-            graph.addAll(triples.toJSArray)
+            triples.foreach(t => graph.addStatement(t))
             graph
          def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] =
             val iFrm: org.w3.banana.rdflib.facade.storeMod.IndexedFormula = graph
@@ -182,24 +182,32 @@ object Rdflib extends RDF:
       end Graph
 
       given rGraph: operations.rGraph[R] with
-         def empty: RDF.rGraph[R] = Graph.empty
+         def empty: RDF.rGraph[R] = storeMod(opts())
          def apply(triples: Iterable[RDF.rTriple[R]]): RDF.rGraph[R] =
-           Graph(triples)
+            val graph: storeMod.IndexedFormula = empty
+            graph.addAll(triples.toJSArray)
+            graph
 
          import org.w3.banana.isomorphism.*
          private val mapGen = new SimpleMappingGenerator[R](VerticeCBuilder.simpleHash[R])
          private val iso    = new GraphIsomorphism[R](mapGen)
 
          extension (rGraph: RDF.rGraph[R])
-            override def triples: Iterable[RDF.rTriple[R]] = Graph.triplesIn(rGraph)
-            override def size: Int                         = Graph.graphSize(rGraph)
+            override def triples: Iterable[RDF.rTriple[R]] =
+               val iFrm: IndexedFormula = rGraph
+               iFrm.`match`(undefined, undefined, undefined, undefined)
+
+            override def size: Int = rGraph.length.toInt
 
             infix def ++(triples: Seq[RDF.rTriple[R]]): RDF.rGraph[R] =
               if triples.isEmpty then rGraph
               else
                  val newGraph: IndexedFormula = empty
                  rGraph.triples.foreach(t => newGraph.addStatement(t))
-                 triples.foreach(s => newGraph.addStatement(s))
+                 triples.foreach { s =>
+                    println("now adding " + s)
+                    newGraph.addStatement(s)
+                 }
                  newGraph
 
             infix def isomorphic(other: RDF.rGraph[R]): Boolean =

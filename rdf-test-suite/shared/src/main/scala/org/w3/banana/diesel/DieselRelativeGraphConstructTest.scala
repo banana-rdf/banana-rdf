@@ -140,7 +140,6 @@ open class DieselRelativeGraphConstructTest[Rdf <: RDF](using ops: Ops[Rdf])
    }
 
    "Diesel must allow easy use of rdf:type through the method 'a'" in {
-
      val g: PointedRGraph[Rdf] = (
        rURI("#betehess").a(foaf.Person)
          -- foaf.name ->- "Alexandre".lang(fr)

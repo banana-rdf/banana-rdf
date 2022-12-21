@@ -123,7 +123,7 @@ object RDF:
 
    private type GetRelURI[U]                 = RDF { type rURI = U }
    private type GetURI[U]                    = RDF { type URI = U }
-   private type GetRelNode[N <: Matchable]                = RDF { type rNode = N }
+   private type GetRelNode[N <: Matchable]   = RDF { type rNode = N }
    private type GetNode[N]                   = RDF { type Node = N }
    private type GetBNode[N]                  = RDF { type BNode = N }
    private type GetLiteral[L]                = RDF { type Literal = L }
@@ -136,7 +136,7 @@ object RDF:
    private type GetGraph[G]                  = RDF { type Graph = G }
    private type GetStore[S]                  = RDF { type Store = S }
    private type GetNodeAny[M]                = RDF { type NodeAny = M }
-   
+
    /** these associate a type to the positions in statements (triples or quads) These are not agreed
      * to by all frameworks, so it would be useful to find a way to parametrise them. Essentially
      * some (Jena?) allow a literal in Subject position (which is useful for reasoning and later n3)

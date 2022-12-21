@@ -122,7 +122,7 @@ object JenaRdf extends org.w3.banana.RDF:
          // note: how should one pass on the information that the Iterable is closeable?
          // https://stackoverflow.com/questions/69153609/is-there-a-cross-platform-autocloseable-iterable-
          override protected def triplesIn(graph: RDF.Graph[R]): Iterable[RDF.Triple[R]] =
-            import collection.JavaConverters.asScalaIteratorConverter
+            import scala.jdk.CollectionConverters.*
             graph.find(JenaANY, JenaANY, JenaANY).nn.asScala.to(Iterable)
 
          override protected def graphSize(graph: RDF.Graph[R]): Int = graph.size()
@@ -167,7 +167,7 @@ object JenaRdf extends org.w3.banana.RDF:
            Graph(triples)
          extension (graph: RDF.rGraph[R])
             override def triples: Iterable[RDF.rTriple[R]] =
-               import collection.JavaConverters.asScalaIteratorConverter
+               import scala.jdk.CollectionConverters.*
                graph.find(JenaANY, JenaANY, JenaANY).nn.asScala.to(Iterable)
             override def size: Int =
               graph.size()

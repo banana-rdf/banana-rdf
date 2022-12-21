@@ -15,15 +15,26 @@ package org.w3.banana.rdflib.facade
 
 import org.scalablytyped.runtime.StObject
 import FormulaOpts.FormulaOpts
+import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
 import run.cosy.rdfjs.model.{BlankNode, DataFactory, Quad, Term}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.*
 
+object formulaReplacementMethods:
+   import formulaMod.Formula
+   val id: js.ThisFunction1[Formula, Term[?], String] = (
+       thisArg: Formula,
+       t: Term[?]
+   ) =>
+     thisArg.rdfFactory.id(t)
+
 object formulaMod:
 
    def apply(quads: js.Array[Quad], opts: FormulaOpts): Formula =
-     new default(quads, js.Array(), js.Array(), js.Array(), opts)
+      val form = new default(quads, js.Array(), js.Array(), js.Array(), opts)
+      form.asInstanceOf[js.Dynamic].updateDynamic("id")(formulaReplacementMethods.id)
+      form
 
    /** Initializes this formula
      *

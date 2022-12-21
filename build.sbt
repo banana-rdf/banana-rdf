@@ -99,7 +99,7 @@ lazy val root = tlCrossRootProject.aggregate(
   jena,
   jenaIOSync,
   rdf_io_sync,
-  rdf4j,
+//  rdf4j, wait for fix https://github.com/lampepfl/dotty/issues/16408
   rdflibJS,
   rdfTestSuite
 )
@@ -195,27 +195,28 @@ lazy val jenaIOSync = project.in(file("jenaIO-sync"))
     rdfTestSuite.jvm % "test->compile"
   )
 
-import Dependencies.RDF4J
-lazy val rdf4j = project.in(file("rdf4j"))
-  .settings(commonSettings*)
-  .settings(
-    name          := "banana-rdf4j",
-    description   := "RDF4J implementation of banana-rdf",
-    scalacOptions := scala3jvmOptions,
-    libraryDependencies ++= Seq(
-      RDF4J.QueryAlgebra,
-      RDF4J.QueryParser,
-      RDF4J.QueryResult,
-      RDF4J.RioTurtle,
-      RDF4J.RioRdfxml,
-      RDF4J.RioJsonLd,
-      RDF4J.SailMemory,
-      RDF4J.SailNativeRdf,
-      RDF4J.RepositorySail,
-      Dependencies.slf4jNop,
-      Dependencies.jsonldJava
-    )
-  ).dependsOn(rdf.jvm, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
+// remove rdf4j until https://github.com/lampepfl/dotty/issues/16408 is resolved
+//import Dependencies.RDF4J
+//lazy val rdf4j = project.in(file("rdf4j"))
+//  .settings(commonSettings*)
+//  .settings(
+//    name          := "banana-rdf4j",
+//    description   := "RDF4J implementation of banana-rdf",
+//    scalacOptions := scala3jvmOptions,
+//    libraryDependencies ++= Seq(
+//      RDF4J.QueryAlgebra,
+//      RDF4J.QueryParser,
+//      RDF4J.QueryResult,
+//      RDF4J.RioTurtle,
+//      RDF4J.RioRdfxml,
+//      RDF4J.RioJsonLd,
+//      RDF4J.SailMemory,
+//      RDF4J.SailNativeRdf,
+//      RDF4J.RepositorySail,
+//      Dependencies.slf4jNop,
+//      Dependencies.jsonldJava
+//    )
+//  ).dependsOn(rdf.jvm, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
 
 // todo: we need to update rdflib.js so that outdated dependencies don't kill build
 ThisBuild / tlFatalWarningsInCi := false
@@ -234,6 +235,7 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
     description := "rdflib.js implementation of banana-rdf",
     useYarn     := true,
     scalacOptions ++= scala3jsOptions,
+    // see: https://github.com/linkeddata/rdflib.js
     Compile / npmDependencies += "rdflib" -> "2.2.8",
     Test / npmDependencies += "rdflib"    -> "2.2.8",
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
@@ -283,7 +285,8 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
 lazy val scala3jvmOptions = Seq(
   // "-classpath", "foo:bar:...",         // Add to the classpath.
   // "-encoding", "utf-8",                // Specify character encoding used by source files.
-  "-release", "17",      // see https://github.com/scala/scala/pull/9982
+  "-release",
+  "17",           // see https://github.com/scala/scala/pull/9982
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-explain",     // useful for type errors, but gives huge explanations
   "-unchecked",   // Enable additional warnings where generated code depends on assumptions.

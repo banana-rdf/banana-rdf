@@ -17,8 +17,10 @@ import org.scalablytyped.runtime.StringDictionary
 import FormulaOpts.FormulaOpts
 import formulaMod.Formula
 import run.cosy.rdfjs.model.*
+import run.cosy.rdfjs.model.Quad.{Graph, Predicate, Subject}
 
 import scala.scalajs.js
+import scala.scalajs.js.ThisFunction4
 import scala.scalajs.js.annotation.{JSImport, JSName}
 
 type Feature      = "sameAs" | "InverseFunctionalProperty" | "FunctionalProperty"
@@ -31,10 +33,12 @@ object StoreReplacementMethods:
    val addStatement: js.ThisFunction1[IndexedFormula, Quad, Quad | Null] =
      (thisFrmla: IndexedFormula, quad: Quad) =>
         val predHash = thisFrmla.rdfFactory.id(quad.rel)
-        val actions  = thisFrmla.propertyActions.get(predHash).getOrElse(js.Array())
         import quad.*
-        for act <- actions do
-           act(thisFrmla, subj, rel, obj, graph)
+//todo: We need to upgrade the library, so no need to spend too much time getting actions to work now.
+//        val actions: js.Array[ThisFunction4[thisFrmla.type, Subject, Predicate, Quad.Object, Graph, Boolean]]  =
+//          thisFrmla.propertyActions.get(predHash).getOrElse(js.Array())
+//        for act <- actions do
+//           act(thisFrmla, subj, rel, obj, graph)
         // note: the implementation there says it is inefficient but there is none using indexes provider
         if thisFrmla.statementsMatching(subj, rel, obj, graph, true).length > 0 then null
         else
@@ -161,16 +165,19 @@ object StoreReplacementMethods:
        g.getOrElse(null),
        false
      )
-
+   val id: js.ThisFunction1[IndexedFormula, Term[?], String] =
+     (thisArg: IndexedFormula, t: Term[?]) => thisArg.rdfFactory.id(t)
+//   val handleRDF
 end StoreReplacementMethods
 
 object storeMod:
    export Quad.*
-   import StoreReplacementMethods as replace
+   val replace = StoreReplacementMethods
    type Index = js.Dictionary[js.Array[Quad]]
 
    def apply(opts: FormulaOpts): IndexedFormula =
       val ixf = default(js.Array(), opts)
+      ixf.asInstanceOf[js.Dynamic].updateDynamic("id")(replace.id)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("add")(replace.add)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("addStatement")(replace.addStatement)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("canon")(replace.canon)
@@ -178,6 +185,7 @@ object storeMod:
       ixf.asInstanceOf[js.Dynamic].updateDynamic("statementsMatching")(replace.statementsMatching)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("removeStatement")(replace.removeStatement)
       ixf
+   end apply
 
 //		def add(
 //			subj: QuadSubject | Quad | js.Array[Quad],
@@ -327,7 +335,7 @@ object storeMod:
       //		def checkStatementList(sts: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]], from: Double): Boolean | Unit = js.native
 
       /** Map of iri predicates to functions to call when adding { s type X } */
-//		var classActions: StringDictionary[js.Array[js.Function]] = js.native
+      var classActions: StringDictionary[js.Array[js.Function]] = js.native
 
       /** Closes this formula (and return it)
         */
