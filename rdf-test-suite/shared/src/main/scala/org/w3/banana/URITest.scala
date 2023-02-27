@@ -146,35 +146,35 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
        (ops.URI("https://bblfish.net:443/people/henry/card"), false)
      )
    }
-   
+
    test("remove fragments from URLs") {
-     val bblStr = "https://bblfish.net/people/henry/card#me"
+     val bblStr    = "https://bblfish.net/people/henry/card#me"
      val bblDocStr = "https://bblfish.net/people/henry/card"
-     
+
      assertEquals(
        ops.URI(bblStr).fragmentLess,
        ops.URI(bblDocStr)
      )
    }
-  
+
    test("remove fragments from relative URLs") {
-     val bblAbsStr = "https://bblfish.net/people/henry/card#me"
+     val bblAbsStr    = "https://bblfish.net/people/henry/card#me"
      val bblAbsDocStr = "https://bblfish.net/people/henry/card"
 
      assertEquals(
        ops.rURI(bblAbsStr).fragmentLess,
        ops.rURI(bblAbsDocStr)
      )
-     
+
      val bblStr    = "/people/henry/card#me"
      val bblDocStr = "/people/henry/card"
-   
-      assertEquals(
-        ops.rURI(bblStr).fragmentLess,
-        ops.rURI(bblDocStr)
-      )
-     
-     val bblShort = "card#me"
+
+     assertEquals(
+       ops.rURI(bblStr).fragmentLess,
+       ops.rURI(bblDocStr)
+     )
+
+     val bblShort    = "card#me"
      val bblShortDoc = "card"
      assertEquals(
        ops.rURI(bblShort).fragmentLess,

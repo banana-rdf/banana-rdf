@@ -64,10 +64,10 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
         ll.Uri.parseTry(uri.value).collect {
           case url: ll.Url => apply(url.withFragment(frag).toString)
         }.getOrElse(uri)
-        
-      def fragmentLess: RDF.URI[Rdf] = ll.Uri.parseTry(uri.value).collect{
+
+      def fragmentLess: RDF.URI[Rdf] = ll.Uri.parseTry(uri.value).collect {
         case url: ll.AbsoluteUrl if url.fragment != None =>
-          given deflt : UriConfig =  UriConfig.default
+          given deflt: UriConfig = UriConfig.default
           apply(url.copy(fragment = None).toString)
       }.getOrElse(uri)
 
