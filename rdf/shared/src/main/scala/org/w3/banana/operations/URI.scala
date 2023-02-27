@@ -14,6 +14,7 @@
 package org.w3.banana.operations
 
 import io.lemonlabs.uri as ll
+import io.lemonlabs.uri.config.UriConfig
 import org.w3.banana.{Ops, RDF}
 import org.w3.banana.exceptions.*
 
@@ -63,6 +64,12 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
         ll.Uri.parseTry(uri.value).collect {
           case url: ll.Url => apply(url.withFragment(frag).toString)
         }.getOrElse(uri)
+        
+      def fragmentLess: RDF.URI[Rdf] = ll.Uri.parseTry(uri.value).collect{
+        case url: ll.AbsoluteUrl if url.fragment != None =>
+          given deflt : UriConfig =  UriConfig.default
+          apply(url.copy(fragment = None).toString)
+      }.getOrElse(uri)
 
       def baseFor(rel: ll.RelativeUrl): RDF.URI[Rdf] =
         ll.Uri.parse(uri.value) match

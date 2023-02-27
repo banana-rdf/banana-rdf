@@ -14,6 +14,7 @@
 package org.w3.banana.operations
 
 import io.lemonlabs.uri as ll
+import io.lemonlabs.uri.config.UriConfig
 import org.w3.banana.RDF.rURI
 import org.w3.banana.exceptions.*
 import org.w3.banana.{Ops, RDF}
@@ -64,6 +65,15 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
    extension (uri: RDF.rURI[Rdf])
       def value: String = stringVal(uri)
 
+      def fragmentLess: RDF.rURI[Rdf] =
+        given deflt: UriConfig = UriConfig.default
+        ll.Uri.parseTry(uri.value).collect {
+         case url: ll.AbsoluteUrl if url.fragment != None =>
+           apply(url.copy(fragment = None).toString)
+         case rurl: ll.RelativeUrl if rurl.fragment != None =>
+           apply(rurl.copy(fragment = None).toString)
+       }.getOrElse(uri)
+      
       /** Returns resolved URL, and whether the result is new. If the URL is relative but cannot be
         * resolved, be lenient and keep the original. //todo: pass a logger
         * @param base
