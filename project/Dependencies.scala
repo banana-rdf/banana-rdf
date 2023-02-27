@@ -1,5 +1,5 @@
-import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport.*
-import sbt.*
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import sbt._
 
 object Dependencies {
 
@@ -7,11 +7,11 @@ object Dependencies {
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
   object Ver {
-    val scala3 = "3.2.1"
+    val scala3 = "3.2.2"
   }
 
   // https://github.com/lemonlabsuk/scala-uri
-  val scalaUri = Def.setting("io.lemonlabs" %%% "scala-uri" % "4.0.2")
+  val scalaUri = Def.setting("io.lemonlabs" %%% "scala-uri" % "4.0.3")
 
   /** Jena
     *
@@ -20,7 +20,7 @@ object Dependencies {
     * @see
     *   https://repo1.maven.org/maven2/org/apache/jena
     */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.6.1"
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.7.0"
 
   object fish {
     val rdf_model_js = Def.setting("net.bblfish.rdf" %%% "rdf-model-js" % "0.2-dbfa81d-SNAPSHOT")
@@ -74,7 +74,8 @@ object Dependencies {
 //	val `rdflib-types` = "org.scala-js" %%% "rdflib-types" % "0.1-SNAPSHOT"
 
   object typelevel {
-    val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.8.0")
+    // https://typelevel.org/cats/
+    val catsCore = Def.setting("org.typelevel" %%% "cats-core" % "2.9.0")
   }
 
 }
