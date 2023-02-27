@@ -63,7 +63,7 @@ object Dependencies {
     * @see
     *   https://repo.typesafe.com/typesafe/snapshots/com/github/jsonld-java/jsonld-java-tools
     */
-  val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.13.3"
+  val jsonldJava = "com.github.jsonld-java" % "jsonld-java" % "0.13.4"
 
   /** slf4j-nop. Test dependency for logging.
     * @see
