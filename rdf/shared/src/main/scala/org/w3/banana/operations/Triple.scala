@@ -67,10 +67,6 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
    extension (rsubj: RDF.Statement.Subject[Rdf])
       // todo: find a way to remove this asInstanceOf
       def widenToNode: RDF.Node[Rdf] = rsubj.asInstanceOf[RDF.Node[Rdf]]
-      def foldSubj[A](uriF: RDF.URI[Rdf] => A, bnF: RDF.BNode[Rdf] => A): A =
-        rsubj match
-           case uri: RDF.URI[Rdf]  => uriF(uri)
-           case bn: RDF.BNode[Rdf] => bnF(bn)
 
    extension (rrel: RDF.Statement.Relation[Rdf])
      // todo: find a way to remove this asInstanceOf

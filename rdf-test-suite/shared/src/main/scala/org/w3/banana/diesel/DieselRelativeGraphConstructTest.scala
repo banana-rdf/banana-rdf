@@ -41,7 +41,7 @@ open class DieselRelativeGraphConstructTest[Rdf <: RDF](using ops: Ops[Rdf])
          (rURI("#b") -- foaf.name ->- "Alexandre".lang(fr)) -- foaf.title ->- "Mr"
        )
 
-     val expectedGraph =
+     val expectedGraph: RDF.rGraph[Rdf] =
        rGraph(
          rTriple(rURI("#b"), foaf.name, Literal("Alexandre", fr)),
          rTriple(rURI("#b"), foaf.title, Literal("Mr"))
