@@ -6,6 +6,8 @@ of the most important ones we were relying on: type projections.
 So this repository is trying to build up from scratch the framework,
 to see what holds water, before moving it back to the main repository.
 
+The main work on this branch is going on in the [bblfish banana-rdf](https://github.com/bblfish/banana-rdf) repository. Check the pull requests there to see what the latest branch being worked on is.
+
 ### Discussions
 
 Some places where ideas have been discussed are:
