@@ -145,8 +145,8 @@ final case class GraphIsomorphism[R <: RDF](
          boundary {
            // 1. verify that bnodeBijection is a bijection, fail early
            val bnodeBijection: mutable.HashMap[BNode[R], BNode[R]] =
-              val back = new mutable.HashMap[BNode[R], BNode[R]]()
-              val resultMap  = new mutable.HashMap[BNode[R], BNode[R]]()
+              val back      = new mutable.HashMap[BNode[R], BNode[R]]()
+              val resultMap = new mutable.HashMap[BNode[R], BNode[R]]()
               for (from, to) <- mapping do
                  if back.put(to, from).fold[Boolean](true)(_ == from)
                     && resultMap.put(from, to).fold(true)(_ == to)

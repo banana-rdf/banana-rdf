@@ -65,8 +65,8 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
       end relativizeAgainst
 
    extension (rsubj: RDF.Statement.Subject[Rdf])
-      // todo: find a way to remove this asInstanceOf
-      def widenToNode: RDF.Node[Rdf] = rsubj.asInstanceOf[RDF.Node[Rdf]]
+     // todo: find a way to remove this asInstanceOf
+     def widenToNode: RDF.Node[Rdf] = rsubj.asInstanceOf[RDF.Node[Rdf]]
 
    extension (rrel: RDF.Statement.Relation[Rdf])
      // todo: find a way to remove this asInstanceOf
