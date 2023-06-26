@@ -7,7 +7,7 @@ object Dependencies {
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
   object Ver {
-    val scala3 = "3.2.2"
+    val scala3 = "3.3.0"
   }
 
   // https://github.com/lemonlabsuk/scala-uri
@@ -20,7 +20,7 @@ object Dependencies {
     * @see
     *   https://repo1.maven.org/maven2/org/apache/jena
     */
-  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.7.0"
+  val jenaLibs = "org.apache.jena" % "apache-jena-libs" % "4.8.0"
 
   object fish {
     val rdf_model_js = Def.setting("net.bblfish.rdf" %%% "rdf-model-js" % "0.2-dbfa81d-SNAPSHOT")
@@ -44,7 +44,7 @@ object Dependencies {
     *   https://repo1.maven.org/maven2/org/eclipse/rdf4j/
     */
   object RDF4J {
-    val Version             = "4.2.17t"
+    val Version             = "4.3.2"
     lazy val QueryAlgebra   = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation"  % Version
     lazy val QueryParser    = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql"       % Version
     lazy val QueryResult    = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % Version

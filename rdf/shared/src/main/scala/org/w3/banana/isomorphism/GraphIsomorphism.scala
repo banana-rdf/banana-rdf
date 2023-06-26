@@ -135,26 +135,26 @@ final case class GraphIsomorphism[R <: RDF](
        mapping: List[(BNode[R], BNode[R])]
    ): List[MappingException] =
 
-      import scala.util.control.NonLocalReturns.*
+      import util.boundary, boundary.break
       // verify that both graphs are the same size
       if graph1.size != graph2.size then
          List(MappingException(
            s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"
          ))
       else
-         returning {
+         boundary {
            // 1. verify that bnodeBijection is a bijection, fail early
            val bnodeBijection: mutable.HashMap[BNode[R], BNode[R]] =
               val back = new mutable.HashMap[BNode[R], BNode[R]]()
-              val map  = new mutable.HashMap[BNode[R], BNode[R]]()
+              val resultMap  = new mutable.HashMap[BNode[R], BNode[R]]()
               for (from, to) <- mapping do
                  if back.put(to, from).fold[Boolean](true)(_ == from)
-                    && map.put(from, to).fold(true)(_ == to)
+                    && resultMap.put(from, to).fold(true)(_ == to)
                  then {} else
-                    throwReturn(List[MappingException](
+                    break(List[MappingException](
                       MappingException(s"bnodeBijection is not a bijection: $from already mapped")
                     ))
-              map
+              resultMap
 
            def bnmap(node: RDF.Statement.Object[R]): RDF.Statement.Object[R] = node.asNode.fold(
              (uri: RDF.URI[R]) => uri,

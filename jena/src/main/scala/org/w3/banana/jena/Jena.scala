@@ -14,8 +14,8 @@
 package org.w3.banana.jena
 
 import org.apache.jena.datatypes.{BaseDatatype, RDFDatatype, TypeMapper}
-import org.apache.jena.graph.{GraphUtil, Node_URI}
 import org.apache.jena.graph.Node.ANY as JenaANY
+import org.apache.jena.graph.{GraphUtil, Node_URI}
 import org.apache.jena.query.DatasetFactory
 import org.apache.jena.sparql.core.DatasetGraphFactory
 import org.apache.jena.sparql.graph.GraphReadOnly
@@ -371,25 +371,25 @@ object JenaRdf extends org.w3.banana.RDF:
       given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & jenaTp.Node_URI) => Some(x)
-              case _                             => None
+              case x: (s.type & RDF.URI[R]) => Some(x)
+              case _                        => None
 
       given rSubjToURITT: TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & jenaTp.Node_URI) => Some(x)
-              case _                             => None
+              case x: (s.type & RDF.URI[R]) => Some(x)
+              case _                        => None
 
       given objToURITT: TypeTest[RDF.Statement.Object[R], RDF.URI[R]] with
          override def unapply(s: RDF.Statement.Object[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & jenaTp.Node_URI) => Some(x)
-              case _                             => None
+              case x: (s.type & RDF.URI[R]) => Some(x)
+              case _                        => None
 
       given rObjToURITT: TypeTest[RDF.rStatement.Object[R], RDF.rURI[R]] with
          override def unapply(s: RDF.rStatement.Object[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & jenaTp.Node_URI) => Some(x)
-              case _                             => None
+              case x: (s.type & RDF.URI[R]) => Some(x)
+              case _                        => None
 
 end JenaRdf
