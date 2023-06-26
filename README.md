@@ -3,6 +3,14 @@
 This project is porting [banana-rdf](https://github.com/banana-rdf/banana-rdf) 
 to Scala3. 
 
+Thanks to the financial help by NlNet in the [solid-control](https://github.com/co-operating-systems/solid-control)
+project.
+
+### Artifacts
+
+Artifacts can be found in the sonatype repository
+https://oss.sonatype.org/content/repositories/snapshots/net/bblfish/rdf/
+
 ### Changes from banana-rdf 0.8
 
 [Scala 3](https://docs.scala-lang.org/scala3/) comes with many new features, but dropped one too.
