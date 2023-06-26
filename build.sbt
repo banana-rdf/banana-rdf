@@ -285,8 +285,9 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
 lazy val scala3jvmOptions = Seq(
   // "-classpath", "foo:bar:...",         // Add to the classpath.
   // "-encoding", "utf-8",                // Specify character encoding used by source files.
+  // see https://github.com/scala/scala/pull/9982
   "-release",
-  "20",           // see https://github.com/scala/scala/pull/9982
+  "17",
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-explain",     // useful for type errors, but gives huge explanations
   "-unchecked",   // Enable additional warnings where generated code depends on assumptions.
