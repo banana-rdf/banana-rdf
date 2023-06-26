@@ -26,9 +26,8 @@ object URI:
    val xsdLangStr: String = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
 
 trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
-   import ops.{rURI, given}
+   import ops.rURI
    import scala.language.implicitConversions
-   import ops.given
    // This will create the URI with minimal verification, assuming the uriStr is already well formed
    protected def mkUriUnsafe(uriStr: String): RDF.URI[Rdf]
 

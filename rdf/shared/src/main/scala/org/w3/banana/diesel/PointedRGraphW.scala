@@ -17,8 +17,6 @@ import org.w3.banana.*
 import org.w3.banana.RDF.*
 //import org.w3.banana.binder._
 
-import scala.util.*
-
 /** Functions needed to **construct** a rGraph.
   *
   * Note this may be better build as a typeClass, since exactly the same methods make sense on an

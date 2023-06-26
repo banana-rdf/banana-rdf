@@ -21,62 +21,61 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    import ops.given
 
    test("relative URLs and incomplete ones should Fail") {
-     assert(ops.URI.mkUri("people").isFailure)
-     assert(ops.URI.mkUri("/people/henry").isFailure)
-     assert(ops.URI.mkUri("/people/henry/card#me").isFailure)
-     assert(ops.URI.mkUri("//bblfish.net/people/henry/card").isFailure)
-     assert(ops.URI.mkUri("//bblfish.net:80/people/henry/card").isFailure)
+     assert(URI.mkUri("people").isFailure)
+     assert(URI.mkUri("/people/henry").isFailure)
+     assert(URI.mkUri("/people/henry/card#me").isFailure)
+     assert(URI.mkUri("//bblfish.net/people/henry/card").isFailure)
+     assert(URI.mkUri("//bblfish.net:80/people/henry/card").isFailure)
      assert(
-       ops.URI.mkUri("https://").isSuccess
+       URI.mkUri("https://").isSuccess
      ) // <- bizzarely enough this is an absolute url. Should we not accept it?
    }
 
    test("relative URLs and incomplete ones should throw exceptions when using apply(") {
      // todo: narrow it down to a banana-exception
-     intercept[Exception] { ops.URI("people") }
-     intercept[Exception] { ops.URI("/people/henry") }
-     intercept[Exception] { ops.URI("/people/henry/card#me") }
-     intercept[Exception] { ops.URI("//bblfish.net/people/henry/card") }
-     intercept[Exception] { ops.URI("//bblfish.net:80/people/henry/card") }
+     intercept[Exception] { URI("people") }
+     intercept[Exception] { URI("/people/henry") }
+     intercept[Exception] { URI("/people/henry/card#me") }
+     intercept[Exception] { URI("//bblfish.net/people/henry/card") }
+     intercept[Exception] { URI("//bblfish.net:80/people/henry/card") }
      assert(
        ops.URI("https://").isInstanceOf[RDF.URI[Rdf]]
      ) // <- bizzarely enough this is an absolute url. Should we not accept it?
    }
 
    test("absolute URLs and URNs should be accepted") {
-     assert(ops.URI.mkUri("https://bblfish.net").isSuccess)
-     assert(ops.URI.mkUri("https://bblfish.net:80/").isSuccess)
-     assert(ops.URI.mkUri("https://bblfish.net/people/henry/").isSuccess)
-     assert(ops.URI.mkUri("https://bblfish.net/people/henry/card#me").isSuccess)
+     assert(URI.mkUri("https://bblfish.net").isSuccess)
+     assert(URI.mkUri("https://bblfish.net:80/").isSuccess)
+     assert(URI.mkUri("https://bblfish.net/people/henry/").isSuccess)
+     assert(URI.mkUri("https://bblfish.net/people/henry/card#me").isSuccess)
      // urn examples taken from wikipedia page https://en.wikipedia.org/wiki/Uniform_Resource_Name
-     assert(ops.URI.mkUri("urn:isbn:0451450523").isSuccess)
-     assert(ops.URI.mkUri("urn:isan:0000-0000-2CEA-0000-1-0000-0000-Y").isSuccess)
-     assert(ops.URI.mkUri("urn:ISSN:0167-6423").isSuccess)
-     assert(ops.URI.mkUri("urn:mpeg:mpeg7:schema:2001").isSuccess)
+     assert(URI.mkUri("urn:isbn:0451450523").isSuccess)
+     assert(URI.mkUri("urn:isan:0000-0000-2CEA-0000-1-0000-0000-Y").isSuccess)
+     assert(URI.mkUri("urn:ISSN:0167-6423").isSuccess)
+     assert(URI.mkUri("urn:mpeg:mpeg7:schema:2001").isSuccess)
      // did spec: https://www.w3.org/TR/did-core/
-     assert(ops.URI.mkUri("did:example:123456789abcdefghi").isSuccess)
-     assert(ops.URI.mkUri("did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK").isSuccess)
+     assert(URI.mkUri("did:example:123456789abcdefghi").isSuccess)
+     assert(URI.mkUri("did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK").isSuccess)
    }
-   import ops.given
 
    test("rURLs are both absolute and relative ones") {
-     assert(ops.rURI.mkUri("https://bblfish.net").isSuccess)
-     assert(ops.rURI.mkUri("https://bblfish.net:80/").isSuccess)
-     assert(ops.rURI.mkUri("https://bblfish.net/people/henry/").isSuccess)
-     assert(ops.rURI.mkUri("https://bblfish.net/people/henry/card#me").isSuccess)
+     assert(rURI.mkUri("https://bblfish.net").isSuccess)
+     assert(rURI.mkUri("https://bblfish.net:80/").isSuccess)
+     assert(rURI.mkUri("https://bblfish.net/people/henry/").isSuccess)
+     assert(rURI.mkUri("https://bblfish.net/people/henry/card#me").isSuccess)
      // urn examples taken from wikipedia page https://en.wikipedia.org/wiki/Uniform_Resource_Name
-     assert(ops.rURI.mkUri("urn:isbn:0451450523").isSuccess)
-     assert(ops.rURI.mkUri("urn:isan:0000-0000-2CEA-0000-1-0000-0000-Y").isSuccess)
-     assert(ops.rURI.mkUri("urn:ISSN:0167-6423").isSuccess)
-     assert(ops.rURI.mkUri("urn:mpeg:mpeg7:schema:2001").isSuccess)
+     assert(rURI.mkUri("urn:isbn:0451450523").isSuccess)
+     assert(rURI.mkUri("urn:isan:0000-0000-2CEA-0000-1-0000-0000-Y").isSuccess)
+     assert(rURI.mkUri("urn:ISSN:0167-6423").isSuccess)
+     assert(rURI.mkUri("urn:mpeg:mpeg7:schema:2001").isSuccess)
      // did spec: https://www.w3.org/TR/did-core/
-     assert(ops.rURI.mkUri("did:example:123456789abcdefghi").isSuccess)
-     assert(ops.rURI.mkUri("did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK").isSuccess)
-     assert(ops.rURI.mkUri("people").isSuccess)
-     assert(ops.rURI.mkUri("/people/henry").isSuccess)
-     assert(ops.rURI.mkUri("/people/henry/card#me").isSuccess)
-     assert(ops.rURI.mkUri("//bblfish.net/people/henry/card").isSuccess)
-     assert(ops.rURI.mkUri("//bblfish.net:80/people/henry/card").isSuccess)
+     assert(rURI.mkUri("did:example:123456789abcdefghi").isSuccess)
+     assert(rURI.mkUri("did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK").isSuccess)
+     assert(rURI.mkUri("people").isSuccess)
+     assert(rURI.mkUri("/people/henry").isSuccess)
+     assert(rURI.mkUri("/people/henry/card#me").isSuccess)
+     assert(rURI.mkUri("//bblfish.net/people/henry/card").isSuccess)
+     assert(rURI.mkUri("//bblfish.net:80/people/henry/card").isSuccess)
 
    }
 

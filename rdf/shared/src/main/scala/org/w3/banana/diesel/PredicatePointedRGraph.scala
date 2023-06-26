@@ -25,14 +25,10 @@ case class PredicatePointedRGraph[R <: RDF](
    import ops.given
 
    infix def --(s: RDF.rStatement.Subject[R]): PointedRGraph[R] =
-      import objectPG.{graph as acc, pointer as o}
-      val graph = acc + rTriple(s, pred, o)
-      PointedRGraph(o, graph)
+      val graph = objectPG.graph + rTriple(s, pred, objectPG.pointer)
+      PointedRGraph(objectPG.pointer, graph)
 
    infix def --(pointedSubject: PointedSubjRGraph[R]): PointedRGraph[R] =
-      import objectPG.graph as acc
-//, pointer as o}
-//      import pointedSubject.{graph as graphObject, pointer as s}
       val graphObject: RDF.rGraph[R] = pointedSubject.graph
       val s: rStatement.Subject[R] = pointedSubject.pointer
       val o: rStatement.Object[R] = objectPG.pointer
@@ -41,7 +37,7 @@ case class PredicatePointedRGraph[R <: RDF](
       val trs: Seq[RDF.rTriple[R]] = graphObject.triples.toSeq
       val newTriple: RDF.rTriple[R] = ops.rTriple(s, pred, o)
       val newTrs: Seq[RDF.rTriple[R]] = newTriple +: trs
-      val graph = acc ++ newTrs
+      val graph = objectPG.graph ++ newTrs
       PointedRGraph(o, graph)
 
 end PredicatePointedRGraph

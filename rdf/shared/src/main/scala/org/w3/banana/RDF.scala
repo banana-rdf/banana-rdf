@@ -13,12 +13,6 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF.NodeAny
-
-import scala.annotation.targetName
-import scala.reflect.TypeTest
-import scala.util.Try
-
 /** Main RDF types. Implementations will mostly use opaque types, so we need to provide the
   * operations too. todo: how can one modularise this, while taking into account that
   * implementations will be using opaque types?

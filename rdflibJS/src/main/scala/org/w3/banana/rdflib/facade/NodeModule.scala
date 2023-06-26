@@ -13,8 +13,6 @@
 
 package org.w3.banana.rdflib.facade
 
-import org.scalablytyped.runtime.StObject
-
 import scala.scalajs.js
 import scala.scalajs.js.annotation.*
 

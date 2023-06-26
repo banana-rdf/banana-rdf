@@ -13,8 +13,6 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF
-
 import RDF.*
 
 class PG[Rdf <: RDF](val pointer: Node[Rdf], val graph: Graph[Rdf])

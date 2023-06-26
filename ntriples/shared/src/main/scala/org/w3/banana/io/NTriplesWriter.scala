@@ -29,7 +29,7 @@ import scala.util.Try
 class NTriplesIterWriter[Rdf <: RDF](using val ops: Ops[Rdf])
     extends AbsoluteRDFIterWriter[Rdf, Try, NTriples]:
 
-   import ops.{given, *}
+   import ops.given
 
    protected def tripleAsString(t: Triple[Rdf]): String =
      node2Str(t.subj) + " " + node2Str(t.rel) + " " + node2Str(t.obj) + " ."

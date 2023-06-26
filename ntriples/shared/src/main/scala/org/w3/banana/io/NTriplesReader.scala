@@ -20,7 +20,6 @@ import RDF.*
 import org.w3.banana.RDF.Statement.Subject
 
 import scala.annotation.tailrec
-import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success, Try}
 
 /** An NTriples Reader based on the NTriples parser */
@@ -40,9 +39,7 @@ class NTriplesReader[Rdf <: RDF](using ops: Ops[Rdf])
 
 object NTriplesParser:
    private def digit(c: Char) = '0' <= c && c <= '9'
-   private def whitespace(c: Char) = c == ' ' || c == '\t'
    private def alpha(c: Char) = ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z')
-   private def hex(c: Char) = digit(c) || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f')
    private def alphaNum(c: Char) = alpha(c) || digit(c)
    private def pn_chars_base(c: Char) = alpha(c) ||
      ('\u00C0' <= c && c <= '\u00D6') || ('\u00D8' <= c && c <= '\u00F6') || ('\u00F8' <= c && c <= '\u02FF') ||
@@ -141,7 +138,6 @@ class NTriplesParser[Rdf <: RDF](
    import RDF.Statement as St
 
    import scala.collection.mutable
-   import scala.collection.mutable.StringBuilder.*
 
    var ended = false
 

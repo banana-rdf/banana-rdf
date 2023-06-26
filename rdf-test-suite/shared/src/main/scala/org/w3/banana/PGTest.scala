@@ -13,11 +13,10 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF
 import RDF.*
 
 open class PGTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
-   import ops.{given, *}
+   import ops.given
    import TestConstants.*
 
    test("PG Creation") {

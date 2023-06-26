@@ -22,7 +22,7 @@ object Test:
 
    import org.w3.banana.RDF
    import org.w3.banana.rdflib.Rdflib
-   import org.w3.banana.rdflib.Rdflib.{*, given}
+   import org.w3.banana.rdflib.Rdflib.given
    type R = Rdflib.type
 
    def main(args: Array[String]): Unit =

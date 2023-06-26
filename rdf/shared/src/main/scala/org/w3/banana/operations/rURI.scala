@@ -19,7 +19,6 @@ import org.w3.banana.RDF.rURI
 import org.w3.banana.exceptions.*
 import org.w3.banana.{Ops, RDF}
 
-import java.net.URI as jURI
 import scala.util.{Failure, Success, Try}
 
 /** If one had a type RelURI which was definitely a relative URI, then type rURI = RelURI | URI

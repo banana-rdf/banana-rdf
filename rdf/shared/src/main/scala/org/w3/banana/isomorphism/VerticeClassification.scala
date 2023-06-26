@@ -65,12 +65,13 @@ class CountingVCBuilder[Rdf <: RDF]
    private val backwardRels = mutable.HashMap[URI[Rdf], Long]().withDefaultValue(0)
 
    def setForwardRel(rel: URI[Rdf], obj: Node[Rdf]): Unit =
-     forwardRels.put(rel, forwardRels(rel) + 1)
+      forwardRels.put(rel, forwardRels(rel) + 1); ()
 
    def setBackwardRel(rel: URI[Rdf], subj: Node[Rdf]): Unit =
-     backwardRels.put(rel, backwardRels(rel) + 1)
+      backwardRels.put(rel, backwardRels(rel) + 1); ()
 
-   override def result: CountingVC = CountingVC(forwardRels.hashCode(), backwardRels.hashCode())
+   override def result: CountingVC =
+     CountingVC(forwardRels.hashCode(), backwardRels.hashCode())
 
 case class CountingVC(forwardRels: Int, backwardRels: Int) extends VerticeClassification
 
@@ -89,10 +90,10 @@ case class SimpleHashVCBuilder[Rdf <: RDF]()(using ops: Ops[Rdf])
    def hashOf(node: RDF.Node[Rdf]) = node.fold(_.hashCode, _ => bnodeValue, _.hashCode)
 
    def setForwardRel(rel: RDF.URI[Rdf], obj: RDF.Node[Rdf]): Unit =
-     forwardRels.put(rel, (forwardRels(rel) + hashOf(obj)) % Long.MaxValue)
+      forwardRels.put(rel, (forwardRels(rel) + hashOf(obj)) % Long.MaxValue); ()
 
    def setBackwardRel(rel: RDF.URI[Rdf], subj: RDF.Node[Rdf]): Unit =
-     backwardRels.put(rel, (backwardRels(rel) + hashOf(subj)) % Long.MaxValue)
+      backwardRels.put(rel, (backwardRels(rel) + hashOf(subj)) % Long.MaxValue); ()
 
    override def result: HashVC = HashVC(forwardRels.hashCode(), backwardRels.hashCode())
 

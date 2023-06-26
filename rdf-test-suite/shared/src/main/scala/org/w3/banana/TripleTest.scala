@@ -15,9 +15,6 @@ package org.w3.banana
 
 import org.w3.banana.TestConstants.{bbl, bfsh, foafPre, tim}
 import org.w3.banana.prefix.{FOAF, XSD}
-import org.w3.banana.{Ops, RDF}
-
-import scala.reflect.TypeTest
 
 /** we cover here URI, BNode, Literal, Triple and Quad tests */
 open class TripleTest[R <: RDF](using ops: Ops[R])
@@ -266,10 +263,8 @@ open class TripleTest[R <: RDF](using ops: Ops[R])
      val timWorkPlace3 = Triple(timbl, foaf.workplaceHomepage, w3c)
      val timGr = Graph(timWorkPlace3, timName3)
 
-     val bblName3 = Triple(bblf, foaf.name, Literal("Henry"))
      val cosy = URI("https://co-operating.systems/")
      val bblWork3 = Triple(bblf, foaf.workplaceHomepage, cosy)
-     val bblGr = Graph(bblName3, bblWork3)
 
      // test triple to quad
      val timName4 = timName3.at(tcard)

@@ -13,9 +13,6 @@
 
 package org.w3.banana
 
-import org.w3.banana.TestConstants.foafPre
-
-import org.w3.banana.RDF.*
 import TestConstants.*
 
 object TestConstants:

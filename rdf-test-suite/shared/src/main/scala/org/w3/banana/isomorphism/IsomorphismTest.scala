@@ -16,7 +16,6 @@ package org.w3.banana.isomorphism
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.w3.banana.*
-import org.w3.banana.prefix.*
 // because AnyWordSpec is not yet declared open
 import scala.language.adhocExtensions
 

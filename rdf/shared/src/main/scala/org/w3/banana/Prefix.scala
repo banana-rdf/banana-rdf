@@ -13,7 +13,6 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF
 import org.w3.banana.RDF.*
 
 import scala.util.*

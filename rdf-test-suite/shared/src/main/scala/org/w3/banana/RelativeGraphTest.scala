@@ -16,11 +16,10 @@ package org.w3.banana
 import org.w3.banana.TestConstants.foafPre
 
 import org.w3.banana.RDF.*
-import TestConstants.*
 
 /** Not all frameworks support relative graphs -- or at least they require different implementations */
 class RelativeGraphTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
-   import ops.{given, *}
+   import ops.given
 
    test("relative graphs") {
      val rg0 = rGraph.empty

@@ -15,13 +15,12 @@ package org.w3.banana.rdflib.facade
 
 import org.scalablytyped.runtime.StringDictionary
 import FormulaOpts.FormulaOpts
-import formulaMod.Formula
 import run.cosy.rdfjs.model.*
 import run.cosy.rdfjs.model.Quad.{Graph, Predicate, Subject}
 
 import scala.scalajs.js
 import scala.scalajs.js.ThisFunction4
-import scala.scalajs.js.annotation.{JSImport, JSName}
+import scala.scalajs.js.annotation.JSImport
 
 type Feature = "sameAs" | "InverseFunctionalProperty" | "FunctionalProperty"
 type FeaturesType = js.UndefOr[js.Array[Feature]]

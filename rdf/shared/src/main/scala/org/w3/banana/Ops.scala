@@ -13,19 +13,15 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF.Graph
 import org.w3.banana.RDF.Statement.Subject
 import org.w3.banana.operations.StoreFactory
 import org.w3.banana.prefix.{RDFPrefix, XSD}
 
-import scala.annotation.targetName
 import scala.reflect.TypeTest
-import scala.util.Try
 
 trait Ops[Rdf <: RDF]:
    ops =>
    import RDF.*
-   import RDF.Statement as St
 
    // interpretation types to help consistent pattern matching across implementations
    val `*`: RDF.NodeAny[Rdf]

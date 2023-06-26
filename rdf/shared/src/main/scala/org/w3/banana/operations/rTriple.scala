@@ -13,7 +13,7 @@
 
 package org.w3.banana.operations
 
-import io.lemonlabs.uri.{AbsoluteUrl, UrlWithScheme}
+import io.lemonlabs.uri.AbsoluteUrl
 import org.w3.banana.RDF.{rNode, rStatement, rTriple, rURI}
 import org.w3.banana.{Ops, RDF}
 

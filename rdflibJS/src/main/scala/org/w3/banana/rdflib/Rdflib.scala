@@ -22,11 +22,9 @@ import run.cosy.rdfjs.model
 import run.cosy.rdfjs.model.{DataFactory, Term}
 
 import scala.annotation.targetName
-import scala.collection.mutable
 import scala.reflect.TypeTest
 import scala.scalajs.js
 import scala.scalajs.js.undefined
-import scala.util.{Success, Try}
 
 object Rdflib extends RDF:
    type Top = AnyRef
@@ -82,7 +80,7 @@ object Rdflib extends RDF:
 //           x.asInstanceOf[scala.scalajs.js.UndefOr[T]]
 //
       import scala.collection.mutable
-      private val init = nodeMod.default
+
       val defaulGraph: RDF.DefaultGraphNode[R] = df.defaultGraph()
 
       val `*` : RDF.NodeAny[R] = null
@@ -94,7 +92,6 @@ object Rdflib extends RDF:
             org.w3.banana.rdflib.facade.storeMod(fopts)
 
       given Store: operations.Store[R](using ops) with
-         import scala.jdk.CollectionConverters.given
          // todo: need to integrate locking functionality
          extension (store: RDF.Store[R])
             override def add(qs: RDF.Quad[R]*): store.type =

@@ -62,12 +62,9 @@ object PointedRGraph:
        node: rNode[R],
        graph: rGraph[R]
    )(using ops: Ops[R]): PointedRGraph[R] =
-      import ops.{*, given}
-      import ops.literalTT as lit
-      import ops.bnodeTT as bn
-      import ops.rUriTT as uri
+      import ops.given
       node match
-       case bn(bnode) => PointedSubjRGraph[R](bnode, graph)
-       case uri(u)    => PointedSubjRGraph[R](u, graph)
-       case lit(n)    => PointedLitRGraph[R](n, graph)
+       case bnodeTT(bnode) => PointedSubjRGraph[R](bnode, graph)
+       case rUriTT(u)      => PointedSubjRGraph[R](u, graph)
+       case literalTT(n)   => PointedLitRGraph[R](n, graph)
 end PointedRGraph

@@ -15,7 +15,6 @@ package org.w3.banana.rdflib.facade
 
 import org.scalablytyped.runtime.StObject
 import FormulaOpts.FormulaOpts
-import org.w3.banana.rdflib.facade.storeMod.IndexedFormula
 import run.cosy.rdfjs.model.{BlankNode, DataFactory, Quad, Term}
 
 import scala.scalajs.js

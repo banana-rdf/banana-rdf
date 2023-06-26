@@ -16,7 +16,6 @@ package org.w3.banana.isomorphism
 import org.w3.banana.{Ops, RDF}
 
 import scala.collection.mutable
-import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success, Try}
 import org.w3.banana.RDF.*
 

@@ -19,13 +19,14 @@ import org.w3.banana.*
 class PointedGraphPredicate[Rdf <: RDF](pointed: PointedSubjRGraph[Rdf], p: RDF.rURI[Rdf]):
 
    infix def ->-(pointedObject: PointedRGraph[Rdf])(using ops: Ops[Rdf]): PointedSubjRGraph[Rdf] =
-      import ops.{given, *}
-      import pointed.{graph as acc, pointer as s}
-      import pointedObject.{graph as graphObject, pointer as o}
-      val newTr: RDF.rTriple[Rdf] = rTriple(s, p, o)
-      val trSeq: Seq[RDF.rTriple[Rdf]] = newTr +: graphObject.triples.toSeq
-      val newGraph = acc ++ trSeq
-      PointedSubjRGraph(s, newGraph)
+      import ops.given
+      val graphObject: RDF.rGraph[Rdf] = pointedObject.graph
+      val newTr: RDF.rTriple[Rdf] = rTriple(pointed.pointer, p, pointedObject.pointer)
+      val trSeq: Seq[RDF.rTriple[Rdf]] =
+         val seq = graphObject.triples.toSeq
+         seq.prepended(newTr)
+      val newGraph = pointed.graph ++ trSeq
+      PointedSubjRGraph(pointed.pointer, newGraph)
 
 // For more general transformations we need ToPG
 // let's first see how far we get without.

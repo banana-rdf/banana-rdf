@@ -17,7 +17,6 @@ package io
 import _root_.io.lemonlabs.uri as ll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.w3.banana.RDF.Literal
 
 import java.io.*
 import scala.util.Try

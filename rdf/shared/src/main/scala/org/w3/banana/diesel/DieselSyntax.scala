@@ -28,8 +28,7 @@ given literalToPointedGraph[Rdf <: RDF](using
     ops: Ops[Rdf]
 ): Conversion[RDF.Literal[Rdf], PointedRGraph[Rdf]] with
    def apply(node: RDF.Literal[Rdf]): PointedLitRGraph[Rdf] =
-      import ops.given
-      PointedLitRGraph(node)
+     PointedLitRGraph(node)
 
 given subjToPointedGraphW[Rdf <: RDF](using
     ops: Ops[Rdf]
@@ -41,36 +40,31 @@ given bNodeToPointedGraphW[Rdf <: RDF](using
     ops: Ops[Rdf]
 ): Conversion[RDF.BNode[Rdf], PointedRGraphW[Rdf]] with
    def apply(node: RDF.BNode[Rdf]): PointedRGraphW[Rdf] =
-      import ops.given
-      new PointedRGraphW[Rdf](PointedSubjRGraph(node))
+     new PointedRGraphW[Rdf](PointedSubjRGraph(node))
 
 given rURIToPointedGraphW[Rdf <: RDF](using
     ops: Ops[Rdf]
 ): Conversion[RDF.rURI[Rdf], PointedRGraphW[Rdf]] with
    def apply(node: RDF.rURI[Rdf]): PointedRGraphW[Rdf] =
-      import ops.given
-      new PointedRGraphW[Rdf](PointedSubjRGraph(node))
+     new PointedRGraphW[Rdf](PointedSubjRGraph(node))
 
 given rURIToPointedGraphWInv[Rdf <: RDF](using
     ops: Ops[Rdf]
 ): Conversion[RDF.rURI[Rdf], PointedRGraphWInv[Rdf]] with
    def apply(uri: RDF.rURI[Rdf]): PointedRGraphWInv[Rdf] =
-      import ops.given
-      new PointedRGraphWInv[Rdf](PointedSubjRGraph(uri))
+     new PointedRGraphWInv[Rdf](PointedSubjRGraph(uri))
 
 given literalToPointedGraphWInv[Rdf <: RDF](using
     ops: Ops[Rdf]
 ): Conversion[RDF.Literal[Rdf], PointedRGraphWInv[Rdf]] with
    def apply(literal: RDF.Literal[Rdf]): PointedRGraphWInv[Rdf] =
-      import ops.given
-      new PointedRGraphWInv[Rdf](PointedLitRGraph(literal))
+     new PointedRGraphWInv[Rdf](PointedLitRGraph(literal))
 
 given bNodeToPointedGraphWInv[Rdf <: RDF](using
     ops: Ops[Rdf]
 ): Conversion[RDF.BNode[Rdf], PointedRGraphWInv[Rdf]] with
    def apply(bn: RDF.BNode[Rdf]): PointedRGraphWInv[Rdf] =
-      import ops.given
-      new PointedRGraphWInv[Rdf](PointedSubjRGraph(bn))
+     new PointedRGraphWInv[Rdf](PointedSubjRGraph(bn))
 
 given [Rdf <: RDF]: Conversion[PointedSubjRGraph[Rdf], PointedRGraphW[Rdf]] with
    def apply(pg: PointedSubjRGraph[Rdf]): PointedRGraphW[Rdf] =
@@ -81,7 +75,6 @@ given [Rdf <: RDF]: Conversion[PointedSubjRGraph[Rdf], PointedRGraphWInv[Rdf]] w
      new PointedRGraphWInv[Rdf](pg)
 
 given strToPG[Rdf <: RDF](using ops: Ops[Rdf]): Conversion[String, PointedRGraph[Rdf]] with
-   import ops.given
    def apply(str: String): PointedRGraph[Rdf] = PointedRGraph(ops.Literal(str))
 
 //given nodeToPG[Rdf <: RDF](using ops: Ops[Rdf]): Conversion[RDF.Node[Rdf], PointedRGraph[Rdf]]

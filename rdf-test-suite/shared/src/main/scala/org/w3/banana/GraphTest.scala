@@ -78,7 +78,7 @@ end GraphTest
 
 open class GraphSearchTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    // todo: find a way to simplify these imports for end users of the library
-   import ops.{*, given}
+   import ops.given
    import org.w3.banana.prefix.{FOAF, XSD}
 
    val timbl: URI[Rdf] = URI(tim("i"))

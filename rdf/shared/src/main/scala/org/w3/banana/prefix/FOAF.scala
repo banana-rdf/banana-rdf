@@ -14,7 +14,6 @@
 package org.w3.banana.prefix
 
 import org.w3.banana.{RDF, Ops, PrefixBuilder}
-import io.lemonlabs.uri.*
 
 object FOAF:
 
