@@ -61,16 +61,17 @@ trait VerticeCBuilder[Rdf <: RDF]:
   */
 class CountingVCBuilder[Rdf <: RDF]
     extends VerticeCBuilder[Rdf]:
-   private val forwardRels  = mutable.HashMap[URI[Rdf], Long]().withDefaultValue(0)
+   private val forwardRels = mutable.HashMap[URI[Rdf], Long]().withDefaultValue(0)
    private val backwardRels = mutable.HashMap[URI[Rdf], Long]().withDefaultValue(0)
 
    def setForwardRel(rel: URI[Rdf], obj: Node[Rdf]): Unit =
-     forwardRels.put(rel, forwardRels(rel) + 1)
+      forwardRels.put(rel, forwardRels(rel) + 1); ()
 
    def setBackwardRel(rel: URI[Rdf], subj: Node[Rdf]): Unit =
-     backwardRels.put(rel, backwardRels(rel) + 1)
+      backwardRels.put(rel, backwardRels(rel) + 1); ()
 
-   override def result: CountingVC = CountingVC(forwardRels.hashCode(), backwardRels.hashCode())
+   override def result: CountingVC =
+     CountingVC(forwardRels.hashCode(), backwardRels.hashCode())
 
 case class CountingVC(forwardRels: Int, backwardRels: Int) extends VerticeClassification
 
@@ -80,19 +81,19 @@ case class CountingVC(forwardRels: Int, backwardRels: Int) extends VerticeClassi
 case class SimpleHashVCBuilder[Rdf <: RDF]()(using ops: Ops[Rdf])
     extends VerticeCBuilder[Rdf]:
 
-   val forwardRels  = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
+   val forwardRels = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
    val backwardRels = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
-   val bnodeValue   = 2017 // prime number
+   val bnodeValue = 2017 // prime number
 
    import ops.{given, *}
 
    def hashOf(node: RDF.Node[Rdf]) = node.fold(_.hashCode, _ => bnodeValue, _.hashCode)
 
    def setForwardRel(rel: RDF.URI[Rdf], obj: RDF.Node[Rdf]): Unit =
-     forwardRels.put(rel, (forwardRels(rel) + hashOf(obj)) % Long.MaxValue)
+      forwardRels.put(rel, (forwardRels(rel) + hashOf(obj)) % Long.MaxValue); ()
 
    def setBackwardRel(rel: RDF.URI[Rdf], subj: RDF.Node[Rdf]): Unit =
-     backwardRels.put(rel, (backwardRels(rel) + hashOf(subj)) % Long.MaxValue)
+      backwardRels.put(rel, (backwardRels(rel) + hashOf(subj)) % Long.MaxValue); ()
 
    override def result: HashVC = HashVC(forwardRels.hashCode(), backwardRels.hashCode())
 

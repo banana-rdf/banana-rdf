@@ -56,7 +56,7 @@ final class SimpleMappingGenerator[R <: RDF](VT: () => VerticeCBuilder[R])(using
        mutable.HashMap[RDF.BNode[R], mutable.Set[RDF.BNode[R]]]()
      for
         (vt, bnds1) <- clz1 // .sortBy { case (vt, bn) => bn.size }
-        bnds2       <- clz2.get(vt)
+        bnds2 <- clz2.get(vt)
      do
         if bnds2.size != bnds1.size then
            throw ClassificationException(
@@ -82,15 +82,15 @@ final class SimpleMappingGenerator[R <: RDF](VT: () => VerticeCBuilder[R])(using
       val bnodeClass = mutable.HashMap[RDF.BNode[R], VerticeCBuilder[R]]()
       for tr <- graph.triples do
          tr.subj match
-            case bn: RDF.BNode[R] =>
-              val vt = bnodeClass.getOrElseUpdate(bn, VT())
-              vt.setForwardRel(tr.rel, tr.obj)
-            case _ => ()
+          case bn: RDF.BNode[R] =>
+            val vt = bnodeClass.getOrElseUpdate(bn, VT())
+            vt.setForwardRel(tr.rel, tr.obj)
+          case _ => ()
          tr.obj match
-            case bn: RDF.BNode[R] =>
-              val vt = bnodeClass.getOrElseUpdate(bn, VT())
-              vt.setBackwardRel(tr.rel, tr.subj)
-            case _ => ()
+          case bn: RDF.BNode[R] =>
+            val vt = bnodeClass.getOrElseUpdate(bn, VT())
+            vt.setBackwardRel(tr.rel, tr.subj)
+          case _ => ()
       bnodeClass.view.mapValues(_.result).toMap
         .groupBy(_._2)
         .view.mapValues(_.keys.toSet).toMap

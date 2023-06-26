@@ -15,13 +15,14 @@ package org.w3.banana.rdflib.facade
 
 import org.scalablytyped.runtime.StringDictionary
 import FormulaOpts.FormulaOpts
-import formulaMod.Formula
 import run.cosy.rdfjs.model.*
+import run.cosy.rdfjs.model.Quad.{Graph, Predicate, Subject}
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSImport, JSName}
+import scala.scalajs.js.ThisFunction4
+import scala.scalajs.js.annotation.JSImport
 
-type Feature      = "sameAs" | "InverseFunctionalProperty" | "FunctionalProperty"
+type Feature = "sameAs" | "InverseFunctionalProperty" | "FunctionalProperty"
 type FeaturesType = js.UndefOr[js.Array[Feature]]
 
 object StoreReplacementMethods:
@@ -31,10 +32,12 @@ object StoreReplacementMethods:
    val addStatement: js.ThisFunction1[IndexedFormula, Quad, Quad | Null] =
      (thisFrmla: IndexedFormula, quad: Quad) =>
         val predHash = thisFrmla.rdfFactory.id(quad.rel)
-        val actions  = thisFrmla.propertyActions.get(predHash).getOrElse(js.Array())
         import quad.*
-        for act <- actions do
-           act(thisFrmla, subj, rel, obj, graph)
+//todo: We need to upgrade the library, so no need to spend too much time getting actions to work now.
+//        val actions: js.Array[ThisFunction4[thisFrmla.type, Subject, Predicate, Quad.Object, Graph, Boolean]]  =
+//          thisFrmla.propertyActions.get(predHash).getOrElse(js.Array())
+//        for act <- actions do
+//           act(thisFrmla, subj, rel, obj, graph)
         // note: the implementation there says it is inefficient but there is none using indexes provider
         if thisFrmla.statementsMatching(subj, rel, obj, graph, true).length > 0 then null
         else
@@ -80,23 +83,23 @@ object StoreReplacementMethods:
          arg4: js.UndefOr[Quad.Graph]
      ) =>
        arg1 match
-          case qs: js.Array[Quad] =>
-            for q <- qs do thisArg.addStatement(q)
-            thisArg
-          case q: Quad =>
-            thisArg.addStatement(q)
-            thisArg
-          case subj: Quad.Subject if arg2.isDefined && arg3.isDefined =>
-            val q = thisArg.rdfFactory.quad(
-              subj,
-              arg2.get,
-              arg3.get,
-              arg4.getOrElse(thisArg.rdfFactory.defaultGraph())
-            )
-            thisArg.addStatement(q)
-          case _ => throw new IllegalArgumentException(
-              s"IndexedFormula.add($arg1,$arg2,$arg3,$arg4) has wrong arguments"
-            )
+        case qs: js.Array[Quad] =>
+          for q <- qs do thisArg.addStatement(q)
+          thisArg
+        case q: Quad =>
+          thisArg.addStatement(q)
+          thisArg
+        case subj: Quad.Subject if arg2.isDefined && arg3.isDefined =>
+          val q = thisArg.rdfFactory.quad(
+            subj,
+            arg2.get,
+            arg3.get,
+            arg4.getOrElse(thisArg.rdfFactory.defaultGraph())
+          )
+          thisArg.addStatement(q)
+        case _ => throw new IllegalArgumentException(
+            s"IndexedFormula.add($arg1,$arg2,$arg3,$arg4) has wrong arguments"
+          )
 
    // the rdflib code returns a Node which is a Term with extra methods, and also does something looking at redirects
    val canon: js.ThisFunction1[IndexedFormula, js.UndefOr[Term[?]], js.UndefOr[Term[?]]] =
@@ -161,16 +164,19 @@ object StoreReplacementMethods:
        g.getOrElse(null),
        false
      )
-
+   val id: js.ThisFunction1[IndexedFormula, Term[?], String] =
+     (thisArg: IndexedFormula, t: Term[?]) => thisArg.rdfFactory.id(t)
+//   val handleRDF
 end StoreReplacementMethods
 
 object storeMod:
    export Quad.*
-   import StoreReplacementMethods as replace
+   val replace = StoreReplacementMethods
    type Index = js.Dictionary[js.Array[Quad]]
 
    def apply(opts: FormulaOpts): IndexedFormula =
       val ixf = default(js.Array(), opts)
+      ixf.asInstanceOf[js.Dynamic].updateDynamic("id")(replace.id)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("add")(replace.add)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("addStatement")(replace.addStatement)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("canon")(replace.canon)
@@ -178,6 +184,7 @@ object storeMod:
       ixf.asInstanceOf[js.Dynamic].updateDynamic("statementsMatching")(replace.statementsMatching)
       ixf.asInstanceOf[js.Dynamic].updateDynamic("removeStatement")(replace.removeStatement)
       ixf
+   end apply
 
 //		def add(
 //			subj: QuadSubject | Quad | js.Array[Quad],
@@ -312,8 +319,7 @@ object storeMod:
       //		def canon(): types.rdflib.nodeMod.default = js.native
       //		def canon(term: Term): types.rdflib.nodeMod.default = js.native
 
-      /** Checks this formula for consistency
-        */
+      /** Checks this formula for consistency */
       //		def check(): Unit = js.native
 
       /** Checks a list of statements for consistency
@@ -327,10 +333,9 @@ object storeMod:
       //		def checkStatementList(sts: js.Array[Quad[QuadSubject, QuadPredicate, QuadObject, QuadGraph]], from: Double): Boolean | Unit = js.native
 
       /** Map of iri predicates to functions to call when adding { s type X } */
-//		var classActions: StringDictionary[js.Array[js.Function]] = js.native
+      var classActions: StringDictionary[js.Array[js.Function]] = js.native
 
-      /** Closes this formula (and return it)
-        */
+      /** Closes this formula (and return it) */
       // underlying rdflib.js is a noop
 //		def close(): IndexedFormula = js.native
 
@@ -383,8 +388,7 @@ object storeMod:
       // an Array of Indexes exactly 4 long
       var index: js.Array[Index] = js.native
 
-      /** @param features
-        */
+      /** @param features */
       //		def initPropertyActions(features: FeaturesType): Unit = js.native
 
       /** Returns the number of statements contained in this IndexedFormula. (Getter proxy to
@@ -433,8 +437,7 @@ object storeMod:
         */
       //		def mentionsURI(uri: String): Boolean = js.native
 
-      /** Dictionary of namespace prefixes
-        */
+      /** Dictionary of namespace prefixes */
       //		var namespaces: StringDictionary[String] = js.native
 
       /** Existentials are BNodes - something exists without naming
@@ -622,8 +625,7 @@ object storeMod:
         */
       def removeStatements(sts: js.Array[Quad]): IndexedFormula = js.native
 
-      /** Replace big with small, obsoleted with obsoleting.
-        */
+      /** Replace big with small, obsoleted with obsoleting. */
       //		def replaceWith(big: QuadSubject, small: QuadSubject): Boolean = js.native
 
       /** Compare by canonical URI as smushed
@@ -642,8 +644,7 @@ object storeMod:
       //			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
       //		] = js.native
 
-      /** An UpdateManager initialised to this store
-        */
+      /** An UpdateManager initialised to this store */
       //		var updater: js.UndefOr[types.rdflib.updateManagerMod.default] = js.native
 
       /** A list of all the URIs by which this thing is known

@@ -13,7 +13,6 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF
 import org.w3.banana.RDF.*
 
 import scala.util.*
@@ -39,8 +38,9 @@ open class PrefixBuilder[Rdf <: RDF](
     val prefixIri: RDF.URI[Rdf]
 )(using ops: Ops[Rdf]) extends Prefix[Rdf]:
    import ops.{*, given}
+
    override def toString: String = "Prefix(" + prefixName + ")"
-   lazy val prefixVal            = ops.rURI.stringValue(prefixIri)
+   lazy val prefixVal = prefixIri.value
 
    def apply(value: String): RDF.URI[Rdf] = ops.URI(prefixIri.value + value)
 
@@ -52,8 +52,8 @@ open class PrefixBuilder[Rdf <: RDF](
          None
 
    def getLocalName(iri: URI[Rdf]): Try[String] = unapply(iri) match
-      case Some(localname) => Success(localname)
-      case _: None.type =>
-        Failure(Exception(this.toString + " couldn't extract localname for " + iri))
+    case Some(localname) => Success(localname)
+    case _: None.type =>
+      Failure(Exception(this.toString + " couldn't extract localname for " + iri))
 
 end PrefixBuilder

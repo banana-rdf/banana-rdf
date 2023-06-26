@@ -13,8 +13,6 @@
 
 package org.w3.banana.rdflib.facade
 
-import org.scalablytyped.runtime.StObject
-
 import scala.scalajs.js
 import scala.scalajs.js.annotation.*
 
@@ -44,8 +42,8 @@ object nodeMod:
       // inline def fromValue[T /* <: FromValueReturns[js.Any] */](value: ValueType): T = ^.asInstanceOf[js.Dynamic].applyDynamic("fromValue")(value.asInstanceOf[js.Any]).asInstanceOf[T]
 
       inline def toJS(term: js.Any)
-          : js.Date | Number | String | Boolean | js.Object |(js.Array[js.Date | Number | String |
+          : js.Date | Number | String | Boolean | js.Object | (js.Array[js.Date | Number | String |
             Boolean | js.Object]) = ^.asInstanceOf[js.Dynamic].applyDynamic("toJS")(
         term.asInstanceOf[js.Any]
-      ).asInstanceOf[js.Date | Number | String | Boolean | js.Object |(js.Array[js.Date | Number |
+      ).asInstanceOf[js.Date | Number | String | Boolean | js.Object | (js.Array[js.Date | Number |
         String | Boolean | js.Object])]

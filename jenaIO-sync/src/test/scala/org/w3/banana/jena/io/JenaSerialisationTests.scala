@@ -41,14 +41,6 @@ class JenaJsonLDTestSuite extends org.w3.banana.io.JsonLDTestSuite[R, JsonLdComp
    val ops = summon[Ops[R]]
    import ops.{*, given}
 
-   /** the Titanium JSON-LD implementation that Jena Uses over-relativizes urls, and so to have
-     * tests pass we need to take into account that the root of the w3c will also be relativized.
-     * Todo: we need a way to distinguish these behaviors
-     */
-   override def w3root(prefix: Prefix[R]): RDF.URI[R] =
-      val root = ll.RelativeUrl(ll.UrlPath.slash, ll.QueryString.empty, None)
-      prefix.prefixIri.baseFor(root)
-
 class JenaPrefixTestSuite extends org.w3.banana.io.PrefixTestSuite[R]
 
 //todo prefix test suites for all the other formats that accept prefixes! (eg jsonld)

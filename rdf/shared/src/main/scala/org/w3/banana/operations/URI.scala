@@ -14,6 +14,7 @@
 package org.w3.banana.operations
 
 import io.lemonlabs.uri as ll
+import io.lemonlabs.uri.config.UriConfig
 import org.w3.banana.{Ops, RDF}
 import org.w3.banana.exceptions.*
 
@@ -21,12 +22,12 @@ import java.net.URI as jURI
 import scala.util.{Failure, Try}
 
 object URI:
-   val xsdStr: String     = "http://www.w3.org/2001/XMLSchema#string"
+   val xsdStr: String = "http://www.w3.org/2001/XMLSchema#string"
    val xsdLangStr: String = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
 
 trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
-   import ops.{rURI, given}
-
+   import ops.rURI
+   import scala.language.implicitConversions
    // This will create the URI with minimal verification, assuming the uriStr is already well formed
    protected def mkUriUnsafe(uriStr: String): RDF.URI[Rdf]
 
@@ -52,28 +53,36 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
        case good => Try(mkUriUnsafe(good.toString))
      }
 
+   protected def stringVal(uri: RDF.URI[Rdf]): String
+
    extension (uri: RDF.URI[Rdf])
-      def value: String = ops.rURI.stringValue(uri)
+      def value: String = stringVal(uri)
 
       // if URL then add fragment, or else return original URN
       def withFragment(frag: String): RDF.URI[Rdf] =
         ll.Uri.parseTry(uri.value).collect {
-          case url: ll.Url => ops.URI(url.withFragment(frag).toString)
+          case url: ll.Url => apply(url.withFragment(frag).toString)
         }.getOrElse(uri)
 
+      def fragmentLess: RDF.URI[Rdf] = ll.Uri.parseTry(uri.value).collect {
+        case url: ll.AbsoluteUrl if url.fragment != None =>
+          given deflt: UriConfig = UriConfig.default
+          apply(url.copy(fragment = None).toString)
+      }.getOrElse(uri)
+
       def baseFor(rel: ll.RelativeUrl): RDF.URI[Rdf] =
-        ll.Uri.parse(ops.rURI.stringValue(uri)) match
-           case us: ll.UrlWithScheme => apply(rel.resolve(us, true).toString)
-           case _                    => uri
+        ll.Uri.parse(uri.value) match
+         case us: ll.UrlWithScheme => apply(rel.resolve(us, true).toString)
+         case _                    => uri
 
       // def value: String <- we use rURI implementation everywhere
       /** return _1 the relativized url relativized _2 if a change was made true else false todo:
         * follow https://github.com/lemonlabsuk/scala-uri/issues/466
         */
       def relativizeAgainst(base: ll.AbsoluteUrl): (RDF.rURI[Rdf], Boolean) =
-         val juri1: jURI   = new jURI(ops.rURI.stringValue(uri))
-         val juri2: jURI   = juri1.normalize().nn
-         val baseJuri      = new jURI(base.normalize().toString)
+         val juri1: jURI = new jURI(uri.value)
+         val juri2: jURI = juri1.normalize().nn
+         val baseJuri = new jURI(base.normalize().toString)
          val relJuri: jURI = baseJuri.relativize(juri2).nn
          if (juri2 eq relJuri) && (juri1 eq juri2) then (uri.asInstanceOf[RDF.rURI[Rdf]], false)
          else (rURI(relJuri.toString), true)

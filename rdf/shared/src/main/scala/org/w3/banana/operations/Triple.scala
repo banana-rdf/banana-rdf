@@ -13,7 +13,7 @@
 
 package org.w3.banana.operations
 
-import io.lemonlabs.uri.{AbsoluteUrl, RelativeUrl}
+import io.lemonlabs.uri.AbsoluteUrl
 import org.w3.banana.{Ops, RDF}
 import org.w3.banana.RDF.Statement as St
 
@@ -41,9 +41,9 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
    protected def objectOf(s: RDF.Triple[Rdf]): St.Object[Rdf]
 
    extension (triple: RDF.Triple[Rdf])
-      def subj: St.Subject[Rdf]               = subjectOf(triple)
-      def rel: St.Relation[Rdf]               = relationOf(triple)
-      def obj: St.Object[Rdf]                 = objectOf(triple)
+      def subj: St.Subject[Rdf] = subjectOf(triple)
+      def rel: St.Relation[Rdf] = relationOf(triple)
+      def obj: St.Object[Rdf] = objectOf(triple)
       def at(g: St.Graph[Rdf]): RDF.Quad[Rdf] = ops.Quad(triple.subj, triple.rel, triple.obj, g)
 
       def relativizeAgainst(base: AbsoluteUrl): (RDF.rTriple[Rdf], Boolean) =
@@ -54,7 +54,7 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
          val (rRz, rChg): (RDF.rStatement.Relation[Rdf], Boolean) =
            triple.rel.asUri.relativizeAgainst(base)
          val (oRz, oChg): (RDF.rStatement.Object[Rdf], Boolean) =
-           triple.obj.asNode.fold(
+           triple.obj.fold(
              uri => uri.relativizeAgainst(base),
              bn => (bn, false),
              lit => (lit, false)
@@ -65,12 +65,8 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
       end relativizeAgainst
 
    extension (rsubj: RDF.Statement.Subject[Rdf])
-      // todo: find a way to remove this asInstanceOf
-      def widenToNode: RDF.Node[Rdf] = rsubj.asInstanceOf[RDF.Node[Rdf]]
-      def foldSubj[A](uriF: RDF.URI[Rdf] => A, bnF: RDF.BNode[Rdf] => A): A =
-        rsubj match
-           case uri: RDF.URI[Rdf]  => uriF(uri)
-           case bn: RDF.BNode[Rdf] => bnF(bn)
+     // todo: find a way to remove this asInstanceOf
+     def widenToNode: RDF.Node[Rdf] = rsubj.asInstanceOf[RDF.Node[Rdf]]
 
    extension (rrel: RDF.Statement.Relation[Rdf])
      // todo: find a way to remove this asInstanceOf

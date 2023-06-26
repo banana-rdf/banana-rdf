@@ -45,8 +45,8 @@ trait Quad[Rdf <: RDF](ops: org.w3.banana.Ops[Rdf]):
         ops.Triple(quad.subj, quad.rel, quad.obj)
       def subj: St.Subject[Rdf] = subjectOf(quad)
       def rel: St.Relation[Rdf] = relationOf(quad)
-      def obj: St.Object[Rdf]   = objectOf(quad)
-      def graph: St.Graph[Rdf]  = graphOf(quad)
-      def at(g: St.Graph[Rdf])  = apply(quad.subj, quad.rel, quad.obj, g)
+      def obj: St.Object[Rdf] = objectOf(quad)
+      def graph: St.Graph[Rdf] = graphOf(quad)
+      def at(g: St.Graph[Rdf]) = apply(quad.subj, quad.rel, quad.obj, g)
 
 end Quad

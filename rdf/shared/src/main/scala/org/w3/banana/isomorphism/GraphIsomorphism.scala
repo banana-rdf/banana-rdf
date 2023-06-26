@@ -16,7 +16,6 @@ package org.w3.banana.isomorphism
 import org.w3.banana.{Ops, RDF}
 
 import scala.collection.mutable
-import scala.util.control.NoStackTrace
 import scala.util.{Failure, Success, Try}
 import org.w3.banana.RDF.*
 
@@ -57,7 +56,7 @@ final case class GraphIsomorphism[R <: RDF](
      *   a pair of Ground graph and non ground graph
      */
    def groundTripleFilter(graph: RDF.Graph[R]): (RDF.Graph[R], RDF.Graph[R]) =
-      var ground: List[RDF.Triple[R]]    = List()
+      var ground: List[RDF.Triple[R]] = List()
       var nonGround: List[RDF.Triple[R]] = List()
       for triple <- graph.triples do
          if triple.subj.isBNode || triple.obj.isBNode then
@@ -84,7 +83,7 @@ final case class GraphIsomorphism[R <: RDF](
              s"ground(g1).size=${grnd1.size} ground(g2).size=${grnd2.size}")
          )
 
-      val bnodeMaps  = mappingGen.bnodeMappings(nongrnd1, nongrnd2)
+      val bnodeMaps = mappingGen.bnodeMappings(nongrnd1, nongrnd2)
       val complexity = MappingGenerator.complexity(bnodeMaps)
       if complexity > maxComplexity then
          return Failure(MappingException(
@@ -118,8 +117,8 @@ final case class GraphIsomorphism[R <: RDF](
    /** @return the first answer or the failure that there is no mapping */
    def findAnswer(g1: Graph[R], g2: Graph[R]): Try[List[(BNode[R], BNode[R])]] =
      possibleAnswers(g1, g2).flatMap(_.headOption match
-        case Some(nodeList) => Success(nodeList)
-        case None           => Failure[Nothing](NoMappingException(LazyList()))
+      case Some(nodeList) => Success(nodeList)
+      case None           => Failure[Nothing](NoMappingException(LazyList()))
      )
 
    /** Verify that the bnode bijection allows one to map graph1 to graph2
@@ -135,26 +134,26 @@ final case class GraphIsomorphism[R <: RDF](
        mapping: List[(BNode[R], BNode[R])]
    ): List[MappingException] =
 
-      import scala.util.control.NonLocalReturns.*
+      import util.boundary, boundary.break
       // verify that both graphs are the same size
       if graph1.size != graph2.size then
          List(MappingException(
            s"graphs not of same size. graph1.size=${graph1.size} graph2.size=${graph2.size}"
          ))
       else
-         returning {
+         boundary {
            // 1. verify that bnodeBijection is a bijection, fail early
            val bnodeBijection: mutable.HashMap[BNode[R], BNode[R]] =
               val back = new mutable.HashMap[BNode[R], BNode[R]]()
-              val map  = new mutable.HashMap[BNode[R], BNode[R]]()
+              val resultMap = new mutable.HashMap[BNode[R], BNode[R]]()
               for (from, to) <- mapping do
                  if back.put(to, from).fold[Boolean](true)(_ == from)
-                    && map.put(from, to).fold(true)(_ == to)
+                    && resultMap.put(from, to).fold(true)(_ == to)
                  then {} else
-                    throwReturn(List[MappingException](
+                    break(List[MappingException](
                       MappingException(s"bnodeBijection is not a bijection: $from already mapped")
                     ))
-              map
+              resultMap
 
            def bnmap(node: RDF.Statement.Object[R]): RDF.Statement.Object[R] = node.asNode.fold(
              (uri: RDF.URI[R]) => uri,
@@ -182,7 +181,7 @@ final case class GraphIsomorphism[R <: RDF](
        List[(BNode[R], BNode[R])],
        List[MappingException]
    )]) extends MappingError(""):
-      def msg: String                 = "No mapping found"
+      def msg: String = "No mapping found"
       override def toString(): String = s"NoMappingException($reasons)"
 
 end GraphIsomorphism

@@ -13,36 +13,21 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF.Graph
 import org.w3.banana.RDF.Statement.Subject
 import org.w3.banana.operations.StoreFactory
+import org.w3.banana.prefix.{RDFPrefix, XSD}
 
-import scala.annotation.targetName
 import scala.reflect.TypeTest
-import scala.util.Try
 
 trait Ops[Rdf <: RDF]:
-   import scala.language.implicitConversions
+   ops =>
    import RDF.*
-   import RDF.Statement as St
-
-   // needed to help inferencing
-   // todo: this transformation should really be automatically handled by compiler. Report back.
-   implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
-   implicit def uri2Node(uri: URI[Rdf]): Node[Rdf]     = uri.asInstanceOf[Node[Rdf]]
-   implicit def bnode2Node(bn: BNode[Rdf]): Node[Rdf]  = bn.asInstanceOf[Node[Rdf]]
-   implicit def uri2rUri(uri: URI[Rdf]): rURI[Rdf]     = uri.asInstanceOf[rURI[Rdf]]
-   implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
-
-   // conversions for position types
-   implicit def obj2Node(obj: St.Object[Rdf]): Node[Rdf]  = obj.asInstanceOf[Node[Rdf]]
-   implicit def sub2Node(obj: St.Subject[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
-   // note:  if we use the conversion below, then all the code needs to import scala.language.implicitConversions
-   //	given Conversion[St.Object[Rdf],RDF.Node[Rdf]] with
-   //		def apply(obj: St.Object[Rdf]): RDF.Node[Rdf] =  obj.asInstanceOf[Node[Rdf]]
 
    // interpretation types to help consistent pattern matching across implementations
    val `*`: RDF.NodeAny[Rdf]
+
+   lazy val rdf: RDFPrefix[Rdf] = prefix.RDFPrefix[Rdf](using ops)
+   lazy val xsd: XSD[Rdf] = prefix.XSD[Rdf](using ops)
 
    given Graph: operations.Graph[Rdf]
 
@@ -81,6 +66,9 @@ trait Ops[Rdf <: RDF]:
    given operations.Literal[Rdf] = Literal
 
    given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
+
+   given rUriTT: TypeTest[Matchable, RDF.rURI[Rdf]]
+   // we could type test for full uri, but that would require parsing
 
    given subjToURITT: TypeTest[RDF.Statement.Subject[Rdf], RDF.URI[Rdf]]
    given rSubjToURITT: TypeTest[RDF.rStatement.Subject[Rdf], RDF.rURI[Rdf]]

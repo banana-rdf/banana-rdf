@@ -41,7 +41,7 @@ object JenaRDFReader:
         def read(is: InputStream, base: AbsoluteUrl): Try[Graph[R]] = Try {
           import scala.language.unsafeNulls
           val graph: org.apache.jena.graph.Graph = Factory.createDefaultGraph
-          val builder: RDFParserBuilder          = RDFParser.create()
+          val builder: RDFParserBuilder = RDFParser.create()
           builder.source(is)
             .lang(lang)
             .base(base.toString)
@@ -53,7 +53,7 @@ object JenaRDFReader:
           // why is Jena deprecating Readers, which should be the correct level to parse character based documents?
           import scala.language.unsafeNulls
           val graph: org.apache.jena.graph.Graph = Factory.createDefaultGraph()
-          val builder: RDFParserBuilder          = RDFParser.create()
+          val builder: RDFParserBuilder = RDFParser.create()
           builder.source(reader)
             .lang(lang)
             .base(base.toString)
@@ -67,7 +67,7 @@ object JenaRDFReader:
         def read(is: InputStream): Try[rGraph[R]] = Try {
           import scala.language.unsafeNulls
           val graph: org.apache.jena.graph.Graph = Factory.createDefaultGraph()
-          val builder: RDFParserBuilder          = RDFParser.create()
+          val builder: RDFParserBuilder = RDFParser.create()
           import org.apache.jena.riot.RelURIParserBuilder
           val ir: IRIxResolver = IRIxResolver.create()
             .noBase().resolve(false)
@@ -86,14 +86,16 @@ object JenaRDFReader:
           // transforming a reader into an input stream in order then to parse it as chars, is really horrible
           read(new ReaderInputStream(reader, Charset.forName("utf-8")))
 
-   given rdfxmlReader: RDFReaderT[RDFXML]    = makeRDFReader[RDFXML](Lang.RDFXML.nn)
+   given rdfxmlReader: RDFReaderT[RDFXML] = makeRDFReader[RDFXML](Lang.RDFXML.nn)
    given rdfxmlRelReader: RelReaderT[RDFXML] = makeRDFRelReader[RDFXML](Lang.RDFXML.nn)
 
-   given turtleReader: RDFReaderT[Turtle]    = makeRDFReader[Turtle](Lang.TURTLE.nn)
+   given turtleReader: RDFReaderT[Turtle] = makeRDFReader[Turtle](Lang.TURTLE.nn)
    given turtleRelReader: RelReaderT[Turtle] = makeRDFRelReader[Turtle](Lang.TURTLE.nn)
 
    // given n3Reader: RDFReaders[N3] = makeRDFReader[N3](Lang.N3.nn)
-
+   /** Jena uses [[https://github.com/filip26/titanium-json-ld Titanium Parser]] This needs to fetch
+     * resources on the web. (In its own threads!)
+     */
    given jsonLdReader: RDFReaderT[JsonLdCompacted] =
      makeRDFReader[JsonLdCompacted](Lang.JSONLD11.nn)
    given jsonLdRelReader: RelReaderT[JsonLdCompacted] =

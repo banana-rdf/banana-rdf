@@ -13,7 +13,7 @@
 
 package org.w3.banana.operations
 
-import io.lemonlabs.uri.{AbsoluteUrl, UrlWithScheme}
+import io.lemonlabs.uri.AbsoluteUrl
 import org.w3.banana.RDF.{rNode, rStatement, rTriple, rURI}
 import org.w3.banana.{Ops, RDF}
 
@@ -23,7 +23,7 @@ import org.w3.banana.{Ops, RDF}
   * @tparam Rdf
   */
 trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
-   import ops.given
+   import ops.{*, given}
    type rTripleI = (rNode[Rdf], rURI[Rdf], rNode[Rdf])
    import RDF.{Statement as St, rStatement as rSt}
 
@@ -38,7 +38,7 @@ trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
    extension (rtriple: RDF.rTriple[Rdf])
       def rsubj: rSt.Subject[Rdf] = subjectOf(rtriple)
       def rrel: rSt.Relation[Rdf] = relationOf(rtriple)
-      def robj: rSt.Object[Rdf]   = objectOf(rtriple)
+      def robj: rSt.Object[Rdf] = objectOf(rtriple)
 
       /** implementations built with clear relative URL types should optimise. resolve relative URLs
         * in triple with base. result._2 is true if a new object was created
@@ -49,7 +49,8 @@ trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
            uri => uri.resolveAgainst(base)
          )
          val (r, rChange): (St.Relation[Rdf], Boolean) = rtriple.rrel.asUri.resolveAgainst(base)
-         val (o, oChange): (St.Object[Rdf], Boolean) = rtriple.robj.asNode.resolveNodeAgainst(base)
+         val (o, oChange): (St.Object[Rdf], Boolean) =
+           rtriple.robj.asNode.resolveNodeAgainst(base): @unchecked
          if sChange || rChange || oChange
          then (ops.Triple(s, r, o), true)
          else (rtriple.asInstanceOf[RDF.Triple[Rdf]], false)
@@ -60,8 +61,8 @@ trait rTriple[Rdf <: RDF](using ops: Ops[Rdf]):
       def widenToNode: RDF.rNode[Rdf] = rsubj.asInstanceOf[RDF.rNode[Rdf]]
       def fold[A](bnF: RDF.BNode[Rdf] => A, uriF: RDF.rURI[Rdf] => A): A =
         rsubj match
-           case bn: RDF.BNode[Rdf]  => bnF(bn)
-           case rUri: RDF.rURI[Rdf] => uriF(rUri)
+         case bn: RDF.BNode[Rdf]  => bnF(bn)
+         case rUri: RDF.rURI[Rdf] => uriF(rUri)
 
    extension (rrel: RDF.rStatement.Relation[Rdf])
      // todo: find a way to remove this asInstanceOf

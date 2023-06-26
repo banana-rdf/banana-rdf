@@ -18,13 +18,13 @@ libraryDependencies += "org.scala-js" %% "scalajs-env-selenium" % "1.1.1"
   * @see
   *   https://scalacenter.github.io/scalajs-bundler/
   */
-addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.0")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.1")
 
 // https://typelevel.org/sbt-typelevel/index.html
 // sbt-typelevel configures sbt for developing, testing, cross-building, publishing, and documenting your Scala library on GitHub
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.5.0-M5")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.5.0-RC3")
 
 // http://www.scala-js.org/doc/tutorial/basic/
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.11.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.12.0")
 // https://github.com/sbt/sbt-buildinfo
 // addSbtPlugin("com.eed3si9n"  % "sbt-buildinfo" % "0.11.0")

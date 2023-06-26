@@ -22,9 +22,9 @@ class Cert[T <: RDF](using ops: Ops[T])
       "cert",
       ops.URI("http://www.w3.org/ns/auth/cert#")
     ):
-   val key          = apply("key")
-   val RSAKey       = apply("RSAKey")
+   val key = apply("key")
+   val RSAKey = apply("RSAKey")
    val RSAPublicKey = apply("RSAPublicKey")
-   val exponent     = apply("exponent")
-   val modulus      = apply("modulus")
+   val exponent = apply("exponent")
+   val modulus = apply("modulus")
 end Cert

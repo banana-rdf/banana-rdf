@@ -28,3 +28,6 @@ class Rdf4PrefixTest extends org.w3.banana.PrefixTest[R]
 class Rdf4TripleTest extends org.w3.banana.TripleTest[R]
 
 class Rdf4jIsomorphismTest extends org.w3.banana.isomorphism.IsomorphismTest[R]
+
+class Rdf4jDieselRelGraphConstructionTest
+    extends org.w3.banana.diesel.DieselRelativeGraphConstructTest[R]

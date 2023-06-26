@@ -14,11 +14,11 @@
 package org.w3.banana.operations
 
 import io.lemonlabs.uri as ll
+import io.lemonlabs.uri.config.UriConfig
 import org.w3.banana.RDF.rURI
 import org.w3.banana.exceptions.*
 import org.w3.banana.{Ops, RDF}
 
-import java.net.URI as jURI
 import scala.util.{Failure, Success, Try}
 
 /** If one had a type RelURI which was definitely a relative URI, then type rURI = RelURI | URI
@@ -46,23 +46,32 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
    def mkUri(iriStr: String): Try[RDF.rURI[Rdf]] =
      ll.Uri.parseTry(iriStr).flatMap(_ => Try(mkUriUnsafe(iriStr)))
 
-   def stringValue(uri: RDF.rURI[Rdf]): String
+   protected def stringVal(uri: RDF.rURI[Rdf]): String
 
    /** resolve url with base, but fail if URL parsing fails, or if the Url is schema relative -
      * since that cannot be resolved.
      */
    def resolveUri(uri: RDF.rURI[Rdf], base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] =
-     ll.Uri.parseTry(stringValue(uri)).flatMap { llUri =>
+     ll.Uri.parseTry(uri.value).flatMap { llUri =>
        llUri match
-          case _: ll.Urn =>
-            Success((uri.asInstanceOf[RDF.URI[Rdf]], false)) // urns are always absolute
-          case _: ll.AbsoluteUrl   => Success((uri.asInstanceOf[RDF.URI[Rdf]], false))
-          case rel: ll.RelativeUrl => Success((ops.URI(rel.resolve(base, true).toString), true))
-          case nonResolvable       => Failure(URIException(s"cannot resolve $nonResolvable"))
+        case _: ll.Urn =>
+          Success((uri.asInstanceOf[RDF.URI[Rdf]], false)) // urns are always absolute
+        case _: ll.AbsoluteUrl   => Success((uri.asInstanceOf[RDF.URI[Rdf]], false))
+        case rel: ll.RelativeUrl => Success((ops.URI(rel.resolve(base, true).toString), true))
+        case nonResolvable       => Failure(URIException(s"cannot resolve $nonResolvable"))
      }
 
    extension (uri: RDF.rURI[Rdf])
-      def value: String = stringValue(uri)
+      def value: String = stringVal(uri)
+
+      def fragmentLess: RDF.rURI[Rdf] =
+         given deflt: UriConfig = UriConfig.default
+         ll.Uri.parseTry(uri.value).collect {
+           case url: ll.AbsoluteUrl if url.fragment != None =>
+             apply(url.copy(fragment = None).toString)
+           case rurl: ll.RelativeUrl if rurl.fragment != None =>
+             apply(rurl.copy(fragment = None).toString)
+         }.getOrElse(uri)
 
       /** Returns resolved URL, and whether the result is new. If the URL is relative but cannot be
         * resolved, be lenient and keep the original. //todo: pass a logger
@@ -73,8 +82,8 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
         */
       def resolveAgainst(base: ll.AbsoluteUrl): (RDF.URI[Rdf], Boolean) =
         resolveUri(uri, base) match
-           case Success(p) => p
-           case Failure(e) => (uri.asInstanceOf[RDF.URI[Rdf]], false)
+         case Success(p) => p
+         case Failure(e) => (uri.asInstanceOf[RDF.URI[Rdf]], false)
 
       /** Return the resolved URL, and whether the result is new * */
       def resolveAgainstUrl(base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] =
