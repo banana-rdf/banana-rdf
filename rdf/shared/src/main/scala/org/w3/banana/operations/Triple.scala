@@ -41,9 +41,9 @@ trait Triple[Rdf <: RDF](using ops: Ops[Rdf]):
    protected def objectOf(s: RDF.Triple[Rdf]): St.Object[Rdf]
 
    extension (triple: RDF.Triple[Rdf])
-      def subj: St.Subject[Rdf]               = subjectOf(triple)
-      def rel: St.Relation[Rdf]               = relationOf(triple)
-      def obj: St.Object[Rdf]                 = objectOf(triple)
+      def subj: St.Subject[Rdf] = subjectOf(triple)
+      def rel: St.Relation[Rdf] = relationOf(triple)
+      def obj: St.Object[Rdf] = objectOf(triple)
       def at(g: St.Graph[Rdf]): RDF.Quad[Rdf] = ops.Quad(triple.subj, triple.rel, triple.obj, g)
 
       def relativizeAgainst(base: AbsoluteUrl): (RDF.rTriple[Rdf], Boolean) =

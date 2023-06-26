@@ -31,20 +31,20 @@ import scala.util.{Success, Try}
 object Rdflib extends RDF:
    type Top = AnyRef
 
-   override opaque type rGraph <: Top  = storeMod.IndexedFormula
+   override opaque type rGraph <: Top = storeMod.IndexedFormula
    override opaque type rTriple <: Top = model.Quad
-   override opaque type rNode <: Top   = model.ValueTerm[?]
-   override opaque type rURI <: rNode  = model.NamedNode
+   override opaque type rNode <: Top = model.ValueTerm[?]
+   override opaque type rURI <: rNode = model.NamedNode
 
-   override opaque type Store                    = storeMod.IndexedFormula
-   override opaque type Graph <: rGraph          = storeMod.IndexedFormula
-   override opaque type Triple <: rTriple        = model.Quad
-   override opaque type Quad <: Top              = model.Quad
-   override opaque type Node <: rNode            = model.ValueTerm[?]
-   override opaque type URI <: Node & rURI       = model.NamedNode
-   override opaque type BNode <: Node            = model.BlankNode
-   override opaque type Literal <: Node          = model.Literal
-   override opaque type Lang <: Top              = String
+   override opaque type Store = storeMod.IndexedFormula
+   override opaque type Graph <: rGraph = storeMod.IndexedFormula
+   override opaque type Triple <: rTriple = model.Quad
+   override opaque type Quad <: Top = model.Quad
+   override opaque type Node <: rNode = model.ValueTerm[?]
+   override opaque type URI <: Node & rURI = model.NamedNode
+   override opaque type BNode <: Node = model.BlankNode
+   override opaque type Literal <: Node = model.Literal
+   override opaque type Lang <: Top = String
    override opaque type DefaultGraphNode <: Node = model.DefaultGraph
 
    override type NodeAny = Null
@@ -73,7 +73,7 @@ object Rdflib extends RDF:
      */
    given ops: Ops[R] with
       import js.JSConverters.*
-      val df: DataFactory     = model.DataFactory()
+      val df: DataFactory = model.DataFactory()
       def opts(): FormulaOpts = facade.FormulaOpts().setRdfFactory(df)
       import RDF.Statement as St
 
@@ -82,7 +82,7 @@ object Rdflib extends RDF:
 //           x.asInstanceOf[scala.scalajs.js.UndefOr[T]]
 //
       import scala.collection.mutable
-      private val init                         = nodeMod.default
+      private val init = nodeMod.default
       val defaulGraph: RDF.DefaultGraphNode[R] = df.defaultGraph()
 
       val `*` : RDF.NodeAny[R] = null
@@ -148,11 +148,11 @@ object Rdflib extends RDF:
          // this type of union is very inefficient
          def gunion(graphs: Seq[RDF.Graph[R]]): RDF.Graph[R] =
            graphs match
-              case Seq(x) => x
-              case _ =>
-                val newGraph: IndexedFormula = empty
-                graphs.foreach(g => g.statements.foreach(s => newGraph.addStatement(s)))
-                newGraph
+            case Seq(x) => x
+            case _ =>
+              val newGraph: IndexedFormula = empty
+              graphs.foreach(g => g.statements.foreach(s => newGraph.addStatement(s)))
+              newGraph
 
          def difference(g1: RDF.Graph[R], g2: RDF.Graph[R]): RDF.Graph[R] =
             val newgraph: IndexedFormula = empty
@@ -165,7 +165,7 @@ object Rdflib extends RDF:
          // todo: set preferences to be higher
          // todo: perhaps have isomorphism be an external object?
          private val mapGen = new SimpleMappingGenerator[R](VerticeCBuilder.simpleHash[R])
-         private val iso    = new GraphIsomorphism[R](mapGen)
+         private val iso = new GraphIsomorphism[R](mapGen)
          def isomorphism(left: RDF.Graph[R], right: RDF.Graph[R]): Boolean =
             val a = iso.findAnswer(left, right)
             a.isSuccess
@@ -190,7 +190,7 @@ object Rdflib extends RDF:
 
          import org.w3.banana.isomorphism.*
          private val mapGen = new SimpleMappingGenerator[R](VerticeCBuilder.simpleHash[R])
-         private val iso    = new GraphIsomorphism[R](mapGen)
+         private val iso = new GraphIsomorphism[R](mapGen)
 
          extension (rGraph: RDF.rGraph[R])
             override def triples: Iterable[RDF.rTriple[R]] =
@@ -219,8 +219,8 @@ object Rdflib extends RDF:
          extension (subj: RDF.Statement.Subject[R])
            def foldSubj[A](uriFnct: RDF.URI[R] => A, bnFcnt: RDF.BNode[R] => A): A =
              subj match
-                case nn: model.NamedNode    => uriFnct(nn)
-                case blank: model.BlankNode => bnFcnt(blank)
+              case nn: model.NamedNode    => uriFnct(nn)
+              case blank: model.BlankNode => bnFcnt(blank)
       end Subject
 
       given Triple: operations.Triple[R] with
@@ -229,9 +229,9 @@ object Rdflib extends RDF:
          // warning throws an exception
          def apply(s: St.Subject[R], p: St.Relation[R], o: St.Object[R]): RDF.Triple[R] =
            df.quad(s, p, o, df.defaultGraph())
-         def subjectOf(t: RDF.Triple[R]): St.Subject[R]   = t.subj
+         def subjectOf(t: RDF.Triple[R]): St.Subject[R] = t.subj
          def relationOf(t: RDF.Triple[R]): St.Relation[R] = t.rel
-         def objectOf(t: RDF.Triple[R]): St.Object[R]     = t.obj
+         def objectOf(t: RDF.Triple[R]): St.Object[R] = t.obj
       end Triple
 
       override val Quad = new operations.Quad[R](this):
@@ -243,10 +243,10 @@ object Rdflib extends RDF:
              o: St.Object[R],
              where: St.Graph[R]
          ): RDF.Quad[R] = df.quad(s, p, o, where)
-         protected def subjectOf(s: RDF.Quad[R]): St.Subject[R]   = s.subj
+         protected def subjectOf(s: RDF.Quad[R]): St.Subject[R] = s.subj
          protected def relationOf(s: RDF.Quad[R]): St.Relation[R] = s.rel
-         protected def objectOf(s: RDF.Quad[R]): St.Object[R]     = s.obj
-         protected def graphOf(s: RDF.Quad[R]): St.Graph[R]       = s.graph
+         protected def objectOf(s: RDF.Quad[R]): St.Object[R] = s.obj
+         protected def graphOf(s: RDF.Quad[R]): St.Graph[R] = s.graph
       end Quad
 
       // todo: see whether this really works! It may be that we need to create a new construct
@@ -256,16 +256,16 @@ object Rdflib extends RDF:
            df.quad(s, p, o, df.defaultGraph())
          def untuple(t: RDF.rTriple[R]): rTripleI =
            (subjectOf(t).widenToNode, relationOf(t), objectOf(t).asNode)
-         protected def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R]   = t.subj
+         protected def subjectOf(t: RDF.rTriple[R]): rSt.Subject[R] = t.subj
          protected def relationOf(t: RDF.rTriple[R]): rSt.Relation[R] = t.rel
-         protected def objectOf(t: RDF.rTriple[R]): rSt.Object[R]     = t.obj
+         protected def objectOf(t: RDF.rTriple[R]): rSt.Object[R] = t.obj
       end rTriple
 
       given Node: operations.Node[R] with
          private def rl(node: RDF.Node[R]): Term[?] = node.asInstanceOf[Term[?]]
          extension (node: RDF.Node[R])
-            def isURI: Boolean     = rl(node).isInstanceOf[model.NamedNode]
-            def isBNode: Boolean   = rl(node).isInstanceOf[model.BlankNode]
+            def isURI: Boolean = rl(node).isInstanceOf[model.NamedNode]
+            def isBNode: Boolean = rl(node).isInstanceOf[model.BlankNode]
             def isLiteral: Boolean = rl(node).isInstanceOf[model.Literal]
             // we override fold, as we can implement it faster with pattern matching
             override def fold[A](
@@ -273,24 +273,24 @@ object Rdflib extends RDF:
                 bnF: RDF.BNode[R] => A,
                 litF: RDF.Literal[R] => A
             ): A = node match
-               case nn: model.NamedNode    => uriF(nn)
-               case blank: model.BlankNode => bnF(blank)
-               case lit: model.Literal     => litF(lit)
+             case nn: model.NamedNode    => uriF(nn)
+             case blank: model.BlankNode => bnF(blank)
+             case lit: model.Literal     => litF(lit)
       end Node
 
       given rNode: operations.rNode[R] with
          private def rl(node: RDF.rNode[R]): Term[?] = node.asInstanceOf[Term[?]]
 
          extension (rnode: RDF.rNode[R])
-            def isURI: Boolean     = rl(rnode).isInstanceOf[model.NamedNode]
-            def isBNode: Boolean   = rl(rnode).isInstanceOf[model.BlankNode]
+            def isURI: Boolean = rl(rnode).isInstanceOf[model.NamedNode]
+            def isBNode: Boolean = rl(rnode).isInstanceOf[model.BlankNode]
             def isLiteral: Boolean = rl(rnode).isInstanceOf[model.Literal]
 
       end rNode
 
       given BNode: operations.BNode[R] with
          def apply(s: String): RDF.BNode[R] = df.blankNode(s)
-         def apply(): RDF.BNode[R]          = df.blankNode(undefined)
+         def apply(): RDF.BNode[R] = df.blankNode(undefined)
          extension (bn: RDF.BNode[R])
            def label: String = bn.value
       end BNode
@@ -298,34 +298,34 @@ object Rdflib extends RDF:
       override given bnodeTT: TypeTest[Matchable, RDF.BNode[R]] with
          def unapply(s: Matchable): Option[s.type & RDF.BNode[R]] =
            s match
-              // note: this does not compile if we use URI instead of jena.Node_URI
-              case x: (s.type & run.cosy.rdfjs.model.BlankNode) => Some(x)
-              case _                                            => None
+            // note: this does not compile if we use URI instead of jena.Node_URI
+            case x: (s.type & run.cosy.rdfjs.model.BlankNode) => Some(x)
+            case _                                            => None
 
       val Literal = new operations.Literal[R]:
          import org.w3.banana.operations.URI.*
-         private val xsdString     = df.namedNode(xsdStr).nn
+         private val xsdString = df.namedNode(xsdStr).nn
          private val xsdLangString = df.namedNode(xsdLangStr).nn
 
          def apply(plain: String): RDF.Literal[R] = df.literal(plain, undefined)
          def apply(lit: LiteralI): RDF.Literal[R] = lit match
-            case LiteralI.Plain(text)     => apply(text)
-            case LiteralI.`@`(text, lang) => df.literal(text, lang)
-            case LiteralI.`^^`(text, tp)  => df.literal(text, tp)
+          case LiteralI.Plain(text)     => apply(text)
+          case LiteralI.`@`(text, lang) => df.literal(text, lang)
+          case LiteralI.`^^`(text, tp)  => df.literal(text, tp)
 
          def unapply(x: Matchable): Option[LiteralI] = x match
-            case lit: model.Literal =>
-              val lex: String    = lit.value
-              val dt: RDF.URI[R] = lit.datatype
-              val lang: String   = lit.language
-              if (lang.isEmpty) then
-                 // todo: this comparison could be costly, check
-                 if dt == xsdString then Some(LiteralI.Plain(lex))
-                 else Some(LiteralI.^^(lex, dt))
-              else if dt == xsdLangString then
-                 Some(LiteralI.`@`(lex, Lang(lang)))
-              else None
-            case _ => None
+          case lit: model.Literal =>
+            val lex: String = lit.value
+            val dt: RDF.URI[R] = lit.datatype
+            val lang: String = lit.language
+            if lang.isEmpty then
+               // todo: this comparison could be costly, check
+               if dt == xsdString then Some(LiteralI.Plain(lex))
+               else Some(LiteralI.^^(lex, dt))
+            else if dt == xsdLangString then
+               Some(LiteralI.`@`(lex, Lang(lang)))
+            else None
+          case _ => None
 
          @targetName("langLit")
          def apply(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] = df.literal(lex, lang.label)
@@ -340,8 +340,8 @@ object Rdflib extends RDF:
       override given literalTT: TypeTest[Matchable, RDF.Literal[R]] with
          override def unapply(s: Matchable): Option[s.type & RDF.Literal[R]] =
            s match
-              case x: (s.type & model.Literal) => Some(x)
-              case _                           => None
+            case x: (s.type & model.Literal) => Some(x)
+            case _                           => None
 
       given Lang: operations.Lang[R] with
          def apply(lang: String): RDF.Lang[R] = lang
@@ -359,8 +359,8 @@ object Rdflib extends RDF:
       given rUriTT: reflect.TypeTest[Matchable, org.w3.banana.RDF.rURI[R]] with
          override def unapply(s: Matchable): Option[s.type & RDF.rURI[R]] =
            s match
-              case x: (s.type & model.NamedNode) => Some(x)
-              case _                             => None
+            case x: (s.type & model.NamedNode) => Some(x)
+            case _                             => None
 
       given URI: operations.URI[R] with
          // this does throw an exception on non relative URLs!

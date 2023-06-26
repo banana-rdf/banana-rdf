@@ -38,10 +38,10 @@ trait RDF:
 
    type Top <: Matchable
 
-   type rGraph <: Top  // immutable graphs  with triples that can contain relative URLs
+   type rGraph <: Top // immutable graphs  with triples that can contain relative URLs
    type rTriple <: Top // triples that can contain relative URLs
-   type rNode <: Top   // relative node
-   type rURI <: rNode  // possibly relative URIs (see rUri trait for details)
+   type rNode <: Top // relative node
+   type rURI <: rNode // possibly relative URIs (see rUri trait for details)
 
    type Graph <: rGraph // immutable RDF graphs with no triples with relative URLs
    type Quad <: Top
@@ -69,73 +69,72 @@ trait RDF:
 
 end RDF
 
-/** The idea of using match types by @neko-kai https://github.com/lampepfl/dotty/issues/13416
-  */
+/** The idea of using match types by @neko-kai https://github.com/lampepfl/dotty/issues/13416 */
 object RDF:
 
    type rTriple[R <: RDF] <: Matchable = R match
-      case GetRelTriple[t] => t
+    case GetRelTriple[t] => t
 
    type Triple[R <: RDF] <: rTriple[R] = R match
-      case GetTriple[t] => t & rTriple[R]
+    case GetTriple[t] => t & rTriple[R]
 
    // Quad is a good short name for Statement, but does not give a good understaning of it
    type Quad[R <: RDF] <: Matchable = R match
-      case GetQuad[t] => t
+    case GetQuad[t] => t
 
    type rNode[R <: RDF] <: Matchable =
      R match
-        case GetRelNode[n] => n & Matchable
+      case GetRelNode[n] => n & Matchable
 
    type Node[R <: RDF] <: rNode[R] =
      R match
-        case GetNode[n] => n & rNode[R]
+      case GetNode[n] => n & rNode[R]
 
    type BNode[R <: RDF] <: Node[R] = R match
-      case GetBNode[bn] => bn & Node[R]
+    case GetBNode[bn] => bn & Node[R]
 
    type DefaultGraphNode[R <: RDF] = R match
-      case GetDefaultGraphNode[n] => n
+    case GetDefaultGraphNode[n] => n
 
    type rURI[R <: RDF] <: rNode[R] = R match
-      case GetRelURI[ru] => ru & rNode[R]
+    case GetRelURI[ru] => ru & rNode[R]
 
    type URI[R <: RDF] <: Node[R] & rURI[R] = R match
-      case GetURI[u] => u & Node[R] & rURI[R]
+    case GetURI[u] => u & Node[R] & rURI[R]
 
    type rGraph[R <: RDF] = R match
-      case GetRelGraph[g] => g
+    case GetRelGraph[g] => g
 
    type Graph[R <: RDF] <: rGraph[R] = R match
-      case GetGraph[g] => g & rGraph[R]
+    case GetGraph[g] => g & rGraph[R]
 
    type Store[R <: RDF] = R match
-      case GetStore[s] => s
+    case GetStore[s] => s
 
    type Literal[R <: RDF] <: Node[R] = R match
-      case GetLiteral[l] => l & Node[R]
+    case GetLiteral[l] => l & Node[R]
 
    type Lang[R <: RDF] <: Matchable = R match
-      case GetLang[l] => l
+    case GetLang[l] => l
 
    type NodeAny[R <: RDF] = R match
-      case GetNodeAny[m] => m
+    case GetNodeAny[m] => m
 
-   private type GetRelURI[U]                 = RDF { type rURI = U }
-   private type GetURI[U]                    = RDF { type URI = U }
-   private type GetRelNode[N <: Matchable]   = RDF { type rNode = N }
-   private type GetNode[N]                   = RDF { type Node = N }
-   private type GetBNode[N]                  = RDF { type BNode = N }
-   private type GetLiteral[L]                = RDF { type Literal = L }
-   private type GetDefaultGraphNode[N]       = RDF { type DefaultGraphNode = N }
-   private type GetLang[L <: Matchable]      = RDF { type Lang = L }
+   private type GetRelURI[U] = RDF { type rURI = U }
+   private type GetURI[U] = RDF { type URI = U }
+   private type GetRelNode[N <: Matchable] = RDF { type rNode = N }
+   private type GetNode[N] = RDF { type Node = N }
+   private type GetBNode[N] = RDF { type BNode = N }
+   private type GetLiteral[L] = RDF { type Literal = L }
+   private type GetDefaultGraphNode[N] = RDF { type DefaultGraphNode = N }
+   private type GetLang[L <: Matchable] = RDF { type Lang = L }
    private type GetRelTriple[T <: Matchable] = RDF { type rTriple = T }
-   private type GetTriple[T]                 = RDF { type Triple = T }
-   private type GetQuad[T <: Matchable]      = RDF { type Quad = T }
-   private type GetRelGraph[G]               = RDF { type rGraph = G }
-   private type GetGraph[G]                  = RDF { type Graph = G }
-   private type GetStore[S]                  = RDF { type Store = S }
-   private type GetNodeAny[M]                = RDF { type NodeAny = M }
+   private type GetTriple[T] = RDF { type Triple = T }
+   private type GetQuad[T <: Matchable] = RDF { type Quad = T }
+   private type GetRelGraph[G] = RDF { type rGraph = G }
+   private type GetGraph[G] = RDF { type Graph = G }
+   private type GetStore[S] = RDF { type Store = S }
+   private type GetNodeAny[M] = RDF { type NodeAny = M }
 
    /** these associate a type to the positions in statements (triples or quads) These are not agreed
      * to by all frameworks, so it would be useful to find a way to parametrise them. Essentially
@@ -146,22 +145,22 @@ object RDF:
      */
    object Statement:
       type DT[A, B, C, R <: RDF, Object[R]] = Object[R] match
-         case URI[R]     => A
-         case BNode[R]   => B
-         case Literal[R] => C
+       case URI[R]     => A
+       case BNode[R]   => B
+       case Literal[R] => C
 
-      type Subject[R <: RDF]  = URI[R] | BNode[R]
+      type Subject[R <: RDF] = URI[R] | BNode[R]
       type Relation[R <: RDF] = URI[R]
-      type Object[R <: RDF]   = URI[R] | BNode[R] | Literal[R]
-      type Graph[R <: RDF]    = URI[R] | BNode[R] | DefaultGraphNode[R]
+      type Object[R <: RDF] = URI[R] | BNode[R] | Literal[R]
+      type Graph[R <: RDF] = URI[R] | BNode[R] | DefaultGraphNode[R]
    end Statement
 
    // relative Statements
    object rStatement:
-      type Subject[R <: RDF]  = rURI[R] | BNode[R]
+      type Subject[R <: RDF] = rURI[R] | BNode[R]
       type Relation[R <: RDF] = rURI[R]
-      type Object[R <: RDF]   = rURI[R] | BNode[R] | Literal[R]
-      type Graph[R <: RDF]    = rURI[R] | BNode[R] | DefaultGraphNode[R]
+      type Object[R <: RDF] = rURI[R] | BNode[R] | Literal[R]
+      type Graph[R <: RDF] = rURI[R] | BNode[R] | DefaultGraphNode[R]
    end rStatement
 
 end RDF

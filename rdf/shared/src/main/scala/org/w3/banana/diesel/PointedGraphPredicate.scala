@@ -22,9 +22,9 @@ class PointedGraphPredicate[Rdf <: RDF](pointed: PointedSubjRGraph[Rdf], p: RDF.
       import ops.{given, *}
       import pointed.{graph as acc, pointer as s}
       import pointedObject.{graph as graphObject, pointer as o}
-      val newTr: RDF.rTriple[Rdf]      = rTriple(s, p, o)
+      val newTr: RDF.rTriple[Rdf] = rTriple(s, p, o)
       val trSeq: Seq[RDF.rTriple[Rdf]] = newTr +: graphObject.triples.toSeq
-      val newGraph                     = acc ++ trSeq
+      val newGraph = acc ++ trSeq
       PointedSubjRGraph(s, newGraph)
 
 // For more general transformations we need ToPG

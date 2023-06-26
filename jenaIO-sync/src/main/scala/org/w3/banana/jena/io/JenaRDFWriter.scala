@@ -121,9 +121,9 @@ object JenaRDFWriter:
         val options = new JsonLdOptions()
         options.setCompactToRelative(true)
         val g: org.apache.jena.graph.Graph = graph.asInstanceOf[org.apache.jena.graph.Graph]
-        val dsg: DatasetGraph              = org.apache.jena.sparql.core.DatasetGraphOne.create(g)
-        val ds: RdfDataset                 = JenaTitanium.convert(dsg)
-        val doc: Document                  = RdfDocument.of(ds)
+        val dsg: DatasetGraph = org.apache.jena.sparql.core.DatasetGraphOne.create(g)
+        val ds: RdfDataset = JenaTitanium.convert(dsg)
+        val doc: Document = RdfDocument.of(ds)
         // Native types.
         // This looses information -- xsd:int becomes xsd:integer, xsd:double becomes xsd:decimal
         //   options.setUseNativeTypes(true);
@@ -157,10 +157,10 @@ object JenaRDFWriter:
         //        if ( dsg.prefixes().containsPrefix("") )
         //            api.base(dsg.prefixes().get(""));
         // JSON Object to output - JSON array
-        val w: JsonObject              = api.get()
-        val config                     = util.Map.of(JsonGenerator.PRETTY_PRINTING, true)
+        val w: JsonObject = api.get()
+        val config = util.Map.of(JsonGenerator.PRETTY_PRINTING, true)
         val factory: JsonWriterFactory = Json.createWriterFactory(config)
-        val jsonWriter                 = factory.createWriter(wr)
+        val jsonWriter = factory.createWriter(wr)
         jsonWriter.write(w)
         wr.write("\n")
         wr.flush()
@@ -179,7 +179,7 @@ object JenaRDFWriter:
             prefixes: Set[Prefix[R]]
         ): Try[Unit] = Try {
           import scala.language.unsafeNulls
-          val jg: jenaTp.Graph    = graph.asInstanceOf[jenaTp.Graph]
+          val jg: jenaTp.Graph = graph.asInstanceOf[jenaTp.Graph]
           val pmap: PrefixMapping = jg.getPrefixMapping
           pmap.clearNsPrefixMap()
           for p <- prefixes do pmap.setNsPrefix(p.prefixName, p.prefixIri.value)
@@ -201,7 +201,7 @@ object JenaRDFWriter:
         ): Try[Unit] = Try {
           import scala.language.unsafeNulls
           val jg: jenaTp.Graph = graph.asInstanceOf[jenaTp.Graph]
-          val pmap             = jg.getPrefixMapping
+          val pmap = jg.getPrefixMapping
           pmap.clearNsPrefixMap()
           for p <- prefixes do pmap.setNsPrefix(p.prefixName, p.prefixIri.value)
           val wrb: RDFWriterBuilder = RioWriter.source(jg)

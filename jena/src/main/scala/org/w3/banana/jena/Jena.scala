@@ -36,21 +36,21 @@ object JenaRdf extends org.w3.banana.RDF:
    override type Top = java.lang.Object
 
    // we hack jena.{Graph, Triple, URI} to allow relative URLs.
-   override opaque type rGraph <: Top  = jenaTp.Graph
+   override opaque type rGraph <: Top = jenaTp.Graph
    override opaque type rTriple <: Top = jenaTp.Triple
-   override opaque type rNode <: Top   = jenaTp.Node
-   override opaque type rURI <: rNode  = jenaTp.Node_URI
+   override opaque type rNode <: Top = jenaTp.Node
+   override opaque type rURI <: rNode = jenaTp.Node_URI
 
    override opaque type Graph <: rGraph = jenaTp.Graph
    // todo: Quad missing
-   override opaque type Triple <: rTriple  = jenaTp.Triple
-   override opaque type Quad <: Top        = org.apache.jena.sparql.core.Quad
-   override opaque type Node <: rNode      = jenaTp.Node
+   override opaque type Triple <: rTriple = jenaTp.Triple
+   override opaque type Quad <: Top = org.apache.jena.sparql.core.Quad
+   override opaque type Node <: rNode = jenaTp.Node
    override opaque type URI <: Node & rURI = jenaTp.Node_URI
-   override opaque type BNode <: Node      = jenaTp.Node_Blank
-   override opaque type Literal <: Node    = jenaTp.Node_Literal
-   override opaque type Lang <: Top        = String
-   override opaque type DefaultGraphNode   = org.apache.jena.sparql.core.Quad.defaultGraphIRI.type
+   override opaque type BNode <: Node = jenaTp.Node_Blank
+   override opaque type Literal <: Node = jenaTp.Node_Literal
+   override opaque type Lang <: Top = String
+   override opaque type DefaultGraphNode = org.apache.jena.sparql.core.Quad.defaultGraphIRI.type
 
    override opaque type NodeAny = Null
    override opaque type Store =
@@ -245,16 +245,16 @@ object JenaRdf extends org.w3.banana.RDF:
          private def jn(node: RDF.rNode[R]) = node.asInstanceOf[org.apache.jena.graph.Node]
 
          extension (rnode: RDF.rNode[R])
-            def isURI: Boolean     = jn(rnode).isURI
-            def isBNode: Boolean   = jn(rnode).isBlank
+            def isURI: Boolean = jn(rnode).isURI
+            def isBNode: Boolean = jn(rnode).isBlank
             def isLiteral: Boolean = jn(rnode).isLiteral
       end rNode
 
       given Node: operations.Node[R] with
          private def jn(node: RDF.Node[R]) = node.asInstanceOf[org.apache.jena.graph.Node]
          extension (node: RDF.Node[R])
-            def isURI: Boolean     = jn(node).isURI
-            def isBNode: Boolean   = jn(node).isBlank
+            def isURI: Boolean = jn(node).isURI
+            def isBNode: Boolean = jn(node).isBlank
             def isLiteral: Boolean = jn(node).isLiteral
       end Node
 
@@ -272,19 +272,19 @@ object JenaRdf extends org.w3.banana.RDF:
       given bnodeTT: TypeTest[Matchable, RDF.BNode[R]] with
          def unapply(s: Matchable): Option[s.type & RDF.BNode[R]] =
            s match
-              // note: this does not compile if we use URI instead of jenaTp.Node_URI
-              case x: (s.type & jenaTp.Node_Blank) => Some(x)
-              case _                               => None
+            // note: this does not compile if we use URI instead of jenaTp.Node_URI
+            case x: (s.type & jenaTp.Node_Blank) => Some(x)
+            case _                               => None
       end bnodeTT
 
       val Literal = new operations.Literal[R]:
          import org.w3.banana.operations.URI.*
-         private val xsdString: RDFDatatype     = mapper.getTypeByName(xsdStr).nn
+         private val xsdString: RDFDatatype = mapper.getTypeByName(xsdStr).nn
          private val xsdLangString: RDFDatatype = mapper.getTypeByName(xsdLangStr).nn
          // todo? are we missing a Datatype Type? (check other frameworks)
 
          def jenaDatatype(datatype: RDF.URI[R]): RDFDatatype =
-            val iriString: String       = datatype.getURI.nn
+            val iriString: String = datatype.getURI.nn
             val typ: RDFDatatype | Null = mapper.getTypeByName(iriString)
             if typ == null then
                val datatype = new BaseDatatype(iriString)
@@ -298,9 +298,9 @@ object JenaRdf extends org.w3.banana.RDF:
            NodeFactory.createLiteral(plain).nn.asInstanceOf[Literal]
 
          override def apply(lit: LiteralI): RDF.Literal[R] = lit match
-            case LiteralI.Plain(text) => NodeFactory.createLiteral(text).nn.asInstanceOf[Literal]
-            case LiteralI.`@`(text, lang) => Literal(text, lang)
-            case LiteralI.`^^`(text, tp)  => Literal(text, tp)
+          case LiteralI.Plain(text)     => NodeFactory.createLiteral(text).nn.asInstanceOf[Literal]
+          case LiteralI.`@`(text, lang) => Literal(text, lang)
+          case LiteralI.`^^`(text, tp)  => Literal(text, tp)
 
          @targetName("langLit") override def apply(lex: String, lang: RDF.Lang[R]): RDF.Literal[R] =
            NodeFactory.createLiteral(lex, lang).nn.asInstanceOf[Literal]
@@ -313,17 +313,17 @@ object JenaRdf extends org.w3.banana.RDF:
 
          def unapply(x: Matchable): Option[LiteralI] =
            x match
-              case lit: Literal =>
-                val lex: String            = lit.getLiteralLexicalForm.nn
-                val dt: RDFDatatype | Null = lit.getLiteralDatatype
-                val lang: String | Null    = lit.getLiteralLanguage
-                if (lang == null || lang.isEmpty) then
-                   if dt == null || dt == xsdString then Some(LiteralI.Plain(lex))
-                   else Some(LiteralI.^^(lex, URI(dt.getURI.nn)))
-                else if dt == null || dt == xsdLangString then
-                   Some(LiteralI.`@`(lex, Lang(lang)))
-                else None
-              case _ => None
+            case lit: Literal =>
+              val lex: String = lit.getLiteralLexicalForm.nn
+              val dt: RDFDatatype | Null = lit.getLiteralDatatype
+              val lang: String | Null = lit.getLiteralLanguage
+              if lang == null || lang.isEmpty then
+                 if dt == null || dt == xsdString then Some(LiteralI.Plain(lex))
+                 else Some(LiteralI.^^(lex, URI(dt.getURI.nn)))
+              else if dt == null || dt == xsdLangString then
+                 Some(LiteralI.`@`(lex, Lang(lang)))
+              else None
+            case _ => None
 
          extension (lit: RDF.Literal[R])
            def text: String = lit.getLiteralLexicalForm.nn
@@ -332,9 +332,9 @@ object JenaRdf extends org.w3.banana.RDF:
       given literalTT: TypeTest[Matchable, RDF.Literal[R]] with
          override def unapply(s: Matchable): Option[s.type & jenaTp.Node_Literal] =
            s match
-              // note: this does not compile if we use URI instead of jenaTp.Node_URI
-              case x: (s.type & jenaTp.Node_Literal) => Some(x)
-              case _                                 => None
+            // note: this does not compile if we use URI instead of jenaTp.Node_URI
+            case x: (s.type & jenaTp.Node_Literal) => Some(x)
+            case _                                 => None
 
       given Lang: operations.Lang[R] with
          def apply(lang: String): RDF.Lang[R] = lang
@@ -356,9 +356,9 @@ object JenaRdf extends org.w3.banana.RDF:
       given rUriTT: reflect.TypeTest[Matchable, org.w3.banana.RDF.rURI[R]] with
          def unapply(s: Matchable): Option[s.type & RDF.rURI[R]] =
            s match
-              // note: this does not compile if we use URI instead of jenaTp.Node_URI
-              case x: (s.type & jenaTp.Node_URI) => Some(x)
-              case _                             => None
+            // note: this does not compile if we use URI instead of jenaTp.Node_URI
+            case x: (s.type & jenaTp.Node_URI) => Some(x)
+            case _                             => None
 
       given URI: operations.URI[R] with
          import java.net.URI as jURI
@@ -371,25 +371,25 @@ object JenaRdf extends org.w3.banana.RDF:
       given subjToURITT: TypeTest[RDF.Statement.Subject[R], RDF.URI[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & RDF.URI[R]) => Some(x)
-              case _                        => None
+            case x: (s.type & RDF.URI[R]) => Some(x)
+            case _                        => None
 
       given rSubjToURITT: TypeTest[RDF.rStatement.Subject[R], RDF.rURI[R]] with
          override def unapply(s: RDF.Statement.Subject[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & RDF.URI[R]) => Some(x)
-              case _                        => None
+            case x: (s.type & RDF.URI[R]) => Some(x)
+            case _                        => None
 
       given objToURITT: TypeTest[RDF.Statement.Object[R], RDF.URI[R]] with
          override def unapply(s: RDF.Statement.Object[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & RDF.URI[R]) => Some(x)
-              case _                        => None
+            case x: (s.type & RDF.URI[R]) => Some(x)
+            case _                        => None
 
       given rObjToURITT: TypeTest[RDF.rStatement.Object[R], RDF.rURI[R]] with
          override def unapply(s: RDF.rStatement.Object[R]): Option[s.type & jenaTp.Node_URI] =
            s match
-              case x: (s.type & RDF.URI[R]) => Some(x)
-              case _                        => None
+            case x: (s.type & RDF.URI[R]) => Some(x)
+            case _                        => None
 
 end JenaRdf

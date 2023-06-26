@@ -130,7 +130,7 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
 
    test("resolve relativeURLs to absolute ones") {
      val bbls = "https://bblfish.net"
-     val bbl  = AbsoluteUrl.parse(bbls)
+     val bbl = AbsoluteUrl.parse(bbls)
      assertEquals(ops.rURI("people").resolveAgainst(bbl), (ops.URI(bbls + "/people"), true))
      assertEquals(
        ops.rURI("/people/henry").resolveAgainst(bbl),
@@ -148,7 +148,7 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    }
 
    test("remove fragments from URLs") {
-     val bblStr    = "https://bblfish.net/people/henry/card#me"
+     val bblStr = "https://bblfish.net/people/henry/card#me"
      val bblDocStr = "https://bblfish.net/people/henry/card"
 
      assertEquals(
@@ -158,7 +158,7 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    }
 
    test("remove fragments from relative URLs") {
-     val bblAbsStr    = "https://bblfish.net/people/henry/card#me"
+     val bblAbsStr = "https://bblfish.net/people/henry/card#me"
      val bblAbsDocStr = "https://bblfish.net/people/henry/card"
 
      assertEquals(
@@ -166,7 +166,7 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
        ops.rURI(bblAbsDocStr)
      )
 
-     val bblStr    = "/people/henry/card#me"
+     val bblStr = "/people/henry/card#me"
      val bblDocStr = "/people/henry/card"
 
      assertEquals(
@@ -174,7 +174,7 @@ open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
        ops.rURI(bblDocStr)
      )
 
-     val bblShort    = "card#me"
+     val bblShort = "card#me"
      val bblShortDoc = "card"
      assertEquals(
        ops.rURI(bblShort).fragmentLess,

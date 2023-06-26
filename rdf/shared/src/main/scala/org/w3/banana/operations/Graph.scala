@@ -48,14 +48,14 @@ trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
 
    extension (graph: RDF.Graph[Rdf])
       @targetName("iso")
-      infix def ≅(other: RDF.Graph[Rdf]): Boolean              = isomorphism(graph, other)
-      infix def isomorphic(other: RDF.Graph[Rdf]): Boolean     = isomorphism(graph, other)
-      def diff(other: RDF.Graph[Rdf]): RDF.Graph[Rdf]          = difference(graph, other)
-      def size: Int                                            = graphSize(graph)
-      def triples: Iterable[RDF.Triple[Rdf]]                   = triplesIn(graph)
+      infix def ≅(other: RDF.Graph[Rdf]): Boolean = isomorphism(graph, other)
+      infix def isomorphic(other: RDF.Graph[Rdf]): Boolean = isomorphism(graph, other)
+      def diff(other: RDF.Graph[Rdf]): RDF.Graph[Rdf] = difference(graph, other)
+      def size: Int = graphSize(graph)
+      def triples: Iterable[RDF.Triple[Rdf]] = triplesIn(graph)
       infix def union(graphs: RDF.Graph[Rdf]*): RDF.Graph[Rdf] = gunion(graph +: graphs)
-      def +(triple: RDF.Triple[Rdf]): RDF.Graph[Rdf]           = gunion(Seq(graph, apply(triple)))
-      def contains(t: RDF.Triple[Rdf]): Boolean                = find(t.subj, t.rel, t.obj).nonEmpty
+      def +(triple: RDF.Triple[Rdf]): RDF.Graph[Rdf] = gunion(Seq(graph, apply(triple)))
+      def contains(t: RDF.Triple[Rdf]): Boolean = find(t.subj, t.rel, t.obj).nonEmpty
 
       // todo: optimize by using info about what has changed, eg. if nothing return same
       def relativizeAgainst(base: AbsoluteUrl): RDF.rGraph[Rdf] =

@@ -22,7 +22,7 @@ import java.net.URI as jURI
 import scala.util.{Failure, Try}
 
 object URI:
-   val xsdStr: String     = "http://www.w3.org/2001/XMLSchema#string"
+   val xsdStr: String = "http://www.w3.org/2001/XMLSchema#string"
    val xsdLangStr: String = "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString"
 
 trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
@@ -73,17 +73,17 @@ trait URI[Rdf <: RDF](using ops: Ops[Rdf]):
 
       def baseFor(rel: ll.RelativeUrl): RDF.URI[Rdf] =
         ll.Uri.parse(uri.value) match
-           case us: ll.UrlWithScheme => apply(rel.resolve(us, true).toString)
-           case _                    => uri
+         case us: ll.UrlWithScheme => apply(rel.resolve(us, true).toString)
+         case _                    => uri
 
       // def value: String <- we use rURI implementation everywhere
       /** return _1 the relativized url relativized _2 if a change was made true else false todo:
         * follow https://github.com/lemonlabsuk/scala-uri/issues/466
         */
       def relativizeAgainst(base: ll.AbsoluteUrl): (RDF.rURI[Rdf], Boolean) =
-         val juri1: jURI   = new jURI(uri.value)
-         val juri2: jURI   = juri1.normalize().nn
-         val baseJuri      = new jURI(base.normalize().toString)
+         val juri1: jURI = new jURI(uri.value)
+         val juri2: jURI = juri1.normalize().nn
+         val baseJuri = new jURI(base.normalize().toString)
          val relJuri: jURI = baseJuri.relativize(juri2).nn
          if (juri2 eq relJuri) && (juri1 eq juri2) then (uri.asInstanceOf[RDF.rURI[Rdf]], false)
          else (rURI(relJuri.toString), true)

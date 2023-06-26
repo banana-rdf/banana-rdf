@@ -55,10 +55,10 @@ abstract class SerialisationTestSuite[Rdf <: RDF, Sin, Sout](
 
    def graphBuilder(prefix: Prefix[Rdf]): Graph[Rdf] =
       val ntriplesDoc = prefix("ntriples/")
-      val creator     = URI("http://purl.org/dc/elements/1.1/creator")
-      val publisher   = URI("http://purl.org/dc/elements/1.1/publisher")
-      val dave        = Literal("Dave Beckett")
-      val art         = Literal("Art Barstow")
+      val creator = URI("http://purl.org/dc/elements/1.1/creator")
+      val publisher = URI("http://purl.org/dc/elements/1.1/publisher")
+      val dave = Literal("Dave Beckett")
+      val art = Literal("Art Barstow")
       Graph(
         Triple(ntriplesDoc, creator, dave),
         Triple(ntriplesDoc, creator, art),
@@ -69,13 +69,13 @@ abstract class SerialisationTestSuite[Rdf <: RDF, Sin, Sout](
    val rdfCore: Option[String] = Some("http://www.w3.org/2001/sw/RDFCore/")
    val rdfCoreUrl: Option[ll.AbsoluteUrl] =
      rdfCore.flatMap(u => ll.AbsoluteUrl.parseTry(u).toOption)
-   val rdfCorePrefix  = Prefix("rdf", rdfCore.get)
+   val rdfCorePrefix = Prefix("rdf", rdfCore.get)
    val referenceGraph = graphBuilder(rdfCorePrefix)
 
    // TODO: there is a bug in Sesame with hash uris as prefix
    // note: some parsers compact urls to ../../../ in which case the foo URL has
    // to be of the same depth as the new one written to. Hence foo/bar/baz
-   val foo       = "http://example.com/foo/bar/baz/"
+   val foo = "http://example.com/foo/bar/baz/"
    val fooPrefix = Prefix("foo", foo)
 
    s"simple $syntax string containing only absolute URIs" should {

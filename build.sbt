@@ -8,13 +8,13 @@ import Dependencies.*
 import JSEnv.{Chrome, Firefox, NodeJS}
 import org.typelevel.sbt.TypelevelPlugin.autoImport.tlFatalWarningsInCi
 
-name                               := "banana-rdf"
-ThisBuild / tlBaseVersion          := "0.9"
+name := "banana-rdf"
+ThisBuild / tlBaseVersion := "0.9"
 ThisBuild / tlUntaggedAreSnapshots := true
 
-ThisBuild / organization     := "net.bblfish.rdf"
+ThisBuild / organization := "net.bblfish.rdf"
 ThisBuild / organizationName := "Henry Story"
-ThisBuild / startYear        := Some(2012)
+ThisBuild / startYear := Some(2012)
 ThisBuild / developers := List(
   tlGitHubDev("bblfish", "Henry Story"),
   tlGitHubDev("betehess", "Alexandre Bertails")
@@ -23,7 +23,7 @@ enablePlugins(TypelevelCiReleasePlugin)
 enablePlugins(TypelevelSonatypePlugin)
 
 ThisBuild / tlCiReleaseBranches := Seq() // "scala3" if github were to do the releases
-ThisBuild / tlCiReleaseTags     := false // don't publish artifacts on github
+ThisBuild / tlCiReleaseTags := false // don't publish artifacts on github
 
 ThisBuild / crossScalaVersions := Seq(Ver.scala3) //, "2.13.8")
 
@@ -56,15 +56,15 @@ ThisBuild / scmInfo := Some(
 )
 def w3cLicence(yearStart: Int, yearEnd: Option[Int] = None) = Some(HeaderLicense.Custom(
   s""" Copyright (c) $yearStart ${yearEnd.map(", " + _).getOrElse("")} W3C Members
-     |
-     | See the NOTICE file(s) distributed with this work for additional
-     | information regarding copyright ownership.
-     |
-     | This program and the accompanying materials are made available under
-     | the W3C Software Notice and Document License (2015-05-13) which is available at
-     | https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document.
-     |
-     | SPDX-License-Identifier: W3C-20150513""".stripMargin
+    |
+    | See the NOTICE file(s) distributed with this work for additional
+    | information regarding copyright ownership.
+    |
+    | This program and the accompanying materials are made available under
+    | the W3C Software Notice and Document License (2015-05-13) which is available at
+    | https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document.
+    |
+    | SPDX-License-Identifier: W3C-20150513""".stripMargin
 ))
 
 ThisBuild / headerLicense := w3cLicence(2021)
@@ -81,15 +81,15 @@ ThisBuild / Test / jsEnv := {
   val old = (Test / jsEnv).value
 
   useJSEnv.value match {
-    case NodeJS => old
-    case Firefox =>
-      val options = new FirefoxOptions()
-      options.setHeadless(true)
-      new SeleniumJSEnv(options)
-    case Chrome =>
-      val options = new ChromeOptions()
-      options.setHeadless(true)
-      new SeleniumJSEnv(options)
+   case NodeJS => old
+   case Firefox =>
+     val options = new FirefoxOptions()
+     options.setHeadless(true)
+     new SeleniumJSEnv(options)
+   case Chrome =>
+     val options = new ChromeOptions()
+     options.setHeadless(true)
+     new SeleniumJSEnv(options)
   }
 }
 
@@ -105,12 +105,12 @@ lazy val root = tlCrossRootProject.aggregate(
 )
 
 lazy val commonSettings = Seq(
-  organization  := "net.bblfish.rdf",
-  description   := "RDF framework for Scala",
+  organization := "net.bblfish.rdf",
+  description := "RDF framework for Scala",
   headerLicense := w3cLicence(2012, Some(2021)),
-  startYear     := Some(2012),
-  scalaVersion  := Ver.scala3,
-  homepage      := Some(url("https://github.com/banana-rdf/banana-rdf")),
+  startYear := Some(2012),
+  scalaVersion := Ver.scala3,
+  homepage := Some(url("https://github.com/banana-rdf/banana-rdf")),
   updateOptions := updateOptions.value.withCachedResolution(
     true
   ) // to speed up dependency resolution
@@ -137,7 +137,7 @@ lazy val rdf_io_sync = crossProject(JVMPlatform, JSPlatform)
   .in(file("rdfIO-sync"))
   .settings(commonSettings*)
   .settings(
-    name        := "rdfIO-sync",
+    name := "rdfIO-sync",
     description := "interfaces of IO (serialisation and deserialisation) using blocking libraries"
   )
   .dependsOn(rdf)
@@ -153,7 +153,7 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
   .settings(commonSettings*)
   .settings(
     headerLicense := w3cLicence(2016),
-    description   := "Blocking NTriples Parser"
+    description := "Blocking NTriples Parser"
   )
   .in(file("ntriples"))
   .dependsOn(rdf_io_sync)
@@ -169,9 +169,9 @@ lazy val ntriples = crossProject(JVMPlatform, JSPlatform)
 lazy val jena: sbt.Project = project.in(file("jena"))
   .settings(commonSettings*)
   .settings(
-    name                               := "banana-jena",
-    description                        := "Jena implementation of banana-rdf",
-    scalacOptions                      := scala3jvmOptions,
+    name := "banana-jena",
+    description := "Jena implementation of banana-rdf",
+    scalacOptions := scala3jvmOptions,
     Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary,
     libraryDependencies ++= Seq(jenaLibs) // , slf4jNop, aalto )
   )
@@ -183,9 +183,9 @@ lazy val jena: sbt.Project = project.in(file("jena"))
 lazy val jenaIOSync = project.in(file("jenaIO-sync"))
   .settings(commonSettings*)
   .settings(
-    name                               := "banana-jena-IO-Sync",
-    description                        := "Blocking IO libraries for Jena",
-    scalacOptions                      := scala3jvmOptions,
+    name := "banana-jena-IO-Sync",
+    description := "Blocking IO libraries for Jena",
+    scalacOptions := scala3jvmOptions,
     Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.ScalaLibrary
   )
   .dependsOn(
@@ -231,13 +231,13 @@ lazy val rdflibJS = project.in(file("rdflibJS"))
   //	.enablePlugins(ScalablyTypedConverterPlugin)
   .settings(commonSettings*)
   .settings(
-    name        := "rdflibJS",
+    name := "rdflibJS",
     description := "rdflib.js implementation of banana-rdf",
-    useYarn     := true,
+    useYarn := true,
     scalacOptions ++= scala3jsOptions,
     // see: https://github.com/linkeddata/rdflib.js
     Compile / npmDependencies += "rdflib" -> "2.2.8",
-    Test / npmDependencies += "rdflib"    -> "2.2.8",
+    Test / npmDependencies += "rdflib" -> "2.2.8",
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
     libraryDependencies ++= Seq(
       fish.rdf_model_js.value,
@@ -261,7 +261,7 @@ lazy val rdfTestSuite = crossProject(JVMPlatform, JSPlatform)
   .in(file("rdf-test-suite"))
   .settings(commonSettings*)
   .settings(
-    name        := "banana-test",
+    name := "banana-test",
     description := "Generic tests to be run on each banana-rdf implementation",
     libraryDependencies ++= Seq(
       scalaUri.value,
@@ -289,8 +289,8 @@ lazy val scala3jvmOptions = Seq(
   "-release",
   "17",
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
-  "-explain",     // useful for type errors, but gives huge explanations
-  "-unchecked",   // Enable additional warnings where generated code depends on assumptions.
+  "-explain", // useful for type errors, but gives huge explanations
+  "-unchecked", // Enable additional warnings where generated code depends on assumptions.
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   // "-explain-types",                    // Explain type errors in more detail.
   "-indent", // Together with -rewrite, remove {...} syntax when possible due to significant indentation.

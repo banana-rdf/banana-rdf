@@ -18,7 +18,7 @@ import scala.annotation.targetName
 
 trait Literal[Rdf <: RDF](using ops: org.w3.banana.Ops[Rdf]):
    enum LiteralI(val text: String):
-      case Plain(override val text: String)                    extends LiteralI(text)
+      case Plain(override val text: String) extends LiteralI(text)
       case `@`(override val text: String, lang: RDF.Lang[Rdf]) extends LiteralI(text)
       case ^^(override val text: String, dataTp: RDF.URI[Rdf]) extends LiteralI(text)
 
@@ -30,7 +30,7 @@ trait Literal[Rdf <: RDF](using ops: org.w3.banana.Ops[Rdf]):
    @targetName("dataTypeLit")
    def apply(lex: String, dataTp: RDF.URI[Rdf]): RDF.Literal[Rdf]
 
-   lazy val langTp: RDF.URI[Rdf]   = ops.URI(org.w3.banana.operations.URI.xsdLangStr)
+   lazy val langTp: RDF.URI[Rdf] = ops.URI(org.w3.banana.operations.URI.xsdLangStr)
    lazy val stringTp: RDF.URI[Rdf] = ops.URI(org.w3.banana.operations.URI.xsdStr)
 
    extension (lit: RDF.Literal[Rdf])
@@ -45,11 +45,11 @@ trait Literal[Rdf <: RDF](using ops: org.w3.banana.Ops[Rdf]):
       ): A =
          import LiteralI.*
          unapply(lit).get match
-            case Plain(t)   => plainF(t)
-            case t `@` lang => langF(t, lang)
-            case t ^^ dt    => dtTypeF(t, dt)
+          case Plain(t)   => plainF(t)
+          case t `@` lang => langF(t, lang)
+          case t ^^ dt    => dtTypeF(t, dt)
       def lang: Option[RDF.Lang[Rdf]] = lit.fold(_ => None, (_, l) => Some(l), (_, _) => None)
-      def dataType: RDF.URI[Rdf]      = lit.fold(_ => stringTp, (_, _) => langTp, (_, tp) => tp)
+      def dataType: RDF.URI[Rdf] = lit.fold(_ => stringTp, (_, _) => langTp, (_, tp) => tp)
 
    extension (str: String)
       @targetName("dt")

@@ -58,19 +58,19 @@ abstract class RelativeGraphSerialisationTestSuite[Rdf <: RDF, Sin, Sout](
    import ops.{*, given}
    import RDF.*
 
-   val wac  = WebACL[Rdf]
+   val wac = WebACL[Rdf]
    val foaf = FOAF[Rdf]
-   val rdf  = RDFPrefix[Rdf]
-   val owl  = OWL[Rdf]
+   val rdf = RDFPrefix[Rdf]
+   val owl = OWL[Rdf]
 
    val w3c: URI[Rdf] = URI("https://www.w3.org/")
-   val timBlcardURI  = URI("https://www.w3.org/People/Berners-Lee/card")
+   val timBlcardURI = URI("https://www.w3.org/People/Berners-Lee/card")
 
    /** we use a realistic example from access control shown in the diagram given in
      * [[https://github.com/solid/authorization-panel/issues/210 issue 210]] of Solid Authorization
      * panel. `rootACL` is meant to be PUT to `</.acl>` of W3C Web server.
      */
-   val admin  = rURI("/.acl#Admin")
+   val admin = rURI("/.acl#Admin")
    val aclPub = rURI("/.acl#Public")
    val rootACL = rGraph(
      rTriple(admin, rdf.`type`, wac.Authorization),
@@ -99,8 +99,7 @@ abstract class RelativeGraphSerialisationTestSuite[Rdf <: RDF, Sin, Sout](
      Triple(timbl, foaf.workInfoHomepage, w3c)
    )
 
-   /** This is the ACL that is meant to be PUT on `</People/Berners-Lee/.acl>`
-     */
+   /** This is the ACL that is meant to be PUT on `</People/Berners-Lee/.acl>` */
    val BLAcl = rGraph(
      rTriple(rURI("#TimRl"), rdf.`type`, wac.Authorization),
      rTriple(rURI("#TimRl"), wac.agent, rURI("card#i")),

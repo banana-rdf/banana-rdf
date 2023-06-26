@@ -33,11 +33,11 @@ open class NTriplesReaderTests[Rdf <: RDF](using
    import RDF.Statement as St
 
    val foaf = prefix.FOAF[Rdf]
-   val rdf  = prefix.RDFPrefix[Rdf]
-   val xsd  = prefix.XSD[Rdf]
+   val rdf = prefix.RDFPrefix[Rdf]
+   val xsd = prefix.XSD[Rdf]
 
    val bblfish = "http://bblfish.net/people/henry/card#me"
-   val name    = "Henry Story"
+   val name = "Henry Story"
 
    val typ = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 
@@ -80,7 +80,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
      }
 
      "not parse a plain Literal that does not close" in {
-       val nt  = ntparser(name)
+       val nt = ntparser(name)
        val lit = Try(nt.parseLiteral())
        assertResult(false)(lit.isSuccess)
      }
@@ -101,7 +101,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
      "parse an TypedLiteral" in {
        val litstr = s"""123"^^<${xsd.integer.value}> """
-       val lit    = ntparser(litstr).parseLiteral()
+       val lit = ntparser(litstr).parseLiteral()
        lit `should` equal(Literal("123", xsd.integer))
      }
 
@@ -121,25 +121,25 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
      "not fail on a triple containing only URIs" in {
        val str = s"$bblfish> <$typ> <${foafstr("Person")}> ."
-       val p   = ntparser(str).parseTriple('<')
+       val p = ntparser(str).parseTriple('<')
        p `should` be(Success(Triple(URI(bblfish), rdf.`type`, foaf.Person)))
      }
 
      "not fail on a triple containing a Literal" in {
        val str = s"""$bblfish> <${foafstr("name")}> "$name"."""
-       val p   = ntparser(str).parseTriple('<')
+       val p = ntparser(str).parseTriple('<')
        p `should` be(Success(Triple(URI(bblfish), foaf.name, Literal(name))))
      }
 
      "not fail on a triple containing a Literal and a bnode" in {
        val str = s""":nolate <${foafstr("name")}> "$name"@en."""
-       val p   = ntparser(str).parseTriple('_')
+       val p = ntparser(str).parseTriple('_')
        p `should` be(Success(Triple(BNode("nolate"), foaf.name, Literal(name, Lang("en")))))
      }
 
      "not fail on a triple containing two bnodes" in {
        val str = s""":jane <${foafstr("knows")}> _:tarzan ."""
-       val p   = ntparser(str).parseTriple('_')
+       val p = ntparser(str).parseTriple('_')
        p `should` be(Success(Triple(BNode("jane"), foaf.knows, BNode("tarzan"))))
      }
    }
@@ -148,7 +148,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
      "not fail with one triple" in {
        val str = s"<$bblfish> <$typ> <${foafstr("Person")}> ."
-       val i   = ntparser(str)
+       val i = ntparser(str)
        i.hasNext `should` be(true)
        i.next() `should` be(Success(Triple(URI(bblfish), rdf.`type`, foaf.Person)))
        val end = i.next()
@@ -158,7 +158,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
      }
 
      "not fail when parsing a document with one triple" in {
-       val str      = s"""<$bblfish>     <${foafstr("name")}>      "$name"@de      ."""
+       val str = s"""<$bblfish>     <${foafstr("name")}>      "$name"@de      ."""
        val graphTry = toGraph(ntparser(str))
        assert(graphTry.get isomorphic Graph(Triple(
          URI(bblfish),
@@ -588,7 +588,7 @@ open class NTriplesReaderTests[Rdf <: RDF](using
 
      def fail(s: String, erros: Int, test: List[Try[Triple[Rdf]]] => Boolean = _ => true) =
         val parseIterator = ntparser(s, true)
-        val resultList    = parseIterator.toList
+        val resultList = parseIterator.toList
         assert(test(resultList))
         assert(resultList.filter {
           case Failure(ParseException(_, -1, _)) => false
@@ -759,8 +759,8 @@ open class NTriplesReaderTests[Rdf <: RDF](using
         ),
         true
       )
-      val t1       = System.currentTimeMillis()
-      var x        = 0
+      val t1 = System.currentTimeMillis()
+      var x = 0
       var failures = 0
       while ntp.hasNext do
          val t = ntp.next()

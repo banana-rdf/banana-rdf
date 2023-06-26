@@ -32,8 +32,8 @@ open class DieselRelativeGraphConstructTest[Rdf <: RDF](using ops: Ops[Rdf])
    val TodoLater = org.scalatest.Tag("TodoLater")
 
    val foaf = prefix.FOAF[Rdf]
-   val fr   = Lang("fr") // todo, put together a list of Lang constants
-   val en   = Lang("en")
+   val fr = Lang("fr") // todo, put together a list of Lang constants
+   val en = Lang("en")
 
    "Diesel must accept a GraphNode in the object position" in {
      val g: PointedRGraph[Rdf] =

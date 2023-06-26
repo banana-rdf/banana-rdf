@@ -31,7 +31,7 @@ trait Ops[Rdf <: RDF]:
    val `*`: RDF.NodeAny[Rdf]
 
    lazy val rdf: RDFPrefix[Rdf] = prefix.RDFPrefix[Rdf](using ops)
-   lazy val xsd: XSD[Rdf]       = prefix.XSD[Rdf](using ops)
+   lazy val xsd: XSD[Rdf] = prefix.XSD[Rdf](using ops)
 
    given Graph: operations.Graph[Rdf]
 

@@ -20,8 +20,8 @@ open class PrefixTest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    import TestConstants.*
    import org.w3.banana.operations.URI.*
    val foaf = FOAF[Rdf]
-   val xsd  = XSD[Rdf]
-   val rdf  = RDFPrefix[Rdf]
+   val xsd = XSD[Rdf]
+   val rdf = RDFPrefix[Rdf]
 
    test("FOAF Prefix") {
      assert(foaf.age == URI(foafPre("age")))

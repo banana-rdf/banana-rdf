@@ -41,7 +41,7 @@ open class PrefixBuilder[Rdf <: RDF](
    import ops.{*, given}
 
    override def toString: String = "Prefix(" + prefixName + ")"
-   lazy val prefixVal            = prefixIri.value
+   lazy val prefixVal = prefixIri.value
 
    def apply(value: String): RDF.URI[Rdf] = ops.URI(prefixIri.value + value)
 
@@ -53,8 +53,8 @@ open class PrefixBuilder[Rdf <: RDF](
          None
 
    def getLocalName(iri: URI[Rdf]): Try[String] = unapply(iri) match
-      case Some(localname) => Success(localname)
-      case _: None.type =>
-        Failure(Exception(this.toString + " couldn't extract localname for " + iri))
+    case Some(localname) => Success(localname)
+    case _: None.type =>
+      Failure(Exception(this.toString + " couldn't extract localname for " + iri))
 
 end PrefixBuilder

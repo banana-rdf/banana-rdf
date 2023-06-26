@@ -35,7 +35,7 @@ object PointedSubjRGraph:
    ): PointedSubjRGraph[R] =
      new PointedSubjRGraph[R]:
         override def pointer = subj
-        override def graph   = gr
+        override def graph = gr
 
 sealed trait PointedLitRGraph[R <: RDF] extends PointedRGraph[R]:
    type Pointer = Literal[R]
@@ -47,7 +47,7 @@ object PointedLitRGraph:
    ): PointedLitRGraph[R] =
      new PointedLitRGraph[R]:
         override def pointer = pointr
-        override def graph   = rgraph
+        override def graph = rgraph
 
    def apply[R <: RDF](lit: Literal[R])(using ops: Ops[R]): PointedLitRGraph[R] =
      PointedLitRGraph[R](lit, ops.rGraph.empty)
@@ -67,7 +67,7 @@ object PointedRGraph:
       import ops.bnodeTT as bn
       import ops.rUriTT as uri
       node match
-         case bn(bnode) => PointedSubjRGraph[R](bnode, graph)
-         case uri(u)    => PointedSubjRGraph[R](u, graph)
-         case lit(n)    => PointedLitRGraph[R](n, graph)
+       case bn(bnode) => PointedSubjRGraph[R](bnode, graph)
+       case uri(u)    => PointedSubjRGraph[R](u, graph)
+       case lit(n)    => PointedLitRGraph[R](n, graph)
 end PointedRGraph

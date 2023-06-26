@@ -23,7 +23,7 @@ import scala.scalajs.js
 import scala.scalajs.js.ThisFunction4
 import scala.scalajs.js.annotation.{JSImport, JSName}
 
-type Feature      = "sameAs" | "InverseFunctionalProperty" | "FunctionalProperty"
+type Feature = "sameAs" | "InverseFunctionalProperty" | "FunctionalProperty"
 type FeaturesType = js.UndefOr[js.Array[Feature]]
 
 object StoreReplacementMethods:
@@ -84,23 +84,23 @@ object StoreReplacementMethods:
          arg4: js.UndefOr[Quad.Graph]
      ) =>
        arg1 match
-          case qs: js.Array[Quad] =>
-            for q <- qs do thisArg.addStatement(q)
-            thisArg
-          case q: Quad =>
-            thisArg.addStatement(q)
-            thisArg
-          case subj: Quad.Subject if arg2.isDefined && arg3.isDefined =>
-            val q = thisArg.rdfFactory.quad(
-              subj,
-              arg2.get,
-              arg3.get,
-              arg4.getOrElse(thisArg.rdfFactory.defaultGraph())
-            )
-            thisArg.addStatement(q)
-          case _ => throw new IllegalArgumentException(
-              s"IndexedFormula.add($arg1,$arg2,$arg3,$arg4) has wrong arguments"
-            )
+        case qs: js.Array[Quad] =>
+          for q <- qs do thisArg.addStatement(q)
+          thisArg
+        case q: Quad =>
+          thisArg.addStatement(q)
+          thisArg
+        case subj: Quad.Subject if arg2.isDefined && arg3.isDefined =>
+          val q = thisArg.rdfFactory.quad(
+            subj,
+            arg2.get,
+            arg3.get,
+            arg4.getOrElse(thisArg.rdfFactory.defaultGraph())
+          )
+          thisArg.addStatement(q)
+        case _ => throw new IllegalArgumentException(
+            s"IndexedFormula.add($arg1,$arg2,$arg3,$arg4) has wrong arguments"
+          )
 
    // the rdflib code returns a Node which is a Term with extra methods, and also does something looking at redirects
    val canon: js.ThisFunction1[IndexedFormula, js.UndefOr[Term[?]], js.UndefOr[Term[?]]] =
@@ -320,8 +320,7 @@ object storeMod:
       //		def canon(): types.rdflib.nodeMod.default = js.native
       //		def canon(term: Term): types.rdflib.nodeMod.default = js.native
 
-      /** Checks this formula for consistency
-        */
+      /** Checks this formula for consistency */
       //		def check(): Unit = js.native
 
       /** Checks a list of statements for consistency
@@ -337,8 +336,7 @@ object storeMod:
       /** Map of iri predicates to functions to call when adding { s type X } */
       var classActions: StringDictionary[js.Array[js.Function]] = js.native
 
-      /** Closes this formula (and return it)
-        */
+      /** Closes this formula (and return it) */
       // underlying rdflib.js is a noop
 //		def close(): IndexedFormula = js.native
 
@@ -391,8 +389,7 @@ object storeMod:
       // an Array of Indexes exactly 4 long
       var index: js.Array[Index] = js.native
 
-      /** @param features
-        */
+      /** @param features */
       //		def initPropertyActions(features: FeaturesType): Unit = js.native
 
       /** Returns the number of statements contained in this IndexedFormula. (Getter proxy to
@@ -441,8 +438,7 @@ object storeMod:
         */
       //		def mentionsURI(uri: String): Boolean = js.native
 
-      /** Dictionary of namespace prefixes
-        */
+      /** Dictionary of namespace prefixes */
       //		var namespaces: StringDictionary[String] = js.native
 
       /** Existentials are BNodes - something exists without naming
@@ -630,8 +626,7 @@ object storeMod:
         */
       def removeStatements(sts: js.Array[Quad]): IndexedFormula = js.native
 
-      /** Replace big with small, obsoleted with obsoleting.
-        */
+      /** Replace big with small, obsoleted with obsoleting. */
       //		def replaceWith(big: QuadSubject, small: QuadSubject): Boolean = js.native
 
       /** Compare by canonical URI as smushed
@@ -650,8 +645,7 @@ object storeMod:
       //			types.rdflib.statementMod.default[SubjectType, PredicateType, ObjectType, GraphType]
       //		] = js.native
 
-      /** An UpdateManager initialised to this store
-        */
+      /** An UpdateManager initialised to this store */
       //		var updater: js.UndefOr[types.rdflib.updateManagerMod.default] = js.native
 
       /** A list of all the URIs by which this thing is known

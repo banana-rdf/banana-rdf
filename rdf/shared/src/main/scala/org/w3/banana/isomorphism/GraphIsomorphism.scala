@@ -57,7 +57,7 @@ final case class GraphIsomorphism[R <: RDF](
      *   a pair of Ground graph and non ground graph
      */
    def groundTripleFilter(graph: RDF.Graph[R]): (RDF.Graph[R], RDF.Graph[R]) =
-      var ground: List[RDF.Triple[R]]    = List()
+      var ground: List[RDF.Triple[R]] = List()
       var nonGround: List[RDF.Triple[R]] = List()
       for triple <- graph.triples do
          if triple.subj.isBNode || triple.obj.isBNode then
@@ -84,7 +84,7 @@ final case class GraphIsomorphism[R <: RDF](
              s"ground(g1).size=${grnd1.size} ground(g2).size=${grnd2.size}")
          )
 
-      val bnodeMaps  = mappingGen.bnodeMappings(nongrnd1, nongrnd2)
+      val bnodeMaps = mappingGen.bnodeMappings(nongrnd1, nongrnd2)
       val complexity = MappingGenerator.complexity(bnodeMaps)
       if complexity > maxComplexity then
          return Failure(MappingException(
@@ -118,8 +118,8 @@ final case class GraphIsomorphism[R <: RDF](
    /** @return the first answer or the failure that there is no mapping */
    def findAnswer(g1: Graph[R], g2: Graph[R]): Try[List[(BNode[R], BNode[R])]] =
      possibleAnswers(g1, g2).flatMap(_.headOption match
-        case Some(nodeList) => Success(nodeList)
-        case None           => Failure[Nothing](NoMappingException(LazyList()))
+      case Some(nodeList) => Success(nodeList)
+      case None           => Failure[Nothing](NoMappingException(LazyList()))
      )
 
    /** Verify that the bnode bijection allows one to map graph1 to graph2
@@ -145,7 +145,7 @@ final case class GraphIsomorphism[R <: RDF](
          boundary {
            // 1. verify that bnodeBijection is a bijection, fail early
            val bnodeBijection: mutable.HashMap[BNode[R], BNode[R]] =
-              val back      = new mutable.HashMap[BNode[R], BNode[R]]()
+              val back = new mutable.HashMap[BNode[R], BNode[R]]()
               val resultMap = new mutable.HashMap[BNode[R], BNode[R]]()
               for (from, to) <- mapping do
                  if back.put(to, from).fold[Boolean](true)(_ == from)
@@ -182,7 +182,7 @@ final case class GraphIsomorphism[R <: RDF](
        List[(BNode[R], BNode[R])],
        List[MappingException]
    )]) extends MappingError(""):
-      def msg: String                 = "No mapping found"
+      def msg: String = "No mapping found"
       override def toString(): String = s"NoMappingException($reasons)"
 
 end GraphIsomorphism

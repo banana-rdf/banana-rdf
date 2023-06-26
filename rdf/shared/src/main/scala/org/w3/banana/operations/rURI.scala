@@ -55,11 +55,11 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
    def resolveUri(uri: RDF.rURI[Rdf], base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] =
      ll.Uri.parseTry(uri.value).flatMap { llUri =>
        llUri match
-          case _: ll.Urn =>
-            Success((uri.asInstanceOf[RDF.URI[Rdf]], false)) // urns are always absolute
-          case _: ll.AbsoluteUrl   => Success((uri.asInstanceOf[RDF.URI[Rdf]], false))
-          case rel: ll.RelativeUrl => Success((ops.URI(rel.resolve(base, true).toString), true))
-          case nonResolvable       => Failure(URIException(s"cannot resolve $nonResolvable"))
+        case _: ll.Urn =>
+          Success((uri.asInstanceOf[RDF.URI[Rdf]], false)) // urns are always absolute
+        case _: ll.AbsoluteUrl   => Success((uri.asInstanceOf[RDF.URI[Rdf]], false))
+        case rel: ll.RelativeUrl => Success((ops.URI(rel.resolve(base, true).toString), true))
+        case nonResolvable       => Failure(URIException(s"cannot resolve $nonResolvable"))
      }
 
    extension (uri: RDF.rURI[Rdf])
@@ -83,8 +83,8 @@ trait rURI[Rdf <: RDF](using ops: Ops[Rdf]):
         */
       def resolveAgainst(base: ll.AbsoluteUrl): (RDF.URI[Rdf], Boolean) =
         resolveUri(uri, base) match
-           case Success(p) => p
-           case Failure(e) => (uri.asInstanceOf[RDF.URI[Rdf]], false)
+         case Success(p) => p
+         case Failure(e) => (uri.asInstanceOf[RDF.URI[Rdf]], false)
 
       /** Return the resolved URL, and whether the result is new * */
       def resolveAgainstUrl(base: ll.AbsoluteUrl): Try[(RDF.URI[Rdf], Boolean)] =

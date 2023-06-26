@@ -21,10 +21,10 @@ trait IsomorphismBNodeTrait[Rdf <: RDF](using ops: Ops[Rdf]):
    import RDF.Statement as St
 
    val foaf = prefix.FOAF[Rdf]
-   val rdf  = prefix.RDFPrefix[Rdf]
-   val xsd  = prefix.XSD[Rdf]
+   val rdf = prefix.RDFPrefix[Rdf]
+   val xsd = prefix.XSD[Rdf]
 
-   val hjs   = URI("http://bblfish.net/people/henry/card#me")
+   val hjs = URI("http://bblfish.net/people/henry/card#me")
    val timbl = URI("http://www.w3.org/People/Berners-Lee/card#i")
 
    def alex(i: Int): BNode[Rdf] = BNode("alex" + i)

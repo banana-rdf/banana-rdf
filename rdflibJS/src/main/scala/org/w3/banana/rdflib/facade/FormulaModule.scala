@@ -177,8 +177,7 @@ object formulaMod:
 //			g: js.UndefOr[QuadGraph | Null]
 //		): js.Any = js.native
 
-      /** Gets the first statement that matches the specified pattern
-        */
+      /** Gets the first statement that matches the specified pattern */
 //		def anyStatementMatching(
 //			s: js.UndefOr[QuadSubject | Null],
 //			p: js.UndefOr[QuadPredicate | Null],
@@ -393,8 +392,7 @@ object formulaMod:
 //
 //		def holds(s: js.Array[js.Any], p: Unit, o: Unit, g: js.Any): Boolean = js.native
 
-      /** Returns true if this formula holds the specified {statement}
-        */
+      /** Returns true if this formula holds the specified {statement} */
       def holdsStatement(statement: Quad): Boolean = js.native
 
       type Indexable = Long | String

@@ -61,7 +61,7 @@ trait VerticeCBuilder[Rdf <: RDF]:
   */
 class CountingVCBuilder[Rdf <: RDF]
     extends VerticeCBuilder[Rdf]:
-   private val forwardRels  = mutable.HashMap[URI[Rdf], Long]().withDefaultValue(0)
+   private val forwardRels = mutable.HashMap[URI[Rdf], Long]().withDefaultValue(0)
    private val backwardRels = mutable.HashMap[URI[Rdf], Long]().withDefaultValue(0)
 
    def setForwardRel(rel: URI[Rdf], obj: Node[Rdf]): Unit =
@@ -80,9 +80,9 @@ case class CountingVC(forwardRels: Int, backwardRels: Int) extends VerticeClassi
 case class SimpleHashVCBuilder[Rdf <: RDF]()(using ops: Ops[Rdf])
     extends VerticeCBuilder[Rdf]:
 
-   val forwardRels  = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
+   val forwardRels = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
    val backwardRels = mutable.Map[URI[Rdf], Long]().withDefaultValue(0)
-   val bnodeValue   = 2017 // prime number
+   val bnodeValue = 2017 // prime number
 
    import ops.{given, *}
 

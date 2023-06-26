@@ -33,7 +33,7 @@ object Dependencies {
     val utest = Def.setting("com.lihaoyi" %%% "utest" % "0.8.1")
     /* @see scalatest docs https://www.scalatest.org/install */
     val scalatest = Def.setting("org.scalatest" %%% "scalatest" % "3.2.14")
-    val scalatic  = "org.scalactic" %% "scalactic" % "3.2.14"
+    val scalatic = "org.scalactic" %% "scalactic" % "3.2.14"
   }
 
   /** RDF4J
@@ -44,16 +44,16 @@ object Dependencies {
     *   https://repo1.maven.org/maven2/org/eclipse/rdf4j/
     */
   object RDF4J {
-    val Version             = "4.3.2"
-    lazy val QueryAlgebra   = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation"  % Version
-    lazy val QueryParser    = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql"       % Version
-    lazy val QueryResult    = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % Version
-    lazy val RioTurtle      = "org.eclipse.rdf4j" % "rdf4j-rio-turtle"               % Version
-    lazy val RioRdfxml      = "org.eclipse.rdf4j" % "rdf4j-rio-rdfxml"               % Version
-    lazy val RioJsonLd      = "org.eclipse.rdf4j" % "rdf4j-rio-jsonld"               % Version
-    lazy val SailMemory     = "org.eclipse.rdf4j" % "rdf4j-sail-memory"              % Version
-    lazy val SailNativeRdf  = "org.eclipse.rdf4j" % "rdf4j-sail-nativerdf"           % Version
-    lazy val RepositorySail = "org.eclipse.rdf4j" % "rdf4j-repository-sail"          % Version
+    val Version = "4.3.2"
+    lazy val QueryAlgebra = "org.eclipse.rdf4j" % "rdf4j-queryalgebra-evaluation" % Version
+    lazy val QueryParser = "org.eclipse.rdf4j" % "rdf4j-queryparser-sparql" % Version
+    lazy val QueryResult = "org.eclipse.rdf4j" % "rdf4j-queryresultio-sparqljson" % Version
+    lazy val RioTurtle = "org.eclipse.rdf4j" % "rdf4j-rio-turtle" % Version
+    lazy val RioRdfxml = "org.eclipse.rdf4j" % "rdf4j-rio-rdfxml" % Version
+    lazy val RioJsonLd = "org.eclipse.rdf4j" % "rdf4j-rio-jsonld" % Version
+    lazy val SailMemory = "org.eclipse.rdf4j" % "rdf4j-sail-memory" % Version
+    lazy val SailNativeRdf = "org.eclipse.rdf4j" % "rdf4j-sail-nativerdf" % Version
+    lazy val RepositorySail = "org.eclipse.rdf4j" % "rdf4j-repository-sail" % Version
   }
 
   /** jsonld-java
