@@ -67,8 +67,6 @@ def w3cLicence(yearStart: Int, yearEnd: Option[Int] = None) = Some(HeaderLicense
     | SPDX-License-Identifier: W3C-20150513""".stripMargin
 ))
 
-ThisBuild / headerLicense := w3cLicence(2021)
-
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 ThisBuild / resolvers += Dependencies.sonatypeSNAPSHOT
 ThisBuild / resolvers += Resolver.mavenLocal
@@ -219,7 +217,7 @@ lazy val jenaIOSync = project.in(file("jenaIO-sync"))
 //  ).dependsOn(rdf.jvm, rdfTestSuite.jvm % "test->compile", ntriples.jvm)
 
 // todo: we need to update rdflib.js so that outdated dependencies don't kill build
-ThisBuild / tlFatalWarningsInCi := false
+ThisBuild / tlFatalWarnings := false
 
 lazy val rdflibJS = project.in(file("rdflibJS"))
   .enablePlugins(ScalaJSPlugin)
