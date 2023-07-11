@@ -27,6 +27,7 @@ import org.w3.banana.jena.JenaRdf.R
 
 import java.io.*
 import java.nio.charset.Charset
+import scala.annotation.nowarn
 import scala.util.*
 
 object JenaRDFReader:
@@ -49,6 +50,7 @@ object JenaRDFReader:
           graph.asInstanceOf[Graph[R]]
         }
 
+        @nowarn("msg=method source in class RDFParserBuilder is deprecated")
         def read(reader: Reader, base: AbsoluteUrl): Try[Graph[R]] = Try {
           // why is Jena deprecating Readers, which should be the correct level to parse character based documents?
           import scala.language.unsafeNulls
