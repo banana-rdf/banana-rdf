@@ -46,6 +46,7 @@ import org.apache.jena.sparql.util.Context
 import java.io.*
 import java.util
 import java.util.Map
+import scala.annotation.nowarn
 import scala.util.*
 
 /** Helpers to create Jena writers. */
@@ -172,6 +173,7 @@ object JenaRDFWriter:
        setBuilder: RDFWriterBuilder => Unit = _ => ()
    ): RDFWriter[R, Try, S] =
      new RDFWriter[R, Try, S]:
+        @nowarn("msg=method output in class RDFWriter is deprecated")
         def write(
             graph: RDF.Graph[R],
             wr: Writer,
@@ -194,6 +196,7 @@ object JenaRDFWriter:
 
    private[JenaRDFWriter] def makeRelRDFWriter[S](format: RDFFormat): RelRDFWriter[R, Try, S] =
      new RelRDFWriter[R, Try, S]:
+        @nowarn("msg=method output in class RDFWriter is deprecated")
         def rgWrite(
             graph: RDF.rGraph[R],
             wr: Writer,

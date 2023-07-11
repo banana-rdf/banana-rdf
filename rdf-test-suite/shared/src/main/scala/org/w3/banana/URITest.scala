@@ -15,7 +15,6 @@ package org.w3.banana
 
 import _root_.io.lemonlabs.uri.*
 import org.w3.banana.RDF.*
-import org.w3.banana.TestConstants.*
 
 open class URITest[Rdf <: RDF](using ops: Ops[Rdf]) extends munit.FunSuite:
    import ops.given

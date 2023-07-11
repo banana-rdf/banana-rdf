@@ -14,7 +14,6 @@
 package org.apache.jena.riot
 
 import org.apache.jena.riot.RDFParser.LangTagForm
-import org.apache.jena.riot.RDFParserBuilder
 import org.apache.jena.riot.system.{ErrorHandlerFactory, RiotLib}
 
 import java.io.InputStream
