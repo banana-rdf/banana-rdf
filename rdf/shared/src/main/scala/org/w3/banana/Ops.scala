@@ -13,45 +13,30 @@
 
 package org.w3.banana
 
-import org.w3.banana.RDF.Graph
 import org.w3.banana.RDF.Statement.Subject
 import org.w3.banana.operations.StoreFactory
+import org.w3.banana.prefix.{RDFPrefix, XSD}
 
-import scala.annotation.targetName
 import scala.reflect.TypeTest
-import scala.util.Try
 
 trait Ops[Rdf <: RDF]:
-   import scala.language.implicitConversions
+   ops =>
    import RDF.*
-   import RDF.Statement as St
-
-   // needed to help inferencing
-   // todo: this transformation should really be automatically handled by compiler. Report back.
-   implicit def lit2Node(lit: Literal[Rdf]): Node[Rdf] = lit.asInstanceOf[Node[Rdf]]
-   implicit def uri2Node(uri: URI[Rdf]): Node[Rdf]     = uri.asInstanceOf[Node[Rdf]]
-   implicit def bnode2Node(bn: BNode[Rdf]): Node[Rdf]  = bn.asInstanceOf[Node[Rdf]]
-   implicit def uri2rUri(uri: URI[Rdf]): rURI[Rdf]     = uri.asInstanceOf[rURI[Rdf]]
-   implicit def rUri2rNode(uri: rURI[Rdf]): rNode[Rdf] = uri.asInstanceOf[rNode[Rdf]]
-
-   // conversions for position types
-   implicit def obj2Node(obj: St.Object[Rdf]): Node[Rdf]  = obj.asInstanceOf[Node[Rdf]]
-   implicit def sub2Node(obj: St.Subject[Rdf]): Node[Rdf] = obj.asInstanceOf[Node[Rdf]]
-   // note:  if we use the conversion below, then all the code needs to import scala.language.implicitConversions
-   //	given Conversion[St.Object[Rdf],RDF.Node[Rdf]] with
-   //		def apply(obj: St.Object[Rdf]): RDF.Node[Rdf] =  obj.asInstanceOf[Node[Rdf]]
 
    // interpretation types to help consistent pattern matching across implementations
    val `*`: RDF.NodeAny[Rdf]
+
+   lazy val rdf: RDFPrefix[Rdf] = prefix.RDFPrefix[Rdf](using ops)
+   lazy val xsd: XSD[Rdf] = prefix.XSD[Rdf](using ops)
 
    given Graph: operations.Graph[Rdf]
 
    given basicStoreFactory: StoreFactory[Rdf]
    given Store: operations.Store[Rdf]
 
-   val rGraph: operations.rGraph[Rdf]
+   given rGraph: operations.rGraph[Rdf]
 
-   val Subject: operations.Subject[Rdf]
+   given Subject: operations.Subject[Rdf]
 
 //	given tripleTT: TypeTest[Matchable, Triple[Rdf]]
    val Quad: operations.Quad[Rdf]
@@ -66,9 +51,10 @@ trait Ops[Rdf <: RDF]:
 
    given Triple: operations.Triple[Rdf]
 
-   val rTriple: operations.rTriple[Rdf]
+   given rTriple: operations.rTriple[Rdf]
 
    given Node: operations.Node[Rdf]
+   given rNode: operations.rNode[Rdf]
 
    // todo? should a BNode be part of a Graph (or DataSet) as per Benjamin Braatz's thesis?
    given BNode: operations.BNode[Rdf]
@@ -76,11 +62,20 @@ trait Ops[Rdf <: RDF]:
 
    val Literal: operations.Literal[Rdf]
    export Literal.LiteralI.*
+
    given operations.Literal[Rdf] = Literal
 
    given literalTT: TypeTest[Matchable, RDF.Literal[Rdf]]
 
-   val rURI: operations.rURI[Rdf]
+   given rUriTT: TypeTest[Matchable, RDF.rURI[Rdf]]
+   // we could type test for full uri, but that would require parsing
+
+   given subjToURITT: TypeTest[RDF.Statement.Subject[Rdf], RDF.URI[Rdf]]
+   given rSubjToURITT: TypeTest[RDF.rStatement.Subject[Rdf], RDF.rURI[Rdf]]
+   given objToURITT: TypeTest[RDF.Statement.Object[Rdf], RDF.URI[Rdf]]
+   given rObjToURITT: TypeTest[RDF.rStatement.Object[Rdf], RDF.rURI[Rdf]]
+
+   given rURI: operations.rURI[Rdf]
 
    given URI: operations.URI[Rdf]
 

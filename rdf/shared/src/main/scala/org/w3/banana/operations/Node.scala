@@ -16,7 +16,9 @@ package org.w3.banana.operations
 import org.w3.banana.RDF
 
 trait Node[Rdf <: RDF]:
+
    extension (node: RDF.Node[Rdf])
+      // todo: could we do with just the rNode fold?
       def fold[A](
           uriF: RDF.URI[Rdf] => A,
           bnF: RDF.BNode[Rdf] => A,
@@ -34,7 +36,4 @@ trait Node[Rdf <: RDF]:
       def isBNode: Boolean
       def isLiteral: Boolean
 
-   extension (node: RDF.Statement.Object[Rdf])
-     // todo: find a way to remove this asInstanceOf
-     def asNode: RDF.Node[Rdf] = node.asInstanceOf[RDF.Node[Rdf]]
 end Node

@@ -11,19 +11,9 @@
  *  SPDX-License-Identifier: W3C-20150513
  */
 
-package org.w3.banana.io
+package org.w3.banana.diesel
 
-/* Some well-known syntaxes so that we can refer to them in banana-rdf. */
+class ObjectList[T](val ts: Iterable[T]) extends AnyVal {}
 
-trait N3
-trait Turtle
-trait NTriples
-trait RDFXML
-trait RDFaXHTML
-trait SparqlAnswerJson
-trait SparqlAnswerXml
-
-trait JsonLd
-trait JsonLdCompacted extends JsonLd
-trait JsonLdExpanded  extends JsonLd
-trait JsonLdFlattened extends JsonLd
+object ObjectList:
+   def apply[T](ts: Iterable[T]): ObjectList[T] = new ObjectList[T](ts)

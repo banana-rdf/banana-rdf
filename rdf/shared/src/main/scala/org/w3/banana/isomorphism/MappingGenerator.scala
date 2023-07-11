@@ -44,12 +44,11 @@ trait MappingGenerator[Rdf <: RDF]:
    ): Try[immutable.ListMap[BNode[Rdf], immutable.Set[BNode[Rdf]]]]
 
 object MappingGenerator:
-   /** calculate the size of the tree of possibilities from the given mapping
-     */
+   /** calculate the size of the tree of possibilities from the given mapping */
    def complexity[T](maps: Try[Map[T, Set[T]]]) =
      maps match
-        case Failure(_) => 0
-        case Success(m) => m.values.foldLeft(1)((n, v) => n * v.size)
+      case Failure(_) => 0
+      case Success(m) => m.values.foldLeft(1)((n, v) => n * v.size)
 
    /** a function to take a list of layers, and turn it into a lazy stream of branches */
    // todo this used to return a scalaz EphemeralStream.
@@ -58,7 +57,7 @@ object MappingGenerator:
        case (streamOfBranches, layer) =>
          for
             mapping <- LazyList(layer*)
-            branch  <- streamOfBranches
+            branch <- streamOfBranches
          yield mapping :: branch
      }
 

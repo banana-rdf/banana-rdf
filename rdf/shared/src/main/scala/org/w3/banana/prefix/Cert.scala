@@ -11,19 +11,20 @@
  *  SPDX-License-Identifier: W3C-20150513
  */
 
-package org.w3.banana
+package org.w3.banana.prefix
+import org.w3.banana.{Ops, PrefixBuilder, RDF}
 
 object Cert:
    def apply[T <: RDF](using Ops[T]) = new Cert()
 
-class Cert[T <: RDF](using Ops[T])
+class Cert[T <: RDF](using ops: Ops[T])
     extends PrefixBuilder[T](
       "cert",
-      "http://www.w3.org/ns/auth/cert#"
+      ops.URI("http://www.w3.org/ns/auth/cert#")
     ):
-   val key          = apply("key")
-   val RSAKey       = apply("RSAKey")
+   val key = apply("key")
+   val RSAKey = apply("RSAKey")
    val RSAPublicKey = apply("RSAPublicKey")
-   val exponent     = apply("exponent")
-   val modulus      = apply("modulus")
+   val exponent = apply("exponent")
+   val modulus = apply("modulus")
 end Cert

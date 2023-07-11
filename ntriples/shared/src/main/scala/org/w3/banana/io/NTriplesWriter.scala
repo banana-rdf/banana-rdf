@@ -26,10 +26,10 @@ import scala.util.Try
   * @tparam Rdf
   *   class with Rdf types
   */
-class NTriplesWriter[Rdf <: RDF](using val ops: Ops[Rdf])
-    extends AbsoluteRDFWriter[Rdf, Try, NTriples]:
+class NTriplesIterWriter[Rdf <: RDF](using val ops: Ops[Rdf])
+    extends AbsoluteRDFIterWriter[Rdf, Try, NTriples]:
 
-   import ops.{given, *}
+   import ops.given
 
    protected def tripleAsString(t: Triple[Rdf]): String =
      node2Str(t.subj) + " " + node2Str(t.rel) + " " + node2Str(t.obj) + " ."
@@ -39,10 +39,10 @@ class NTriplesWriter[Rdf <: RDF](using val ops: Ops[Rdf])
      *   Rdf node
      * @return
      */
-   def node2Str(node: Node[Rdf]): String = node.fold(
-     url => "<" + url.value + ">",
-     bn => "_:" + bn.label,
-     lit =>
+   def node2Str(node: RDF.Node[Rdf]): String = node.fold(
+     (url: RDF.URI[Rdf]) => "<" + url.value + ">",
+     (bn: RDF.BNode[Rdf]) => "_:" + bn.label,
+     (lit: RDF.Literal[Rdf]) =>
        lit.fold(
          txt => "\"" + txt + "\"",
          (txt, lang) => "\"" + txt + "\"" + "@" + lang.label,

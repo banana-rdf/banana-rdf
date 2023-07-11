@@ -18,4 +18,4 @@ import org.w3.banana.RDF.Statement as St
 
 trait Subject[Rdf <: RDF]:
    extension (subj: St.Subject[Rdf])
-     def fold[A](uriFnct: RDF.URI[Rdf] => A, bnFcnt: RDF.BNode[Rdf] => A): A
+     def foldSubj[A](uriFnct: RDF.URI[Rdf] => A, bnFcnt: RDF.BNode[Rdf] => A): A

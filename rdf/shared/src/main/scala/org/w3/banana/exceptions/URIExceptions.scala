@@ -11,14 +11,8 @@
  *  SPDX-License-Identifier: W3C-20150513
  */
 
-package org.w3.banana.jena.io
+package org.w3.banana.exceptions
 
-import org.w3.banana.jena.JenaRdf.R
-import org.w3.banana.io.{AbsoluteRDFReader, NTriples}
+trait BananaException
 
-import scala.util.Try
-
-//todo: move this to the library
-given gg: AbsoluteRDFReader[R, Try, NTriples] = org.w3.banana.io.NTriplesReader[R]
-
-class JenaNTripleReaderTests extends org.w3.banana.io.NTriplesReaderTests[R]
+class URIException(message: String) extends Exception(message) with BananaException

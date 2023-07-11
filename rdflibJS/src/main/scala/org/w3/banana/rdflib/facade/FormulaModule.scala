@@ -20,10 +20,20 @@ import run.cosy.rdfjs.model.{BlankNode, DataFactory, Quad, Term}
 import scala.scalajs.js
 import scala.scalajs.js.annotation.*
 
+object formulaReplacementMethods:
+   import formulaMod.Formula
+   val id: js.ThisFunction1[Formula, Term[?], String] = (
+       thisArg: Formula,
+       t: Term[?]
+   ) =>
+     thisArg.rdfFactory.id(t)
+
 object formulaMod:
 
    def apply(quads: js.Array[Quad], opts: FormulaOpts): Formula =
-     new default(quads, js.Array(), js.Array(), js.Array(), opts)
+      val form = new default(quads, js.Array(), js.Array(), js.Array(), opts)
+      form.asInstanceOf[js.Dynamic].updateDynamic("id")(formulaReplacementMethods.id)
+      form
 
    /** Initializes this formula
      *
@@ -166,8 +176,7 @@ object formulaMod:
 //			g: js.UndefOr[QuadGraph | Null]
 //		): js.Any = js.native
 
-      /** Gets the first statement that matches the specified pattern
-        */
+      /** Gets the first statement that matches the specified pattern */
 //		def anyStatementMatching(
 //			s: js.UndefOr[QuadSubject | Null],
 //			p: js.UndefOr[QuadPredicate | Null],
@@ -382,8 +391,7 @@ object formulaMod:
 //
 //		def holds(s: js.Array[js.Any], p: Unit, o: Unit, g: js.Any): Boolean = js.native
 
-      /** Returns true if this formula holds the specified {statement}
-        */
+      /** Returns true if this formula holds the specified {statement} */
       def holdsStatement(statement: Quad): Boolean = js.native
 
       type Indexable = Long | String

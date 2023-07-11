@@ -14,8 +14,10 @@
 package org.w3.banana
 package io
 
+import org.w3.banana.RDF.*
+import _root_.io.lemonlabs.uri.AbsoluteUrl
+
 import java.io.*
-import RDF.*
 
 /** Reader for Syntaxes that contain no relative URLs.
   * @tparam Rdf
@@ -24,20 +26,25 @@ import RDF.*
   */
 trait AbsoluteRDFReader[Rdf <: RDF, M[_], +S]:
    /** todo: look into returning an Iterator rather than an M[Graph]. Iterators would be better for
-     * memory useage, and in any case leave it open to use this to produce a Graph. Parses an rdf
+     * memory usage, and in any case leave it open to use this to produce a Graph. Parses an rdf
      * Graph from an java.io.InputStream returning the value in context M (Try, Future, ...)
      *
      * Note: Many libraries prefer to have an intput stream that allows the parser to switch
      * encoding and syntax for when the mime type was wrong. But that indicates that those should be
      * called before this.
      */
-   // def read(is: InputStream): M[Graph[Rdf]]
+   def read(is: InputStream): M[Graph[Rdf]] =
+     read(new InputStreamReader(is))
 
    /** Parses an RDF Graph from a java.io.Reader and a base URI.
      * @param base
-     *   the base URI to use, to resolve relative URLs
+     *   the base URL to use, to resolve relative URLs
      */
    def read(reader: Reader): M[Graph[Rdf]]
+
+end AbsoluteRDFReader
+
+//todo: add Reader that outputs a Stream[Triple] and Stream[Quad]
 
 /** RDF readers for syntaxes that can contain relative URLs
   *
@@ -49,13 +56,15 @@ trait RDFReader[Rdf <: RDF, M[_], +S]:
      * @param base
      *   URI in context M (Try, Future, ...)
      */
-   def read(is: InputStream, base: String): M[Graph[Rdf]]
+   def read(is: InputStream, base: AbsoluteUrl): M[Graph[Rdf]]
 
    /** Parses an RDF Graph from a java.io.Reader and a base URI.
      * @param base
      *   the base URI to use, to resolve relative URLs
      */
-   def read(reader: Reader, base: String): M[Graph[Rdf]]
+   def read(reader: Reader, base: AbsoluteUrl): M[Graph[Rdf]]
+
+end RDFReader
 
 /** traits to be implemented by Syntaxes S that can contain relative URLs, for Rdf implementations
   * that can return relative graphs.
@@ -69,7 +78,9 @@ trait RDFReader[Rdf <: RDF, M[_], +S]:
   */
 trait RelRDFReader[Rdf <: RDF, M[_], +S]:
 
-   /** Tries parsing an RDF Graph from an java.io.InputStream
+   /** Tries parsing an RDF Graph from an java.io.InputStream, but does not resolve relative URLs,
+     * result thus in an rGraph, ie. a graph which could contain relative URLs and so cannot be
+     * merged with others.
      */
    def read(is: InputStream): M[rGraph[Rdf]]
 
@@ -78,3 +89,5 @@ trait RelRDFReader[Rdf <: RDF, M[_], +S]:
      *   the base URI to use, to resolve relative URLs found in the InputStream
      */
    def read(reader: Reader): M[rGraph[Rdf]]
+
+end RelRDFReader

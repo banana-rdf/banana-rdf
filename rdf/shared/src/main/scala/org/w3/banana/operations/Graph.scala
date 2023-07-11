@@ -13,12 +13,18 @@
 
 package org.w3.banana.operations
 
+import io.lemonlabs.uri.AbsoluteUrl
 import org.w3.banana.RDF
 import org.w3.banana.RDF.{NodeAny, Triple, Statement as St}
 import org.w3.banana.Ops
 
 import scala.annotation.targetName
 
+// todo: we may want a slightly richer notion of graph, namely one that
+//     can keep track of namespaces and optional base.
+//    - Jena keeps track of those
+//    - Rdf4j ?
+//    - other ?
 trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
    import ops.given
 
@@ -39,16 +45,22 @@ trait Graph[Rdf <: RDF](using ops: Ops[Rdf]):
        p: St.Relation[Rdf] | RDF.NodeAny[Rdf],
        o: St.Object[Rdf] | RDF.NodeAny[Rdf]
    ): Iterator[RDF.Triple[Rdf]]
+
    extension (graph: RDF.Graph[Rdf])
       @targetName("iso")
-      def ≅(other: RDF.Graph[Rdf]): Boolean                    = isomorphism(graph, other)
-      infix def isomorphic(other: RDF.Graph[Rdf]): Boolean     = isomorphism(graph, other)
-      def diff(other: RDF.Graph[Rdf]): RDF.Graph[Rdf]          = difference(graph, other)
-      def size: Int                                            = graphSize(graph)
-      def triples: Iterable[RDF.Triple[Rdf]]                   = triplesIn(graph)
+      infix def ≅(other: RDF.Graph[Rdf]): Boolean = isomorphism(graph, other)
+      infix def isomorphic(other: RDF.Graph[Rdf]): Boolean = isomorphism(graph, other)
+      def diff(other: RDF.Graph[Rdf]): RDF.Graph[Rdf] = difference(graph, other)
+      def size: Int = graphSize(graph)
+      def triples: Iterable[RDF.Triple[Rdf]] = triplesIn(graph)
       infix def union(graphs: RDF.Graph[Rdf]*): RDF.Graph[Rdf] = gunion(graph +: graphs)
-      def +(triple: RDF.Triple[Rdf]): RDF.Graph[Rdf]           = gunion(Seq(graph, apply(triple)))
-      def contains(t: RDF.Triple[Rdf]): Boolean                = find(t.subj, t.rel, t.obj).nonEmpty
+      def +(triple: RDF.Triple[Rdf]): RDF.Graph[Rdf] = gunion(Seq(graph, apply(triple)))
+      def contains(t: RDF.Triple[Rdf]): Boolean = find(t.subj, t.rel, t.obj).nonEmpty
+
+      // todo: optimize by using info about what has changed, eg. if nothing return same
+      def relativizeAgainst(base: AbsoluteUrl): RDF.rGraph[Rdf] =
+        ops.rGraph(triples.map((t: RDF.Triple[Rdf]) => t.relativizeAgainst(base)._1))
+
       def find(
           subj: St.Subject[Rdf] | RDF.NodeAny[Rdf],
           rel: St.Relation[Rdf] | RDF.NodeAny[Rdf],
